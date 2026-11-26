@@ -1,1158 +1,1176 @@
 {
- "charter": "# Charter \u2014 T2 Decision ladder (retrospective, 2026-11-21)\n\n- **Project:** T2 \"Decision ladder\", track v2, ADM phase G, plateau capability, tranche 2, issue #73. The build is the delivery commit `39363ba8cfb532d415c9ad06b45e86421c5c86b6` (2026-11-17 15:36:58 +0000), subject \"#73 T2 \u2014 Decision ladder (#286)\"; issue #73 is CLOSED (GitHub updatedAt 2026-11-17T15:37:01Z). This charter is written by the 2026-11-21 retrospective rework under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; it does not attest contemporaneous intent, because no charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored at the 2026-11-17 close.\n- **Mandate:** give the conveyor one decision ladder \u2014 an L0 rule, an L1 laya choice and an L3 human decision recorded through one `decision` row shape, with the policy, refinement and laya-config versions each read pinned; a tenant refinement that changes a threshold without a code change; authored options and questions as rows; and the generation split in which an L2 output is a draft artefact that reaches a card only through a human `draft.apply` gate. The mandate is not fully discharged: the batch admitted six findings, and v1-t2-1 blocks the fourth gate clause.\n- **Scope:** `docs/SPEC_V2.md` \u00a77.1\u2013\u00a77.5, \u00a710.3\u2013\u00a710.4 and the T2 row of \u00a712; `migrations/0046_decision_ladder.sql` \u2014 the rung, answer, option-set and version-pin columns on `decision`, the three CHECK constraints, the `decision_approval_fk`, `decision_kind_idx` and `decision_rung_idx`, the one-refinement index and the one-policy-per-case index \u2014 over the five decision tables T0 shipped as contracts in `migrations/0040_organisation.sql:216\u2013360`; the `ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list` and `laya_configs.create|list` actions; `DRAFT_APPLY_GATE` and `human_approved_gate_tx`; and the real-Postgres suites `crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), cadence materialisation and PI planning (T10), the S15 judge's own laya call in `crates/actions/src/process/judge.rs`, and the ADR board's existing `decisions.*` family, which keeps its name.\n- **Expected outputs:** `project-brief`, `evidence`. The project's configured closure output is `closure-review`; this pass does not close T2, so no closure or closure review is authored.\n- **Deliverables:** the `decision` write shape and its three rungs; the policy, refinement and laya-config rows with their unique indexes; `ladder.evaluate`'s threshold comparison and `pins_incomplete` refusal; `ladder.record`'s person-only human rung and approved-approval check; `ladder.apply_draft` as the only gated draft application; the `documents.update` refusal of the generated class; the compile-time `compile_fail` doctest in `conveyor_domain::ladder`; and the `decision.changed` event on every mutation.\n- **Acceptance:** the \u00a712 T2 gate \u2014 \"a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card.\" The first three clauses are proved by `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`; the fourth is proved only on the update path by `::a_generated_draft_cannot_transition_a_card` and `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, and is not true of `documents.compose` (v1-t2-1). The rework's acceptance instrument is `acceptance/programme/T2.toml`.\n- **Tranche and governance:** tranche 2 (`01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`) is `planned`: it has no authorisation review, no `authorised_at` and no baseline reference, and its entry criterion is still \"the tranche 1 review decides continue\"; its exit criteria name S03 and T2. T2 closed on 2026-11-17, before that authorisation; the live register records the out-of-sequence closure as the accepted P0 issue `U3-EXC-T2` (`01a1fbac-aeb9-7dea-a079-bf159140344a`). The Architecture Board (`conveyor-architecture-board`) approves the A\u2013D artefacts and the delivery contract; the requester `conveyor-e2e` and the approver `conveyor-approver` are distinct identities. The contemporaneous records are the git commit, issue #73 (CLOSED) and the T0 decision-ladder schema; everything in this set is retrospective.",
- "soaw": {
-  "title": "Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)",
-  "body": {
-   "assignment": "Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project's one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project's expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.",
-   "scope": "the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge's laya call, and the ADR board's `decisions.*` family.",
-   "responsibilities": {
-    "approver": "conveyor-approver",
-    "architecture board": "conveyor-architecture-board",
-    "programme architect": "conveyor-e2e"
-   },
-   "acceptance_criteria": "The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework's acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.",
-   "retrospective": true
-  }
- },
- "artifacts": [
-  {
-   "title": "Stakeholder Map \u2014 T2 Decision ladder (Phase A)",
-   "links": [
-    {
-     "to": "Driver/Goal/Objective Catalog \u2014 T2 Decision ladder (Phase A)",
-     "kind": "derivation"
+  "charter": "# Charter — T2 Decision ladder (retrospective, 2026-11-21)\n\n- **Project:** T2 \"Decision ladder\", track v2, ADM phase G, plateau capability, tranche 2, issue #73. The build is the delivery commit `39363ba8cfb532d415c9ad06b45e86421c5c86b6` (2026-11-17 15:36:58 +0000), subject \"#73 T2 — Decision ladder (#286)\"; issue #73 is CLOSED (GitHub updatedAt 2026-11-17T15:37:01Z). This charter is written by the 2026-11-21 retrospective rework under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; it does not attest contemporaneous intent, because no charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored at the 2026-11-17 close.\n- **Mandate:** give the conveyor one decision ladder — an L0 rule, an L1 laya choice and an L3 human decision recorded through one `decision` row shape, with the policy, refinement and laya-config versions each read pinned; a tenant refinement that changes a threshold without a code change; authored options and questions as rows; and the generation split in which an L2 output is a draft artefact that reaches a card only through a human `draft.apply` gate. The mandate is not fully discharged: the batch admitted six findings, and v1-t2-1 blocks the fourth gate clause.\n- **Scope:** `docs/SPEC_V2.md` §7.1–§7.5, §10.3–§10.4 and the T2 row of §12; `migrations/0046_decision_ladder.sql` — the rung, answer, option-set and version-pin columns on `decision`, the three CHECK constraints, the `decision_approval_fk`, `decision_kind_idx` and `decision_rung_idx`, the one-refinement index and the one-policy-per-case index — over the five decision tables T0 shipped as contracts in `migrations/0040_organisation.sql:216–360`; the `ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list` and `laya_configs.create|list` actions; `DRAFT_APPLY_GATE` and `human_approved_gate_tx`; and the real-Postgres suites `crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), cadence materialisation and PI planning (T10), the S15 judge's own laya call in `crates/actions/src/process/judge.rs`, and the ADR board's existing `decisions.*` family, which keeps its name.\n- **Expected outputs:** `project-brief`, `evidence`. The project's configured closure output is `closure-review`; this pass does not close T2, so no closure or closure review is authored.\n- **Deliverables:** the `decision` write shape and its three rungs; the policy, refinement and laya-config rows with their unique indexes; `ladder.evaluate`'s threshold comparison and `pins_incomplete` refusal; `ladder.record`'s person-only human rung and approved-approval check; `ladder.apply_draft` as the only gated draft application; the `documents.update` refusal of the generated class; the compile-time `compile_fail` doctest in `conveyor_domain::ladder`; and the `decision.changed` event on every mutation.\n- **Acceptance:** the §12 T2 gate — \"a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card.\" The first three clauses are proved by `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`; the fourth is proved only on the update path by `::a_generated_draft_cannot_transition_a_card` and `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, and is not true of `documents.compose` (v1-t2-1). The rework's acceptance instrument is `acceptance/programme/T2.toml`.\n- **Tranche and governance:** tranche 2 (`01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`) is `planned`: it has no authorisation review, no `authorised_at` and no baseline reference, and its entry criterion is still \"the tranche 1 review decides continue\"; its exit criteria name S03 and T2. T2 closed on 2026-11-17, before that authorisation; the live register records the out-of-sequence closure as the accepted P0 issue `U3-EXC-T2` (`01a1fbac-aeb9-7dea-a079-bf159140344a`). The Architecture Board (`conveyor-architecture-board`) approves the A–D artefacts and the delivery contract; the requester `conveyor-e2e` and the approver `conveyor-approver` are distinct identities. The contemporaneous records are the git commit, issue #73 (CLOSED) and the T0 decision-ladder schema; everything in this set is retrospective.",
+  "soaw": {
+    "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)",
+    "body": {
+      "assignment": "Rework the V2 slice T2 (SPEC_V2 §7 and §12, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A–D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project's one WBS deliverable, take the Phase-G compliance review against the §12 gate, and publish the project's expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.",
+      "scope": "the decision ladder and generation split of SPEC_V2 §7: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge's laya call, and the ADR board's `decisions.*` family.",
+      "responsibilities": {
+        "approver": "conveyor-approver",
+        "architecture board": "conveyor-architecture-board",
+        "programme architect": "conveyor-e2e"
+      },
+      "acceptance_criteria": "The SPEC_V2 §12 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework's acceptance instrument is `acceptance/programme/T2.toml`. The A–D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.",
+      "retrospective": true
     }
-   ],
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "matrix",
-   "purpose": "Who is affected by the decision ladder, what each needs from it, and how the rework engages them.",
-   "scope": "the ladder, its tenant configuration and the generation split delivered by issue #73, and the tranche-2 governance around it.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "Sponsoring group",
-     "axis_b": "tranche-2 authorisation, the tranche exit and the benefit decision",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "decide"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "SRO",
-     "axis_b": "accountable for the coherent capability and the tranche-2 exit criteria",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "accountable"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Architecture Board",
-     "axis_b": "conformance of the seven A\u2013D artefacts, the charter and the delivery contract",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "approve"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Tenant policy owner (admin)",
-     "axis_b": "publishes `decision_policy_refinement` and `laya_inference_config` rows; needs the publish action to be a gated policy change",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "consult"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "PM job (T3)",
-     "axis_b": "consumes ladder decisions for gate routing and must not decide its own gate",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "consult"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Delivery jobs (T4, T5, T7, T13, T16)",
-     "axis_b": "consume L1 triage, routing, severity and gate pre-check answers",
-     "value": {
-      "influence": "medium",
-      "interest": "high",
-      "engagement": "consult"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "Laya operator (DGX jev bridge)",
-     "axis_b": "serves `POST /v1/systemone` for L1; T2 records the config but never calls it (v1-t2-2)",
-     "value": {
-      "influence": "medium",
-      "interest": "medium",
-      "engagement": "inform"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "Security and audit",
-     "axis_b": "`actor_kind`/`actor_id`, `input_hash`, `approval_id` and the append-only `decision.changed` event",
-     "value": {
-      "influence": "high",
-      "interest": "medium",
-      "engagement": "consult"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "Operators and tenants",
-     "axis_b": "tenant-scoped policies, refinements and the decision audit read",
-     "value": {
-      "influence": "low",
-      "interest": "high",
-      "engagement": "inform"
-     },
-     "position": 9
-    }
-   ],
-   "body": "## Metadata\n\nType: stakeholder matrix. Title: Stakeholder Map \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2 (Decision ladder).\n\n## Entries\n\nThe matrix carries nine stakeholder rows. The sponsoring group and SRO decide and are accountable for the tranche; the Architecture Board approves; the tenant policy owner, the PM job and the delivery jobs consume the ladder or configure it; the laya operator hosts the inference endpoint; security and audit read the decision row; operators and tenants receive the tenant-scoped behaviour.\n\n## Links\n\nDerives from SPEC_V2 \u00a77.1\u2013\u00a77.5 and the T2 row of \u00a712, and from issue #73. It realizes the stakeholder positions in the project brief and the plan; it reuses the estate's `approval`/`approval_decision` roles and the T1 tranche rows.\n\n## Document\n\nThis is Phase A artefact `stakeholder_map` under the T2 delivery contract and the T2 row of `docs/SPEC_V2.md` \u00a712; it is approved by the Architecture Board with the rest of the A\u2013D set."
   },
-  {
-   "title": "Driver/Goal/Objective Catalog \u2014 T2 Decision ladder (Phase A)",
-   "links": [
+  "artifacts": [
     {
-     "to": "Requirements Catalog \u2014 T2 Decision ladder (Phase A)",
-     "kind": "derivation"
+      "title": "Stakeholder Map — T2 Decision ladder (Phase A)",
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — T2 Decision ladder (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Who is affected by the decision ladder, what each needs from it, and how the rework engages them.",
+      "scope": "the ladder, its tenant configuration and the generation split delivered by issue #73, and the tranche-2 governance around it.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "tranche-2 authorisation, the tranche exit and the benefit decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the coherent capability and the tranche-2 exit criteria",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "conformance of the seven A–D artefacts, the charter and the delivery contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Tenant policy owner (admin)",
+          "axis_b": "publishes `decision_policy_refinement` and `laya_inference_config` rows; needs the publish action to be a gated policy change",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "PM job (T3)",
+          "axis_b": "consumes ladder decisions for gate routing and must not decide its own gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Delivery jobs (T4, T5, T7, T13, T16)",
+          "axis_b": "consume L1 triage, routing, severity and gate pre-check answers",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Laya operator (DGX jev bridge)",
+          "axis_b": "serves `POST /v1/systemone` for L1; T2 records the config but never calls it (v1-t2-2)",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "inform"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Security and audit",
+          "axis_b": "`actor_kind`/`actor_id`, `input_hash`, `approval_id` and the append-only `decision.changed` event",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Operators and tenants",
+          "axis_b": "tenant-scoped policies, refinements and the decision audit read",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 9
+        }
+      ],
+      "body": "## Metadata\n\nType: stakeholder matrix. Title: Stakeholder Map — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2 (Decision ladder).\n\n## Entries\n\nThe matrix carries nine stakeholder rows. The sponsoring group and SRO decide and are accountable for the tranche; the Architecture Board approves; the tenant policy owner, the PM job and the delivery jobs consume the ladder or configure it; the laya operator hosts the inference endpoint; security and audit read the decision row; operators and tenants receive the tenant-scoped behaviour.\n\n## Links\n\nDerives from SPEC_V2 §7.1–§7.5 and the T2 row of §12, and from issue #73. It realizes the stakeholder positions in the project brief and the plan; it reuses the estate's `approval`/`approval_decision` roles and the T1 tranche rows.\n\n## Document\n\nThis is Phase A artefact `stakeholder_map` under the T2 delivery contract and the T2 row of `docs/SPEC_V2.md` §12; it is approved by the Architecture Board with the rest of the A–D set."
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — T2 Decision ladder (Phase A)",
+      "links": [
+        {
+          "to": "Requirements Catalog — T2 Decision ladder (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The drivers behind the decision ladder, the goals it serves, and the objective each mechanism installs or fails to install.",
+      "scope": "one audit shape, version pins, tenant refinement, the human gate, the draft gate, authored options and questions, the laya call and the budget refusal.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 Three decision rungs read as three different records",
+          "axis_b": "G1 One audit shape across L0, L1 and L3",
+          "value": {
+            "objective": "`decision` carries rung, answer, option-set version, policy/refinement/laya-config pins, actor, outcome and approval link for every rung; `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape` asserts the three rows have identical column sets."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 A threshold change needs a build and a deploy",
+          "axis_b": "G2 A tenant refinement changes a threshold as configuration",
+          "value": {
+            "objective": "`decision_policy_refinement` overrides the threshold, rule and fail action for one policy; `decision_policy_refinement_one_per_policy` keeps one live row and bumps its version. `decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change` moves 0.7 from refused to accepted at 0.5."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 A decision cannot be reproduced after the policy moves",
+          "axis_b": "G3 Every decision pins the versions it read",
+          "value": {
+            "objective": "the decision row records `policy_version`, `refinement_version` and `laya_config_version`; an L1 decision with no config to pin is refused `422 pins_incomplete`; `decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions` leaves the first row at version 1 after the policy moves to version 2."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 A generated draft can move a card",
+          "axis_b": "G4 L2 has no transition path; applying a draft is a human gate",
+          "value": {
+            "objective": "`ladder.apply_draft` requires an accepted human `draft.apply` decision backed by an approved `draft.apply` approval on the same card; `documents.update` refuses the generated class with `409 draft_requires_gate`. `decision_ladder.rs::a_generated_draft_cannot_transition_a_card` and `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft` prove the update and apply paths."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 The create path can still attach a generated draft",
+          "axis_b": "G5 Close the `documents.compose` hole",
+          "value": {
+            "objective": "OPEN — v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and writes an attached document with no gate, so the fourth gate clause is not universally true and T2 stays active."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 A human decision can cite any approved approval",
+          "axis_b": "G6 A human decision cites the gate that posed its question",
+          "value": {
+            "objective": "OPEN — v1-t2-6: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` field is not compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`. `ladder_human_gate.rs::a_human_decision_without_an_approved_human_gate_is_refused` checks approval status and human decider, not gate identity."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "D7 Options and questions are free text in a prompt",
+          "axis_b": "G7 Options and questions are authored, versioned rows",
+          "value": {
+            "objective": "PARTIAL — v1-t2-4: `ladder.evaluate` accepts inline `options: [{key, label, payload}]` and a free `question` string, and `decision_policy` carries kind/gate/threshold/fail_policy/action, not an authored question with `fire_when` and `min_confidence`."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "D8 L1 is recorded but never asks laya",
+          "axis_b": "G8 The L1 answer comes from the laya client",
+          "value": {
+            "objective": "OPEN — v1-t2-2: `ladder.evaluate` records the caller's `answer`, `confidence`, `probabilities` and `latency_ms`; `laya_configs` pins model_ref/params/timeout_ms but no T2 path calls `POST /v1/systemone`."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "D9 The generation budget has no §7.5 refusal",
+          "axis_b": "G9 Refuse over budget before the next call",
+          "value": {
+            "objective": "OPEN — v1-t2-5: SPEC_V2 §7.5 records `429 budget_exceeded`; T2 enforces no inference budget, and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` (`crates/actions/src/invoke.rs`, `crates/actions/src/broker.rs`, #526)."
+          },
+          "position": 9
+        }
+      ],
+      "body": "## Metadata\n\nType: driver/goal/objective catalog. Title: Driver/Goal/Objective Catalog — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nNine driver rows: one audit shape, refinement without a build, version pins, the draft gate, the `documents.compose` hole, gate identity on a human decision, authored options and questions, the laya call, and the budget refusal. Each names its objective and, where the objective is not fully met, the admitted finding that keeps it open.\n\n## Links\n\nDerives from SPEC_V2 §7.1–§7.5 and §12 T2; realizes the acceptance clauses in the project brief; reuses the T0 schema contracts and the estate's approval primitive.\n\n## Document\n\nThis is Phase A artefact `driver_goal_objective` under the T2 delivery contract; it is the goals view the Phase-B capability map and the Phase-G review read."
+    },
+    {
+      "title": "Requirements Catalog — T2 Decision ladder (Phase A)",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — T2 Decision ladder (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The requirements the T2 gate and its contracts must satisfy, each with an executable check and its current status.",
+      "scope": "the four §12 clauses, the issue-#73 scenarios P1.1–P4.2, and the contract requirements the six admitted findings concern.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1 P1.1",
+          "axis_b": "A rule, a laya and a human decision share one audit shape",
+          "value": {
+            "priority": "must",
+            "acceptance": "`decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape` lists three rows with identical column sets and distinct rungs rule, laya and human; every row names `policy_id`, `policy_version`, `answer`, `confidence`, `actor_kind` and `latency_ms`."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 P2.1",
+          "axis_b": "A tenant refinement changes a threshold with no code change",
+          "value": {
+            "priority": "must",
+            "acceptance": "`decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change` publishes a 0.5 override on a 0.8 policy and the same 0.7 answer moves from `refused` to `accepted`, pinning refinement version 1 and policy version 1."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 P3.1",
+          "axis_b": "Every decision pins the policy, refinement and laya-config versions it read",
+          "value": {
+            "priority": "must",
+            "acceptance": "`decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions`: an L1 decision with no laya config is `422 pins_incomplete`; with one, the row pins policy 1, refinement 1 and laya config 1; after the policy moves to 2, the stored first row still reads 1."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 P4.1/P4.2",
+          "axis_b": "A generated draft cannot transition a card on the apply or update path",
+          "value": {
+            "priority": "must",
+            "acceptance": "`decision_ladder.rs::a_generated_draft_cannot_transition_a_card` refuses a refused L1 decision and an accepted L1 decision with 422 `draft_requires_gate`; the human `draft.apply` decision backed by an approved gate on the card applies the draft; `documents.update` attaching the generated class is 409 `draft_requires_gate`; `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft` bars a routine accepted decision."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 P4.1 (create path)",
+          "axis_b": "A generated draft cannot be attached by `documents.compose`",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and creates an attached document with no `draft.apply` check. This is the P0 finding that blocks the fourth clause and the project's closure."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 P1.1 (human)",
+          "axis_b": "A human decision is a person's act on a resolved human approval",
+          "value": {
+            "priority": "must",
+            "acceptance": "`ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision` returns `403 person_required`; `::a_human_decision_without_an_approved_human_gate_is_refused` refuses a missing, pending or agent-decided approval; `::a_pending_approval_cannot_gate_a_draft` refuses a pending gate."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7 P1.1 (gate identity)",
+          "axis_b": "A human decision cites the approval of its own gate",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-6: `ladder.record` passes `None` for the gate to `human_approved_gate_tx`, so any approved approval with a human approve decision on the same card qualifies. The check must compare `approval.gate` with the decision's gate."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8 §7.2 (options)",
+          "axis_b": "Options are authored, versioned rows",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-4: `ladder.evaluate` accepts an inline `options` array and records it with `option_set_version`; there is no authored option-set row the tenant versions independently of the request."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9 §7.2 (questions)",
+          "axis_b": "Questions are rows with fire_when, min_confidence and fail_policy",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-4: `decision_policy` carries kind, gate, threshold, fail_policy, action and meta; the question is an optional free string on the request, defaulted to the kind, and `fire_when`/`min_confidence` have no columns."
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10 §7.2 (gated refinement)",
+          "axis_b": "Publishing a refinement is a gated policy change",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-3: `refinements.publish` has `confirm = \"none\"`, writes the override and bumps the version with no approval; `decision_policies.update` is likewise ungated."
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "R11 §7.2 (laya)",
+          "axis_b": "L1 asks the laya client and records its answer",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-2: no T2 path calls `POST /v1/systemone`; the answer and confidence are supplied by the caller, and `laya_configs` only pins model_ref, params and timeout."
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "R12 §7.5 (budget)",
+          "axis_b": "An over-budget run is refused before the next call",
+          "value": {
+            "priority": "must",
+            "acceptance": "OPEN — v1-t2-5: no inference budget is declared or enforced in T2; the tree's only budget refusal is `429 tool_budget_exceeded`, not the §7.5 spelling `429 budget_exceeded`."
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "R13",
+          "axis_b": "Tenant isolation on every ladder table",
+          "value": {
+            "priority": "must",
+            "acceptance": "the five decision tables are tenant-scoped with FORCE RLS as shipped by T0 in `migrations/0040_organisation.sql`; `migrations/0046_decision_ladder.sql` only adds columns, constraints and indexes, and both new indexes lead with `tenant_id`; the one-refinement and one-policy indexes are tenant-scoped."
+          },
+          "position": 13
+        }
+      ],
+      "body": "## Metadata\n\nType: requirements catalog. Title: Requirements Catalog — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nThirteen requirements. R1–R4 and R13 are satisfied by named tests or schema; R5–R12 are the contract requirements the batch's six findings keep open. Each row names its priority, the executable check or the missing mechanism, and its status.\n\n## Links\n\nDerives from the §12 T2 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2; realizes the acceptance section of the project brief; reuses the T0 decision-table contracts and the approval primitive.\n\n## Document\n\nThis is Phase A artefact `requirements_catalog` under the T2 delivery contract; the Phase-G review records the compliance level against it."
+    },
+    {
+      "title": "Solution Concept Diagram — T2 Decision ladder (Phase A)",
+      "links": [
+        {
+          "to": "Business Capability Map — T2 Decision ladder (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "The rows, actions and edges that carry the ladder, including the create-path hole and the ungated refinement.",
+      "scope": "migrations/0046_decision_ladder.sql, the ladder action families, the approval gate and the document draft paths.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "decision",
+          "axis_b": "the one ladder row",
+          "value": {
+            "kind": "component",
+            "note": "rung rule|laya|human; answer; option_set_version; policy_version; refinement_version; laya_config_version; actor_kind/actor_id; approval_id; input_hash; outcome; latency_ms"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "decision_policy",
+          "axis_b": "the case definition",
+          "value": {
+            "kind": "component",
+            "note": "kind, optional gate, threshold, fail_policy, action; unique on (tenant, kind, coalesce(gate, '')); no question, fire_when or min_confidence column (v1-t2-4)"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "decision_policy_refinement",
+          "axis_b": "the tenant's per-case override",
+          "value": {
+            "kind": "component",
+            "note": "threshold_override, rule_override, fail_action, laya_config_id, version; one live row per policy by `decision_policy_refinement_one_per_policy`"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "decision_option",
+          "axis_b": "the authored option set",
+          "value": {
+            "kind": "component",
+            "note": "T0 shipped the table; T2 writes options from the `ladder.evaluate` request body and stamps an option_set_version, not from a tenant-authored option-set row"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "laya_inference_config",
+          "axis_b": "the tenant's laya pin",
+          "value": {
+            "kind": "component",
+            "note": "model_ref (default jev-latest), params, timeout_ms; pinned by every L1 decision; no client uses it in T2 (v1-t2-2)"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "ladder.record",
+          "axis_b": "the L0 and L3 write",
+          "value": {
+            "kind": "component",
+            "note": "rule or human; a human record needs `actor_kind = user` and an approved approval with a human approve decision; gate identity is not checked (v1-t2-6)"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "ladder.evaluate",
+          "axis_b": "the L1 write",
+          "value": {
+            "kind": "component",
+            "note": "resolves the effective policy, compares caller-supplied confidence to the threshold, records the outcome and the three pins; below threshold escalates or refuses per policy"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "ladder.apply_draft",
+          "axis_b": "the only gated draft application",
+          "value": {
+            "kind": "component",
+            "note": "requires an accepted human `draft.apply` decision on the card and an approved `draft.apply` approval with a human approve decision; attaches the document"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "refinements.publish",
+          "axis_b": "the tenant configuration write",
+          "value": {
+            "kind": "component",
+            "note": "writes the override and bumps the version with `confirm = \"none\"` and no approval (v1-t2-3)"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "documents.compose",
+          "axis_b": "the draft creation path",
+          "value": {
+            "kind": "component",
+            "note": "accepts `card_id` and `meta.generated = true` and creates an attached document with no gate (v1-t2-1, P0)"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "documents.update",
+          "axis_b": "the edit path",
+          "value": {
+            "kind": "component",
+            "note": "refuses attaching the generated class with `409 draft_requires_gate`; this is the path the test proves, not the compose create path"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "approval / approval_decision",
+          "axis_b": "the L3 gate",
+          "value": {
+            "kind": "component",
+            "note": "the human decision cites a resolved approval; `approvals.decide` keeps the requester/executor exclusion from T1"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "inference_call",
+          "axis_b": "the L2 generation ledger",
+          "value": {
+            "kind": "component",
+            "note": "not a rung; a generation call is an `inference_call` bound to a draft artefact; applying it is `ladder.apply_draft`"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "decision.changed",
+          "axis_b": "the outbox event",
+          "value": {
+            "kind": "component",
+            "note": "one append-only event per ladder mutation, topic `<entity>:<id>`, payload `{entity, id, op}`"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "ladder.evaluate",
+          "axis_b": "decision_policy / refinement / laya_config",
+          "value": {
+            "kind": "edge",
+            "note": "the effective policy, its live refinement and its laya config are read and their versions pinned into the decision row"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "ladder.record (human)",
+          "axis_b": "approval",
+          "value": {
+            "kind": "edge",
+            "note": "the decision cites an approved approval; the gate comparison is absent today (v1-t2-6)"
+          },
+          "position": 16
+        },
+        {
+          "axis_a": "ladder.apply_draft",
+          "axis_b": "decision / approval / document",
+          "value": {
+            "kind": "edge",
+            "note": "the `draft.apply` decision, its approved gate and the document are all required; the card is updated only after all three agree"
+          },
+          "position": 17
+        },
+        {
+          "axis_a": "documents.compose",
+          "axis_b": "card",
+          "value": {
+            "kind": "edge",
+            "note": "the ungated attach edge that v1-t2-1 must close"
+          },
+          "position": 18
+        },
+        {
+          "axis_a": "inference_call",
+          "axis_b": "draft document",
+          "value": {
+            "kind": "edge",
+            "note": "the generation result is a draft artefact; it has no edge to a transition except through `ladder.apply_draft`"
+          },
+          "position": 19
+        }
+      ],
+      "body": "## Metadata\n\nType: solution concept diagram. Title: Solution Concept Diagram — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nThe diagram carries fourteen components and five edges. The ladder row, the policy, the refinement, the option table and the laya config are the data; `ladder.record`, `ladder.evaluate`, `ladder.apply_draft`, `refinements.publish`, `documents.compose` and `documents.update` are the write paths; approval, `inference_call` and `decision.changed` are the surrounding primitives. The two open edges are drawn explicitly: `documents.compose` to card (v1-t2-1) and a human record to an approval without gate identity (v1-t2-6).\n\n## Links\n\nDerives from SPEC_V2 §7.1–§7.5 and the T2 row of §12; realizes the requirements catalog; reuses the T0 decision tables, the approval primitive, the document store and the outbox.\n\n## Document\n\nThis is Phase A artefact `solution_concept` under the T2 delivery contract; the Phase-C data catalog expands each row and the Phase-D standards catalog fixes each rule."
+    },
+    {
+      "title": "Business Capability Map — T2 Decision ladder (Phase B)",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T2 Decision ladder (Phase C)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "The capabilities T2 installs and how far each is live at the 2026-11-21 rework.",
+      "scope": "the one audit shape, the version pins, tenant refinement, the human gate, the draft gate, laya evaluation, authored options, budget enforcement and tenant isolation.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "One decision audit shape",
+          "axis_b": "L0, L1 and L3 recorded through one row and one projected view",
+          "value": {
+            "maturity": "live",
+            "evidence": "migration 0046 columns and CHECKs; `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Version-pinned decisions",
+          "axis_b": "a decision is reproducible after the policy or refinement moves",
+          "value": {
+            "maturity": "live",
+            "evidence": "policy/refinement/laya-config pins; `422 pins_incomplete`; `decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions`"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Tenant refinement without a build",
+          "axis_b": "a threshold override changes behaviour at once",
+          "value": {
+            "maturity": "live",
+            "evidence": "`refinements.publish`; one-refinement index; `decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change`"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Gated policy change",
+          "axis_b": "a refinement is approved before it takes effect",
+          "value": {
+            "maturity": "not built",
+            "evidence": "v1-t2-3: `refinements.publish` is `confirm = \"none\"` with no approval"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "L1 laya evaluation",
+          "axis_b": "the ladder asks laya and records its answer",
+          "value": {
+            "maturity": "partial",
+            "evidence": "v1-t2-2: the row, threshold comparison and config pins are live; no client calls `POST /v1/systemone`"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "L3 human gate",
+          "axis_b": "a person decides, on an approved approval",
+          "value": {
+            "maturity": "partial",
+            "evidence": "`ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`; gate identity is missing (v1-t2-6)"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Draft gate",
+          "axis_b": "a generated draft reaches a card only through a human `draft.apply` decision",
+          "value": {
+            "maturity": "partial",
+            "evidence": "`ladder.apply_draft` and the `documents.update` refusal are live; `documents.compose` attaches without a gate (v1-t2-1, P0)"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Generation split",
+          "axis_b": "L2 is an `inference_call` plus a draft, never a rung",
+          "value": {
+            "maturity": "partial",
+            "evidence": "the `decision_rung_check` admits only rule|laya|human and the `compile_fail` doctest in `conveyor_domain::ladder` forbids a transition; the call path is T13"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Authored options and questions",
+          "axis_b": "options and questions are tenant-versioned rows",
+          "value": {
+            "maturity": "not built",
+            "evidence": "v1-t2-4: inline `options` and a free `question` string; `decision_policy` has no question, `fire_when` or `min_confidence`"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Budget enforcement",
+          "axis_b": "an over-budget run is refused before the next call",
+          "value": {
+            "maturity": "not built",
+            "evidence": "v1-t2-5: no inference budget; the only refusal is `429 tool_budget_exceeded`"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Tenant isolation and audit event",
+          "axis_b": "every ladder row is tenant-scoped and every mutation emits an event",
+          "value": {
+            "maturity": "live",
+            "evidence": "T0's tenant tables with FORCE RLS; tenant-leading indexes in 0046; `decision.changed` on every mutation"
+          },
+          "position": 11
+        }
+      ],
+      "body": "## Metadata\n\nType: business capability map. Title: Business Capability Map — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase B, plateau HLD, related project T2.\n\n## Entries\n\nEleven capabilities. Five are live (the one audit shape, version pins, tenant refinement, tenant isolation and the audit event); three are partial (L1 laya, the human gate and the draft gate); three are not built (gated policy change, authored options and questions, budget enforcement). The maturity labels are the honest state at the 2026-11-21 snapshot, not the intent.\n\n## Links\n\nDerives from the Phase-A requirements and solution concept; realizes the §12 gate's four clauses to the extent the tests prove them; reuses the T0 schema and the estate's approval, document and outbox primitives.\n\n## Document\n\nThis is Phase B artefact `business_capability_map` under the T2 delivery contract; the Phase-G review records the level against it and the four blocking findings v1-t2-1 to v1-t2-4."
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — T2 Decision ladder (Phase C)",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — T2 Decision ladder (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The entities T2 adds or extends, each with its owner and its one invariant.",
+      "scope": "the five T0 decision tables as written by T2, the 0046 columns and indexes, the approval and inference ledgers, and the draft document.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "decision",
+          "axis_b": "the one ladder row",
+          "value": {
+            "owner": "decision ladder",
+            "table": "decision",
+            "note": "0046 adds rung, answer, option_set_version, policy_version, refinement_version, laya_config_version, actor_kind, actor_id, approval_id; rung CHECK rule|laya|human; actor CHECK system|user|agent|service; approval FK; the three version CHECKs require a positive version when pinned"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "decision_option",
+          "axis_b": "the option written with a decision",
+          "value": {
+            "owner": "decision ladder",
+            "table": "decision_option",
+            "note": "T0 table; T2 inserts the request's inline option array and stamps `option_set_version` (default 1 when options are present); there is no tenant-authored option-set row (v1-t2-4)"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "decision_policy",
+          "axis_b": "the case definition",
+          "value": {
+            "owner": "decision ladder",
+            "table": "decision_policy",
+            "note": "kind, optional gate, threshold, fail_policy, action, meta; unique `decision_policy_case` on (tenant_id, kind, coalesce(gate, '')); a second create is 409 `policy_exists`"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "decision_policy_refinement",
+          "axis_b": "the tenant's live override",
+          "value": {
+            "owner": "decision ladder",
+            "table": "decision_policy_refinement",
+            "note": "threshold_override, rule_override, fail_action, laya_config_id, version; unique `decision_policy_refinement_one_per_policy` on (tenant_id, policy_id); publish bumps the version"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "laya_inference_config",
+          "axis_b": "the tenant's laya pin",
+          "value": {
+            "owner": "decision ladder",
+            "table": "laya_inference_config",
+            "note": "model_ref, params, timeout_ms; created through `laya_configs.create` with a 30000 ms default; every L1 decision pins its version when one applies"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "approval / approval_decision",
+          "axis_b": "the L3 gate",
+          "value": {
+            "owner": "control",
+            "table": "approval, approval_decision",
+            "note": "the human decision cites an approved approval with at least one human approve decision; `decision_approval_fk` keeps the citation honest; the requester/executor exclusion is T1's"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "inference_call",
+          "axis_b": "the L2 ledger row",
+          "value": {
+            "owner": "generation",
+            "table": "inference_call",
+            "note": "the generation call's prompt identity and usage; never a rung and never a transition input; the result is bound to a draft document"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "document (draft artefact)",
+          "axis_b": "the generated draft",
+          "value": {
+            "owner": "documents",
+            "table": "document",
+            "note": "`documents.compose` creates the draft with `meta.generated` and an optional `card_id`; `documents.update` refuses the generated class; `ladder.apply_draft` is the gated attach"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "outbox event",
+          "axis_b": "the audit trace",
+          "value": {
+            "owner": "event store",
+            "table": "event",
+            "note": "`decision.changed` with topic `<entity>:<id>` and payload `{entity, id, op}` is appended in the caller's transaction for every ladder mutation"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "decision indexes",
+          "axis_b": "the two ladder reads",
+          "value": {
+            "owner": "decision ladder",
+            "index": "decision_kind_idx, decision_rung_idx",
+            "note": "both lead with `tenant_id` and order by `created_at DESC`; the audit reads by case kind and by rung"
+          },
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType: data entity/data component catalog. Title: Data Entity/Data Component Catalog — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase C, plateau HLD, related project T2.\n\n## Entries\n\nTen data components: the five decision tables (`decision`, `decision_option`, `decision_policy`, `decision_policy_refinement`, `laya_inference_config`), the approval and inference ledgers they cite, the draft document, the outbox event and the two tenant-leading indexes. Each row names the owner, the table or index and the one invariant the schema enforces.\n\n## Links\n\nDerives from migration 0046 and the T0 decision tables in 0040_organisation.sql:216–360; realizes the solution concept's components; reuses the approval, document and outbox stores.\n\n## Document\n\nThis is Phase C artefact `data_entity_catalog` under the T2 delivery contract; the Phase-D standards catalog fixes the DB, RLS and error conventions it depends on."
+    },
+    {
+      "title": "Technology Standards Catalog — T2 Decision ladder (Phase D)",
+      "links": [
+        {
+          "to": "Stakeholder Map — T2 Decision ladder (Phase A)",
+          "kind": "dependency"
+        }
+      ],
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The standards T2's rows and actions fix for every later slice, including the standards it fails to meet.",
+      "scope": "Postgres and RLS, the migration set, the action registry, HTTP and errors, concurrency, the laya contract, the generation split and verification.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "tenant policy owners",
+          "the PM job",
+          "the delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "PostgreSQL",
+          "axis_b": "18 with FORCE RLS",
+          "value": {
+            "usage": "the five decision tables are tenant-scoped with ENABLE and FORCE ROW LEVEL SECURITY from `migrations/0040_organisation.sql`; 0046 only alters `decision` and adds tenant-leading indexes"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Rust workspace",
+          "axis_b": "edition 2024; forbid(unsafe_code)",
+          "value": {
+            "usage": "`crates/actions/src/ladder/mod.rs` carries `#![forbid(unsafe_code)]` and declares every action with the workspace's `#[action]` macro; the tests run against real Postgres 18"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Migration discipline",
+          "axis_b": "forward only, numbered, never edited after a slice closes",
+          "value": {
+            "usage": "one set, `0046_decision_ladder.sql`; it adds columns to T0's `decision` table and does not reshape `decision_policy` to add the missing question, fire_when or min_confidence (v1-t2-4)"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "ActionSpec",
+          "axis_b": "one declaration -> HTTP + MCP + OpenAPI",
+          "value": {
+            "usage": "`ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list` and `laya_configs.create|list` are ordinary actions; the family name is `ladder.*` because the ADR board owns `decisions.*` (SPEC_V2 §10.4 amendment)"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "HTTP API",
+          "axis_b": "unversioned /api/<resource>",
+          "value": {
+            "usage": "no version segment; errors are RFC 9457 `application/problem+json` with stable slugs such as `pins_incomplete`, `approval_missing`, `draft_requires_gate` and `policy_exists`"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Optimistic concurrency",
+          "axis_b": "version + If-Match/ETag",
+          "value": {
+            "usage": "policies, refinements and laya configs return an ETag; a stale update is `412 version_mismatch`, and a human decision row is append-only"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Laya contract",
+          "axis_b": "POST /v1/systemone with questions keyed by qid",
+          "value": {
+            "usage": "the contract's types are noul|choice|score and answers are `answers.<qid>`; `laya_configs` pins model_ref, params and timeout_ms. T2 does not call it (v1-t2-2), so the contract is recorded but unexercised"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Generation split",
+          "axis_b": "an inference_call plus a draft; no transition",
+          "value": {
+            "usage": "`decision_rung_check` admits only rule|laya|human; the `compile_fail` doctest in `conveyor_domain::ladder` makes the generated result type unusable by any transition, and `ladder.apply_draft` is the only gated apply"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Budget refusal",
+          "axis_b": "429 budget_exceeded before the next call",
+          "value": {
+            "usage": "NOT MET — v1-t2-5: no inference budget is enforced; the only budget refusal in the tree is `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), not the §7.5 spelling"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Human gate",
+          "axis_b": "a person, an approved approval, the same card",
+          "value": {
+            "usage": "`ladder.record` requires `actor_kind = user` and an approved approval with a human `approve` decision; gate identity is missing (v1-t2-6) and only `ladder.apply_draft` enforces `draft.apply`"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Verification",
+          "axis_b": "real Postgres, then the GitHub-hosted preflight",
+          "value": {
+            "usage": "`crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs` run against real Postgres 18; the compile/test verdict is `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1` (`docs/plans/03-DELIVERY.md`)"
+          },
+          "position": 11
+        }
+      ],
+      "body": "## Metadata\n\nType: technology standards catalog. Title: Technology Standards Catalog — T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase D, plateau HLD, related project T2.\n\n## Entries\n\nEleven standards: Postgres 18 with FORCE RLS, Rust edition 2024, forward-only migrations, the ActionSpec single declaration, unversioned HTTP with RFC 9457 errors, optimistic concurrency, the laya contract, the generation split, the budget refusal, the human gate and the verification ladder. Each row states the usage and, where the standard is not met, the finding that keeps it open.\n\n## Links\n\nDerives from SPEC_V2 §7 and the repository's delivery standards; realizes the Phase-C data catalog and the Phase-A solution concept; reuses the action registry, the error vocabulary and the real-Postgres harness.\n\n## Document\n\nThis is Phase D artefact `technology_standards` under the T2 delivery contract; it is the standards set every later slice that consumes the ladder inherits."
     }
-   ],
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "purpose": "The drivers behind the decision ladder, the goals it serves, and the objective each mechanism installs or fails to install.",
-   "scope": "one audit shape, version pins, tenant refinement, the human gate, the draft gate, authored options and questions, the laya call and the budget refusal.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "D1 Three decision rungs read as three different records",
-     "axis_b": "G1 One audit shape across L0, L1 and L3",
-     "value": {
-      "objective": "`decision` carries rung, answer, option-set version, policy/refinement/laya-config pins, actor, outcome and approval link for every rung; `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape` asserts the three rows have identical column sets."
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "D2 A threshold change needs a build and a deploy",
-     "axis_b": "G2 A tenant refinement changes a threshold as configuration",
-     "value": {
-      "objective": "`decision_policy_refinement` overrides the threshold, rule and fail action for one policy; `decision_policy_refinement_one_per_policy` keeps one live row and bumps its version. `decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change` moves 0.7 from refused to accepted at 0.5."
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "D3 A decision cannot be reproduced after the policy moves",
-     "axis_b": "G3 Every decision pins the versions it read",
-     "value": {
-      "objective": "the decision row records `policy_version`, `refinement_version` and `laya_config_version`; an L1 decision with no config to pin is refused `422 pins_incomplete`; `decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions` leaves the first row at version 1 after the policy moves to version 2."
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "D4 A generated draft can move a card",
-     "axis_b": "G4 L2 has no transition path; applying a draft is a human gate",
-     "value": {
-      "objective": "`ladder.apply_draft` requires an accepted human `draft.apply` decision backed by an approved `draft.apply` approval on the same card; `documents.update` refuses the generated class with `409 draft_requires_gate`. `decision_ladder.rs::a_generated_draft_cannot_transition_a_card` and `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft` prove the update and apply paths."
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "D5 The create path can still attach a generated draft",
-     "axis_b": "G5 Close the `documents.compose` hole",
-     "value": {
-      "objective": "OPEN \u2014 v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and writes an attached document with no gate, so the fourth gate clause is not universally true and T2 stays active."
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "D6 A human decision can cite any approved approval",
-     "axis_b": "G6 A human decision cites the gate that posed its question",
-     "value": {
-      "objective": "OPEN \u2014 v1-t2-6: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` field is not compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`. `ladder_human_gate.rs::a_human_decision_without_an_approved_human_gate_is_refused` checks approval status and human decider, not gate identity."
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "D7 Options and questions are free text in a prompt",
-     "axis_b": "G7 Options and questions are authored, versioned rows",
-     "value": {
-      "objective": "PARTIAL \u2014 v1-t2-4: `ladder.evaluate` accepts inline `options: [{key, label, payload}]` and a free `question` string, and `decision_policy` carries kind/gate/threshold/fail_policy/action, not an authored question with `fire_when` and `min_confidence`."
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "D8 L1 is recorded but never asks laya",
-     "axis_b": "G8 The L1 answer comes from the laya client",
-     "value": {
-      "objective": "OPEN \u2014 v1-t2-2: `ladder.evaluate` records the caller's `answer`, `confidence`, `probabilities` and `latency_ms`; `laya_configs` pins model_ref/params/timeout_ms but no T2 path calls `POST /v1/systemone`."
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "D9 The generation budget has no \u00a77.5 refusal",
-     "axis_b": "G9 Refuse over budget before the next call",
-     "value": {
-      "objective": "OPEN \u2014 v1-t2-5: SPEC_V2 \u00a77.5 records `429 budget_exceeded`; T2 enforces no inference budget, and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` (`crates/actions/src/invoke.rs`, `crates/actions/src/broker.rs`, #526)."
-     },
-     "position": 9
-    }
-   ],
-   "body": "## Metadata\n\nType: driver/goal/objective catalog. Title: Driver/Goal/Objective Catalog \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nNine driver rows: one audit shape, refinement without a build, version pins, the draft gate, the `documents.compose` hole, gate identity on a human decision, authored options and questions, the laya call, and the budget refusal. Each names its objective and, where the objective is not fully met, the admitted finding that keeps it open.\n\n## Links\n\nDerives from SPEC_V2 \u00a77.1\u2013\u00a77.5 and \u00a712 T2; realizes the acceptance clauses in the project brief; reuses the T0 schema contracts and the estate's approval primitive.\n\n## Document\n\nThis is Phase A artefact `driver_goal_objective` under the T2 delivery contract; it is the goals view the Phase-B capability map and the Phase-G review read."
-  },
-  {
-   "title": "Requirements Catalog \u2014 T2 Decision ladder (Phase A)",
-   "links": [
-    {
-     "to": "Solution Concept Diagram \u2014 T2 Decision ladder (Phase A)",
-     "kind": "realization"
-    }
-   ],
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "purpose": "The requirements the T2 gate and its contracts must satisfy, each with an executable check and its current status.",
-   "scope": "the four \u00a712 clauses, the issue-#73 scenarios P1.1\u2013P4.2, and the contract requirements the six admitted findings concern.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "R1 P1.1",
-     "axis_b": "A rule, a laya and a human decision share one audit shape",
-     "value": {
-      "priority": "must",
-      "acceptance": "`decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape` lists three rows with identical column sets and distinct rungs rule, laya and human; every row names `policy_id`, `policy_version`, `answer`, `confidence`, `actor_kind` and `latency_ms`."
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "R2 P2.1",
-     "axis_b": "A tenant refinement changes a threshold with no code change",
-     "value": {
-      "priority": "must",
-      "acceptance": "`decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change` publishes a 0.5 override on a 0.8 policy and the same 0.7 answer moves from `refused` to `accepted`, pinning refinement version 1 and policy version 1."
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "R3 P3.1",
-     "axis_b": "Every decision pins the policy, refinement and laya-config versions it read",
-     "value": {
-      "priority": "must",
-      "acceptance": "`decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions`: an L1 decision with no laya config is `422 pins_incomplete`; with one, the row pins policy 1, refinement 1 and laya config 1; after the policy moves to 2, the stored first row still reads 1."
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "R4 P4.1/P4.2",
-     "axis_b": "A generated draft cannot transition a card on the apply or update path",
-     "value": {
-      "priority": "must",
-      "acceptance": "`decision_ladder.rs::a_generated_draft_cannot_transition_a_card` refuses a refused L1 decision and an accepted L1 decision with 422 `draft_requires_gate`; the human `draft.apply` decision backed by an approved gate on the card applies the draft; `documents.update` attaching the generated class is 409 `draft_requires_gate`; `ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft` bars a routine accepted decision."
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "R5 P4.1 (create path)",
-     "axis_b": "A generated draft cannot be attached by `documents.compose`",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and creates an attached document with no `draft.apply` check. This is the P0 finding that blocks the fourth clause and the project's closure."
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "R6 P1.1 (human)",
-     "axis_b": "A human decision is a person's act on a resolved human approval",
-     "value": {
-      "priority": "must",
-      "acceptance": "`ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision` returns `403 person_required`; `::a_human_decision_without_an_approved_human_gate_is_refused` refuses a missing, pending or agent-decided approval; `::a_pending_approval_cannot_gate_a_draft` refuses a pending gate."
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "R7 P1.1 (gate identity)",
-     "axis_b": "A human decision cites the approval of its own gate",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-6: `ladder.record` passes `None` for the gate to `human_approved_gate_tx`, so any approved approval with a human approve decision on the same card qualifies. The check must compare `approval.gate` with the decision's gate."
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "R8 \u00a77.2 (options)",
-     "axis_b": "Options are authored, versioned rows",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-4: `ladder.evaluate` accepts an inline `options` array and records it with `option_set_version`; there is no authored option-set row the tenant versions independently of the request."
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "R9 \u00a77.2 (questions)",
-     "axis_b": "Questions are rows with fire_when, min_confidence and fail_policy",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-4: `decision_policy` carries kind, gate, threshold, fail_policy, action and meta; the question is an optional free string on the request, defaulted to the kind, and `fire_when`/`min_confidence` have no columns."
-     },
-     "position": 9
-    },
-    {
-     "axis_a": "R10 \u00a77.2 (gated refinement)",
-     "axis_b": "Publishing a refinement is a gated policy change",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-3: `refinements.publish` has `confirm = \"none\"`, writes the override and bumps the version with no approval; `decision_policies.update` is likewise ungated."
-     },
-     "position": 10
-    },
-    {
-     "axis_a": "R11 \u00a77.2 (laya)",
-     "axis_b": "L1 asks the laya client and records its answer",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-2: no T2 path calls `POST /v1/systemone`; the answer and confidence are supplied by the caller, and `laya_configs` only pins model_ref, params and timeout."
-     },
-     "position": 11
-    },
-    {
-     "axis_a": "R12 \u00a77.5 (budget)",
-     "axis_b": "An over-budget run is refused before the next call",
-     "value": {
-      "priority": "must",
-      "acceptance": "OPEN \u2014 v1-t2-5: no inference budget is declared or enforced in T2; the tree's only budget refusal is `429 tool_budget_exceeded`, not the \u00a77.5 spelling `429 budget_exceeded`."
-     },
-     "position": 12
-    },
-    {
-     "axis_a": "R13",
-     "axis_b": "Tenant isolation on every ladder table",
-     "value": {
-      "priority": "must",
-      "acceptance": "the five decision tables are tenant-scoped with FORCE RLS as shipped by T0 in `migrations/0040_organisation.sql`; `migrations/0046_decision_ladder.sql` only adds columns, constraints and indexes, and both new indexes lead with `tenant_id`; the one-refinement and one-policy indexes are tenant-scoped."
-     },
-     "position": 13
-    }
-   ],
-   "body": "## Metadata\n\nType: requirements catalog. Title: Requirements Catalog \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nThirteen requirements. R1\u2013R4 and R13 are satisfied by named tests or schema; R5\u2013R12 are the contract requirements the batch's six findings keep open. Each row names its priority, the executable check or the missing mechanism, and its status.\n\n## Links\n\nDerives from the \u00a712 T2 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2; realizes the acceptance section of the project brief; reuses the T0 decision-table contracts and the approval primitive.\n\n## Document\n\nThis is Phase A artefact `requirements_catalog` under the T2 delivery contract; the Phase-G review records the compliance level against it."
-  },
-  {
-   "title": "Solution Concept Diagram \u2014 T2 Decision ladder (Phase A)",
-   "links": [
-    {
-     "to": "Business Capability Map \u2014 T2 Decision ladder (Phase B)",
-     "kind": "realization"
-    }
-   ],
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "diagram",
-   "purpose": "The rows, actions and edges that carry the ladder, including the create-path hole and the ungated refinement.",
-   "scope": "migrations/0046_decision_ladder.sql, the ladder action families, the approval gate and the document draft paths.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "decision",
-     "axis_b": "the one ladder row",
-     "value": {
-      "kind": "component",
-      "note": "rung rule|laya|human; answer; option_set_version; policy_version; refinement_version; laya_config_version; actor_kind/actor_id; approval_id; input_hash; outcome; latency_ms"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "decision_policy",
-     "axis_b": "the case definition",
-     "value": {
-      "kind": "component",
-      "note": "kind, optional gate, threshold, fail_policy, action; unique on (tenant, kind, coalesce(gate, '')); no question, fire_when or min_confidence column (v1-t2-4)"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "decision_policy_refinement",
-     "axis_b": "the tenant's per-case override",
-     "value": {
-      "kind": "component",
-      "note": "threshold_override, rule_override, fail_action, laya_config_id, version; one live row per policy by `decision_policy_refinement_one_per_policy`"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "decision_option",
-     "axis_b": "the authored option set",
-     "value": {
-      "kind": "component",
-      "note": "T0 shipped the table; T2 writes options from the `ladder.evaluate` request body and stamps an option_set_version, not from a tenant-authored option-set row"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "laya_inference_config",
-     "axis_b": "the tenant's laya pin",
-     "value": {
-      "kind": "component",
-      "note": "model_ref (default jev-latest), params, timeout_ms; pinned by every L1 decision; no client uses it in T2 (v1-t2-2)"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "ladder.record",
-     "axis_b": "the L0 and L3 write",
-     "value": {
-      "kind": "component",
-      "note": "rule or human; a human record needs `actor_kind = user` and an approved approval with a human approve decision; gate identity is not checked (v1-t2-6)"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "ladder.evaluate",
-     "axis_b": "the L1 write",
-     "value": {
-      "kind": "component",
-      "note": "resolves the effective policy, compares caller-supplied confidence to the threshold, records the outcome and the three pins; below threshold escalates or refuses per policy"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "ladder.apply_draft",
-     "axis_b": "the only gated draft application",
-     "value": {
-      "kind": "component",
-      "note": "requires an accepted human `draft.apply` decision on the card and an approved `draft.apply` approval with a human approve decision; attaches the document"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "refinements.publish",
-     "axis_b": "the tenant configuration write",
-     "value": {
-      "kind": "component",
-      "note": "writes the override and bumps the version with `confirm = \"none\"` and no approval (v1-t2-3)"
-     },
-     "position": 9
-    },
-    {
-     "axis_a": "documents.compose",
-     "axis_b": "the draft creation path",
-     "value": {
-      "kind": "component",
-      "note": "accepts `card_id` and `meta.generated = true` and creates an attached document with no gate (v1-t2-1, P0)"
-     },
-     "position": 10
-    },
-    {
-     "axis_a": "documents.update",
-     "axis_b": "the edit path",
-     "value": {
-      "kind": "component",
-      "note": "refuses attaching the generated class with `409 draft_requires_gate`; this is the path the test proves, not the compose create path"
-     },
-     "position": 11
-    },
-    {
-     "axis_a": "approval / approval_decision",
-     "axis_b": "the L3 gate",
-     "value": {
-      "kind": "component",
-      "note": "the human decision cites a resolved approval; `approvals.decide` keeps the requester/executor exclusion from T1"
-     },
-     "position": 12
-    },
-    {
-     "axis_a": "inference_call",
-     "axis_b": "the L2 generation ledger",
-     "value": {
-      "kind": "component",
-      "note": "not a rung; a generation call is an `inference_call` bound to a draft artefact; applying it is `ladder.apply_draft`"
-     },
-     "position": 13
-    },
-    {
-     "axis_a": "decision.changed",
-     "axis_b": "the outbox event",
-     "value": {
-      "kind": "component",
-      "note": "one append-only event per ladder mutation, topic `<entity>:<id>`, payload `{entity, id, op}`"
-     },
-     "position": 14
-    },
-    {
-     "axis_a": "ladder.evaluate",
-     "axis_b": "decision_policy / refinement / laya_config",
-     "value": {
-      "kind": "edge",
-      "note": "the effective policy, its live refinement and its laya config are read and their versions pinned into the decision row"
-     },
-     "position": 15
-    },
-    {
-     "axis_a": "ladder.record (human)",
-     "axis_b": "approval",
-     "value": {
-      "kind": "edge",
-      "note": "the decision cites an approved approval; the gate comparison is absent today (v1-t2-6)"
-     },
-     "position": 16
-    },
-    {
-     "axis_a": "ladder.apply_draft",
-     "axis_b": "decision / approval / document",
-     "value": {
-      "kind": "edge",
-      "note": "the `draft.apply` decision, its approved gate and the document are all required; the card is updated only after all three agree"
-     },
-     "position": 17
-    },
-    {
-     "axis_a": "documents.compose",
-     "axis_b": "card",
-     "value": {
-      "kind": "edge",
-      "note": "the ungated attach edge that v1-t2-1 must close"
-     },
-     "position": 18
-    },
-    {
-     "axis_a": "inference_call",
-     "axis_b": "draft document",
-     "value": {
-      "kind": "edge",
-      "note": "the generation result is a draft artefact; it has no edge to a transition except through `ladder.apply_draft`"
-     },
-     "position": 19
-    }
-   ],
-   "body": "## Metadata\n\nType: solution concept diagram. Title: Solution Concept Diagram \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase A, plateau PSA, related project T2.\n\n## Entries\n\nThe diagram carries fourteen components and five edges. The ladder row, the policy, the refinement, the option table and the laya config are the data; `ladder.record`, `ladder.evaluate`, `ladder.apply_draft`, `refinements.publish`, `documents.compose` and `documents.update` are the write paths; approval, `inference_call` and `decision.changed` are the surrounding primitives. The two open edges are drawn explicitly: `documents.compose` to card (v1-t2-1) and a human record to an approval without gate identity (v1-t2-6).\n\n## Links\n\nDerives from SPEC_V2 \u00a77.1\u2013\u00a77.5 and the T2 row of \u00a712; realizes the requirements catalog; reuses the T0 decision tables, the approval primitive, the document store and the outbox.\n\n## Document\n\nThis is Phase A artefact `solution_concept` under the T2 delivery contract; the Phase-C data catalog expands each row and the Phase-D standards catalog fixes each rule."
-  },
-  {
-   "title": "Business Capability Map \u2014 T2 Decision ladder (Phase B)",
-   "links": [
-    {
-     "to": "Data Entity/Data Component Catalog \u2014 T2 Decision ladder (Phase C)",
-     "kind": "realization"
-    }
-   ],
-   "phase_code": "b",
-   "plateau": "hld",
-   "artifact_kind": "diagram",
-   "purpose": "The capabilities T2 installs and how far each is live at the 2026-11-21 rework.",
-   "scope": "the one audit shape, the version pins, tenant refinement, the human gate, the draft gate, laya evaluation, authored options, budget enforcement and tenant isolation.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "One decision audit shape",
-     "axis_b": "L0, L1 and L3 recorded through one row and one projected view",
-     "value": {
-      "maturity": "live",
-      "evidence": "migration 0046 columns and CHECKs; `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "Version-pinned decisions",
-     "axis_b": "a decision is reproducible after the policy or refinement moves",
-     "value": {
-      "maturity": "live",
-      "evidence": "policy/refinement/laya-config pins; `422 pins_incomplete`; `decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions`"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Tenant refinement without a build",
-     "axis_b": "a threshold override changes behaviour at once",
-     "value": {
-      "maturity": "live",
-      "evidence": "`refinements.publish`; one-refinement index; `decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change`"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Gated policy change",
-     "axis_b": "a refinement is approved before it takes effect",
-     "value": {
-      "maturity": "not built",
-      "evidence": "v1-t2-3: `refinements.publish` is `confirm = \"none\"` with no approval"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "L1 laya evaluation",
-     "axis_b": "the ladder asks laya and records its answer",
-     "value": {
-      "maturity": "partial",
-      "evidence": "v1-t2-2: the row, threshold comparison and config pins are live; no client calls `POST /v1/systemone`"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "L3 human gate",
-     "axis_b": "a person decides, on an approved approval",
-     "value": {
-      "maturity": "partial",
-      "evidence": "`ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`; gate identity is missing (v1-t2-6)"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "Draft gate",
-     "axis_b": "a generated draft reaches a card only through a human `draft.apply` decision",
-     "value": {
-      "maturity": "partial",
-      "evidence": "`ladder.apply_draft` and the `documents.update` refusal are live; `documents.compose` attaches without a gate (v1-t2-1, P0)"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "Generation split",
-     "axis_b": "L2 is an `inference_call` plus a draft, never a rung",
-     "value": {
-      "maturity": "partial",
-      "evidence": "the `decision_rung_check` admits only rule|laya|human and the `compile_fail` doctest in `conveyor_domain::ladder` forbids a transition; the call path is T13"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "Authored options and questions",
-     "axis_b": "options and questions are tenant-versioned rows",
-     "value": {
-      "maturity": "not built",
-      "evidence": "v1-t2-4: inline `options` and a free `question` string; `decision_policy` has no question, `fire_when` or `min_confidence`"
-     },
-     "position": 9
-    },
-    {
-     "axis_a": "Budget enforcement",
-     "axis_b": "an over-budget run is refused before the next call",
-     "value": {
-      "maturity": "not built",
-      "evidence": "v1-t2-5: no inference budget; the only refusal is `429 tool_budget_exceeded`"
-     },
-     "position": 10
-    },
-    {
-     "axis_a": "Tenant isolation and audit event",
-     "axis_b": "every ladder row is tenant-scoped and every mutation emits an event",
-     "value": {
-      "maturity": "live",
-      "evidence": "T0's tenant tables with FORCE RLS; tenant-leading indexes in 0046; `decision.changed` on every mutation"
-     },
-     "position": 11
-    }
-   ],
-   "body": "## Metadata\n\nType: business capability map. Title: Business Capability Map \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase B, plateau HLD, related project T2.\n\n## Entries\n\nEleven capabilities. Five are live (the one audit shape, version pins, tenant refinement, tenant isolation and the audit event); three are partial (L1 laya, the human gate and the draft gate); three are not built (gated policy change, authored options and questions, budget enforcement). The maturity labels are the honest state at the 2026-11-21 snapshot, not the intent.\n\n## Links\n\nDerives from the Phase-A requirements and solution concept; realizes the \u00a712 gate's four clauses to the extent the tests prove them; reuses the T0 schema and the estate's approval, document and outbox primitives.\n\n## Document\n\nThis is Phase B artefact `business_capability_map` under the T2 delivery contract; the Phase-G review records the level against it and the four blocking findings v1-t2-1 to v1-t2-4."
-  },
-  {
-   "title": "Data Entity/Data Component Catalog \u2014 T2 Decision ladder (Phase C)",
-   "links": [
-    {
-     "to": "Technology Standards Catalog \u2014 T2 Decision ladder (Phase D)",
-     "kind": "dependency"
-    }
-   ],
-   "phase_code": "c",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "The entities T2 adds or extends, each with its owner and its one invariant.",
-   "scope": "the five T0 decision tables as written by T2, the 0046 columns and indexes, the approval and inference ledgers, and the draft document.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "decision",
-     "axis_b": "the one ladder row",
-     "value": {
-      "owner": "decision ladder",
-      "table": "decision",
-      "note": "0046 adds rung, answer, option_set_version, policy_version, refinement_version, laya_config_version, actor_kind, actor_id, approval_id; rung CHECK rule|laya|human; actor CHECK system|user|agent|service; approval FK; the three version CHECKs require a positive version when pinned"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "decision_option",
-     "axis_b": "the option written with a decision",
-     "value": {
-      "owner": "decision ladder",
-      "table": "decision_option",
-      "note": "T0 table; T2 inserts the request's inline option array and stamps `option_set_version` (default 1 when options are present); there is no tenant-authored option-set row (v1-t2-4)"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "decision_policy",
-     "axis_b": "the case definition",
-     "value": {
-      "owner": "decision ladder",
-      "table": "decision_policy",
-      "note": "kind, optional gate, threshold, fail_policy, action, meta; unique `decision_policy_case` on (tenant_id, kind, coalesce(gate, '')); a second create is 409 `policy_exists`"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "decision_policy_refinement",
-     "axis_b": "the tenant's live override",
-     "value": {
-      "owner": "decision ladder",
-      "table": "decision_policy_refinement",
-      "note": "threshold_override, rule_override, fail_action, laya_config_id, version; unique `decision_policy_refinement_one_per_policy` on (tenant_id, policy_id); publish bumps the version"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "laya_inference_config",
-     "axis_b": "the tenant's laya pin",
-     "value": {
-      "owner": "decision ladder",
-      "table": "laya_inference_config",
-      "note": "model_ref, params, timeout_ms; created through `laya_configs.create` with a 30000 ms default; every L1 decision pins its version when one applies"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "approval / approval_decision",
-     "axis_b": "the L3 gate",
-     "value": {
-      "owner": "control",
-      "table": "approval, approval_decision",
-      "note": "the human decision cites an approved approval with at least one human approve decision; `decision_approval_fk` keeps the citation honest; the requester/executor exclusion is T1's"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "inference_call",
-     "axis_b": "the L2 ledger row",
-     "value": {
-      "owner": "generation",
-      "table": "inference_call",
-      "note": "the generation call's prompt identity and usage; never a rung and never a transition input; the result is bound to a draft document"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "document (draft artefact)",
-     "axis_b": "the generated draft",
-     "value": {
-      "owner": "documents",
-      "table": "document",
-      "note": "`documents.compose` creates the draft with `meta.generated` and an optional `card_id`; `documents.update` refuses the generated class; `ladder.apply_draft` is the gated attach"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "outbox event",
-     "axis_b": "the audit trace",
-     "value": {
-      "owner": "event store",
-      "table": "event",
-      "note": "`decision.changed` with topic `<entity>:<id>` and payload `{entity, id, op}` is appended in the caller's transaction for every ladder mutation"
-     },
-     "position": 9
-    },
-    {
-     "axis_a": "decision indexes",
-     "axis_b": "the two ladder reads",
-     "value": {
-      "owner": "decision ladder",
-      "index": "decision_kind_idx, decision_rung_idx",
-      "note": "both lead with `tenant_id` and order by `created_at DESC`; the audit reads by case kind and by rung"
-     },
-     "position": 10
-    }
-   ],
-   "body": "## Metadata\n\nType: data entity/data component catalog. Title: Data Entity/Data Component Catalog \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase C, plateau HLD, related project T2.\n\n## Entries\n\nTen data components: the five decision tables (`decision`, `decision_option`, `decision_policy`, `decision_policy_refinement`, `laya_inference_config`), the approval and inference ledgers they cite, the draft document, the outbox event and the two tenant-leading indexes. Each row names the owner, the table or index and the one invariant the schema enforces.\n\n## Links\n\nDerives from migration 0046 and the T0 decision tables in 0040_organisation.sql:216\u2013360; realizes the solution concept's components; reuses the approval, document and outbox stores.\n\n## Document\n\nThis is Phase C artefact `data_entity_catalog` under the T2 delivery contract; the Phase-D standards catalog fixes the DB, RLS and error conventions it depends on."
-  },
-  {
-   "title": "Technology Standards Catalog \u2014 T2 Decision ladder (Phase D)",
-   "links": [
-    {
-     "to": "Stakeholder Map \u2014 T2 Decision ladder (Phase A)",
-     "kind": "dependency"
-    }
-   ],
-   "phase_code": "d",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "The standards T2's rows and actions fix for every later slice, including the standards it fails to meet.",
-   "scope": "Postgres and RLS, the migration set, the action registry, HTTP and errors, concurrency, the laya contract, the generation split and verification.",
-   "stakeholders": {
-    "owner": "programme architect (conveyor-e2e)",
-    "reviewer": "the Architecture Board (conveyor-architecture-board)",
-    "consumers": [
-     "the sponsoring group",
-     "the SRO",
-     "tenant policy owners",
-     "the PM job",
-     "the delivery jobs"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "PostgreSQL",
-     "axis_b": "18 with FORCE RLS",
-     "value": {
-      "usage": "the five decision tables are tenant-scoped with ENABLE and FORCE ROW LEVEL SECURITY from `migrations/0040_organisation.sql`; 0046 only alters `decision` and adds tenant-leading indexes"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "Rust workspace",
-     "axis_b": "edition 2024; forbid(unsafe_code)",
-     "value": {
-      "usage": "`crates/actions/src/ladder/mod.rs` carries `#![forbid(unsafe_code)]` and declares every action with the workspace's `#[action]` macro; the tests run against real Postgres 18"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Migration discipline",
-     "axis_b": "forward only, numbered, never edited after a slice closes",
-     "value": {
-      "usage": "one set, `0046_decision_ladder.sql`; it adds columns to T0's `decision` table and does not reshape `decision_policy` to add the missing question, fire_when or min_confidence (v1-t2-4)"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "ActionSpec",
-     "axis_b": "one declaration -> HTTP + MCP + OpenAPI",
-     "value": {
-      "usage": "`ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list` and `laya_configs.create|list` are ordinary actions; the family name is `ladder.*` because the ADR board owns `decisions.*` (SPEC_V2 \u00a710.4 amendment)"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "HTTP API",
-     "axis_b": "unversioned /api/<resource>",
-     "value": {
-      "usage": "no version segment; errors are RFC 9457 `application/problem+json` with stable slugs such as `pins_incomplete`, `approval_missing`, `draft_requires_gate` and `policy_exists`"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "Optimistic concurrency",
-     "axis_b": "version + If-Match/ETag",
-     "value": {
-      "usage": "policies, refinements and laya configs return an ETag; a stale update is `412 version_mismatch`, and a human decision row is append-only"
-     },
-     "position": 6
-    },
-    {
-     "axis_a": "Laya contract",
-     "axis_b": "POST /v1/systemone with questions keyed by qid",
-     "value": {
-      "usage": "the contract's types are noul|choice|score and answers are `answers.<qid>`; `laya_configs` pins model_ref, params and timeout_ms. T2 does not call it (v1-t2-2), so the contract is recorded but unexercised"
-     },
-     "position": 7
-    },
-    {
-     "axis_a": "Generation split",
-     "axis_b": "an inference_call plus a draft; no transition",
-     "value": {
-      "usage": "`decision_rung_check` admits only rule|laya|human; the `compile_fail` doctest in `conveyor_domain::ladder` makes the generated result type unusable by any transition, and `ladder.apply_draft` is the only gated apply"
-     },
-     "position": 8
-    },
-    {
-     "axis_a": "Budget refusal",
-     "axis_b": "429 budget_exceeded before the next call",
-     "value": {
-      "usage": "NOT MET \u2014 v1-t2-5: no inference budget is enforced; the only budget refusal in the tree is `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), not the \u00a77.5 spelling"
-     },
-     "position": 9
-    },
-    {
-     "axis_a": "Human gate",
-     "axis_b": "a person, an approved approval, the same card",
-     "value": {
-      "usage": "`ladder.record` requires `actor_kind = user` and an approved approval with a human `approve` decision; gate identity is missing (v1-t2-6) and only `ladder.apply_draft` enforces `draft.apply`"
-     },
-     "position": 10
-    },
-    {
-     "axis_a": "Verification",
-     "axis_b": "real Postgres, then the GitHub-hosted preflight",
-     "value": {
-      "usage": "`crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs` run against real Postgres 18; the compile/test verdict is `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1` (`docs/plans/03-DELIVERY.md`)"
-     },
-     "position": 11
-    }
-   ],
-   "body": "## Metadata\n\nType: technology standards catalog. Title: Technology Standards Catalog \u2014 T2 Decision ladder. Version 1. Owner: programme architect (`conveyor-e2e`). Reviewer: the Architecture Board (`conveyor-architecture-board`). Review date: 2026-11-21. Phase D, plateau HLD, related project T2.\n\n## Entries\n\nEleven standards: Postgres 18 with FORCE RLS, Rust edition 2024, forward-only migrations, the ActionSpec single declaration, unversioned HTTP with RFC 9457 errors, optimistic concurrency, the laya contract, the generation split, the budget refusal, the human gate and the verification ladder. Each row states the usage and, where the standard is not met, the finding that keeps it open.\n\n## Links\n\nDerives from SPEC_V2 \u00a77 and the repository's delivery standards; realizes the Phase-C data catalog and the Phase-A solution concept; reuses the action registry, the error vocabulary and the real-Postgres harness.\n\n## Document\n\nThis is Phase D artefact `technology_standards` under the T2 delivery contract; it is the standards set every later slice that consumes the ladder inherits."
-  }
- ],
- "registers": {
-  "risk": [
-   {
-    "title": "The create path attaches a generated draft without the gate",
-    "code": "R-T2-01",
-    "body": "`documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document to the card with no gate, so a generated L2 draft can reach a card on the create path although `ladder.apply_draft` and `documents.update` refuse it (v1-t2-1, P0). Until the create path runs the same human `draft.apply` gate, the fourth clause of the §12 T2 gate holds only on the update path.",
-    "probability": "high",
-    "impact": 5,
-    "review_at": "2026-12-10",
-    "severity": "P0",
-    "response": "mitigate: route `documents.compose` through `human_approved_gate_tx` before any generated document is attached to a card",
-    "status": "open",
-    "meta": {
-     "owner": "the head of platform in the T2 sponsoring group"
-    },
-    "links": {
-     "cards": [],
-     "requirements": [
-      "R5 P4.1 (create path)",
-      "R4 P4.1/P4.2"
-     ],
-     "decisions": []
-    }
-   },
-   {
-    "title": "A human decision cites an approval that did not gate it",
-    "code": "R-T2-02",
-    "body": "`ladder.record` accepts any approved approval for the human rung instead of the approval its own gate produced (v1-t2-6). The requester and the approver are distinct identities under the standing delegation, but without a gate-identity check a requester can attach a third party's approval, or one borrowed from another case, and the self-approval refusal rests on convention rather than on the record.",
-    "probability": "medium",
-    "impact": 4,
-    "review_at": "2026-12-10",
-    "severity": "P1",
-    "response": "mitigate: require the decision's `approval_id` to equal the gate approval for the same case and card",
-    "status": "open",
-    "meta": {
-     "owner": "the programme architect (conveyor-e2e)"
-    },
-    "links": {
-     "cards": [],
-     "requirements": [
-      "R6 P1.1 (human)",
-      "R7 P1.1 (gate identity)"
-     ],
-     "decisions": []
-    }
-   },
-   {
-    "title": "L1 records a decision without asking laya",
-    "code": "R-T2-03",
-    "body": "The L1 rung is recorded but never calls laya (v1-t2-2), so a middle-rung decision can be written without the laya answer and latency the audit shape pins. The three rungs still share one row shape, but an L1 row that skipped laya cannot be compared with a rule or human row on the evidence the gate names.",
-    "probability": "medium",
-    "impact": 3,
-    "review_at": "2026-12-10",
-    "severity": "P2",
-    "response": "mitigate: call the laya contract from `ladder.evaluate` on the L1 rung and refuse a decision whose pin set is incomplete",
-    "status": "open",
-    "meta": {
-     "owner": "the laya owner on the Architecture Board"
-    },
-    "links": {
-     "cards": [],
-     "requirements": [
-      "R11 §7.2 (laya)",
-      "R2 P2.1"
-     ],
-     "decisions": []
-    }
-   }
   ],
-  "issue": [
-   {
-    "title": "`refinements.publish` changes a threshold without the gate",
-    "code": "I-T2-01",
-    "body": "The publish action accepts a refinement that changes an approval threshold with no gated approval recorded (v1-t2-3). A tenant can therefore move a threshold the ladder's policy pins without the human decision the gate requires, and the audit shape records the new version as if it had been approved.",
-    "severity": "P1",
-    "status": "open",
-    "links": {
-     "requirements": [
-      "R3 P3.1",
-      "R10 §7.2 (gated refinement)"
-     ]
+  "registers": {
+    "risk": [
+      {
+        "title": "The create path attaches a generated draft without the gate",
+        "code": "R-T2-01",
+        "body": "`documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document to the card with no gate, so a generated L2 draft can reach a card on the create path although `ladder.apply_draft` and `documents.update` refuse it (v1-t2-1, P0). Until the create path runs the same human `draft.apply` gate, the fourth clause of the §12 T2 gate holds only on the update path.",
+        "probability": "high",
+        "impact": 5,
+        "review_at": "2026-12-10",
+        "severity": "P0",
+        "response": "mitigate: route `documents.compose` through `human_approved_gate_tx` before any generated document is attached to a card",
+        "status": "open",
+        "meta": {
+          "owner": "the head of platform in the T2 sponsoring group"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R5 P4.1 (create path)",
+            "R4 P4.1/P4.2"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A human decision cites an approval that did not gate it",
+        "code": "R-T2-02",
+        "body": "`ladder.record` accepts any approved approval for the human rung instead of the approval its own gate produced (v1-t2-6). The requester and the approver are distinct identities under the standing delegation, but without a gate-identity check a requester can attach a third party's approval, or one borrowed from another case, and the self-approval refusal rests on convention rather than on the record.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-10",
+        "severity": "P1",
+        "response": "mitigate: require the decision's `approval_id` to equal the gate approval for the same case and card",
+        "status": "open",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R6 P1.1 (human)",
+            "R7 P1.1 (gate identity)"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "L1 records a decision without asking laya",
+        "code": "R-T2-03",
+        "body": "The L1 rung is recorded but never calls laya (v1-t2-2), so a middle-rung decision can be written without the laya answer and latency the audit shape pins. The three rungs still share one row shape, but an L1 row that skipped laya cannot be compared with a rule or human row on the evidence the gate names.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-10",
+        "severity": "P2",
+        "response": "mitigate: call the laya contract from `ladder.evaluate` on the L1 rung and refuse a decision whose pin set is incomplete",
+        "status": "open",
+        "meta": {
+          "owner": "the laya owner on the Architecture Board"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R11 §7.2 (laya)",
+            "R2 P2.1"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "`refinements.publish` changes a threshold without the gate",
+        "code": "I-T2-01",
+        "body": "The publish action accepts a refinement that changes an approval threshold with no gated approval recorded (v1-t2-3). A tenant can therefore move a threshold the ladder's policy pins without the human decision the gate requires, and the audit shape records the new version as if it had been approved.",
+        "severity": "P1",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "R3 P3.1",
+            "R10 §7.2 (gated refinement)"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Options and questions are inline free text",
+        "code": "I-T2-02",
+        "body": "Options and questions are carried as free text inside a prompt rather than as authored `decision_option` rows (v1-t2-4), so an option-set version cannot be pinned and a decision cannot be reproduced after the prompt or its options change.",
+        "severity": "P2",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "R8 §7.2 (options)",
+            "R9 §7.2 (questions)"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The standing delegation remains the authority for this rework",
+        "code": "A-T2-01",
+        "body": "The retrospective rework acts under the delegation published on 2026-11-22, and the requester `conveyor-e2e` and the approver `conveyor-approver` stay distinct identities for every approval the ladder records. If the delegation lapses, the A-D artefacts and the delivery contract lose the authority they were approved under.",
+        "links": {
+          "requirements": [
+            "R7 P1.1 (gate identity)"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The ladder keeps three distinct rungs and actors",
+        "code": "A-T2-02",
+        "body": "The L0 rule, the L1 laya choice and the L3 human decision stay separate rungs with separate actors, and no rung is collapsed into another. The audit-shape test compares the three rows on one column set, and that comparison only means something while the rung and actor CHECKs keep the rows distinct.",
+        "links": {
+          "requirements": [
+            "R1 P1.1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ],
+    "dependency": [
+      {
+        "title": "T1 and the T0 decision-table contracts hold",
+        "code": "D-T2-01",
+        "body": "T2 carries a declared `needs` dependency on T1 and reuses the five decision tables and the approval primitive T0 shipped as contracts in `migrations/0040_organisation.sql`. A schema break upstream would strand the rung, answer and version-pin columns that 0046 adds to `decision`.",
+        "links": {
+          "requirements": [
+            "R1 P1.1",
+            "R4 P4.1/P4.2"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Postgres 18 with FORCE RLS stays the only store",
+        "code": "D-T2-02",
+        "body": "The tenant-scoped decision rows rely on the FORCE ROW LEVEL SECURITY and the forward-only migration discipline that `migrations/0040_organisation.sql` and `0046_decision_ladder.sql` establish. A store that does not enforce the same policies would break the tenant isolation the decision tables and their audit event depend on.",
+        "links": {
+          "requirements": [
+            "R13"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Every rung reads as one audit shape",
+        "code": "B-T2-01",
+        "body": "A rule, a laya and a human decision are recorded through one `decision` row with the policy, refinement and laya-config versions pinned, so an auditor compares the three rungs on the same columns instead of translating three record families.",
+        "links": {
+          "requirements": [
+            "R1 P1.1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A tenant threshold changes without a build",
+        "code": "B-T2-02",
+        "body": "A published refinement changes a decision threshold for one tenant without a code change or a deploy, because `ladder.evaluate` reads the pinned refinement version rather than a compiled constant. The same row records which refinement version answered, so the change is reproducible.",
+        "links": {
+          "requirements": [
+            "R3 P3.1",
+            "R10 §7.2 (gated refinement)"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "title": "No decision passes without its own gate approval",
+        "code": "B-T2-03",
+        "body": "Once the gate-identity check lands, the human rung requires the approval its own gate produced, and the requester is never the approver under the standing delegation. A self-approval, or an approval borrowed from another case, is refused, so the ladder's escalation path becomes an audit fact rather than a convention.",
+        "links": {
+          "requirements": [
+            "R6 P1.1 (human)",
+            "R7 P1.1 (gate identity)"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)",
+    "body": {
+      "compliance": "T2 is assessed clause by clause against the SPEC_V2 §12 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2. The first three gate clauses are proved by named real-Postgres tests: `crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`. The fourth clause is proved on the apply and update paths by `::a_generated_draft_cannot_transition_a_card` and `crates/actions/tests/ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, but is refuted on the create path by v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document with no gate. The batch admitted six findings — v1-t2-1 (P0, blocking), v1-t2-2 (L1 never calls laya), v1-t2-3 (`refinements.publish` ungated), v1-t2-4 (inline options and questions), v1-t2-5 (budget code spelling) and v1-t2-6 (a human decision cites any approved approval, not its gate). The compliance level is non_conformant; the project stays ACTIVE and is not closed in this pass. The rework's acceptance instrument is `acceptance/programme/T2.toml`.",
+      "acceptance_at": "the live record at the rework snapshot 2026-11-21T19:24:46Z (snapshot main@d367a4a9) and the delivery commit 39363ba8 (2026-11-17)",
+      "manifest": "acceptance/programme/T2.toml",
+      "retrospective": true,
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
     }
-   },
-   {
-    "title": "Options and questions are inline free text",
-    "code": "I-T2-02",
-    "body": "Options and questions are carried as free text inside a prompt rather than as authored `decision_option` rows (v1-t2-4), so an option-set version cannot be pinned and a decision cannot be reproduced after the prompt or its options change.",
-    "severity": "P2",
-    "status": "open",
-    "links": {
-     "requirements": [
-      "R8 §7.2 (options)",
-      "R9 §7.2 (questions)"
-     ]
+  },
+  "wbs_deliverable": {
+    "title": "The decision ladder — four rungs, the laya contract and the draft gate",
+    "business_value": 8,
+    "time_criticality": 8,
+    "risk_reduction": 8,
+    "job_size": 8
+  },
+  "review": {
+    "level": "non_conformant",
+    "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) — a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth §12 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 — L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 — `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although §7.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 — options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so §7.2's \"options are rows, questions are rows\" is not met. v1-t2-5 — budget code spelling: §7.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 — a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A–D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/T2.toml"
     }
-   }
-  ],
-  "assumption": [
-   {
-    "title": "The standing delegation remains the authority for this rework",
-    "code": "A-T2-01",
-    "body": "The retrospective rework acts under the delegation published on 2026-11-22, and the requester `conveyor-e2e` and the approver `conveyor-approver` stay distinct identities for every approval the ladder records. If the delegation lapses, the A-D artefacts and the delivery contract lose the authority they were approved under.",
-    "links": {
-     "requirements": [
-      "R7 P1.1 (gate identity)"
-     ]
-    }
-   },
-   {
-    "title": "The ladder keeps three distinct rungs and actors",
-    "code": "A-T2-02",
-    "body": "The L0 rule, the L1 laya choice and the L3 human decision stay separate rungs with separate actors, and no rung is collapsed into another. The audit-shape test compares the three rows on one column set, and that comparison only means something while the rung and actor CHECKs keep the rows distinct.",
-    "links": {
-     "requirements": [
-      "R1 P1.1"
-     ]
-    }
-   }
-  ],
-  "dependency": [
-   {
-    "title": "T1 and the T0 decision-table contracts hold",
-    "code": "D-T2-01",
-    "body": "T2 carries a declared `needs` dependency on T1 and reuses the five decision tables and the approval primitive T0 shipped as contracts in `migrations/0040_organisation.sql`. A schema break upstream would strand the rung, answer and version-pin columns that 0046 adds to `decision`.",
-    "links": {
-     "requirements": [
-      "R1 P1.1",
-      "R4 P4.1/P4.2"
-     ]
-    }
-   },
-   {
-    "title": "Postgres 18 with FORCE RLS stays the only store",
-    "code": "D-T2-02",
-    "body": "The tenant-scoped decision rows rely on the FORCE ROW LEVEL SECURITY and the forward-only migration discipline that `migrations/0040_organisation.sql` and `0046_decision_ladder.sql` establish. A store that does not enforce the same policies would break the tenant isolation the decision tables and their audit event depend on.",
-    "links": {
-     "requirements": [
-      "R13"
-     ]
-    }
-   }
-  ],
-  "benefit": [
-   {
-    "title": "Every rung reads as one audit shape",
-    "code": "B-T2-01",
-    "body": "A rule, a laya and a human decision are recorded through one `decision` row with the policy, refinement and laya-config versions pinned, so an auditor compares the three rungs on the same columns instead of translating three record families.",
-    "links": {
-     "requirements": [
-      "R1 P1.1"
-     ]
-    }
-   },
-   {
-    "title": "A tenant threshold changes without a build",
-    "code": "B-T2-02",
-    "body": "A published refinement changes a decision threshold for one tenant without a code change or a deploy, because `ladder.evaluate` reads the pinned refinement version rather than a compiled constant. The same row records which refinement version answered, so the change is reproducible.",
-    "links": {
-     "requirements": [
-      "R3 P3.1",
-      "R10 §7.2 (gated refinement)"
-     ]
-    }
-   },
-   {
-    "title": "No decision passes without its own gate approval",
-    "code": "B-T2-03",
-    "body": "Once the gate-identity check lands, the human rung requires the approval its own gate produced, and the requester is never the approver under the standing delegation. A self-approval, or an approval borrowed from another case, is refused, so the ladder's escalation path becomes an audit fact rather than a convention.",
-    "links": {
-     "requirements": [
-      "R6 P1.1 (human)",
-      "R7 P1.1 (gate identity)"
-     ]
-    }
-   }
-  ]
- },
- "delivery_contract": {
-  "title": "Delivery contract \u2014 T2 Decision ladder (retrospective, U5a)",
-  "body": {
-   "compliance": "T2 is assessed clause by clause against the SPEC_V2 \u00a712 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2. The first three gate clauses are proved by named real-Postgres tests: `crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`. The fourth clause is proved on the apply and update paths by `::a_generated_draft_cannot_transition_a_card` and `crates/actions/tests/ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, but is refuted on the create path by v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document with no gate. The batch admitted six findings \u2014 v1-t2-1 (P0, blocking), v1-t2-2 (L1 never calls laya), v1-t2-3 (`refinements.publish` ungated), v1-t2-4 (inline options and questions), v1-t2-5 (budget code spelling) and v1-t2-6 (a human decision cites any approved approval, not its gate). The compliance level is non_conformant; the project stays ACTIVE and is not closed in this pass. The rework's acceptance instrument is `acceptance/programme/T2.toml`.",
-   "acceptance_at": "the live record at the rework snapshot 2026-11-21T19:24:46Z (snapshot main@d367a4a9) and the delivery commit 39363ba8 (2026-11-17)",
-   "manifest": "acceptance/programme/T2.toml",
-   "retrospective": true,
-   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-  }
- },
- "wbs_deliverable": {
-  "title": "The decision ladder \u2014 four rungs, the laya contract and the draft gate",
-  "business_value": 8,
-  "time_criticality": 8,
-  "risk_reduction": 8,
-  "job_size": 8
- },
- "review": {
-  "level": "non_conformant",
-  "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) \u2014 a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth \u00a712 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 \u2014 L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 \u2014 `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although \u00a77.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 \u2014 options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so \u00a77.2's \"options are rows, questions are rows\" is not met. v1-t2-5 \u2014 budget code spelling: \u00a77.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 \u2014 a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
-  "evidence": {
-   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-   "acceptance_manifest": "acceptance/programme/T2.toml"
-  }
- },
- "project_brief_output": "# Project brief \u2014 T2 Decision ladder (retrospective, 2026-11-21)\n\n## Outcome\n\nThe conveyor has one decision ladder. An L0 rule, an L1 laya choice and an L3 human decision are written through one `decision` row shape; each row pins the policy, refinement and laya-config versions it read; a tenant refinement changes a threshold without a build; and a generated draft is applied only through `ladder.apply_draft` with a human `draft.apply` decision backed by an approved gate. Six findings remain open, and v1-t2-1 \u2014 `documents.compose` can attach a generated draft with no gate \u2014 keeps the project active.\n\n## Boundary\n\nT2 owns the ladder row, the policy, refinement and laya-config rows, the human gate and the draft-apply gate. It does not own the PM job (T3), the tool platform (T13), metrics and metering (T11), cadence materialisation or PI planning (T10), the S15 judge's own laya call in `crates/actions/src/process/judge.rs`, or the ADR board's `decisions.*` family, which keeps its name. The console does not gain a ladder panel in T2; `ladder.list` is the read.\n\n## Reuse sources\n\n`migrations/0040_organisation.sql:216\u2013360` \u2014 the five decision tables shipped by T0 as schema and contracts only. `crates/actions/src/control/approvals.rs` \u2014 the approval row, `approval_decision` and the requester/executor exclusion from T1. `crates/actions/src/documents/actions.rs` \u2014 `documents.compose` and `documents.update`, the two paths the draft gate must cover. The S16 `inference_call` ledger for the L2 generation split. The action registry, the `#[action]` declaration and the real-Postgres test harness.\n\n## Inception units\n\nNo T2-specific inception analysis or architecture design is present in the snapshot; this rework authored none. The inception claim is the SPEC_V2 \u00a77.1\u2013\u00a77.5 text, the T2 row of \u00a712 and the issue #73 body. The implementation record is the delivery commit and the two acceptance suites.\n\n## Dependencies\n\n- blocked-by: T1 and P0 (`project.meta.depends_on = [\"T1\", \"P0\"]`); the ladder writes the pins T1's plan spine and T0's decision contracts define.\n- blocks: T3 (PM gate routing), T5 (kata decisions), T7 (operations severity and gate pre-check), T13 (tool selection) and T16 (procedure publication), per the \u00a712 dependency line.\n- related: T4 (coach triage and remedy) and T11 (governance metrics read `decision`).\n\n## Acceptance\n\nThe SPEC_V2 \u00a712 T2 gate: a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions; a generated draft cannot transition a card. The first three are green by `decision_ladder.rs`; the fourth is green on `ladder.apply_draft` and `documents.update` and red on `documents.compose` (v1-t2-1). The rework's acceptance instrument is `acceptance/programme/T2.toml`.\n\n## Capabilities\n\nOne decision audit shape across L0, L1 and L3; version-pinned and reproducible decisions; tenant refinement without a build; the laya config row; the person-only human rung; the gated draft application; the `decision.changed` event; tenant-scoped rows and indexes.\n\n## Plan\n\nHeld to `docs/SPEC_V2.md` \u00a712 (T2) and \u00a77.1\u2013\u00a77.5. The project row's plan pointer is `docs/SPEC_V2.md#12` with `plan_status: draft`; no separate plan document exists. Delivered 2026-11-17 by commit `39363ba8` (#73, #286); reworked retrospectively 2026-11-21 and left active.\n\n## Risks\n\n- `documents.compose` attaches a generated draft with no gate (v1-t2-1, P0): the fourth clause is not true until the create path checks the draft class.\n- L1 records a caller-supplied answer and never calls laya (v1-t2-2): the ladder's confidence is only as good as its caller.\n- `refinements.publish` and `decision_policies.update` are ungated (v1-t2-3): a tenant can weaken a safety gate without an approval.\n- Options and questions are inline request data (v1-t2-4): the option set is not independently versioned and the policy has no `fire_when` or `min_confidence`.\n- The \u00a77.5 budget slug has no implementation (v1-t2-5).\n- A human decision does not pin its approval to its gate (v1-t2-6).\n\n## Links\n\n- Issue: https://github.com/nonagenticai/conveyor/issues/73\n- Commit: `39363ba8cfb532d415c9ad06b45e86421c5c86b6`\n- Specification: `docs/SPEC_V2.md` \u00a77.1\u2013\u00a77.5 and \u00a712 (T2)\n- Schema: `migrations/0046_decision_ladder.sql`\n- Tests: `crates/actions/tests/decision_ladder.rs`, `crates/actions/tests/ladder_human_gate.rs`\n- Tranche 2: `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`\n- Standing delegation: `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`\n",
- "evidence_output": "# Evidence \u2014 T2 Decision ladder (retrospective, 2026-11-21)\n\n## Claim\n\nT2 delivered the decision ladder's one row shape across L0, L1 and L3; the policy, refinement and laya-config rows with their version pins; the person-only human rung; the gated `draft.apply` application; and the generated-class refusal on `documents.update` \u2014 proved by named tests against real Postgres 18. Six findings remain open; v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks closure.\n\n## Evidence\n\n- **Delivery:** commit `39363ba8cfb532d415c9ad06b45e86421c5c86b6`, 2026-11-17 15:36:58 +0000, \"#73 T2 \u2014 Decision ladder (#286)\"; issue #73 is CLOSED (GitHub updatedAt 2026-11-17T15:37:01Z).\n- **Schema:** `migrations/0046_decision_ladder.sql` adds the rung, answer, option-set and policy/refinement/laya-config version pins, `actor_kind`, `actor_id` and `approval_id` to `decision`; the CHECKs `decision_rung_check` (rule|laya|human), `decision_actor_kind_check` (system|user|agent|service) and the three positive-version CHECKs; `decision_approval_fk`; `decision_kind_idx` and `decision_rung_idx`; the one-refinement index and the one-policy-per-case index. The five decision tables are T0's, in `migrations/0040_organisation.sql:216\u2013360`.\n- **Tests:** `crates/actions/tests/decision_ladder.rs` \u2014 `a_rule_a_laya_and_a_human_decision_share_one_audit_shape` (three rows, identical columns), `a_refinement_changes_a_threshold_without_a_code_change` (0.7 refused at 0.8, accepted at 0.5, refinement pin 1), `every_decision_pins_the_refinement_and_laya_config_versions` (422 `pins_incomplete` with no laya config; pins 1/1/1; first row unchanged after policy v2), `a_generated_draft_cannot_transition_a_card` (refused L1 and accepted L1 are 422 `draft_requires_gate`; the human `draft.apply` applies; `documents.update` attaching the generated class is 409 `draft_requires_gate`); `crates/actions/tests/ladder_human_gate.rs` \u2014 `a_service_principal_cannot_record_a_human_decision` (403 `person_required`), `a_human_decision_without_an_approved_human_gate_is_refused`, `a_pending_approval_cannot_gate_a_draft`, `only_a_human_draft_apply_decision_can_gate_a_draft`, `a_human_draft_apply_decision_and_approval_applies_the_draft`.\n- **Action surface:** `ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list`, `laya_configs.create|list`; the human check is `human_approved_gate_tx`, the dedicated gate is `DRAFT_APPLY_GATE = \"draft.apply\"`, and every mutation appends `decision.changed`.\n- **Governance:** tranche 2 (`01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`) is `planned`, with no authorisation review, no `authorised_at` and no baseline reference; its exit criteria name S03 and T2. T2 closed on 2026-11-17 before that authorisation; the live register records the out-of-sequence closure as the accepted P0 issue `U3-EXC-T2` (`01a1fbac-aeb9-7dea-a079-bf159140344a`) under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n\n## Verification\n\nAn independent reader can read the named test functions and run them against real Postgres 18 in the repository's harness: `crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs`. The compile/test verdict is the repository's GitHub-hosted `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1` (`docs/plans/03-DELIVERY.md`). The rework records the acceptance instrument as `acceptance/programme/T2.toml`; it does not assert a manifest run the facts do not record.\n\n## Links\n\n- Issue: https://github.com/nonagenticai/conveyor/issues/73\n- Commit: `39363ba8cfb532d415c9ad06b45e86421c5c86b6`\n- Specification: `docs/SPEC_V2.md` \u00a77.1\u2013\u00a77.5 and \u00a712 (T2)\n- Schema: `migrations/0046_decision_ladder.sql`\n- Tests: `crates/actions/tests/decision_ladder.rs`, `crates/actions/tests/ladder_human_gate.rs`\n- Tranche 2: `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`\n- Standing delegation: `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`\n\n## Gap\n\n- **v1-t2-1 (P0, blocks closure).** A generated draft can be attached by `documents.compose`: the action accepts `card_id` and `meta.generated = true` and creates an attached document with no `draft.apply` check; `ladder.apply_draft` and the `documents.update` refusal do not cover the create path.\n- **v1-t2-2.** L1 never calls laya: the answer, confidence, probabilities and latency are caller-supplied; no T2 path issues `POST /v1/systemone`.\n- **v1-t2-3.** `refinements.publish` is ungated: `confirm = \"none\"` and no approval, although a refinement change is a gated policy change.\n- **v1-t2-4.** Options and questions are inline free text: `ladder.evaluate` takes an `options` array and a `question` string; `decision_policy` has no authored question, `fire_when` or `min_confidence`.\n- **v1-t2-5.** Budget code spelling: \u00a77.5's `429 budget_exceeded` has no implementation; the only budget refusal is `429 tool_budget_exceeded` for tool spend.\n- **v1-t2-6.** A human decision cites any approved approval, not its gate: `ladder.record` passes `None` for the gate to `human_approved_gate_tx`; only `ladder.apply_draft` checks `draft.apply`.\n- No contemporaneous charter, Statement of Architecture Work, delivery contract or Phase-G review existed at the 2026-11-17 close; this set is retrospective and does not attest contemporaneous intent.\n- T2 remains ACTIVE in this pass. The seven A\u2013D artefacts, the charter and this evidence are published; no closure or closure review is authored because v1-t2-1 blocks the fourth gate clause.\n",
- "closure": "# Closure record \u2014 T2 Decision ladder (retrospective, 2026-11-21)\n\n- **What was delivered:** the decision ladder of `docs/SPEC_V2.md` \u00a77 \u2014 the four rungs (rule, laya, LLM, human) with one stored and returned audit shape, the threshold and fail-policy contract with refinements pinned by version, the generation contract with `ladder.apply_draft`, and the decision rows in `migrations/0044`-era schema. Built at `39363ba8cfb532d415c9ad06b45e86421c5c86b6` (\"#73 T2 \u2014 Decision ladder (#286)\"); issue #73 closed 2026-11-17.\n- **What this rework added:** the programme record the original close never carried \u2014 charter, Statement of Architecture Work, the seven Phase A\u2013D artefacts bound to the adopted standard, the board-approved delivery contract, the scope baseline, this Phase-G review and its closure review \u2014 plus the six audit findings of 2026-11-21 and the fix for the one of them that was a P0.\n- **What remains open:** `v1-t2-3` and `v1-t2-6` (P1, owned by T2), `v1-t2-5` (P2). None is waived; each is a package with an acceptance clause.\n- **Honesty note:** no contemporaneous charter, contract, review or closure record existed at the 2026-11-17 close. This set is written retrospectively under the standing delegation and attests the evidence, not the intent, of that day.",
- "closure_review": "# Closure review \u2014 T2 Decision ladder (retrospective, 2026-11-21)\n\n## Outcome vs acceptance\n\nT2's \u00a712 gate asks that a rule, a laya decision and a human decision produce the same audit shape; that a tenant refinement changes a threshold without a code change; that every decision pins the refinement and laya config versions; and that a generated draft cannot transition a card. The first three hold at HEAD and were re-read for this review. The fourth did not: `documents.compose` attached a generated draft to a card with no gate. It now does not, and the gate is proved.\n\n## Evidence\n\n- `acceptance/programme/T2.toml` \u2014 the project's manifest.\n- `docs/evidence/rework/tranche-2/findings.json` \u2014 the six findings, every quote verified against the tree.\n- `crates/actions/tests/documents_compose_gate.rs` at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` \u2014 4/4, with `process_step` 20/20.\n- the ledger's `resolved_by` on `v1-t2-1`.\n\n## Open items\n\n- `v1-t2-3` (P1) \u2014 `refinements.publish` is ungated although \u00a77.2 calls a refinement change a gated policy change. Owned by T2, package scheduled behind this tranche.\n- `v1-t2-6` (P1) \u2014 a human decision may cite any approved approval on the card rather than the gate that posed its question. Owned by T2.\n- `v1-t2-5` (P2) \u2014 the budget refusal ships as `tool_budget_exceeded` where \u00a77.5 names `budget_exceeded`.\n\nNone is waived.\n\n## Decision\n\nClose T2 on the P0-only product gate. Requested by the programme's service actor `conveyor-e2e` and decided by the distinct approver `conveyor-approver` under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the requester is not the approver. The three open items above are carried into the next tranche and must be disposed by a dated decision at the programme's viability review if still open."
+  },
+  "project_brief_output": "# Project brief — T2 Decision ladder (retrospective, 2026-11-21)\n\n## Outcome\n\nThe conveyor has one decision ladder. An L0 rule, an L1 laya choice and an L3 human decision are written through one `decision` row shape; each row pins the policy, refinement and laya-config versions it read; a tenant refinement changes a threshold without a build; and a generated draft is applied only through `ladder.apply_draft` with a human `draft.apply` decision backed by an approved gate. Six findings remain open, and v1-t2-1 — `documents.compose` can attach a generated draft with no gate — keeps the project active.\n\n## Boundary\n\nT2 owns the ladder row, the policy, refinement and laya-config rows, the human gate and the draft-apply gate. It does not own the PM job (T3), the tool platform (T13), metrics and metering (T11), cadence materialisation or PI planning (T10), the S15 judge's own laya call in `crates/actions/src/process/judge.rs`, or the ADR board's `decisions.*` family, which keeps its name. The console does not gain a ladder panel in T2; `ladder.list` is the read.\n\n## Reuse sources\n\n`migrations/0040_organisation.sql:216–360` — the five decision tables shipped by T0 as schema and contracts only. `crates/actions/src/control/approvals.rs` — the approval row, `approval_decision` and the requester/executor exclusion from T1. `crates/actions/src/documents/actions.rs` — `documents.compose` and `documents.update`, the two paths the draft gate must cover. The S16 `inference_call` ledger for the L2 generation split. The action registry, the `#[action]` declaration and the real-Postgres test harness.\n\n## Inception units\n\nNo T2-specific inception analysis or architecture design is present in the snapshot; this rework authored none. The inception claim is the SPEC_V2 §7.1–§7.5 text, the T2 row of §12 and the issue #73 body. The implementation record is the delivery commit and the two acceptance suites.\n\n## Dependencies\n\n- blocked-by: T1 and P0 (`project.meta.depends_on = [\"T1\", \"P0\"]`); the ladder writes the pins T1's plan spine and T0's decision contracts define.\n- blocks: T3 (PM gate routing), T5 (kata decisions), T7 (operations severity and gate pre-check), T13 (tool selection) and T16 (procedure publication), per the §12 dependency line.\n- related: T4 (coach triage and remedy) and T11 (governance metrics read `decision`).\n\n## Acceptance\n\nThe SPEC_V2 §12 T2 gate: a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions; a generated draft cannot transition a card. The first three are green by `decision_ladder.rs`; the fourth is green on `ladder.apply_draft` and `documents.update` and red on `documents.compose` (v1-t2-1). The rework's acceptance instrument is `acceptance/programme/T2.toml`.\n\n## Capabilities\n\nOne decision audit shape across L0, L1 and L3; version-pinned and reproducible decisions; tenant refinement without a build; the laya config row; the person-only human rung; the gated draft application; the `decision.changed` event; tenant-scoped rows and indexes.\n\n## Plan\n\nHeld to `docs/SPEC_V2.md` §12 (T2) and §7.1–§7.5. The project row's plan pointer is `docs/SPEC_V2.md#12` with `plan_status: draft`; no separate plan document exists. Delivered 2026-11-17 by commit `39363ba8` (#73, #286); reworked retrospectively 2026-11-21 and left active.\n\n## Risks\n\n- `documents.compose` attaches a generated draft with no gate (v1-t2-1, P0): the fourth clause is not true until the create path checks the draft class.\n- L1 records a caller-supplied answer and never calls laya (v1-t2-2): the ladder's confidence is only as good as its caller.\n- `refinements.publish` and `decision_policies.update` are ungated (v1-t2-3): a tenant can weaken a safety gate without an approval.\n- Options and questions are inline request data (v1-t2-4): the option set is not independently versioned and the policy has no `fire_when` or `min_confidence`.\n- The §7.5 budget slug has no implementation (v1-t2-5).\n- A human decision does not pin its approval to its gate (v1-t2-6).\n\n## Links\n\n- Issue: https://github.com/nonagenticai/conveyor/issues/73\n- Commit: `39363ba8cfb532d415c9ad06b45e86421c5c86b6`\n- Specification: `docs/SPEC_V2.md` §7.1–§7.5 and §12 (T2)\n- Schema: `migrations/0046_decision_ladder.sql`\n- Tests: `crates/actions/tests/decision_ladder.rs`, `crates/actions/tests/ladder_human_gate.rs`\n- Tranche 2: `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`\n- Standing delegation: `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`\n",
+  "evidence_output": "# Evidence — T2 Decision ladder (retrospective, 2026-11-21)\n\n## Claim\n\nT2 delivered the decision ladder's one row shape across L0, L1 and L3; the policy, refinement and laya-config rows with their version pins; the person-only human rung; the gated `draft.apply` application; and the generated-class refusal on `documents.update` — proved by named tests against real Postgres 18. Six findings remain open; v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks closure.\n\n## Evidence\n\n- **Delivery:** commit `39363ba8cfb532d415c9ad06b45e86421c5c86b6`, 2026-11-17 15:36:58 +0000, \"#73 T2 — Decision ladder (#286)\"; issue #73 is CLOSED (GitHub updatedAt 2026-11-17T15:37:01Z).\n- **Schema:** `migrations/0046_decision_ladder.sql` adds the rung, answer, option-set and policy/refinement/laya-config version pins, `actor_kind`, `actor_id` and `approval_id` to `decision`; the CHECKs `decision_rung_check` (rule|laya|human), `decision_actor_kind_check` (system|user|agent|service) and the three positive-version CHECKs; `decision_approval_fk`; `decision_kind_idx` and `decision_rung_idx`; the one-refinement index and the one-policy-per-case index. The five decision tables are T0's, in `migrations/0040_organisation.sql:216–360`.\n- **Tests:** `crates/actions/tests/decision_ladder.rs` — `a_rule_a_laya_and_a_human_decision_share_one_audit_shape` (three rows, identical columns), `a_refinement_changes_a_threshold_without_a_code_change` (0.7 refused at 0.8, accepted at 0.5, refinement pin 1), `every_decision_pins_the_refinement_and_laya_config_versions` (422 `pins_incomplete` with no laya config; pins 1/1/1; first row unchanged after policy v2), `a_generated_draft_cannot_transition_a_card` (refused L1 and accepted L1 are 422 `draft_requires_gate`; the human `draft.apply` applies; `documents.update` attaching the generated class is 409 `draft_requires_gate`); `crates/actions/tests/ladder_human_gate.rs` — `a_service_principal_cannot_record_a_human_decision` (403 `person_required`), `a_human_decision_without_an_approved_human_gate_is_refused`, `a_pending_approval_cannot_gate_a_draft`, `only_a_human_draft_apply_decision_can_gate_a_draft`, `a_human_draft_apply_decision_and_approval_applies_the_draft`.\n- **Action surface:** `ladder.record|evaluate|list|apply_draft`, `decision_policies.create|update|list`, `refinements.publish|list`, `laya_configs.create|list`; the human check is `human_approved_gate_tx`, the dedicated gate is `DRAFT_APPLY_GATE = \"draft.apply\"`, and every mutation appends `decision.changed`.\n- **Governance:** tranche 2 (`01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`) is `planned`, with no authorisation review, no `authorised_at` and no baseline reference; its exit criteria name S03 and T2. T2 closed on 2026-11-17 before that authorisation; the live register records the out-of-sequence closure as the accepted P0 issue `U3-EXC-T2` (`01a1fbac-aeb9-7dea-a079-bf159140344a`) under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n\n## Verification\n\nAn independent reader can read the named test functions and run them against real Postgres 18 in the repository's harness: `crates/actions/tests/decision_ladder.rs` and `crates/actions/tests/ladder_human_gate.rs`. The compile/test verdict is the repository's GitHub-hosted `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1` (`docs/plans/03-DELIVERY.md`). The rework records the acceptance instrument as `acceptance/programme/T2.toml`; it does not assert a manifest run the facts do not record.\n\n## Links\n\n- Issue: https://github.com/nonagenticai/conveyor/issues/73\n- Commit: `39363ba8cfb532d415c9ad06b45e86421c5c86b6`\n- Specification: `docs/SPEC_V2.md` §7.1–§7.5 and §12 (T2)\n- Schema: `migrations/0046_decision_ladder.sql`\n- Tests: `crates/actions/tests/decision_ladder.rs`, `crates/actions/tests/ladder_human_gate.rs`\n- Tranche 2: `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`\n- Standing delegation: `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`\n\n## Gap\n\n- **v1-t2-1 (P0, blocks closure).** A generated draft can be attached by `documents.compose`: the action accepts `card_id` and `meta.generated = true` and creates an attached document with no `draft.apply` check; `ladder.apply_draft` and the `documents.update` refusal do not cover the create path.\n- **v1-t2-2.** L1 never calls laya: the answer, confidence, probabilities and latency are caller-supplied; no T2 path issues `POST /v1/systemone`.\n- **v1-t2-3.** `refinements.publish` is ungated: `confirm = \"none\"` and no approval, although a refinement change is a gated policy change.\n- **v1-t2-4.** Options and questions are inline free text: `ladder.evaluate` takes an `options` array and a `question` string; `decision_policy` has no authored question, `fire_when` or `min_confidence`.\n- **v1-t2-5.** Budget code spelling: §7.5's `429 budget_exceeded` has no implementation; the only budget refusal is `429 tool_budget_exceeded` for tool spend.\n- **v1-t2-6.** A human decision cites any approved approval, not its gate: `ladder.record` passes `None` for the gate to `human_approved_gate_tx`; only `ladder.apply_draft` checks `draft.apply`.\n- No contemporaneous charter, Statement of Architecture Work, delivery contract or Phase-G review existed at the 2026-11-17 close; this set is retrospective and does not attest contemporaneous intent.\n- T2 remains ACTIVE in this pass. The seven A–D artefacts, the charter and this evidence are published; no closure or closure review is authored because v1-t2-1 blocks the fourth gate clause.\n",
+  "closure": "# Closure record — T2 Decision ladder (retrospective, 2026-11-21)\n\n- **What was delivered:** the decision ladder of `docs/SPEC_V2.md` §7 — the four rungs (rule, laya, LLM, human) with one stored and returned audit shape, the threshold and fail-policy contract with refinements pinned by version, the generation contract with `ladder.apply_draft`, and the decision rows in `migrations/0044`-era schema. Built at `39363ba8cfb532d415c9ad06b45e86421c5c86b6` (\"#73 T2 — Decision ladder (#286)\"); issue #73 closed 2026-11-17.\n- **What this rework added:** the programme record the original close never carried — charter, Statement of Architecture Work, the seven Phase A–D artefacts bound to the adopted standard, the board-approved delivery contract, the scope baseline, this Phase-G review and its closure review — plus the six audit findings of 2026-11-21 and the fix for the one of them that was a P0.\n- **What remains open:** `v1-t2-3` and `v1-t2-6` (P1, owned by T2), `v1-t2-5` (P2). None is waived; each is a package with an acceptance clause.\n- **Honesty note:** no contemporaneous charter, contract, review or closure record existed at the 2026-11-17 close. This set is written retrospectively under the standing delegation and attests the evidence, not the intent, of that day.",
+  "closure_review": "# Closure review — T2 Decision ladder (retrospective, 2026-11-21)\n\n## Outcome vs acceptance\n\nT2's §12 gate asks that a rule, a laya decision and a human decision produce the same audit shape; that a tenant refinement changes a threshold without a code change; that every decision pins the refinement and laya config versions; and that a generated draft cannot transition a card. The first three hold at HEAD and were re-read for this review. The fourth did not: `documents.compose` attached a generated draft to a card with no gate. It now does not, and the gate is proved.\n\n## Evidence\n\n- `acceptance/programme/T2.toml` — the project's manifest.\n- `docs/evidence/rework/tranche-2/findings.json` — the six findings, every quote verified against the tree.\n- `crates/actions/tests/documents_compose_gate.rs` at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` — 4/4, with `process_step` 20/20.\n- the ledger's `resolved_by` on `v1-t2-1`.\n\n## Open items\n\n- `v1-t2-3` (P1) — `refinements.publish` is ungated although §7.2 calls a refinement change a gated policy change. Owned by T2, package scheduled behind this tranche.\n- `v1-t2-6` (P1) — a human decision may cite any approved approval on the card rather than the gate that posed its question. Owned by T2.\n- `v1-t2-5` (P2) — the budget refusal ships as `tool_budget_exceeded` where §7.5 names `budget_exceeded`.\n\nNone is waived.\n\n## Decision\n\nClose T2 on the P0-only product gate. Requested by the programme's service actor `conveyor-e2e` and decided by the distinct approver `conveyor-approver` under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the requester is not the approver. The three open items above are carried into the next tranche and must be disposed by a dated decision at the programme's viability review if still open."
 }

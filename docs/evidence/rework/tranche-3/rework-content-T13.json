@@ -1,0 +1,988 @@
+{
+  "charter": "# Charter — T13 tool platform (retrospective, 2026-11-26)\n\n- **Project:** T13 'Tool platform', track v2, ADM phase G, plateau capability, tranche 3, project `01a1d039-0d37-730f-8f8a-2f50e5a0933d`, plan `docs/SPEC_V2.md#12` (the T13 row in SPEC_V2 §12). The row records `meta.measured_status: built`, `meta.depends_on: [T2 (needs), P0 (needs)]`, `meta.issues: [76, 556, 557, 630]` — all four closed on GitHub — and `meta.expected_outputs: [project-brief, evidence]`. It was reopened for the #526 retrospective rework under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14` with the reason 'the retrospective MSP/TOGAF/SAFe rework of tranche 3 (#526)', and the rework runs against the acceptance receipt `docs/evidence/rework/T13.json`, which is red on the mandatory artefact packages and on the P1 package v1-p116-1.\n- **Mandate:** give every conveyor-internal run exactly one governed way to reach a job backend — `tools.call` — with the binding row as its authority, refusal before dispatch, one `tool_call` ledger row per call, credential brokerage over sealed secrets, and tenant-prefixed object storage. The retrospective reconstitutes the MSP/TOGAF lifecycle record for that slice: charter, Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review, the project-brief and evidence outputs and the closure review.\n- **Scope:** in — the broker `tools.call` and its seven steps; the `tool`, `toolkit`, `tool_binding` and `tool_call` tables; effect classes read, write, destructive and spend; binding-scoped credential aliases; the direct MinIO storage adapter with the `tenant/<tenant_id>/` prefix; the coding toolkit and one kag-era toolkit; V1's external actions migrated; the six §12 gate proofs. Out — the catalogue actions and the estate import (T14); the agent platform gateway `nonagenticai_mcp_server` (D44, D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); a production `tool_binding` writer (v1-p111-1).\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle of a build proved on 2026-11-22 at lane head 582e2dc6, it does not authorise new work, and it does not re-run the suite.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T13 tool platform (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework T13 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and re-publish the project-brief and evidence outputs. The architecture work is the tool platform itself — the broker, the call ledger, the effect and schema gates and the tenant-prefixed storage adapter — recorded retrospectively and dated 2026-11-26.",
+      "scope": "In scope: the broker tools.call and its seven steps (resolve the binding, check effect and budget, validate the closed schema, resolve the credential alias, call the registered destination, normalise and redact, record and emit); the tool, toolkit, tool_binding and tool_call tables; effect classes read, write, destructive and spend with tenant-configured approvals, dry-run and dual control; credential aliases over sealed secrets; the direct MinIO adapter with tenant, project and run prefixes; the coding toolkit and one kag-era toolkit; V1's external-action migration; the six §12 gate proofs. Out of scope: catalogue actions and the estate import, which T14 owns; the agent platform gateway nonagenticai_mcp_server, permanently outside the conveyor's path (D44, D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); a production tool_binding writer (v1-p111-1).",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the seven A–D artefacts and both contracts, which the record shows approved on 2026-11-22. The Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 is approved under approval 01a20273-4f0f-77e6-8005-9744d1e3a574, and the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c under approval 01a20277-4be1-78c6-8516-728eb4d6068b; both approvals are recorded against the approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545, distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d.",
+      "acceptance_criteria": "The SPEC_V2 §12 gate is executable through the manifest acceptance/programme/T13.toml and six named tests in crates/actions/tests/tool_platform.rs: a_bound_job_calls_coding_through_the_broker, one_call_is_one_ledger_row, a_destructive_call_without_approvals_is_refused, a_closed_schema_refuses_before_the_call, a_job_round_trips_a_tenant_prefixed_object and the_compiled_prompt_carries_no_s3_key. The suite re-ran for the record at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub, 17 of 17 passed, and every refusal assertion is on the wire — a refusal that called upstream would move the stub counter.",
+      "contract": "This statement 01a20271-2a37-7329-b159-28031ddcb966 sits under its approval 01a20273-4f0f-77e6-8005-9744d1e3a574. It is complemented by the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c under approval 01a20277-4be1-78c6-8516-728eb4d6068b, and by the approved scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 (taken 2026-11-22) and 01a20279-854d-79f6-a751-a34d51be7589 (taken 2026-11-22, the baseline the change request accepted the WBS deliverable against). The Phase-G reviews are 01a216d0-f1b9-78c6-854b-8da02cacd819 on the statement and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 on the delivery contract, both at level compliant. It is retrospective, dated 2026-11-26, and claims no fresh gate run.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — T13 tool platform",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the tool platform serves and the engagement each needs, from the development job that calls a backend to the operator who retires a zero-call tool.",
+      "scope": "The stakeholders of the tool platform and its two contracts; later slices appear only where SPEC_V2 §11 or §12 makes them a dependency or boundary.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the development and delivery job families",
+          "tenant admins",
+          "the platform operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the development job family",
+          "axis_b": "reaches a job backend only through tools.call under a binding row's authority",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the programme owner",
+          "axis_b": "sponsors the slice and closes it on the tranche-3 exit criteria",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews the seven A–D artefacts and approves both contracts under the standing delegation",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "authors the retrospective lifecycle record under the #526 rework",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the coding fleet owner",
+          "axis_b": "registers and reviews the coding destination alias; no caller-supplied URL is admitted at call time",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "tenant admins",
+          "axis_b": "configure destructive-call approvals and approve BYO toolkit publication",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep satisfied"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "the platform operator",
+          "axis_b": "publishes immutable versions, probes toolkits and retires zero-call tools",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "keep informed"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "the agent platform gateway nonagenticai_mcp_server",
+          "axis_b": "boundary: serves the agent platform's own backends and stays outside the conveyor's call path (D44, D59)",
+          "value": {
+            "influence": "low",
+            "interest": "low",
+            "engagement": "monitor"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — T13 tool platform",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder map — T13 tool platform\n\n## Metadata\n\nRetrospective matrix for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d. The record is the one authored on 2026-11-22 and re-read here act by act; nothing in it is a live elicitation.\n\n## Entries\n\nEight actors on the influence, interest and engagement axes. The development job family is the consumer whose only path to a backend is tools.call. The programme owner and the Architecture Board hold the decision and the approval, and the board acts under the standing delegation with an approver distinct from the requester. The programme architect is responsible for this retrospective record. The coding fleet owner registers the destination alias, tenant admins configure destructive approvals and BYO publication, and the platform operator publishes versions, probes and retires. The agent platform gateway is named as a boundary rather than a consumer.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T13 tool platform as dependency, because the requirements fix what each actor receives from the broker. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: place the actors of the tool platform so each concern has a named owner and a stated engagement. Scope: the stakeholders of the tool platform and its two contracts. It was reconstructed retrospectively on 2026-11-26 from the recorded roles, not from a live elicitation, and it does not claim that any actor re-accepted the platform after the 2026-11-22 record."
+    },
+    {
+      "title": "Driver/goal/objective — T13 tool platform",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the tool platform exists and what the broker, the ledger and the storage adapter are meant to achieve.",
+      "scope": "The drivers and goals of one governed call path, for the T13 slice only; catalogue actions and the estate import belong to T14.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the development job family",
+          "the platform operator",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 a procedure or agent reaches a backend by an ad-hoc HTTP call",
+          "axis_b": "G1 make tools.call the only path to a job backend",
+          "value": {
+            "objective": "one governed call path for every conveyor-internal run",
+            "measure": "a_bound_job_calls_coding_through_the_broker returns 200 with exactly one destination hit"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 the predecessor MCP server would be a second catalogue, queue and runner",
+          "axis_b": "G2 refuse the second control plane and borrow only its shape",
+          "value": {
+            "objective": "one repo, one schema, one queue; nonagenticai_mcp_server stays outside the path (D44, D59)",
+            "measure": "the slice ships no second catalogue and the gateway is named only as a boundary"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 a credential or an S3 key leaks into a prompt or a ledger row",
+          "axis_b": "G3 inject the sealed credential only at the destination",
+          "value": {
+            "objective": "the prompt and the tool_call row never carry the access key, the secret key or an S3 key",
+            "measure": "the_compiled_prompt_carries_no_s3_key and a_call_uses_the_bindings_sealed_credential"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 a destructive operation runs on a job's own authority alone",
+          "axis_b": "G4 gate destructive calls on the tenant's configured approvals",
+          "value": {
+            "objective": "approval, dry-run and dual control before a destructive effect",
+            "measure": "a_destructive_call_without_approvals_is_refused returns 403 approval_required with zero destination hits"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 unvalidated input reaches a backend and fails there",
+          "axis_b": "G5 refuse a closed-schema violation before egress",
+          "value": {
+            "objective": "422 tool_input_invalid with populated errors[] before any network call",
+            "measure": "a_closed_schema_refuses_before_the_call counts zero stub hits for three invalid documents"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 a caller builds an object key and crosses the tenant boundary",
+          "axis_b": "G6 let the adapter build every tenant-prefixed key with a content hash",
+          "value": {
+            "objective": "tenant/<tenant_id>/ addressing, sha256 verification and a refused traversal name",
+            "measure": "a_job_round_trips_a_tenant_prefixed_object checks prefix, hash, read-back and refusal"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "D7 a call happens but leaves no trace",
+          "axis_b": "G7 record one tool_call row and one tool.called event per call",
+          "value": {
+            "objective": "run, step, tool version, input hash, status, latency, bytes and cost visible per call",
+            "measure": "one_call_is_one_ledger_row asserts exactly one row and exactly one event"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — T13 tool platform",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/goal/objective — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nSeven drivers, each with a goal and a measurable objective. D1 records the ad-hoc call and G1 makes one broker path. D2 records the second-control-plane pressure and G2 refuses it while borrowing the catalogue shape. D3 records secret leakage and G3 keeps keys out of prompts and ledgers. D4 records ungoverned destructive effects and G4 gates them on tenant approvals. D5 records backend-side rejection and G5 refuses invalid input before egress. D6 records caller-built keys and G6 lets the adapter build every tenant-prefixed key. D7 records invisible calls and G7 writes one ledger row and one event per call.\n\n## Links\n\nThis artefact carries one typed edge: Stakeholder map — T13 tool platform as derivation, because the drivers are held by the actors named there. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: trace why the tool platform exists and what it is meant to achieve. Scope: the drivers and goals of one governed call path. It was authored retrospectively on 2026-11-26 from SPEC_V2 §11 and the proving suite, and it records the objective the slice set rather than claiming a wider capability than the six proofs support."
+    },
+    {
+      "title": "Requirements catalog — T13 tool platform",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the tool platform must satisfy, each with the proof that carries it.",
+      "scope": "Broker dispatch, ledger, destructive and effect gating, closed-schema refusal, credential brokerage, storage, idempotency and refusal instrumentation.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the development job family",
+          "tenant admins",
+          "auditors"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "a bound development job calls coding through the broker, not the agent platform gateway",
+          "value": {
+            "requirement": "tools.call resolves the binding and dispatches to the registered coding destination alias",
+            "acceptance": "a_bound_job_calls_coding_through_the_broker: 200, one destination hit, /api/jobs reached"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "one call writes exactly one ledger row and one event",
+          "value": {
+            "requirement": "tool_call carries run, step, tool version, input hash, status, latency, bytes and cost, and is not action_invocation",
+            "acceptance": "one_call_is_one_ledger_row: one row for the call, one tool.called event"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "a destructive call without the tenant's configured approvals is refused",
+          "value": {
+            "requirement": "effect class destructive requires approval, dry-run and dual control before dispatch",
+            "acceptance": "a_destructive_call_without_approvals_is_refused: 403 approval_required, zero hits, no row"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "schema-invalid input is refused before the backend call",
+          "value": {
+            "requirement": "a closed JSON-Schema subset with additionalProperties false, enums, patterns and bounds, returning 422 tool_input_invalid with errors[]",
+            "acceptance": "a_closed_schema_refuses_before_the_call: zero hits for three invalid documents, one hit for the valid one"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "a job writes and reads a tenant-prefixed object with no S3 key in the prompt",
+          "value": {
+            "requirement": "the storage adapter builds every key under tenant/<tenant_id>/ with project and run prefixes, a sha256 content hash and a size cap",
+            "acceptance": "a_job_round_trips_a_tenant_prefixed_object: prefix, hash, read-back, wrong-hash refusal, head and traversal refusal"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "the compiled prompt carries no credential or S3 key",
+          "value": {
+            "requirement": "copilot_system@1 compiles without the access-key, secret-key or CONVEYOR_S3_ sentinels",
+            "acceptance": "the_compiled_prompt_carries_no_s3_key"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "the binding row, not a compiled constant, decides access",
+          "value": {
+            "requirement": "a missing binding or missing credential is 409 tool_not_ready; a binding narrows the grant and cannot raise it at call time",
+            "acceptance": "extra tests: missing credential 409 tool_not_ready; a call-time ceiling raise is refused"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "the broker injects the binding's sealed credential by alias",
+          "value": {
+            "requirement": "the credential is resolved from the sealed secret table and injected only at the destination, never carried by the prompt or the ledger",
+            "acceptance": "a_call_uses_the_bindings_sealed_credential sends the binding's token, not the tenant default"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "a keyed write replays rather than duplicates",
+          "value": {
+            "requirement": "writes take an idempotency_key, replay the stored response and never make a second destination call",
+            "acceptance": "a_required_key_is_forwarded_and_replays: one destination call for two keyed calls"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "every refusal is asserted on the wire, not on an error string",
+          "value": {
+            "requirement": "the proving suite uses a counting HTTP stub, so a refusal that called upstream moves the counter and fails",
+            "acceptance": "the stub hit count is asserted at zero for each refusal path"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — T13 tool platform",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements catalog — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nTen requirements. R1 to R6 restate the six SPEC_V2 §12 gate clauses and name their proofs: broker dispatch, the ledger row, the destructive refusal, the closed-schema refusal, the tenant-prefixed round trip and prompt secrecy. R7 and R8 make the binding row the authority and keep credential resolution behind an alias. R9 makes retries safe. R10 is the instrument requirement that gives every refusal its force: the counting stub proves the call did not leave the process.\n\n## Links\n\nThis artefact carries one typed edge: Driver/goal/objective — T13 tool platform as derivation, because each requirement serves a stated goal. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements the tool platform must satisfy. Scope: broker dispatch, ledger, effect gating, schema refusal, credentials, storage, idempotency and instrumentation. It was reconstructed retrospectively on 2026-11-26 from the verified tests and the manifest, so each acceptance line names a check that actually ran at lane head 582e2dc6 rather than a check the pack hopes will run."
+    },
+    {
+      "title": "Solution concept — T13 tool platform",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components and edges that turn a bound job call into one governed destination call, one ledger row and one tenant-prefixed object.",
+      "scope": "The broker, the four catalogue and ledger tables, credential profiles, the destination alias registry, the storage adapter and the verify-then-judge flow.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the development job family",
+          "the coding fleet owner",
+          "the platform operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the broker tools.call",
+          "axis_b": "the seven-step path",
+          "value": {
+            "kind": "component",
+            "note": "resolve the binding, check effect and budget, validate the closed schema, resolve the credential alias, call the destination, normalise and redact, record and emit; refusal happens before any network call"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the tool table",
+          "axis_b": "one operation version",
+          "value": {
+            "kind": "component",
+            "note": "input and output schema, effect, idempotency, timeout, redact, destination alias and status"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the toolkit table",
+          "axis_b": "an immutable published bundle",
+          "value": {
+            "kind": "component",
+            "note": "key@version, auth adapter, licence app and owner; a version is never edited in place"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the tool_binding table",
+          "axis_b": "tenant-scoped access",
+          "value": {
+            "kind": "component",
+            "note": "pinned toolkit versions, effect ceiling, credential alias, enabled flag and run_id; the binding narrows and never widens"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the tool_call table",
+          "axis_b": "the call ledger",
+          "value": {
+            "kind": "component",
+            "note": "run and step, tool version, input hash, status, latency, bytes and cost; it is not action_invocation and never transitions a card"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "credential profiles",
+          "axis_b": "sealed secrets behind aliases",
+          "value": {
+            "kind": "component",
+            "note": "the broker resolves the alias against the reused secret table and injects the value only at the destination"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "the storage adapter",
+          "axis_b": "tenant-prefixed object storage",
+          "value": {
+            "kind": "component",
+            "note": "direct MinIO, tenant/<tenant_id>/ with project and run prefixes, server-side encryption, sha256 content hash and a size cap; no bucket administration from a job"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "the destination alias registry",
+          "axis_b": "no caller-supplied URL",
+          "value": {
+            "kind": "component",
+            "note": "the base URL is registered and reviewed at publication and the alias is resolved at call time, which is the anti-SSRF rule"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "verify then judge",
+          "axis_b": "a write returns read-back checks",
+          "value": {
+            "kind": "component",
+            "note": "a write with no verification path cannot be published; a failed or absent verdict is check_failed, a passing verdict is ok"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "binding to broker",
+          "axis_b": "the authority edge",
+          "value": {
+            "kind": "edge",
+            "note": "the binding row decides reachability; a missing binding or credential refuses 409 tool_not_ready before dispatch"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "schema to broker",
+          "axis_b": "the validation edge",
+          "value": {
+            "kind": "edge",
+            "note": "the closed schema is applied before egress, returning 422 tool_input_invalid with errors[] and zero destination hits"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "broker to ledger",
+          "axis_b": "the evidence edge",
+          "value": {
+            "kind": "edge",
+            "note": "every dispatched call writes one tool_call row and one tool.called event, and a refused call writes neither a row nor a hit"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "adapter to tenant key",
+          "axis_b": "the separation edge",
+          "value": {
+            "kind": "edge",
+            "note": "the adapter builds every key, so a traversal name is refused and a hash mismatch fails the read"
+          },
+          "position": 13
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — T13 tool platform",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution concept — T13 tool platform\n\n## Metadata\n\nRetrospective diagram for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nThirteen rows: nine components and four edges. The broker is one seven-step path with refusal before egress. The four tables hold the operation, the immutable bundle, the tenant-scoped binding and the ledger. Credential profiles put sealed secrets behind aliases; the adapter owns every tenant-prefixed key; the alias registry keeps the destination out of the caller's hands; verify-then-judge makes a write carry its read-back. The four edges record the path from authority to evidence, with a refusal at each step rather than a silent repair.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T13 tool platform as realization, because the components exist to satisfy those requirements. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: show the components and edges that turn a bound call into one governed destination call and one ledger row. Scope: the broker, the tables, credentials, the alias registry, the adapter and the write verification. It was drawn retrospectively on 2026-11-26 from the build order in SPEC_V2 §11.3 and the tests, not from a design session held before the work."
+    },
+    {
+      "title": "Business capability map — T13 tool platform",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the tool platform establishes and the evidence each one leaves behind.",
+      "scope": "Tool lifecycle, binding-scoped access, dispatch, effect gating, input enforcement, the ledger, tenant-separated storage and tool retirement.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme owner",
+          "the programme office",
+          "the platform operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Tool and toolkit lifecycle",
+          "axis_b": "every callable operation is an immutable versioned bundle",
+          "value": {
+            "maturity": "delivered for the coding toolkit and one kag-era toolkit",
+            "evidence": "governed_asset kind='tool_draft' carries validation, security review, tools.publish and binding; the toolkit row pins key@version"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Binding-scoped access",
+          "axis_b": "a job or run reaches only what its binding pins",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "tool_binding pins toolkit versions, effect ceiling and credential alias; extra tests show a missing credential is 409 tool_not_ready and a ceiling cannot be raised at call time"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Broker dispatch",
+          "axis_b": "one governed path to a job backend",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "a_bound_job_calls_coding_through_the_broker reaches /api/jobs at the registered coding destination with exactly one hit"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Effect-class gating",
+          "axis_b": "read, write, destructive and spend are gated differently",
+          "value": {
+            "maturity": "delivered for the refusal; the approved execution path is open",
+            "evidence": "a_destructive_call_without_approvals_is_refused returns 403 approval_required with zero hits; the approved destructive execution is a recorded open finding"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Input contract enforcement",
+          "axis_b": "a closed schema decides before egress",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "a_closed_schema_refuses_before_the_call returns 422 tool_input_invalid for an undeclared property, a pattern violation and a numeric bound, with zero hits"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Call ledger and metering",
+          "axis_b": "each call is one row and one event",
+          "value": {
+            "maturity": "delivered",
+            "evidence": "one_call_is_one_ledger_row asserts the tool key, toolkit version, status, http status, a 64-hex input hash, latency and one tool.called event"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Tenant-separated object storage",
+          "axis_b": "a job's bytes stay under its tenant prefix",
+          "value": {
+            "maturity": "delivered against the in-memory store; live MinIO wiring is open",
+            "evidence": "a_job_round_trips_a_tenant_prefixed_object checks the prefix, sha256 equality, read-back, wrong-hash refusal, head and traversal refusal"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Probe and retirement",
+          "axis_b": "an unhealthy tool unbinds new runs and a zero-call tool is retired",
+          "value": {
+            "maturity": "specified; exercised by estate toolkits in T14",
+            "evidence": "SPEC_V2 §11.9 names the tools.probe failure, the 409 tool_not_ready unbind and the zero-call retirement, which this slice records as a capability it enables rather than one it proves"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — T13 tool platform",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — T13 tool platform",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Business capability map — T13 tool platform\n\n## Metadata\n\nRetrospective diagram for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nEight capabilities. Tool and toolkit lifecycle makes every callable operation an immutable version. Binding-scoped access gives a run exactly what its binding pins. Broker dispatch makes one path real. Effect-class gating separates read, write, destructive and spend, and its approved execution path is the one capability recorded as open. Input enforcement refuses a closed-schema violation before egress. The ledger makes each call visible. Storage separates tenant bytes under an adapter-built key. Probe and retirement is specified and enabled here, exercised by the estate import in T14.\n\n## Links\n\nThis artefact carries two typed edges: Solution concept — T13 tool platform and Requirements catalog — T13 tool platform, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the tool platform establishes and the evidence each leaves behind. Scope: lifecycle, access, dispatch, gating, enforcement, ledger, storage and retirement. It is retrospective and dated 2026-11-26; it records the capability set as proved on 2026-11-22 and states plainly which capability the record leaves open rather than upgrading it."
+    },
+    {
+      "title": "Data entity catalog — T13 tool platform",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the stored entities the tool platform creates or reuses, and the key each one carries.",
+      "scope": "The four created tables, the reused secret, governed-asset, event and audit rows, and the tenant-prefixed storage object.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the estate operator",
+          "auditors",
+          "the platform operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "tool",
+          "axis_b": "one operation version",
+          "value": {
+            "kind": "entity",
+            "definition": "input and output schema, effect class, idempotency, timeout, redact, destination alias and status",
+            "key": "tool key plus version"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "toolkit",
+          "axis_b": "a service's published bundle",
+          "value": {
+            "kind": "entity",
+            "definition": "immutable key@version with auth adapter, licence app and owner",
+            "key": "toolkit key plus version"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "tool_binding",
+          "axis_b": "job or run access",
+          "value": {
+            "kind": "entity",
+            "definition": "tenant-scoped row pinning toolkit versions, an effect ceiling, a credential alias and an enabled flag, with run_id in the proving suite",
+            "key": "tenant plus binding id, joined to run_id"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "tool_call",
+          "axis_b": "the call ledger row",
+          "value": {
+            "kind": "entity",
+            "definition": "run and step, tool version, input hash, status, latency, bytes and cost; it is not action_invocation and never transitions a card",
+            "key": "call id, indexed by run and step"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "secret",
+          "axis_b": "a sealed credential",
+          "value": {
+            "kind": "reused entity",
+            "definition": "the V1 secret row, resolved by alias through create_secret_tx; the value never enters the prompt or the ledger",
+            "key": "tenant plus alias"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "governed_asset kind='tool_draft'",
+          "axis_b": "the publication lifecycle",
+          "value": {
+            "kind": "reused entity",
+            "definition": "validation, security review, tools.publish and binding for a toolkit draft",
+            "key": "asset id with kind tool_draft"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "event and audit_event",
+          "axis_b": "the call event and audit trail",
+          "value": {
+            "kind": "reused entity",
+            "definition": "one tool.called event per dispatched call and the audit record beside it",
+            "key": "event id and subject"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "tenant-prefixed storage object",
+          "axis_b": "a job's bytes in MinIO",
+          "value": {
+            "kind": "storage entity",
+            "definition": "an object addressed under tenant/<tenant_id>/ with project and run prefixes, server-side encryption, a sha256 content hash and a size cap; the adapter builds every key",
+            "key": "tenant plus project plus run plus object name"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "destination alias",
+          "axis_b": "the registered base URL",
+          "value": {
+            "kind": "entity",
+            "definition": "a publication-reviewed destination alias resolved at call time; no caller-supplied URL is admitted",
+            "key": "alias name"
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — T13 tool platform",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — T13 tool platform",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Data entity catalog — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nNine entities. Four are created: the tool operation, the immutable toolkit, the tenant-scoped binding and the call ledger. Four are reused rather than rebuilt: the sealed secret, the governed-asset draft, the event and the audit trail, and the MinIO object itself. The destination alias is its own record because it is the anti-SSRF control. Each line names the key that makes the row addressable, and the ledger row is explicitly not action_invocation.\n\n## Links\n\nThis artefact carries two typed edges: Business capability map — T13 tool platform and Solution concept — T13 tool platform, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the stored entities the tool platform creates or reuses and the key each carries. Scope: the four tables, the reused secret, governed-asset, event and audit rows, the alias and the storage object. It was authored retrospectively on 2026-11-26 from SPEC_V2 §11.8 and the tests, so it does not invent a table or a key the record does not carry."
+    },
+    {
+      "title": "Technology standards — T13 tool platform",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the formats, protocols and instruments the tool platform relies on, and where each one is enforced.",
+      "scope": "The Rust workspace, Postgres 18, MinIO, the closed JSON-Schema subset, destination aliases, BYO protocols, refusal instrumentation and idempotency.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the estate operator",
+          "auditors",
+          "the platform operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Language and layout",
+          "axis_b": "one Rust workspace",
+          "value": {
+            "usage": "a new tool is a crate or service in the conveyor monorepo registered from its own OpenAPI; a migrated tool joins when rewritten in Rust (D58)"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Database",
+          "axis_b": "PostgreSQL 18",
+          "value": {
+            "usage": "the proving suite runs a fresh Postgres 18 and writes tenant-scoped through begin_scoped; the four tables live in the same schema as the reused rows"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Object storage",
+          "axis_b": "MinIO (S3-compatible)",
+          "value": {
+            "usage": "the adapter talks to the shared MinIO instance directly, with no artifact_service or storage-api dependency, and the tenant prefix plus bucket policy carry the separation"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Input schema",
+          "axis_b": "a closed JSON-Schema subset",
+          "value": {
+            "usage": "Draft 2020-12 with additionalProperties false, enums, patterns and bounds; a violation returns 422 tool_input_invalid with errors[] before egress"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Destination addressing",
+          "axis_b": "registered HTTP aliases",
+          "value": {
+            "usage": "the base URL is registered and reviewed at publication and resolved at call time, so no caller-supplied URL is admitted (the SSRF rule)"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "BYO protocols",
+          "axis_b": "OpenAPI 3.1 and streamable-HTTP MCP",
+          "value": {
+            "usage": "exactly two forms; a remote MCP server is discovered binding-scoped and every BYO destination is tenant-allowlisted at registration"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Refusal instrumentation",
+          "axis_b": "a counting HTTP stub",
+          "value": {
+            "usage": "every refusal asserts on the wire: a refused call that reached upstream would move the counter; the suite serialises because the destination URL is process-global"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Idempotency and bounds",
+          "axis_b": "keys and bounded polls",
+          "value": {
+            "usage": "writes take an idempotency_key and replay the stored response; a poll has a fixed budget and a timeout returns pending with a resume_token"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — T13 tool platform",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Technology standards — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nEight standards. The workspace keeps tool code in one Rust repository. Postgres 18 holds the four tables and the reused rows under tenant-scoped writes. MinIO is reached directly by the adapter, with the tenant prefix as the separation rule. The closed schema subset decides input before egress. Destination aliases keep URLs out of a caller's hands, and the two BYO protocols are fixed at OpenAPI 3.1 and streamable-HTTP MCP. The counting stub makes each refusal a wire assertion, and idempotency keys with bounded polls keep retries safe.\n\n## Links\n\nThis artefact carries one typed edge: Data entity catalog — T13 tool platform as derivation, because each entity is held in one of these formats. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the formats, protocols and instruments the tool platform relies on. Scope: the workspace, the database, the object store, the schema subset, addressing, BYO protocols, instrumentation and idempotency. It was authored retrospectively on 2026-11-26 and names only standards that SPEC_V2 §11 and the proving suite actually apply, with no version pin asserted beyond what the sources state."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T13 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — T13 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for T13 is the seven mandatory Phase A–D artefacts on the delivery track (track v2): the Stakeholder map, the Driver/goal/objective, the Requirements catalog and the Solution concept at phase a, plateau psa, and the Business capability map, the Data entity catalog and the Technology standards at phases b, c and d, plateau hld. The seven approved artefact rows carry ids 01a20275-1783-769e-9744-fa9246b22916, 01a20275-6094-70ad-89a6-512086e3a162, 01a20275-a8ee-7e43-afaa-505a452e314d, 01a20275-f69f-77aa-b414-595b4337e30c, 01a20276-3c76-793c-a765-68b0210bcb5e, 01a20276-82e4-7594-b73b-60590e969803 and 01a20276-c56b-75f2-b9bd-9ddaba1dd95f; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: Stakeholder map — T13 tool platform (matrix), Driver/goal/objective — T13 tool platform (catalog), Requirements catalog — T13 tool platform (catalog), Solution concept — T13 tool platform (diagram), Business capability map — T13 tool platform (diagram), Data entity catalog — T13 tool platform (catalog) and Technology standards — T13 tool platform (catalog). Each carries its own entries: eight stakeholders, seven drivers, ten requirements, thirteen components and edges, eight capabilities, nine entities and eight standards, so the index points at authored content rather than at an empty shell.\n\n## Links\n\nThe typed edges are: the driver catalogue derives from the stakeholder map; the requirements catalogue derives from the driver catalogue; the solution concept realizes the requirements catalogue; the capability map derives from the solution concept and the requirements catalogue; the data entity catalogue derives from the capability map and the solution concept; and the technology standards derive from the data entity catalogue. Every edge names another artefact of this pack, so no artefact is an orphan.\n\n## Document\n\nThe index is the architecture-artifact page the artefact standard reads, published in the rework batch as 01a20525-8994-7731-84a8-bb7e310e7ba0. It records the seven artefact rows approved on 2026-11-22 and re-published with their authored bodies in this retrospective pack dated 2026-11-26; it does not claim that the board re-reviewed any artefact after 2026-11-22, and it names no artefact the record does not carry."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The approved destructive execution path is not proved — only its refusal is",
+        "code": "R-T13-01",
+        "body": "The T13 suite proves a_destructive_call_without_approvals_is_refused at the wire: 403 approval_required, zero destination hits and no ledger row. It does not prove an approved destructive call executing under the tenant's configured approvals, dry-run and dual control, so the positive half of SPEC_V2 §11.4 remains an open finding rather than a delivered capability. This retrospective row, recorded 2026-11-26, keeps the gap visible instead of reading the refusal as the whole gate.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the T13 destructive-approval gate",
+            "crates/actions/tests/tool_platform.rs — a_destructive_call_without_approvals_is_refused"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The storage round trip falls back to the in-memory store, so live MinIO stays unproved",
+        "code": "R-T13-02",
+        "body": "a_job_round_trips_a_tenant_prefixed_object checks the tenant prefix, sha256 equality, read-back bytes, a wrong-hash refusal, head and a traversal refusal, but when no endpoint is configured the test uses the in-memory store. Live MinIO wiring is the recorded open item v1-p1110-1, so the bytes-separation claim is proved against the adapter's contract rather than against the deployed bucket. Recorded 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the tenant-prefixed object gate",
+            "crates/actions/tests/tool_platform.rs — a_job_round_trips_a_tenant_prefixed_object"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The destination URL is process-global, so a parallel runner would produce false refusals",
+        "code": "R-T13-03",
+        "body": "The proving suite serialises on one lock because the destination URL is process-global. Under a parallel test runner two tests would swap the destination and the counting stub would report hits against the wrong case, so a refusal could pass or fail for the wrong reason. The record keeps the suite serialised; this retrospective row of 2026-11-26 states the trap so a later runner change is not made silently.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "crates/actions/tests/tool_platform.rs — the serialising lock"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "No production tool_binding writer exists — bindings are written directly in the suite",
+        "code": "I-T13-01",
+        "body": "The binding row is the broker's authority, but the slice ships no production writer for it: the test header says tool rows are written directly in the proving suite. The recorded open item v1-p111-1 carries this, and a real run therefore depends on the catalogue path that T14 and the tenant authoring surface own. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "severity": "high",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the binding is the authority",
+            "crates/actions/tests/tool_platform.rs — the direct-write note"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Catalogue actions and the estate import are deferred to T14",
+        "code": "I-T13-02",
+        "body": "This slice ships no catalogue actions and no estate import; it proves the broker against a coding toolkit and one kag-era toolkit and leaves the broad import, the published tool contract and the binding and catalogue actions to T14, which depends on T13. Issues #556 and #557 record that follow-on work, both closed. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the T14 dependency",
+            "issues #556 and #557"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The six §12 proofs are sufficient evidence of the gate",
+        "code": "A-T13-01",
+        "body": "The acceptance evidence is the named tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. The assumption is that those tests, not a manual run, are the gate: each §12 clause maps to a named test and each refusal asserts on the wire. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "No destructive call is bound before its tenant configures approvals",
+        "code": "A-T13-02",
+        "body": "With no configured approvals the broker refuses 403 approval_required and makes no destination call, so the default posture is refusal rather than dispatch. The assumption is that a tenant cannot bind a destructive tool into a run without first configuring the approvals the effect class requires. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "Directly written test rows exercise the same resolution the broker performs in production",
+        "code": "A-T13-03",
+        "body": "Because the slice ships no catalogue write path, the suite writes tool, toolkit and tool_binding rows directly. The assumption is that the broker's resolution — binding, pinned toolkit version, effect ceiling and credential alias — reads the same rows a production writer would create, so the proof transfers despite the missing writer. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "T13 needs T2's run and queue, and T14 needs T13",
+        "code": "D-T13-01",
+        "body": "The project record names depends_on as needs T2 and needs P0. T2 supplies the run and durable-queue context that tool_binding.run_id targets and that the broker's step and run ids reference; P0 supplies the constitution and gates. Downstream, T6, T7, T14, T15, T16 and T17 depend on T13, and T14's estate import is the first consumer. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      },
+      {
+        "title": "Calls depend on a reviewed destination alias, never a caller-supplied URL",
+        "code": "D-T13-02",
+        "body": "Every call resolves a destination alias registered and reviewed at publication; the coding fleet owner supplies the alias and no caller-supplied URL is admitted at call time. The dependency is one way: a fleet moving its base URL requires a new reviewed alias before a run can reach it. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "A job reaches a backend only through one governed call path",
+        "code": "B-T13-01",
+        "body": "The broker resolves the binding, checks effect and budget, validates the schema and resolves the credential before any network call, so an unbound, over-ceiling or invalid call is refused with zero destination hits. The benefit is that no procedure or agent can reach a backend by an ad hoc HTTP call, and the ledger row plus the tool.called event make every dispatched call attributable to a run and a step. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the broker gate"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Job bytes are tenant-separated without a compatibility shim",
+        "code": "B-T13-02",
+        "body": "The adapter writes and reads MinIO directly under tenant/<tenant_id>/ with project and run prefixes, verifies a sha256 content hash, refuses a traversal name and applies a size cap, while the compiled prompt carries no S3 key. The benefit is that a job's objects are separated by the adapter's own key construction rather than by a legacy artifact service, and the round-trip test proves the contract. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md#12 — the storage gate"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T13 tool platform (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Deliver the tool platform of SPEC_V2 §12: the broker tools.call as the only path from a conveyor-internal run to a job backend; the tool, toolkit, tool_binding and tool_call tables; effect classes read, write, destructive and spend with tenant-configured approvals; binding-scoped credential aliases over sealed secrets; the direct MinIO storage adapter under tenant/<tenant_id>/; the coding toolkit and one kag-era toolkit; V1's external actions migrated; and the six gate proofs, each asserting on the wire through a counting HTTP stub.",
+      "compliance": "The Phase-G review 01a2027a-6502-72a6-9ef8-4c1582dbdf36 records the level compliant against this contract and the review 01a216d0-f1b9-78c6-854b-8da02cacd819 records it against the Statement of Architecture Work. The contract's own terms are the SPEC_V2 §12 gate, executed as the named tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18. No waiver is recorded; the open packages are carried as open items, not as compliance.",
+      "approval": "The delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c is approved under approval 01a20277-4be1-78c6-8516-728eb4d6068b by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 sits under its own approval 01a20273-4f0f-77e6-8005-9744d1e3a574, and the scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589 were taken and approved on 2026-11-22.",
+      "capacity": "The unit is one WBS deliverable, 'The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage', accepted with WSJF inputs business value 8, time criticality 5, risk reduction 8 and job size 5. The work runs as one slice over the broker, the four tables, credential resolution, the storage adapter, the two toolkits and the proving suite.",
+      "acceptance": "Acceptance is executable and per clause: a_bound_job_calls_coding_through_the_broker; one_call_is_one_ledger_row; a_destructive_call_without_approvals_is_refused; a_closed_schema_refuses_before_the_call; a_job_round_trips_a_tenant_prefixed_object; the_compiled_prompt_carries_no_s3_key. The manifest acceptance/programme/T13.toml is the gate the tests serve, and the recorded run is 17 of 17 passed at lane head 582e2dc6 against a fresh Postgres 18 and a counting HTTP stub.",
+      "evidence": "The evidence route is crates/actions/tests/tool_platform.rs (the six proofs and the extra broker tests), acceptance/programme/T13.toml (the manifest), the seven A–D artefact rows and this pack's authored bodies, the registers and the delivery record, the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966, and the published outputs: the project brief 01a20279-c813-754b-902b-f85be7ede1cd, the evidence 01a1f2cc-d575-7766-a4c6-a50af370f369 and the closure review 01a216d0-ae7e-7447-8014-17ee525860b8.",
+      "manifest": "acceptance/programme/T13.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage",
+    "business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction": 8,
+    "job_size": 5
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c is approved under approval 01a20277-4be1-78c6-8516-728eb4d6068b by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d; the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 is approved under 01a20273-4f0f-77e6-8005-9744d1e3a574; both scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589 are approved; and the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 both record compliant. The six SPEC_V2 §12 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. This rework batch closes the governance-record gaps the receipt names — the twelve mandatory artefact packages, including the seven A–D artefact instances, the project registers and the baseline evidence — by authoring them in this pack. Against that, the review refuses to waive what is still open: the receipt for the project lists the P1 package v1-p116-1 as unresolved, and the five Phase-G findings — no production tool_binding writer (v1-p111-1), a storage round trip that uses the in-memory store when no endpoint is configured (v1-p1110-1), a destructive execution path proved only for its refusal, the unexercised kag-era toolkit and V1 migration, and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6 — are recorded as open items with owners.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+      "soaw_review": "01a216d0-f1b9-78c6-854b-8da02cacd819",
+      "delivery_contract": "01a20277-2d08-7c91-bce6-1a8326add30c",
+      "statement_of_architecture_work": "01a20271-2a37-7329-b159-28031ddcb966",
+      "scope_baseline": "01a20279-854d-79f6-a751-a34d51be7589",
+      "acceptance_manifest": "acceptance/programme/T13.toml",
+      "rework_note": "docs/evidence/rework/T13/transcript.jsonl"
+    }
+  },
+  "project_brief_output": "# Project brief — T13 tool platform (retrospective, 2026-11-26)\n\n## Outcome\n\nT13 made one governed call path real: every conveyor-internal run reaches a job backend through tools.call under a binding row's authority, with the effect class, the tool budget and the closed input schema decided before any network call, and exactly one tool_call row and one tool.called event recorded per dispatched call. The six SPEC_V2 §12 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub.\n\n## Boundary\n\nOut of scope: the catalogue actions and the estate import, which T14 owns; the agent platform gateway nonagenticai_mcp_server, which serves the agent platform's own backends and stays outside the conveyor's path (D44, D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); and a production tool_binding writer (v1-p111-1). The slice must not fork T2's run or durable queue, must not become a second catalogue or runner, and must not carry a credential or an S3 key into a prompt or a ledger row.\n\n## Reuse sources\n\n- conveyor_store::secret::create_secret_tx — sealed credentials, reused rather than rebuilt (§11.8).\n- governed_asset kind='tool_draft' — the publication lifecycle of validation, security review, tools.publish and binding (§11.6).\n- event and audit_event — the tool.called event and the audit trail (§11.3 step 7).\n- T2's run and durable queue — tool_binding.run_id targets a run, and §12 places T13 after T2.\n- The predecessor MCP server's coding toolkit as a reference shape only: eleven operations and the mcp_tool_call_audit model, never routed through (D44, D59).\n\n## Inception units\n\nThe analysis T13 starts from is SPEC_V2 §11.1–§11.10 and the T13 row in SPEC_V2 §12, and its recorded entry point is issue #76, with the follow-on issues #556 (bound toolkits reach the agent executor), #557 (binding and catalogue actions and the full published tool contract) and #630 (the run inspector's executor kind, binding pin and tools panel), all closed on GitHub. The retrospective reconstitutes the governance record over the completed slice — charter, Statement of Architecture Work, the seven A–D artefacts approved by the board, the delivery contract, the WBS deliverable, the Phase-G review, the project brief, the evidence and the closure review.\n\n## Dependencies\n\nThe project record names depends_on as needs T2 (the run and durable-queue context that tool_binding.run_id targets) and needs P0 (the constitution and gates). In the other direction, T6, T7, T14, T15, T16 and T17 depend on T13, with T14's estate import as the first consumer, and a job's calls additionally depend on a destination alias registered and reviewed at publication. In governance the slice depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and on the approvals 01a20273-4f0f-77e6-8005-9744d1e3a574 and 01a20277-4be1-78c6-8516-728eb4d6068b.\n\n## Acceptance\n\nThe SPEC_V2 §12 gate, executed through acceptance/programme/T13.toml and six named tests: a_bound_job_calls_coding_through_the_broker; one_call_is_one_ledger_row; a_destructive_call_without_approvals_is_refused; a_closed_schema_refuses_before_the_call; a_job_round_trips_a_tenant_prefixed_object; the_compiled_prompt_carries_no_s3_key. Each refusal is asserted on the wire through a counting HTTP stub, so a refusal that reached upstream would fail. The recorded run is 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18.\n\n## Capabilities\n\nThe platform exercises an immutable tool and toolkit lifecycle; binding-scoped access that narrows but never widens; broker dispatch as the single path to a backend; effect-class gating for read, write, destructive and spend; closed-schema input enforcement before egress; a call ledger that makes each call and its cost visible; tenant-separated object storage under an adapter-built tenant prefix with a content hash; and the probe and retirement rules that T14's estate toolkits exercise.\n\n## Plan\n\nThe plan is one WBS deliverable, 'The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage', accepted with WSJF inputs 8, 5, 8 and 5 and evidenced by acceptance/programme/T13.toml and the proving suite. It sits in tranche 3, whose review 01a216d0-d634-738e-985a-00a85cfd48d9 records continue. This brief is retrospective and dated 2026-11-26: it records the slice proved on 2026-11-22 and the governance reconstituted over it, and it does not claim a fresh gate run or a capability the six proofs do not carry.\n",
+  "evidence_output": "# Evidence — T13 tool platform (retrospective, 2026-11-26)\n\n## Claim\n\nT13 implements SPEC_V2 §11's broker, ledger, gates and storage adapter, and the six §12 clauses are proved by named wire-level tests: a bound development job calls coding through the broker; one call writes one tool_call row and one tool.called event; a destructive call without the tenant's approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed object with no S3 key in the prompt; and the compiled prompt carries no credential.\n\n## Evidence\n\nThe proving suite is crates/actions/tests/tool_platform.rs: 17 tests, re-run for the record as 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub. The manifest is acceptance/programme/T13.toml. The governance record is the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 under approval 01a20273-4f0f-77e6-8005-9744d1e3a574, the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c under approval 01a20277-4be1-78c6-8516-728eb4d6068b, and the scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589. The seven A–D artefact rows 01a20275-1783-769e-9744-fa9246b22916, 01a20275-6094-70ad-89a6-512086e3a162, 01a20275-a8ee-7e43-afaa-505a452e314d, 01a20275-f69f-77aa-b414-595b4337e30c, 01a20276-3c76-793c-a765-68b0210bcb5e, 01a20276-82e4-7594-b73b-60590e969803 and 01a20276-c56b-75f2-b9bd-9ddaba1dd95f carry the authored bodies.\n\n## Verification\n\nRun the tool_platform suite through the build guard at the recorded sha: it needs a fresh Postgres 18 and starts a counting HTTP stub, so a refusal that called upstream moves the counter and fails. The suite serialises on one lock because the destination URL is process-global. Each of the six proofs asserts on the wire rather than on an error string, and the extra tests show a missing credential refusing 409 tool_not_ready, a call-time ceiling raise refused, the binding's sealed credential used and a keyed write replayed with one destination call. This content pack is checked offline by scripts/rework-content-check.py --project T13 before the factory reads it.\n\n## Links\n\nThe plan section is SPEC_V2 §12 (the T13 row) over §11.1–§11.10. The governance record is the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966, the delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36 at level compliant, the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9, and the published outputs: the project brief 01a20279-c813-754b-902b-f85be7ede1cd, the evidence 01a1f2cc-d575-7766-a4c6-a50af370f369 and the closure review 01a216d0-ae7e-7447-8014-17ee525860b8. The transcript is docs/evidence/rework/T13/transcript.jsonl.\n\n## Gap\n\nSeveral limits are recorded and none is closed by this pack. The receipt lists the P1 package v1-p116-1 as unresolved. There is no production tool_binding writer (v1-p111-1), so the suite writes tool rows directly; the storage round trip uses the in-memory store when no endpoint is configured (v1-p1110-1), so live MinIO is unproved; the destructive path is proved only for its refusal, not for an approved execution; the kag-era toolkit and V1's external-action migration are recorded but not exercised by a live call; and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6 remain open. Two traps are carried: the destination URL is process-global, so the suite serialises, and a zero-call tool is only flagged, not yet retired, until T14 exercises the probe.\n",
+  "closure": "# Closure — T13 tool platform (retrospective, 2026-11-26)\n\nT13 re-closes through the record the snapshot carries: the approved delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c, the approved Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966, the approved scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589, the compliant Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36, and the seven A–D artefact rows approved by the board. The closure records the six SPEC_V2 §12 clauses proved by named wire-level tests, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub, and it records the mandatory artefact packages the receipt named as red as authored in this rework batch. It keeps the open items visible rather than closed: the P1 package v1-p116-1, the absent production binding writer, the test-only storage path, the unproved approved destructive execution, the unexercised kag-era toolkit and V1 migration, and the named sub-features.\n",
+  "closure_review": "# Closure review — T13 tool platform (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is one governed call path to a job backend, and the acceptance the record carries matches it: the six SPEC_V2 §12 clauses are proved by the named tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub, each refusal asserted on the wire with zero destination hits. The delivery contract 01a20277-2d08-7c91-bce6-1a8326add30c and the Statement of Architecture Work 01a20271-2a37-7329-b159-28031ddcb966 are approved under approvals 01a20277-4be1-78c6-8516-728eb4d6068b and 01a20273-4f0f-77e6-8005-9744d1e3a574, both against the phase-G reviews at level compliant.\n\n## Evidence\n\nThe evidence is the proving suite with its six §12 proofs and extra broker tests, the manifest acceptance/programme/T13.toml, the seven A–D artefact rows and their authored bodies in this pack, the registers, the delivery contract on the scope baselines 01a20277-9131-7ee2-acad-7e40ffa8f947 and 01a20279-854d-79f6-a751-a34d51be7589, and the Phase-G reviews 01a216d0-f1b9-78c6-854b-8da02cacd819 and 01a2027a-6502-72a6-9ef8-4c1582dbdf36. The transcript docs/evidence/rework/T13/transcript.jsonl records the build acts, including the two baselines, the board decisions and the acceptance change that set the WBS deliverable to accepted.\n\n## Open items\n\nThe following remain open and are not waived by this review: the P1 package v1-p116-1 listed on the project receipt; no production tool_binding writer (v1-p111-1); the storage round trip falling back to the in-memory store when no endpoint is configured (v1-p1110-1); the destructive execution path proved only for its refusal; the kag-era toolkit and V1 external-action migration recorded but not exercised by a live call; and the sub-features of v1-w4a-5, v1-p111-3, v1-p118-2 and v1-w4a-6. Each carries an owner in the registers and a review date of 2026-12-15, so the tranche-3 review sees them rather than a closure that hides them.\n\n## Decision\n\nThe retrospective decision is to close on the record the snapshot carries, at the level compliant that the Phase-G reviews record, with the open items stated rather than waived and the mandatory artefact packages authored here. The decision is dated 2026-11-26 and rests on the approved contracts, the two approved baselines, the six wire-level proofs and the delivered coding and kag-era toolkit, and it does not assert a fresh gate run, a live MinIO proof or an approved destructive execution. It does not reopen the classification of any call or object that the tests did not cover.\n"
+}

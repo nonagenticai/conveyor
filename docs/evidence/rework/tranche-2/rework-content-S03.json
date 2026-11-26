@@ -942,10 +942,17 @@
         "impact": 3,
         "review_at": "2026-12-05",
         "links": {
-          "requirements": ["R2"],
-          "decisions": ["S3-D5"]
+          "requirements": [
+            "R2"
+          ],
+          "decisions": [
+            "S3-D5"
+          ],
+          "cards": []
         },
-        "meta": {"owner": "programme architect (conveyor-e2e)"},
+        "meta": {
+          "owner": "programme architect (conveyor-e2e)"
+        },
         "status": "admitted"
       },
       {
@@ -956,10 +963,17 @@
         "impact": 2,
         "review_at": "2026-12-05",
         "links": {
-          "requirements": ["R10"],
-          "decisions": ["S3-D1"]
+          "requirements": [
+            "R10"
+          ],
+          "decisions": [
+            "S3-D1"
+          ],
+          "cards": []
         },
-        "meta": {"owner": "programme architect (conveyor-e2e)"},
+        "meta": {
+          "owner": "programme architect (conveyor-e2e)"
+        },
         "status": "admitted"
       }
     ],

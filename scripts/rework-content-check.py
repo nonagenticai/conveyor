@@ -372,6 +372,19 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
                     for key in ("cards", "requirements", "decisions")
                 )
                 expect(linked, f"{label} (a risk) needs at least one link")
+                # `registers.create` refuses a links object missing any of the three arrays
+                # (`links_invalid`); a pack that passed here died inside the factory after the
+                # earlier rows were written (measured on S03/T2, 2026-11-26).
+                if isinstance(links, dict):
+                    missing_arrays = [
+                        key for key in ("cards", "requirements", "decisions")
+                        if not isinstance(links.get(key), list)
+                    ]
+                    expect(
+                        not missing_arrays,
+                        f"{label} links must carry cards, requirements and decisions arrays "
+                        f"(missing: {', '.join(missing_arrays)})",
+                    )
 
     contract = content.get("delivery_contract") or {}
     expect(isinstance(contract.get("title"), str) and isinstance(contract.get("body"), dict),
