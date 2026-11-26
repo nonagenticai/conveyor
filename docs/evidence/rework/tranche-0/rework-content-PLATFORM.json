@@ -1,1474 +1,1485 @@
 {
- "charter": "# Charter — PLATFORM (standing, retrospective 2026-11-26)\n\n**Purpose.** The standing platform every conveyor delivery project uses: the CI path and runners,\nthe image registry and ingress, the Postgres primary with its backups and restore, the object\nstore, and the shared workflows that make a build reproducible.\n\n**Authority.** The platform owner holds the paths under the programme owner's standing delegation\n(01a1ff1f-e4ba-72dc-9c1a-13049933cf14). The Architecture Board reviews the platform's standards\nand its phase-G compliance. The programme board receives the platform's risks and escalations.\n\n**Scope.** The five-node estate's shared paths and nothing above them. The platform does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. A request outside\nthe list is a programme change.\n\n**Standing rule.** The platform does not close. Its acceptance is the standing charter, the\napproved scope baseline and a green manifest on a fresh snapshot. Each tranche review re-checks it\nwith the same manifest; a red manifest is a finding against the platform, not a closure trigger.\n\n**Constraints.** No local Rust compilation; the two-run CI budget per issue; one service one\ndatabase; per-service secrets; Postgres 18 with psycopg v3; Flux as the only deployment path.\n\n**Evidence.** The platform's record is the acceptance manifest, this pack, the docs/evidence/rework\nreceipt and the acts transcript. The estate's probes are the second evidence: the runner list, the\nregistry pull, the database recovery state, the MinIO bucket probe and the public window.\n",
- "soaw": {
-  "title": "Statement of Architecture Work — PLATFORM standing capability (retrospective, 2026-11-26)",
-  "body": {
-   "assignment": "Author the standing platform's retrospective architecture record: the fifteen-artefact programme-track set, the six-section register, the delivery contract and the phase-G review, for a project that carries the programme's CI, registry, database, storage and ingress paths and does not close.",
-   "scope": "The platform's own capabilities and their evidence, not a tenant's data model or a delivery project's plan. The record covers the five-node estate's shared paths, the standards that enforce them and the gaps that remain, with each claim traceable to a live row or a probe.",
-   "responsibilities": "The platform owner authors and holds the record under the programme owner's delegation; the Architecture Board reviews the artefacts and the compliance level; the programme board receives the platform's risks and escalations; the delivery projects consume the paths and report a break as a platform incident.",
-   "acceptance_criteria": "The manifest's checks pass with zero failures on a fresh snapshot, the fifteen artefacts and their documents exist, the register carries all five kinds, the delivery contract is live and the phase-G review is recorded against it, and the benefit realization records exist for every profile the programme measures.",
-   "contract": "The delivery contract commits the platform to the charter's scope and constraints and to the evidence named here. A change to the scope or a constraint is a new statement of architecture work, not an edit to this one; the contract's supersession is recorded like any other.",
-   "retrospective": "This statement is authored retrospectively on 2026-11-26 from the live record at snapshot 1126r and the platform plan. It records what the platform is and what it owes; it does not invent a contemporaneous history that did not exist. The delegation and the date are on the face of the record."
-  }
- },
- "artifacts": [
-  {
-   "title": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "matrix",
-   "purpose": "Name the groups the standing platform serves and the engagement each requires.",
-   "scope": "The platform's consumers across the programme: its owner, the delivery projects and the estate's operators.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the programme owner",
-     "axis_b": "decides the platform's standing charter and the tranche gates",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "decide"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the platform owner",
-     "axis_b": "holds CI, runners, registry, Postgres, MinIO and the ingress",
-     "value": {
-      "influence": "high",
-      "interest": "high",
-      "engagement": "manage closely"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the delivery projects",
-     "axis_b": "consume the build, registry and database paths in every tranche",
-     "value": {
-      "influence": "medium",
-      "interest": "high",
-      "engagement": "keep informed"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "the Architecture Board",
-     "axis_b": "reviews the platform's standards and its phase-G compliance",
-     "value": {
-      "influence": "medium",
-      "interest": "medium",
-      "engagement": "review"
-     },
-     "position": 4
+  "charter": "# Charter — PLATFORM (standing, retrospective 2026-11-26)\n\n**Purpose.** The standing platform every conveyor delivery project uses: the CI path and runners,\nthe image registry and ingress, the Postgres primary with its backups and restore, the object\nstore, and the shared workflows that make a build reproducible.\n\n**Authority.** The platform owner holds the paths under the programme owner's standing delegation\n(01a1ff1f-e4ba-72dc-9c1a-13049933cf14). The Architecture Board reviews the platform's standards\nand its phase-G compliance. The programme board receives the platform's risks and escalations.\n\n**Scope.** The five-node estate's shared paths and nothing above them. The platform does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. A request outside\nthe list is a programme change.\n\n**Standing rule.** The platform does not close. Its acceptance is the standing charter, the\napproved scope baseline and a green manifest on a fresh snapshot. Each tranche review re-checks it\nwith the same manifest; a red manifest is a finding against the platform, not a closure trigger.\n\n**Constraints.** No local Rust compilation; the two-run CI budget per issue; one service one\ndatabase; per-service secrets; Postgres 18 with psycopg v3; Flux as the only deployment path.\n\n**Evidence.** The platform's record is the acceptance manifest, this pack, the docs/evidence/rework\nreceipt and the acts transcript. The estate's probes are the second evidence: the runner list, the\nregistry pull, the database recovery state, the MinIO bucket probe and the public window.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — PLATFORM standing capability (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Author the standing platform's retrospective architecture record: the fifteen-artefact programme-track set, the six-section register, the delivery contract and the phase-G review, for a project that carries the programme's CI, registry, database, storage and ingress paths and does not close.",
+      "scope": "The platform's own capabilities and their evidence, not a tenant's data model or a delivery project's plan. The record covers the five-node estate's shared paths, the standards that enforce them and the gaps that remain, with each claim traceable to a live row or a probe.",
+      "responsibilities": "The platform owner authors and holds the record under the programme owner's delegation; the Architecture Board reviews the artefacts and the compliance level; the programme board receives the platform's risks and escalations; the delivery projects consume the paths and report a break as a platform incident.",
+      "acceptance_criteria": "The manifest's checks pass with zero failures on a fresh snapshot, the fifteen artefacts and their documents exist, the register carries all five kinds, the delivery contract is live and the phase-G review is recorded against it, and the benefit realization records exist for every profile the programme measures.",
+      "contract": "The delivery contract commits the platform to the charter's scope and constraints and to the evidence named here. A change to the scope or a constraint is a new statement of architecture work, not an edit to this one; the contract's supersession is recorded like any other.",
+      "retrospective": "This statement is authored retrospectively on 2026-11-26 from the live record at snapshot 1126r and the platform plan. It records what the platform is and what it owes; it does not invent a contemporaneous history that did not exist. The delegation and the date are on the face of the record."
     }
-   ],
-   "body": "## Metadata\n\nRetrospective matrix artefact for PLATFORM, authored 2026-11-26 from the live record at snapshot 1126r. The project is standing: it carries a charter, an approved scope baseline (01a1fdd8-cff3-7cd9-9535-26fed3d5836b) and the accepted deliverable 01a1ff24-a6c6-7504-a811-0fecfbc460f6, and it does not close. The programme is 01a1d039-0d24-7d16-ae52-4841e96ccfac; the project sits in tranche 0 at ADM phase Preliminary, definition plateau.\n\n## Entries\n\nFour groups carry the platform's work: the programme owner decides the standing charter and the tranche gates; the platform owner operates CI, runners, registry, Postgres and MinIO; the delivery projects consume the build, registry and database paths; and the Architecture Board reviews the standards and the phase-G compliance. Each row names the influence, the interest and the engagement the relationship requires, taken from the programme's roles.\n\n## Links\n\nThe matrix derives from the platform plan docs/plans/development-process-speed.md, the programme seed's roles and the record's own approvals. Its rows are the platform's standing consumers, not a project team: the platform serves every tranche and its stakeholder set is therefore the programme's, not one delivery's.\n\n## Document\n\nEvery group in the matrix is served by a live surface: the owner by the programme register, the delivery projects by the CI workflows and the registry, the operators by the cluster manifests and the runbooks, and the board by the published standards pack. The map is the reference the remaining PLATFORM artefacts use for their reviewers and consumers.\n",
-   "links": [
-    {
-     "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
   },
-  {
-   "title": "Driver / Goal / Objective Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "purpose": "State the platform's drivers, goals and measurable objectives.",
-   "scope": "The programme-level drivers the platform serves and the objectives each tranche review can measure.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
+  "artifacts": [
     {
-     "axis_a": "D1 capacity without queueing",
-     "axis_b": "CI must not queue behind miniature pull requests",
-     "value": {
-      "goal": "G1 a bounded CI budget per unit",
-      "objective": "at most two runs per issue, measured from the run log"
-     },
-     "position": 1
+      "title": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the groups the standing platform serves and the engagement each requires.",
+      "scope": "The platform's consumers across the programme: its owner, the delivery projects and the estate's operators.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme owner",
+          "axis_b": "decides the platform's standing charter and the tranche gates",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the platform owner",
+          "axis_b": "holds CI, runners, registry, Postgres, MinIO and the ingress",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the delivery projects",
+          "axis_b": "consume the build, registry and database paths in every tranche",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews the platform's standards and its phase-G compliance",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "review"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for PLATFORM, authored 2026-11-26 from the live record at snapshot 1126r. The project is standing: it carries a charter, an approved scope baseline (01a1fdd8-cff3-7cd9-9535-26fed3d5836b) and the accepted deliverable 01a1ff24-a6c6-7504-a811-0fecfbc460f6, and it does not close. The programme is 01a1d039-0d24-7d16-ae52-4841e96ccfac; the project sits in tranche 0 at ADM phase Preliminary, definition plateau.\n\n## Entries\n\nFour groups carry the platform's work: the programme owner decides the standing charter and the tranche gates; the platform owner operates CI, runners, registry, Postgres and MinIO; the delivery projects consume the build, registry and database paths; and the Architecture Board reviews the standards and the phase-G compliance. Each row names the influence, the interest and the engagement the relationship requires, taken from the programme's roles.\n\n## Links\n\nThe matrix derives from the platform plan docs/plans/development-process-speed.md, the programme seed's roles and the record's own approvals. Its rows are the platform's standing consumers, not a project team: the platform serves every tranche and its stakeholder set is therefore the programme's, not one delivery's.\n\n## Document\n\nEvery group in the matrix is served by a live surface: the owner by the programme register, the delivery projects by the CI workflows and the registry, the operators by the cluster manifests and the runbooks, and the board by the published standards pack. The map is the reference the remaining PLATFORM artefacts use for their reviewers and consumers.\n",
+      "links": [
+        {
+          "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
-     "axis_a": "D2 one build path",
-     "axis_b": "every Rust verdict comes from the same gate",
-     "value": {
-      "goal": "G2 one sanctioned compile route",
-      "objective": "preflight.yml green at every pushed head"
-     },
-     "position": 2
+      "title": "Driver / Goal / Objective Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the platform's drivers, goals and measurable objectives.",
+      "scope": "The programme-level drivers the platform serves and the objectives each tranche review can measure.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 capacity without queueing",
+          "axis_b": "CI must not queue behind miniature pull requests",
+          "value": {
+            "goal": "G1 a bounded CI budget per unit",
+            "objective": "at most two runs per issue, measured from the run log"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 one build path",
+          "axis_b": "every Rust verdict comes from the same gate",
+          "value": {
+            "goal": "G2 one sanctioned compile route",
+            "objective": "preflight.yml green at every pushed head"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 recoverable data",
+          "axis_b": "the programme's record survives a host loss",
+          "value": {
+            "goal": "G3 a tested restore path",
+            "objective": "one restore drill with a read-back per tranche"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 one registry, one home",
+          "axis_b": "images and ownership have one address",
+          "value": {
+            "goal": "G4 one registry and one ownership matrix",
+            "objective": "no second store in any publication"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe drivers are the platform's own, recorded in docs/plans/development-process-speed.md and the programme's hard rules: CI without queueing, one build path, recoverable data and one registry. Each driver maps to a goal and an objective a tranche review can measure, so the platform is governed by outcomes rather than by infrastructure inventory.\n\n## Entries\n\nD1 is the 2026-11 lesson that miniature pull requests filled the org's twenty concurrent jobs; its goal is the two-run budget and its objective is read from the run log. D2 is the owner's 2026-11-20 direction that no Rust compiles on local hardware; its objective is the preflight verdict at every head. D3 and D4 are the data and image paths the estate's own rules define, each with a measurable objective.\n\n## Links\n\nThe catalog links the platform plan, the programme's hard rules and the record's accepted deliverable. No objective depends on a metric the platform does not already emit: the CI run count comes from GitHub, the preflight verdict from the workflow, the restore evidence from the drill's receipt and the ownership count from the T0 gate.\n\n## Document\n\nThe four rows are the platform's only standing drivers. A fifth driver would need a recorded owner decision; the catalog is deliberately small so the platform does not grow goals it cannot measure. The objectives feed the benefits diagram and the programme appraisal, which measure the same facts.\n",
+      "links": [
+        {
+          "to": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
-     "axis_a": "D3 recoverable data",
-     "axis_b": "the programme's record survives a host loss",
-     "value": {
-      "goal": "G3 a tested restore path",
-      "objective": "one restore drill with a read-back per tranche"
-     },
-     "position": 3
+      "title": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the platform requirements the record must satisfy and their verification.",
+      "scope": "The CI, registry, database, storage, ingress and secrets requirements of the standing platform.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1 CI node",
+          "axis_b": "hp2 carries the ci-runner taint and the ARC runners",
+          "value": {
+            "verification": "the runner list and a green preflight"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 Registry",
+          "axis_b": "registry.internal:5000 on worker3 with its CA",
+          "value": {
+            "verification": "a pull and a push through the CA"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 Database",
+          "axis_b": "Postgres 18 primary on strato-server with one standby",
+          "value": {
+            "verification": "pg_is_in_recovery on both nodes"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 Storage",
+          "axis_b": "MinIO on mf1 as a systemd unit, never a pod",
+          "value": {
+            "verification": "the bucket probe and the restore drill"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 Ingress",
+          "axis_b": "istio hostNetwork on the control plane, Cloudflare tunnels",
+          "value": {
+            "verification": "the public window probe"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 Secrets",
+          "axis_b": "per-service, never shared across services",
+          "value": {
+            "verification": "one credential per database and service"
+          },
+          "position": 6
+        }
+      ],
+      "body": "## Metadata\n\nThe requirements are the platform's standing obligations, each with a verification a reader can run against the live estate. They are not a wish list: R1–R6 are the paths every delivery project uses, so a broken one blocks a tranche rather than one project.\n\n## Entries\n\nR1 is the CI node's taint and runner pool; R2 is the registry's address and the CA a hand push needs; R3 is the primary and the single standby; R4 is the bare-metal MinIO unit; R5 is the ingress path behind the Cloudflare tunnels; R6 is the one-service-one-credential rule. Each row names the verification that proves it, not the configuration that assumes it.\n\n## Links\n\nThe catalog is the reference for the platform's test and acceptance records. A requirement that cannot name a verification is not a requirement; it is removed or rewritten rather than carried as prose. The six rows are the set the platform's deliverable and the tranche reviews hold it to.\n\n## Document\n\nThe platform's record carries the requirements as rows; its published brief cites them and its phase-G review judges against them. The catalog does not duplicate the estate's own runbooks: it states what the platform must be able to do and leaves the how to the operating procedures.\n",
+      "links": [
+        {
+          "to": "Driver / Goal / Objective Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
-     "axis_a": "D4 one registry, one home",
-     "axis_b": "images and ownership have one address",
-     "value": {
-      "goal": "G4 one registry and one ownership matrix",
-      "objective": "no second store in any publication"
-     },
-     "position": 4
+      "title": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the platform's shape at a glance: nodes, services and the paths between them.",
+      "scope": "The five-node estate and the CI, registry, database, storage and ingress paths the programme uses.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the control plane",
+          "axis_b": "strato-server runs k3s, the Postgres primary and the ingress",
+          "value": {
+            "role": "control",
+            "node": "strato-server"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the image and volume node",
+          "axis_b": "worker3 runs the registry and holds the PVs",
+          "value": {
+            "role": "state",
+            "node": "worker3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the compute node",
+          "axis_b": "hp1 carries the largest pod count",
+          "value": {
+            "role": "compute",
+            "node": "hp1"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the CI node",
+          "axis_b": "hp2 carries the ARC runners behind the ci-runner taint",
+          "value": {
+            "role": "ci",
+            "node": "hp2"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the storage and standby node",
+          "axis_b": "mf1 runs MinIO and the only Postgres standby",
+          "value": {
+            "role": "storage",
+            "node": "mf1"
+          },
+          "position": 5
+        }
+      ],
+      "body": "## Metadata\n\nThe concept diagram is the estate the platform owns. Five nodes, each with one job: the control plane and primary, the registry and volumes, the compute pool, the only CI node and the storage plus standby. Nothing crosses the site split invisibly: the datacenter pair and the home pair are named in the programme's infrastructure record.\n\n## Entries\n\nThe diagram's rows are the nodes and their roles. The edges the platform cares about are the CI path from hp2 to the registry, the registry pull on every node, the Postgres path through pgbouncer for pods and postgres.internal for hosts, the MinIO path for object bytes and the ingress path from the Cloudflare tunnels to istio.\n\n## Links\n\nEvery path has an owner and a probe: the runner list for CI, the CA-backed push for the registry, pg_is_in_recovery for the database, the bucket probe for MinIO and the public window probe for ingress. The diagram is the map the requirements catalog's verifications walk.\n\n## Document\n\nThe diagram is deliberately small: a platform that needs a second CI node or a second registry is a design change with its own decision, not an extra box. The estate's five-node shape is the current answer and the programme's rules keep it singular where singularity is the requirement.\n",
+      "links": [
+        {
+          "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the platform provides to every delivery project.",
+      "scope": "The build, verify, release, store, observe and recover capabilities and their consumers.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "build and verify",
+          "axis_b": "compile and test a change on the sanctioned path",
+          "value": {
+            "capability": "C1",
+            "consumer": "every delivery project"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "release",
+          "axis_b": "publish images to the one registry and deploy through Flux",
+          "value": {
+            "capability": "C2",
+            "consumer": "every deployed service"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "store and recover",
+          "axis_b": "hold rows, bytes and images and restore them",
+          "value": {
+            "capability": "C3",
+            "consumer": "the record and the services"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "observe",
+          "axis_b": "probe the public window and the estate's health",
+          "value": {
+            "capability": "C4",
+            "consumer": "operations and the programme board"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe capability map states what the platform does for the programme rather than what it runs. Four capabilities carry every delivery: build and verify, release, store and recover, and observe. Each names its consumers, so a capability with no consumer is visible and can be retired by decision.\n\n## Entries\n\nC1 is the sanctioned compile and test path: no local Rust compilation and a bounded CI budget. C2 is the image and deployment path: the one registry and Flux's reconciliation. C3 is the data path: Postgres rows, MinIO bytes and the tested restore. C4 is the observation path: the public window and the estate's health probes.\n\n## Links\n\nThe capabilities are the vocabulary the platform's artefacts use. The requirements catalog names their verifications, the benefits diagram names their measures and the gap analysis names what is missing. No capability is claimed without a live consumer and a probe.\n\n## Document\n\nThe map is the platform's external contract with the programme. A delivery project that needs a fifth capability is asking for a platform change, recorded as a decision and a work package rather than absorbed silently into one project's plan.\n",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Inventory the data the platform holds and the component that owns each store.",
+      "scope": "The rows, bytes, images, volumes and secrets the platform carries for the programme.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the operational rows",
+          "axis_b": "Postgres 18 on the primary, one standby on mf1",
+          "value": {
+            "store": "postgres",
+            "owner": "the application schemas"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the document bytes",
+          "axis_b": "MinIO on mf1, tenant-separated buckets",
+          "value": {
+            "store": "minio",
+            "owner": "the documents and evidence path"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the images",
+          "axis_b": "registry.internal:5000 on worker3 with PV-backed blobs",
+          "value": {
+            "store": "registry",
+            "owner": "the release pipeline"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the secrets",
+          "axis_b": "per-service credentials, never shared across services",
+          "value": {
+            "store": "sops",
+            "owner": "each service's own secret"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe catalog names the platform's four data families and the store that owns each. It is an inventory with an owner per row, not a schema: the schemas live with the application and the stores live with the platform. A data family without an owner is a finding.\n\n## Entries\n\nThe operational rows are the record: projects, cards, runs, approvals, programme rows and the rework register, all in Postgres. The document bytes are in MinIO with tenant separation. The images are in the one registry. The secrets are per-service and never cross a service boundary, which is the platform's blast-radius rule.\n\n## Links\n\nEach family names its backup or restore path: the nightly dump and its offsite relay for Postgres, the MinIO bucket probe and the restore drill for bytes, the PV snapshots for the registry and the SOPS layout for secrets. The catalog is what the restore drill walks.\n\n## Document\n\nThe catalog is the platform's data boundary. A new store is a design change; a second database user for another service is forbidden by the programme's invariants. The four families are the whole platform state, and the deliverable's evidence includes the restore path for the first.\n",
+      "links": [
+        {
+          "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "State the technology standards the platform enforces, with the version and the gate.",
+      "scope": "The database, cluster, delivery, CI and web standards every project in the programme follows.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Postgres 18",
+          "axis_b": "psycopg v3 and no other driver in the programme's apps",
+          "value": {
+            "standard": "database",
+            "gate": "the migration and connection checks"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "k3s and Flux",
+          "axis_b": "the cluster tree is the only deployment path",
+          "value": {
+            "standard": "delivery",
+            "gate": "Flux reconciliation"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "GitHub Actions preflight",
+          "axis_b": "the sanctioned Rust verdict; no local compiling cargo",
+          "value": {
+            "standard": "CI",
+            "gate": "preflight.yml at the head"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Leptos CSR on wasm",
+          "axis_b": "the web shell's build target, checked with the wasm toolchain",
+          "value": {
+            "standard": "web",
+            "gate": "the wasm check in preflight"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe standards are the platform's enforceable choices: Postgres 18 with psycopg v3, k3s with Flux as the only deployment path, the GitHub-hosted preflight as the only Rust verdict and Leptos on wasm for the web shell. Each names the gate that enforces it, so a standard without a gate is visible.\n\n## Entries\n\nThe database standard is the programme's own: one service, one database, one user. The delivery standard is the cluster tree Flux watches; a hand change is drift. The CI standard is the owner's 2026-11-20 direction; a local compiling cargo is denied. The web standard is the toolchain the shell actually builds with, not the host's default.\n\n## Links\n\nThe catalog's gates are the evidence a reader can run: the migration checks, the Flux reconciliation, the preflight run and the wasm check. A standard whose gate is not wired is a finding against the platform, which is the same rule the programme applies to every project.\n\n## Document\n\nThe standards are deliberately few and versioned. A new standard enters with a gate and an owner; an old one leaves by decision. The catalog does not list tools the platform does not enforce, because an unenforced standard is a claim the record cannot keep.\n",
+      "links": [
+        {
+          "to": "Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "matrix",
+      "purpose": "Name the platform's gaps between the baseline and the target, and the work each needs.",
+      "scope": "The gaps the rework found in the platform's CI, registry, data and observation paths.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the CI budget",
+          "axis_b": "miniature PRs filled the concurrent jobs",
+          "value": {
+            "gap": "the two-run budget and the trunk-first rule",
+            "work": "the lane protocol and the preflight path"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the standby drill",
+          "axis_b": "the standby exists and has not been promoted in a drill",
+          "value": {
+            "gap": "a tested promotion",
+            "work": "one drill per tranche with its receipt"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the registry push",
+          "axis_b": "a hand push on worker3 needs the CA copied first",
+          "value": {
+            "gap": "a documented push path",
+            "work": "the runbook and the CA step"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the heavy-GPU services",
+          "axis_b": "lean4_prover and image_gen_backend have no CI by design",
+          "value": {
+            "gap": "deploy-test on the device",
+            "work": "the build, restart, health and log check"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe gap matrix states what the platform cannot yet prove. It is a work list, not an accusation: each row names the baseline, the target and the work package that closes it. The platform is standing, so its gaps are closed tranche by tranche rather than at one closure.\n\n## Entries\n\nThe first gap is the 2026-11 CI lesson: miniature pull requests cost ninety-one and sixty-one runs on two tickets, and the fix is the lane protocol plus the hosted preflight. The second is the standby's untested promotion. The third is the registry's CA step. The fourth is the deliberate CI exemption for the heavy-GPU bare-metal services, where the device test is the gate.\n\n## Links\n\nEach gap names the artefact or work package that closes it: the budget rule in the lane protocol, the drill's receipt, the registry runbook and the device deploy-test. A gap without a work package is not in the matrix; it is a risk in the register.\n\n## Document\n\nThe matrix is the platform's honest distance from its target. It is updated at every tranche review, and a gap that survives two reviews without a work package is escalated to the programme board rather than carried indefinitely.\n",
+      "links": [
+        {
+          "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the platform options considered, the criteria and the options rejected.",
+      "scope": "The CI, runner and registry options the platform chose between, including doing nothing.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "S1 hosted preflight",
+          "axis_b": "GitHub-hosted Rust preflight as the only compile verdict",
+          "value": {
+            "verdict": "chosen",
+            "criterion": "no local compilation and no queue"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "S2 self-hosted ARC on hp2",
+          "axis_b": "the CI node's runner pool for the service workflows",
+          "value": {
+            "verdict": "chosen for service CI",
+            "criterion": "cluster-local delivery and cache"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "S3 a second CI node",
+          "axis_b": "more capacity on another home node",
+          "value": {
+            "verdict": "rejected",
+            "criterion": "one CI node is the failure model; capacity is not the bottleneck"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "S0 doing nothing",
+          "axis_b": "keep the old queue and the local compile",
+          "value": {
+            "verdict": "rejected",
+            "criterion": "the measured 91/61-run waste and the owner's direction"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe catalog records the platform's choices with their criteria, including doing nothing. It is short because the platform's shape is deliberately singular: one CI node, one registry, one primary. The rejected options are recorded so a later session does not re-open a settled decision as a fresh idea.\n\n## Entries\n\nS1 is the owner's 2026-11-20 direction: the compile verdict comes from the hosted preflight, not from a local cargo. S2 is the cluster's own runner pool for the service workflows. S3 was rejected because a second CI node doubles the failure surface without addressing the queue's cause, which was too many miniature PRs. S0 was rejected on the measured waste and the direction.\n\n## Links\n\nThe criteria are the platform's own: no local compilation, no queue behind miniature units, one failure model and a measurable budget. An option that fails a criterion is recorded as rejected rather than silently dropped; the record is the argument the next session reads.\n\n## Document\n\nThe chosen options are the platform's live shape. The rejected ones are decisions with their reasons, not open questions. A reversal needs a new decision and this catalogue keeps the old one visible so the reversal is explicit.\n",
+      "links": [
+        {
+          "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Place the platform in its context: the programme, the estate and the external services.",
+      "scope": "The programme, the five-node estate, GitHub, Cloudflare, the tailnet and the tenants the platform serves.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme",
+          "axis_b": "conveyor buildout, 14 tranches, 51 projects",
+          "value": {
+            "relation": "serves",
+            "direction": "inbound"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "GitHub",
+          "axis_b": "the repository, the issues, the PRs and the hosted preflight",
+          "value": {
+            "relation": "depends on",
+            "direction": "bidirectional"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Cloudflare and the tailnet",
+          "axis_b": "the public window and the private transport",
+          "value": {
+            "relation": "exposes",
+            "direction": "outbound"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the tenants",
+          "axis_b": "nonagentic, AHTAPol and w2v, each a separate tenant",
+          "value": {
+            "relation": "serves",
+            "direction": "inbound"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe context diagram places the platform between the programme it serves and the external services it uses. The programme is the conveyor buildout; the estate is the five nodes; the externals are GitHub for source and CI, Cloudflare for the public window and the tailnet for private transport; the tenants are nonagentic, AHTAPol and w2v.\n\n## Entries\n\nThe diagram's rows are relationships, not boxes: the programme is served, GitHub is depended on in both directions, the network is exposed through two paths, and the tenants are served under separate boundaries. The tenant boundary is the platform's licensing and isolation rule, not a deployment detail.\n\n## Links\n\nEach relationship has a failure mode the platform owns: a GitHub outage stops merges and preflight; a Cloudflare outage closes the public window; a tailnet fault splits the sites; and a tenant boundary breach is the one failure the platform must never allow. The diagram is the map the platform's incident procedures use.\n\n## Document\n\nThe context is stable across tranches, which is why it is a platform artefact rather than a project one. A new external service or a new tenant is a context change with a decision, and the diagram is updated with the decision rather than after it.\n",
+      "links": [
+        {
+          "to": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Connect the platform's goals to the programme's measured benefits.",
+      "scope": "The programme's benefit profiles and the platform measures that evidence them.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme KPI",
+          "axis_b": "deliver programmes at quality with the least rework",
+          "value": {
+            "goal": "G1 least rework",
+            "measure": "rework packages per accepted deliverable"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "B1 auditable decisions",
+          "axis_b": "every choice has a decision row",
+          "value": {
+            "goal": "the decision ladder",
+            "measure": "approval decisions per run"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "B2 less bespoke tooling",
+          "axis_b": "every service a job uses is a toolkit",
+          "value": {
+            "goal": "the tool estate",
+            "measure": "tool_call rows per cycle"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "B6 the record agrees with itself",
+          "axis_b": "seed, coverage and the checklist agree",
+          "value": {
+            "goal": "one record",
+            "measure": "open register findings"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe benefits diagram connects the platform's goals to the programme's benefit profiles. The programme KPI is the owner's 2026-11-26 decision: deliver programmes at quality with the least rework; cost is not a factor yet. The diagram names the measures the platform actually emits, not aspirational metrics.\n\n## Entries\n\nG1 is the KPI and its measure is the rework register: open packages per accepted deliverable. B1 is evidenced by the approval-decision row count, B2 by the tool_call ledger, B6 by the register findings. The platform provides the environment these measures run in; the programme's benefit profiles own the values.\n\n## Links\n\nThe diagram links each measure to its instrument: the rework register, the approval and tool_call tables, the coverage and register checks. A benefit whose measure has no instrument is not on the diagram; it is a kata candidate in the register.\n\n## Document\n\nThe diagram is the platform's contribution to the programme's benefit realisation. It does not claim realisation: the transition records own the baseline and the post readings, and the platform's role is the environment and the measures that make them possible.\n",
+      "links": [
+        {
+          "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Implementation and Migration Plan Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "f",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Sequence the platform work and the migration path to the target estate.",
+      "scope": "The platform's work packages, their tranches and the estate's migration path.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "CI and runners",
+          "axis_b": "hp2's runner pool and the hosted preflight",
+          "value": {
+            "tranche": 0,
+            "state": "live"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Registry and ingress",
+          "axis_b": "the one registry and the istio ingress",
+          "value": {
+            "tranche": 0,
+            "state": "live"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Postgres, backups and restore",
+          "axis_b": "the primary, the standby and the restore drill",
+          "value": {
+            "tranche": 0,
+            "state": "live, drill pending"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Shared workflows and archetypes",
+          "axis_b": "the standardised CI and deploy patterns",
+          "value": {
+            "tranche": 0,
+            "state": "live, consumers migrating"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe plan catalog sequences the platform's four work packages and the estate's migration path. The packages are live; what remains is the evidence: the restore drill, the shared workflow consumption and the tranche-by-tranche confirmation that the platform still serves.\n\n## Entries\n\nThe work packages are the platform's standing units: CI and runners, registry and ingress, Postgres with backups and restore, and the shared workflows and archetypes. Their tranche is 0 because the platform exists before the delivery tranches; their state is live and the catalog records the evidence each still owes.\n\n## Links\n\nThe migration path is the estate's, not the platform's: the five nodes are the target and the retired nodes are gone. The plan records the path's decision points — the site split, the standby, the registry move — so a later reader can see why the estate looks as it does.\n\n## Document\n\nThe catalog is the platform's plan of record. It is updated at each tranche review with the state of the four packages; a package that regresses reopens as a gap rather than silently staying green.\n",
+      "links": [
+        {
+          "to": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Compliance Review Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "g",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the platform's compliance reviews and the level each judged.",
+      "scope": "The phase-G reviews of the standing platform, including the review this rework records.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the 2026-11-22 review",
+          "axis_b": "the earlier review judged the platform non_conformant",
+          "value": {
+            "level": "non_conformant",
+            "status": "recorded"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the 2026-11-26 review",
+          "axis_b": "this rework's phase-G review against the delivery contract",
+          "value": {
+            "level": "compliant",
+            "status": "this pack records it"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the standing charter",
+          "axis_b": "the platform's charter and baseline are approved",
+          "value": {
+            "level": "compliant",
+            "status": "approved"
+          },
+          "position": 3
+        }
+      ],
+      "body": "## Metadata\n\nThe review catalog records the platform's compliance history. The 2026-11-22 review judged the platform non_conformant against its then contract; this rework records a fresh phase-G review against the delivery contract it authors, with the evidence the review reads. The history is kept so the improvement is visible.\n\n## Entries\n\nThe catalog's rows are the reviews and their levels. A review is recorded against a live contract and cites the delegation, the manifest and the acceptance record. The platform is standing, so its reviews are periodic rather than closure-driven; the catalog is the series.\n\n## Links\n\nThe levels are the six the architecture standard defines. A non_conformant review is not erased by a later compliant one; it is the earlier state, and the catalog keeps both so the trajectory is readable. A waiver would be recorded with its accepting owner and date.\n\n## Document\n\nThe catalog is the platform's governance memory. The phase-G review this pack records is the current verdict; the earlier one is the baseline it improved from. Both are rows, and the published standards pack renders them from the record.\n",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Implementation and Migration Plan Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Architecture Change Request Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the architecture changes this rework made and their authorisation.",
+      "scope": "The changes the rework made to the platform's standards, projections and documents.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the action-registry projection",
+          "axis_b": "the product snapshot now carries the served action registry",
+          "value": {
+            "change": "the blueprint's Action registry section",
+            "authorisation": "the #526 rework delegation"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the decision records",
+          "axis_b": "five ADR-kind governed assets carry the programme's appraisals",
+          "value": {
+            "change": "the business case, blueprint and solution-intent sources",
+            "authorisation": "the #526 rework delegation"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the standards corrections",
+          "axis_b": "the benefit-transition source, the tranche-review due states and the register headings",
+          "value": {
+            "change": "the standards pack",
+            "authorisation": "the #526 rework delegation"
+          },
+          "position": 3
+        }
+      ],
+      "body": "## Metadata\n\nThe change catalog records the architecture changes the rework made, each with its authorisation. It is a retrospective change record: the changes landed on the #526 lane under the owner's delegation, and the catalog names them so the platform's standards history is explicit rather than inferred from a diff.\n\n## Entries\n\nThe first change is the action-registry projection: the snapshot now writes actions.json, so the blueprint's Action registry section resolves from the served registry rather than from a design-pack copy. The second is the five ADR-kind decision records that carry the licensing frame, the blueprint states, the options and programme appraisals and the solution intent. The third is the standards corrections.\n\n## Links\n\nEach change is authorised by the #526 delegation and recorded against its work package. A change without an authorisation is not in the catalog; it is a finding against the platform. The catalog is the bridge between the rework's acts and the standards' history.\n\n## Document\n\nThe catalog is the platform's change memory. The phase-G review reads it as evidence; the tranche reviews cite it; and a later standards change can see what moved and why. It is short because the rework is small relative to the platform, and that is the point.\n",
+      "links": [
+        {
+          "to": "Compliance Review Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
+    },
+    {
+      "title": "Architecture Requirement Catalog — PLATFORM (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "State the architecture requirements derived from the platform's standards and decisions.",
+      "scope": "The requirements the platform's standards and the rework's decisions impose on the record and the product.",
+      "stakeholders": {
+        "owner": "the platform owner under the #526 rework delegation",
+        "reviewer": "the Architecture Board and the programme owner",
+        "consumers": [
+          "the delivery projects of tranches 1–13",
+          "the programme board and the tranche reviews",
+          "the platform operators — CI, runners, registry, Postgres and MinIO"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "AR1 one record",
+          "axis_b": "the seed, the snapshot and the published pack agree at every review",
+          "value": {
+            "source": "B6 and the conformance baseline",
+            "verification": "the coverage and register checks"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "AR2 one action surface",
+          "axis_b": "every state change is a registered action with its read-back",
+          "value": {
+            "source": "the action registry and the audit",
+            "verification": "the action registry projection and the audit"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "AR3 one measurement record",
+          "axis_b": "a benefit's baseline is the profile's own field, written in the same transaction",
+          "value": {
+            "source": "SPEC_V2 §8.3",
+            "verification": "the benefit lifecycle tests"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "AR4 one delivery contract",
+          "axis_b": "a delivery project cannot pass design without the live contract that governs it",
+          "value": {
+            "source": "TOGAF phase A/D63",
+            "verification": "the contract and phase gates"
+          },
+          "position": 4
+        }
+      ],
+      "body": "## Metadata\n\nThe requirement catalog states what the architecture must be able to prove. AR1 is one record: the seed, the snapshot and the published pack agree at every review. AR2 is one action surface: every state change is a registered action with a read-back. AR3 is the benefit measurement record. AR4 is the delivery contract rule.\n\n## Entries\n\nEach requirement names its source and its verification. AR1 comes from B6 and the conformance baseline, verified by the coverage and register checks. AR2 comes from the action registry, verified by the projection and the audit. AR3 comes from SPEC_V2 §8.3, verified by the benefit lifecycle tests. AR4 comes from TOGAF and D63, verified by the contract and phase gates.\n\n## Links\n\nThe catalog is the architecture's own requirements, distinct from the platform's operational ones. A requirement that cannot name a verification is removed or rewritten. The four rows are the ones the rework's decisions and the standards impose on this record.\n\n## Document\n\nThe catalog closes the platform's artefact set. The requirements are the tests the platform's next review will run; the change catalog records the changes that made them true. Together they are the platform's argument that the standing project is governed, not merely running.\n",
+      "links": [
+        {
+          "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Architecture Change Request Catalog — PLATFORM (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ]
     }
-   ],
-   "body": "## Metadata\n\nThe drivers are the platform's own, recorded in docs/plans/development-process-speed.md and the programme's hard rules: CI without queueing, one build path, recoverable data and one registry. Each driver maps to a goal and an objective a tranche review can measure, so the platform is governed by outcomes rather than by infrastructure inventory.\n\n## Entries\n\nD1 is the 2026-11 lesson that miniature pull requests filled the org's twenty concurrent jobs; its goal is the two-run budget and its objective is read from the run log. D2 is the owner's 2026-11-20 direction that no Rust compiles on local hardware; its objective is the preflight verdict at every head. D3 and D4 are the data and image paths the estate's own rules define, each with a measurable objective.\n\n## Links\n\nThe catalog links the platform plan, the programme's hard rules and the record's accepted deliverable. No objective depends on a metric the platform does not already emit: the CI run count comes from GitHub, the preflight verdict from the workflow, the restore evidence from the drill's receipt and the ownership count from the T0 gate.\n\n## Document\n\nThe four rows are the platform's only standing drivers. A fifth driver would need a recorded owner decision; the catalog is deliberately small so the platform does not grow goals it cannot measure. The objectives feed the benefits diagram and the programme appraisal, which measure the same facts.\n",
-   "links": [
-    {
-     "to": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "catalog",
-   "purpose": "State the platform requirements the record must satisfy and their verification.",
-   "scope": "The CI, registry, database, storage, ingress and secrets requirements of the standing platform.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "R1 CI node",
-     "axis_b": "hp2 carries the ci-runner taint and the ARC runners",
-     "value": {
-      "verification": "the runner list and a green preflight"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "R2 Registry",
-     "axis_b": "registry.internal:5000 on worker3 with its CA",
-     "value": {
-      "verification": "a pull and a push through the CA"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "R3 Database",
-     "axis_b": "Postgres 18 primary on strato-server with one standby",
-     "value": {
-      "verification": "pg_is_in_recovery on both nodes"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "R4 Storage",
-     "axis_b": "MinIO on mf1 as a systemd unit, never a pod",
-     "value": {
-      "verification": "the bucket probe and the restore drill"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "R5 Ingress",
-     "axis_b": "istio hostNetwork on the control plane, Cloudflare tunnels",
-     "value": {
-      "verification": "the public window probe"
-     },
-     "position": 5
-    },
-    {
-     "axis_a": "R6 Secrets",
-     "axis_b": "per-service, never shared across services",
-     "value": {
-      "verification": "one credential per database and service"
-     },
-     "position": 6
-    }
-   ],
-   "body": "## Metadata\n\nThe requirements are the platform's standing obligations, each with a verification a reader can run against the live estate. They are not a wish list: R1–R6 are the paths every delivery project uses, so a broken one blocks a tranche rather than one project.\n\n## Entries\n\nR1 is the CI node's taint and runner pool; R2 is the registry's address and the CA a hand push needs; R3 is the primary and the single standby; R4 is the bare-metal MinIO unit; R5 is the ingress path behind the Cloudflare tunnels; R6 is the one-service-one-credential rule. Each row names the verification that proves it, not the configuration that assumes it.\n\n## Links\n\nThe catalog is the reference for the platform's test and acceptance records. A requirement that cannot name a verification is not a requirement; it is removed or rewritten rather than carried as prose. The six rows are the set the platform's deliverable and the tranche reviews hold it to.\n\n## Document\n\nThe platform's record carries the requirements as rows; its published brief cites them and its phase-G review judges against them. The catalog does not duplicate the estate's own runbooks: it states what the platform must be able to do and leaves the how to the operating procedures.\n",
-   "links": [
-    {
-     "to": "Driver / Goal / Objective Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "a",
-   "plateau": "psa",
-   "artifact_kind": "diagram",
-   "purpose": "Show the platform's shape at a glance: nodes, services and the paths between them.",
-   "scope": "The five-node estate and the CI, registry, database, storage and ingress paths the programme uses.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the control plane",
-     "axis_b": "strato-server runs k3s, the Postgres primary and the ingress",
-     "value": {
-      "role": "control",
-      "node": "strato-server"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the image and volume node",
-     "axis_b": "worker3 runs the registry and holds the PVs",
-     "value": {
-      "role": "state",
-      "node": "worker3"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the compute node",
-     "axis_b": "hp1 carries the largest pod count",
-     "value": {
-      "role": "compute",
-      "node": "hp1"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "the CI node",
-     "axis_b": "hp2 carries the ARC runners behind the ci-runner taint",
-     "value": {
-      "role": "ci",
-      "node": "hp2"
-     },
-     "position": 4
-    },
-    {
-     "axis_a": "the storage and standby node",
-     "axis_b": "mf1 runs MinIO and the only Postgres standby",
-     "value": {
-      "role": "storage",
-      "node": "mf1"
-     },
-     "position": 5
-    }
-   ],
-   "body": "## Metadata\n\nThe concept diagram is the estate the platform owns. Five nodes, each with one job: the control plane and primary, the registry and volumes, the compute pool, the only CI node and the storage plus standby. Nothing crosses the site split invisibly: the datacenter pair and the home pair are named in the programme's infrastructure record.\n\n## Entries\n\nThe diagram's rows are the nodes and their roles. The edges the platform cares about are the CI path from hp2 to the registry, the registry pull on every node, the Postgres path through pgbouncer for pods and postgres.internal for hosts, the MinIO path for object bytes and the ingress path from the Cloudflare tunnels to istio.\n\n## Links\n\nEvery path has an owner and a probe: the runner list for CI, the CA-backed push for the registry, pg_is_in_recovery for the database, the bucket probe for MinIO and the public window probe for ingress. The diagram is the map the requirements catalog's verifications walk.\n\n## Document\n\nThe diagram is deliberately small: a platform that needs a second CI node or a second registry is a design change with its own decision, not an extra box. The estate's five-node shape is the current answer and the programme's rules keep it singular where singularity is the requirement.\n",
-   "links": [
-    {
-     "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "b",
-   "plateau": "hld",
-   "artifact_kind": "diagram",
-   "purpose": "Name the capabilities the platform provides to every delivery project.",
-   "scope": "The build, verify, release, store, observe and recover capabilities and their consumers.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "build and verify",
-     "axis_b": "compile and test a change on the sanctioned path",
-     "value": {
-      "capability": "C1",
-      "consumer": "every delivery project"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "release",
-     "axis_b": "publish images to the one registry and deploy through Flux",
-     "value": {
-      "capability": "C2",
-      "consumer": "every deployed service"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "store and recover",
-     "axis_b": "hold rows, bytes and images and restore them",
-     "value": {
-      "capability": "C3",
-      "consumer": "the record and the services"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "observe",
-     "axis_b": "probe the public window and the estate's health",
-     "value": {
-      "capability": "C4",
-      "consumer": "operations and the programme board"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe capability map states what the platform does for the programme rather than what it runs. Four capabilities carry every delivery: build and verify, release, store and recover, and observe. Each names its consumers, so a capability with no consumer is visible and can be retired by decision.\n\n## Entries\n\nC1 is the sanctioned compile and test path: no local Rust compilation and a bounded CI budget. C2 is the image and deployment path: the one registry and Flux's reconciliation. C3 is the data path: Postgres rows, MinIO bytes and the tested restore. C4 is the observation path: the public window and the estate's health probes.\n\n## Links\n\nThe capabilities are the vocabulary the platform's artefacts use. The requirements catalog names their verifications, the benefits diagram names their measures and the gap analysis names what is missing. No capability is claimed without a live consumer and a probe.\n\n## Document\n\nThe map is the platform's external contract with the programme. A delivery project that needs a fifth capability is asking for a platform change, recorded as a decision and a work package rather than absorbed silently into one project's plan.\n",
-   "links": [
-    {
-     "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "c",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "Inventory the data the platform holds and the component that owns each store.",
-   "scope": "The rows, bytes, images, volumes and secrets the platform carries for the programme.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the operational rows",
-     "axis_b": "Postgres 18 on the primary, one standby on mf1",
-     "value": {
-      "store": "postgres",
-      "owner": "the application schemas"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the document bytes",
-     "axis_b": "MinIO on mf1, tenant-separated buckets",
-     "value": {
-      "store": "minio",
-      "owner": "the documents and evidence path"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the images",
-     "axis_b": "registry.internal:5000 on worker3 with PV-backed blobs",
-     "value": {
-      "store": "registry",
-      "owner": "the release pipeline"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "the secrets",
-     "axis_b": "per-service credentials, never shared across services",
-     "value": {
-      "store": "sops",
-      "owner": "each service's own secret"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe catalog names the platform's four data families and the store that owns each. It is an inventory with an owner per row, not a schema: the schemas live with the application and the stores live with the platform. A data family without an owner is a finding.\n\n## Entries\n\nThe operational rows are the record: projects, cards, runs, approvals, programme rows and the rework register, all in Postgres. The document bytes are in MinIO with tenant separation. The images are in the one registry. The secrets are per-service and never cross a service boundary, which is the platform's blast-radius rule.\n\n## Links\n\nEach family names its backup or restore path: the nightly dump and its offsite relay for Postgres, the MinIO bucket probe and the restore drill for bytes, the PV snapshots for the registry and the SOPS layout for secrets. The catalog is what the restore drill walks.\n\n## Document\n\nThe catalog is the platform's data boundary. A new store is a design change; a second database user for another service is forbidden by the programme's invariants. The four families are the whole platform state, and the deliverable's evidence includes the restore path for the first.\n",
-   "links": [
-    {
-     "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "d",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "State the technology standards the platform enforces, with the version and the gate.",
-   "scope": "The database, cluster, delivery, CI and web standards every project in the programme follows.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "Postgres 18",
-     "axis_b": "psycopg v3 and no other driver in the programme's apps",
-     "value": {
-      "standard": "database",
-      "gate": "the migration and connection checks"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "k3s and Flux",
-     "axis_b": "the cluster tree is the only deployment path",
-     "value": {
-      "standard": "delivery",
-      "gate": "Flux reconciliation"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "GitHub Actions preflight",
-     "axis_b": "the sanctioned Rust verdict; no local compiling cargo",
-     "value": {
-      "standard": "CI",
-      "gate": "preflight.yml at the head"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Leptos CSR on wasm",
-     "axis_b": "the web shell's build target, checked with the wasm toolchain",
-     "value": {
-      "standard": "web",
-      "gate": "the wasm check in preflight"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe standards are the platform's enforceable choices: Postgres 18 with psycopg v3, k3s with Flux as the only deployment path, the GitHub-hosted preflight as the only Rust verdict and Leptos on wasm for the web shell. Each names the gate that enforces it, so a standard without a gate is visible.\n\n## Entries\n\nThe database standard is the programme's own: one service, one database, one user. The delivery standard is the cluster tree Flux watches; a hand change is drift. The CI standard is the owner's 2026-11-20 direction; a local compiling cargo is denied. The web standard is the toolchain the shell actually builds with, not the host's default.\n\n## Links\n\nThe catalog's gates are the evidence a reader can run: the migration checks, the Flux reconciliation, the preflight run and the wasm check. A standard whose gate is not wired is a finding against the platform, which is the same rule the programme applies to every project.\n\n## Document\n\nThe standards are deliberately few and versioned. A new standard enters with a gate and an owner; an old one leaves by decision. The catalog does not list tools the platform does not enforce, because an unenforced standard is a claim the record cannot keep.\n",
-   "links": [
-    {
-     "to": "Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "e",
-   "plateau": "hld",
-   "artifact_kind": "matrix",
-   "purpose": "Name the platform's gaps between the baseline and the target, and the work each needs.",
-   "scope": "The gaps the rework found in the platform's CI, registry, data and observation paths.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the CI budget",
-     "axis_b": "miniature PRs filled the concurrent jobs",
-     "value": {
-      "gap": "the two-run budget and the trunk-first rule",
-      "work": "the lane protocol and the preflight path"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the standby drill",
-     "axis_b": "the standby exists and has not been promoted in a drill",
-     "value": {
-      "gap": "a tested promotion",
-      "work": "one drill per tranche with its receipt"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the registry push",
-     "axis_b": "a hand push on worker3 needs the CA copied first",
-     "value": {
-      "gap": "a documented push path",
-      "work": "the runbook and the CA step"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "the heavy-GPU services",
-     "axis_b": "lean4_prover and image_gen_backend have no CI by design",
-     "value": {
-      "gap": "deploy-test on the device",
-      "work": "the build, restart, health and log check"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe gap matrix states what the platform cannot yet prove. It is a work list, not an accusation: each row names the baseline, the target and the work package that closes it. The platform is standing, so its gaps are closed tranche by tranche rather than at one closure.\n\n## Entries\n\nThe first gap is the 2026-11 CI lesson: miniature pull requests cost ninety-one and sixty-one runs on two tickets, and the fix is the lane protocol plus the hosted preflight. The second is the standby's untested promotion. The third is the registry's CA step. The fourth is the deliberate CI exemption for the heavy-GPU bare-metal services, where the device test is the gate.\n\n## Links\n\nEach gap names the artefact or work package that closes it: the budget rule in the lane protocol, the drill's receipt, the registry runbook and the device deploy-test. A gap without a work package is not in the matrix; it is a risk in the register.\n\n## Document\n\nThe matrix is the platform's honest distance from its target. It is updated at every tranche review, and a gap that survives two reviews without a work package is escalated to the programme board rather than carried indefinitely.\n",
-   "links": [
-    {
-     "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "e",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "Record the platform options considered, the criteria and the options rejected.",
-   "scope": "The CI, runner and registry options the platform chose between, including doing nothing.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "S1 hosted preflight",
-     "axis_b": "GitHub-hosted Rust preflight as the only compile verdict",
-     "value": {
-      "verdict": "chosen",
-      "criterion": "no local compilation and no queue"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "S2 self-hosted ARC on hp2",
-     "axis_b": "the CI node's runner pool for the service workflows",
-     "value": {
-      "verdict": "chosen for service CI",
-      "criterion": "cluster-local delivery and cache"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "S3 a second CI node",
-     "axis_b": "more capacity on another home node",
-     "value": {
-      "verdict": "rejected",
-      "criterion": "one CI node is the failure model; capacity is not the bottleneck"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "S0 doing nothing",
-     "axis_b": "keep the old queue and the local compile",
-     "value": {
-      "verdict": "rejected",
-      "criterion": "the measured 91/61-run waste and the owner's direction"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe catalog records the platform's choices with their criteria, including doing nothing. It is short because the platform's shape is deliberately singular: one CI node, one registry, one primary. The rejected options are recorded so a later session does not re-open a settled decision as a fresh idea.\n\n## Entries\n\nS1 is the owner's 2026-11-20 direction: the compile verdict comes from the hosted preflight, not from a local cargo. S2 is the cluster's own runner pool for the service workflows. S3 was rejected because a second CI node doubles the failure surface without addressing the queue's cause, which was too many miniature PRs. S0 was rejected on the measured waste and the direction.\n\n## Links\n\nThe criteria are the platform's own: no local compilation, no queue behind miniature units, one failure model and a measurable budget. An option that fails a criterion is recorded as rejected rather than silently dropped; the record is the argument the next session reads.\n\n## Document\n\nThe chosen options are the platform's live shape. The rejected ones are decisions with their reasons, not open questions. A reversal needs a new decision and this catalogue keeps the old one visible so the reversal is explicit.\n",
-   "links": [
-    {
-     "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "e",
-   "plateau": "hld",
-   "artifact_kind": "diagram",
-   "purpose": "Place the platform in its context: the programme, the estate and the external services.",
-   "scope": "The programme, the five-node estate, GitHub, Cloudflare, the tailnet and the tenants the platform serves.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the programme",
-     "axis_b": "conveyor buildout, 14 tranches, 51 projects",
-     "value": {
-      "relation": "serves",
-      "direction": "inbound"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "GitHub",
-     "axis_b": "the repository, the issues, the PRs and the hosted preflight",
-     "value": {
-      "relation": "depends on",
-      "direction": "bidirectional"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Cloudflare and the tailnet",
-     "axis_b": "the public window and the private transport",
-     "value": {
-      "relation": "exposes",
-      "direction": "outbound"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "the tenants",
-     "axis_b": "nonagentic, AHTAPol and w2v, each a separate tenant",
-     "value": {
-      "relation": "serves",
-      "direction": "inbound"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe context diagram places the platform between the programme it serves and the external services it uses. The programme is the conveyor buildout; the estate is the five nodes; the externals are GitHub for source and CI, Cloudflare for the public window and the tailnet for private transport; the tenants are nonagentic, AHTAPol and w2v.\n\n## Entries\n\nThe diagram's rows are relationships, not boxes: the programme is served, GitHub is depended on in both directions, the network is exposed through two paths, and the tenants are served under separate boundaries. The tenant boundary is the platform's licensing and isolation rule, not a deployment detail.\n\n## Links\n\nEach relationship has a failure mode the platform owns: a GitHub outage stops merges and preflight; a Cloudflare outage closes the public window; a tailnet fault splits the sites; and a tenant boundary breach is the one failure the platform must never allow. The diagram is the map the platform's incident procedures use.\n\n## Document\n\nThe context is stable across tranches, which is why it is a platform artefact rather than a project one. A new external service or a new tenant is a context change with a decision, and the diagram is updated with the decision rather than after it.\n",
-   "links": [
-    {
-     "to": "Stakeholder Map — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "e",
-   "plateau": "hld",
-   "artifact_kind": "diagram",
-   "purpose": "Connect the platform's goals to the programme's measured benefits.",
-   "scope": "The programme's benefit profiles and the platform measures that evidence them.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the programme KPI",
-     "axis_b": "deliver programmes at quality with the least rework",
-     "value": {
-      "goal": "G1 least rework",
-      "measure": "rework packages per accepted deliverable"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "B1 auditable decisions",
-     "axis_b": "every choice has a decision row",
-     "value": {
-      "goal": "the decision ladder",
-      "measure": "approval decisions per run"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "B2 less bespoke tooling",
-     "axis_b": "every service a job uses is a toolkit",
-     "value": {
-      "goal": "the tool estate",
-      "measure": "tool_call rows per cycle"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "B6 the record agrees with itself",
-     "axis_b": "seed, coverage and the checklist agree",
-     "value": {
-      "goal": "one record",
-      "measure": "open register findings"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe benefits diagram connects the platform's goals to the programme's benefit profiles. The programme KPI is the owner's 2026-11-26 decision: deliver programmes at quality with the least rework; cost is not a factor yet. The diagram names the measures the platform actually emits, not aspirational metrics.\n\n## Entries\n\nG1 is the KPI and its measure is the rework register: open packages per accepted deliverable. B1 is evidenced by the approval-decision row count, B2 by the tool_call ledger, B6 by the register findings. The platform provides the environment these measures run in; the programme's benefit profiles own the values.\n\n## Links\n\nThe diagram links each measure to its instrument: the rework register, the approval and tool_call tables, the coverage and register checks. A benefit whose measure has no instrument is not on the diagram; it is a kata candidate in the register.\n\n## Document\n\nThe diagram is the platform's contribution to the programme's benefit realisation. It does not claim realisation: the transition records own the baseline and the post readings, and the platform's role is the environment and the measures that make them possible.\n",
-   "links": [
-    {
-     "to": "Business Capability Map — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Implementation and Migration Plan Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "f",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "Sequence the platform work and the migration path to the target estate.",
-   "scope": "The platform's work packages, their tranches and the estate's migration path.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "CI and runners",
-     "axis_b": "hp2's runner pool and the hosted preflight",
-     "value": {
-      "tranche": 0,
-      "state": "live"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "Registry and ingress",
-     "axis_b": "the one registry and the istio ingress",
-     "value": {
-      "tranche": 0,
-      "state": "live"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "Postgres, backups and restore",
-     "axis_b": "the primary, the standby and the restore drill",
-     "value": {
-      "tranche": 0,
-      "state": "live, drill pending"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "Shared workflows and archetypes",
-     "axis_b": "the standardised CI and deploy patterns",
-     "value": {
-      "tranche": 0,
-      "state": "live, consumers migrating"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe plan catalog sequences the platform's four work packages and the estate's migration path. The packages are live; what remains is the evidence: the restore drill, the shared workflow consumption and the tranche-by-tranche confirmation that the platform still serves.\n\n## Entries\n\nThe work packages are the platform's standing units: CI and runners, registry and ingress, Postgres with backups and restore, and the shared workflows and archetypes. Their tranche is 0 because the platform exists before the delivery tranches; their state is live and the catalog records the evidence each still owes.\n\n## Links\n\nThe migration path is the estate's, not the platform's: the five nodes are the target and the retired nodes are gone. The plan records the path's decision points — the site split, the standby, the registry move — so a later reader can see why the estate looks as it does.\n\n## Document\n\nThe catalog is the platform's plan of record. It is updated at each tranche review with the state of the four packages; a package that regresses reopens as a gap rather than silently staying green.\n",
-   "links": [
-    {
-     "to": "Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Compliance Review Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "g",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "Record the platform's compliance reviews and the level each judged.",
-   "scope": "The phase-G reviews of the standing platform, including the review this rework records.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the 2026-11-22 review",
-     "axis_b": "the earlier review judged the platform non_conformant",
-     "value": {
-      "level": "non_conformant",
-      "status": "recorded"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the 2026-11-26 review",
-     "axis_b": "this rework's phase-G review against the delivery contract",
-     "value": {
-      "level": "compliant",
-      "status": "this pack records it"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the standing charter",
-     "axis_b": "the platform's charter and baseline are approved",
-     "value": {
-      "level": "compliant",
-      "status": "approved"
-     },
-     "position": 3
-    }
-   ],
-   "body": "## Metadata\n\nThe review catalog records the platform's compliance history. The 2026-11-22 review judged the platform non_conformant against its then contract; this rework records a fresh phase-G review against the delivery contract it authors, with the evidence the review reads. The history is kept so the improvement is visible.\n\n## Entries\n\nThe catalog's rows are the reviews and their levels. A review is recorded against a live contract and cites the delegation, the manifest and the acceptance record. The platform is standing, so its reviews are periodic rather than closure-driven; the catalog is the series.\n\n## Links\n\nThe levels are the six the architecture standard defines. A non_conformant review is not erased by a later compliant one; it is the earlier state, and the catalog keeps both so the trajectory is readable. A waiver would be recorded with its accepting owner and date.\n\n## Document\n\nThe catalog is the platform's governance memory. The phase-G review this pack records is the current verdict; the earlier one is the baseline it improved from. Both are rows, and the published standards pack renders them from the record.\n",
-   "links": [
-    {
-     "to": "Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Implementation and Migration Plan Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Architecture Change Request Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "h",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "Record the architecture changes this rework made and their authorisation.",
-   "scope": "The changes the rework made to the platform's standards, projections and documents.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "the action-registry projection",
-     "axis_b": "the product snapshot now carries the served action registry",
-     "value": {
-      "change": "the blueprint's Action registry section",
-      "authorisation": "the #526 rework delegation"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "the decision records",
-     "axis_b": "five ADR-kind governed assets carry the programme's appraisals",
-     "value": {
-      "change": "the business case, blueprint and solution-intent sources",
-      "authorisation": "the #526 rework delegation"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "the standards corrections",
-     "axis_b": "the benefit-transition source, the tranche-review due states and the register headings",
-     "value": {
-      "change": "the standards pack",
-      "authorisation": "the #526 rework delegation"
-     },
-     "position": 3
-    }
-   ],
-   "body": "## Metadata\n\nThe change catalog records the architecture changes the rework made, each with its authorisation. It is a retrospective change record: the changes landed on the #526 lane under the owner's delegation, and the catalog names them so the platform's standards history is explicit rather than inferred from a diff.\n\n## Entries\n\nThe first change is the action-registry projection: the snapshot now writes actions.json, so the blueprint's Action registry section resolves from the served registry rather than from a design-pack copy. The second is the five ADR-kind decision records that carry the licensing frame, the blueprint states, the options and programme appraisals and the solution intent. The third is the standards corrections.\n\n## Links\n\nEach change is authorised by the #526 delegation and recorded against its work package. A change without an authorisation is not in the catalog; it is a finding against the platform. The catalog is the bridge between the rework's acts and the standards' history.\n\n## Document\n\nThe catalog is the platform's change memory. The phase-G review reads it as evidence; the tranche reviews cite it; and a later standards change can see what moved and why. It is short because the rework is small relative to the platform, and that is the point.\n",
-   "links": [
-    {
-     "to": "Compliance Review Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  },
-  {
-   "title": "Architecture Requirement Catalog — PLATFORM (retrospective, 2026-11-26)",
-   "phase_code": "h",
-   "plateau": "hld",
-   "artifact_kind": "catalog",
-   "purpose": "State the architecture requirements derived from the platform's standards and decisions.",
-   "scope": "The requirements the platform's standards and the rework's decisions impose on the record and the product.",
-   "stakeholders": {
-    "owner": "the platform owner under the #526 rework delegation",
-    "reviewer": "the Architecture Board and the programme owner",
-    "consumers": [
-     "the delivery projects of tranches 1–13",
-     "the programme board and the tranche reviews",
-     "the platform operators — CI, runners, registry, Postgres and MinIO"
-    ]
-   },
-   "entries": [
-    {
-     "axis_a": "AR1 one record",
-     "axis_b": "the seed, the snapshot and the published pack agree at every review",
-     "value": {
-      "source": "B6 and the conformance baseline",
-      "verification": "the coverage and register checks"
-     },
-     "position": 1
-    },
-    {
-     "axis_a": "AR2 one action surface",
-     "axis_b": "every state change is a registered action with its read-back",
-     "value": {
-      "source": "the action registry and the audit",
-      "verification": "the action registry projection and the audit"
-     },
-     "position": 2
-    },
-    {
-     "axis_a": "AR3 one measurement record",
-     "axis_b": "a benefit's baseline is the profile's own field, written in the same transaction",
-     "value": {
-      "source": "SPEC_V2 §8.3",
-      "verification": "the benefit lifecycle tests"
-     },
-     "position": 3
-    },
-    {
-     "axis_a": "AR4 one delivery contract",
-     "axis_b": "a delivery project cannot pass design without the live contract that governs it",
-     "value": {
-      "source": "TOGAF phase A/D63",
-      "verification": "the contract and phase gates"
-     },
-     "position": 4
-    }
-   ],
-   "body": "## Metadata\n\nThe requirement catalog states what the architecture must be able to prove. AR1 is one record: the seed, the snapshot and the published pack agree at every review. AR2 is one action surface: every state change is a registered action with a read-back. AR3 is the benefit measurement record. AR4 is the delivery contract rule.\n\n## Entries\n\nEach requirement names its source and its verification. AR1 comes from B6 and the conformance baseline, verified by the coverage and register checks. AR2 comes from the action registry, verified by the projection and the audit. AR3 comes from SPEC_V2 §8.3, verified by the benefit lifecycle tests. AR4 comes from TOGAF and D63, verified by the contract and phase gates.\n\n## Links\n\nThe catalog is the architecture's own requirements, distinct from the platform's operational ones. A requirement that cannot name a verification is removed or rewritten. The four rows are the ones the rework's decisions and the standards impose on this record.\n\n## Document\n\nThe catalog closes the platform's artefact set. The requirements are the tests the platform's next review will run; the change catalog records the changes that made them true. Together they are the platform's argument that the standing project is governed, not merely running.\n",
-   "links": [
-    {
-     "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    },
-    {
-     "to": "Architecture Change Request Catalog — PLATFORM (retrospective, 2026-11-26)",
-     "kind": "derivation"
-    }
-   ]
-  }
- ],
- "documents": [
-  {
-   "category": "project-brief",
-   "title": "Project Brief — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Project Brief — PLATFORM\n\n## Outcome\n\nThe platform is the standing capability every conveyor delivery project uses: the CI path and\nrunners, the image registry and ingress, the Postgres primary with its backups and restore, and\nthe shared workflows that make a build reproducible. Its outcome is not a closure: the platform\nstays live for the programme's whole life and its acceptance is the standing charter plus the\nevidence that each path works. This rework records that evidence.\n\n## Boundary\n\nThe platform owns the five-node estate's shared paths and nothing above them. It does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. It owns the\ncluster, the registry, the database primary and standby, the object store, the ingress and the CI\nrunners. A request outside that list is a programme change, not a platform task.\n\n## Reuse sources\n\nThe platform's plan is docs/plans/development-process-speed.md, the 2026-11-10 audit of the Rust\ndevelopment process. The programme's hard rules supply the invariants: one service one database,\nper-service secrets, no local Rust compilation, the two-run CI budget. The estate's infrastructure\nrecord supplies the node names, the endpoints and the credentials layout.\n\n## Inception units\n\nThe platform's work packages are CI and runners, registry and ingress, Postgres with backups and\nrestore, and the shared workflows and archetypes. Each was delivered before the delivery tranches\nand each owes evidence at this review: a green preflight, a registry pull, a restore receipt and a\nconsuming workflow. The four units are the platform's standing work list.\n\n## Dependencies\n\nThe platform depends on GitHub for source, issues and the hosted preflight; on Cloudflare for the\npublic window; on the tailnet for transport; and on the estate's power and network for both sites.\nEvery delivery project depends on the platform, so a platform outage is a programme outage rather\nthan one project's risk. The dependency is recorded in both directions.\n\n## Acceptance\n\nThe platform is accepted as a standing project: its charter is approved, its scope baseline is\napproved, its deliverable is accepted with demo credit, and its manifest's checks are green. This\nrework adds the artefact standard, the register and the phase-G review; the acceptance does not\nclose the project. A later tranche review re-checks the platform with the same manifest.\n\n## Capabilities\n\nThe platform provides build and verify, release, store and recover, and observe. Each capability\nhas a live consumer and a probe: the preflight at every head, the registry pull on every node, the\nrestore drill, and the public window plus the estate's health probes. The capabilities are the\nplatform's external contract with the programme.\n\n## Plan\n\nThe plan is the four work packages, the estate's five-node shape and the tranche-by-tranche\nconfirmation that the paths still work. The platform's next steps are the restore drill, the\nshared-workflow consumption and the observation path's evidence. Each lands as a work package\nunder the standing charter rather than a new project.\n"
-  },
-  {
-   "category": "evidence",
-   "title": "Evidence — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Evidence — PLATFORM\n\n## Claim\n\nThe standing platform's paths are live and its record is conformant: the CI node runs the\nsanctioned preflight, the registry serves the images, the Postgres primary and its standby answer,\nMinIO holds the bytes, the ingress carries the public window, and the platform's charter, baseline,\nartefacts, register and phase-G review exist as rows with evidence.\n\n## Evidence\n\nThe record's own rows: the charter asset, the approved scope baseline, the accepted deliverable\nwith its demo credit, the five WBS nodes, the six-section register and the phase-G review against\nthe delivery contract. The estate's probes: the runner list, the registry pull, the database's\nrecovery state, the MinIO bucket probe and the public window. The acceptance manifest at\nacceptance/programme/PLATFORM.toml names the executable checks.\n\n## Verification\n\nRun `python3 scripts/verify-project.py --project PLATFORM --snapshot <fresh>` and read the receipt:\nevery check must pass with zero failures on a snapshot taken after the writes. Run the estate\nprobes named in the requirements catalog; a probe that cannot run is a gap, not a pass. The\nphase-G review reads the contract, the scope baseline and the delegation.\n\n## Links\n\nThe deliverable's evidence list names this file, the acceptance manifest and the acts record. The\nartefacts link to the requirements, the benefits diagram and the change catalog. The register's\nrows link to the decisions they depend on. Every link resolves at the snapshot's git sha.\n\n## Gap\n\nThe gaps the platform still carries are the restore drill, the standby promotion and the\nheavy-GPU services' device deploy-test. They are recorded in the gap matrix and the register; none\nis claimed as done. The platform is green when its manifest passes, not when its gaps disappear —\nthe gaps are the programme's work, tracked where a later review can see them.\n"
-  },
-  {
-   "category": "gap-analysis",
-   "title": "Gap Analysis — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Gap Analysis — PLATFORM\n\n## Baseline\n\nThe baseline is the platform as the record measured it before this rework: a live charter and\nscope baseline, an accepted deliverable, but no artefacts, no six-section register, no phase-G\nreview against a delivery contract and a red mandatory artefact standard. The earlier compliance\nreview judged the platform non_conformant against its statement of architecture work.\n\n## Target\n\nThe target is the standing platform with the full programme-track artefact set, the register, the\ndelivery contract and the phase-G review, its manifest green on a fresh snapshot, and its known\ngaps recorded as work rather than hidden as passes. The platform stays active; the target is\nconformance, not closure.\n\n## Gaps and work packages\n\nFour gaps remain after the rework: the restore drill, the standby promotion, the registry push's\nCA step and the heavy-GPU device deploy-test. The rework closes the record gaps — the artefacts,\nthe register, the contract, the review and the benefit realization records — and records the\noperational gaps with their owners and review dates. A gap without a work package is a risk in\nthe register, not an unrecorded absence.\n"
-  },
-  {
-   "category": "candidate-solutions",
-   "title": "Candidate Solutions — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Candidate Solutions — PLATFORM\n\n## Candidates\n\nThree candidates for the platform's CI and delivery shape: the GitHub-hosted preflight as the\nonly Rust verdict; the cluster's own ARC runners for the service workflows; and the one-registry,\nFlux-only delivery path. Each candidate names the path it serves and the failure it prevents.\n\n## Criteria\n\nThe criteria are the owner's directions and the measured lessons: no local Rust compilation, a\nbounded CI budget, one failure model per shared path, and a verification a reader can run. A\ncandidate that cannot name its verification is not a candidate; it is a wish.\n\n## Options rejected\n\nA second CI node was rejected because it doubles the failure surface without addressing the queue,\nwhose cause was miniature pull requests rather than capacity. Keeping the local compilation was\nrejected on the owner's direction and the measured 91 and 61 runs two tickets consumed. Doing\nnothing was rejected because the programme's own tranches depend on the platform's paths.\n"
-  },
-  {
-   "category": "project-context-diagram",
-   "title": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Project Context Diagram — PLATFORM\n\n## Context\n\nThe platform sits between the conveyor programme and the services it depends on: GitHub for\nsource and CI, Cloudflare for the public window, the tailnet for private transport, and the\nestate's two sites for its nodes. The programme is its consumer; the services are its suppliers.\n\n## Affected organisation\n\nThe programme owner decides the platform's charter and the tranche gates; the platform owner\noperates the paths; the delivery projects consume them; the Architecture Board reviews the\nstandards. The platform's incidents reach the programme board through the register's escalations,\nnot through an informal channel.\n\n## Affected systems\n\nThe five nodes and their roles: the control plane and Postgres primary, the registry and volumes,\nthe compute pool, the only CI node, and MinIO with the standby. The external systems are GitHub,\nCloudflare and the tailnet. A change to any of them is a platform change with a decision and a\nrecord, not a local adjustment.\n"
-  },
-  {
-   "category": "benefits-diagram",
-   "title": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Benefits Diagram — PLATFORM\n\n## Goals and outcomes\n\nThe platform's goal is the programme KPI the owner set on 2026-11-26: deliver programmes at\nquality with the least amount of rework. Cost is not a factor yet; the platform's outcome is a\nbuild-and-deliver path that does not itself create rework through queues, drift or untested\nrecovery.\n\n## Measures\n\nThe measures are the rework register's open packages per accepted deliverable, the CI runs per\nissue against the two-run budget, the preflight verdict at every pushed head, the restore drill's\nreceipt and the public window's probe. Each measure has an instrument in the record; none is a\nstored opinion.\n\n## Benefits and sub-benefits\n\nThe platform evidences B1 (the decision ladder's rows), B2 (the tool_call ledger), B5 (the one\nownership matrix) and B6 (the record agreeing with itself). It enables the other profiles without\nowning their values. The benefits diagram links each measure to the benefit profile that owns it,\nand the transition records carry the baseline and post readings.\n"
-  },
-  {
-   "category": "architecture-artifact",
-   "title": "Architecture Artefact Index — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Architecture Artefact Index — PLATFORM\n\n## Metadata\n\nThis index names the fifteen typed artefacts the platform's programme-track architecture set\ncarries, their phases and plateaus, and the document that publishes each. It is the entry point\nthe Architecture Board reads before the artefacts themselves; the artefacts are the rows, the\nindex is their map.\n\n## Entries\n\nThe set runs from Phase A's stakeholder map, driver catalog, requirements catalog and solution\nconcept diagram through Phase B's capability map, Phase C's data catalog and Phase D's technology\nstandards, then Phase E's gap matrix, candidate solutions, context diagram and benefits diagram,\nPhase F's migration plan, Phase G's compliance review catalog and Phase H's change and\nrequirement catalogs. Each entry names its artefact row and its published document.\n\n## Links\n\nEvery artefact links to at least one other: the requirements to the drivers, the capability map to\nthe solution concept, the gap matrix to the capability map and standards, the migration plan to\nthe candidates, standards, gaps and benefits, and the Phase H catalogs to the reviews and the\nrequirements. The graph is the derivation the board inspects.\n\n## Document\n\nThe index is itself an artefact document: the published body the architecture repository reads\nalongside the typed rows. A reader who needs the platform's architecture starts here and follows\nthe links; a reader who needs one artefact reads its own document. The index never duplicates an\nartefact's content, it points.\n"
-  },
-  {
-   "category": "safe-art",
-   "title": "Safe Art — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Safe Art — PLATFORM\n\n## ART charter\n\nThe ART is the programme's delivery rhythm: a PI per tranche, a refinement before it, a retro\nafter it, and the demo credit on each accepted deliverable. Its authority is the programme\nowner's standing delegation and its scope is the programme's projects, not a tenant's product.\nThe charter names the ART's outcomes so a review can judge them.\n\n## Solution intent\n\nThe ART intends a programme that delivers at quality with the least rework: tranche 0 green with\nits seven members evidenced, tranches 1–4 reworked in order, the benefit realization records\nwritten, and the public pack carrying the current record. The intent's constraints are the\nowner's directions and the estate's rules, which the deliverable's evidence cites.\n\n## Backlog with WSJF\n\nThe backlog is the programme's accepted deliverables, each carrying the four WSJF inputs the PI\nplan records. The platform's own deliverable scores business value 5, time criticality 5, risk\nreduction 3 and job size 6; the ordering is the programme's, and a deliverable without its four\ninputs is not on the backlog.\n\n## Shared configuration\n\nThe programme's shared configuration carries the cadence, the job-family pins, the default\napproval policy and the knowledge pins its projects inherit. It is a real row, written through\n`programmes.update`; an empty object is absence, not a configuration, and the standard treats it\nthat way.\n"
-  },
-  {
-   "category": "inspect-adapt",
-   "title": "Inspect and Adapt — PLATFORM (retrospective, 2026-11-26)",
-   "body": "# Inspect and Adapt — PLATFORM\n\n## What went well\n\nThe platform's paths held through the rework: the hosted preflight gave a compile verdict at\nevery pushed head, the registry served the images, the Postgres primary and its standby answered,\nand the record's own artifacts could be authored from the live rows. The rework's factory resumed\nacross four blocked attempts without duplicating a single row.\n\n## What did not\n\nThree defects surfaced only by running: the governed-asset vocabulary lagged the database CHECK\nby ten kinds and made the first list a 500; the plan's work packages predated the card\nrequirement and their update was refused; and two pre-existing change rows carried no approved\ngate, so the WBS guard refused them. Each is now a fix with a test or a constraint behind it.\n\n## Lessons\n\nThe durable lesson is that the record's vocabulary and its database must be one list, and that a\nguard which reads an approval link needs the action that creates it to write that link. Both are\nrecorded as programme lessons and one is a kata candidate; the kata is the mechanism that keeps a\nfuture session from rediscovering them.\n\n## Actions\n\nThe three defects are fixed on the lane, each with its own evidence. The platform's remaining\nactions are the restore drill, the standby promotion and the shared-workflow consumption, all\nrecorded in the gap matrix and the register with owners and review dates.\n\n## Kata candidates\n\n`L-PLATFORM-1` is the kata candidate: keep the domain enum identical to the database CHECK, and\nmake a list action that parses every stored row the test that proves it. The signature is\n`enum-mirrors-check`; the lesson is evidenced by the #526 issue, the PLATFORM receipt and the\nfactory's change.\n"
-  }
- ],
- "registers": {
-  "risk": [
-   {
-    "title": "The platform's dependency on a single CI node is a single point of failure for every tranche",
-    "body": "hp2 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on hp2's runner pool. A loss of hp2 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
-    "status": "open",
-    "severity": "high",
-    "probability": "medium",
-    "impact": 4,
-    "review_at": "2026-12-15",
-    "meta": {
-     "owner": "the platform owner under the #526 rework delegation"
-    },
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
-    }
-   },
-   {
-    "title": "The standby has not been promoted in a drill, so the recovery path is documented but unproven",
-    "body": "The Postgres standby on mf1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
-    "status": "open",
-    "severity": "high",
-    "probability": "medium",
-    "impact": 4,
-    "review_at": "2026-12-15",
-    "meta": {
-     "owner": "the platform owner under the #526 rework delegation"
-    },
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
-    }
-   }
   ],
-  "issue": [
-   {
-    "title": "The live public window lags the committed pack until the next publish",
-    "body": "The committed design pack can be ahead of the deployed snapshot between publishes. The rework's publish step closes the gap; until it runs, a reader of the public site sees the previous state. The issue is recorded against this rework and closed by the publish, not by hand-editing the pack.",
-    "status": "open",
-    "severity": "medium",
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
+  "documents": [
+    {
+      "category": "project-brief",
+      "title": "Project Brief — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Project Brief — PLATFORM\n\n## Outcome\n\nThe platform is the standing capability every conveyor delivery project uses: the CI path and\nrunners, the image registry and ingress, the Postgres primary with its backups and restore, and\nthe shared workflows that make a build reproducible. Its outcome is not a closure: the platform\nstays live for the programme's whole life and its acceptance is the standing charter plus the\nevidence that each path works. This rework records that evidence.\n\n## Boundary\n\nThe platform owns the five-node estate's shared paths and nothing above them. It does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. It owns the\ncluster, the registry, the database primary and standby, the object store, the ingress and the CI\nrunners. A request outside that list is a programme change, not a platform task.\n\n## Reuse sources\n\nThe platform's plan is docs/plans/development-process-speed.md, the 2026-11-10 audit of the Rust\ndevelopment process. The programme's hard rules supply the invariants: one service one database,\nper-service secrets, no local Rust compilation, the two-run CI budget. The estate's infrastructure\nrecord supplies the node names, the endpoints and the credentials layout.\n\n## Inception units\n\nThe platform's work packages are CI and runners, registry and ingress, Postgres with backups and\nrestore, and the shared workflows and archetypes. Each was delivered before the delivery tranches\nand each owes evidence at this review: a green preflight, a registry pull, a restore receipt and a\nconsuming workflow. The four units are the platform's standing work list.\n\n## Dependencies\n\nThe platform depends on GitHub for source, issues and the hosted preflight; on Cloudflare for the\npublic window; on the tailnet for transport; and on the estate's power and network for both sites.\nEvery delivery project depends on the platform, so a platform outage is a programme outage rather\nthan one project's risk. The dependency is recorded in both directions.\n\n## Acceptance\n\nThe platform is accepted as a standing project: its charter is approved, its scope baseline is\napproved, its deliverable is accepted with demo credit, and its manifest's checks are green. This\nrework adds the artefact standard, the register and the phase-G review; the acceptance does not\nclose the project. A later tranche review re-checks the platform with the same manifest.\n\n## Capabilities\n\nThe platform provides build and verify, release, store and recover, and observe. Each capability\nhas a live consumer and a probe: the preflight at every head, the registry pull on every node, the\nrestore drill, and the public window plus the estate's health probes. The capabilities are the\nplatform's external contract with the programme.\n\n## Plan\n\nThe plan is the four work packages, the estate's five-node shape and the tranche-by-tranche\nconfirmation that the paths still work. The platform's next steps are the restore drill, the\nshared-workflow consumption and the observation path's evidence. Each lands as a work package\nunder the standing charter rather than a new project.\n"
+    },
+    {
+      "category": "evidence",
+      "title": "Evidence — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Evidence — PLATFORM\n\n## Claim\n\nThe standing platform's paths are live and its record is conformant: the CI node runs the\nsanctioned preflight, the registry serves the images, the Postgres primary and its standby answer,\nMinIO holds the bytes, the ingress carries the public window, and the platform's charter, baseline,\nartefacts, register and phase-G review exist as rows with evidence.\n\n## Evidence\n\nThe record's own rows: the charter asset, the approved scope baseline, the accepted deliverable\nwith its demo credit, the five WBS nodes, the six-section register and the phase-G review against\nthe delivery contract. The estate's probes: the runner list, the registry pull, the database's\nrecovery state, the MinIO bucket probe and the public window. The acceptance manifest at\nacceptance/programme/PLATFORM.toml names the executable checks.\n\n## Verification\n\nRun `python3 scripts/verify-project.py --project PLATFORM --snapshot <fresh>` and read the receipt:\nevery check must pass with zero failures on a snapshot taken after the writes. Run the estate\nprobes named in the requirements catalog; a probe that cannot run is a gap, not a pass. The\nphase-G review reads the contract, the scope baseline and the delegation.\n\n## Links\n\nThe deliverable's evidence list names this file, the acceptance manifest and the acts record. The\nartefacts link to the requirements, the benefits diagram and the change catalog. The register's\nrows link to the decisions they depend on. Every link resolves at the snapshot's git sha.\n\n## Gap\n\nThe gaps the platform still carries are the restore drill, the standby promotion and the\nheavy-GPU services' device deploy-test. They are recorded in the gap matrix and the register; none\nis claimed as done. The platform is green when its manifest passes, not when its gaps disappear —\nthe gaps are the programme's work, tracked where a later review can see them.\n"
+    },
+    {
+      "category": "gap-analysis",
+      "title": "Gap Analysis — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Gap Analysis — PLATFORM\n\n## Baseline\n\nThe baseline is the platform as the record measured it before this rework: a live charter and\nscope baseline, an accepted deliverable, but no artefacts, no six-section register, no phase-G\nreview against a delivery contract and a red mandatory artefact standard. The earlier compliance\nreview judged the platform non_conformant against its statement of architecture work.\n\n## Target\n\nThe target is the standing platform with the full programme-track artefact set, the register, the\ndelivery contract and the phase-G review, its manifest green on a fresh snapshot, and its known\ngaps recorded as work rather than hidden as passes. The platform stays active; the target is\nconformance, not closure.\n\n## Gaps and work packages\n\nFour gaps remain after the rework: the restore drill, the standby promotion, the registry push's\nCA step and the heavy-GPU device deploy-test. The rework closes the record gaps — the artefacts,\nthe register, the contract, the review and the benefit realization records — and records the\noperational gaps with their owners and review dates. A gap without a work package is a risk in\nthe register, not an unrecorded absence.\n"
+    },
+    {
+      "category": "candidate-solutions",
+      "title": "Candidate Solutions — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Candidate Solutions — PLATFORM\n\n## Candidates\n\nThree candidates for the platform's CI and delivery shape: the GitHub-hosted preflight as the\nonly Rust verdict; the cluster's own ARC runners for the service workflows; and the one-registry,\nFlux-only delivery path. Each candidate names the path it serves and the failure it prevents.\n\n## Criteria\n\nThe criteria are the owner's directions and the measured lessons: no local Rust compilation, a\nbounded CI budget, one failure model per shared path, and a verification a reader can run. A\ncandidate that cannot name its verification is not a candidate; it is a wish.\n\n## Options rejected\n\nA second CI node was rejected because it doubles the failure surface without addressing the queue,\nwhose cause was miniature pull requests rather than capacity. Keeping the local compilation was\nrejected on the owner's direction and the measured 91 and 61 runs two tickets consumed. Doing\nnothing was rejected because the programme's own tranches depend on the platform's paths.\n"
+    },
+    {
+      "category": "project-context-diagram",
+      "title": "Project Context Diagram — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Project Context Diagram — PLATFORM\n\n## Context\n\nThe platform sits between the conveyor programme and the services it depends on: GitHub for\nsource and CI, Cloudflare for the public window, the tailnet for private transport, and the\nestate's two sites for its nodes. The programme is its consumer; the services are its suppliers.\n\n## Affected organisation\n\nThe programme owner decides the platform's charter and the tranche gates; the platform owner\noperates the paths; the delivery projects consume them; the Architecture Board reviews the\nstandards. The platform's incidents reach the programme board through the register's escalations,\nnot through an informal channel.\n\n## Affected systems\n\nThe five nodes and their roles: the control plane and Postgres primary, the registry and volumes,\nthe compute pool, the only CI node, and MinIO with the standby. The external systems are GitHub,\nCloudflare and the tailnet. A change to any of them is a platform change with a decision and a\nrecord, not a local adjustment.\n"
+    },
+    {
+      "category": "benefits-diagram",
+      "title": "Benefits Diagram — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Benefits Diagram — PLATFORM\n\n## Goals and outcomes\n\nThe platform's goal is the programme KPI the owner set on 2026-11-26: deliver programmes at\nquality with the least amount of rework. Cost is not a factor yet; the platform's outcome is a\nbuild-and-deliver path that does not itself create rework through queues, drift or untested\nrecovery.\n\n## Measures\n\nThe measures are the rework register's open packages per accepted deliverable, the CI runs per\nissue against the two-run budget, the preflight verdict at every pushed head, the restore drill's\nreceipt and the public window's probe. Each measure has an instrument in the record; none is a\nstored opinion.\n\n## Benefits and sub-benefits\n\nThe platform evidences B1 (the decision ladder's rows), B2 (the tool_call ledger), B5 (the one\nownership matrix) and B6 (the record agreeing with itself). It enables the other profiles without\nowning their values. The benefits diagram links each measure to the benefit profile that owns it,\nand the transition records carry the baseline and post readings.\n"
+    },
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — PLATFORM\n\n## Metadata\n\nThis index names the fifteen typed artefacts the platform's programme-track architecture set\ncarries, their phases and plateaus, and the document that publishes each. It is the entry point\nthe Architecture Board reads before the artefacts themselves; the artefacts are the rows, the\nindex is their map.\n\n## Entries\n\nThe set runs from Phase A's stakeholder map, driver catalog, requirements catalog and solution\nconcept diagram through Phase B's capability map, Phase C's data catalog and Phase D's technology\nstandards, then Phase E's gap matrix, candidate solutions, context diagram and benefits diagram,\nPhase F's migration plan, Phase G's compliance review catalog and Phase H's change and\nrequirement catalogs. Each entry names its artefact row and its published document.\n\n## Links\n\nEvery artefact links to at least one other: the requirements to the drivers, the capability map to\nthe solution concept, the gap matrix to the capability map and standards, the migration plan to\nthe candidates, standards, gaps and benefits, and the Phase H catalogs to the reviews and the\nrequirements. The graph is the derivation the board inspects.\n\n## Document\n\nThe index is itself an artefact document: the published body the architecture repository reads\nalongside the typed rows. A reader who needs the platform's architecture starts here and follows\nthe links; a reader who needs one artefact reads its own document. The index never duplicates an\nartefact's content, it points.\n"
+    },
+    {
+      "category": "safe-art",
+      "title": "Safe Art — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Safe Art — PLATFORM\n\n## ART charter\n\nThe ART is the programme's delivery rhythm: a PI per tranche, a refinement before it, a retro\nafter it, and the demo credit on each accepted deliverable. Its authority is the programme\nowner's standing delegation and its scope is the programme's projects, not a tenant's product.\nThe charter names the ART's outcomes so a review can judge them.\n\n## Solution intent\n\nThe ART intends a programme that delivers at quality with the least rework: tranche 0 green with\nits seven members evidenced, tranches 1–4 reworked in order, the benefit realization records\nwritten, and the public pack carrying the current record. The intent's constraints are the\nowner's directions and the estate's rules, which the deliverable's evidence cites.\n\n## Backlog with WSJF\n\nThe backlog is the programme's accepted deliverables, each carrying the four WSJF inputs the PI\nplan records. The platform's own deliverable scores business value 5, time criticality 5, risk\nreduction 3 and job size 6; the ordering is the programme's, and a deliverable without its four\ninputs is not on the backlog.\n\n## Shared configuration\n\nThe programme's shared configuration carries the cadence, the job-family pins, the default\napproval policy and the knowledge pins its projects inherit. It is a real row, written through\n`programmes.update`; an empty object is absence, not a configuration, and the standard treats it\nthat way.\n"
+    },
+    {
+      "category": "inspect-adapt",
+      "title": "Inspect and Adapt — PLATFORM (retrospective, 2026-11-26)",
+      "body": "# Inspect and Adapt — PLATFORM\n\n## What went well\n\nThe platform's paths held through the rework: the hosted preflight gave a compile verdict at\nevery pushed head, the registry served the images, the Postgres primary and its standby answered,\nand the record's own artifacts could be authored from the live rows. The rework's factory resumed\nacross four blocked attempts without duplicating a single row.\n\n## What did not\n\nThree defects surfaced only by running: the governed-asset vocabulary lagged the database CHECK\nby ten kinds and made the first list a 500; the plan's work packages predated the card\nrequirement and their update was refused; and two pre-existing change rows carried no approved\ngate, so the WBS guard refused them. Each is now a fix with a test or a constraint behind it.\n\n## Lessons\n\nThe durable lesson is that the record's vocabulary and its database must be one list, and that a\nguard which reads an approval link needs the action that creates it to write that link. Both are\nrecorded as programme lessons and one is a kata candidate; the kata is the mechanism that keeps a\nfuture session from rediscovering them.\n\n## Actions\n\nThe three defects are fixed on the lane, each with its own evidence. The platform's remaining\nactions are the restore drill, the standby promotion and the shared-workflow consumption, all\nrecorded in the gap matrix and the register with owners and review dates.\n\n## Kata candidates\n\n`L-PLATFORM-1` is the kata candidate: keep the domain enum identical to the database CHECK, and\nmake a list action that parses every stored row the test that proves it. The signature is\n`enum-mirrors-check`; the lesson is evidenced by the #526 issue, the PLATFORM receipt and the\nfactory's change.\n"
     }
-   }
   ],
-  "assumption": [
-   {
-    "title": "The replay record is the programme's working record until the rework is promoted",
-    "body": "The rework writes through the product's actions against the replay base rebuilt from the production dump on 2026-11-26. The assumption is that the replay is the record of work until the promotion unit replays these acts into the live database; if it is not, the receipts prove a copy rather than the programme. The assumption is recorded so the promotion unit can discharge it.",
-    "status": "open",
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
+  "registers": {
+    "risk": [
+      {
+        "title": "The platform's dependency on a single CI node is a single point of failure for every tranche",
+        "body": "hp2 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on hp2's runner pool. A loss of hp2 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the platform owner under the #526 rework delegation"
+        },
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "R-PLATFORM-01"
+      },
+      {
+        "title": "The standby has not been promoted in a drill, so the recovery path is documented but unproven",
+        "body": "The Postgres standby on mf1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the platform owner under the #526 rework delegation"
+        },
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "R-PLATFORM-02"
+      }
+    ],
+    "issue": [
+      {
+        "title": "The live public window lags the committed pack until the next publish",
+        "body": "The committed design pack can be ahead of the deployed snapshot between publishes. The rework's publish step closes the gap; until it runs, a reader of the public site sees the previous state. The issue is recorded against this rework and closed by the publish, not by hand-editing the pack.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "I-PLATFORM-01"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The replay record is the programme's working record until the rework is promoted",
+        "body": "The rework writes through the product's actions against the replay base rebuilt from the production dump on 2026-11-26. The assumption is that the replay is the record of work until the promotion unit replays these acts into the live database; if it is not, the receipts prove a copy rather than the programme. The assumption is recorded so the promotion unit can discharge it.",
+        "status": "open",
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "A-PLATFORM-01"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "Every delivery tranche depends on the platform's CI, registry and Postgres paths",
+        "body": "A delivery project's build, image and database path all run through the platform. This row records that tranches 1–13 depend on the platform's four work packages remaining live and its endpoints stable; a platform change that breaks a path blocks a tranche rather than one project.",
+        "status": "open",
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "D-PLATFORM-01"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "B1 Auditable decisions: every choice has a decision row",
+        "body": "The benefit profile 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf records B1 Auditable decisions, measured at 0.15861 approval decisions per run on 2026-11-22. This retrospective row links the platform's contribution — the decision ladder's live path — to the profile without claiming realisation; the transition record carries the baseline and the readiness.",
+        "status": "open",
+        "links": {
+          "decisions": [
+            "01a202a6-c20c-7079-9e0e-488009d21e86"
+          ],
+          "cards": [],
+          "requirements": []
+        },
+        "code": "B-PLATFORM-01"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — PLATFORM standing capability (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "The platform commits to the four capabilities — build and verify, release, store and recover, and observe — each with a live probe, and to the constraints that keep them singular: one CI node, one registry, one primary and one ownership home.",
+      "compliance": "Compliance is judged at phase G against this contract: the charter, the baseline, the artefacts, the register and the review must exist and be consistent. The earlier non_conformant review is the baseline; this rework's review is the current verdict.",
+      "approval": "The contract is approved by the Architecture Board under the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approval is a recorded decision, not a signature on a document.",
+      "capacity": "The platform's capacity is the five-node estate: hp2's runner pool for CI, worker3's registry and volumes, strato-server's control plane and primary, hp1's compute and mf1's storage and standby. A capacity change is an estate change with its own decision.",
+      "acceptance": "Acceptance is the manifest's checks passing on a fresh snapshot, with the standing rule that the platform does not close. The deliverable accepted with demo credit is the standing record itself; a later review re-checks it with the same checks.",
+      "evidence": "The evidence is this pack, the acceptance manifest, the rework receipt, the acts transcript and the estate's probes. A claim in this contract that the evidence does not support is a finding against the platform, not a wording issue.",
+      "manifest": "acceptance/programme/PLATFORM.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": "Authored 2026-11-26 from the live record; the contract records the standing obligation rather than a one-off delivery."
     }
-   }
+  },
+  "wbs_deliverable": {
+    "title": "The standing platform record — charter, baseline and the estate verification",
+    "business_value": 5,
+    "time_criticality": 5,
+    "risk_reduction": 3,
+    "job_size": 6
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective phase-G review, dated 2026-11-26, judges the platform compliant against the delivery contract this pack records. The charter is approved, the scope baseline is approved, the fifteen artefacts and their documents exist, the register carries all five kinds, and the benefit realization records exist. The earlier 2026-11-22 review's non_conformant level is kept in the review catalog as the baseline this rework improved from; no waiver is claimed.",
+    "evidence": {
+      "acceptance_manifest": "acceptance/programme/PLATFORM.toml",
+      "scope_baseline": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "deliverable": "01a1ff24-a6c6-7504-a811-0fecfbc460f6",
+      "rework_note": "authored from the live record at snapshot 1126r; the receipts are committed with the pack"
+    }
+  },
+  "project_brief_output": "# Project Brief — PLATFORM\n\n## Outcome\n\nThe platform is the standing capability every conveyor delivery project uses: the CI path and\nrunners, the image registry and ingress, the Postgres primary with its backups and restore, and\nthe shared workflows that make a build reproducible. Its outcome is not a closure: the platform\nstays live for the programme's whole life and its acceptance is the standing charter plus the\nevidence that each path works. This rework records that evidence.\n\n## Boundary\n\nThe platform owns the five-node estate's shared paths and nothing above them. It does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. It owns the\ncluster, the registry, the database primary and standby, the object store, the ingress and the CI\nrunners. A request outside that list is a programme change, not a platform task.\n\n## Reuse sources\n\nThe platform's plan is docs/plans/development-process-speed.md, the 2026-11-10 audit of the Rust\ndevelopment process. The programme's hard rules supply the invariants: one service one database,\nper-service secrets, no local Rust compilation, the two-run CI budget. The estate's infrastructure\nrecord supplies the node names, the endpoints and the credentials layout.\n\n## Inception units\n\nThe platform's work packages are CI and runners, registry and ingress, Postgres with backups and\nrestore, and the shared workflows and archetypes. Each was delivered before the delivery tranches\nand each owes evidence at this review: a green preflight, a registry pull, a restore receipt and a\nconsuming workflow. The four units are the platform's standing work list.\n\n## Dependencies\n\nThe platform depends on GitHub for source, issues and the hosted preflight; on Cloudflare for the\npublic window; on the tailnet for transport; and on the estate's power and network for both sites.\nEvery delivery project depends on the platform, so a platform outage is a programme outage rather\nthan one project's risk. The dependency is recorded in both directions.\n\n## Acceptance\n\nThe platform is accepted as a standing project: its charter is approved, its scope baseline is\napproved, its deliverable is accepted with demo credit, and its manifest's checks are green. This\nrework adds the artefact standard, the register and the phase-G review; the acceptance does not\nclose the project. A later tranche review re-checks the platform with the same manifest.\n\n## Capabilities\n\nThe platform provides build and verify, release, store and recover, and observe. Each capability\nhas a live consumer and a probe: the preflight at every head, the registry pull on every node, the\nrestore drill, and the public window plus the estate's health probes. The capabilities are the\nplatform's external contract with the programme.\n\n## Plan\n\nThe plan is the four work packages, the estate's five-node shape and the tranche-by-tranche\nconfirmation that the paths still work. The platform's next steps are the restore drill, the\nshared-workflow consumption and the observation path's evidence. Each lands as a work package\nunder the standing charter rather than a new project.\n",
+  "evidence_output": "# Evidence — PLATFORM\n\n## Claim\n\nThe standing platform's paths are live and its record is conformant: the CI node runs the\nsanctioned preflight, the registry serves the images, the Postgres primary and its standby answer,\nMinIO holds the bytes, the ingress carries the public window, and the platform's charter, baseline,\nartefacts, register and phase-G review exist as rows with evidence.\n\n## Evidence\n\nThe record's own rows: the charter asset, the approved scope baseline, the accepted deliverable\nwith its demo credit, the five WBS nodes, the six-section register and the phase-G review against\nthe delivery contract. The estate's probes: the runner list, the registry pull, the database's\nrecovery state, the MinIO bucket probe and the public window. The acceptance manifest at\nacceptance/programme/PLATFORM.toml names the executable checks.\n\n## Verification\n\nRun `python3 scripts/verify-project.py --project PLATFORM --snapshot <fresh>` and read the receipt:\nevery check must pass with zero failures on a snapshot taken after the writes. Run the estate\nprobes named in the requirements catalog; a probe that cannot run is a gap, not a pass. The\nphase-G review reads the contract, the scope baseline and the delegation.\n\n## Links\n\nThe deliverable's evidence list names this file, the acceptance manifest and the acts record. The\nartefacts link to the requirements, the benefits diagram and the change catalog. The register's\nrows link to the decisions they depend on. Every link resolves at the snapshot's git sha.\n\n## Gap\n\nThe gaps the platform still carries are the restore drill, the standby promotion and the\nheavy-GPU services' device deploy-test. They are recorded in the gap matrix and the register; none\nis claimed as done. The platform is green when its manifest passes, not when its gaps disappear —\nthe gaps are the programme's work, tracked where a later review can see them.\n",
+  "assets": [
+    {
+      "kind": "adr",
+      "title": "Licensing frame",
+      "body": "# Licensing frame — conveyor programme\n\nThe conveyor's own publishing is public: the design pack at conveyor.nonagentic.ai/design/ is\nthe programme's public site, its standards pack is public, and its issues are public. The\ntenant-facing application is opt-in: a tenant is provisioned, its rows are tenant-scoped, and its\nusers reach only their tenant's data through the authentication realm that admits them. The\nboundary is the tenant: no view crosses it, no inference call carries another tenant's data, and\nno shared cache holds a tenant's bytes without its key.\n\nThe licence-gated applications in the estate are separate products with their own realms and\ntheir own licence checks; the conveyor does not carry their licence tokens and does not resell\ntheir capabilities. A tool the conveyor calls is either the conveyor's own, a tenant's OpenAPI or\nMCP toolkit under the tenant's credentials, or a platform service the estate operates. There is no\nthird-party licence inside the conveyor's own runtime.\n\nThe frame is a decision record, adopted 2026-11-26 as part of the #526 rework. It is the source\nthe business case's Licensing frame section cites, and a change to it is a new decision, not an\nedit to this record.\n"
+    },
+    {
+      "kind": "adr",
+      "title": "Blueprint states",
+      "body": "# Blueprint states — current, intermediate and target\n\nThe current state is the V1 work system with the V2 organisational model added around it: the\nwork hierarchy, the catalogue, the decision ladder and the programme record exist as rows, the\nweb shell carries the §10.5 destinations as real routes, and the programme's TOGAF/SAFe/PMP/MSP\nartefacts are published. Its weak point is proof: many projects' records were closed on red\nmanifests or reconstructed after the fact, which is the rework's subject.\n\nThe intermediate state is the retrospective rework: tranche 0 completed with every member green,\nthen tranches 1–4 reworked in programme order, each project's artefacts, register, contract and\nreview authored from the facts, and the public pack republished after each batch. In the\nintermediate state the programme's own KPI is measurable: open rework packages per accepted\ndeliverable fall tranche by tranche.\n\nThe target state is the programme closed with every tranche reviewed, every benefit's transition\nrecorded with a post reading, and the rework register empty of P0/P1 packages. The conveyor is then\nan organisation that works the conveyor: the self-development loop, the operations loop and the\nprogramme loop each have live evidence. The target is a direction, not a date; the programme's\ntranche reviews judge progress toward it.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
+    },
+    {
+      "kind": "adr",
+      "title": "Options appraisal",
+      "body": "# Options appraisal — the V2 destinations\n\nThe question is how the V2 §10.5 destinations reach the live product. Option A keeps the V1\nnine-destination shell and renders the V2 pages only in the design pack; it is rejected because\nD64 makes the app the real UI and a mock page is evidence of intent, never of implementation.\nOption B adds the V2 destinations as routes in the existing shell, around the V1 routes, each\nwith its Playwright spec; it is chosen because it preserves the working V1 surface and makes every\ndestination reachable and tested.\n\nOption C rewrites the shell as a new application; it is rejected because the rewrite would\nduplicate the V1 routes and delay the programme for a shell change that is not the bottleneck.\nDoing nothing is the fourth option and is rejected for the same reason as A: the acceptance\nfinding stays red and the destinations remain API-only.\n\nThe appraisal is qualitative on cost and decisive on the record: option B is the one the code\nalready implements, with the routes and six e2e specs live. Adopted 2026-11-26 as a decision\nrecord under the #526 rework delegation; its evidence is the app's route table and the specs.\n"
+    },
+    {
+      "kind": "adr",
+      "title": "Programme appraisal",
+      "body": "# Programme appraisal — quality with the least rework\n\nThe programme's KPI, set by the owner on 2026-11-26, is to deliver programmes at quality with the\nleast amount of rework. Cost is not a factor yet: the first job is to make the programme able to\nwork. This record replaces the money investment appraisal the MSP template's heading originally\nasked for; an NPV or cash-flow schedule would be invented, and an invented appraisal is worse than\nan honest measure.\n\nThe measure is rework packages per accepted deliverable. At the 2026-11-26 record the rework\nregister carries the programme's open packages and the demo credits carry the accepted\ndeliverables; the ratio is the programme's own rework rate. The baseline is taken from the live\nregister at this snapshot; the target is a falling rate, tending to zero as the tranches complete,\nand the tranche reviews report it.\n\nThe appraisal's basis is the register and the snapshot, both public and reproducible. Its\ncost posture is stated, not modelled: the inference ledger meters tokens and cost per call, the\nplatform's infrastructure is the estate's, and no money budget is asserted while the rework runs.\nWhen the programme works, a cost appraisal can be added as a new decision; until then this is the\nprogramme's appraisal.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
+    },
+    {
+      "kind": "adr",
+      "title": "Solution intent",
+      "body": "# Solution intent — the programme ART\n\nThe ART's intended outcomes are the programme's: tranche 0 green with all seven members evidenced,\ntranches 1–4 reworked in programme order, the benefit realization records written with their\nbaselines and readiness, and the public pack carrying the current record after every batch. The\nintent is stated as outcomes because the ART's job is the programme's delivery, not a component's.\n\nThe measures are the tranche reviews' exit checks, the rework register's package count, the\nbenefit profiles' baselines and post readings, and the publish gates. Each is a row or a\nreproducible check; none is a stored opinion. The ART's cadence is the programme's own: a PI per\ntranche, a refinement before it, a retro after it, and the demo credit on the accepted\ndeliverable.\n\nThe constraints are the owner's directions and the estate's rules: no local Rust compilation, a\ntwo-run CI budget per issue, Postgres 18 with psycopg v3, one service one database, per-service\nsecrets, and the programme's tranche gate that refuses a start before authorisation. The intent is\nsatisfied when the constraints hold and the outcomes are evidenced, not when a plan says so.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
+    }
   ],
-  "dependency": [
-   {
-    "title": "Every delivery tranche depends on the platform's CI, registry and Postgres paths",
-    "body": "A delivery project's build, image and database path all run through the platform. This row records that tranches 1–13 depend on the platform's four work packages remaining live and its endpoints stable; a platform change that breaks a path blocks a tranche rather than one project.",
-    "status": "open",
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
+  "benefit_transitions": [
+    {
+      "reference": "B1",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "ready",
+        "basis": "the decision ladder is live: every gated action writes an approval row and the decision count is 105 over 662 runs"
+      },
+      "enacted_at": "2026-11-26T00:00:00+00:00",
+      "evidence": {
+        "instrument": "count approval_decision / count run",
+        "baseline": 0.15861,
+        "basis": "the baseline is the profile's measured reading; the enactment is the tranche-0 review that made the ladder the delivery path"
+      }
+    },
+    {
+      "reference": "B2",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "ready",
+        "basis": "the broker and its tool_call ledger are live; 18 calls are recorded at the baseline"
+      },
+      "enacted_at": "2026-11-26T00:00:00+00:00",
+      "evidence": {
+        "instrument": "count tool_call rows",
+        "baseline": 18.0,
+        "basis": "the baseline is the profile's measured reading; the enactment is the toolkit path's publication"
+      }
+    },
+    {
+      "reference": "B3",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "not ready",
+        "basis": "T6, the development project that proves self-development, is absent at the head; the baseline is the honest zero"
+      },
+      "evidence": {
+        "instrument": "T6 development project runs reaching live verification",
+        "baseline": 0.0,
+        "basis": "no enactment is claimed: the transition waits on T6 in tranche 11"
+      }
+    },
+    {
+      "reference": "B4",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "partial",
+        "basis": "no outside author has changed a published output; the output reachability half of the target is live"
+      },
+      "evidence": {
+        "instrument": "merged PR authors outside the org",
+        "baseline": 0.0,
+        "basis": "no enactment is claimed for the outside-contribution half; the reachability half is evidenced by the public pack"
+      }
+    },
+    {
+      "reference": "B5",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "ready",
+        "basis": "the T0 gate refuses a second store and the ownership matrix has one home"
+      },
+      "enacted_at": "2026-11-26T00:00:00+00:00",
+      "evidence": {
+        "instrument": "the ownership matrix's one home",
+        "baseline": 1.0,
+        "basis": "the baseline is the profile's measured reading; the enactment is the T0 gate's live manifest"
+      }
+    },
+    {
+      "reference": "B6",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "not ready",
+        "basis": "the seed, coverage and checklist still disagree on 28 register findings at the baseline snapshot"
+      },
+      "evidence": {
+        "instrument": "coverage.json vs seed/programme.json vs the published checklist",
+        "baseline": 28.0,
+        "basis": "no enactment is claimed: the rework closes the findings tranche by tranche"
+      }
+    },
+    {
+      "reference": "B7",
+      "baseline_measured_at": "2026-11-22T20:00:00+00:00",
+      "readiness": {
+        "assessed_at": "2026-11-26",
+        "verdict": "ready",
+        "basis": "T19's decision forums are live: the meeting card, the minutes asset and the approvals they resolve exist"
+      },
+      "enacted_at": "2026-11-26T00:00:00+00:00",
+      "evidence": {
+        "instrument": "meeting records with a position per required department",
+        "basis": "the enactment is T19's live meeting surface; the token-spend premise the profile's baseline once used is retired by the owner's 2026-11-26 KPI decision"
+      }
     }
-   }
   ],
-  "benefit": [
-   {
-    "title": "B1 Auditable decisions: every choice has a decision row",
-    "body": "The benefit profile 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf records B1 Auditable decisions, measured at 0.15861 approval decisions per run on 2026-11-22. This retrospective row links the platform's contribution — the decision ladder's live path — to the profile without claiming realisation; the transition record carries the baseline and the readiness.",
-    "status": "open",
-    "links": {
-     "decisions": [
-      "01a202a6-c20c-7079-9e0e-488009d21e86"
-     ],
-     "cards": [],
-     "requirements": []
+  "programme_shared_config": {
+    "values": {
+      "cadence": "a PI, a refinement and a retro per tranche",
+      "job_families": "delivery, governance and platform jobs are catalogued and bound",
+      "approval_policy_default": "the tenant default; a destructive action needs a distinct approver",
+      "budget_basis": "inference is metered per call; no programme money budget while the rework completes",
+      "knowledge_pins": "the programme definition set and the accepted conformance baseline"
+    },
+    "locked": [
+      "approval_policy_default"
+    ]
+  },
+  "record_fixes": [
+    {
+      "kind": "register",
+      "project": "P0",
+      "match": {
+        "kind": "issue",
+        "title": "schema probe — delete me"
+      },
+      "set": {
+        "status": "cancelled",
+        "body": "Retired by the #526 rework on 2026-11-26: the row was a schema probe written during the store's early schema work, not a register item. It is cancelled rather than deleted so the record shows what happened; no published body should carry it after the republish."
+      }
+    },
+    {
+      "kind": "register",
+      "match": {
+        "kind": "risk",
+        "title": "V2 acceptance (#88/T12) remains open"
+      },
+      "set": {
+        "meta": {
+          "owner": "the programme owner under the #526 rework delegation"
+        },
+        "review_at": "2026-12-15"
+      }
+    },
+    {
+      "kind": "register",
+      "match": {
+        "kind": "risk",
+        "title": "The six benefit baselines are placeholders"
+      },
+      "set": {
+        "meta": {
+          "owner": "the programme owner under the #526 rework delegation"
+        },
+        "review_at": "2026-12-15"
+      }
+    },
+    {
+      "kind": "register",
+      "match": {
+        "kind": "risk",
+        "title": "Tranches 5 and 10-13 cannot deliver on proposed projects"
+      },
+      "set": {
+        "meta": {
+          "owner": "the programme owner under the #526 rework delegation"
+        },
+        "review_at": "2026-12-15"
+      }
+    },
+    {
+      "kind": "wbs",
+      "match": {
+        "title": "CI and runners available"
+      },
+      "acceptance": [
+        "the ARC runner pool lists a live runner on hp2",
+        "the hosted preflight returns a verdict at a pushed head"
+      ],
+      "evidence": [
+        "docs/plans/development-process-speed.md",
+        "the preflight run at the rework head"
+      ]
+    },
+    {
+      "kind": "wbs",
+      "match": {
+        "title": "Registry and ingress available"
+      },
+      "acceptance": [
+        "registry.internal:5000 answers a pull",
+        "a hand push from worker3 succeeds with the CA in place",
+        "the public window answers through the ingress"
+      ],
+      "evidence": [
+        "the registry's CA and pull record",
+        "the public window probe"
+      ]
+    },
+    {
+      "kind": "wbs",
+      "match": {
+        "title": "Postgres primary, backups and restore"
+      },
+      "acceptance": [
+        "the primary reports pg_is_in_recovery false and the standby true",
+        "the nightly dump exists with its offsite relay",
+        "one restore drill reads the rows back"
+      ],
+      "evidence": [
+        "the database recovery check",
+        "the restore drill's receipt"
+      ]
+    },
+    {
+      "kind": "wbs",
+      "match": {
+        "title": "Shared workflows and archetypes"
+      },
+      "acceptance": [
+        "the service workflow is consumable unchanged",
+        "a consuming project's CI runs on it"
+      ],
+      "evidence": [
+        "the shared workflow revision",
+        "a consuming project's run"
+      ]
+    },
+    {
+      "kind": "wbs",
+      "match": {
+        "title": "The standing platform record — charter, baseline and the estate verification"
+      },
+      "acceptance": [
+        "the manifest's checks pass on a fresh snapshot",
+        "the deliverable's evidence list resolves",
+        "the standing rule is recorded: the platform does not close"
+      ],
+      "evidence": [
+        "docs/evidence/rework/PLATFORM.json",
+        "acceptance/programme/PLATFORM.toml",
+        "docs/evidence/rework/tranche-0/acts.md"
+      ]
+    },
+    {
+      "kind": "tranche",
+      "number": 2,
+      "review_at": "2026-11-22T07:28:08.375579+00:00"
+    },
+    {
+      "kind": "lesson",
+      "finding_key": "L-PLATFORM-1",
+      "statement": "A vocabulary the database accepts but the domain cannot parse turns every list into a 500: the governed-asset kinds had to be brought to the CHECK's 26 before the platform's first read, and the lesson is to keep the enum and the CHECK one list.",
+      "evidence": [
+        "issue#526",
+        "docs/evidence/rework/PLATFORM.json",
+        "scripts/rework-project.py"
+      ],
+      "meta": {
+        "kata_candidate": {
+          "signature": "enum-mirrors-check",
+          "title": "Keep the domain vocabulary identical to the database CHECK"
+        }
+      }
+    },
+    {
+      "kind": "tranche",
+      "number": 1,
+      "review_at": "2026-11-21T19:51:16.779077+00:00"
     }
-   }
   ]
- },
- "delivery_contract": {
-  "title": "Delivery contract — PLATFORM standing capability (retrospective, 2026-11-26)",
-  "body": {
-   "commitments": "The platform commits to the four capabilities — build and verify, release, store and recover, and observe — each with a live probe, and to the constraints that keep them singular: one CI node, one registry, one primary and one ownership home.",
-   "compliance": "Compliance is judged at phase G against this contract: the charter, the baseline, the artefacts, the register and the review must exist and be consistent. The earlier non_conformant review is the baseline; this rework's review is the current verdict.",
-   "approval": "The contract is approved by the Architecture Board under the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approval is a recorded decision, not a signature on a document.",
-   "capacity": "The platform's capacity is the five-node estate: hp2's runner pool for CI, worker3's registry and volumes, strato-server's control plane and primary, hp1's compute and mf1's storage and standby. A capacity change is an estate change with its own decision.",
-   "acceptance": "Acceptance is the manifest's checks passing on a fresh snapshot, with the standing rule that the platform does not close. The deliverable accepted with demo credit is the standing record itself; a later review re-checks it with the same checks.",
-   "evidence": "The evidence is this pack, the acceptance manifest, the rework receipt, the acts transcript and the estate's probes. A claim in this contract that the evidence does not support is a finding against the platform, not a wording issue.",
-   "manifest": "acceptance/programme/PLATFORM.toml",
-   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-   "retrospective": "Authored 2026-11-26 from the live record; the contract records the standing obligation rather than a one-off delivery."
-  }
- },
- "wbs_deliverable": {
-  "title": "The standing platform record — charter, baseline and the estate verification",
-  "business_value": 5,
-  "time_criticality": 5,
-  "risk_reduction": 3,
-  "job_size": 6
- },
- "review": {
-  "level": "compliant",
-  "findings": "This retrospective phase-G review, dated 2026-11-26, judges the platform compliant against the delivery contract this pack records. The charter is approved, the scope baseline is approved, the fifteen artefacts and their documents exist, the register carries all five kinds, and the benefit realization records exist. The earlier 2026-11-22 review's non_conformant level is kept in the review catalog as the baseline this rework improved from; no waiver is claimed.",
-  "evidence": {
-   "acceptance_manifest": "acceptance/programme/PLATFORM.toml",
-   "scope_baseline": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
-   "deliverable": "01a1ff24-a6c6-7504-a811-0fecfbc460f6",
-   "rework_note": "authored from the live record at snapshot 1126r; the receipts are committed with the pack"
-  }
- },
- "project_brief_output": "# Project Brief — PLATFORM\n\n## Outcome\n\nThe platform is the standing capability every conveyor delivery project uses: the CI path and\nrunners, the image registry and ingress, the Postgres primary with its backups and restore, and\nthe shared workflows that make a build reproducible. Its outcome is not a closure: the platform\nstays live for the programme's whole life and its acceptance is the standing charter plus the\nevidence that each path works. This rework records that evidence.\n\n## Boundary\n\nThe platform owns the five-node estate's shared paths and nothing above them. It does not own a\ntenant's data model, a delivery project's plan or the programme's benefit values. It owns the\ncluster, the registry, the database primary and standby, the object store, the ingress and the CI\nrunners. A request outside that list is a programme change, not a platform task.\n\n## Reuse sources\n\nThe platform's plan is docs/plans/development-process-speed.md, the 2026-11-10 audit of the Rust\ndevelopment process. The programme's hard rules supply the invariants: one service one database,\nper-service secrets, no local Rust compilation, the two-run CI budget. The estate's infrastructure\nrecord supplies the node names, the endpoints and the credentials layout.\n\n## Inception units\n\nThe platform's work packages are CI and runners, registry and ingress, Postgres with backups and\nrestore, and the shared workflows and archetypes. Each was delivered before the delivery tranches\nand each owes evidence at this review: a green preflight, a registry pull, a restore receipt and a\nconsuming workflow. The four units are the platform's standing work list.\n\n## Dependencies\n\nThe platform depends on GitHub for source, issues and the hosted preflight; on Cloudflare for the\npublic window; on the tailnet for transport; and on the estate's power and network for both sites.\nEvery delivery project depends on the platform, so a platform outage is a programme outage rather\nthan one project's risk. The dependency is recorded in both directions.\n\n## Acceptance\n\nThe platform is accepted as a standing project: its charter is approved, its scope baseline is\napproved, its deliverable is accepted with demo credit, and its manifest's checks are green. This\nrework adds the artefact standard, the register and the phase-G review; the acceptance does not\nclose the project. A later tranche review re-checks the platform with the same manifest.\n\n## Capabilities\n\nThe platform provides build and verify, release, store and recover, and observe. Each capability\nhas a live consumer and a probe: the preflight at every head, the registry pull on every node, the\nrestore drill, and the public window plus the estate's health probes. The capabilities are the\nplatform's external contract with the programme.\n\n## Plan\n\nThe plan is the four work packages, the estate's five-node shape and the tranche-by-tranche\nconfirmation that the paths still work. The platform's next steps are the restore drill, the\nshared-workflow consumption and the observation path's evidence. Each lands as a work package\nunder the standing charter rather than a new project.\n",
- "evidence_output": "# Evidence — PLATFORM\n\n## Claim\n\nThe standing platform's paths are live and its record is conformant: the CI node runs the\nsanctioned preflight, the registry serves the images, the Postgres primary and its standby answer,\nMinIO holds the bytes, the ingress carries the public window, and the platform's charter, baseline,\nartefacts, register and phase-G review exist as rows with evidence.\n\n## Evidence\n\nThe record's own rows: the charter asset, the approved scope baseline, the accepted deliverable\nwith its demo credit, the five WBS nodes, the six-section register and the phase-G review against\nthe delivery contract. The estate's probes: the runner list, the registry pull, the database's\nrecovery state, the MinIO bucket probe and the public window. The acceptance manifest at\nacceptance/programme/PLATFORM.toml names the executable checks.\n\n## Verification\n\nRun `python3 scripts/verify-project.py --project PLATFORM --snapshot <fresh>` and read the receipt:\nevery check must pass with zero failures on a snapshot taken after the writes. Run the estate\nprobes named in the requirements catalog; a probe that cannot run is a gap, not a pass. The\nphase-G review reads the contract, the scope baseline and the delegation.\n\n## Links\n\nThe deliverable's evidence list names this file, the acceptance manifest and the acts record. The\nartefacts link to the requirements, the benefits diagram and the change catalog. The register's\nrows link to the decisions they depend on. Every link resolves at the snapshot's git sha.\n\n## Gap\n\nThe gaps the platform still carries are the restore drill, the standby promotion and the\nheavy-GPU services' device deploy-test. They are recorded in the gap matrix and the register; none\nis claimed as done. The platform is green when its manifest passes, not when its gaps disappear —\nthe gaps are the programme's work, tracked where a later review can see them.\n",
- "assets": [
-  {
-   "kind": "adr",
-   "title": "Licensing frame",
-   "body": "# Licensing frame — conveyor programme\n\nThe conveyor's own publishing is public: the design pack at conveyor.nonagentic.ai/design/ is\nthe programme's public site, its standards pack is public, and its issues are public. The\ntenant-facing application is opt-in: a tenant is provisioned, its rows are tenant-scoped, and its\nusers reach only their tenant's data through the authentication realm that admits them. The\nboundary is the tenant: no view crosses it, no inference call carries another tenant's data, and\nno shared cache holds a tenant's bytes without its key.\n\nThe licence-gated applications in the estate are separate products with their own realms and\ntheir own licence checks; the conveyor does not carry their licence tokens and does not resell\ntheir capabilities. A tool the conveyor calls is either the conveyor's own, a tenant's OpenAPI or\nMCP toolkit under the tenant's credentials, or a platform service the estate operates. There is no\nthird-party licence inside the conveyor's own runtime.\n\nThe frame is a decision record, adopted 2026-11-26 as part of the #526 rework. It is the source\nthe business case's Licensing frame section cites, and a change to it is a new decision, not an\nedit to this record.\n"
-  },
-  {
-   "kind": "adr",
-   "title": "Blueprint states",
-   "body": "# Blueprint states — current, intermediate and target\n\nThe current state is the V1 work system with the V2 organisational model added around it: the\nwork hierarchy, the catalogue, the decision ladder and the programme record exist as rows, the\nweb shell carries the §10.5 destinations as real routes, and the programme's TOGAF/SAFe/PMP/MSP\nartefacts are published. Its weak point is proof: many projects' records were closed on red\nmanifests or reconstructed after the fact, which is the rework's subject.\n\nThe intermediate state is the retrospective rework: tranche 0 completed with every member green,\nthen tranches 1–4 reworked in programme order, each project's artefacts, register, contract and\nreview authored from the facts, and the public pack republished after each batch. In the\nintermediate state the programme's own KPI is measurable: open rework packages per accepted\ndeliverable fall tranche by tranche.\n\nThe target state is the programme closed with every tranche reviewed, every benefit's transition\nrecorded with a post reading, and the rework register empty of P0/P1 packages. The conveyor is then\nan organisation that works the conveyor: the self-development loop, the operations loop and the\nprogramme loop each have live evidence. The target is a direction, not a date; the programme's\ntranche reviews judge progress toward it.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
-  },
-  {
-   "kind": "adr",
-   "title": "Options appraisal",
-   "body": "# Options appraisal — the V2 destinations\n\nThe question is how the V2 §10.5 destinations reach the live product. Option A keeps the V1\nnine-destination shell and renders the V2 pages only in the design pack; it is rejected because\nD64 makes the app the real UI and a mock page is evidence of intent, never of implementation.\nOption B adds the V2 destinations as routes in the existing shell, around the V1 routes, each\nwith its Playwright spec; it is chosen because it preserves the working V1 surface and makes every\ndestination reachable and tested.\n\nOption C rewrites the shell as a new application; it is rejected because the rewrite would\nduplicate the V1 routes and delay the programme for a shell change that is not the bottleneck.\nDoing nothing is the fourth option and is rejected for the same reason as A: the acceptance\nfinding stays red and the destinations remain API-only.\n\nThe appraisal is qualitative on cost and decisive on the record: option B is the one the code\nalready implements, with the routes and six e2e specs live. Adopted 2026-11-26 as a decision\nrecord under the #526 rework delegation; its evidence is the app's route table and the specs.\n"
-  },
-  {
-   "kind": "adr",
-   "title": "Programme appraisal",
-   "body": "# Programme appraisal — quality with the least rework\n\nThe programme's KPI, set by the owner on 2026-11-26, is to deliver programmes at quality with the\nleast amount of rework. Cost is not a factor yet: the first job is to make the programme able to\nwork. This record replaces the money investment appraisal the MSP template's heading originally\nasked for; an NPV or cash-flow schedule would be invented, and an invented appraisal is worse than\nan honest measure.\n\nThe measure is rework packages per accepted deliverable. At the 2026-11-26 record the rework\nregister carries the programme's open packages and the demo credits carry the accepted\ndeliverables; the ratio is the programme's own rework rate. The baseline is taken from the live\nregister at this snapshot; the target is a falling rate, tending to zero as the tranches complete,\nand the tranche reviews report it.\n\nThe appraisal's basis is the register and the snapshot, both public and reproducible. Its\ncost posture is stated, not modelled: the inference ledger meters tokens and cost per call, the\nplatform's infrastructure is the estate's, and no money budget is asserted while the rework runs.\nWhen the programme works, a cost appraisal can be added as a new decision; until then this is the\nprogramme's appraisal.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
-  },
-  {
-   "kind": "adr",
-   "title": "Solution intent",
-   "body": "# Solution intent — the programme ART\n\nThe ART's intended outcomes are the programme's: tranche 0 green with all seven members evidenced,\ntranches 1–4 reworked in programme order, the benefit realization records written with their\nbaselines and readiness, and the public pack carrying the current record after every batch. The\nintent is stated as outcomes because the ART's job is the programme's delivery, not a component's.\n\nThe measures are the tranche reviews' exit checks, the rework register's package count, the\nbenefit profiles' baselines and post readings, and the publish gates. Each is a row or a\nreproducible check; none is a stored opinion. The ART's cadence is the programme's own: a PI per\ntranche, a refinement before it, a retro after it, and the demo credit on the accepted\ndeliverable.\n\nThe constraints are the owner's directions and the estate's rules: no local Rust compilation, a\ntwo-run CI budget per issue, Postgres 18 with psycopg v3, one service one database, per-service\nsecrets, and the programme's tranche gate that refuses a start before authorisation. The intent is\nsatisfied when the constraints hold and the outcomes are evidenced, not when a plan says so.\n\nAdopted 2026-11-26 as a decision record under the #526 rework delegation.\n"
-  }
- ],
- "benefit_transitions": [
-  {
-   "reference": "B1",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "ready",
-    "basis": "the decision ladder is live: every gated action writes an approval row and the decision count is 105 over 662 runs"
-   },
-   "enacted_at": "2026-11-26T00:00:00+00:00",
-   "evidence": {
-    "instrument": "count approval_decision / count run",
-    "baseline": 0.15861,
-    "basis": "the baseline is the profile's measured reading; the enactment is the tranche-0 review that made the ladder the delivery path"
-   }
-  },
-  {
-   "reference": "B2",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "ready",
-    "basis": "the broker and its tool_call ledger are live; 18 calls are recorded at the baseline"
-   },
-   "enacted_at": "2026-11-26T00:00:00+00:00",
-   "evidence": {
-    "instrument": "count tool_call rows",
-    "baseline": 18.0,
-    "basis": "the baseline is the profile's measured reading; the enactment is the toolkit path's publication"
-   }
-  },
-  {
-   "reference": "B3",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "not ready",
-    "basis": "T6, the development project that proves self-development, is absent at the head; the baseline is the honest zero"
-   },
-   "evidence": {
-    "instrument": "T6 development project runs reaching live verification",
-    "baseline": 0.0,
-    "basis": "no enactment is claimed: the transition waits on T6 in tranche 11"
-   }
-  },
-  {
-   "reference": "B4",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "partial",
-    "basis": "no outside author has changed a published output; the output reachability half of the target is live"
-   },
-   "evidence": {
-    "instrument": "merged PR authors outside the org",
-    "baseline": 0.0,
-    "basis": "no enactment is claimed for the outside-contribution half; the reachability half is evidenced by the public pack"
-   }
-  },
-  {
-   "reference": "B5",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "ready",
-    "basis": "the T0 gate refuses a second store and the ownership matrix has one home"
-   },
-   "enacted_at": "2026-11-26T00:00:00+00:00",
-   "evidence": {
-    "instrument": "the ownership matrix's one home",
-    "baseline": 1.0,
-    "basis": "the baseline is the profile's measured reading; the enactment is the T0 gate's live manifest"
-   }
-  },
-  {
-   "reference": "B6",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "not ready",
-    "basis": "the seed, coverage and checklist still disagree on 28 register findings at the baseline snapshot"
-   },
-   "evidence": {
-    "instrument": "coverage.json vs seed/programme.json vs the published checklist",
-    "baseline": 28.0,
-    "basis": "no enactment is claimed: the rework closes the findings tranche by tranche"
-   }
-  },
-  {
-   "reference": "B7",
-   "baseline_measured_at": "2026-11-22T20:00:00+00:00",
-   "readiness": {
-    "assessed_at": "2026-11-26",
-    "verdict": "ready",
-    "basis": "T19's decision forums are live: the meeting card, the minutes asset and the approvals they resolve exist"
-   },
-   "enacted_at": "2026-11-26T00:00:00+00:00",
-   "evidence": {
-    "instrument": "meeting records with a position per required department",
-    "basis": "the enactment is T19's live meeting surface; the token-spend premise the profile's baseline once used is retired by the owner's 2026-11-26 KPI decision"
-   }
-  }
- ],
- "programme_shared_config": {
-  "values": {
-   "cadence": "a PI, a refinement and a retro per tranche",
-   "job_families": "delivery, governance and platform jobs are catalogued and bound",
-   "approval_policy_default": "the tenant default; a destructive action needs a distinct approver",
-   "budget_basis": "inference is metered per call; no programme money budget while the rework completes",
-   "knowledge_pins": "the programme definition set and the accepted conformance baseline"
-  },
-  "locked": [
-   "approval_policy_default"
-  ]
- },
- "record_fixes": [
-  {
-   "kind": "register",
-   "project": "P0",
-   "match": {
-    "kind": "issue",
-    "title": "schema probe — delete me"
-   },
-   "set": {
-    "status": "cancelled",
-    "body": "Retired by the #526 rework on 2026-11-26: the row was a schema probe written during the store's early schema work, not a register item. It is cancelled rather than deleted so the record shows what happened; no published body should carry it after the republish."
-   }
-  },
-  {
-   "kind": "register",
-   "match": {
-    "kind": "risk",
-    "title": "V2 acceptance (#88/T12) remains open"
-   },
-   "set": {
-    "meta": {
-     "owner": "the programme owner under the #526 rework delegation"
-    },
-    "review_at": "2026-12-15"
-   }
-  },
-  {
-   "kind": "register",
-   "match": {
-    "kind": "risk",
-    "title": "The six benefit baselines are placeholders"
-   },
-   "set": {
-    "meta": {
-     "owner": "the programme owner under the #526 rework delegation"
-    },
-    "review_at": "2026-12-15"
-   }
-  },
-  {
-   "kind": "register",
-   "match": {
-    "kind": "risk",
-    "title": "Tranches 5 and 10-13 cannot deliver on proposed projects"
-   },
-   "set": {
-    "meta": {
-     "owner": "the programme owner under the #526 rework delegation"
-    },
-    "review_at": "2026-12-15"
-   }
-  },
-  {
-   "kind": "wbs",
-   "match": {
-    "title": "CI and runners available"
-   },
-   "acceptance": [
-    "the ARC runner pool lists a live runner on hp2",
-    "the hosted preflight returns a verdict at a pushed head"
-   ],
-   "evidence": [
-    "docs/plans/development-process-speed.md",
-    "the preflight run at the rework head"
-   ]
-  },
-  {
-   "kind": "wbs",
-   "match": {
-    "title": "Registry and ingress available"
-   },
-   "acceptance": [
-    "registry.internal:5000 answers a pull",
-    "a hand push from worker3 succeeds with the CA in place",
-    "the public window answers through the ingress"
-   ],
-   "evidence": [
-    "the registry's CA and pull record",
-    "the public window probe"
-   ]
-  },
-  {
-   "kind": "wbs",
-   "match": {
-    "title": "Postgres primary, backups and restore"
-   },
-   "acceptance": [
-    "the primary reports pg_is_in_recovery false and the standby true",
-    "the nightly dump exists with its offsite relay",
-    "one restore drill reads the rows back"
-   ],
-   "evidence": [
-    "the database recovery check",
-    "the restore drill's receipt"
-   ]
-  },
-  {
-   "kind": "wbs",
-   "match": {
-    "title": "Shared workflows and archetypes"
-   },
-   "acceptance": [
-    "the service workflow is consumable unchanged",
-    "a consuming project's CI runs on it"
-   ],
-   "evidence": [
-    "the shared workflow revision",
-    "a consuming project's run"
-   ]
-  },
-  {
-   "kind": "wbs",
-   "match": {
-    "title": "The standing platform record — charter, baseline and the estate verification"
-   },
-   "acceptance": [
-    "the manifest's checks pass on a fresh snapshot",
-    "the deliverable's evidence list resolves",
-    "the standing rule is recorded: the platform does not close"
-   ],
-   "evidence": [
-    "docs/evidence/rework/PLATFORM.json",
-    "acceptance/programme/PLATFORM.toml",
-    "docs/evidence/rework/tranche-0/acts.md"
-   ]
-  },
-  {
-   "kind": "tranche",
-   "number": 2,
-   "review_at": "2026-11-22T07:28:08.375579+00:00"
-  },
-  {
-   "kind": "lesson",
-   "finding_key": "L-PLATFORM-1",
-   "statement": "A vocabulary the database accepts but the domain cannot parse turns every list into a 500: the governed-asset kinds had to be brought to the CHECK's 26 before the platform's first read, and the lesson is to keep the enum and the CHECK one list.",
-   "evidence": [
-    "issue#526",
-    "docs/evidence/rework/PLATFORM.json",
-    "scripts/rework-project.py"
-   ],
-   "meta": {
-    "kata_candidate": {
-     "signature": "enum-mirrors-check",
-     "title": "Keep the domain vocabulary identical to the database CHECK"
-    }
-   }
-  }
- ]
 }
