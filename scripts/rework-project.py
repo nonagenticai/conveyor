@@ -1518,19 +1518,30 @@ class Runner:
         card; the plan's older nodes predate it. The card is the executors' handle on the work,
         so the fix is to create it, not to exempt the row.
         """
+        boards = [
+            board
+            for board in self.snapshot_json("work.json").get("boards") or []
+            if str(board.get("project_id")) == self.project_id
+        ]
+        if not boards:
+            fail(f"{self.project}: no kanban board for the work-package card")
+        board_id = str(boards[0]["id"])
         lanes = [
             lane
             for lane in self.snapshot_json("work.json").get("lists") or []
-            if str(lane.get("board_id")) == self.board
+            if str(lane.get("board_id")) == board_id
             and str(lane.get("kind")) == "intake"
         ]
         if not lanes:
             fail(f"{self.project}: the board has no intake lane for the work-package card")
+        lane = next(
+            (row for row in lanes if str(row.get("name")) == "Intake"), lanes[0]
+        )
         card = self.invoke(
             "cards.create",
             {
-                "board_id": self.board,
-                "list_id": lanes[0]["id"],
+                "board_id": board_id,
+                "list_id": lane["id"],
                 "name": title[:190],
                 "description": (
                     f"The work package '{title}' of the standing platform's plan. The card is the "

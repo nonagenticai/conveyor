@@ -1,13 +1,13 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T10:30:37+00:00",
+  "generated_at": "2026-11-26T10:31:46+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: wbs.update refused at act 43: error: wbs.update refused (500): the invocation could not be completed",
+          "detail": "rework: PLATFORM: the board has no intake lane for the work-package card",
           "gap": "instrument",
           "id": null
         }
