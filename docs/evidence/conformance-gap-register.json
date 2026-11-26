@@ -1,8 +1,8 @@
 {
   "counts": {
     "P0": 29,
-    "P1": 133,
-    "P2": 37,
+    "P1": 136,
+    "P2": 38,
     "P3": 0
   },
   "gaps": [
@@ -1084,7 +1084,31 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
+      "subject": "S02"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
       "subject": "S21"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "SPEC-V2"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T13"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
@@ -1487,6 +1511,14 @@
       "subject": "T9"
     },
     {
+      "detail": "seed status 'active' != live status 'closed'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P2",
+      "subject": "T1"
+    },
+    {
       "detail": "closed without a review date",
       "disposition": "rework",
       "evidence": null,
@@ -1600,8 +1632,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-25T11:25:19.603151696+00:00",
-    "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
+    "generated_at": "2026-11-26T13:38:38Z",
+    "git_sha": "a5a6a46040fada4f1f59dc9dc63abf446433c468",
     "path": "data",
     "tenant": "nonagentic"
   },

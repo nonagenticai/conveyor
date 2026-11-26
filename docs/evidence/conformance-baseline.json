@@ -1210,12 +1210,39 @@
     },
     {
       "rule": "seed_live_drift",
+      "subject": "S02",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from S02's closed unit issues, while the live row stays `active`: the retrospective rework's S02 slice is green on the replay record but not promoted, so a closure now would claim evidence the live record does not carry; the synchronisation waits on the #526 chain or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
       "subject": "S21",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "the seed derives `closed` from S21's closed unit issues (#713 closed the execution level), while the live row stays `active`: closing a project in planned tranche 9 manufactures a tranche P0, and the synchronisation waits on the tranche-9 authorisation (#526 chain) or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
+      "subject": "SPEC-V2",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from SPEC-V2's closed unit issues, while the live row stays `active`: the live record still carries ten open TOGAF/MSP artefact packages (phase E/G/H, registers, compliance review), so a closure now would claim artefacts the live record does not carry; the synchronisation waits on the retrospective rework's SPEC-V2 slice (#526 chain) or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
+      "subject": "T13",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from T13's closed unit issues, while the live row stays `active`: the live closure is refused on two open P0 rework packages (v1-w4a-1 spend budget gate, v1-w4a-2 write-verify), and the synchronisation waits on the rework lane's T13 slice (#526 chain) and the tranche-3 review"
     },
     {
       "rule": "seed_live_drift",
