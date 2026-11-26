@@ -1623,8 +1623,24 @@ class Runner:
             existing = self._read(
                 "documents.list", {"project_id": self.project_id, "category": category}
             ).get("items") or []
-            if any(str(row.get("category") or "") == category for row in existing):
-                print(f"  document {category}: already present")
+            present = next(
+                (row for row in existing if str(row.get("category") or "") == category), None
+            )
+            if present is not None:
+                # A row that exists is not a row that is published. The close gate reads
+                # `published_at`; an unpublished row left behind by an earlier pass counted as
+                # "already present" and made the project unclosable while the pack's own body
+                # was never applied (measured on SPEC-V2, 2026-11-26).
+                if present.get("published_at"):
+                    print(f"  document {category}: already present and published")
+                    continue
+                self.invoke(
+                    "documents.publish",
+                    {"id": present["id"], "publish": True},
+                    read_input={"id": present["id"]},
+                    if_match=present.get("version", 1),
+                )
+                print(f"  document {category}: published (row existed, unpublished)")
                 continue
             doc = self.invoke(
                 "documents.compose",

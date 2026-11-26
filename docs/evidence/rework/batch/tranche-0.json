@@ -1,11 +1,20 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T11:38:43+00:00",
+  "generated_at": "2026-11-26T11:42:57+00:00",
   "green": 0,
   "members": [
     {
-      "gaps": [],
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: projects.close refused at act 175: error: projects.close refused (409): project SPEC-V2 cannot close until its mandatory artefacts exist (missing: gap-analysis, project-brief, project-registers, project-wbs, statement-of-architecture-work)",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
       "key": "SPEC-V2",
+      "log": "docs/evidence/rework/batch/tranche-0/SPEC-V2.log",
+      "publish_exit": 1,
       "state": "BLOCKED"
     }
   ],

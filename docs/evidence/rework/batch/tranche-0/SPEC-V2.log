@@ -1,0 +1,500 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project SPEC-V2 --content docs/evidence/rework/tranche-0/rework-content-SPEC-V2.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+  reopen: not needed
+  charter: already approved
+  01 projects.programme_meta ok
+  SoAW: already live
+  02 documents.compose ok
+  03 documents.publish ok
+  04 architecture.artifacts_supersede ok
+  05 architecture.artifacts_update ok
+  06 architecture.artifacts_approve ok
+  artefact: Stakeholder map — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  07 documents.compose ok
+  08 documents.publish ok
+  09 architecture.artifacts_supersede ok
+  10 architecture.artifacts_update ok
+  11 architecture.artifacts_approve ok
+  artefact: Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  12 documents.compose ok
+  13 documents.publish ok
+  14 architecture.artifacts_supersede ok
+  15 architecture.artifacts_update ok
+  16 architecture.artifacts_approve ok
+  artefact: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  17 documents.compose ok
+  18 documents.publish ok
+  19 architecture.artifacts_supersede ok
+  20 architecture.artifacts_update ok
+  21 architecture.artifacts_approve ok
+  artefact: Solution concept — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_supersede ok
+  25 architecture.artifacts_update ok
+  26 architecture.artifacts_approve ok
+  artefact: Business capability map — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  27 documents.compose ok
+  28 documents.publish ok
+  29 architecture.artifacts_supersede ok
+  30 architecture.artifacts_update ok
+  31 architecture.artifacts_approve ok
+  artefact: Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  32 documents.compose ok
+  33 documents.publish ok
+  34 architecture.artifacts_supersede ok
+  35 architecture.artifacts_update ok
+  36 architecture.artifacts_approve ok
+  artefact: Technology standards — SPEC-V2 (retrospective, 2026-11-21) re-versioned, bound and documented
+  37 documents.compose ok
+  38 documents.publish ok
+  39 architecture.artifacts_create ok
+  40 architecture.artifacts_approve ok
+  41 documents.compose ok
+  42 documents.publish ok
+  43 architecture.artifacts_create ok
+  44 architecture.artifacts_approve ok
+  45 documents.compose ok
+  46 documents.publish ok
+  47 architecture.artifacts_create ok
+  48 architecture.artifacts_approve ok
+  49 documents.compose ok
+  50 documents.publish ok
+  51 architecture.artifacts_create ok
+  52 architecture.artifacts_approve ok
+  53 documents.compose ok
+  54 documents.publish ok
+  55 architecture.artifacts_create ok
+  56 architecture.artifacts_approve ok
+  57 documents.compose ok
+  58 documents.publish ok
+  59 architecture.artifacts_create ok
+  60 architecture.artifacts_approve ok
+  61 documents.compose ok
+  62 documents.publish ok
+  63 architecture.artifacts_create ok
+  64 architecture.artifacts_approve ok
+  65 documents.compose ok
+  66 documents.publish ok
+  67 architecture.artifacts_create ok
+  68 architecture.artifacts_approve ok
+  69 architecture.artifacts_link ok
+  70 architecture.artifacts_link ok
+  71 architecture.artifacts_link ok
+  72 architecture.artifacts_link ok
+  73 architecture.artifacts_link ok
+  74 architecture.artifacts_link ok
+  75 architecture.artifacts_link ok
+  76 architecture.artifacts_link ok
+  77 architecture.artifacts_link ok
+  78 architecture.artifacts_link ok
+  79 architecture.artifacts_link ok
+  80 architecture.artifacts_link ok
+  81 architecture.artifacts_link ok
+  82 architecture.artifacts_link ok
+  83 architecture.artifacts_link ok
+  84 architecture.artifacts_link ok
+  85 architecture.artifacts_link ok
+  86 architecture.artifacts_link ok
+  87 architecture.artifacts_link ok
+  88 architecture.artifacts_link ok
+  89 architecture.artifacts_link ok
+  90 architecture.artifacts_link ok
+  91 architecture.artifacts_link ok
+  92 architecture.artifacts_link ok
+  93 architecture.artifacts_link ok
+  94 architecture.artifacts_link ok
+  95 architecture.artifacts_link ok
+  document project-brief: already present
+  96 documents.compose ok
+  97 documents.publish ok
+  document benefits-diagram: published
+  98 documents.compose ok
+  99 documents.publish ok
+  document candidate-solutions: published
+  100 documents.compose ok
+  101 documents.publish ok
+  document project-context-diagram: published
+  102 documents.compose ok
+  103 documents.publish ok
+  document architecture-artifact: published
+  104 architecture.contracts_request ok
+  105 architecture.board_decide ok
+  106 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  107 registers.create ok
+  108 registers.create ok
+  109 registers.create ok
+  110 registers.create ok
+  111 registers.create ok
+  112 registers.create ok
+  113 registers.create ok
+  114 registers.create ok
+  115 registers.create ok
+  116 registers.create ok
+  117 registers.create ok
+  118 registers.create ok
+  benefit transitions: none in the content
+  baseline: already taken
+  119 projects.baseline ok
+  120 approvals.decide ok
+  121 projects.baseline ok
+  122 approvals.decide ok
+  closure-review output: already published
+  123 documents.publish ok
+  124 documents.update ok
+  125 documents.publish ok
+  spec output: body corrected and republished
+  126 architecture.reviews_record ok
+  127 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  128 approvals.request ok
+  129 approvals.decide ok
+  130 cards.comment ok
+  131 cards.move ok
+  132 cards.move ok
+  card cleared: std-togaf-phase-g-spec-v2-g:SPEC-V2
+  133 approvals.request ok
+  134 approvals.decide ok
+  135 cards.comment ok
+  136 cards.move ok
+  137 cards.move ok
+  card cleared: std-togaf-phase-h-spec-v2-h:SPEC-V2
+  138 approvals.request ok
+  139 approvals.decide ok
+  140 cards.comment ok
+  141 cards.move ok
+  142 cards.move ok
+  card cleared: std-pmp-project-registers-spec-v2:SPEC-V2
+  143 approvals.request ok
+  144 approvals.decide ok
+  145 cards.comment ok
+  146 cards.move ok
+  147 cards.move ok
+  card cleared: std-togaf-architecture-artifact-spec-v2:SPEC-V2
+  148 approvals.request ok
+  149 approvals.decide ok
+  150 cards.comment ok
+  151 cards.move ok
+  152 cards.move ok
+  card cleared: std-togaf-compliance-review-spec-v2:SPEC-V2
+  153 approvals.request ok
+  154 approvals.decide ok
+  155 cards.comment ok
+  156 cards.move ok
+  157 cards.move ok
+  card cleared: std-togaf-phase-b-spec-v2-b:SPEC-V2
+  158 approvals.request ok
+  159 approvals.decide ok
+  160 cards.comment ok
+  161 cards.move ok
+  162 cards.move ok
+  card cleared: std-togaf-phase-c-spec-v2-c:SPEC-V2
+  163 approvals.request ok
+  164 approvals.decide ok
+  165 cards.comment ok
+  166 cards.move ok
+  167 cards.move ok
+  card cleared: std-togaf-phase-d-spec-v2-d:SPEC-V2
+  168 approvals.request ok
+  169 approvals.decide ok
+  170 cards.comment ok
+  171 cards.move ok
+  172 cards.move ok
+  card cleared: std-togaf-phase-f-spec-v2-f:SPEC-V2
+  card discharge: 9 card(s) cleared of 483 open package(s)
+  closure gate: already approved
+  173 approvals.request ok
+  174 approvals.decide ok
+
+rework: projects.close refused at act 175: error: projects.close refused (409): project SPEC-V2 cannot close until its mandatory artefacts exist (missing: gap-analysis, project-brief, project-registers, project-wbs, statement-of-architecture-work)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project SPEC-V2 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-SPEC-V2-snap-c668_ecy/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-SPEC-V2-snap-c668_ecy/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "change-control",
+      "document_id": "01a217aa-3509-7507-b05d-b8da5a46c2a5",
+      "natural_key": "artefact:SPEC-V2:change-control:c03527ad4db0c5fb",
+      "body_sha256": "c03527ad4db0c5fb464c1d4db752989d9719a57a2eb28fc3668bd7028e3e51c6"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "compliance-review",
+      "document_id": "01a217aa-36a2-702a-947e-2502c0f0e7bf",
+      "natural_key": "artefact:SPEC-V2:compliance-review:cdd40ef1afcd00b8",
+      "body_sha256": "cdd40ef1afcd00b8a993dbd5d0dc9acef8d783c7e764e48b4570b39d704489ca"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "delivery-contract",
+      "document_id": "01a217aa-3835-71e8-abfb-d7eccfbfcd5b",
+      "natural_key": "artefact:SPEC-V2:delivery-contract:b93f7ad3b9c48b63",
+      "body_sha256": "b93f7ad3b9c48b63f0a101246cdb5189607a646678943b1d32ea1f76ff059e05"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-baseline",
+      "document_id": "01a217aa-39b9-7449-a698-552811d2f130",
+      "natural_key": "artefact:SPEC-V2:project-baseline:76f10298558dbba5",
+      "body_sha256": "76f10298558dbba572700f9a45b666fdf5c6b32cbd281afcd9e5276387acd9e2"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-wbs",
+      "document_id": "01a217aa-3b4c-700b-97af-b608fd95e991",
+      "natural_key": "artefact:SPEC-V2:project-wbs:be0f84fd27335f97",
+      "body_sha256": "be0f84fd27335f9790bc7e155c9e64a87a1a502bb7c1839ced047f6f7ffb5994"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a217aa-3cdc-7111-a9ca-8dec6641ed63",
+      "natural_key": "artefact:SPEC-V2:statement-of-architecture-work:0f1fa5dba9bedaa5",
+      "body_sha256": "0f1fa5dba9bedaa530757e5ef6c1b2971348e5b98cbc1d137b73acf5a8ae8bcf"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Baseline' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Outcome' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_REGISTER_CODE",
+        "message": "required heading 'Risks' resolves a register row with an empty code"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 14,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 4,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project SPEC-V2 --content docs/evidence/rework/tranche-0/rework-content-SPEC-V2.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder map — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Solution concept — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Business capability map — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Technology standards — SPEC-V2 (retrospective, 2026-11-21) already present
+  artefact: Gap Analysis — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Benefits Diagram — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Compliance Review Catalogue — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Request Catalogue — SPEC-V2 (retrospective, 2026-11-26) already present
+  artefact: Architecture Requirement Catalogue — SPEC-V2 (retrospective, 2026-11-26) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  11 architecture.artifacts_link ok
+  12 architecture.artifacts_link ok
+  13 architecture.artifacts_link ok
+  14 architecture.artifacts_link ok
+  15 architecture.artifacts_link ok
+  16 architecture.artifacts_link ok
+  17 architecture.artifacts_link ok
+  18 architecture.artifacts_link ok
+  19 architecture.artifacts_link ok
+  20 architecture.artifacts_link ok
+  21 architecture.artifacts_link ok
+  22 architecture.artifacts_link ok
+  23 architecture.artifacts_link ok
+  24 architecture.artifacts_link ok
+  25 architecture.artifacts_link ok
+  26 architecture.artifacts_link ok
+  27 architecture.artifacts_link ok
+  document project-brief: already present
+  document benefits-diagram: already present
+  document candidate-solutions: already present
+  document project-context-diagram: already present
+  document architecture-artifact: already present
+  delivery contract: already live
+  register risk: The organisation spine ships before any tenant uses it already present
+  register risk: Gates that cannot fail already present
+  register risk: The decision trail drifts back into prompts already present
+  register risk: Meeting theatre after the 2026-11-22 ruling already present
+  register issue: D61, D62 and D63 are proposed, not accepted already present
+  register issue: The spec grew after the rework record already present
+  register assumption: The 2026-11-17 closure stays unattributed already present
+  register assumption: The plan remains the active plan the records cite already present
+  register dependency: Every meta-job depends on the organisation and tool spines already present
+  register dependency: The board and cadence binding to meetings depends on T19F already present
+  register benefit: Auditability at the level of a single decision already present
+  register benefit: A measurable benefit rather than a wished one already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  spec output: current
+  Phase-G review: already recorded
+  28 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: 0 card(s) cleared of 483 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 29: error: projects.close refused (409): project SPEC-V2 cannot close until its mandatory artefacts exist (missing: gap-analysis, project-brief, project-registers)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
