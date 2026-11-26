@@ -875,7 +875,7 @@ async fn resolve_action<'a>(
     let found = crate::resolve::approved_action_tx(&mut tx, name).await;
     let _ = tx.rollback().await;
     match found {
-        Ok(Some(spec)) => Ok(crate::resolve::ResolvedAction::Imported(spec)),
+        Ok(Some(spec)) => Ok(crate::resolve::ResolvedAction::Imported(Box::new(spec))),
         Ok(None) => Err(ActionError::not_found(name)),
         Err(error) => {
             tracing::error!(%error, action = name, "resolve an approved imported action");

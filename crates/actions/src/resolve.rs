@@ -71,8 +71,9 @@ pub enum ResolveError {
 pub enum ResolvedAction<'a> {
     /// A compiled action in this binary.
     Compiled(&'a ActionSpec),
-    /// An approved imported action, built from its stored row.
-    Imported(ActionSpec),
+    /// An approved imported action, built from its stored row. Boxed so the enum stays the
+    /// size of a reference (clippy::large_enum_variant) — it is created once per invocation.
+    Imported(Box<ActionSpec>),
 }
 
 impl Deref for ResolvedAction<'_> {
@@ -81,7 +82,7 @@ impl Deref for ResolvedAction<'_> {
     fn deref(&self) -> &Self::Target {
         match self {
             Self::Compiled(spec) => spec,
-            Self::Imported(spec) => spec,
+            Self::Imported(spec) => spec.as_ref(),
         }
     }
 }
@@ -295,7 +296,7 @@ pub async fn assert_served_registry(
             let resolved = match compiled.get(&row.name) {
                 Some(spec) => ResolvedAction::Compiled(spec),
                 None => match resolve_row(&row) {
-                    Ok(spec) => ResolvedAction::Imported(spec),
+                    Ok(spec) => ResolvedAction::Imported(Box::new(spec)),
                     Err(source) => {
                         return Err(BootRefusal::Unresolvable {
                             name: row.name,

@@ -4339,6 +4339,10 @@ pub async fn list_demo_credits_tx(
 ///
 /// The evidence refs are stored as given (T8 owns the independent-ref rule); the cadence is the
 /// retro the lesson came from, kept so a later review can read the finding beside its lesson.
+///
+/// The eight parameters mirror the table's columns, the same shape as the other `_tx` helpers
+/// in this module; a struct would only rename them.
+#[allow(clippy::too_many_arguments)]
 pub async fn propose_lesson_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
