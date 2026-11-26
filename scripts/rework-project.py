@@ -601,6 +601,29 @@ class Runner:
                 row = titles[artefact["title"]]
                 meta = dict(row.get("meta") or {})
                 document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
+                # The standard's artefact-instance rule resolves the `Document` section from a
+                # document of category `architecture-artifact-instance`. A v1 row's document has
+                # no category at all, so reusing it by id leaves the section unresolved and the
+                # package open while the row exists (measured on S00, 2026-11-26: the package
+                # stayed open after the artefacts were bound). The repair therefore requires an
+                # instance document, not merely some document.
+                document_row = (
+                    next(
+                        (
+                            item
+                            for item in self._published_outputs()
+                            if str(item.get("id")) == str(document_id)
+                        ),
+                        None,
+                    )
+                    if document_id
+                    else None
+                )
+                instance_document = (
+                    document_row is not None
+                    and str(document_row.get("category") or "")
+                    == "architecture-artifact-instance"
+                )
                 # The close and phase gates resolve an approved artefact by its standard type,
                 # not by `meta.artifact_key` (measured on S00, 2026-11-26: a re-versioned row
                 # carried the meta key but no type, so `projects.close` named every artefact
@@ -610,6 +633,7 @@ class Runner:
                 needs_key = (
                     meta.get("artifact_key") != key
                     or str(row.get("artifact_type_id") or "") != str(expected_type or "")
+                    or not instance_document
                 )
                 # A supersede copies the row but not its entries: a re-versioned artefact whose
                 # pack carries entries and whose row has none is repaired in place (measured on
@@ -624,8 +648,11 @@ class Runner:
                     continue
                 # An approved artefact is immutable; the repair is a new version that carries
                 # the standard key and the published document it sits under. The document is
-                # published first, so the new row pins a real body from its first version.
-                document_id = document_id or self.publish_artefact_document(artefact)
+                # published first, so the new row pins a real body from its first version, and a
+                # v1 document without the instance category is replaced rather than reused.
+                document_id = (
+                    document_id if instance_document else self.publish_artefact_document(artefact)
+                )
                 draft = self.invoke(
                     "architecture.artifacts_supersede",
                     {"id": row["id"]},

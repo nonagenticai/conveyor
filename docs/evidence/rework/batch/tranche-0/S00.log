@@ -1,35 +1,37 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S00 --content docs/evidence/rework/tranche-0/rework-content-S00.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
 
-  01 projects.reopen ok
+  reopen: not needed
   charter: already approved
-  02 projects.programme_meta ok
+  closure outputs: already ['closure-review']
   SoAW: already live
-  03 architecture.artifacts_supersede ok
-  04 architecture.artifacts_update ok
-  05 architecture.artifacts_approve ok
+  01 architecture.artifacts_supersede ok
+  02 architecture.artifacts_update ok
+  03 architecture.artifacts_approve ok
   artefact: Stakeholder map — usage inventory re-versioned, bound and documented
-  06 architecture.artifacts_supersede ok
-  07 architecture.artifacts_update ok
-  08 architecture.artifacts_approve ok
+  04 architecture.artifacts_supersede ok
+  05 architecture.artifacts_update ok
+  06 architecture.artifacts_approve ok
   artefact: Driver/goal/objective — usage inventory re-versioned, bound and documented
-  09 architecture.artifacts_supersede ok
-  10 architecture.artifacts_update ok
-  11 architecture.artifacts_approve ok
+  07 architecture.artifacts_supersede ok
+  08 architecture.artifacts_update ok
+  09 architecture.artifacts_approve ok
   artefact: Requirements catalog — usage inventory re-versioned, bound and documented
-  artefact: Solution concept — usage inventory already present
-  12 architecture.artifacts_supersede ok
-  13 architecture.artifacts_update ok
-  14 architecture.artifacts_approve ok
+  10 architecture.artifacts_supersede ok
+  11 architecture.artifacts_update ok
+  12 architecture.artifacts_approve ok
+  artefact: Solution concept — usage inventory re-versioned, bound and documented
+  13 architecture.artifacts_supersede ok
+  14 architecture.artifacts_update ok
+  15 architecture.artifacts_approve ok
   artefact: Business capability map — usage inventory re-versioned, bound and documented
-  15 architecture.artifacts_supersede ok
-  16 architecture.artifacts_update ok
-  17 architecture.artifacts_approve ok
+  16 architecture.artifacts_supersede ok
+  17 architecture.artifacts_update ok
+  18 architecture.artifacts_approve ok
   artefact: Data entity catalog — usage inventory re-versioned, bound and documented
-  18 architecture.artifacts_supersede ok
-  19 architecture.artifacts_update ok
-  20 architecture.artifacts_approve ok
+  19 architecture.artifacts_supersede ok
+  20 architecture.artifacts_update ok
+  21 architecture.artifacts_approve ok
   artefact: Technology standards — usage inventory re-versioned, bound and documented
-  21 architecture.artifacts_link ok
   22 architecture.artifacts_link ok
   23 architecture.artifacts_link ok
   24 architecture.artifacts_link ok
@@ -38,151 +40,45 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   27 architecture.artifacts_link ok
   28 architecture.artifacts_link ok
   29 architecture.artifacts_link ok
-  30 documents.compose ok
-  31 documents.publish ok
-  document architecture-artifact: published
-  32 architecture.contracts_request ok
-  33 architecture.board_decide ok
-  34 architecture.contracts_approve ok
-  delivery contract: revised to carry the authored body
-  35 registers.create ok
-  36 registers.create ok
-  37 registers.create ok
-  38 registers.create ok
-  39 registers.create ok
-  40 registers.create ok
-  41 registers.create ok
-  42 registers.create ok
-  43 registers.create ok
-  44 registers.create ok
-  45 registers.create ok
+  30 architecture.artifacts_link ok
+  document architecture-artifact: already present
+  delivery contract: already live
+  register risk: The dated samples cannot be re-measured, so a later reader cannot reproduce the counts already present
+  register risk: A used id that no later slice builds would break S14's 100 % gate already present
+  register risk: A surface dropped by decision may still receive live traffic after sign-off already present
+  register issue: Planka's database cannot evidence usage: four boards and five test cards already present
+  register issue: The execution census covers three days, so it cannot answer quarterly use already present
+  register assumption: No active caller reaches a decision-dropped surface, so the sign-off carried no contradiction already present
+  register assumption: The two adjacent 24-hour windows represent ordinary traffic already present
+  register dependency: Every later slice depends on parity_ids, and S14 gates on 100 % of used already present
+  register dependency: The measurement depends on read-only access to master Postgres and Loki already present
+  register benefit: Zero-usage surface is dropped rather than ported already present
+  register benefit: Every planned feature enters the rebuild with a stable id and a named acceptance already present
   baseline: already taken
-  46 projects.baseline ok
-  47 approvals.decide ok
-  48 projects.baseline ok
-  49 approvals.decide ok
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: already published
-  50 documents.publish ok
-  51 documents.update ok
-  52 documents.publish ok
-  project-brief output: body corrected and republished
-  53 documents.publish ok
-  54 documents.update ok
-  55 documents.publish ok
-  evidence output: body corrected and republished
-  56 architecture.reviews_record ok
-  57 cadences.credit_demo ok
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  31 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
-  58 approvals.request ok
-  59 approvals.decide ok
-  60 cards.comment ok
-  61 cards.move ok
-  62 cards.move ok
-  card cleared: std-pmp-project-registers-s00:S00
-  63 approvals.request ok
-  64 approvals.decide ok
-  65 cards.comment ok
-  66 cards.move ok
-  67 cards.move ok
-  card cleared: std-togaf-compliance-review-s00:S00
-  68 approvals.request ok
-  69 approvals.decide ok
-  70 cards.comment ok
-  71 cards.move ok
-  72 cards.move ok
-  card cleared: std-togaf-phase-b-s00-b:S00
-  73 approvals.request ok
-  74 approvals.decide ok
-  75 cards.comment ok
-  76 cards.move ok
-  77 cards.move ok
-  card cleared: std-togaf-phase-c-s00-c:S00
-  78 approvals.request ok
-  79 approvals.decide ok
-  80 cards.comment ok
-  81 cards.move ok
-  82 cards.move ok
-  card cleared: std-togaf-phase-d-s00-d:S00
-  83 approvals.request ok
-  84 approvals.decide ok
-  85 cards.comment ok
-  86 cards.move ok
-  87 cards.move ok
-  card cleared: std-togaf-phase-f-s00-f:S00
-  card discharge: 6 card(s) cleared of 570 open package(s)
-  88 projects.close_request ok
-  89 approvals.decide ok
-  90 approvals.request ok
-  91 approvals.decide ok
+  card discharge: 0 card(s) cleared of 569 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  32 projects.close ok
+  closed S00: 01a1d039-0d26-7573-9b0c-e0f60af92003
+S00: 32 acts recorded
 
-rework: projects.close refused at act 92: error: projects.close refused (409): project S00 cannot close until its mandatory artefacts exist (missing: business_capability_map, data_entity_catalog, driver_goal_objective, project-registers, project-wbs, requirements_catalog, solution_concept, stakeholder_map, technology_standards)
-FAILED: projects.close: transport exited 1
 
-[exit 1]
+[exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S00 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-yxmbcw3z/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-yxmbcw3z/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/S00-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S00 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-hhpvb4z0/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-hhpvb4z0/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/S00-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "change-control",
-      "document_id": "01a2173b-3e12-7186-b5ee-cf6113bb5567",
-      "natural_key": "artefact:S00:change-control:352b7d8119c3422f",
-      "body_sha256": "352b7d8119c3422f07a7f0f718257c30cc8a813e14d419a6858cff2634842881"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "compliance-review",
-      "document_id": "01a2173b-3fc4-768f-8900-f29435357fa9",
-      "natural_key": "artefact:S00:compliance-review:02411b9240dfcdfb",
-      "body_sha256": "02411b9240dfcdfbb3ddcb17a82ce88c933fb9a852e386e60f212b8506a21f54"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "delivery-contract",
-      "document_id": "01a2173b-416c-73a9-a840-f59c9cc41e25",
-      "natural_key": "artefact:S00:delivery-contract:c2547abf7730d1b5",
-      "body_sha256": "c2547abf7730d1b57c6a14b5052f199c6970be2a53e0280f459bcb7547451a82"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "project-baseline",
-      "document_id": "01a2173b-431c-775c-8115-f302209b90e3",
-      "natural_key": "artefact:S00:project-baseline:b9a9562c89008211",
-      "body_sha256": "b9a9562c89008211b0758af886d247b7dbdc61c294f2f506cfe8432de4a9fecf"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "project-registers",
-      "document_id": "01a2173b-44e2-719f-8f36-10c8b40f6b68",
-      "natural_key": "artefact:S00:project-registers:1b4cd2d24b5adeee",
-      "body_sha256": "1b4cd2d24b5adeee217dd1b543cc6cadf29eb6778e7265d88a425f9c5b6788a7"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "project-wbs",
-      "document_id": "01a2173b-468c-72fb-8e5b-a826dc4b4a68",
-      "natural_key": "artefact:S00:project-wbs:be87342ced6f6ace",
-      "body_sha256": "be87342ced6f6ace6df00d72b63bbaf0f0ffabc7d31294d84177d51fb0d4692d"
-    },
-    {
-      "project_key": "S00",
-      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a2173b-4833-76b4-9baa-160f688e6b7b",
-      "natural_key": "artefact:S00:statement-of-architecture-work:c3baefa7793a6c8f",
-      "body_sha256": "c3baefa7793a6c8fbd217ef953b13e0ecef41443ddfc3fc39afe01c51f38e167"
-    }
-  ],
+  "applied": [],
   "skipped": [
     {
       "project_key": "S00",
@@ -195,10 +91,74 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "S00",
       "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
       "category": "project-brief",
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     }
   ],
   "refused": [
@@ -252,68 +212,14 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     }
   ],
   "counts": {
-    "due": 11,
-    "present": 0,
+    "due": 4,
+    "present": 7,
     "missing-edge": 0,
-    "stale": 2,
+    "stale": 3,
     "ambiguous": 0
   }
 }
 
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S00 --content docs/evidence/rework/tranche-0/rework-content-S00.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
-
-  reopen: not needed
-  charter: already approved
-  closure outputs: already ['closure-review']
-  SoAW: already live
-  artefact: Stakeholder map — usage inventory already present
-  artefact: Driver/goal/objective — usage inventory already present
-  artefact: Requirements catalog — usage inventory already present
-  artefact: Solution concept — usage inventory already present
-  artefact: Business capability map — usage inventory already present
-  artefact: Data entity catalog — usage inventory already present
-  artefact: Technology standards — usage inventory already present
-  01 architecture.artifacts_link ok
-  02 architecture.artifacts_link ok
-  03 architecture.artifacts_link ok
-  04 architecture.artifacts_link ok
-  05 architecture.artifacts_link ok
-  06 architecture.artifacts_link ok
-  07 architecture.artifacts_link ok
-  08 architecture.artifacts_link ok
-  09 architecture.artifacts_link ok
-  document architecture-artifact: already present
-  delivery contract: already live
-  register risk: The dated samples cannot be re-measured, so a later reader cannot reproduce the counts already present
-  register risk: A used id that no later slice builds would break S14's 100 % gate already present
-  register risk: A surface dropped by decision may still receive live traffic after sign-off already present
-  register issue: Planka's database cannot evidence usage: four boards and five test cards already present
-  register issue: The execution census covers three days, so it cannot answer quarterly use already present
-  register assumption: No active caller reaches a decision-dropped surface, so the sign-off carried no contradiction already present
-  register assumption: The two adjacent 24-hour windows represent ordinary traffic already present
-  register dependency: Every later slice depends on parity_ids, and S14 gates on 100 % of used already present
-  register dependency: The measurement depends on read-only access to master Postgres and Loki already present
-  register benefit: Zero-usage surface is dropped rather than ported already present
-  register benefit: Every planned feature enters the rebuild with a stable id and a named acceptance already present
-  baseline: already taken
-  schedule baseline: already taken
-  cost baseline: already taken
-  closure-review output: already published
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  10 cadences.credit_demo ok
-  baseline approval: none pending
-  change control: 1 change row(s) present
-  card discharge: 0 card(s) cleared of 570 open package(s)
-  closure gate: already approved
-  destructive gate: already approved
-
-rework: projects.close refused at act 11: error: projects.close refused (409): project S00 cannot close until its mandatory artefacts exist (missing: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards)
-FAILED: projects.close: transport exited 1
 
 [exit 1]
 
