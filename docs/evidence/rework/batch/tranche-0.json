@@ -1,15 +1,12 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T08:44:57+00:00",
-  "green": 1,
+  "blocked": 1,
+  "generated_at": "2026-11-26T08:45:16+00:00",
+  "green": 0,
   "members": [
     {
-      "factory_exit": 0,
       "gaps": [],
-      "key": "DESIGN-PUBLISH",
-      "log": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
+      "key": "P0",
+      "state": "BLOCKED"
     }
   ],
   "red": 0,

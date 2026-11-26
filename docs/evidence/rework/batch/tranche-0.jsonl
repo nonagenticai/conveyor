@@ -25,3 +25,5 @@
 {"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-DESIGN-PUBLISH.json", "key": "DESIGN-PUBLISH", "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T08:44:30+00:00"}
 {"key": "DESIGN-PUBLISH", "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T08:44:30+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "DESIGN-PUBLISH", "log": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH.log", "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T08:44:57+00:00"}
+{"blocked": "no content pack", "content": null, "key": "P0", "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T08:45:16+00:00"}
+{"key": "P0", "reason": "no content pack", "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9", "state": "BLOCKED", "tranche": 0, "ts": "2026-11-26T08:45:16+00:00"}
