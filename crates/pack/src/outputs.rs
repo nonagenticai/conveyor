@@ -159,24 +159,60 @@ pub async fn write_outputs(
     generated_at: &str,
     out: &Path,
 ) -> Result<usize, PublishOutputsError> {
+    let inputs = read_outputs_inputs(pool, tenant).await?;
+    let (index, pages) = render_outputs(
+        &inputs.records,
+        &inputs.projects,
+        &inputs.attachments,
+        &inputs.names,
+        generated_at,
+        rendered_commit().as_deref(),
+    )?;
+    write_rendered(out, &index, &pages)
+}
+
+/// The rows one outputs render needs, read inside one read-only transaction.
+///
+/// The register (`crate::register`) is built from these same rows, so the index and the register
+/// cannot describe different published sets when they are built from one read.
+pub struct OutputsInputs {
+    /// The published output rows.
+    pub records: Vec<store::document::DocumentRecord>,
+    /// Every project the rows can belong to.
+    pub projects: Vec<Project>,
+    /// The published attachments, in upload order.
+    pub attachments: Vec<store::document::DocumentRecord>,
+    /// Author display names, by user id.
+    pub names: HashMap<Uuid, String>,
+}
+
+/// Read the published-output rows and their lookups in one read-only transaction.
+pub async fn read_outputs_inputs(
+    pool: &PgPool,
+    tenant: TenantId,
+) -> Result<OutputsInputs, PublishOutputsError> {
     let mut tx = store::begin_scoped_read_only(pool, tenant).await?;
     let records = store::document::list_published_outputs_tx(&mut tx, tenant).await?;
     let projects = store::project::list_projects_tx(&mut tx, tenant, None, 1000).await?;
     let attachments = store::document::list_published_attachments_tx(&mut tx, tenant).await?;
     let names = author_names(&mut tx, &records).await?;
     tx.rollback().await?;
+    Ok(OutputsInputs {
+        records,
+        projects,
+        attachments,
+        names,
+    })
+}
 
-    let (index, pages) = render_outputs(
-        &records,
-        &projects,
-        &attachments,
-        &names,
-        generated_at,
-        rendered_commit().as_deref(),
-    )?;
-
+/// Write the rendered index and pages. No database: the caller already read the rows.
+pub fn write_rendered(
+    out: &Path,
+    index: &str,
+    pages: &HashMap<Uuid, String>,
+) -> Result<usize, PublishOutputsError> {
     std::fs::create_dir_all(out)?;
-    for (id, page) in &pages {
+    for (id, page) in pages {
         std::fs::write(out.join(format!("output-{id}.html")), page)?;
     }
     std::fs::write(out.join("outputs.js"), index)?;

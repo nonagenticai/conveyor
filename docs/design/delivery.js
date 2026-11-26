@@ -674,6 +674,80 @@ window.CONVEYOR_DELIVERY = (function () {
     }</span><div class="rail-chips">${counts}${items}${more}</div></div>`;
   }
 
+  // The output register (#756 P2): per project, the kinds the standard declares against the
+  // kinds the project published. A missing kind is named, never rounded away, and a project no
+  // class matches says so. The conformance gap register's posture rides beside it. A project
+  // chip drills into that project's page.
+  function registerRail(register, projects) {
+    const data = register || null;
+    if (!data) {
+      return `<div class="delivery-rail"><span class="rail-label">Output register</span><div class="rail-chips"><span class="rail-chip">register not published</span></div></div>`;
+    }
+    const rows = list(data.projects);
+    const totals = data.totals || {};
+    const target = new Map();
+    list(projects).forEach((row) => {
+      if (!row) return;
+      if (row.id) target.set(row.id, row.id);
+      if (row.key) target.set(row.key, row.id);
+    });
+    const missingOf = (row) =>
+      list(row.missing && row.missing.now).length + list(row.missing && row.missing.closure).length;
+    const gapped = rows.filter((row) => missingOf(row) > 0);
+    const classChips = list(data.classes)
+      .map((cls) => {
+        const count = list(cls.projects).length;
+        return `<span class="rail-chip"><b>${esc(cls.name)}</b> ${count} project${
+          count === 1 ? "" : "s"
+        }</span>`;
+      })
+      .join("");
+    const items = gapped
+      .slice(0, 8)
+      .map((row) => {
+        const missing = [
+          ...list(row.missing && row.missing.now),
+          ...list(row.missing && row.missing.closure),
+        ];
+        const declared =
+          list(row.declared && row.declared.now).length +
+          list(row.declared && row.declared.closure).length;
+        const title = `${row.key} · class ${row.class || "unmatched"} · declared ${declared} · evidenced ${
+          list(row.evidenced).length
+        } · missing ${missing.join(", ")}`;
+        const id = target.get(row.id) || target.get(row.key);
+        const label = `${esc(row.key)} · ${missing.length} missing`;
+        const links = [];
+        if (id) links.push(`<a href="#projects/${esc(id)}">page</a>`);
+        const issue = list(row.issues)[0];
+        if (issue) {
+          links.push(
+            `<a href="https://github.com/nonagenticai/conveyor/issues/${esc(issue)}">#${esc(issue)}</a>`,
+          );
+        }
+        const drill = links.length ? ` · ${links.join(" · ")}` : "";
+        return `<span class="rail-chip sev-p1" title="${esc(title)}">${label}${drill}</span>`;
+      })
+      .join("");
+    const more =
+      gapped.length > 8
+        ? `<span class="rail-chip">showing 8 of ${gapped.length} projects with a gap</span>`
+        : "";
+    const unmatched = Number(totals.projects_without_class || 0);
+    const posture = data.gaps
+      ? `<span class="rail-chip">conformance gaps · ${Object.entries(data.gaps.counts || {})
+          .map(([severity, count]) => `${esc(severity)} ${esc(count)}`)
+          .join(" · ")}</span>`
+      : `<span class="rail-chip">conformance gaps not recorded</span>`;
+    return `<div class="delivery-rail"><span class="rail-label">Output register · ${esc(
+      totals.projects || rows.length,
+    )} projects · ${esc(totals.declared || 0)} declared · ${esc(
+      totals.evidenced || 0,
+    )} evidenced · ${esc(totals.missing || 0)} missing${
+      unmatched ? ` · ${unmatched} with no class` : ""
+    }</span><div class="rail-chips">${classChips}${items}${more}${posture}</div></div>`;
+  }
+
   // L1 scorecard: one tile per standard from the register's own scorecard, plus the delivery tile.
   // A standard the register does not score shows "—"; a denominator is never invented.
   function scorecard(rework, delivery) {
@@ -1794,6 +1868,7 @@ window.CONVEYOR_DELIVERY = (function () {
     phaseStrip,
     cadenceRail,
     reworkRail,
+    registerRail,
     scorecard,
     standardsSummary,
     artefactRail,

@@ -21,6 +21,8 @@
 //! docs/design/data/evidence.json      the evidence/plan documents and their hashes
 //! docs/design/data/feedback.json      the external feedback issues
 //! docs/design/data/rework.json        the rework register, only with `--conformance`
+//! docs/design/data/register.json      the declared-vs-evidenced output register (#756 P2)
+//! docs/design/data/register.js        window.CONVEYOR_REGISTER = {…}
 //! docs/design/data/snapshot.js        window.CONVEYOR_SNAPSHOT = {…}
 //! ```
 //!
@@ -182,6 +184,20 @@ pub async fn run_with_pool(
     let mut data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
     tx.rollback().await?;
 
+    // The register compares the standard's declared kinds with the rows this snapshot publishes.
+    // Read them once and reuse them for the pages: one read is what keeps `register.json` and
+    // `outputs.js` describing the same published set.
+    let outputs_inputs = crate::outputs::read_outputs_inputs(pool, tenant).await?;
+    let register = with_header(
+        crate::register::build(
+            &data.programme,
+            &crate::register::from_records(&outputs_inputs.records),
+            crate::register::read_gaps(&std::env::current_dir()?).as_ref(),
+        ),
+        SCHEMA,
+        &generated_at,
+    );
+
     let issues = read_issues(&args.issues)?;
     let feedback = feedback_issues(&issues);
     // The rework register is a file input like the issue registry, but the flag is explicit:
@@ -201,6 +217,7 @@ pub async fn run_with_pool(
     let snapshot_js = snapshot_js(
         &data,
         rework.as_ref(),
+        Some(&register),
         &args.tenant,
         &args.feedback_url,
         &generated_at,
@@ -288,15 +305,35 @@ pub async fn run_with_pool(
         write_file(&args.out, "rework.json", rework, &mut files)?;
     }
 
+    // The declared-vs-evidenced register: a downloadable file and the wrapper the studio loads
+    // beside its others. The wrapper is built from the same value the file is, redacted once.
+    let mut register = register;
+    redact(&mut register);
+    write_file(&args.out, "register.json", register.clone(), &mut files)?;
+    let register_js = format!(
+        "window.CONVEYOR_REGISTER = {};\n",
+        serde_json::to_string(&register)?
+    );
+    write_bytes(&args.out, "register.js", register_js.as_bytes(), &mut files)?;
+
     // The combined wrapper the studio loads with one <script> tag. It carries the files the
     // pages render; the raw JSON files stay beside it for sharing and diffing.
     write_bytes(&args.out, "snapshot.js", snapshot_js.as_bytes(), &mut files)?;
 
     // Platform outputs are a separate, published-only projection. They land beside the tracked
-    // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both.
+    // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both. The
+    // rows are the ones the register read, so the two projections cannot disagree.
     let mut outputs = 0usize;
     if let Some(dir) = args.outputs_dir.as_deref() {
-        outputs = crate::outputs::write_outputs(pool, tenant, &generated_at, dir).await?;
+        let (index, pages) = crate::outputs::render_outputs(
+            &outputs_inputs.records,
+            &outputs_inputs.projects,
+            &outputs_inputs.attachments,
+            &outputs_inputs.names,
+            &generated_at,
+            crate::outputs::rendered_commit().as_deref(),
+        )?;
+        outputs = crate::outputs::write_rendered(dir, &index, &pages)?;
         tracing::info!(outputs, dir = %dir.display(), "platform outputs written");
     }
 
@@ -342,7 +379,7 @@ pub(crate) fn section_json(section: &Value, generated_at: &str) -> Result<String
 }
 
 /// Add the schema and timestamp so every file is self-describing.
-fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
+pub(crate) fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
     if let Some(object) = value.as_object_mut() {
         object.insert("schema".to_owned(), Value::String(schema.to_owned()));
         object.insert(
@@ -356,6 +393,7 @@ fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
 pub(crate) fn snapshot_js(
     data: &store::snapshot::SnapshotData,
     rework: Option<&Value>,
+    register: Option<&Value>,
     tenant: &str,
     feedback_url: &str,
     generated_at: &str,
@@ -382,6 +420,11 @@ pub(crate) fn snapshot_js(
     // otherwise, so a snapshot without `--conformance` keeps its exact bytes.
     if let Some(rework) = rework {
         value["rework"] = rework.clone();
+    }
+    // The declared-vs-evidenced register rides with the rows it judges, so the studio reads one
+    // global and a reader can diff the section against the standalone `register.json`.
+    if let Some(register) = register {
+        value["register"] = register.clone();
     }
     redact(&mut value);
     // The hash covers the payload BEFORE this field is added; it is what the LIVE ribbon shows
