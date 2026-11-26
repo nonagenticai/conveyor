@@ -59,6 +59,15 @@ ${level} Definition of done
 EOF
 }
 
+# 0. A bold `**Verify:**` line is the shape most authored bodies use; it must pass.
+body="$tmp/bold-verify.md"
+write_body "##" "$body" && sed -i.bak 's/^  Verify:/  **Verify:**/' "$body"
+if $B --contract-body "$body" >/dev/null 2>&1; then
+  ok "a bold **Verify:** line passes"
+else
+  bad "a bold **Verify:** line was refused"
+fi
+
 # 1. Both contract shapes pass.
 for level in "##" "###"; do
   body="$tmp/body-${level//#/h}.md"

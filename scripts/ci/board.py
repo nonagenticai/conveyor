@@ -108,6 +108,9 @@ CONTRACT_SECTIONS = (
     "Definition of done",
 )
 SECTION_RE = re.compile(r"^(#{2,3})\s+(.*?)\s*#*\s*$")
+# A scenario's acceptance line, however it is emphasised: `Verify:` in the template, `**Verify:**`
+# in most authored bodies. The leading emphasis markers are not part of the token.
+VERIFY_RE = re.compile(r"^\s*[*_`]*verify\s*:", re.IGNORECASE)
 
 # Every heading the unit template (and so the form) can carry. A same-level heading in this set
 # ends the section it follows; any other same-level heading is an author's subheading.
@@ -212,7 +215,7 @@ def contract_gaps(body: str) -> list[str]:
     if missing:
         gaps.append(f"`Programme` rows: {', '.join(missing)}")
     parts = section_lines(body, "Parts and acceptance criteria") or []
-    if not any(line.strip().startswith("Verify:") for line in parts):
+    if not any(VERIFY_RE.match(line) for line in parts):
         gaps.append("a `Verify:` line in `Parts and acceptance criteria`")
     return gaps
 
