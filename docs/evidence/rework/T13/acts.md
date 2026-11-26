@@ -22,3 +22,5 @@ change-control artefact are peer 1's S04/standards batch; the project stays open
 decision.
 
 T13: 35 acts in `transcript.jsonl`; the last run recorded 4.
+
+T13: 222 acts in `transcript.jsonl`; the last run recorded 187.

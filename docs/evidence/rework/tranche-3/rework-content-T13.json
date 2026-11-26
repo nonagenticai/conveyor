@@ -13,7 +13,7 @@
  },
  "artifacts": [
   {
-   "title": "Stakeholder map — T13 tool platform",
+   "title": "Stakeholder Map — T13 Tool platform (Phase A, retrospective)",
    "phase_code": "a",
    "plateau": "psa",
    "artifact_kind": "matrix",
@@ -112,14 +112,14 @@
    ],
    "links": [
     {
-     "to": "Requirements catalog — T13 tool platform",
+     "to": "Requirements Catalogue — T13 Tool platform (Phase A, retrospective)",
      "kind": "dependency"
     }
    ],
    "body": "# Stakeholder map — T13 tool platform\n\n## Metadata\n\nRetrospective matrix for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d. The record is the one authored on 2026-11-22 and re-read here act by act; nothing in it is a live elicitation.\n\n## Entries\n\nEight actors on the influence, interest and engagement axes. The development job family is the consumer whose only path to a backend is tools.call. The programme owner and the Architecture Board hold the decision and the approval, and the board acts under the standing delegation with an approver distinct from the requester. The programme architect is responsible for this retrospective record. The coding fleet owner registers the destination alias, tenant admins configure destructive approvals and BYO publication, and the platform operator publishes versions, probes and retires. The agent platform gateway is named as a boundary rather than a consumer.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T13 tool platform as dependency, because the requirements fix what each actor receives from the broker. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: place the actors of the tool platform so each concern has a named owner and a stated engagement. Scope: the stakeholders of the tool platform and its two contracts. It was reconstructed retrospectively on 2026-11-26 from the recorded roles, not from a live elicitation, and it does not claim that any actor re-accepted the platform after the 2026-11-22 record."
   },
   {
-   "title": "Driver/goal/objective — T13 tool platform",
+   "title": "Driver/Goal/Objective Catalogue — T13 Tool platform (Phase A, retrospective)",
    "phase_code": "a",
    "plateau": "psa",
    "artifact_kind": "catalog",
@@ -201,14 +201,14 @@
    ],
    "links": [
     {
-     "to": "Stakeholder map — T13 tool platform",
+     "to": "Stakeholder Map — T13 Tool platform (Phase A, retrospective)",
      "kind": "derivation"
     }
    ],
    "body": "# Driver/goal/objective — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nSeven drivers, each with a goal and a measurable objective. D1 records the ad-hoc call and G1 makes one broker path. D2 records the second-control-plane pressure and G2 refuses it while borrowing the catalogue shape. D3 records secret leakage and G3 keeps keys out of prompts and ledgers. D4 records ungoverned destructive effects and G4 gates them on tenant approvals. D5 records backend-side rejection and G5 refuses invalid input before egress. D6 records caller-built keys and G6 lets the adapter build every tenant-prefixed key. D7 records invisible calls and G7 writes one ledger row and one event per call.\n\n## Links\n\nThis artefact carries one typed edge: Stakeholder map — T13 tool platform as derivation, because the drivers are held by the actors named there. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: trace why the tool platform exists and what it is meant to achieve. Scope: the drivers and goals of one governed call path. It was authored retrospectively on 2026-11-26 from SPEC_V2 §11 and the proving suite, and it records the objective the slice set rather than claiming a wider capability than the six proofs support."
   },
   {
-   "title": "Requirements catalog — T13 tool platform",
+   "title": "Requirements Catalogue — T13 Tool platform (Phase A, retrospective)",
    "phase_code": "a",
    "plateau": "psa",
    "artifact_kind": "catalog",
@@ -317,14 +317,14 @@
    ],
    "links": [
     {
-     "to": "Driver/goal/objective — T13 tool platform",
+     "to": "Driver/Goal/Objective Catalogue — T13 Tool platform (Phase A, retrospective)",
      "kind": "derivation"
     }
    ],
    "body": "# Requirements catalog — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nTen requirements. R1 to R6 restate the six SPEC_V2 §12 gate clauses and name their proofs: broker dispatch, the ledger row, the destructive refusal, the closed-schema refusal, the tenant-prefixed round trip and prompt secrecy. R7 and R8 make the binding row the authority and keep credential resolution behind an alias. R9 makes retries safe. R10 is the instrument requirement that gives every refusal its force: the counting stub proves the call did not leave the process.\n\n## Links\n\nThis artefact carries one typed edge: Driver/goal/objective — T13 tool platform as derivation, because each requirement serves a stated goal. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements the tool platform must satisfy. Scope: broker dispatch, ledger, effect gating, schema refusal, credentials, storage, idempotency and instrumentation. It was reconstructed retrospectively on 2026-11-26 from the verified tests and the manifest, so each acceptance line names a check that actually ran at lane head 582e2dc6 rather than a check the pack hopes will run."
   },
   {
-   "title": "Solution concept — T13 tool platform",
+   "title": "Solution Concept Diagram — T13 Tool platform (Phase A, retrospective)",
    "phase_code": "a",
    "plateau": "psa",
    "artifact_kind": "diagram",
@@ -460,14 +460,14 @@
    ],
    "links": [
     {
-     "to": "Requirements catalog — T13 tool platform",
+     "to": "Requirements Catalogue — T13 Tool platform (Phase A, retrospective)",
      "kind": "realization"
     }
    ],
    "body": "# Solution concept — T13 tool platform\n\n## Metadata\n\nRetrospective diagram for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nThirteen rows: nine components and four edges. The broker is one seven-step path with refusal before egress. The four tables hold the operation, the immutable bundle, the tenant-scoped binding and the ledger. Credential profiles put sealed secrets behind aliases; the adapter owns every tenant-prefixed key; the alias registry keeps the destination out of the caller's hands; verify-then-judge makes a write carry its read-back. The four edges record the path from authority to evidence, with a refusal at each step rather than a silent repair.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T13 tool platform as realization, because the components exist to satisfy those requirements. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: show the components and edges that turn a bound call into one governed destination call and one ledger row. Scope: the broker, the tables, credentials, the alias registry, the adapter and the write verification. It was drawn retrospectively on 2026-11-26 from the build order in SPEC_V2 §11.3 and the tests, not from a design session held before the work."
   },
   {
-   "title": "Business capability map — T13 tool platform",
+   "title": "Business Capability Map — T13 Tool platform (Phase B, retrospective)",
    "phase_code": "b",
    "plateau": "hld",
    "artifact_kind": "diagram",
@@ -558,18 +558,18 @@
    ],
    "links": [
     {
-     "to": "Solution concept — T13 tool platform",
+     "to": "Solution Concept Diagram — T13 Tool platform (Phase A, retrospective)",
      "kind": "derivation"
     },
     {
-     "to": "Requirements catalog — T13 tool platform",
+     "to": "Requirements Catalogue — T13 Tool platform (Phase A, retrospective)",
      "kind": "derivation"
     }
    ],
    "body": "# Business capability map — T13 tool platform\n\n## Metadata\n\nRetrospective diagram for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nEight capabilities. Tool and toolkit lifecycle makes every callable operation an immutable version. Binding-scoped access gives a run exactly what its binding pins. Broker dispatch makes one path real. Effect-class gating separates read, write, destructive and spend, and its approved execution path is the one capability recorded as open. Input enforcement refuses a closed-schema violation before egress. The ledger makes each call visible. Storage separates tenant bytes under an adapter-built key. Probe and retirement is specified and enabled here, exercised by the estate import in T14.\n\n## Links\n\nThis artefact carries two typed edges: Solution concept — T13 tool platform and Requirements catalog — T13 tool platform, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the tool platform establishes and the evidence each leaves behind. Scope: lifecycle, access, dispatch, gating, enforcement, ledger, storage and retirement. It is retrospective and dated 2026-11-26; it records the capability set as proved on 2026-11-22 and states plainly which capability the record leaves open rather than upgrading it."
   },
   {
-   "title": "Data entity catalog — T13 tool platform",
+   "title": "Data Entity Catalogue — T13 Tool platform (Phase C, retrospective)",
    "phase_code": "c",
    "plateau": "hld",
    "artifact_kind": "catalog",
@@ -678,18 +678,18 @@
    ],
    "links": [
     {
-     "to": "Business capability map — T13 tool platform",
+     "to": "Business Capability Map — T13 Tool platform (Phase B, retrospective)",
      "kind": "derivation"
     },
     {
-     "to": "Solution concept — T13 tool platform",
+     "to": "Solution Concept Diagram — T13 Tool platform (Phase A, retrospective)",
      "kind": "derivation"
     }
    ],
    "body": "# Data entity catalog — T13 tool platform\n\n## Metadata\n\nRetrospective catalog for T13, authored 2026-11-26 from SPEC_V2 §11.1–§11.10, the T13 row in SPEC_V2 §12 and the project transcript. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d37-730f-8f8a-2f50e5a0933d.\n\n## Entries\n\nNine entities. Four are created: the tool operation, the immutable toolkit, the tenant-scoped binding and the call ledger. Four are reused rather than rebuilt: the sealed secret, the governed-asset draft, the event and the audit trail, and the MinIO object itself. The destination alias is its own record because it is the anti-SSRF control. Each line names the key that makes the row addressable, and the ledger row is explicitly not action_invocation.\n\n## Links\n\nThis artefact carries two typed edges: Business capability map — T13 tool platform and Solution concept — T13 tool platform, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the stored entities the tool platform creates or reuses and the key each carries. Scope: the four tables, the reused secret, governed-asset, event and audit rows, the alias and the storage object. It was authored retrospectively on 2026-11-26 from SPEC_V2 §11.8 and the tests, so it does not invent a table or a key the record does not carry."
   },
   {
-   "title": "Technology standards — T13 tool platform",
+   "title": "Technology Standards Catalogue — T13 Tool platform (Phase D, retrospective)",
    "phase_code": "d",
    "plateau": "hld",
    "artifact_kind": "catalog",
@@ -772,7 +772,7 @@
    ],
    "links": [
     {
-     "to": "Data entity catalog — T13 tool platform",
+     "to": "Data Entity Catalogue — T13 Tool platform (Phase C, retrospective)",
      "kind": "derivation"
     }
    ],
