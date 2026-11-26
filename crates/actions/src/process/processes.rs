@@ -488,9 +488,9 @@ async fn processes_publish(
     let facts: Vec<ActionFacts> = registry()
         .iter()
         .map(|spec| {
-            action_outputs.insert(spec.name.to_owned(), spec.output_schema());
+            action_outputs.insert(spec.name.to_string(), spec.output_schema());
             ActionFacts {
-                name: spec.name.to_owned(),
+                name: spec.name.to_string(),
                 idempotent: spec.idempotent,
             }
         })

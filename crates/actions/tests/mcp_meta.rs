@@ -59,7 +59,7 @@ fn every_tool_carries_its_operation() {
                 spec.name
             ));
         }
-        if tool["_meta"]["x-action-name"].as_str() != Some(spec.name) {
+        if tool["_meta"]["x-action-name"].as_str() != Some(spec.name.as_ref()) {
             wrong.push(format!("{}: x-action-name drifted", spec.name));
         }
     }

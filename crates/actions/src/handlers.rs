@@ -212,7 +212,7 @@ async fn actions_describe(
         return Err(ActionError::not_found(&input.name));
     }
     Ok(ActionSpecView {
-        name: spec.name.to_owned(),
+        name: spec.name.to_string(),
         version: spec.version,
         kind: spec.kind.as_str().to_owned(),
         scopes: spec.scope_names().into_iter().map(str::to_owned).collect(),

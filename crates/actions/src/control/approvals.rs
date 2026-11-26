@@ -786,16 +786,16 @@ pub async fn enforce_destructive_gate(
             detail: format!("this action declares no approval target for this input: {detail}"),
         }])
     })?;
-    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, spec.name)
+    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, &spec.name)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "read approval policy");
+            tracing::error!(%error, action = %spec.name, "read approval policy");
             ActionError::internal()
         })?;
     if waived {
         return Ok(());
     }
-    require_approval_tx(tx, ctx, spec.name, &target, ctx.approval_id)
+    require_approval_tx(tx, ctx, spec.static_name(), &target, ctx.approval_id)
         .await
         .map(|_| ())
 }

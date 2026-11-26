@@ -126,7 +126,7 @@ pub fn meta_document(
         Some(compute) => {
             Some(
                 compute(&request.input).map_err(|detail| ProposalError::NoTarget {
-                    action: request.spec.name,
+                    action: request.spec.static_name(),
                     detail,
                 })?,
             )
@@ -229,7 +229,7 @@ pub async fn create_tx(
     tenant: TenantId,
     request: &ProposalRequest<'_>,
 ) -> Result<Approval, ProposalError> {
-    let mut new = NewApproval::new(request.spec.name, KIND);
+    let mut new = NewApproval::new(request.spec.name.to_string(), KIND);
     new.project_id = request.project_id;
     new.requested_by = Some(request.proposer_id);
     new.expires_at = request.expires_at;

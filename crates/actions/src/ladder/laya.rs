@@ -19,10 +19,12 @@
 //! authored options asks a `choice` question over those option keys.
 
 use serde_json::{Map, Value, json};
+use std::borrow::Cow;
 
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Schema, Scope, Tenancy,
+    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Schema, SchemaRef, Scope,
+    Tenancy,
 };
 
 /// The sealed secret that holds a tenant's laya bearer token.
@@ -272,12 +274,12 @@ fn wire_output() -> Schema {
 /// `503`, which `ladder.evaluate` reports as `gate_unavailable` and never as a pass.
 fn laya_classify() -> ActionSpec {
     ActionSpec {
-        name: LAYA_CLASSIFY,
+        name: Cow::Borrowed(LAYA_CLASSIFY),
         version: 1,
         kind: ActionKind::External,
-        input: wire_input,
-        output: wire_output,
-        scopes: &[Scope::GovernanceWrite],
+        input: SchemaRef::Compiled(wire_input),
+        output: SchemaRef::Compiled(wire_output),
+        scopes: Cow::Borrowed(&[Scope::GovernanceWrite]),
         idempotent: true,
         // SPEC_V2 §7.2 / §11: 1500 ms is the measured default and 3 s the hard budget. The
         // engine's external invoker has one static timeout, so the hard budget is the spec's;
@@ -293,10 +295,10 @@ fn laya_classify() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: LAYA_SERVICE,
-            method: "POST",
-            path: LAYA_PATH,
-            auth: Some(LAYA_TOKEN_SECRET),
+            service: Cow::Borrowed(LAYA_SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed(LAYA_PATH),
+            auth: Some(Cow::Borrowed(LAYA_TOKEN_SECRET)),
             auth_optional: false,
             upload: None,
         },

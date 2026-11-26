@@ -27,9 +27,9 @@ fn only_the_locked_reads_are_declared() {
     let mut declared: Vec<&str> = registry()
         .iter()
         .filter(|spec| {
-            matches!(spec.handler, HandlerRef::External { service, .. } if service == "scientific")
+            matches!(&spec.handler, HandlerRef::External { service, .. } if service.as_ref() == "scientific")
         })
-        .map(|spec| spec.name)
+        .map(|spec| spec.name.as_ref())
         .collect();
     declared.sort_unstable();
     assert_eq!(

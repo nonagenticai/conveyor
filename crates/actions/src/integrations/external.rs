@@ -21,9 +21,10 @@
 
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, SchemaRef,
+    Scope, Tenancy,
 };
+use std::borrow::Cow;
 
 /// The scope every external read carries.
 const READ: &[Scope] = &[Scope::IntegrationsRead];
@@ -150,12 +151,12 @@ const fn spec(target: Target) -> ActionSpec {
         idempotent,
     } = target;
     ActionSpec {
-        name,
+        name: Cow::Borrowed(name),
         version: 1,
         kind: ActionKind::External,
-        input: empty_input,
-        output: passthrough_output,
-        scopes,
+        input: SchemaRef::Compiled(empty_input),
+        output: SchemaRef::Compiled(passthrough_output),
+        scopes: Cow::Borrowed(scopes),
         idempotent,
         timeout_ms,
         effect,
@@ -170,9 +171,9 @@ const fn spec(target: Target) -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service,
-            method,
-            path,
+            service: Cow::Borrowed(service),
+            method: Cow::Borrowed(method),
+            path: Cow::Borrowed(path),
             auth: None,
             auth_optional: false,
             upload: None,
@@ -201,7 +202,7 @@ fn coding_jobs_create() -> ActionSpec {
     // The only two externals that are a *job submission* rather than a display: their bodies are
     // the coding service's own documents, so the manifest names the fields instead of saying
     // nothing.
-    action.input = coding_job_create_input;
+    action.input = SchemaRef::Compiled(coding_job_create_input);
     action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_create) }
@@ -220,7 +221,7 @@ fn coding_jobs_get() -> ActionSpec {
         effect: Effect::Read,
         idempotent: true,
     });
-    action.input = coding_job_get_input;
+    action.input = SchemaRef::Compiled(coding_job_get_input);
     action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_get) }
@@ -259,7 +260,7 @@ fn billing_rollup() -> ActionSpec {
         effect: Effect::Read,
         idempotent: true,
     });
-    action.input = billing_rollup_input;
+    action.input = SchemaRef::Compiled(billing_rollup_input);
     action
 }
 inventory::submit! { ActionRegistration::new(billing_rollup) }

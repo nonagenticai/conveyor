@@ -909,7 +909,7 @@ fn one_value_projects_three_identical_hashes() {
         let hash = spec.spec_hash();
         let entry = manifest
             .iter()
-            .find(|entry| entry["name"] == spec.name)
+            .find(|entry| entry["name"] == spec.name.as_ref())
             .unwrap_or_else(|| panic!("{} is not in the manifest", spec.name));
         assert_eq!(entry["spec_hash"], hash, "manifest hash for {}", spec.name);
 
@@ -1183,8 +1183,8 @@ fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {
         if !spec.name.starts_with("eval") {
             continue;
         }
-        eval_actions.push(spec.name);
-        if REACHABLE.contains(&spec.name) {
+        eval_actions.push(spec.name.as_ref());
+        if REACHABLE.contains(&spec.name.as_ref()) {
             assert!(
                 spec.permits_channel(&authority),
                 "{} is one of the nine the slice admits and must be in the MCP default",

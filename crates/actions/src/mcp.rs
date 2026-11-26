@@ -155,10 +155,25 @@ impl ServerHandler for McpServer {
         // The role is `kata_executor` for every intra-action check; the grant set is where the
         // elevation lives, so intersecting it with the role would hide `projects.create` — the
         // very action the agent exists to call.
+        // The tenant's approved imported actions resolve through the same projection (S04
+        // P1.1/P1.2): a tool a role cannot call is absent, exactly as for a compiled one.
+        let imported = match crate::resolve::approved_actions(&self.deps.pool, session.tenant).await
+        {
+            Ok(specs) => specs,
+            Err(error) => {
+                tracing::error!(%error, "list the tenant's approved imported actions");
+                Vec::new()
+            }
+        };
         let tools = if let Some(authority) = &session.channel {
             registry()
                 .iter()
                 .filter(|spec| spec.permits_channel(authority))
+                .chain(
+                    imported
+                        .iter()
+                        .filter(|spec| spec.permits_channel(authority)),
+                )
                 .map(tool_json)
                 .filter_map(|value| serde_json::from_value(value).ok())
                 .collect()
@@ -166,6 +181,12 @@ impl ServerHandler for McpServer {
             registry()
                 .tools(session.role)
                 .into_iter()
+                .chain(
+                    imported
+                        .iter()
+                        .filter(|spec| spec.permits(session.role))
+                        .map(tool_json),
+                )
                 .filter_map(|value| serde_json::from_value(value).ok())
                 .collect()
         };
@@ -187,10 +208,26 @@ impl ServerHandler for McpServer {
         let Some(session) = session_of(&context) else {
             return Err(McpError::invalid_request("unauthenticated", None));
         };
-        let Some(spec) = registry()
+        // The compiled registry first, then the tenant's approved imported actions — the same
+        // resolution model the HTTP surface uses (S04 P1.2). Discovery lists both, so a call
+        // to a listed imported tool must reach the same spec `precheck` will resolve.
+        let compiled = registry()
             .iter()
-            .find(|spec| spec.mcp_name() == request.name.as_ref())
-        else {
+            .find(|spec| spec.mcp_name() == request.name.as_ref());
+        let imported = if compiled.is_some() {
+            None
+        } else {
+            match crate::resolve::approved_actions(&self.deps.pool, session.tenant).await {
+                Ok(specs) => specs
+                    .into_iter()
+                    .find(|spec| spec.mcp_name() == request.name.as_ref()),
+                Err(error) => {
+                    tracing::error!(%error, "resolve an imported tool call");
+                    None
+                }
+            }
+        };
+        let Some(spec) = compiled.or(imported.as_ref()) else {
             // An unknown NAME is a JSON-RPC -32602. A tool that exists but is outside this
             // role's set is NOT handled here: it resolves to its spec and the shared
             // `invoke` refuses it with the same `403 action-forbidden` HTTP returns. The
@@ -220,7 +257,7 @@ impl ServerHandler for McpServer {
             .unwrap_or_else(|| json!({}));
         let invoke_request = InvokeRequest {
             credential_alias: None,
-            action: spec.name.to_owned(),
+            action: spec.name.to_string(),
             input,
             precondition: None,
             idempotency_key: idempotency_key_of(&context),
@@ -356,7 +393,7 @@ pub async fn mcp_tool_body(
 ) -> (u16, Value) {
     let request = InvokeRequest {
         credential_alias: None,
-        action: spec.name.to_owned(),
+        action: spec.name.to_string(),
         input: arguments,
         precondition: None,
         idempotency_key: None,

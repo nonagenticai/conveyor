@@ -9,7 +9,8 @@
 
 use conveyor_actions::registry::{Registry, validate};
 use conveyor_actions::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Scope, Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, SchemaRef, Scope,
+    Tenancy,
 };
 
 fn schema() -> schemars::Schema {
@@ -18,12 +19,12 @@ fn schema() -> schemars::Schema {
 
 fn spec(name: &'static str) -> ActionSpec {
     ActionSpec {
-        name,
+        name: Cow::Borrowed(name),
         version: 1,
         kind: ActionKind::External,
-        input: schema,
-        output: schema,
-        scopes: &[Scope::ActionsRead],
+        input: SchemaRef::Compiled(schema),
+        output: SchemaRef::Compiled(schema),
+        scopes: Cow::Borrowed(&[Scope::ActionsRead]),
         idempotent: false,
         timeout_ms: 30_000,
         effect: Effect::Read,

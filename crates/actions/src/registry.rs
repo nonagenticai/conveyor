@@ -14,6 +14,7 @@
 //! prove a serving process exits 1 **before bind**. It is read here, once, and never by a
 //! handler.
 
+use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
@@ -89,18 +90,18 @@ pub enum RegistryError {
 #[derive(Debug)]
 pub struct Registry {
     actions: Vec<ActionSpec>,
-    by_name: BTreeMap<&'static str, usize>,
+    by_name: BTreeMap<Cow<'static, str>, usize>,
 }
 
 impl Registry {
     /// Build from the collected specs, sorted by name so every projection is deterministic
     /// (the manifest order is part of its ETag).
     pub fn new(mut actions: Vec<ActionSpec>) -> Self {
-        actions.sort_by_key(|spec| spec.name);
+        actions.sort_by(|a, b| a.name.cmp(&b.name));
         let by_name = actions
             .iter()
             .enumerate()
-            .map(|(index, spec)| (spec.name, index))
+            .map(|(index, spec)| (spec.name.clone(), index))
             .collect();
         Self { actions, by_name }
     }
@@ -127,7 +128,10 @@ impl Registry {
 
     /// The names only, for assertions and logs.
     pub fn names(&self) -> Vec<&'static str> {
-        self.actions.iter().map(|spec| spec.name).collect()
+        self.actions
+            .iter()
+            .map(crate::spec::ActionSpec::static_name)
+            .collect()
     }
 
     /// The manifest entries a caller holding `role` may invoke.
@@ -139,17 +143,7 @@ impl Registry {
         self.actions
             .iter()
             .filter(|spec| spec.permits(role))
-            .map(|spec| {
-                json!({
-                    "name": spec.name,
-                    "version": spec.version,
-                    "kind": spec.kind.as_str(),
-                    "spec_hash": spec.spec_hash(),
-                    "scopes": spec.scope_names(),
-                    "idempotent": spec.idempotent,
-                    "timeout_ms": spec.timeout_ms,
-                })
-            })
+            .map(manifest_entry)
             .collect()
     }
 
@@ -162,6 +156,20 @@ impl Registry {
     pub fn tools(&self, role: conveyor_auth::Role) -> Vec<Value> {
         self.permitted(role).map(crate::mcp::tool_json).collect()
     }
+}
+
+/// The manifest entry one action projects — the same shape for a compiled and an imported
+/// action, so an imported one is discoverable exactly like a compiled one (S04 P1.1).
+pub fn manifest_entry(spec: &ActionSpec) -> Value {
+    json!({
+        "name": spec.name,
+        "version": spec.version,
+        "kind": spec.kind.as_str(),
+        "spec_hash": spec.spec_hash(),
+        "scopes": spec.scope_names(),
+        "idempotent": spec.idempotent,
+        "timeout_ms": spec.timeout_ms,
+    })
 }
 
 static REGISTRY: OnceLock<Registry> = OnceLock::new();
@@ -199,8 +207,8 @@ fn env_value(key: &str) -> Option<String> {
 fn find(actions: &[ActionSpec], name: &str, fallback: &str) -> Option<ActionSpec> {
     actions
         .iter()
-        .find(|spec| spec.name == name)
-        .or_else(|| actions.iter().find(|spec| spec.name == fallback))
+        .find(|spec| spec.name.as_ref() == name)
+        .or_else(|| actions.iter().find(|spec| spec.name.as_ref() == fallback))
         .cloned()
 }
 
@@ -219,9 +227,9 @@ fn inject_test_spec(actions: &mut Vec<ActionSpec>) {
     }
     if let Some(source) = env_value("CONVEYOR_TEST_MCP_COLLISION")
         && let Some(mut spec) = find(actions, &source, "members.set_role")
-        && let Some(colliding) = colliding_name(spec.name)
+        && let Some(colliding) = colliding_name(&spec.name)
     {
-        spec.name = Box::leak(colliding.into_boxed_str());
+        spec.name = Cow::Owned(colliding);
         actions.push(spec);
     }
     if let Some(source) = env_value("CONVEYOR_TEST_HANDLERLESS")
@@ -234,7 +242,7 @@ fn inject_test_spec(actions: &mut Vec<ActionSpec>) {
     if let Some(source) = env_value("CONVEYOR_TEST_BAD_NAME")
         && let Some(mut spec) = find(actions, &source, "me.get")
     {
-        spec.name = Box::leak("Bad.name".to_owned().into_boxed_str());
+        spec.name = Cow::Borrowed("Bad.name");
         actions.push(spec);
     }
 }
@@ -255,18 +263,18 @@ pub fn validate(registry: &Registry) -> Result<(), RegistryError> {
         return Err(RegistryError::Handlerless("<the registry is empty>".into()));
     }
 
-    let mut seen: BTreeMap<&'static str, usize> = BTreeMap::new();
+    let mut seen: BTreeMap<&str, usize> = BTreeMap::new();
     for spec in registry.iter() {
-        if let Err(reason) = validate_name(spec.name) {
+        if let Err(reason) = validate_name(&spec.name) {
             return Err(RegistryError::InvalidName {
-                name: spec.name.to_owned(),
+                name: spec.name.to_string(),
                 reason,
             });
         }
-        *seen.entry(spec.name).or_default() += 1;
+        *seen.entry(spec.name.as_ref()).or_default() += 1;
         if let Err(reason) = validate_mcp_name(&spec.mcp_name()) {
             return Err(RegistryError::InvalidMcpName {
-                name: spec.name.to_owned(),
+                name: spec.name.to_string(),
                 reason,
             });
         }
@@ -275,16 +283,16 @@ pub fn validate(registry: &Registry) -> Result<(), RegistryError> {
         // `HandlerRef::Internal` carries — a compiled, in-process path, never a missing arm.
         if spec.kind == ActionKind::Internal
             && !matches!(
-                spec.handler,
+                &spec.handler,
                 HandlerRef::Internal(_) | HandlerRef::Broker | HandlerRef::ToolDestination
             )
         {
-            return Err(RegistryError::Handlerless(spec.name.to_owned()));
+            return Err(RegistryError::Handlerless(spec.name.to_string()));
         }
-        for scope in spec.scopes {
+        for scope in spec.scopes.iter() {
             if !Scope::ALL.contains(scope) {
                 return Err(RegistryError::UnknownScope {
-                    name: spec.name.to_owned(),
+                    name: spec.name.to_string(),
                     scope: format!("{scope:?}"),
                 });
             }
@@ -306,7 +314,8 @@ pub fn validate(registry: &Registry) -> Result<(), RegistryError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::spec::{AgentHints, AgentTier, Confirm, Effect, Tenancy};
+    use crate::spec::{AgentHints, AgentTier, Confirm, Effect, SchemaRef, Tenancy};
+    use std::borrow::Cow;
 
     fn schema() -> crate::spec::Schema {
         schemars::schema_for!(crate::views::EmptyIn)
@@ -314,12 +323,12 @@ mod tests {
 
     fn spec(name: &'static str) -> ActionSpec {
         ActionSpec {
-            name,
+            name: Cow::Borrowed(name),
             version: 1,
             kind: ActionKind::External,
-            input: schema,
-            output: schema,
-            scopes: &[],
+            input: SchemaRef::Compiled(schema),
+            output: SchemaRef::Compiled(schema),
+            scopes: Cow::Borrowed(&[]),
             idempotent: false,
             timeout_ms: 1000,
             effect: Effect::Read,

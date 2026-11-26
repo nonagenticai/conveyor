@@ -152,8 +152,8 @@ async fn approval_policies_set(
     // destructive gate only ever consults policies for destructive actions; T6's development
     // gates are the one other governed surface (their policy row is §6.4's auto-merge).
     let governed = spec.is_some_and(|spec| {
-        crate::development::is_governed_gate(spec.name)
-            || crate::tool_authoring::is_governed_gate(spec.name)
+        crate::development::is_governed_gate(&spec.name)
+            || crate::tool_authoring::is_governed_gate(&spec.name)
     });
     if let Some(spec) = spec
         && spec.effect != Effect::Destructive

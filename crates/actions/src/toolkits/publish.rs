@@ -235,11 +235,11 @@ async fn insert_version(
             tracing::error!(action = %tool.action, "publish: the manifest names an absent action");
             ActionError::internal()
         })?;
-        let schema = serde_json::to_value((spec.input)()).map_err(|error| {
+        let schema = serde_json::to_value(spec.input_schema()).map_err(|error| {
             tracing::error!(%error, action = %tool.action, "publish: project the input schema");
             ActionError::internal()
         })?;
-        let output_schema = serde_json::to_value((spec.output)()).map_err(|error| {
+        let output_schema = serde_json::to_value(spec.output_schema()).map_err(|error| {
             tracing::error!(%error, action = %tool.action, "publish: project the output schema");
             ActionError::internal()
         })?;

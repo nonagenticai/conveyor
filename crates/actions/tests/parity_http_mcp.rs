@@ -9854,7 +9854,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         .filter(|spec| spec.effect == conveyor_actions::Effect::Destructive)
         .filter(|spec| !spec.name.starts_with("ops."))
     {
-        seed_earned_waiver(&mut tx, ctx.tenant, spec.name).await;
+        seed_earned_waiver(&mut tx, ctx.tenant, &spec.name).await;
     }
     tx.commit().await.expect("commit the earned waivers");
 

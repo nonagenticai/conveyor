@@ -104,6 +104,7 @@ pub mod prompt_audit;
 pub mod publish;
 pub mod rbac;
 pub mod registry;
+pub mod resolve;
 // T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
 pub mod spine;
@@ -136,7 +137,8 @@ pub use registry::{
 };
 pub use spec::{
     ActionKind, ActionSpec, AgentHints, AgentTier, ApprovalTarget, Confirm, Effect, FieldError,
-    HandlerFn, HandlerFuture, HandlerOutput, HandlerRef, Schema, Scope, Tenancy, validate_input,
+    HandlerFn, HandlerFuture, HandlerOutput, HandlerRef, Schema, SchemaRef, Scope, Tenancy,
+    validate_input,
 };
 pub use views::{
     ActionManifest, ActionManifestEntry, ActionSpecView, InvocationBody, InvocationResponse, Page,

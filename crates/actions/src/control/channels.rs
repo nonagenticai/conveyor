@@ -443,7 +443,7 @@ async fn channels_policy_set(
                 format!("unknown action {action:?}"),
             ));
         };
-        if !seen.insert(spec_action.name) {
+        if !seen.insert(spec_action.name.as_ref()) {
             return Err(invalid(
                 "action",
                 "duplicate",
@@ -457,7 +457,7 @@ async fn channels_policy_set(
                 format!("{action:?} cannot be granted to a machine channel: {reason}"),
             ));
         }
-        entries.push((spec_action.name, *allowed));
+        entries.push((spec_action.name.as_ref(), *allowed));
     }
     store::rbac::set_channel_policy_tx(&mut *tx, ctx.tenant, spec.kind, &entries)
         .await
@@ -518,10 +518,10 @@ fn denial(spec: &crate::spec::ActionSpec) -> Option<&'static str> {
     if spec.scopes.contains(&Scope::EvalsApprove) {
         return Some("human sign-off");
     }
-    if crate::channel::is_denied_action(spec.name) {
+    if crate::channel::is_denied_action(&spec.name) {
         return Some("person-only");
     }
-    let resource = crate::channel::resource_of(spec.name);
+    let resource = crate::channel::resource_of(&spec.name);
     if resource == "workflows" {
         return Some("workflow authoring");
     }
@@ -594,14 +594,18 @@ fn matrix(
         }
         let denial = denial(spec);
         let grantable = denial.is_none();
-        let default = connector.default_actions.contains(&spec.name);
-        let overridden = overrides.contains_key(spec.name);
-        let allowed = grantable && overrides.get(spec.name).copied().unwrap_or(default);
+        let default = connector.default_actions.contains(&spec.name.as_ref());
+        let overridden = overrides.contains_key(spec.name.as_ref());
+        let allowed = grantable
+            && overrides
+                .get(spec.name.as_ref())
+                .copied()
+                .unwrap_or(default);
         groups
-            .entry(crate::channel::resource_of(spec.name))
+            .entry(crate::channel::resource_of(&spec.name))
             .or_default()
             .push(ChannelPolicyAction {
-                action: spec.name.to_owned(),
+                action: spec.name.to_string(),
                 default: grantable && default,
                 allowed,
                 overridden,

@@ -1430,7 +1430,7 @@ fn known_action(raw: &str) -> Result<&'static str, ActionError> {
     let action = raw.trim();
     crate::registry()
         .get(action)
-        .map(|spec| spec.name)
+        .map(|spec| spec.static_name())
         .ok_or_else(|| {
             invalid(
                 "action",
@@ -1464,9 +1464,9 @@ fn matrix_actions(stored: &[store::job_authority::JobAuthority]) -> Vec<&'static
         .collect();
     for row in stored {
         if let Some(spec) = crate::registry().get(row.action.as_str())
-            && !actions.contains(&spec.name)
+            && !actions.contains(&spec.static_name())
         {
-            actions.push(spec.name);
+            actions.push(spec.static_name());
         }
     }
     actions.sort_unstable();

@@ -320,7 +320,7 @@ pub async fn run_with_pool(
             json!({
                 "actions": conveyor_actions::registry()
                     .iter()
-                    .map(|spec| spec.name)
+                    .map(|spec| spec.name.as_ref())
                     .collect::<Vec<_>>(),
             }),
             SCHEMA,

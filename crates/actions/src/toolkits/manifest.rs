@@ -299,15 +299,15 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
             .ok_or_else(|| ManifestError::UnknownAction {
                 action: tool.action.clone(),
             })?;
-        let HandlerRef::External { service, .. } = spec.handler else {
+        let HandlerRef::External { service, .. } = &spec.handler else {
             return Err(ManifestError::NotExternal {
                 action: tool.action.clone(),
             });
         };
-        if service != manifest.service {
+        if service.as_ref() != manifest.service.as_str() {
             return Err(ManifestError::ServiceMismatch {
                 action: tool.action.clone(),
-                actual: service.to_owned(),
+                actual: service.to_string(),
                 declared: manifest.service.clone(),
             });
         }
@@ -436,12 +436,12 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
             hasher.update([0u8]);
             hasher.update(spec.timeout_ms.to_string().as_bytes());
             hasher.update([0u8]);
-            let input = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
+            let input = serde_json::to_vec(&spec.input_schema()).unwrap_or_default();
             hasher.update(Sha256::digest(&input));
             hasher.update([0u8]);
             // The output schema is copied from the action at publish time; hashing it here makes
             // a registry schema change a new version, exactly like the input schema.
-            let output = serde_json::to_vec(&(spec.output)()).unwrap_or_default();
+            let output = serde_json::to_vec(&spec.output_schema()).unwrap_or_default();
             hasher.update(Sha256::digest(&output));
             hasher.update([0u8]);
         }

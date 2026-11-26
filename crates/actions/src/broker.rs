@@ -105,7 +105,7 @@ async fn check_spend_budget(
     let captured: Vec<String> = registry()
         .iter()
         .filter(|spec| spec.captures_usage)
-        .map(|spec| spec.name.to_owned())
+        .map(|spec| spec.name.to_string())
         .collect();
     let budget = store::inference::run_budget_tx(conn, tenant, run.run_id, &captured)
         .await

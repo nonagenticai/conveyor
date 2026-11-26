@@ -35,11 +35,12 @@
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 use crate::registry::ActionRegistration;
 use crate::spec::{
     ActionKind, ActionSpec, AgentHints, AgentTier, Artefact, ArtefactEncoding, Confirm, Effect,
-    HandlerRef, Schema, Scope, Tenancy, Upload,
+    HandlerRef, Schema, SchemaRef, Scope, Tenancy, Upload,
 };
 
 /// The speech service key: `CONVEYOR_EXTERNAL_TTS_URL`.
@@ -201,14 +202,14 @@ fn audio_output() -> Schema {
 /// `produce.speech`.
 fn speech() -> ActionSpec {
     ActionSpec {
-        name: "produce.speech",
+        name: Cow::Borrowed("produce.speech"),
         version: 1,
         kind: ActionKind::External,
-        input: speech_input,
-        output: audio_output,
+        input: SchemaRef::Compiled(speech_input),
+        output: SchemaRef::Compiled(audio_output),
         // The production family's write scope: narrating is authoring the deliverable, exactly as
         // a render is.
-        scopes: &[Scope::CapabilitiesWrite],
+        scopes: Cow::Borrowed(&[Scope::CapabilitiesWrite]),
         // A replay with the same key returns the first clip — one synthesis, one charge.
         idempotent: true,
         // Long narration is chunked by the service; a 10,000-character ask is minutes of audio.
@@ -233,11 +234,11 @@ fn speech() -> ActionSpec {
         }),
         approval_target: None,
         handler: HandlerRef::External {
-            service: SPEECH_SERVICE,
-            method: "POST",
-            path: "/api/tts/synthesize",
+            service: Cow::Borrowed(SPEECH_SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/api/tts/synthesize"),
             // The host's licence gate is armed: an anonymous call is `503 license_unavailable`.
-            auth: Some(LICENCE_TOKEN_SECRET),
+            auth: Some(Cow::Borrowed(LICENCE_TOKEN_SECRET)),
             auth_optional: false,
             upload: None,
         },
@@ -247,12 +248,12 @@ fn speech() -> ActionSpec {
 /// `media.transcribe`.
 fn transcribe() -> ActionSpec {
     ActionSpec {
-        name: "media.transcribe",
+        name: Cow::Borrowed("media.transcribe"),
         version: 1,
         kind: ActionKind::External,
-        input: transcribe_input,
-        output: audio_output,
-        scopes: &[Scope::CapabilitiesWrite],
+        input: SchemaRef::Compiled(transcribe_input),
+        output: SchemaRef::Compiled(audio_output),
+        scopes: Cow::Borrowed(&[Scope::CapabilitiesWrite]),
         // The same audio and the same key produce the same transcript; a replay returns the first.
         idempotent: true,
         // Transcription is linear in audio length, and the same host serves the estate's speech and
@@ -277,11 +278,11 @@ fn transcribe() -> ActionSpec {
         }),
         approval_target: None,
         handler: HandlerRef::External {
-            service: TRANSCRIBE_SERVICE,
-            method: "POST",
-            path: "/v1/audio/transcriptions",
+            service: Cow::Borrowed(TRANSCRIBE_SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/v1/audio/transcriptions"),
             // The host rejects a request with no licence token: `401 INVALID_TOKEN`.
-            auth: Some(LICENCE_TOKEN_SECRET),
+            auth: Some(Cow::Borrowed(LICENCE_TOKEN_SECRET)),
             auth_optional: false,
             upload: Some(Upload {
                 input: "document",

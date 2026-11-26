@@ -46,12 +46,27 @@ pub fn manifest_etag(entries: &Value) -> String {
 /// learns the name of an action it cannot call. `If-None-Match` matching the current ETag
 /// answers `304` with no body.
 pub async fn manifest(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     caller: Caller,
     _licence: RequireLicence,
     headers: HeaderMap,
 ) -> Response {
-    let entries = Value::Array(registry().manifest(caller.role));
+    // The compiled surface plus the tenant's approved imported actions, projected through the
+    // same manifest entry (S04 P1.1). An imported action a role cannot call is absent, the same
+    // rule the compiled manifest applies.
+    let mut entries = registry().manifest(caller.role);
+    match conveyor_actions::resolve::approved_actions(&state.pool, caller.tenant).await {
+        Ok(specs) => entries.extend(
+            specs
+                .iter()
+                .filter(|spec| spec.permits(caller.role))
+                .map(conveyor_actions::registry::manifest_entry),
+        ),
+        Err(error) => {
+            tracing::error!(%error, "list the tenant's approved imported actions");
+        }
+    }
+    let entries = Value::Array(entries);
     let etag = manifest_etag(&entries);
     if headers
         .get(header::IF_NONE_MATCH)

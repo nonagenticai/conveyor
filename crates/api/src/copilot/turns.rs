@@ -556,7 +556,7 @@ async fn run(
                     // A refused tool is an agent-loop event, not a turn failure: the model gets the
                     // reason and may recover. The call is still recorded with its outcome.
                     tool_calls.push(ToolCallRecord {
-                        action: spec.name.to_owned(),
+                        action: spec.name.to_string(),
                         invocation_id: None,
                         outcome: format!("error:{}", error.code),
                     });
@@ -763,7 +763,7 @@ async fn invoke_action(
         caller.tenant,
         InvokeRequest {
             credential_alias: None,
-            action: spec.name.to_owned(),
+            action: spec.name.to_string(),
             input: input.clone(),
             precondition: None,
             idempotency_key: Some(idempotency_key.to_owned()),
@@ -795,7 +795,7 @@ async fn invoke_action(
     )
     .await?;
     let record = ToolCallRecord {
-        action: spec.name.to_owned(),
+        action: spec.name.to_string(),
         invocation_id: outcome.invocation_id,
         outcome: "ok".to_owned(),
     };

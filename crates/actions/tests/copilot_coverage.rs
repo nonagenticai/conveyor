@@ -23,7 +23,7 @@ use conveyor_auth::{PrincipalKind, Role};
 #[test]
 fn every_mutating_action_is_in_the_owners_copilot_surface() {
     let owner = surface(registry(), PrincipalKind::Human, Role::Admin, None);
-    let names: BTreeSet<&str> = owner.iter().map(|spec| spec.name).collect();
+    let names: BTreeSet<&str> = owner.iter().map(|spec| spec.name.as_ref()).collect();
     let mut missing = Vec::new();
     for spec in registry().iter() {
         let exposed_kind = matches!(spec.kind, ActionKind::Internal | ActionKind::External);

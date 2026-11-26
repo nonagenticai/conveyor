@@ -10,7 +10,6 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use conveyor_actions::registry::{assert_registry_consistent, registry};
-use conveyor_actions::spec::HandlerRef;
 use conveyor_api::{AppState, Config, ConfigError, app, openapi};
 use conveyor_store as store;
 use sqlx::PgPool;
@@ -642,37 +641,16 @@ async fn serve() -> Result<(), RunError> {
     Ok(())
 }
 
-/// Every approved `action_registry` row must name a compiled action, and an external row's
-/// service must have a configured base URL (S04 §5.2).
+/// Every approved `action_registry` row must be executable by this build: a compiled action,
+/// or an imported external action whose stored spec resolves. An external row's service must
+/// have a configured base URL (S04 §5.2, issue #3 P1.1).
+///
+/// The gate lives in `conveyor_actions::resolve` so it is testable; this wrapper maps its
+/// refusal onto the process's exit path before bind.
 async fn assert_db_registry(pool: &PgPool) -> Result<(), RunError> {
-    for tenant in store::tenants::active_ids(pool).await? {
-        let mut tx = store::begin_scoped(pool, tenant).await?;
-        let rows = store::actions::approved_registry(&mut tx).await?;
-        tx.commit().await?;
-        for row in rows {
-            let Some(spec) = registry().get(&row.name) else {
-                return Err(RunError::Refused(format!(
-                    "the database names action {:?}, which this binary does not compile",
-                    row.name
-                )));
-            };
-            if let HandlerRef::External { service, .. } = spec.handler
-                && conveyor_actions::invoke::service_url(service).is_none()
-            {
-                return Err(RunError::Refused(format!(
-                    "action {:?} names service {:?}, which has no configured base URL",
-                    row.name, row.service
-                )));
-            }
-            if row.kind == "workflow" && !matches!(spec.handler, HandlerRef::Workflow) {
-                return Err(RunError::Refused(format!(
-                    "action {:?} is stored as a workflow but compiled without one",
-                    row.name
-                )));
-            }
-        }
-    }
-    Ok(())
+    conveyor_actions::resolve::assert_served_registry(pool, registry())
+        .await
+        .map_err(|error| RunError::Refused(error.to_string()))
 }
 
 async fn worker() -> Result<(), RunError> {

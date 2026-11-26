@@ -16,10 +16,12 @@
 //! document and an optional `step_id`. A caller never names a destination, a URL or a credential —
 //! the binding resolves all three (§11.3 steps 1, 4 and 5).
 
+use std::borrow::Cow;
+
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, SchemaRef,
+    Scope, Tenancy,
 };
 
 /// The one action a job uses to reach a tool (SPEC_V2 §11.3). It is a dispatch mechanism, not a
@@ -62,14 +64,14 @@ fn broker_output() -> Schema {
 /// `tools.call` — resolve, check, validate, call and ledger one tool call (§11.3).
 fn tools_call() -> ActionSpec {
     ActionSpec {
-        name: TOOLS_CALL,
+        name: Cow::Borrowed(TOOLS_CALL),
         version: 1,
         kind: ActionKind::Internal,
-        input: tool_call_input,
-        output: broker_output,
+        input: SchemaRef::Compiled(tool_call_input),
+        output: SchemaRef::Compiled(broker_output),
         // A tool call is part of a run's execution: whoever may write runs may make one. The
         // real grant is the tool binding, resolved per run and never widened by this scope.
-        scopes: &[Scope::RunsWrite],
+        scopes: Cow::Borrowed(&[Scope::RunsWrite]),
         // A read tool is safe to repeat; a write tool's own idempotency decides, and the caller
         // can supply an `Idempotency-Key` which the engine replays.
         idempotent: false,
@@ -113,13 +115,13 @@ fn resume_input() -> Schema {
 
 fn tools_resume() -> ActionSpec {
     ActionSpec {
-        name: TOOLS_RESUME,
+        name: Cow::Borrowed(TOOLS_RESUME),
         version: 1,
         kind: ActionKind::Internal,
-        input: resume_input,
-        output: broker_output,
+        input: SchemaRef::Compiled(resume_input),
+        output: SchemaRef::Compiled(broker_output),
         // The resume continues a run's call; the run's binding and the pending row are the grant.
-        scopes: &[Scope::RunsWrite],
+        scopes: Cow::Borrowed(&[Scope::RunsWrite]),
         idempotent: false,
         timeout_ms: 300_000,
         effect: Effect::Read,

@@ -12,6 +12,7 @@
 //! blip.
 
 use serde_json::{Map, Value, json};
+use std::borrow::Cow;
 
 use conveyor_domain::procedure::{CheckerRule, Inspection};
 
@@ -315,7 +316,8 @@ pub fn judge_of(inspection: &Inspection) -> JudgeKind {
 
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Schema, Scope, Tenancy,
+    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Schema, SchemaRef, Scope,
+    Tenancy,
 };
 
 /// The laya wire body. Deliberately the wire, not a conveyor-shaped DTO: the engine's external
@@ -350,12 +352,12 @@ fn wire_output() -> Schema {
 /// secret is a `503`, which the step executor treats as an outage (wait), never as a rejection.
 fn laya_judge() -> ActionSpec {
     ActionSpec {
-        name: "laya.judge",
+        name: Cow::Borrowed("laya.judge"),
         version: 1,
         kind: ActionKind::External,
-        input: wire_input,
-        output: wire_output,
-        scopes: &[Scope::ProcessesWrite],
+        input: SchemaRef::Compiled(wire_input),
+        output: SchemaRef::Compiled(wire_output),
+        scopes: Cow::Borrowed(&[Scope::ProcessesWrite]),
         idempotent: true,
         // SPEC_V2 §10.2 fixes the conveyor→laya seam at a 1500 ms default with a 3 s HARD
         // budget: a stalled engine must be abandoned and recorded as an outage, never hold a
@@ -371,10 +373,10 @@ fn laya_judge() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: LAYA_SERVICE,
-            method: "POST",
-            path: LAYA_PATH,
-            auth: Some(LAYA_TOKEN_SECRET),
+            service: Cow::Borrowed(LAYA_SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed(LAYA_PATH),
+            auth: Some(Cow::Borrowed(LAYA_TOKEN_SECRET)),
             auth_optional: false,
             upload: None,
         },

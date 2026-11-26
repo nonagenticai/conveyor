@@ -417,7 +417,7 @@ pub fn capabilities() -> MediaCapabilitiesOut {
         .iter()
         .filter(|spec| spec.name.starts_with("media.") && spec.name != CAPABILITIES)
         .map(|spec| MediaCapabilityView {
-            kind: spec.name.to_owned(),
+            kind: spec.name.to_string(),
             effect: spec.effect.as_str().to_owned(),
         })
         .collect();

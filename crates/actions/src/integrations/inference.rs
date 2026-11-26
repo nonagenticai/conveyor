@@ -18,11 +18,12 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::borrow::Cow;
 
 use crate::registry::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, SchemaRef,
+    Scope, Tenancy,
 };
 
 /// The service key: `CONVEYOR_EXTERNAL_INFERENCE_URL`.
@@ -116,13 +117,13 @@ fn passthrough_output() -> Schema {
 /// `UsageContext`, not by the action.
 fn chat_spec(name: &'static str, timeout_ms: u32) -> ActionSpec {
     ActionSpec {
-        name,
+        name: Cow::Borrowed(name),
         version: 1,
         kind: ActionKind::External,
-        input: completion_input,
-        output: passthrough_output,
+        input: SchemaRef::Compiled(completion_input),
+        output: SchemaRef::Compiled(passthrough_output),
         // The scope the turn runner needs to ask the model anything.
-        scopes: &[Scope::ModelWrite],
+        scopes: Cow::Borrowed(&[Scope::ModelWrite]),
         // A replay with the same key returns the first body — one turn, one charge.
         idempotent: true,
         // The declaration is the deadline the engine grants a caller (`handlers.rs` passes
@@ -144,10 +145,10 @@ fn chat_spec(name: &'static str, timeout_ms: u32) -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/api/chat/completions",
-            auth: Some(INFERENCE_TOKEN_SECRET),
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/api/chat/completions"),
+            auth: Some(Cow::Borrowed(INFERENCE_TOKEN_SECRET)),
             auth_optional: true,
             upload: None,
         },
