@@ -47,9 +47,9 @@ right order, keep the output pages in the input, and hand live/e2e acceptance to
    rendering; a register written before it is stale and fails `generate-standards --check`.
 3. **Keep the output pages in the input.** `generate-standards.py` resolves a document-backed
    section by reading `output-<id>.html` from `--outputs-dir`. Never derive findings from `data/`
-   alone: measured 2026-11-25, that produced 354 findings / 572 packages versus 298 / 493 with the
-   pages — 56 false reds on documents that exist. Pass the snapshot's docs directory that holds
-   `output-*.html`.
+   alone: measured 2026-11-25, that produced 354 findings versus 298 with the pages — the extra 56
+   were document-heading false reds on documents that exist. Pass the snapshot's docs directory
+   that holds `output-*.html`.
 4. **Check the committed pack.** `python3 scripts/generate-standards.py --check` and
    `docs/design/scripts/publish-standards.sh --check` must be green; `scripts/ci/tests/standards_pack.sh`
    refuses a missing or stale pack.
@@ -58,9 +58,10 @@ right order, keep the output pages in the input, and hand live/e2e acceptance to
    the benefit's retirement. Report `absent`/`unmeasured`, never infer.
 6. **Use the snapshot instruments, not the live DB.** `verify-slices` trusts only a green receipt in
    `docs/evidence/rework/<KEY>.json`; `--findings` for the viability check is the **v1 ledger**
-   (`docs/evidence/v1-conformance-findings.json`), not the standards findings. Charter checks need
-   `PROGRAMME_RECORD_LOCAL_BIN`, `DATABASE_URL`, `DATABASE_MIGRATE_URL`, `DATABASE_LISTEN_URL` and
-   `APP_KEY`; without them every check exits 1 and slices read `broken`.
+   (`docs/evidence/v1-conformance-findings.json`), not the standards findings. Those instruments
+   live on the #526 lane, not on main: treat them as `pending #526` until that lane merges. Charter
+   checks need `PROGRAMME_RECORD_LOCAL_BIN`, `DATABASE_URL`, `DATABASE_MIGRATE_URL`,
+   `DATABASE_LISTEN_URL` and `APP_KEY`; without them every check exits 1 and slices read `broken`.
 7. **Dispatch the independent acceptance** for a live or end-to-end part (#88/T12) to a fresh
    `validator-deep` or `aa-pr-auditor`. The builder's own evidence is not acceptance. The
    verifier's verdict and the exact commands are recorded in the evidence table.

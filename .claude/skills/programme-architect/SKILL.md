@@ -76,7 +76,7 @@ approves — you prepare and never sign.
 | Artefacts | `architecture_artifact` + entries + links |
 | Board decision | `governance_body` + `architecture.board_decide` |
 | Compliance review | `architecture_compliance_review` (delivery contract) |
-| Waiver | `architecture_waiver` with owner + reassessment date |
+| Waiver | `architecture_waiver` with the accepting asset owner's signature + reassessment date (the Board/owner supplies it) |
 
 ## Refusals
 
