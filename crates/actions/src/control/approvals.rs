@@ -497,6 +497,7 @@ async fn approvals_request(
         ctx.tenant,
         &input.evidence,
         input.require_evidence,
+        &input.required_kinds,
         input.pinned_spec_sha256.as_deref(),
     )
     .await?;

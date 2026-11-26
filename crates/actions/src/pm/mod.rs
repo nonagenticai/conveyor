@@ -58,14 +58,35 @@ pub(crate) async fn resolve_evidence(
     tenant: store::TenantId,
     evidence: &[EvidenceRef],
     require: bool,
+    required_kinds: &[String],
     spec_pin: Option<&str>,
 ) -> Result<Vec<Value>, ActionError> {
+    // Validate the named kinds first: an unknown kind is a caller bug whether or not any evidence
+    // was supplied, and it is the more precise refusal.
+    for kind in required_kinds {
+        if !EVIDENCE_KINDS.contains(&kind.as_str()) {
+            return Err(ActionError::new(
+                422,
+                "gate_evidence_unknown_kind",
+                format!(
+                    "required_kinds names {kind:?}, which is not a typed evidence kind; use \
+                     governed_asset, baseline or lean_proof"
+                ),
+            ));
+        }
+    }
     if require && evidence.is_empty() {
-        return Err(ActionError::new(
-            422,
-            "gate_evidence_missing",
-            "this gate requires at least one typed evidence reference",
-        ));
+        // When the gate names what it requires, say so: "requires at least one reference" leaves
+        // the caller guessing which one.
+        let detail = match required_kinds.first() {
+            Some(kind) => {
+                format!(
+                    "this gate requires a {kind:?} evidence item to open; the request names none"
+                )
+            }
+            None => "this gate requires at least one typed evidence reference".to_owned(),
+        };
+        return Err(ActionError::new(422, "gate_evidence_missing", detail));
     }
     let mut stored = Vec::with_capacity(evidence.len());
     for item in evidence {
@@ -209,8 +230,29 @@ pub(crate) async fn resolve_evidence(
         }
         stored.push(json!({ "kind": item.kind, "id": item.id }));
     }
+
+    // `require` alone only refuses an *empty* list, so a caller that supplies some other evidence
+    // and omits the proof is still accepted — advisory, not a gate. §5.4: a gate that cannot
+    // refuse a defect is broken. A required kind names what must be present.
+    for kind in required_kinds {
+        if !stored
+            .iter()
+            .any(|item| item.get("kind").and_then(Value::as_str) == Some(kind.as_str()))
+        {
+            return Err(ActionError::new(
+                422,
+                "gate_evidence_missing",
+                format!(
+                    "this gate requires a {kind:?} evidence item to open; the request names none"
+                ),
+            ));
+        }
+    }
     Ok(stored)
 }
+
+/// The typed evidence kinds a gate can carry; `architecture_contract` lands with T9.
+const EVIDENCE_KINDS: [&str; 3] = ["governed_asset", "baseline", "lean_proof"];
 
 /// The PM's binding check: an active binding of an active job whose key is `pm`.
 async fn assert_pm(
@@ -685,6 +727,12 @@ pub struct PmGateIn {
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,
+    /// Evidence kinds this gate refuses to open without (#746).
+    ///
+    /// `require_evidence` only refuses an *empty* list; a caller that omits the proof is still
+    /// accepted, which makes the gate advisory. Naming a kind here is what makes it required.
+    #[serde(default)]
+    pub required_kinds: Vec<String>,
     /// What is being asked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -765,6 +813,7 @@ async fn pm_route_gate(
         ctx.tenant,
         &input.evidence,
         input.require_evidence,
+        &input.required_kinds,
         input.pinned_spec_sha256.as_deref(),
     )
     .await?;
@@ -1083,6 +1132,9 @@ async fn changes_request(
             id: input.baseline_id,
         }],
         true,
+        // A change gate requires its baseline and nothing else: no proof can answer it, so it
+        // names no required kind and has no pin to compare.
+        &[],
         // A change gate is about a baseline, not a specification: no proof can answer it, so
         // there is no pin to compare and a `lean_proof` item here would be refused.
         None,

@@ -283,6 +283,12 @@ gate.
 | docs/skills only | `git diff --check` + every relative Markdown link resolves |
 
 - Paste the command, result and SHA into the PR body. **No PR until green.**
+- A unit that adds or removes an action, **or changes an action's input schema**, also runs and
+  names in its acceptance: the `registry` and `parity_http_mcp` suites, `--print-openapi
+  --check-lock` (refresh `served-spec.lock.json` when it reports), `python3 scripts/build-coverage.py`
+  (refresh `docs/design/data/actions.json`), and the design-pack index when a document is added.
+  This is the correction for #744, whose two PR reds were exactly a missing parity sample and a
+  stale served-spec lock — both invisible to a gate that ran only the crate's own tests.
 
 ## Enforcement
 
