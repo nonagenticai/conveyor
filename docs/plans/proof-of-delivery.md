@@ -69,6 +69,24 @@ An action handler runs inside one transaction and may not speak HTTP
 
 A caller cannot supply a verdict; it can only name an invocation the engine already made.
 
+## The actions
+
+Four internal actions, all tenant-scoped; the prover calls stay the declared `lean4.*` externals
+from T14.
+
+| Action | Scope | What it refuses |
+|---|---|---|
+| `proofs.record` | `approvals:write` | an unknown, in-flight, expired or non-200 invocation; a body whose request hash differs from the stored one (the source is taken from that body, so a caller cannot substitute it); a theorem the source does not declare; `trust: kernel` on a source that reduces with `native_decide`; facts that are not JSON; a second certificate for one invocation |
+| `proofs.reverify` | `approvals:read` | a row whose digest or facts no longer describe its columns; naming the certificate's own invocation (a replay is not a re-check); a fresh check whose source, verdict or recomputed digest differs from the stored ones |
+| `proofs.get` | `approvals:read` | a missing id in this tenant |
+| `proofs.list` | `approvals:read` | an unknown subject kind |
+
+`proofs.reverify` cannot call the prover — an action handler runs in one transaction and may not
+speak HTTP — so re-verification is two steps like record: the caller runs a **fresh**
+`lean4.check` on the stored source under a new key, then names both the certificate and that
+invocation. The action is the judgement, and it writes nothing: the table is append-only, so a
+certificate that re-verifies is the same certificate.
+
 ## Gate evidence
 
 `lean_proof` joins `governed_asset` and `baseline` in `resolve_evidence`

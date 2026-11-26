@@ -57,6 +57,14 @@ CREATE TABLE proof (
 CREATE INDEX proof_subject_idx ON proof (tenant_id, subject_type, subject_id, created_at DESC);
 CREATE INDEX proof_spec_idx ON proof (tenant_id, spec_sha256);
 
+-- The engine call a certificate cites is found by its key, not by scanning 24 hours of
+-- invocations: `proofs.record` reads the `action_invocation` row for the call it records, which
+-- is the same lookup the copilot's proposal execution makes. Partial, because a key is optional
+-- on both paths and the null rows are never asked for.
+CREATE INDEX action_invocation_idempotency_idx ON action_invocation (tenant_id, action,
+                                                                   idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+
 ALTER TABLE proof ENABLE ROW LEVEL SECURITY;
 ALTER TABLE proof FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON proof FOR ALL

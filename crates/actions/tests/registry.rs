@@ -141,7 +141,9 @@ use serde_json::{Value, json};
 /// `architecture.board_sit_open|board_sit_decide`, `cadences.materialise` — 582 → **587**.
 /// **S21 step 11 (#697) adds 2 internal**: `organisation_layers.list|set` — 587 → **589**,
 /// internal 563 → 565, external stays 24.
-const EXPECTED: [&str; 589] = [
+/// **Delivery proofs (#744) adds 4 internal**: `proofs.record|reverify|get|list` — 589 →
+/// **593**, internal 565 → 569, external stays 24.
+const EXPECTED: [&str; 593] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -601,6 +603,10 @@ const EXPECTED: [&str; 589] = [
     "prompt_recipes.get",
     "prompt_recipes.list",
     "prompt_recipes.retire",
+    "proofs.get",
+    "proofs.list",
+    "proofs.record",
+    "proofs.reverify",
     "providers.list",
     "publish.start",
     "publish.status",
@@ -861,7 +867,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 558 -> 563; external stays 24.
     // S21 step 11 (#697) adds two internal actions (`organisation_layers.list|set`):
     // internal 563 -> 565; external stays 24 — both read and write this tenant's own layer rows.
-    assert_eq!((internal, external), (565, 24));
+    // Delivery proofs (#744) add four internal actions (`proofs.record|reverify|get|list`):
+    // internal 565 -> 569; external stays 24 — the prover calls are the declared `lean4.*`
+    // externals from T14, and a certificate is written from what the engine recorded, not a new
+    // outbound call.
+    assert_eq!((internal, external), (569, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
