@@ -279,9 +279,14 @@ async fn resolve_invocation(
         }
     };
 
+    // The engine persists its own `InvocationResponse` envelope — `{output, request_id,
+    // duration_ms}` — and the prover's document is its `output`. Reading `response` itself would
+    // find no verdict and quietly certify nothing.
+    let missing = Value::Null;
+    let output = response.get("output").unwrap_or(&missing);
     let proven = match action {
-        "lean4.check" => response.get("valid").and_then(Value::as_bool),
-        "lean4.prove" => response.get("proven").and_then(Value::as_bool),
+        "lean4.check" => output.get("valid").and_then(Value::as_bool),
+        "lean4.prove" => output.get("proven").and_then(Value::as_bool),
         _ => None,
     }
     .ok_or_else(|| {
@@ -291,7 +296,7 @@ async fn resolve_invocation(
             format!("the persisted {action} response carries no verdict field"),
         )
     })?;
-    let computation_time_ms = response.get("computation_time_ms").and_then(Value::as_f64);
+    let computation_time_ms = output.get("computation_time_ms").and_then(Value::as_f64);
     let invocation_id = store::actions::find_invocation_by_key(&mut *conn, tenant, action, key)
         .await
         .map_err(|error| {

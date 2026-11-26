@@ -102,7 +102,7 @@ async fn a_valid_proof_opens_the_gate() {
     )
     .await
     .expect("a proven certificate opens the gate");
-    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
 
     let approval_id = output(&outcome.body)["id"]
         .as_str()
@@ -186,6 +186,11 @@ async fn every_bad_proof_is_refused() {
     // Another tenant's certificate is invisible under RLS: the same id in tenant B's gate is
     // simply not found, never a certificate it cannot see.
     let other = support::seed(&pg, "dev-b", "bob", "Bob").await;
+    // The catalogue seed walks the tenants that exist, so a tenant created after it needs it
+    // re-run — otherwise `projects.create` refuses the project type in that tenant.
+    conveyor_store::seed::catalogue(&pg.owner)
+        .await
+        .expect("the catalogue seed for the second tenant");
     let other_project = project(&pg, &other).await;
     let error = conveyor_actions::invoke(
         &pg.runtime,

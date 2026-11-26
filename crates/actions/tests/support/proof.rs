@@ -70,12 +70,26 @@ impl Prover {
             }
         };
         let app = axum::Router::new().route("/api/check", axum::routing::post(handler));
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind the prover stub");
+        // The stub must outlive any one test: `#[tokio::test]` builds a runtime per test and
+        // tears it down when that test returns, so a `tokio::spawn` here would die with the
+        // first test and every later test would see an unreachable prover. Its own thread with
+        // its own runtime lives until the process exits, which is exactly one test binary.
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind the prover stub");
+        listener
+            .set_nonblocking(true)
+            .expect("the stub listener is non-blocking");
         let base = format!("http://{}", listener.local_addr().expect("addr"));
-        tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
+        std::thread::spawn(move || {
+            let runtime = tokio::runtime::Builder::new_multi_thread()
+                .worker_threads(1)
+                .enable_all()
+                .build()
+                .expect("the stub runtime");
+            runtime.block_on(async move {
+                let listener =
+                    tokio::net::TcpListener::from_std(listener).expect("the stub listener");
+                let _ = axum::serve(listener, app).await;
+            });
         });
         // One base URL for the whole binary: every test talks to this stub.
         set_env("CONVEYOR_EXTERNAL_LEAN4_URL", &base);
