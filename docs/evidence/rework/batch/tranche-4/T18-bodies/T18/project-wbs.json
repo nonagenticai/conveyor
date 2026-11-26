@@ -1,0 +1,59 @@
+{
+  "body_sha256": "0c139a1717f75634c619132ebe6805c70c3693a9c777877147fcbf894d38da9b",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a20c80-b734-748a-b299-879ea19be681",
+    "key": "T18",
+    "kind": "project",
+    "title": "The real V2 UI"
+  },
+  "title": "Project Wbs \u2014 The real V2 UI"
+}

@@ -1,91 +1,205 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T18 --content docs/evidence/rework/tranche-4/rework-content-T18.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
 
   reopen: not needed
-  01 projects.charter ok
-  02 approvals.decide ok
+  charter: already approved
   closure outputs: not applicable (the project stays active)
-  03 architecture.contracts_request ok
-  04 architecture.board_decide ok
-  05 architecture.contracts_approve ok
-  06 documents.compose ok
-  07 documents.publish ok
-  08 architecture.artifacts_create ok
-  09 architecture.artifacts_approve ok
-  10 documents.compose ok
-  11 documents.publish ok
-  12 architecture.artifacts_create ok
-  13 architecture.artifacts_approve ok
-  14 documents.compose ok
-  15 documents.publish ok
-  16 architecture.artifacts_create ok
-  17 architecture.artifacts_approve ok
-  18 documents.compose ok
-  19 documents.publish ok
-  20 architecture.artifacts_create ok
-  21 architecture.artifacts_approve ok
-  22 documents.compose ok
-  23 documents.publish ok
-  24 architecture.artifacts_create ok
-  25 architecture.artifacts_approve ok
-  26 documents.compose ok
-  27 documents.publish ok
-  28 architecture.artifacts_create ok
-  29 architecture.artifacts_approve ok
-  30 documents.compose ok
-  31 documents.publish ok
-  32 architecture.artifacts_create ok
-  33 architecture.artifacts_approve ok
-  34 architecture.artifacts_link ok
-  35 architecture.artifacts_link ok
-  36 architecture.artifacts_link ok
-  37 architecture.artifacts_link ok
-  38 architecture.artifacts_link ok
-  39 architecture.artifacts_link ok
-  40 architecture.artifacts_link ok
-  41 architecture.artifacts_link ok
-  42 architecture.artifacts_link ok
-  43 documents.compose ok
-  44 documents.publish ok
-  document architecture-artifact: published
-  45 architecture.contracts_request ok
-  46 architecture.board_decide ok
-  47 architecture.contracts_approve ok
-  48 registers.create ok
-  49 registers.create ok
-  50 registers.create ok
-  51 registers.create ok
-  52 registers.create ok
-  53 registers.create ok
-  54 registers.create ok
-  55 registers.create ok
-  56 registers.create ok
-  57 registers.create ok
+  SoAW: already live
+  artefact: Stakeholder Map — T18 The real V2 UI (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T18 The real V2 UI (Phase A) already present
+  artefact: Requirements Catalog — T18 The real V2 UI (Phase A) already present
+  artefact: Solution Concept Diagram — T18 The real V2 UI (Phase A) already present
+  artefact: Business Capability Map — T18 The real V2 UI (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T18 The real V2 UI (Phase C) already present
+  artefact: Technology Standards Catalog — T18 The real V2 UI (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The stale V2 coverage record cannot be regenerated before the tranche-4 review already present
+  register risk: Tools and the architecture destination remain honest gates with no destination spec already present
+  register issue: T18-4 (issue #565) and T18-5 (issue #566) are open and T18-3c (issue #630) is blocked already present
+  register issue: The project row still records measured_status proposed and plan_status draft while construction has advanced already present
+  register assumption: The routes and specs measured in apps/web are T18's delivery already present
+  register assumption: The 2026-11-24 snapshot is the authoritative record for T18 already present
+  register dependency: Construction is blocked by T0, T1, T2, T3 and P0; acceptance by the owning slices and T12 already present
+  register dependency: The T12 organisation loop gates acceptance through issue #566 already present
+  register benefit: The programme measures the live application instead of the design mock already present
+  register benefit: Every V2 destination is a route behind one shell with its own spec already present
   benefit transitions: none in the content
-  58 projects.baseline ok
-  59 projects.baseline ok
-  60 approvals.decide ok
-  61 projects.baseline ok
-  62 approvals.decide ok
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: not applicable (the project stays active)
-  63 documents.compose ok
-  64 documents.publish ok
-  65 documents.compose ok
-  66 documents.publish ok
-  67 documents.compose ok
-  68 documents.publish ok
-  69 architecture.reviews_record ok
-  70 wbs.update ok
-  71 cadences.credit_demo ok
-  72 approvals.decide ok
-  73 changes.request ok
-  74 approvals.decide ok
+  project-brief output: current
+  inception-analysis output: current
+  architecture-design output: current
+  Phase-G review: already recorded
+  10 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  11 registers.update ok
   record fixes: none in the content
-  75 approvals.request ok
-  76 approvals.decide ok
-  77 cards.comment ok
+  12 cards.comment ok
+  13 cards.move ok
+  14 cards.move ok
+  card cleared: std-togaf-architecture-artifact-t18:T18
+  card discharge: 1 card(s) cleared of 310 open package(s)
+  closure: not applicable (the project stays active)
+T18: 14 acts recorded
 
-rework: cards.move refused at act 78: error: cards.move refused (409): the project declares no project_type, so no move is legal
-FAILED: cards.move: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T18 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-xn7s2bjx/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-xn7s2bjx/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T18-bodies --local-bin /tmp/conv526-bin-8111c984
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "change-control",
+      "document_id": "01a219e4-770e-766e-8253-9782c418d9ca",
+      "natural_key": "artefact:T18:change-control:9ab1ca6ce5baf985",
+      "body_sha256": "9ab1ca6ce5baf9850d7d9184c73c5b62394bd5b9b5a5d5621a94c60c878a0013"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "compliance-review",
+      "document_id": "01a219e4-78cc-7583-8a29-2a5ace7242c6",
+      "natural_key": "artefact:T18:compliance-review:b666b479f9b5b4e7",
+      "body_sha256": "b666b479f9b5b4e72ff8a0842b532bf180703d97c61a1ae2344709f3bcfea4ac"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "delivery-contract",
+      "document_id": "01a219e4-7a8e-7134-8e7f-df925995362a",
+      "natural_key": "artefact:T18:delivery-contract:dd22cf972c6a8d69",
+      "body_sha256": "dd22cf972c6a8d69d1fd3de3f2187d109fca786f8ab5f60402cdfaa94e76126f"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-baseline",
+      "document_id": "01a219e4-7c34-7069-88ff-3fb255bf814c",
+      "natural_key": "artefact:T18:project-baseline:46f89492e6176064",
+      "body_sha256": "46f89492e617606498e4bad3a0c58529f0b759d0d2ae8ee1f94dccaa66e92c28"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-registers",
+      "document_id": "01a219e4-7dde-753d-b3fc-52995093d4ed",
+      "natural_key": "artefact:T18:project-registers:c2d2889c9516a497",
+      "body_sha256": "c2d2889c9516a497f893490f0ceb5bad0e79e74d56c9850229a6c437ac02e871"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-wbs",
+      "document_id": "01a219e4-7fa1-7689-93c2-c185a93bc76c",
+      "natural_key": "artefact:T18:project-wbs:0c139a1717f75634",
+      "body_sha256": "0c139a1717f75634c619132ebe6805c70c3693a9c777877147fcbf894d38da9b"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a219e4-8162-775d-91a1-079ab493ef31",
+      "natural_key": "artefact:T18:statement-of-architecture-work:486770c89af1d777",
+      "body_sha256": "486770c89af1d777fd54bab22b65229af4c71f34e1da785fcb4d27a66c487c87"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 10,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 4,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 

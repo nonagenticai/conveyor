@@ -70,3 +70,6 @@
 {"factory_exit": 0, "gaps": [], "key": "T10", "log": "docs/evidence/rework/batch/tranche-4/T10.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:03:54+00:00"}
 {"key": "T19", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:03:54+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "T19", "log": "docs/evidence/rework/batch/tranche-4/T19.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:04:30+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-4/rework-content-T18.json", "key": "T18", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-26T22:05:13+00:00"}
+{"key": "T18", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:05:13+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T18", "log": "docs/evidence/rework/batch/tranche-4/T18.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:05:39+00:00"}

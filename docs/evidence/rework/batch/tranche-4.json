@@ -1,37 +1,13 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T22:04:30+00:00",
-  "green": 4,
+  "generated_at": "2026-11-26T22:05:39+00:00",
+  "green": 1,
   "members": [
     {
       "factory_exit": 0,
       "gaps": [],
-      "key": "S07",
-      "log": "docs/evidence/rework/batch/tranche-4/S07.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "S09",
-      "log": "docs/evidence/rework/batch/tranche-4/S09.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "T10",
-      "log": "docs/evidence/rework/batch/tranche-4/T10.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "T19",
-      "log": "docs/evidence/rework/batch/tranche-4/T19.log",
+      "key": "T18",
+      "log": "docs/evidence/rework/batch/tranche-4/T18.log",
       "publish_exit": 1,
       "state": "RECEIPT_GREEN"
     }

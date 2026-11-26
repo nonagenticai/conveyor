@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a21214-4a5f-77a2-8137-7fef2dd397be approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a219de-9ebf-72e9-a4cf-4631952a79ec approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T18-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -21,7 +21,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21214-3a3e-7c2b-b7d9-328b26a53ff7 approved by board decision 01a21214-3a87-726c-9180-d5aff504ce69 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a219de-7def-7827-8a21-98428640f502 approved by board decision 01a219de-7e7e-72db-b751-a17bdd9b013d about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T18-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -30,7 +30,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-63c9-7615-976b-755293239187 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219de-b233-7c79-9cf9-5c16a4f05765 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T18-review",
       "kind": "snapshot",
       "result": "pass",
@@ -93,7 +93,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "T18-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-25T11:48:35.653135+00:00",
+  "generated_at": "2026-11-26T22:05:39.949826+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T22:05:35.610795+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
   "verdict": "green",
   "warnings": []
