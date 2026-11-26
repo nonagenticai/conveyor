@@ -1409,21 +1409,12 @@ class Runner:
                 if row is None:
                     fail(f"record fix: no WBS node matches {match}")
                 if change_id is None:
-                    # The change must be approved AND reference the approved scope baseline;
-                    # an open change with a blocked approval reads like a change but the WBS
-                    # gate refuses it (measured 2026-11-26 on PLATFORM's two change rows).
-                    changes = [
-                        r
-                        for r in self._read(
-                            "registers.list", {"project_id": self.project_id}
-                        ).get("items") or []
-                        if r.get("kind") == "change"
-                        and str(r.get("status") or "") in ("accepted", "approved")
-                        and r.get("baseline_ref")
-                    ]
-                    if not changes:
-                        fail("record fix: a WBS edit needs the approved change row")
-                    change_id = str(changes[0]["id"])
+                    # The WBS gate reads an APPROVED `change` gate whose meta names the change;
+                    # a row's own status is never an approval (`change_is_approved_tx`). A
+                    # pre-existing change whose approval predates that link authorises nothing
+                    # (measured 2026-11-26 on PLATFORM), so the factory resolves a linked
+                    # approval and, when there is none, opens and decides one.
+                    change_id = self.approved_change()
                 payload = {"id": row["id"], "change_id": change_id, **{
                     key: fix[key] for key in ("acceptance", "evidence", "status") if key in fix
                 }}
@@ -1454,6 +1445,64 @@ class Runner:
                 )
             else:
                 fail(f"record fix: unknown kind {kind!r}")
+
+    def approved_change(self) -> str:
+        """The change id an approved `change` gate authorises, or a newly approved change.
+
+        The WBS guard joins the change row to an `approval` with `gate='change'`,
+        `status='approved'` and `meta.change_id` naming it; a change row's own status is never
+        an approval. A change created before that link existed authorises nothing, so the
+        factory opens one through `changes.request` — the action writes the link — and decides
+        its gate.
+        """
+        changes = {
+            str(row.get("id"))
+            for row in self._read(
+                "registers.list", {"project_id": self.project_id}
+            ).get("items") or []
+            if row.get("kind") == "change"
+        }
+        for approval in self.snapshot_json("work.json").get("approvals") or []:
+            meta = approval.get("meta") or {}
+            change = str(meta.get("change_id") or "")
+            if (
+                change
+                and change in changes
+                and approval.get("gate") == "change"
+                and approval.get("status") == "approved"
+            ):
+                return change
+        baseline = next(
+            (
+                row.get("id")
+                for row in self.snapshot_json("msp.json").get("project_baselines") or []
+                if row.get("project_id") == self.project_id
+                and str(row.get("kind") or "scope") == "scope"
+                and row.get("approved_by")
+            ),
+            None,
+        )
+        if not baseline:
+            fail(f"{self.project}: no approved scope baseline for the record-fix change")
+        created = self.invoke(
+            "changes.request",
+            {
+                "project_id": self.project_id,
+                "baseline_id": baseline,
+                "title": "The retrospective rework's record fixes",
+                "body": (
+                    "The retrospective rework completes the project's record: its work packages "
+                    "carry acceptance and evidence, its register rows are owned and dated, and "
+                    "the probe rows are retired. This change authorises those edits against the "
+                    "approved scope baseline."
+                ),
+                "impact": {"scope": "the record fixes' WBS acceptance and evidence"},
+            },
+            read_action="registers.get",
+            read_id_from_output="change_id",
+        )
+        self.decide(created["approval_id"], "approve the record-fix change")
+        return str(created["change_id"])
 
     def ensure_extra_baselines(self) -> None:
         """Take the schedule and cost baselines the PMP baseline rule reads.

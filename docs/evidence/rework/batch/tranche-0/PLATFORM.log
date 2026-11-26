@@ -61,53 +61,42 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   register assumption: The replay record is the programme's working record until the rework is promoted already present
   register dependency: Every delivery tranche depends on the platform's CI, registry and Postgres paths already present
   register benefit: B1 Auditable decisions: every choice has a decision row already present
-  29 governed_assets.compose ok
-  30 governed_assets.submit ok
-  31 governed_assets.approve ok
-  32 governed_assets.compose ok
-  33 governed_assets.submit ok
-  34 governed_assets.approve ok
-  35 governed_assets.compose ok
-  36 governed_assets.submit ok
-  37 governed_assets.approve ok
-  38 governed_assets.compose ok
-  39 governed_assets.submit ok
-  40 governed_assets.approve ok
-  41 governed_assets.compose ok
-  42 governed_assets.submit ok
-  43 governed_assets.approve ok
-  44 programmes.update ok
-  45 benefits.transition_upsert ok
-  46 benefits.transition_upsert ok
-  47 benefits.transition_upsert ok
-  48 benefits.transition_upsert ok
-  49 benefits.transition_upsert ok
-  50 benefits.transition_upsert ok
-  51 benefits.transition_upsert ok
+  governed asset Licensing frame: already present
+  governed asset Blueprint states: already present
+  governed asset Options appraisal: already present
+  governed asset Programme appraisal: already present
+  governed asset Solution intent: already present
+  programme shared_config: already set
+  benefit transition B1: already present
+  29 benefits.transition_upsert ok
+  benefit transition B2: already present
+  30 benefits.transition_upsert ok
+  benefit transition B3: already present
+  31 benefits.transition_upsert ok
+  benefit transition B4: already present
+  32 benefits.transition_upsert ok
+  benefit transition B5: already present
+  33 benefits.transition_upsert ok
+  benefit transition B6: already present
+  34 benefits.transition_upsert ok
+  benefit transition B7: already present
+  35 benefits.transition_upsert ok
   baseline: already taken
-  52 projects.baseline ok
-  53 approvals.decide ok
-  54 projects.baseline ok
-  55 approvals.decide ok
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: not applicable (the project stays active)
-  56 documents.publish ok
-  57 documents.update ok
-  58 documents.publish ok
-  project-brief output: body corrected and republished
-  59 documents.publish ok
-  60 documents.update ok
-  61 documents.publish ok
-  evidence output: body corrected and republished
-  62 architecture.reviews_record ok
-  63 cadences.credit_demo ok
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  36 cadences.credit_demo ok
   baseline approval: none pending
   change control: 2 change row(s) present
-  64 registers.update ok
-  65 registers.update ok
-  66 registers.update ok
-  67 registers.update ok
+  37 registers.update ok
+  38 registers.update ok
+  39 registers.update ok
+  40 registers.update ok
 
-rework: wbs.update refused at act 68: error: wbs.update refused (409): `change_id` 01a2029f-8e2e-78de-bc99-119da42fdfbf is not an approved change request whose `baseline_ref` is the approved scope baseline 01a1fdd8-cff3-7cd9-9535-26fed3d5836b
+rework: wbs.update refused at act 41: error: wbs.update refused (409): `change_id` 01a20200-562e-7a53-9fcd-e136048a00fb is not an approved change request whose `baseline_ref` is the approved scope baseline 01a1fdd8-cff3-7cd9-9535-26fed3d5836b
 FAILED: wbs.update: transport exited 1
 
 [exit 1]
