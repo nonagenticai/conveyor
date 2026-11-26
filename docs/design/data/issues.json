@@ -1,6 +1,73 @@
 {
   "issues": [
     {
+      "number": 746,
+      "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/746",
+      "updatedAt": "2026-11-26T10:57:09Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 745,
+      "title": "add: SPEC \u00a710.4 \u2014 the four missing analyse.* actions (app, brand, content, report)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/745",
+      "updatedAt": "2026-11-26T11:25:05Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 744,
+      "title": "add: the proof store, proofs actions and the lean_proof gate evidence",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/744",
+      "updatedAt": "2026-11-26T11:48:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 738,
       "title": "fix: the Procedures loader must not settle empty while the capability manifest is still loading",
       "state": "CLOSED",
@@ -463,7 +530,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-25T14:15:02Z",
+      "updatedAt": "2026-11-26T11:49:48Z",
       "labels": [
         {
           "name": "programme",
@@ -1524,7 +1591,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-25T11:48:49Z",
+      "updatedAt": "2026-11-26T11:48:35Z",
       "labels": [
         {
           "name": "unit",
@@ -5794,13 +5861,17 @@
     {
       "number": 24,
       "title": "docs: land SPEC V2 \u2014 the organisational operating model",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/24",
-      "updatedAt": "2026-11-24T22:24:33Z",
+      "updatedAt": "2026-11-26T11:04:25Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },

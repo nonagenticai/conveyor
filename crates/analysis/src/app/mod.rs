@@ -16,7 +16,10 @@ pub mod ux;
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::model::{Category, Document, Finding, Report, Scorecard};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+use crate::model::{Category, Document, Finding, Report, Scorecard, Severity};
 use crate::rubric::{Rubric, dedupe, grade};
 
 /// The TLS facts a capture observed. The source's TLS checks made their own handshake; the
@@ -245,6 +248,182 @@ fn scorecard(findings: &[Finding]) -> Scorecard {
         grade: grade(overall_score),
         buckets,
     }
+}
+
+/// One route the caller observed in the application's route table.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct RouteEvidence {
+    /// The route path, e.g. `/portfolio`.
+    pub path: String,
+    /// Whether the application actually serves the route.
+    #[serde(default)]
+    pub served: bool,
+}
+
+/// The SPEC V2 §10.5 destinations: display name and the first path of the spec's route cell.
+///
+/// This is the coverage contract, not a live probe: the caller supplies the route table and the
+/// captured pages, and the analysis says which destinations they do not cover.
+pub const DESTINATIONS: [(&str, &str); 11] = [
+    ("Organisation", "/organisation"),
+    ("Procedures", "/procedures"),
+    ("Authoring", "/authoring"),
+    ("Portfolio", "/portfolio"),
+    ("Meetings", "/meetings"),
+    ("Programme", "/programme"),
+    ("Architecture", "/design/adm"),
+    ("Plan", "/plan"),
+    ("Improve", "/improve"),
+    ("Operations", "/operations"),
+    ("Tools", "/tools"),
+];
+
+/// Measure the §10.5 destinations against a supplied route table and captured pages.
+///
+/// A destination is covered when a supplied route serves its path (or a path under it). When pages
+/// are supplied, a served destination no page links to is reported as unreachable. Served routes
+/// that are not a §10.5 destination are reported once, in path order. The report is a pure
+/// function of its arguments; no clock, network or storage is read.
+pub fn coverage(routes: &[RouteEvidence], pages: &[Document]) -> Report {
+    let linked = linked_paths(pages);
+    let mut findings = Vec::new();
+
+    for (name, route) in DESTINATIONS {
+        let matching: Vec<&RouteEvidence> = routes
+            .iter()
+            .filter(|evidence| route_matches(evidence, route))
+            .collect();
+        if matching.is_empty() {
+            findings.push(coverage_finding(
+                "app-destination-missing",
+                Severity::High,
+                format!("{name} has no route"),
+                format!(
+                    "The §10.5 destination {name} ({route}) is missing from the supplied route table."
+                ),
+                route.to_owned(),
+            ));
+        } else if !matching.iter().any(|evidence| evidence.served) {
+            findings.push(coverage_finding(
+                "app-destination-unserved",
+                Severity::High,
+                format!("{name} is not served"),
+                format!(
+                    "The §10.5 destination {name} ({route}) has a route row but the application does not serve it."
+                ),
+                route.to_owned(),
+            ));
+        } else if !pages.is_empty() && !linked.iter().any(|path| path_matches(path, route)) {
+            findings.push(coverage_finding(
+                "app-destination-unreachable",
+                Severity::Info,
+                format!("{name} is not linked from the captured pages"),
+                format!(
+                    "The §10.5 destination {name} ({route}) is served, but none of the supplied pages links to it."
+                ),
+                route.to_owned(),
+            ));
+        }
+    }
+
+    let mut unmapped: Vec<&str> = routes
+        .iter()
+        .filter(|evidence| evidence.served)
+        .filter(|evidence| {
+            !DESTINATIONS
+                .iter()
+                .any(|(_, route)| route_matches(evidence, route))
+        })
+        .map(|evidence| evidence.path.as_str())
+        .collect();
+    unmapped.sort_unstable();
+    unmapped.dedup();
+    if !unmapped.is_empty() {
+        findings.push(coverage_finding(
+            "app-route-unmapped",
+            Severity::Info,
+            "served routes outside the §10.5 destination table",
+            "The supplied route table serves paths that no §10.5 destination claims.",
+            unmapped.join(", "),
+        ));
+    }
+    // No dedupe: each destination is a distinct item, and the rubric's dedupe keys on `check_id`,
+    // so it would collapse two missing destinations into one finding.
+    let scorecard = scorecard(&findings);
+    Report {
+        url: String::new(),
+        findings,
+        scorecard,
+    }
+}
+
+fn coverage_finding(
+    check_id: &str,
+    severity: Severity,
+    title: impl Into<String>,
+    description: impl Into<String>,
+    evidence: impl Into<String>,
+) -> Finding {
+    Finding {
+        check_id: Some(check_id.to_owned()),
+        category: Category::Ux,
+        severity,
+        title: title.into(),
+        description: description.into(),
+        evidence: Some(evidence.into()),
+        source_tool: Some("app_coverage".to_owned()),
+        scanner_count: 1,
+        ..Finding::default()
+    }
+}
+
+fn normalise_path(path: &str) -> String {
+    let path = path.trim();
+    let path = path.split(['?', '#']).next().unwrap_or_default();
+    if path.len() > 1 {
+        path.trim_end_matches('/').to_owned()
+    } else {
+        path.to_owned()
+    }
+}
+
+fn path_matches(path: &str, destination: &str) -> bool {
+    let path = normalise_path(path);
+    path == destination || path.starts_with(&format!("{destination}/"))
+}
+
+fn route_matches(route: &RouteEvidence, destination: &str) -> bool {
+    path_matches(&route.path, destination)
+}
+
+/// The path of every link the supplied pages carry, normalised and deduplicated.
+///
+/// A relative link without a leading `/` is skipped: without a base URL its target is unknowable,
+/// and guessing one would invent coverage the pages do not prove.
+fn linked_paths(pages: &[Document]) -> BTreeSet<String> {
+    let selector = scraper::Selector::parse("a[href]").expect("a[href] is a valid selector");
+    let mut paths = BTreeSet::new();
+    for page in pages {
+        let html = scraper::Html::parse_document(&page.html);
+        for element in html.select(&selector) {
+            let Some(href) = element.value().attr("href") else {
+                continue;
+            };
+            let href = href.trim();
+            let path = if href.starts_with("http://") || href.starts_with("https://") {
+                match url::Url::parse(href) {
+                    Ok(parsed) => parsed.path().to_owned(),
+                    Err(_) => continue,
+                }
+            } else if href.starts_with('/') {
+                href.to_owned()
+            } else {
+                continue;
+            };
+            paths.insert(normalise_path(&path));
+        }
+    }
+    paths
 }
 
 #[cfg(test)]

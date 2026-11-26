@@ -6,6 +6,10 @@ Every finding is an evidence-backed claim about the code. This gate re-reads eac
 A stale quote is a stale finding: the fix has landed, the line moved, or the claim was never
 true. Either way it must not reach the rework register.
 
+A resolved finding carries either a legacy prose string or a receipt
+`{commit, test, evidence}`: a 40-hex ancestor commit, a test path that exists, and the run or
+result. A resolved finding skips the quote check because the fix may have moved the line.
+
 Usage:
     python3 scripts/verify-findings.py [docs/evidence/v1-conformance-findings.json]
     python3 scripts/verify-findings.py --stdout      # verify, print a summary, write nothing
@@ -17,6 +21,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -40,6 +45,59 @@ REQUIRED = (
     "acceptance",
     "owner_project",
 )
+
+
+def verify_receipt(value: object, label: str, errors: list[str]) -> bool:
+    """Check a resolution: a legacy non-empty string, or a `{commit, test, evidence}` receipt.
+
+    The receipt form is the one the #526 lane already carries: a 40-hex ancestor commit, a test
+    path that exists, and a non-empty note naming the run or result. A legacy prose string stays
+    valid so the conversion of the older findings is not a precondition for this gate.
+    """
+    if isinstance(value, str):
+        if value.strip():
+            return True
+        errors.append(f"{label}: resolved_by must be a non-empty string or a receipt object")
+        return False
+    if not isinstance(value, dict):
+        errors.append(f"{label}: resolved_by must be a non-empty string or a receipt object")
+        return False
+    missing = [key for key in ("commit", "test", "evidence") if key not in value]
+    if missing:
+        errors.append(f"{label}: resolved_by receipt is missing {missing}")
+        return False
+    ok = True
+    commit = value["commit"]
+    if not isinstance(commit, str) or not SHA.match(commit):
+        errors.append(f"{label}: resolved_by.commit must be a 40-character lowercase hex commit")
+        ok = False
+    elif subprocess.run(
+        ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", commit, "HEAD"],
+        capture_output=True,
+    ).returncode != 0:
+        errors.append(f"{label}: resolved_by.commit {commit[:8]} is not an ancestor of HEAD")
+        ok = False
+    test = value["test"]
+    if not isinstance(test, str) or not test.strip():
+        errors.append(f"{label}: resolved_by.test must name a test path or path::name")
+        ok = False
+    else:
+        relative = test.split("::", 1)[0]
+        target = (ROOT / relative).resolve()
+        try:
+            target.relative_to(ROOT)
+        except ValueError:
+            errors.append(f"{label}: resolved_by.test path escapes the repository: {relative!r}")
+            ok = False
+        else:
+            if not target.is_file():
+                errors.append(f"{label}: resolved_by.test path does not exist: {relative}")
+                ok = False
+    evidence = value["evidence"]
+    if not isinstance(evidence, str) or not evidence.strip():
+        errors.append(f"{label}: resolved_by.evidence must name the run, command or result")
+        ok = False
+    return ok
 
 
 def verify(path: Path) -> list[str]:
@@ -69,9 +127,9 @@ def verify(path: Path) -> list[str]:
             errors.append(f"{label} is missing {missing}")
             continue
         resolved = finding.get("resolved_by")
-        if resolved is not None and (not isinstance(resolved, str) or not resolved.strip()):
-            errors.append(f"{label}: resolved_by must be a non-empty string when present")
-            continue
+        if resolved is not None:
+            if not verify_receipt(resolved, label, errors):
+                continue
         identifier = finding["id"]
         label = str(identifier)
         if not isinstance(identifier, str) or not re.match(r"^v1-[a-z0-9-]+$", identifier):

@@ -850,13 +850,15 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          72
+          72,
+          744,
+          746
         ],
         "depends_on": [
           "T0",
@@ -1678,7 +1680,8 @@
           569,
           660,
           669,
-          733
+          733,
+          745
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1700,7 +1703,7 @@
       "key": "SPEC-V2",
       "name": "SPEC V2 — the organisational operating model",
       "description": "Programme-level unit (plan: docs/SPEC_V2.md)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md",

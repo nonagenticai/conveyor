@@ -7,6 +7,7 @@
 
 pub mod cro;
 pub mod marketing;
+pub mod quality;
 
 use crate::model::{Category, Document, Finding, Report, Scorecard};
 use crate::rubric::{Rubric, dedupe, grade, round_1dp};
@@ -25,14 +26,30 @@ pub fn analyse(document: &Document) -> Report {
     }
 }
 
-/// The CRO/marketing scorecard: each present category scored by the decay law, weighted equally
-/// when both are present (the source's `compute_scores` set is findings-derived).
+/// The same, plus the heading, source and filler checks.
+///
+/// The quality checks join the conversion and marketing findings rather than replacing them: a
+/// gate that cites `analyse.content` sees the whole content picture in one report.
+pub fn analyse_quality(document: &Document) -> Report {
+    let mut findings = analyse(document).findings;
+    findings.extend(quality::scan(document));
+    // The two sets have disjoint check ids, and each quality finding is a distinct item; dedupe
+    // would collapse several filler phrases into one.
+    let scorecard = scorecard(&findings);
+    Report {
+        url: document.url.clone(),
+        findings,
+        scorecard,
+    }
+}
+
+/// The content scorecard: each present category scored by the decay law and weighted equally.
 fn scorecard(findings: &[Finding]) -> Scorecard {
     let rubric = Rubric::default();
     let mut buckets = std::collections::BTreeMap::new();
     let mut weighted_sum = 0.0;
     let mut total_weight = 0.0;
-    for category in [Category::Cro, Category::Marketing] {
+    for category in [Category::Cro, Category::Marketing, Category::Content] {
         if findings.iter().any(|finding| finding.category == category) {
             let score = rubric.category_score(findings, category);
             buckets.insert(category.as_str().to_owned(), score);

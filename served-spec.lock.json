@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "67295ca74258a1858b7bb83fa373a60c4ce38b220fd574eb7ec6598e3d118546",
+    "GET /api/actions": "21099f79cde231701562002fbb4ae225b2668eef64bbfc8c2434e915d6ae71ec",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -26,6 +26,10 @@
     "POST /api/actions/actions.describe/invocations": "2b42cd8f4ff618ee7bf82d6dc93107a80587623839940ad15bcd31eac8d72916",
     "POST /api/actions/actions.list/invocations": "fbbce32255a060978118c04d258962fbc65d3b0e1d76f222f16d6ce563ca8f41",
     "POST /api/actions/agent.run/invocations": "6cced65ad5be350a3028e6bad85f6b07b33362667752b6a1e14e3a96e90be932",
+    "POST /api/actions/analyse.app/invocations": "3992ddd0300ac47d3defb5664a71e9d046ad9d2dc8624dc1e7b599f276c95168",
+    "POST /api/actions/analyse.brand/invocations": "ecc7e7ae2e50cb8ae7628b3b834d1691019aca15615cd68a694a8630a3376e63",
+    "POST /api/actions/analyse.content/invocations": "5d3831a311c3b19374681bdf17ee0b776dcdcbb6dbf84e6fb1cd3176ce291313",
+    "POST /api/actions/analyse.report/invocations": "d15a380e5ebeaeb4857db123bbe03f9c6c3415c37cfb376aa38e6f51e0882b7a",
     "POST /api/actions/analyse.site/invocations": "f4a2bee0012dd67c594894c25d87c3b9928a0f438d1118f45616180dcaf09bc7",
     "POST /api/actions/analyse.video/invocations": "5b9d5af873fd7dd8071ccf5db44def47ae5ee81956532d0f477863ab1697ad47",
     "POST /api/actions/andon.engage/invocations": "ff487e6c1af676fe03962408a99589d1a9ba1e6f30cbc80b5425fb589f6e550a",

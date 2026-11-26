@@ -434,10 +434,12 @@ mod tests {
         // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
         // 582 -> 587; internal 558 -> 563, external stays 24.
         // S21 step 11 (#697) adds `organisation_layers.list|set`: 587 -> 589.
-        // Delivery proofs (#744) adds `proofs.record|reverify|get|list`: 589 -> 593.
+        // #745 adds the four `analyse.*` actions: 589 -> 593; internal 565 -> 569.
+        // Delivery proofs (#744) adds `proofs.record|reverify|get|list`: 593 -> 597; internal
+        // 569 -> 573.
         assert_eq!(
             registry.len(),
-            593,
+            597,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

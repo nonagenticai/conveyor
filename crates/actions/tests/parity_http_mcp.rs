@@ -3142,8 +3142,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push(sample.name, id);
         }
         // ADR 0007 §5: `analyse.site` reads a stored page, so each round needs its own document
-        // with its own object.
-        "analyse.site" => {
+        // with its own object. The four §10.4 actions below read the same kind of prepared page.
+        "analyse.site" | "analyse.app" | "analyse.brand" | "analyse.content" | "analyse.report" => {
             let id = seed_site_document(pg, ctx).await;
             ctx.push(sample.name, id);
         }
@@ -5315,6 +5315,57 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 json!({
                     "document_id": ctx.pop("analyse.site"),
                     "url": "https://example.test/parity",
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: the app coverage report over a prepared page and a supplied route table.
+            let mut sample = on_prepared("analyse.app", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_ids": [ctx.pop("analyse.app")],
+                    "routes": [{"path": "/organisation", "served": true}],
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: the prepared page measured against the caller's brand facts.
+            let mut sample = on_prepared("analyse.brand", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("analyse.brand"),
+                    "brand": {
+                        "palette": ["#ffffff"],
+                        "typography": ["Inter"],
+                        "voice": {"required_terms": ["plumber"], "forbidden_terms": []},
+                    },
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: one content-quality report per prepared page.
+            let mut sample = on_prepared("analyse.content", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"document_ids": [ctx.pop("analyse.content")]}));
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: each claim checked against the prepared page's visible text.
+            let mut sample = on_prepared("analyse.report", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("analyse.report"),
+                    "claims": [{
+                        "claim": "the page names Leeds",
+                        "reference": "Parity plumber in Leeds",
+                    }],
                 })
             });
             sample.expect_status = Some(200);
