@@ -1,0 +1,87 @@
+{
+  "body_sha256": "62266a335d3ba5870f2c331228ee3578375d8dc6d0f26cc26e174d0412f96857",
+  "category": "project-baseline",
+  "headings": [
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Schedule",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Cost",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 3,
+          "file": "work.json",
+          "kind": "rows",
+          "pointer": "/approvals"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "867f2ff6871888a0419142381b8cf4e10506ee1da0017d3e5d6776613f6eb7db",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+    "key": "PLATFORM",
+    "kind": "project",
+    "title": "CI, runners and platform"
+  },
+  "title": "Project Baseline \u2014 CI, runners and platform"
+}

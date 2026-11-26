@@ -305,8 +305,8 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
     expect(isinstance(fixes, list), "record_fixes must be a list")
     for fix in fixes:
         kind = str(fix.get("kind") or "")
-        expect(kind in {"register", "wbs", "tranche"},
-               f"record fix {kind!r} is not register|wbs|tranche")
+        expect(kind in {"register", "wbs", "tranche", "lesson"},
+               f"record fix {kind!r} is not register|wbs|tranche|lesson")
         if kind in {"register", "wbs"}:
             expect(isinstance(fix.get("match"), dict) and bool(fix["match"]),
                    f"record fix {kind} needs a match object")
@@ -319,6 +319,11 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
         if kind == "tranche":
             expect(fix.get("number") is not None and isinstance(fix.get("review_at"), str),
                    "a tranche fix needs number and review_at")
+        if kind == "lesson":
+            expect(isinstance(fix.get("statement"), str) and bool(fix["statement"].strip()),
+                   "a lesson fix needs a statement")
+            expect(isinstance(fix.get("evidence"), list) and len(fix["evidence"]) >= 2,
+                   "a lesson fix needs at least two evidence refs")
 
     registers = content.get("registers")
     expect(isinstance(registers, dict) and bool(registers),

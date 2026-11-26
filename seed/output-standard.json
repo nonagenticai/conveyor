@@ -2847,11 +2847,11 @@
     "programme-risk-register": {
       "required": [
         "Register",
-        "Categories",
-        "Owners and review dates",
-        "Escalations"
+        "Owners and review dates"
       ],
       "optional": [
+        "Categories",
+        "Escalations",
         "Links"
       ],
       "skeleton": "# Programme Risk Register\n\nThe programme's risks, categorized and owned, with the dates they are reviewed and the escalations they forced.\n\n## Register\n\nEvery open and closed risk, with its impact, probability, status and mitigation.\n\n## Categories\n\nThe categories the risks are grouped by, and the category each risk belongs to.\n\n## Owners and review dates\n\nWho owns each risk and the date it is next reviewed; a risk with no owner or review date is refused.\n\n## Escalations\n\nThe risks escalated to the programme board, the sponsoring group or the SRO, with the decision each escalation seeks.\n\n## Links\n\nThe artefacts and issues the register informs.\n",

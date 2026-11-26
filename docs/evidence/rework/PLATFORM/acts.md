@@ -7,3 +7,5 @@ the charter and baseline, created its one WBS deliverable with the four WSJF inp
 credit and published its declared outputs (project-brief, evidence).
 
 0 acts recorded; see transcript.jsonl. Verification green (6 checks) at d7293f96.
+
+PLATFORM: 601 acts in `transcript.jsonl`; the last run recorded 305.

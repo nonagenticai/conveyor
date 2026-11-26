@@ -1037,6 +1037,16 @@
    "category": "architecture-artifact",
    "title": "Architecture Artefact Index — PLATFORM (retrospective, 2026-11-26)",
    "body": "# Architecture Artefact Index — PLATFORM\n\n## Metadata\n\nThis index names the fifteen typed artefacts the platform's programme-track architecture set\ncarries, their phases and plateaus, and the document that publishes each. It is the entry point\nthe Architecture Board reads before the artefacts themselves; the artefacts are the rows, the\nindex is their map.\n\n## Entries\n\nThe set runs from Phase A's stakeholder map, driver catalog, requirements catalog and solution\nconcept diagram through Phase B's capability map, Phase C's data catalog and Phase D's technology\nstandards, then Phase E's gap matrix, candidate solutions, context diagram and benefits diagram,\nPhase F's migration plan, Phase G's compliance review catalog and Phase H's change and\nrequirement catalogs. Each entry names its artefact row and its published document.\n\n## Links\n\nEvery artefact links to at least one other: the requirements to the drivers, the capability map to\nthe solution concept, the gap matrix to the capability map and standards, the migration plan to\nthe candidates, standards, gaps and benefits, and the Phase H catalogs to the reviews and the\nrequirements. The graph is the derivation the board inspects.\n\n## Document\n\nThe index is itself an artefact document: the published body the architecture repository reads\nalongside the typed rows. A reader who needs the platform's architecture starts here and follows\nthe links; a reader who needs one artefact reads its own document. The index never duplicates an\nartefact's content, it points.\n"
+  },
+  {
+   "category": "safe-art",
+   "title": "Safe Art — PLATFORM (retrospective, 2026-11-26)",
+   "body": "# Safe Art — PLATFORM\n\n## ART charter\n\nThe ART is the programme's delivery rhythm: a PI per tranche, a refinement before it, a retro\nafter it, and the demo credit on each accepted deliverable. Its authority is the programme\nowner's standing delegation and its scope is the programme's projects, not a tenant's product.\nThe charter names the ART's outcomes so a review can judge them.\n\n## Solution intent\n\nThe ART intends a programme that delivers at quality with the least rework: tranche 0 green with\nits seven members evidenced, tranches 1–4 reworked in order, the benefit realization records\nwritten, and the public pack carrying the current record. The intent's constraints are the\nowner's directions and the estate's rules, which the deliverable's evidence cites.\n\n## Backlog with WSJF\n\nThe backlog is the programme's accepted deliverables, each carrying the four WSJF inputs the PI\nplan records. The platform's own deliverable scores business value 5, time criticality 5, risk\nreduction 3 and job size 6; the ordering is the programme's, and a deliverable without its four\ninputs is not on the backlog.\n\n## Shared configuration\n\nThe programme's shared configuration carries the cadence, the job-family pins, the default\napproval policy and the knowledge pins its projects inherit. It is a real row, written through\n`programmes.update`; an empty object is absence, not a configuration, and the standard treats it\nthat way.\n"
+  },
+  {
+   "category": "inspect-adapt",
+   "title": "Inspect and Adapt — PLATFORM (retrospective, 2026-11-26)",
+   "body": "# Inspect and Adapt — PLATFORM\n\n## What went well\n\nThe platform's paths held through the rework: the hosted preflight gave a compile verdict at\nevery pushed head, the registry served the images, the Postgres primary and its standby answered,\nand the record's own artifacts could be authored from the live rows. The rework's factory resumed\nacross four blocked attempts without duplicating a single row.\n\n## What did not\n\nThree defects surfaced only by running: the governed-asset vocabulary lagged the database CHECK\nby ten kinds and made the first list a 500; the plan's work packages predated the card\nrequirement and their update was refused; and two pre-existing change rows carried no approved\ngate, so the WBS guard refused them. Each is now a fix with a test or a constraint behind it.\n\n## Lessons\n\nThe durable lesson is that the record's vocabulary and its database must be one list, and that a\nguard which reads an approval link needs the action that creates it to write that link. Both are\nrecorded as programme lessons and one is a kata candidate; the kata is the mechanism that keeps a\nfuture session from rediscovering them.\n\n## Actions\n\nThe three defects are fixed on the lane, each with its own evidence. The platform's remaining\nactions are the restore drill, the standby promotion and the shared-workflow consumption, all\nrecorded in the gap matrix and the register with owners and review dates.\n\n## Kata candidates\n\n`L-PLATFORM-1` is the kata candidate: keep the domain enum identical to the database CHECK, and\nmake a list action that parses every stored row the test that proves it. The signature is\n`enum-mirrors-check`; the lesson is evidenced by the #526 issue, the PLATFORM receipt and the\nfactory's change.\n"
   }
  ],
  "registers": {
@@ -1207,7 +1217,7 @@
     "verdict": "ready",
     "basis": "the decision ladder is live: every gated action writes an approval row and the decision count is 105 over 662 runs"
    },
-   "enacted_at": "2026-11-21T00:00:00+00:00",
+   "enacted_at": "2026-11-26T00:00:00+00:00",
    "evidence": {
     "instrument": "count approval_decision / count run",
     "baseline": 0.15861,
@@ -1222,7 +1232,7 @@
     "verdict": "ready",
     "basis": "the broker and its tool_call ledger are live; 18 calls are recorded at the baseline"
    },
-   "enacted_at": "2026-11-21T00:00:00+00:00",
+   "enacted_at": "2026-11-26T00:00:00+00:00",
    "evidence": {
     "instrument": "count tool_call rows",
     "baseline": 18.0,
@@ -1265,7 +1275,7 @@
     "verdict": "ready",
     "basis": "the T0 gate refuses a second store and the ownership matrix has one home"
    },
-   "enacted_at": "2026-11-21T00:00:00+00:00",
+   "enacted_at": "2026-11-26T00:00:00+00:00",
    "evidence": {
     "instrument": "the ownership matrix's one home",
     "baseline": 1.0,
@@ -1294,7 +1304,7 @@
     "verdict": "ready",
     "basis": "T19's decision forums are live: the meeting card, the minutes asset and the approvals they resolve exist"
    },
-   "enacted_at": "2026-11-22T00:00:00+00:00",
+   "enacted_at": "2026-11-26T00:00:00+00:00",
    "evidence": {
     "instrument": "meeting records with a position per required department",
     "basis": "the enactment is T19's live meeting surface; the token-spend premise the profile's baseline once used is retired by the owner's 2026-11-26 KPI decision"
@@ -1443,6 +1453,22 @@
    "kind": "tranche",
    "number": 2,
    "review_at": "2026-11-22T07:28:08.375579+00:00"
+  },
+  {
+   "kind": "lesson",
+   "finding_key": "L-PLATFORM-1",
+   "statement": "A vocabulary the database accepts but the domain cannot parse turns every list into a 500: the governed-asset kinds had to be brought to the CHECK's 26 before the platform's first read, and the lesson is to keep the enum and the CHECK one list.",
+   "evidence": [
+    "issue#526",
+    "docs/evidence/rework/PLATFORM.json",
+    "scripts/rework-project.py"
+   ],
+   "meta": {
+    "kata_candidate": {
+     "signature": "enum-mirrors-check",
+     "title": "Keep the domain vocabulary identical to the database CHECK"
+    }
+   }
   }
  ]
 }

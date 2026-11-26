@@ -1432,6 +1432,28 @@ class Runner:
                     read_input={"id": row["id"]},
                     if_match=row.get("version", 1),
                 )
+            elif kind == "lesson":
+                finding_key = str(fix.get("finding_key") or f"L-{self.project}-1")
+                existing = self._read(
+                    "programme_lessons.list", {"programme_id": self.programme_id}
+                ).get("items") or []
+                if any(str(row.get("finding_key")) == finding_key for row in existing):
+                    print(f"  lesson {finding_key}: already present")
+                    continue
+                self.invoke(
+                    "programme_lessons.propose",
+                    {
+                        "programme_id": self.programme_id,
+                        "cadence_id": fix.get("cadence_id"),
+                        "finding_key": finding_key,
+                        "statement": str(fix.get("statement") or ""),
+                        "evidence": fix.get("evidence") or [],
+                        "meta": fix.get("meta") or {},
+                    },
+                    read_action="programme_lessons.list",
+                    read_input={"programme_id": self.programme_id},
+                    read_match=[f"finding_key={finding_key}"],
+                )
             elif kind == "tranche":
                 rows = self._read(
                     "tranches.list", {"programme_id": self.programme_id}
