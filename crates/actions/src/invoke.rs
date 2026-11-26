@@ -1580,7 +1580,7 @@ async fn invoke_external(
                         pool,
                         call.name,
                         call.version,
-                        &ctx,
+                        ctx,
                         &input_hash,
                         request,
                         "error",
