@@ -45,6 +45,9 @@ The authority is `docs/plans/03-DELIVERY.md`. One issue = one branch = exactly o
    - the issue's docs/migrations/lock DoD items are handled;
    - every CARRIED-BY-#9 part was re-checked on merged main (or is explicitly deferred to the
      post-train sweep, named in the PR);
+   - a deployment-gated/live scenario or an end-to-end acceptance part carries an independent
+     verdict (`quality-manager` → `validator-deep` or `aa-pr-auditor`), never the builder's own
+     evidence; a governance-artefact part checks its owning role skill's refusal conditions;
    - the issue's Definition-of-done checklist is satisfied.
    A green CI check is not the DoD. If an item cannot be met, do not merge: post the handoff naming
    the gap.
@@ -68,5 +71,6 @@ The authority is `docs/plans/03-DELIVERY.md`. One issue = one branch = exactly o
 - Iterate in CI / push to probe.
 - Open a second PR for the same issue.
 - Claim "done" from a green check: verify the merge and the shipped state.
+- Merge on a green check plus self-attestation when the part is live or a governance gate.
 - Merge before the Definition-of-done gate passes.
 - End on a verbal status.
