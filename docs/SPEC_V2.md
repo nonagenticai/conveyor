@@ -1,11 +1,20 @@
 # SPEC V2 — conveyor: the organisational operating model
 
 **Repo:** `nonagenticai/conveyor` · **Host:** `conveyor.nonagentic.ai` · **Port:** 8930 (existing; no new port)
-**Date:** 2026-11-11 · **Status:** draft for review · no V2 code written
+**Date:** 2026-11-11 · **Status:** adopted 2026-11-26 · the V2 model is implemented and operating
 **Relationship to `SPEC.md`:** V1 (2026-11-07) remains the build record and stays binding for the slices it defines.
 V2 extends it — it adds **the organisation that works the conveyor** and **the work hierarchy that organisation
 needs**. V1 decisions D1–D27 stand unless a V2 decision explicitly extends or amends them (Appendix B). No V1 slice
 is re-opened by this document.
+
+**Adoption record (2026-11-26).** This document is the adopted V2 operating model. It was reviewed in three
+sessions (the v1 review record lives in the archived v1 PRs: a deep adversarial audit returned NO with four
+findings, all fixed, and a fresh validator returned PASS); the decisions run to D66 as §15.1 records, and §15.2's
+open questions were resolved or renumbered by those decisions, so the current text is authoritative. The model is
+live: `apps/web` carries the §10.5 destinations as real routes with Playwright specs, the programme's
+TOGAF/SAFe/PMP/MSP artefacts are rows with gates and evidence, and the programme record is published at
+`conveyor.nonagentic.ai/design/`. Where this document and the live record disagree, the record is the measurement
+and the divergence is a finding to reconcile, not a licence to edit the text.
 
 > **In one paragraph.** V2 turns the conveyor from a work system into an organisation. Jobs are configured positions
 > (industry → department → job) that receive cards, decide with rules and laya in typed decision forums, generate with
