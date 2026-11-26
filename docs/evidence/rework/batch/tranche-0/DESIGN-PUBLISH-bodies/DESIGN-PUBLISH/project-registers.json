@@ -1,0 +1,101 @@
+{
+  "body_sha256": "85067ff7e2c655e646a2272a57b37739f57391bcd61b568e1a1ea217534cfbc2",
+  "category": "project-registers",
+  "headings": [
+    {
+      "heading": "Risks",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Issues",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Assumptions",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Dependencies",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Benefits",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Changes",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "30e438c3340c062dd1d9f892bc2bd0f5e842ba820cbc12b7696079fdb98e5be6",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+    "key": "DESIGN-PUBLISH",
+    "kind": "project",
+    "title": "Publish the SPEC_V2 studio design pack, live"
+  },
+  "title": "Project Registers \u2014 Publish the SPEC_V2 studio design pack, live"
+}

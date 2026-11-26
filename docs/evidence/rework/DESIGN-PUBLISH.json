@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "DESIGN-PUBLISH is closed",
-      "detail": "project DESIGN-PUBLISH is closed",
+      "detail": "project DESIGN-PUBLISH is active",
       "id": "DESIGN-PUBLISH-project",
       "kind": "snapshot",
       "result": "pass",
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a216e5-659b-76a2-993d-e802a1a97775 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "DESIGN-PUBLISH-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 decided by a distinct approver",
+      "detail": "latest closure gate 01a216e5-6ff2-78bb-885d-e99ff0176e42 decided by a distinct approver",
       "id": "DESIGN-PUBLISH-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "11 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +3 more",
+      "detail": "2 mandatory artefact package(s) open: std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
       "id": "DESIGN-PUBLISH-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -124,7 +124,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "4 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
+      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:DESIGN-PUBLISH (P1)",
       "id": "DESIGN-PUBLISH-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -138,34 +138,24 @@
       "kind": "manifest",
       "result": "fail",
       "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
-      "severity": "P0"
     }
   ],
   "failures": [
-    "DESIGN-PUBLISH-artefact-standard (P1): 11 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +3 more",
-    "DESIGN-PUBLISH-rework (P0): 4 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
-    "gate (P0): the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "DESIGN-PUBLISH-artefact-standard (P1): 2 mandatory artefact package(s) open: std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
+    "DESIGN-PUBLISH-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:DESIGN-PUBLISH (P1)",
+    "gate (P0): the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass"
   ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-26T07:53:49.815078+00:00",
+  "generated_at": "2026-11-26T08:22:33.285114+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
   "name": "Publish the SPEC_V2 studio design pack, live",
   "project": "DESIGN-PUBLISH",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T07:53:20.026933+00:00",
-    "git_sha": "3e10fc52830ac80ac33071a32b8d25eb4430d337",
-    "path": "retained-snapshot/3e10fc52830ac80ac33071a32b8d25eb4430d337"
+    "generated_at": "2026-11-26T08:21:56.482180+00:00",
+    "git_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9",
+    "path": "retained-snapshot/03d6c357863ea3455d188fb0f98c8acc5d308ac9"
   },
   "verdict": "red",
   "warnings": []
