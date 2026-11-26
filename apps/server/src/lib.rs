@@ -21,6 +21,8 @@ pub use conveyor_pack::{export as programme_export, outputs as publish_outputs, 
 pub mod runner_dispatch;
 pub mod sandbox;
 pub mod seed;
+// #760: `conveyor auth token` — the session's machine channel.
+pub mod session;
 pub mod shutdown;
 pub mod telemetry;
 pub mod worker;
