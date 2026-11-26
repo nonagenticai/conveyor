@@ -169,16 +169,31 @@ fn cursor_error(detail: &str) -> ActionError {
     tenancy = "tenant"
 )]
 async fn actions_list(
-    _tx: &mut PgConnection,
+    tx: &mut PgConnection,
     ctx: HandlerCtx,
     _input: EmptyIn,
 ) -> Result<ActionManifest, ActionError> {
     let registry = registry();
-    let entries = registry
+    let mut entries: Vec<ActionManifestEntry> = registry
         .manifest(ctx.role)
         .into_iter()
         .filter_map(|entry| serde_json::from_value::<ActionManifestEntry>(entry).ok())
         .collect();
+    // S04 P1: the tenant's approved imported actions are entries of the SAME manifest.
+    let rows = conveyor_store::actions::approved_registry(&mut *tx)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "actions.list: approved registry");
+            ActionError::internal()
+        })?;
+    for row in rows {
+        if let Ok(action) = crate::resolve::ResolvedAction::from_row(&row)
+            && action.permits_role(ctx.role)
+        {
+            entries.push(action.manifest_entry());
+        }
+    }
+    entries.sort_by(|left, right| left.name.cmp(&right.name));
     Ok(ActionManifest {
         actions: entries,
         generated_at: Utc::now(),
@@ -198,14 +213,31 @@ async fn actions_list(
     tenancy = "tenant"
 )]
 async fn actions_describe(
-    _tx: &mut PgConnection,
+    tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: ActionsDescribeIn,
 ) -> Result<ActionSpecView, ActionError> {
     let registry = registry();
-    let spec = registry
-        .get(&input.name)
-        .ok_or_else(|| ActionError::not_found(&input.name))?;
+    let Some(spec) = registry.get(&input.name) else {
+        // S04 P1: an imported action describes through the same view as a compiled one.
+        let row = conveyor_store::actions::approved_registry_by_name(&mut *tx, &input.name)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, action = %input.name, "actions.describe: approved row");
+                ActionError::internal()
+            })?;
+        let Some(row) = row else {
+            return Err(ActionError::not_found(&input.name));
+        };
+        let action = crate::resolve::ResolvedAction::from_row(&row).map_err(|error| {
+            tracing::error!(%error, action = %input.name, "actions.describe: malformed row");
+            ActionError::internal()
+        })?;
+        if !action.permits_role(ctx.role) {
+            return Err(ActionError::not_found(&input.name));
+        }
+        return Ok(action.spec_view());
+    };
     if !spec.permits(ctx.role) {
         // A callable-looking name the role cannot use is absent, not forbidden (S4-D6
         // applies to the manifest and MCP; describe follows the same rule).

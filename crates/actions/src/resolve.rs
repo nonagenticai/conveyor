@@ -263,6 +263,90 @@ impl ResolvedAction {
             .all(|scope| policy.allows(scope.as_str(), scope.granted_to(role)))
     }
 
+    /// Whether a role holds every declared scope under the compiled defaults.
+    pub fn permits_role(&self, role: conveyor_auth::Role) -> bool {
+        self.scopes.iter().all(|scope| scope.granted_to(role))
+    }
+
+    /// The contract hash discovery publishes: the ingest's schema hash for an imported row.
+    pub fn spec_hash(&self) -> String {
+        match &self.source {
+            ActionSource::Registry { schema_hash, .. } => schema_hash.clone(),
+            ActionSource::Compiled => String::new(),
+        }
+    }
+
+    /// The discovery entry, the same shape the compiled manifest publishes.
+    pub fn manifest_entry(&self) -> crate::views::ActionManifestEntry {
+        crate::views::ActionManifestEntry {
+            name: self.name.clone(),
+            version: self.version,
+            kind: self.kind.as_str().to_owned(),
+            spec_hash: self.spec_hash(),
+            scopes: self
+                .scopes
+                .iter()
+                .map(|scope| scope.as_str().to_owned())
+                .collect(),
+            idempotent: self.idempotent,
+            timeout_ms: self.timeout_ms,
+        }
+    }
+
+    /// The full contract `actions.describe` returns.
+    pub fn spec_view(&self) -> crate::views::ActionSpecView {
+        crate::views::ActionSpecView {
+            name: self.name.clone(),
+            version: self.version,
+            kind: self.kind.as_str().to_owned(),
+            scopes: self
+                .scopes
+                .iter()
+                .map(|scope| scope.as_str().to_owned())
+                .collect(),
+            idempotent: self.idempotent,
+            timeout_ms: self.timeout_ms,
+            effect: self.effect.as_str().to_owned(),
+            confirm: self.confirm.as_str().to_owned(),
+            tenancy: self.tenancy.as_str().to_owned(),
+            spec_hash: self.spec_hash(),
+            input: self.input.clone(),
+            output: self.output.clone(),
+        }
+    }
+
+    /// The MCP tool projection, the same shape [`crate::mcp::tool_json`] emits.
+    pub fn tool_json(&self) -> Value {
+        json!({
+            "name": self.mcp_name(),
+            "description": format!(
+                "{} — {} action, effect {}.",
+                self.name,
+                self.kind.as_str(),
+                self.effect.as_str()
+            ),
+            "inputSchema": self.input,
+            "outputSchema": self.output,
+            "annotations": {
+                "readOnlyHint": self.effect.as_str() == "read",
+                "destructiveHint": self.effect.as_str() == "destructive",
+                "idempotentHint": self.idempotent,
+                "openWorldHint": self.kind.as_str() == "external",
+            },
+            "_meta": {
+                "operation": self.name,
+                "x-action-name": self.name,
+                "x-action-version": self.version,
+                "x-spec-hash": self.spec_hash(),
+            },
+        })
+    }
+
+    /// The literal invocation route an error instance names.
+    pub fn route_path(&self) -> String {
+        format!("/api/actions/{}/invocations", self.name)
+    }
+
     /// Whether this action is closed to every machine channel, whatever a tenant stores.
     pub fn machine_forbidden(&self) -> bool {
         self.scopes
@@ -354,6 +438,64 @@ fn bindings_from(row: &RegistryRow, path: &str, method: &str, input: &Value) -> 
     }
 }
 
+/// The boot rule: every approved row is either a compiled action or a valid imported contract.
+///
+/// A compiled name keeps its old checks (a configured service, a compiled workflow). An
+/// imported row must resolve through [`ResolvedAction::from_row`], must be external — this
+/// binary has no engine for an imported workflow — and must name a service with a configured
+/// base URL. Returns the first refusal as a message the caller maps to its own error type.
+pub async fn assert_boot_registry(pool: &PgPool) -> Result<(), String> {
+    for tenant in conveyor_store::tenants::active_ids(pool)
+        .await
+        .map_err(|error| format!("read the active tenants: {error}"))?
+    {
+        let mut tx = conveyor_store::begin_scoped(pool, tenant)
+            .await
+            .map_err(|error| format!("scope tenant {tenant}: {error}"))?;
+        let rows = actions::approved_registry(&mut tx)
+            .await
+            .map_err(|error| format!("read the approved registry: {error}"))?;
+        let _ = tx.rollback().await;
+        for row in rows {
+            if let Some(spec) = crate::registry::registry().get(&row.name) {
+                if let crate::spec::HandlerRef::External { service, .. } = spec.handler
+                    && crate::invoke::service_url(service).is_none()
+                {
+                    return Err(format!(
+                        "action {:?} names service {:?}, which has no configured base URL",
+                        row.name, row.service
+                    ));
+                }
+                if row.kind == "workflow"
+                    && !matches!(spec.handler, crate::spec::HandlerRef::Workflow)
+                {
+                    return Err(format!(
+                        "action {:?} is stored as a workflow but compiled without one",
+                        row.name
+                    ));
+                }
+                continue;
+            }
+            let action = ResolvedAction::from_row(&row).map_err(|error| error.to_string())?;
+            if action.kind == ActionKind::Workflow {
+                return Err(format!(
+                    "action {:?} is an imported workflow, which this binary cannot run",
+                    row.name
+                ));
+            }
+            if let ResolvedHandler::External(external) = &action.handler
+                && crate::invoke::service_url(&external.service).is_none()
+            {
+                return Err(format!(
+                    "action {:?} names service {:?}, which has no configured base URL",
+                    row.name, row.service
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 /// One action by name: compiled first, then the tenant's approved imported row.
 ///
 /// A name with registry versions but no approved row is **revoked**, not unknown: it answers
@@ -406,6 +548,20 @@ pub async fn get(
 /// Every action this tenant may resolve: the compiled table plus its approved imported rows,
 /// ordered by name.
 pub async fn list(pool: &PgPool, tenant: TenantId) -> Result<Vec<ResolvedAction>, ActionError> {
+    let mut actions: Vec<ResolvedAction> = crate::registry::registry()
+        .iter()
+        .map(ResolvedAction::from_spec)
+        .collect();
+    actions.extend(imported(pool, tenant).await?);
+    actions.sort_by(|left, right| left.name.cmp(&right.name));
+    Ok(actions)
+}
+
+/// The tenant's approved imported actions, ordered by name.
+///
+/// One malformed row must not empty every surface: it is reported and skipped, and a direct
+/// call to it still fails as malformed through [`get`].
+pub async fn imported(pool: &PgPool, tenant: TenantId) -> Result<Vec<ResolvedAction>, ActionError> {
     let mut tx = conveyor_store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| {
@@ -417,18 +573,11 @@ pub async fn list(pool: &PgPool, tenant: TenantId) -> Result<Vec<ResolvedAction>
         ActionError::internal()
     })?;
     let _ = tx.rollback().await;
-    let mut actions: Vec<ResolvedAction> = crate::registry::registry()
-        .iter()
-        .map(ResolvedAction::from_spec)
-        .collect();
+    let mut actions = Vec::with_capacity(rows.len());
     for row in rows {
         match ResolvedAction::from_row(&row) {
             Ok(action) => actions.push(action),
-            Err(error) => {
-                // One malformed row must not empty every surface; it is reported and skipped,
-                // and a direct call to it still fails as malformed through `get`.
-                tracing::warn!(%error, "resolve: skipping a malformed approved row");
-            }
+            Err(error) => tracing::warn!(%error, "resolve: skipping a malformed approved row"),
         }
     }
     actions.sort_by(|left, right| left.name.cmp(&right.name));
