@@ -1,0 +1,13 @@
+{
+  "action": "cadences.update",
+  "change": "write meta.refinement.wsjf_inputs for the five tranche-5 members; the full meta is sent because the store replaces it",
+  "cadence_id": "01a216d1-1a40-7246-ba5e-254b8c0986fe",
+  "version": 2,
+  "inputs": {
+    "S06": {"business_value": 9, "job_size": 6, "risk_reduction": 8, "time_criticality": 13},
+    "S08": {"business_value": 6, "job_size": 7, "risk_reduction": 8, "time_criticality": 8},
+    "S17": {"business_value": 6, "job_size": 8, "risk_reduction": 8, "time_criticality": 8},
+    "T17": {"business_value": 6, "job_size": 6, "risk_reduction": 5, "time_criticality": 5},
+    "T7": {"business_value": 10, "job_size": 6, "risk_reduction": 8, "time_criticality": 9}
+  }
+}
