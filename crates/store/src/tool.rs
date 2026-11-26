@@ -401,6 +401,14 @@ pub struct ToolCallRow {
     pub http_status: Option<i32>,
     /// Latency in milliseconds.
     pub latency_ms: i32,
+    /// The grant's credential alias, when the call was authorised by a binding.
+    pub credential_alias: Option<String>,
+    /// The run step's returned evidence, when the call recorded one (T18-3c).
+    pub evidence: Option<Value>,
+    /// The failure class, when the call failed.
+    pub error_class: Option<String>,
+    /// The failure message, when the call failed.
+    pub error_message: Option<String>,
     /// When the call was recorded — the ledger cursor's first component.
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
@@ -412,11 +420,16 @@ pub async fn calls_for_run(
     run_id: Uuid,
 ) -> Result<Vec<ToolCallRow>, ToolStoreError> {
     let rows: Vec<ToolCallRow> = sqlx::query_as(
-        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
-                input_hash, status, http_status, latency_ms, created_at
-           FROM tool_call
-          WHERE tenant_id = $1 AND run_id = $2
-          ORDER BY created_at ASC, id ASC",
+        "SELECT c.id, c.run_id, c.tool_id, c.binding_id, c.tool_key, c.toolkit_key,
+                c.toolkit_version, c.input_hash, c.status, c.http_status, c.latency_ms,
+                c.created_at, b.credential_alias, s.output AS evidence, c.error_class, c.error_message
+           FROM tool_call c
+           LEFT JOIN tool_binding b
+                  ON b.id = c.binding_id AND b.tenant_id = c.tenant_id
+           LEFT JOIN run_step s
+                  ON s.id = c.run_step_id AND s.tenant_id = c.tenant_id
+          WHERE c.tenant_id = $1 AND c.run_id = $2
+          ORDER BY c.created_at ASC, c.id ASC",
     )
     .bind(tenant.as_uuid())
     .bind(run_id)
@@ -433,11 +446,16 @@ pub async fn calls_for_tool(
     limit: i64,
 ) -> Result<Vec<ToolCallRow>, ToolStoreError> {
     let rows: Vec<ToolCallRow> = sqlx::query_as(
-        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
-                input_hash, status, http_status, latency_ms, created_at
-           FROM tool_call
-          WHERE tenant_id = $1 AND tool_id = $2
-          ORDER BY created_at DESC, id DESC
+        "SELECT c.id, c.run_id, c.tool_id, c.binding_id, c.tool_key, c.toolkit_key,
+                c.toolkit_version, c.input_hash, c.status, c.http_status, c.latency_ms,
+                c.created_at, b.credential_alias, s.output AS evidence, c.error_class, c.error_message
+           FROM tool_call c
+           LEFT JOIN tool_binding b
+                  ON b.id = c.binding_id AND b.tenant_id = c.tenant_id
+           LEFT JOIN run_step s
+                  ON s.id = c.run_step_id AND s.tenant_id = c.tenant_id
+          WHERE c.tenant_id = $1 AND c.tool_id = $2
+          ORDER BY c.created_at DESC, c.id DESC
           LIMIT $3",
     )
     .bind(tenant.as_uuid())
@@ -1206,15 +1224,20 @@ pub async fn calls_page(
         None => (None, None),
     };
     let rows = sqlx::query_as(
-        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
-                input_hash, status, http_status, latency_ms, created_at
-           FROM tool_call
-          WHERE tenant_id = $1
-            AND ($2::uuid IS NULL OR run_id = $2)
-            AND ($3::uuid IS NULL OR tool_id = $3)
-            AND ($4::text IS NULL OR status = $4)
-            AND ($5::timestamptz IS NULL OR (created_at, id) < ($5::timestamptz, $6::uuid))
-          ORDER BY created_at DESC, id DESC
+        "SELECT c.id, c.run_id, c.tool_id, c.binding_id, c.tool_key, c.toolkit_key,
+                c.toolkit_version, c.input_hash, c.status, c.http_status, c.latency_ms,
+                c.created_at, b.credential_alias, s.output AS evidence, c.error_class, c.error_message
+           FROM tool_call c
+           LEFT JOIN tool_binding b
+                  ON b.id = c.binding_id AND b.tenant_id = c.tenant_id
+           LEFT JOIN run_step s
+                  ON s.id = c.run_step_id AND s.tenant_id = c.tenant_id
+          WHERE c.tenant_id = $1
+            AND ($2::uuid IS NULL OR c.run_id = $2)
+            AND ($3::uuid IS NULL OR c.tool_id = $3)
+            AND ($4::text IS NULL OR c.status = $4)
+            AND ($5::timestamptz IS NULL OR (c.created_at, c.id) < ($5::timestamptz, $6::uuid))
+          ORDER BY c.created_at DESC, c.id DESC
           LIMIT $7",
     )
     .bind(tenant.as_uuid())

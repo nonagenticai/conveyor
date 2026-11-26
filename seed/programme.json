@@ -57,7 +57,7 @@
       "key": "S02",
       "name": "Skeleton — workspace, tenancy, auth, jobs, SSE",
       "description": "Plan: docs/plans/slices/S02-skeleton.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S02-skeleton.md",
@@ -111,7 +111,7 @@
       "key": "S04",
       "name": "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest",
       "description": "Plan: docs/plans/slices/S04-action-registry.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S04-action-registry.md",
@@ -123,7 +123,7 @@
           "S02",
           "S03"
         ],
-        "plan_status": "built 2026-11-22",
+        "plan_status": "planned",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
@@ -806,15 +806,13 @@
         ],
         "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "partial",
+        "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
           "evidence"
         ],
-        "closure_outputs": [
-          "closure-review"
-        ],
+        "closure_outputs": [],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -858,7 +856,10 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          72
+          72,
+          744,
+          746,
+          762
         ],
         "depends_on": [
           "T0",
@@ -1231,7 +1232,7 @@
       "key": "T12",
       "name": "One organisation loop",
       "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1279,7 +1280,7 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1288,7 +1289,8 @@
           76,
           556,
           557,
-          630
+          630,
+          778
         ],
         "depends_on": [
           "T2",
@@ -1314,7 +1316,7 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1324,7 +1326,8 @@
           558,
           560,
           561,
-          688
+          688,
+          776
         ],
         "depends_on": [
           "T13",
@@ -1530,7 +1533,7 @@
       "key": "T19F",
       "name": "Decision-forum governance (follow-on)",
       "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/T19F-meeting-bindings.md",
@@ -1548,7 +1551,7 @@
           "T10",
           "P0"
         ],
-        "plan_status": "proposed",
+        "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 6,
@@ -1561,6 +1564,7 @@
         ],
         "adm_phase": "G",
         "plateau": "capability",
+        "closure_deferred_to_tranche": 6,
         "gate": "a reviewed policy asset publishes a new immutable meeting_type version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a sitting whose qualifying seats each write one approval_decision with via='meeting'; a cadence row materialises exactly one meeting; the direct board path is unchanged"
       }
     },
@@ -1679,7 +1683,21 @@
           569,
           660,
           669,
-          733
+          733,
+          755,
+          756,
+          760,
+          779,
+          780,
+          781,
+          782,
+          783,
+          784,
+          787,
+          788,
+          789,
+          791,
+          792
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1701,7 +1719,7 @@
       "key": "SPEC-V2",
       "name": "SPEC V2 — the organisational operating model",
       "description": "Programme-level unit (plan: docs/SPEC_V2.md)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md",

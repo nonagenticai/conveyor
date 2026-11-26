@@ -53,6 +53,29 @@ impl Destructive {
     }
 }
 
+/// One typed evidence reference the console attaches to a gate (`approvals.request.evidence`).
+///
+/// The server resolves it before the gate is opened (`pm::resolve_evidence`) and stores what it
+/// resolved on `meta.evidence`; `kind` is `governed_asset` (T9 adds `architecture_contract`) and
+/// `baseline`.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct EvidenceRef {
+    /// `governed_asset | baseline`.
+    pub kind: String,
+    /// The row in that kind's table.
+    pub id: String,
+}
+
+impl EvidenceRef {
+    /// The gate's evidence is a governed asset, by row id.
+    pub fn governed_asset(id: impl Into<String>) -> Self {
+        Self {
+            kind: "governed_asset".to_owned(),
+            id: id.into(),
+        }
+    }
+}
+
 /// Ask, decide when the tenant allows it, then invoke — with the approval id on the call.
 ///
 /// Mirrors the screens' existing `run_write` shape so a call site keeps its own refresh and
@@ -65,8 +88,26 @@ pub fn run_destructive(
     done: impl FnOnce(Destructive) + 'static,
     finish: impl FnOnce() + 'static,
 ) {
+    run_destructive_with_evidence(ctx, action, input, Vec::new(), options, done, finish);
+}
+
+/// [`run_destructive`] with typed evidence attached to the gate (#572).
+///
+/// The evidence is the record the gate protects — a governed asset (or a baseline where the
+/// caller has one) — resolved by `approvals.request` before the gate opens. The requirement that
+/// a destructive gate *needs* evidence, and the waiver that can replace it, are the server's
+/// (#526); this caller only supplies what the operator attached.
+pub fn run_destructive_with_evidence(
+    ctx: AppCtx,
+    action: &'static str,
+    input: Value,
+    evidence: Vec<EvidenceRef>,
+    options: InvokeOptions,
+    done: impl FnOnce(Destructive) + 'static,
+    finish: impl FnOnce() + 'static,
+) {
     leptos::task::spawn_local(async move {
-        let outcome = attempt(ctx, action, input, options).await;
+        let outcome = attempt(ctx, action, input, evidence, options).await;
         match &outcome {
             Destructive::Done => {}
             Destructive::Waiting { approval_id } => {
@@ -88,6 +129,7 @@ async fn attempt(
     ctx: AppCtx,
     action: &'static str,
     input: Value,
+    evidence: Vec<EvidenceRef>,
     options: InvokeOptions,
 ) -> Destructive {
     let (approval, self_approval) = policy(ctx, action).await;
@@ -127,6 +169,9 @@ async fn attempt(
         "input": input,
         "proposed_input": input,
         "description": format!("{action} from the console"),
+        // The record the gate protects; empty when the operator attached none. The server
+        // decides whether that is allowed (#526 owns the destructive rule).
+        "evidence": evidence,
     });
     let mut requested = ctx
         .invoke(

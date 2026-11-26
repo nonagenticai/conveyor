@@ -215,12 +215,16 @@ async fn check_executor(
     agent: &store::capability::AgentRecord,
     blocking: &mut Vec<ReadinessBlocker>,
 ) -> Result<(), ActionError> {
-    if let Some(reference) = agent.prompt_ref.as_deref()
-        && !prompt_is_active(&mut *conn, tenant, reference).await?
-    {
-        blocking.push(ReadinessBlocker::PromptMissing {
-            prompt_ref: reference.to_owned(),
-        });
+    match agent.prompt_ref.as_deref() {
+        Some(reference) => {
+            if !prompt_is_active(&mut *conn, tenant, reference).await? {
+                blocking.push(ReadinessBlocker::PromptMissing {
+                    prompt_ref: reference.to_owned(),
+                });
+            }
+        }
+        // An active agent with no prompt has no compiled text to call a model over (§7.7).
+        None => blocking.push(ReadinessBlocker::PromptNotConfigured),
     }
     for action in &agent.allowed_actions {
         if registry().get(action).is_none() {
@@ -285,6 +289,10 @@ fn blocker_field(blocker: &ReadinessBlocker) -> FieldError {
         ReadinessBlocker::PromptMissing { prompt_ref } => (
             "prompt_ref",
             format!("{prompt_ref} is not an active prompt in this tenant's catalogue"),
+        ),
+        ReadinessBlocker::PromptNotConfigured => (
+            "prompt_ref",
+            "the active executor names no prompt; a model call needs compiled text".to_owned(),
         ),
     };
     FieldError {

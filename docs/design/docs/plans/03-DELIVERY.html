@@ -56,7 +56,8 @@
 <li><strong>No duplication.</strong> At most one paraphrased sentence per part, then the link. The issue is a brief, not a copy of the plan.</li>
 </ul>
 <p><strong>Definition of ready</strong> — the claim gate: baseline and doc blob shas named · every reference resolves · every part has a scenario with a <code>Verify:</code> · dependencies complete, typed and cited · <code>Blocker: #N</code> present iff <code>status:blocked</code> · programme fields present and resolvable (issues created on/after 2026-11-18) · one-PR scope, file-disjoint or sequenced · scope corrections applied.</p>
-<p><strong>Definition of done</strong> — the merge gate: every scenario passes at the PR head with a row in <code>Evidence at completion</code> · the repo gate is green at the exact head · tests added/updated per part, none skipped · docs updated · migrations/ledger and <code>--check-lock</code> handled when touched · live verification recorded where deployment is a prerequisite · every CARRIED-BY-#9 part re-checked on merged main · one PR <code>Closes #N</code> MERGED, issue closed, branch deleted.</p>
+<p><strong>Definition of done</strong> — the merge gate: every scenario passes at the PR head with a row in <code>Evidence at completion</code> · the repo gate is green at the exact head · tests added/updated per part, none skipped · docs updated · migrations/ledger and <code>--check-lock</code> handled when touched · a unit that closes the slice's last open issue updates that slice's <code>scripts/v2-slice-artefacts.json</code> row to the measured shape (tables/actions/modules) and runs <code>python3 scripts/build-coverage.py --check</code> · live verification recorded where deployment is a prerequisite · every CARRIED-BY-#9 part re-checked on merged main · one PR <code>Closes #N</code> MERGED, issue closed, branch deleted.</p>
+<p>The <code>design-pack</code> job runs <code>python3 scripts/build-coverage.py --check</code>. A failure naming <code>a non-built project has no open unit</code> means the slice that just closed still carries a curated row: update its <code>scripts/v2-slice-artefacts.json</code> entry to the measured shape and re-run the check.</p>
 <p>A <code>status:blocked</code> issue carries a plain line starting <code>Blocker: #N</code>; a <code>Blocker:</code> mention inside prose or a checklist is not a blocker line. The number is an issue, never a PR.</p>
 <h2 id="labels-and-states">Labels and states</h2>
 <table>
@@ -225,6 +226,7 @@ git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
 </table>
 <ul>
 <li>Paste the command, result and SHA into the PR body. <strong>No PR until green.</strong></li>
+<li>A unit that adds or removes an action, <strong>or changes an action's input schema</strong>, also runs and names in its acceptance: the <code>registry</code> and <code>parity_http_mcp</code> suites, <code>--print-openapi --check-lock</code> (refresh <code>served-spec.lock.json</code> when it reports), <code>python3 scripts/build-coverage.py</code> (refresh <code>docs/design/data/actions.json</code>), and the design-pack index when a document is added. This is the correction for #744, whose two PR reds were exactly a missing parity sample and a stale served-spec lock — both invisible to a gate that ran only the crate's own tests.</li>
 </ul>
 <h2 id="enforcement">Enforcement</h2>
 <p>Two repo-level <code>PreToolUse</code> hooks (registered in <code>.claude/settings.json</code>) enforce the two rules that were broken before this protocol:</p>

@@ -6,7 +6,8 @@
 //! card's cockpit, is where their gate is read and decided.
 //!
 //! A row shows what an approver needs to judge it: the action, the **target** it authorises, the
-//! proposed input, who asked, and how long it has waited. The decide control is present for every
+//! typed evidence the gate resolved, the proposed input, who asked, and how long it has waited.
+//! The decide control is present for every
 //! gate the caller may decide; where the tenant forbids self-approval and the caller is the
 //! requester, it is **disabled with the reason** rather than hidden — a screen that silently
 //! omits the control reads as "nothing to do here", which is wrong.
@@ -169,6 +170,29 @@ pub fn Approvals() -> impl IntoView {
                                     <p class="approval-target mono" data-target=row.target.clone().unwrap_or_default()>
                                         {row.target.clone().unwrap_or_else(|| "(no target)".to_owned())}
                                     </p>
+                                    {(!row.evidence.is_empty()).then(|| {
+                                        let items = row
+                                            .evidence
+                                            .iter()
+                                            .map(|item| {
+                                                let kind = item
+                                                    .get("kind")
+                                                    .and_then(Value::as_str)
+                                                    .unwrap_or("evidence");
+                                                let id = item
+                                                    .get("id")
+                                                    .and_then(Value::as_str)
+                                                    .unwrap_or("—");
+                                                format!("{kind} {id}")
+                                            })
+                                            .collect::<Vec<_>>()
+                                            .join(", ");
+                                        view! {
+                                            <p class="muted evidence" data-testid="approval-evidence">
+                                                {"Evidence: "}{items}
+                                            </p>
+                                        }
+                                    })}
                                     <p class="muted">
                                         "Requested by "
                                         {row.requested_by_label.clone()

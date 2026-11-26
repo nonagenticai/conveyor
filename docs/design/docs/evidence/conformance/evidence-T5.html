@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T5 evidence — the published output · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T5.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t5-evidence--the-published-output">T5 evidence — the published output</h1>
+<p><code>documents.compose</code> of <code>docs/plans/T5/evidence.md</code> (category <code>evidence</code>, unit <code>T5</code>), then <code>documents.publish</code>; the audit's declared-output rule reads this row.</p>
+<pre><code>== write: documents.compose ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T5/evidence\nversion: 1\nstatus: published\nproject: T5\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T5 \u2014 Kata: evidence\n\n## Claim\n\nT5 delivers the kata loop: a planned procedure change opens a kata whose prediction is recorded\nbefore its measurement, the measurement runs on a held-out split, a measured regression reverts the\ncandidate, a flat or incomparable result adopts nothing, the kata cannot approve its own adoption,\nand the open/adopt gates refuse the documented cases.\n\n## Evidence\n\n- `crates/actions/tests/kata_gets.rs::the_prediction_is_recorded_before_the_measurement`\n- `crates/actions/tests/kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split`\n- `crates/actions/tests/kata_revert.rs::a_measured_regression_reverts_the_candidate`,\n  `::a_flat_or_incomparable_result_adopts_nothing`\n- `crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption`\n- `crates/actions/tests/kata_open.rs::a_kata_without_an_instrument_is_not_opened`,\n  `::a_second_kata_for_an_open_signature_is_refused`\n- Migrations `0066_kata.sql` and `0067_kata_gate.sql`; merges `7e617673` (PR #636) and\n  `f8c82c68` (PR #654).\n\n## Verification\n\nRun the suite on a checked-out main: `cargo test -p conveyor-actions --test kata_adopt --test\nkata_gets --test kata_measure --test kata_open --test kata_revert`. The CI equivalent is the PR&#39;s\n`preflight` and `ci-public` at the merge commits above.\n\n## Links\n\n- `docs/plans/inception/T5/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issues #77 and #653; PRs #636 and #654.\n\n## Gap\n\nThe tranche-10 authorisation is not evidenced here and is not claimed \u2014 it is the #526 programme\nchain&#39;s act. No delivery gap is claimed by the issue record.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;547352fa0926cd8c98b084e84d26ca118aa15d6b1a4c755513a8720dcc7726f3&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:47:03.383099Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a21219-ffc6-7397-8721-61e5aa7e78fc&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;547352fa0926cd8c98b084e84d26ca118aa15d6b1a4c755513a8720dcc7726f3&quot;,
+    &quot;size_bytes&quot;: 1864,
+    &quot;unit&quot;: &quot;T5&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d34-73db-975e-5d178d729cef&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 1864,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T5 Kata&quot;,
+  &quot;unit&quot;: &quot;T5&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:47:03.383099Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.list ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;body&quot;: null,
+      &quot;card_id&quot;: null,
+      &quot;category&quot;: &quot;evidence&quot;,
+      &quot;content_hash&quot;: &quot;547352fa0926cd8c98b084e84d26ca118aa15d6b1a4c755513a8720dcc7726f3&quot;,
+      &quot;content_type&quot;: &quot;text/markdown&quot;,
+      &quot;created_at&quot;: &quot;2026-11-25T09:47:03.383099Z&quot;,
+      &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+      &quot;created_by_name&quot;: &quot;FR Test&quot;,
+      &quot;external_ref&quot;: null,
+      &quot;id&quot;: &quot;01a21219-ffc6-7397-8721-61e5aa7e78fc&quot;,
+      &quot;kind&quot;: &quot;document&quot;,
+      &quot;meta&quot;: {
+        &quot;category&quot;: &quot;evidence&quot;,
+        &quot;content_type&quot;: &quot;text/markdown&quot;,
+        &quot;sha256&quot;: &quot;547352fa0926cd8c98b084e84d26ca118aa15d6b1a4c755513a8720dcc7726f3&quot;,
+        &quot;size_bytes&quot;: 1864,
+        &quot;unit&quot;: &quot;T5&quot;
+      },
+      &quot;parent_document_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d34-73db-975e-5d178d729cef&quot;,
+      &quot;publish_requested_at&quot;: null,
+      &quot;publishable&quot;: false,
+      &quot;published_at&quot;: null,
+      &quot;published_by&quot;: null,
+      &quot;published_by_name&quot;: null,
+      &quot;size_bytes&quot;: 1864,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;title&quot;: &quot;Evidence \u2014 T5 Kata&quot;,
+      &quot;unit&quot;: &quot;T5&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-25T09:47:03.383099Z&quot;,
+      &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+      &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/conformance/evidence-T5.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

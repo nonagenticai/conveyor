@@ -44,6 +44,9 @@ pub(crate) fn run_out(record: &RunRecord) -> RunOut {
         version: i64::try_from(run.version.get()).unwrap_or(i64::MAX),
         process_step_id: record.process_step_id.map(|id| id.to_string()),
         workflow_step_id: record.workflow_step_id.map(|id| id.to_string()),
+        job_binding_id: record.job_binding_id.map(|id| id.to_string()),
+        release_hash: record.release_hash.clone(),
+        executor_kind: record.executor_kind.clone(),
         created_at: record.created_at,
         // Only `runs.get` loads the trace, so only it can compose a declared output (S18 P3b).
         output: Value::Null,

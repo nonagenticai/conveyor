@@ -356,6 +356,14 @@ pub enum Scope {
 }
 
 impl Scope {
+    /// Parse a scope's wire spelling.
+    ///
+    /// Scans [`Scope::ALL`] and compares [`Scope::as_str`], so the parser cannot drift from the
+    /// vocabulary: a new variant joins both directions in one edit.
+    pub fn parse(text: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|scope| scope.as_str() == text)
+    }
+
     /// Every scope this build knows.
     pub const ALL: [Scope; 74] = [
         Scope::ActionsRead,

@@ -91,6 +91,10 @@ struct Gate {
     refusal: Option<Refusal>,
     /// A `handover`: park the run and open the approval that applies the draft.
     escalation: Option<Escalation>,
+    /// The L1 decision this gate recorded, when it recorded one.
+    decision_id: Option<Uuid>,
+    /// Whether the effective policy declares `meta.on_accept = "apply"`.
+    apply: bool,
 }
 
 /// The facts the `executor` approval needs when a gate hands the draft to a person.
@@ -460,9 +464,54 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     )
     .await
     .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    store::process::record_run_step_judge_tx(&mut tx, tenant, step_id, &gate.judge)
+    // An accepted gate applies its draft when the effective policy declares `on_accept = "apply"`
+    // (ADR 0019, CONTRACT §29). The application is the one `apply_draft_tx` gate the action and
+    // the resume worker also call; it runs in this finish transaction, after the step row, and
+    // never re-generates. A cardless run has no work package to receive the draft.
+    let mut judge = gate.judge.clone();
+    let mut apply_failure: Option<String> = None;
+    if gate.refusal.is_none() && gate.escalation.is_none() && gate.apply {
+        match (run.card_id, gate.decision_id, document_id.as_deref()) {
+            (Some(card_id), Some(decision_id), Some(document)) => {
+                let document = Uuid::parse_str(document).map_err(|error| {
+                    ExecutorFailure::permanent(format!("the draft id is not a uuid: {error}"))
+                })?;
+                let ctx = service_ctx(tenant, Some(actor_id), app_key, "run.execute");
+                match crate::ladder::apply_draft_tx(&mut tx, &ctx, document, card_id, decision_id)
+                    .await
+                {
+                    Ok(document) => judge["applied_document_id"] = json!(document.id),
+                    Err(error) => apply_failure = Some(format!("{}: {}", error.code, error.detail)),
+                }
+            }
+            (None, _, _) => judge["apply_skipped"] = json!("no_card"),
+            _ => {
+                apply_failure = Some(
+                    "the accepted gate recorded no decision to apply the draft with".to_owned(),
+                );
+            }
+        }
+    }
+    store::process::record_run_step_judge_tx(&mut tx, tenant, step_id, &judge)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+    if let Some(detail) = apply_failure {
+        // The generation succeeded and the step says so; the apply did not, so the run fails
+        // with the resume worker's class — never a half-applied draft.
+        finish_failed(
+            &mut tx,
+            tenant,
+            app_key,
+            run_id,
+            "draft_apply_invalid",
+            &detail,
+        )
+        .await?;
+        tx.commit()
+            .await
+            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+        return Ok(());
+    }
     match (gate.refusal, gate.escalation) {
         (Some(refusal), _) => {
             finish_failed(
@@ -624,6 +673,8 @@ async fn decide(
             judge: json!({ "decision": "no_policy", "kind": GATE_KIND }),
             refusal: None,
             escalation: None,
+            decision_id: None,
+            apply: false,
         });
     };
     // Readiness proved both of these above; re-reading them here cannot fail.
@@ -642,6 +693,8 @@ async fn decide(
     let action = policy
         .action()
         .map_err(|error| ExecutorFailure::permanent(format!("the policy is unusable: {error}")))?;
+    // `on_accept` is validated at authoring (`422 invalid_policy_meta`); absent means `park`.
+    let apply = policy.policy.meta.get("on_accept").and_then(Value::as_str) == Some("apply");
     let actor_id = store::identity::tenant_actor(pool, tenant)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -690,6 +743,8 @@ async fn decide(
             }),
             refusal: None,
             escalation: None,
+            decision_id: None,
+            apply: false,
         });
     }
     let prepared = invoke(
@@ -869,6 +924,8 @@ async fn decide(
                 refusal_for(outcome, "gate_unavailable", "the laya judge did not decide")
             },
             escalation,
+            decision_id: None,
+            apply: false,
         });
     };
 
@@ -944,6 +1001,9 @@ async fn decide(
             )));
         }
     };
+    let recorded_decision = decision_id
+        .as_deref()
+        .and_then(|raw| Uuid::parse_str(raw).ok());
     let judge_doc = json!({
         "decision": outcome_str(outcome),
         "decision_id": decision_id,
@@ -973,6 +1033,8 @@ async fn decide(
         judge: judge_doc,
         refusal,
         escalation,
+        decision_id: recorded_decision,
+        apply,
     })
 }
 

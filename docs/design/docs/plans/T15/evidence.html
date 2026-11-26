@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T15 — Tool authoring and BYO: evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T15/evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t15--tool-authoring-and-byo-evidence">T15 — Tool authoring and BYO: evidence</h1>
+<h2 id="claim">Claim</h2>
+<p>T15 delivers the tool-authoring route: a tool generated from a spec is published and called, the publication approval defaults to a human and is tenant-configurable, a BYO MCP server is bound, narrowed and audited, and no publishing job can exceed its effect ceiling.</p>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li><code>crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called</code>, <code>::a_scaffolded_service_registers_its_own_openapi</code></li>
+<li><code>::publication_waits_for_a_human_by_default</code>, <code>::a_tenant_policy_changes_the_publication_gate_without_a_code_change</code></li>
+<li><code>crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited</code>, <code>::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped</code></li>
+<li><code>::the_publishing_job_cannot_widen_its_own_effect_ceiling</code>, <code>::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read</code>, <code>::a_destructive_tool_needs_a_named_approver</code></li>
+<li>PR #666, merge <code>a2ef9194eb2c</code>; <code>actions:tools</code> = <code>exists</code> in <code>docs/evidence/v2-coverage.md</code>.</li>
+</ul>
+<h2 id="verification">Verification</h2>
+<p><code>cargo test -p conveyor-actions --test tool_authoring --test byo_tools</code> on a checked-out main; the CI equivalent is the PR's <code>preflight</code> and <code>ci-public</code> at the merge commit.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li><code>docs/plans/inception/T15/00-project-brief.md</code>, <code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code></li>
+<li>Issue #86; PR #666; <code>docs/evidence/v2-coverage.md</code>.</li>
+</ul>
+<h2 id="gap">Gap</h2>
+<p><code>/tools</code> is the V1 legacy surface and is not evidence for this project. A promotion returns <code>requested</code>; no platform version is stamped. Caller-supplied URLs and an archived-kag binding are not claimed. No other delivery gap is named by the record.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T15/evidence.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

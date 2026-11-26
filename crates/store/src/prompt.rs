@@ -672,10 +672,10 @@ pub struct NewPrompt {
     pub key: String,
     /// Human title.
     pub title: String,
+    /// The whole-prompt character ceiling; `None` means unbounded.
+    pub budget_chars: Option<u32>,
     /// In order.
     pub sections: Vec<NewPromptSection>,
-    /// The compiled prompt text's character ceiling; `None` is unbounded.
-    pub budget_chars: Option<u32>,
 }
 
 /// One catalogue row without its sections, for `prompt_recipes.list`.

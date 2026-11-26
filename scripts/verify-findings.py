@@ -8,6 +8,10 @@ the evidence; the line is a hint. A quote that is gone, or that now appears more
 stale finding: the fix has landed or the claim was never true. Either way it must not reach the
 rework register.
 
+A resolved finding carries either a legacy prose string or a receipt
+`{commit, test, evidence}`: a 40-hex ancestor commit, a test path that exists, and the run or
+result. A resolved finding skips the quote check because the fix may have moved the line.
+
 Usage:
     python3 scripts/verify-findings.py [docs/evidence/v1-conformance-findings.json]
     python3 scripts/verify-findings.py --stdout      # print failures to stdout, write nothing
@@ -71,9 +75,15 @@ def validate_resolution(finding: dict) -> list[str]:
     if not isinstance(test, str) or not test.strip():
         errors.append(f"{label}: resolved_by.test must name a test path or path::name")
     else:
-        path = test.split("::", 1)[0]
-        if not (ROOT / path).exists():
-            errors.append(f"{label}: resolved_by.test path does not exist: {path}")
+        relative = test.split("::", 1)[0]
+        target = (ROOT / relative).resolve()
+        try:
+            target.relative_to(ROOT)
+        except ValueError:
+            errors.append(f"{label}: resolved_by.test path escapes the repository: {relative!r}")
+        else:
+            if not target.is_file():
+                errors.append(f"{label}: resolved_by.test path does not exist: {relative}")
     if not isinstance(evidence, str) or not evidence.strip():
         errors.append(f"{label}: resolved_by.evidence must name the run, command or result")
     return errors

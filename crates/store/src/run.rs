@@ -288,7 +288,8 @@ impl TryFrom<RunRow> for Run {
 
 const COLUMNS: &str = "id, card_id, project_id, status, attempt, error_class, error_message, \
                        started_at, finished_at, version, parent_run_id, step_id, depth, \
-                       process_version, workflow_step_id";
+                       process_version, workflow_step_id, job_binding_id, release_hash, \
+                       executor_kind";
 
 /// One run row together with its position in the run tree (0033).
 ///
@@ -376,6 +377,12 @@ pub struct RunRecord {
     pub process_step_id: Option<Uuid>,
     /// The workflow node that started this run, when it is a child of a workflow parent (0037).
     pub workflow_step_id: Option<Uuid>,
+    /// The job binding this run pinned (T0, §4.4).
+    pub job_binding_id: Option<Uuid>,
+    /// The release the binding pinned (T18-3c).
+    pub release_hash: Option<String>,
+    /// The executor kind pinned when the run was created (T18-3c).
+    pub executor_kind: Option<String>,
     /// When the row was created (the page's sort key).
     pub created_at: DateTime<Utc>,
 }
@@ -396,6 +403,12 @@ struct RunRecordRow {
     step_id: Option<Uuid>,
     /// The `run.workflow_step_id` edge (a workflow parent's node, 0037).
     workflow_step_id: Option<Uuid>,
+    /// The organisation pin (T18-3c).
+    job_binding_id: Option<Uuid>,
+    /// The release the binding pinned (T18-3c).
+    release_hash: Option<String>,
+    /// The executor kind pinned at creation (T18-3c).
+    executor_kind: Option<String>,
     created_at: DateTime<Utc>,
 }
 
@@ -419,6 +432,9 @@ impl TryFrom<RunRecordRow> for RunRecord {
             },
             process_step_id: row.step_id,
             workflow_step_id: row.workflow_step_id,
+            job_binding_id: row.job_binding_id,
+            release_hash: row.release_hash,
+            executor_kind: row.executor_kind,
             created_at: row.created_at,
         })
     }
@@ -463,27 +479,27 @@ pub async fn insert_run_tx(
     }
     ensure_parent_tx(conn, tenant, Parent::Project, input.project_id).await?;
     ensure_optional_parent_tx(conn, tenant, Parent::Card, input.card_id).await?;
-    let (job_binding_id, release_hash) = match input.job_binding_id {
+    let (job_binding_id, release_hash, executor_kind) = match input.job_binding_id {
         Some(binding_id) => {
-            let (id, hash) = crate::organisation::resolve_binding_pin_tx(
+            let (id, hash, kind) = crate::organisation::resolve_binding_pin_tx(
                 conn,
                 tenant,
                 binding_id,
                 input.release_hash.as_deref(),
             )
             .await?;
-            (Some(id), Some(hash))
+            (Some(id), Some(hash), Some(kind))
         }
         None if input.release_hash.is_some() => return Err(RunStoreError::ReleaseWithoutBinding),
-        None => (None, None),
+        None => (None, None, None),
     };
     let sql = format!(
         "INSERT INTO run (tenant_id, card_id, project_id, status, attempt, correlation_id,
                           process_id, inputs, capability_id, capability_agent_id,
                           parent_run_id, step_id, depth, process_version,
-                          job_binding_id, release_hash, kind)
+                          job_binding_id, release_hash, kind, executor_kind)
          VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-                 $16)
+                 $16, $17)
          RETURNING {COLUMNS}"
     );
     let row: RunRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -503,6 +519,7 @@ pub async fn insert_run_tx(
         .bind(job_binding_id)
         .bind(release_hash.as_deref())
         .bind(input.kind.as_str())
+        .bind(executor_kind.as_deref())
         .fetch_one(&mut *conn)
         .await
         .map_err(|error| {

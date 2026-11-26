@@ -1,19 +1,14 @@
-project 01a210ba-b6cb-76cc-82a3-a2b45cfb498f board 01a210ba-b766-753d-a807-d5248d0818c2 list 01a210ba-b7f4-71d2-84f3-f0c9f72c1dce
-RESUME v1: meeting 01a210c2-a327-7dc7-bab4-5a402a8497a8 is already pinned at version 1
-v1: meeting 01a210c2-a327-7dc7-bab4-5a402a8497a8 pinned at version 1
-RESUME policy: asset 01a210c3-7c34-7338-89f2-6c7a6e40bea7 exists (draft)
-BLOCKED policy v2: authoring.review refused: the approval has no human decision (the admin CLI records `service`); a person must approve it in the console, then re-run
-pinned: meeting 01a210c2-a327-7dc7-bab4-5a402a8497a8 still resolves v1; the type list carries 1 version row(s)
-sitting: approval 01a210c8-9273-7964-9b97-0f3dd810bcf3 -> approved with 1 decision row(s)
-cadence: 01a210c9-0d47-7473-8339-7ea7648e59e9 materialised as meeting 01a210c9-2397-73f1-8d07-7e8e807e524f twice
-state: /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-684/docs/evidence/t19f/live-gate.json
 PASS the live project row is T19F
 PASS the v1-pinned meeting still resolves version 1 (got 1)
 PASS the pinned meeting names the forum type
-FAIL the policy v2 is published after a human review: authoring.review refused: the approval has no human decision (the admin CLI records `service`); a person must approve it in the console, then re-run
-FAIL the sitting's approval is a row
+PASS the forum type carries v1 and v2 (got 2 row(s))
+PASS the v2 policy is an active version
+PASS the sitting's approval is a row
+PASS the sitting's approval is approved (got 'approved')
+PASS one per-seat decision row carries via.surface='meeting' (got 1)
+PASS the meeting decision row names the chair seat
 PASS the sitting item closed as decision (got 1)
 PASS the materialised meeting names the cadence's forum type
 PASS the materialised meeting carries the cadence slot
 PASS the materialised meeting is non-cancelled
-2 check(s) failed
+all T19F live-gate checks passed

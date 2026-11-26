@@ -24,8 +24,6 @@
 //!   the binding's pin is [`OrganisationStoreError::StaleRelease`], which the run store turns
 //!   into `409 job_binding_stale` before the INSERT (P2.2).
 
-use std::collections::{BTreeMap, BTreeSet};
-
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::executor::{BindingConfig, BindingError, ExecutorKind, Registry};
@@ -34,6 +32,7 @@ use conveyor_domain::organisation::{
 };
 use serde_json::{Value, json};
 use sqlx::PgConnection;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use uuid::Uuid;
 
 /// Why an organisation write or read failed.
@@ -130,6 +129,27 @@ pub enum OrganisationStoreError {
         /// The kind the release's anatomy declares.
         release: String,
     },
+    /// A required knowledge kind has no value anywhere on the job's layer path (SPEC_V2 §4.1).
+    #[error("release_not_ready: required kind {kind:?} has no value for department {department:?}")]
+    LayerReleaseNotReady {
+        /// The unresolved kind.
+        kind: String,
+        /// The department whose path is short (the job key when the job has no placement).
+        department: String,
+    },
+    /// Two departments in one job's placement set a kind to different values.
+    #[error("department_conflict: {departments:?} disagree on kind {kind:?}")]
+    LayerDepartmentConflict {
+        /// The kind they disagree on.
+        kind: String,
+        /// The departments, in placement order.
+        departments: Vec<String>,
+    },
+    /// A knowledge-layer level the release compiler does not resolve.
+    #[error(
+        "the knowledge-layer level {0:?} is not one of base, industry, department_archetype, department, job"
+    )]
+    UnknownLayerLevel(String),
 }
 
 /// Parse an anatomy, turning a missing one into a field-level refusal.
@@ -1062,6 +1082,10 @@ pub async fn compile_release_tx(
             })
         })
         .collect();
+    // SPEC_V2 §4.1: the release carries the resolved knowledge layers and their sources. The
+    // resolution refuses an unresolved required kind and a sibling-department disagreement, so a
+    // published release never encodes a configuration the spec forbids.
+    let layers = resolve_layers_tx(conn, tenant, job_id).await?;
     Ok(json!({
         "job_key": job.job_key,
         "title": job.title,
@@ -1070,6 +1094,7 @@ pub async fn compile_release_tx(
         "departments": departments,
         "anatomy": job.definition,
         "layer_values": layer_values,
+        "layers": layers,
     }))
 }
 
@@ -1357,15 +1382,17 @@ pub async fn resolve_binding_pin_tx(
     tenant: TenantId,
     binding_id: Uuid,
     requested_hash: Option<&str>,
-) -> Result<(Uuid, String), OrganisationStoreError> {
-    let row: Option<(String, String)> = sqlx::query_as(
-        "SELECT status, release_hash FROM job_binding WHERE tenant_id = $1 AND id = $2",
+) -> Result<(Uuid, String, String), OrganisationStoreError> {
+    let row: Option<(String, String, String)> = sqlx::query_as(
+        "SELECT status, release_hash, executor_kind FROM job_binding
+          WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(binding_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (status, binding_hash) = row.ok_or(OrganisationStoreError::NotFound("binding"))?;
+    let (status, binding_hash, executor_kind) =
+        row.ok_or(OrganisationStoreError::NotFound("binding"))?;
     let status: BindingStatus = status
         .parse()
         .map_err(OrganisationStoreError::UnknownStatus)?;
@@ -1376,7 +1403,7 @@ pub async fn resolve_binding_pin_tx(
             requested_hash: requested,
         });
     }
-    Ok((binding_id, binding_hash))
+    Ok((binding_id, binding_hash, executor_kind))
 }
 
 // ── the public snapshot section ───────────────────────────────────────────────────────────
@@ -1519,6 +1546,344 @@ pub async fn organisation_json_tx(
             "capability_id": row.capability_id,
         })).collect::<Vec<_>>(),
     }))
+}
+
+// ── knowledge layers (SPEC_V2 §4.1) ──────────────────────────────────────────────────────
+
+/// The levels a knowledge-layer row may sit at, in resolve order.
+pub const LAYER_LEVELS: [&str; 5] = [
+    "base",
+    "industry",
+    "department_archetype",
+    "department",
+    "job",
+];
+
+const LAYER_COLUMNS: &str = "id, level, industry_id, department_id, job_id, kind, value, required, version, created_at, \
+     updated_at";
+
+/// One authored knowledge-layer row (migration `0072`).
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct LayerRow {
+    /// Row id.
+    pub id: Uuid,
+    /// `base | industry | department_archetype | department | job`.
+    pub level: String,
+    /// The industry an `industry` row scopes to.
+    pub industry_id: Option<Uuid>,
+    /// The department an archetype or department row scopes to.
+    pub department_id: Option<Uuid>,
+    /// The job a `job` row scopes to.
+    pub job_id: Option<Uuid>,
+    /// The knowledge kind.
+    pub kind: String,
+    /// The value this layer sets, when it sets one.
+    pub value: Option<Value>,
+    /// Whether the layer requires the kind.
+    pub required: bool,
+    /// The row's bookkeeping version.
+    pub version: i64,
+    /// Creation instant.
+    pub created_at: DateTime<Utc>,
+    /// Last change.
+    pub updated_at: DateTime<Utc>,
+}
+
+/// What `organisation_layers.set` writes: one row's value and/or requirement.
+#[derive(Clone, Debug)]
+pub struct LayerSet {
+    /// The level.
+    pub level: String,
+    /// The industry scope, for `industry`.
+    pub industry_id: Option<Uuid>,
+    /// The department scope, for `department_archetype` and `department`.
+    pub department_id: Option<Uuid>,
+    /// The job scope, for `job`.
+    pub job_id: Option<Uuid>,
+    /// The knowledge kind.
+    pub kind: String,
+    /// The value, when the layer sets one.
+    pub value: Option<Value>,
+    /// Whether the layer requires the kind.
+    pub required: bool,
+}
+
+/// Author one layer: insert, or bump the version of the live row for the same scope and kind.
+pub async fn set_layer_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    layer: &LayerSet,
+) -> Result<LayerRow, OrganisationStoreError> {
+    match layer.level.as_str() {
+        "base" => {}
+        "industry" => {
+            industry_get_tx(conn, tenant, layer.industry_id.unwrap_or_default()).await?;
+        }
+        "department_archetype" | "department" => {
+            let present: bool = sqlx::query_scalar(
+                "SELECT EXISTS (SELECT 1 FROM department WHERE tenant_id = $1 AND id = $2)",
+            )
+            .bind(tenant.as_uuid())
+            .bind(layer.department_id.unwrap_or_default())
+            .fetch_one(&mut *conn)
+            .await?;
+            if !present {
+                return Err(OrganisationStoreError::NotFound("department"));
+            }
+        }
+        "job" => {
+            job_get_tx(conn, tenant, layer.job_id.unwrap_or_default()).await?;
+        }
+        other => return Err(OrganisationStoreError::UnknownLayerLevel(other.to_owned())),
+    }
+    let sql = format!(
+        "INSERT INTO organisation_layer
+             (tenant_id, level, industry_id, department_id, job_id, kind, value, required)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         ON CONFLICT (tenant_id, level, industry_id, department_id, job_id, kind) DO UPDATE
+            SET value = EXCLUDED.value,
+                required = EXCLUDED.required,
+                version = organisation_layer.version + 1,
+                updated_at = now()
+         RETURNING {LAYER_COLUMNS}"
+    );
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(&layer.level)
+        .bind(layer.industry_id)
+        .bind(layer.department_id)
+        .bind(layer.job_id)
+        .bind(&layer.kind)
+        .bind(&layer.value)
+        .bind(layer.required)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(OrganisationStoreError::Database)
+}
+
+/// The tenant's layer rows, narrowed by any of level and the three scopes.
+pub async fn layers_list_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    level: Option<&str>,
+    industry_id: Option<Uuid>,
+    department_id: Option<Uuid>,
+    job_id: Option<Uuid>,
+) -> Result<Vec<LayerRow>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {LAYER_COLUMNS} FROM organisation_layer
+          WHERE tenant_id = $1
+            AND ($2::text IS NULL OR level = $2)
+            AND ($3::uuid IS NULL OR industry_id = $3)
+            AND ($4::uuid IS NULL OR department_id = $4)
+            AND ($5::uuid IS NULL OR job_id = $5)
+          ORDER BY level, kind, id"
+    );
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(level)
+        .bind(industry_id)
+        .bind(department_id)
+        .bind(job_id)
+        .fetch_all(&mut *conn)
+        .await
+}
+
+/// One kind's state while the layers are merged.
+#[derive(Default)]
+struct LayerMerge {
+    value: Option<Value>,
+    required: bool,
+    level: Option<String>,
+    source: Option<String>,
+}
+
+fn merge_layer(merged: &mut BTreeMap<String, LayerMerge>, row: &LayerRow, source: &str) {
+    let entry = merged.entry(row.kind.clone()).or_default();
+    entry.required |= row.required;
+    if let Some(value) = &row.value {
+        entry.value = Some(value.clone());
+        entry.level = Some(row.level.clone());
+        entry.source = Some(source.to_owned());
+    }
+}
+
+/// Resolve the job's knowledge layers in SPEC_V2 §4.1's order — base → industry → department
+/// archetype → each department in declared order → job — and refuse what §4.1 forbids: a required
+/// kind with no value (`409 release_not_ready`) or siblings that disagree (`422
+/// department_conflict`) unless a job-layer row sets the kind.
+pub async fn resolve_layers_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    job_id: Uuid,
+) -> Result<BTreeMap<String, Value>, OrganisationStoreError> {
+    let job = job_get_tx(conn, tenant, job_id).await?;
+    let industry = industry_get_tx(conn, tenant, job.industry_id).await?;
+    let placements = job_placements_tx(conn, tenant, job_id).await?;
+    let department_ids: Vec<Uuid> = placements.iter().map(|row| row.department_id).collect();
+
+    // A department's archetype is its parent, one level up; a top-level department has none.
+    let parents: Vec<(Uuid, Option<Uuid>)> = if department_ids.is_empty() {
+        Vec::new()
+    } else {
+        sqlx::query_as("SELECT id, parent_id FROM department WHERE tenant_id = $1 AND id = ANY($2)")
+            .bind(tenant.as_uuid())
+            .bind(&department_ids)
+            .fetch_all(&mut *conn)
+            .await?
+    };
+    let archetype_of: HashMap<Uuid, Uuid> = parents
+        .iter()
+        .filter_map(|(id, parent)| parent.map(|parent| (*id, parent)))
+        .collect();
+    let mut archetype_ids: Vec<Uuid> = archetype_of.values().copied().collect();
+    archetype_ids.sort_unstable();
+    archetype_ids.dedup();
+    let archetype_names: HashMap<Uuid, String> = if archetype_ids.is_empty() {
+        HashMap::new()
+    } else {
+        sqlx::query_as::<_, (Uuid, String)>(
+            "SELECT id, name FROM department WHERE tenant_id = $1 AND id = ANY($2)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(&archetype_ids)
+        .fetch_all(&mut *conn)
+        .await?
+        .into_iter()
+        .collect()
+    };
+
+    let base: Vec<LayerRow> = sqlx::query_as(sqlx::AssertSqlSafe(format!(
+        "SELECT {LAYER_COLUMNS} FROM organisation_layer
+          WHERE tenant_id = $1 AND level = 'base' ORDER BY kind, id"
+    )))
+    .bind(tenant.as_uuid())
+    .fetch_all(&mut *conn)
+    .await?;
+    let industry_rows: Vec<LayerRow> = sqlx::query_as(sqlx::AssertSqlSafe(format!(
+        "SELECT {LAYER_COLUMNS} FROM organisation_layer
+          WHERE tenant_id = $1 AND level = 'industry' AND industry_id = $2 ORDER BY kind, id"
+    )))
+    .bind(tenant.as_uuid())
+    .bind(industry.id)
+    .fetch_all(&mut *conn)
+    .await?;
+    let archetype_rows: Vec<LayerRow> = if archetype_ids.is_empty() {
+        Vec::new()
+    } else {
+        sqlx::query_as(sqlx::AssertSqlSafe(format!(
+            "SELECT {LAYER_COLUMNS} FROM organisation_layer
+              WHERE tenant_id = $1 AND level = 'department_archetype'
+                AND department_id = ANY($2) ORDER BY kind, id"
+        )))
+        .bind(tenant.as_uuid())
+        .bind(&archetype_ids)
+        .fetch_all(&mut *conn)
+        .await?
+    };
+    let department_rows: Vec<LayerRow> = if department_ids.is_empty() {
+        Vec::new()
+    } else {
+        sqlx::query_as(sqlx::AssertSqlSafe(format!(
+            "SELECT {LAYER_COLUMNS} FROM organisation_layer
+              WHERE tenant_id = $1 AND level = 'department'
+                AND department_id = ANY($2) ORDER BY kind, id"
+        )))
+        .bind(tenant.as_uuid())
+        .bind(&department_ids)
+        .fetch_all(&mut *conn)
+        .await?
+    };
+    let job_rows: Vec<LayerRow> = sqlx::query_as(sqlx::AssertSqlSafe(format!(
+        "SELECT {LAYER_COLUMNS} FROM organisation_layer
+          WHERE tenant_id = $1 AND level = 'job' AND job_id = $2 ORDER BY kind, id"
+    )))
+    .bind(tenant.as_uuid())
+    .bind(job_id)
+    .fetch_all(&mut *conn)
+    .await?;
+
+    let mut merged: BTreeMap<String, LayerMerge> = BTreeMap::new();
+    let mut department_values: HashMap<String, Vec<(String, Value)>> = HashMap::new();
+    let mut job_value_kinds: BTreeSet<String> = BTreeSet::new();
+    for row in &base {
+        merge_layer(&mut merged, row, "base");
+    }
+    for row in &industry_rows {
+        merge_layer(&mut merged, row, &industry.key);
+    }
+    for placement in &placements {
+        if let Some(archetype) = archetype_of.get(&placement.department_id) {
+            let source = archetype_names
+                .get(archetype)
+                .map(String::as_str)
+                .unwrap_or("archetype");
+            for row in archetype_rows
+                .iter()
+                .filter(|row| row.department_id == Some(*archetype))
+            {
+                merge_layer(&mut merged, row, source);
+            }
+        }
+        for row in department_rows
+            .iter()
+            .filter(|row| row.department_id == Some(placement.department_id))
+        {
+            merge_layer(&mut merged, row, &placement.department_name);
+            if let Some(value) = &row.value {
+                department_values
+                    .entry(row.kind.clone())
+                    .or_default()
+                    .push((placement.department_name.clone(), value.clone()));
+            }
+        }
+    }
+    for row in &job_rows {
+        merge_layer(&mut merged, row, &job.job_key);
+        if row.value.is_some() {
+            job_value_kinds.insert(row.kind.clone());
+        }
+    }
+
+    for (kind, values) in &department_values {
+        let first = &values[0].1;
+        if values.iter().any(|(_, value)| value != first) && !job_value_kinds.contains(kind) {
+            return Err(OrganisationStoreError::LayerDepartmentConflict {
+                kind: kind.clone(),
+                departments: values.iter().map(|(name, _)| name.clone()).collect(),
+            });
+        }
+    }
+
+    let department_label = placements
+        .iter()
+        .find(|row| row.is_primary)
+        .map(|row| row.department_name.clone())
+        .unwrap_or_else(|| job.job_key.clone());
+    for (kind, state) in &merged {
+        if state.required && state.value.is_none() {
+            return Err(OrganisationStoreError::LayerReleaseNotReady {
+                kind: kind.clone(),
+                department: department_label.clone(),
+            });
+        }
+    }
+
+    let mut layers: BTreeMap<String, Value> = BTreeMap::new();
+    for (kind, state) in merged {
+        if let Some(value) = state.value {
+            layers.insert(
+                kind,
+                json!({
+                    "value": value,
+                    "required": state.required,
+                    "level": state.level,
+                    "source": state.source,
+                }),
+            );
+        }
+    }
+    Ok(layers)
 }
 
 #[cfg(test)]

@@ -3833,8 +3833,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push(sample.name, id);
         }
         // ADR 0007 §5: `analyse.site` reads a stored page, so each round needs its own document
-        // with its own object.
-        "analyse.site" => {
+        // with its own object. The four §10.4 actions below read the same kind of prepared page.
+        "analyse.site" | "analyse.app" | "analyse.brand" | "analyse.content" | "analyse.report" => {
             let id = seed_site_document(pg, ctx).await;
             ctx.push(sample.name, id);
         }
@@ -4516,6 +4516,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
             sample
         },
+        {
+            // S21 step 11 (#697): the release knowledge layers are authorable and readable.
+            let mut sample = plain("organisation_layers.set", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "level": "industry",
+                    "industry_id": ctx.industry_id,
+                    "kind": "parity_style",
+                    "value": "plain",
+                    "required": false
+                })
+            });
+            sample
+        },
+        plain("organisation_layers.list", json!({}), None),
         {
             let mut sample = plain("job_bindings.list", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
@@ -5965,6 +5980,48 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("lean4.check", json!({}), None),
         plain("lean4.elaborate", json!({}), None),
         plain("lean4.prove", json!({}), None),
+        // Delivery proofs (#744). Each refusal in `crates/actions/src/proof/mod.rs` is a typed 422,
+        // so the nil id is a row that cannot exist and the uninvoked key cannot resolve. `list` is
+        // the one read that answers: an empty, tenant-scoped set.
+        expecting(plain("proofs.get", json!({"id": Uuid::nil()}), None), 422),
+        expecting(
+            plain(
+                "proofs.list",
+                json!({"subject_type": "card", "subject_id": Uuid::nil()}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "proofs.record",
+                json!({
+                    "idempotency_key": "parity-record-never-invoked",
+                    "invocation_input": {"source": "theorem parity : True := by trivial"},
+                    "subject_type": "card",
+                    "subject_id": Uuid::nil(),
+                    "spec_name": "parity",
+                    "spec_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "facts_canonical": "{}",
+                    "theorem": "parity",
+                    "trust": "kernel",
+                }),
+                None,
+            ),
+            422,
+        ),
+        expecting(
+            plain(
+                "proofs.reverify",
+                json!({
+                    "proof_id": Uuid::nil(),
+                    "idempotency_key": "parity-reverify-never-invoked",
+                    "invocation_input": {},
+                }),
+                None,
+            ),
+            422,
+        ),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
@@ -6043,6 +6100,57 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 json!({
                     "document_id": ctx.pop("analyse.site"),
                     "url": "https://example.test/parity",
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: the app coverage report over a prepared page and a supplied route table.
+            let mut sample = on_prepared("analyse.app", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_ids": [ctx.pop("analyse.app")],
+                    "routes": [{"path": "/organisation", "served": true}],
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: the prepared page measured against the caller's brand facts.
+            let mut sample = on_prepared("analyse.brand", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("analyse.brand"),
+                    "brand": {
+                        "palette": ["#ffffff"],
+                        "typography": ["Inter"],
+                        "voice": {"required_terms": ["plumber"], "forbidden_terms": []},
+                    },
+                })
+            });
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: one content-quality report per prepared page.
+            let mut sample = on_prepared("analyse.content", None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"document_ids": [ctx.pop("analyse.content")]}));
+            sample.expect_status = Some(200);
+            sample
+        },
+        {
+            // SPEC §10.4: each claim checked against the prepared page's visible text.
+            let mut sample = on_prepared("analyse.report", None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "document_id": ctx.pop("analyse.report"),
+                    "claims": [{
+                        "claim": "the page names Leeds",
+                        "reference": "Parity plumber in Leeds",
+                    }],
                 })
             });
             sample.expect_status = Some(200);
@@ -9593,8 +9701,10 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         // A process_agent must name its process (0035's CHECK); this anchor is a generic
         // executor, so it declares the tool-agent role.
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, status, model_ref, max_iterations, timeout_secs)
-         VALUES ($1, $2, 'parity-anchor', 'tool_agent', 'active', 'claude-sonnet-5-5', 8, 300)
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, max_iterations,
+              timeout_secs)
+         VALUES ($1, $2, 'parity-anchor', 'tool_agent', 'active', 'claude-sonnet-5-5', 'agent@1',
+                 8, 300)
          RETURNING id",
     )
     .bind(seeded.tenant_id)

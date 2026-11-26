@@ -489,7 +489,8 @@
     },
     "T19F": {
       "adm_phase": "G",
-      "plateau": "capability"
+      "plateau": "capability",
+      "closure_deferred_to_tranche": 6
     }
   }
 }

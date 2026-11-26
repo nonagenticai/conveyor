@@ -1,232 +1,81 @@
-//! One resolution model for compiled and imported actions (S04 P1, issue #3).
+//! The one resolution model for compiled and imported actions (S04 P1).
 //!
-//! The compiled registry is the process's static set. An imported action is a tenant's approved
-//! `action_registry` row: the ingester stored the operation's spec, the tenant approved it, and
-//! this module turns that stored document into the same [`ActionSpec`] the compiled path uses.
-//! There is no second registry and no private invocation path: [`precheck`](crate::invoke::precheck)
-//! resolves one or the other, and every downstream surface reads the resulting spec.
+//! A name resolves **compiled-first**, then through the caller tenant's *approved* registry
+//! rows. The row is re-read on every call (inside a tenant-scoped transaction, so RLS is the
+//! confinement), which is what makes restart, approval and revocation take effect without a
+//! cache to invalidate: for imported actions the database is the authority.
 //!
-//! The compiled variant borrows the process-wide spec; the imported variant owns one built from
-//! the row. [`ResolvedAction`] derefs to `&ActionSpec`, so a caller that only needs the spec does
-//! not care which it holds.
+//! A compiled [`crate::spec::ActionSpec`] stays `&'static`; an imported row becomes an owned
+//! [`ResolvedAction`]. Both carry the same fields the authorisation and dispatch need, so HTTP,
+//! MCP, discovery and readiness read one shape.
 
-use std::borrow::Cow;
-use std::ops::Deref;
-use std::sync::Arc;
+use conveyor_domain::TenantId;
+use conveyor_store::actions::{self, RegistryRow};
+use serde_json::{Value, json};
+use sqlx::PgPool;
 
-use serde_json::Value;
-use sqlx::PgConnection;
+use crate::invoke::{ActionError, Authority, InvokeRequest, MAX_DEPTH, Precondition};
+use crate::spec::{ActionKind, Confirm, Effect, Scope, Tenancy, validate_input};
 
-use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, SchemaRef, Tenancy,
-};
-
-/// Why a stored row cannot become a runtime action.
-///
-/// Every variant names the field and the rule; a malformed approved row is a serving failure
-/// (the tenant approved a document this build cannot execute), never a silent 404.
-#[derive(Debug, thiserror::Error)]
-pub enum ResolveError {
-    /// The row's kind is not executable (a workflow row needs S13's engine).
-    #[error("action {name:?} is stored as kind {kind:?}, which has no runtime handler")]
-    UnsupportedKind {
-        /// The action name.
-        name: String,
-        /// The stored kind.
-        kind: String,
+/// Where a resolved action came from.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ActionSource {
+    /// A compiled `ActionSpec`.
+    Compiled,
+    /// One tenant's approved `action_registry` row.
+    Registry {
+        /// The row id.
+        id: uuid::Uuid,
+        /// The approved spec version.
+        spec_version: u32,
+        /// The ingest's schema hash.
+        schema_hash: String,
     },
-    /// A required spec member is absent or of the wrong shape.
-    #[error("action {name:?}: spec.{field} {reason}")]
-    BadSpec {
-        /// The action name.
-        name: String,
-        /// The spec member.
-        field: &'static str,
-        /// What is wrong with it.
-        reason: &'static str,
-    },
-    /// The stored method is not one this engine may call.
-    #[error("action {name:?}: method {method:?} is not allowed")]
-    BadMethod {
-        /// The action name.
-        name: String,
-        /// The stored method.
-        method: String,
-    },
-    /// The stored path is not an absolute path on the service (a scheme or `//` would escape it).
-    #[error("action {name:?}: path {path:?} must be an absolute path on the service")]
-    BadPath {
-        /// The action name.
-        name: String,
-        /// The stored path.
-        path: String,
-    },
-    /// The row could not be read.
-    #[error(transparent)]
-    Database(#[from] sqlx::Error),
 }
 
-/// A spec resolved for one invocation: the compiled entry, or an owned imported one.
+/// How an input member reaches the upstream request (S04 P3).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Bindings {
+    /// Members substituted into `{name}` in the path, in path order.
+    pub path: Vec<String>,
+    /// Members sent as the query string.
+    pub query: Vec<String>,
+    /// Members sent as the JSON body; `None` sends the whole input object.
+    pub body: Option<Vec<String>>,
+}
+
+/// The HTTP operation an imported action performs.
 #[derive(Clone, Debug)]
-pub enum ResolvedAction<'a> {
-    /// A compiled action in this binary.
-    Compiled(&'a ActionSpec),
-    /// An approved imported action, built from its stored row. Boxed so the enum stays the
-    /// size of a reference (clippy::large_enum_variant) — it is created once per invocation.
-    Imported(Box<ActionSpec>),
+pub struct ExternalAction {
+    /// The service key whose base URL is configuration.
+    pub service: String,
+    /// The HTTP method.
+    pub method: String,
+    /// The operation path, `{name}` templates included.
+    pub path: String,
+    /// The name of a per-tenant sealed secret sent as the bearer.
+    pub auth: Option<String>,
+    /// When true, an absent secret sends no bearer instead of refusing.
+    pub auth_optional: bool,
+    /// How the input maps onto path, query and body.
+    pub bindings: Bindings,
 }
 
-impl Deref for ResolvedAction<'_> {
-    type Target = ActionSpec;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Self::Compiled(spec) => spec,
-            Self::Imported(spec) => spec.as_ref(),
-        }
-    }
+/// What an imported action dispatches to.
+#[derive(Clone, Debug)]
+pub enum ResolvedHandler {
+    /// A compiled handler reference (internal, external, broker or tool destination).
+    Compiled(crate::spec::HandlerRef),
+    /// An imported HTTP operation.
+    External(ExternalAction),
+    /// A workflow (the engine does not exist yet).
+    Workflow,
 }
 
-impl ResolvedAction<'_> {
-    /// The spec itself, whatever the variant.
-    pub fn spec(&self) -> &ActionSpec {
-        self
-    }
-}
-
-/// The methods an imported operation may declare. GET/HEAD read; DELETE is destructive; every
-/// other method writes.
-const READ_METHODS: [&str; 2] = ["GET", "HEAD"];
-
-fn stored<'a>(spec: &'a Value, field: &'static str) -> Option<&'a Value> {
-    spec.get(field)
-}
-
-/// Turn one approved row into a runtime [`ActionSpec`].
-pub fn resolve_row(row: &conveyor_store::actions::RegistryRow) -> Result<ActionSpec, ResolveError> {
-    let name = row.name.clone();
-    if row.kind != "external" {
-        return Err(ResolveError::UnsupportedKind {
-            name,
-            kind: row.kind.clone(),
-        });
-    }
-    let method = stored(&row.spec, "method")
-        .and_then(Value::as_str)
-        .map(str::to_ascii_uppercase)
-        .ok_or(ResolveError::BadSpec {
-            name: name.clone(),
-            field: "method",
-            reason: "must be a string",
-        })?;
-    if !matches!(
-        method.as_str(),
-        "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE"
-    ) {
-        return Err(ResolveError::BadMethod { name, method });
-    }
-    let path = stored(&row.spec, "path")
-        .and_then(Value::as_str)
-        .ok_or(ResolveError::BadSpec {
-            name: name.clone(),
-            field: "path",
-            reason: "must be a string",
-        })?;
-    if !path.starts_with('/') || path.starts_with("//") || path.contains("://") {
-        return Err(ResolveError::BadPath {
-            name,
-            path: path.to_owned(),
-        });
-    }
-    let input = stored(&row.spec, "input").ok_or(ResolveError::BadSpec {
-        name: name.clone(),
-        field: "input",
-        reason: "must be the operation's request schema",
-    })?;
-    let output = stored(&row.spec, "output").unwrap_or(&Value::Null);
-    let auth = stored(&row.spec, "auth")
-        .and_then(Value::as_str)
-        .filter(|value| !value.is_empty())
-        .map(|value| Cow::Owned(value.to_owned()));
-    let effect = if READ_METHODS.contains(&method.as_str()) {
-        Effect::Read
-    } else if method == "DELETE" {
-        Effect::Destructive
-    } else {
-        Effect::Write
-    };
-    Ok(ActionSpec {
-        name: Cow::Owned(row.name.clone()),
-        version: u32::try_from(row.spec_version.max(1)).unwrap_or(1),
-        kind: ActionKind::External,
-        input: SchemaRef::Imported(Arc::new(input.clone())),
-        output: SchemaRef::Imported(Arc::new(output.clone())),
-        scopes: Cow::Borrowed(&[]),
-        idempotent: row.idempotent,
-        timeout_ms: u32::try_from(row.timeout_ms.max(1)).unwrap_or(10_000),
-        effect,
-        approval_target: None,
-        confirm: Confirm::None,
-        tenancy: Tenancy::Tenant,
-        agent: AgentHints::default(),
-        task_capable: false,
-        captures_usage: false,
-        artefact: None,
-        handler: HandlerRef::External {
-            service: Cow::Owned(row.service.clone()),
-            method: Cow::Owned(method),
-            path: Cow::Owned(path.to_owned()),
-            auth,
-            auth_optional: true,
-            upload: None,
-        },
-    })
-}
-
-/// The tenant's approved row for one action name, if any.
+/// Intern a spec name once, so `HandlerCtx.action` can hold a `&'static str`.
 ///
-/// `Ok(None)` means the tenant approved no such action; an `Err` means it approved one this
-/// build cannot execute, which must be a typed serving failure, never a silent absence.
-pub async fn approved_action_tx(
-    conn: &mut PgConnection,
-    name: &str,
-) -> Result<Option<ActionSpec>, ResolveError> {
-    let Some(row) = conveyor_store::actions::approved_action_tx(conn, name).await? else {
-        return Ok(None);
-    };
-    resolve_row(&row).map(Some)
-}
-
-/// The tenant's approved imported actions, resolved for discovery.
-///
-/// Discovery merges these with the compiled registry; a row that cannot resolve is logged and
-/// omitted from the list but still refuses at invocation (the typed 500 in `precheck`), so a
-/// bad approval cannot silently disappear from the surface that would expose it.
-pub async fn approved_actions(
-    pool: &sqlx::PgPool,
-    tenant: conveyor_store::TenantId,
-) -> Result<Vec<ActionSpec>, ResolveError> {
-    let mut tx = conveyor_store::begin_scoped_read_only(pool, tenant).await?;
-    let rows = conveyor_store::actions::approved_registry(&mut tx).await?;
-    let _ = tx.rollback().await;
-    let mut specs = Vec::with_capacity(rows.len());
-    for row in &rows {
-        match resolve_row(row) {
-            Ok(spec) => specs.push(spec),
-            Err(error) => {
-                tracing::error!(%error, action = %row.name, "omit an unresolvable imported action from discovery")
-            }
-        }
-    }
-    Ok(specs)
-}
-
-/// Intern an imported action name for the handler context.
-///
-/// `HandlerCtx.action` is `&'static str` across the handler surface; an imported name is owned
-/// by its row. The number of distinct approved action names a process can serve is bounded by
-/// the tenant's registry, so one leaked copy per **distinct** name is a bounded allocation —
-/// never a per-invocation leak.
+/// Compiled names are already static; imported ones are owned `String`s read from a row. The
+/// set is bounded by the registry, so leaking each distinct name is the intended lifetime.
 pub fn intern_name(name: &str) -> &'static str {
     use std::collections::HashSet;
     use std::sync::{Mutex, OnceLock};
@@ -245,78 +94,689 @@ pub fn intern_name(name: &str) -> &'static str {
     leaked
 }
 
-/// Why the boot gate refused.
+/// One action, ready to authorise and dispatch.
+#[derive(Clone, Debug)]
+pub struct ResolvedAction {
+    /// `<resource>.<verb>`.
+    pub name: String,
+    /// The integer version.
+    pub version: u32,
+    /// Internal, external or workflow.
+    pub kind: ActionKind,
+    /// The request schema.
+    pub input: Value,
+    /// The response schema.
+    pub output: Value,
+    /// The scopes a caller must hold.
+    pub scopes: Vec<Scope>,
+    /// Whether replaying the same key is safe.
+    pub idempotent: bool,
+    /// The caller's deadline.
+    pub timeout_ms: u32,
+    /// Read, write, spend or destructive.
+    pub effect: Effect,
+    /// Confirmation mode for channels.
+    pub confirm: Confirm,
+    /// The resolution scope.
+    pub tenancy: Tenancy,
+    /// Whether the call buys a billable model call (the run-budget gate reads it).
+    pub captures_usage: bool,
+    /// Where the work happens.
+    pub handler: ResolvedHandler,
+    /// Where the definition came from.
+    pub source: ActionSource,
+}
+
+/// A row that cannot become a [`ResolvedAction`].
 #[derive(Debug, thiserror::Error)]
-pub enum BootRefusal {
-    /// An approved row exists that this build cannot turn into an action.
-    #[error("the database names action {name:?}, which this binary cannot execute: {source}")]
-    Unresolvable {
-        /// The action name.
+pub enum ResolveError {
+    /// The stored spec is missing a member or names an unknown vocabulary value.
+    #[error("the action registry row {name:?} is malformed: {detail}")]
+    Malformed {
+        /// The row's name.
         name: String,
-        /// Why it did not resolve.
-        #[source]
-        source: ResolveError,
+        /// What is wrong.
+        detail: String,
     },
-    /// An external action's service has no base URL configured.
-    #[error("action {name:?} names service {service:?}, which has no configured base URL")]
-    Unconfigured {
-        /// The action name.
-        name: String,
-        /// The stored service key.
-        service: String,
-    },
-    /// A workflow row needs S13's engine, which is not compiled in.
-    #[error("action {name:?} is stored as a workflow but compiled without one")]
-    Workflow {
-        /// The action name.
-        name: String,
-    },
-    /// The rows could not be read.
+    /// The database refused the read.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
 
-/// The boot gate (S04 §5.2, issue #3 P1.1): every approved row must be executable by this build.
+impl ResolvedAction {
+    /// Project a compiled spec into the resolved shape.
+    pub fn from_spec(spec: &crate::spec::ActionSpec) -> Self {
+        Self {
+            name: spec.name.to_string(),
+            version: spec.version,
+            kind: spec.kind,
+            input: spec.input_schema(),
+            output: spec.output_schema(),
+            scopes: spec.scopes.to_vec(),
+            idempotent: spec.idempotent,
+            timeout_ms: spec.timeout_ms,
+            effect: spec.effect,
+            confirm: spec.confirm,
+            tenancy: spec.tenancy,
+            captures_usage: spec.captures_usage,
+            handler: match &spec.handler {
+                crate::spec::HandlerRef::Workflow => ResolvedHandler::Workflow,
+                handler => ResolvedHandler::Compiled((*handler).clone()),
+            },
+            source: ActionSource::Compiled,
+        }
+    }
+
+    /// Project an approved imported row into the resolved shape.
+    ///
+    /// The row's `spec` carries the operation (`method`, `path`, `input`, `output`) and an
+    /// optional `runtime` block (`effect`, `confirm`, `tenancy`, `scopes`, `auth`,
+    /// `auth_optional`); an absent member gets the method's conservative default. `bindings`
+    /// is explicit when present and derived from the path template otherwise.
+    pub fn from_row(row: &RegistryRow) -> Result<Self, ResolveError> {
+        let bad = |detail: &str| ResolveError::Malformed {
+            name: row.name.clone(),
+            detail: detail.to_owned(),
+        };
+        let kind = match row.kind.as_str() {
+            "external" => ActionKind::External,
+            "workflow" => ActionKind::Workflow,
+            other => return Err(bad(&format!("unknown kind {other:?}"))),
+        };
+        let method = row
+            .spec
+            .get("method")
+            .and_then(Value::as_str)
+            .ok_or_else(|| bad("spec.method is missing"))?
+            .to_ascii_uppercase();
+        let path = row
+            .spec
+            .get("path")
+            .and_then(Value::as_str)
+            .ok_or_else(|| bad("spec.path is missing"))?
+            .to_owned();
+        let input = row
+            .spec
+            .get("input")
+            .cloned()
+            .unwrap_or_else(|| json!({"type": "object"}));
+        let output = row
+            .spec
+            .get("output")
+            .cloned()
+            .unwrap_or_else(|| json!({"type": "object"}));
+        let runtime = row.spec.get("runtime").cloned().unwrap_or(Value::Null);
+
+        let effect = match runtime.get("effect").and_then(Value::as_str) {
+            Some(text) => Effect::parse(text).ok_or_else(|| bad("runtime.effect is unknown"))?,
+            None => default_effect(&method),
+        };
+        let confirm = match runtime.get("confirm").and_then(Value::as_str) {
+            Some("card") => Confirm::Card,
+            Some("card-typed") => Confirm::CardTyped,
+            Some("none") | None => Confirm::None,
+            Some(other) => return Err(bad(&format!("runtime.confirm {other:?} is unknown"))),
+        };
+        let tenancy = match runtime.get("tenancy").and_then(Value::as_str) {
+            Some("tenant") | None => Tenancy::Tenant,
+            Some("self") => Tenancy::Self_,
+            Some("project") => Tenancy::Project,
+            Some("platform") => Tenancy::Platform,
+            Some(other) => return Err(bad(&format!("runtime.tenancy {other:?} is unknown"))),
+        };
+        let scopes = match runtime.get("scopes").and_then(Value::as_array) {
+            Some(items) => items
+                .iter()
+                .map(|item| {
+                    item.as_str()
+                        .and_then(Scope::parse)
+                        .ok_or_else(|| bad("runtime.scopes names an unknown scope"))
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+            None => default_scopes(&method),
+        };
+        let auth = runtime
+            .get("auth")
+            .and_then(Value::as_str)
+            .map(str::to_owned);
+        let auth_optional = runtime
+            .get("auth_optional")
+            .and_then(Value::as_bool)
+            .unwrap_or(false);
+        let bindings = bindings_from(row, &path, &method, &input);
+
+        let handler = match kind {
+            ActionKind::Workflow => ResolvedHandler::Workflow,
+            _ => ResolvedHandler::External(ExternalAction {
+                service: row.service.clone(),
+                method,
+                path,
+                auth,
+                auth_optional,
+                bindings,
+            }),
+        };
+        Ok(Self {
+            name: row.name.clone(),
+            version: u32::try_from(row.spec_version).unwrap_or(0),
+            kind,
+            input,
+            output,
+            scopes,
+            idempotent: row.idempotent,
+            timeout_ms: u32::try_from(row.timeout_ms).unwrap_or(30_000),
+            effect,
+            confirm,
+            tenancy,
+            captures_usage: false,
+            handler,
+            source: ActionSource::Registry {
+                id: row.id,
+                spec_version: u32::try_from(row.spec_version).unwrap_or(0),
+                schema_hash: row.schema_hash.clone(),
+            },
+        })
+    }
+
+    /// Whether a caller holding `role` may invoke it, with the tenant's overrides applied.
+    pub fn permits_with(
+        &self,
+        role: conveyor_auth::Role,
+        policy: &conveyor_auth::ScopePolicy,
+    ) -> bool {
+        self.scopes
+            .iter()
+            .all(|scope| policy.allows(scope.as_str(), scope.granted_to(role)))
+    }
+
+    /// Whether a role holds every declared scope under the compiled defaults.
+    pub fn permits_role(&self, role: conveyor_auth::Role) -> bool {
+        self.scopes.iter().all(|scope| scope.granted_to(role))
+    }
+
+    /// The contract hash discovery publishes: the ingest's schema hash for an imported row.
+    pub fn spec_hash(&self) -> String {
+        match &self.source {
+            ActionSource::Registry { schema_hash, .. } => schema_hash.clone(),
+            ActionSource::Compiled => String::new(),
+        }
+    }
+
+    /// The discovery entry, the same shape the compiled manifest publishes.
+    pub fn manifest_entry(&self) -> crate::views::ActionManifestEntry {
+        crate::views::ActionManifestEntry {
+            name: self.name.clone(),
+            version: self.version,
+            kind: self.kind.as_str().to_owned(),
+            spec_hash: self.spec_hash(),
+            scopes: self
+                .scopes
+                .iter()
+                .map(|scope| scope.as_str().to_owned())
+                .collect(),
+            idempotent: self.idempotent,
+            timeout_ms: self.timeout_ms,
+        }
+    }
+
+    /// The full contract `actions.describe` returns.
+    pub fn spec_view(&self) -> crate::views::ActionSpecView {
+        crate::views::ActionSpecView {
+            name: self.name.clone(),
+            version: self.version,
+            kind: self.kind.as_str().to_owned(),
+            scopes: self
+                .scopes
+                .iter()
+                .map(|scope| scope.as_str().to_owned())
+                .collect(),
+            idempotent: self.idempotent,
+            timeout_ms: self.timeout_ms,
+            effect: self.effect.as_str().to_owned(),
+            confirm: self.confirm.as_str().to_owned(),
+            tenancy: self.tenancy.as_str().to_owned(),
+            spec_hash: self.spec_hash(),
+            input: self.input.clone(),
+            output: self.output.clone(),
+        }
+    }
+
+    /// The MCP tool projection, the same shape [`crate::mcp::tool_json`] emits.
+    pub fn tool_json(&self) -> Value {
+        json!({
+            "name": self.mcp_name(),
+            "description": format!(
+                "{} — {} action, effect {}.",
+                self.name,
+                self.kind.as_str(),
+                self.effect.as_str()
+            ),
+            "inputSchema": self.input,
+            "outputSchema": self.output,
+            "annotations": {
+                "readOnlyHint": self.effect.as_str() == "read",
+                "destructiveHint": self.effect.as_str() == "destructive",
+                "idempotentHint": self.idempotent,
+                "openWorldHint": self.kind.as_str() == "external",
+            },
+            "_meta": {
+                "operation": self.name,
+                "x-action-name": self.name,
+                "x-action-version": self.version,
+                "x-spec-hash": self.spec_hash(),
+            },
+        })
+    }
+
+    /// The literal invocation route an error instance names.
+    pub fn route_path(&self) -> String {
+        format!("/api/actions/{}/invocations", self.name)
+    }
+
+    /// Whether this action is closed to every machine channel, whatever a tenant stores.
+    pub fn machine_forbidden(&self) -> bool {
+        self.scopes
+            .iter()
+            .any(|scope| crate::channel::is_denied_scope(scope.as_str()))
+            || crate::channel::is_denied_action(&self.name)
+            || crate::channel::is_denied_resource(crate::channel::resource_of(&self.name))
+    }
+
+    /// The MCP tool name: `.` → `_`.
+    pub fn mcp_name(&self) -> String {
+        self.name.replace('.', "_")
+    }
+}
+
+/// The conservative effect of an HTTP method when the row declares none.
+fn default_effect(method: &str) -> Effect {
+    match method {
+        "GET" | "HEAD" | "OPTIONS" => Effect::Read,
+        "DELETE" => Effect::Destructive,
+        _ => Effect::Write,
+    }
+}
+
+/// The conservative scope of an HTTP method when the row declares none.
+fn default_scopes(method: &str) -> Vec<Scope> {
+    match method {
+        "GET" | "HEAD" | "OPTIONS" => vec![Scope::ActionsRead],
+        _ => vec![Scope::ActionsWrite],
+    }
+}
+
+/// Read explicit bindings, or derive them from the path template and the input schema.
+fn bindings_from(row: &RegistryRow, path: &str, method: &str, input: &Value) -> Bindings {
+    let template: Vec<String> = path
+        .split('/')
+        .filter_map(|segment| segment.strip_prefix('{')?.strip_suffix('}'))
+        .map(str::to_owned)
+        .collect();
+    if let Some(explicit) = row.spec.get("bindings") {
+        let list = |member: &str| -> Vec<String> {
+            explicit
+                .get(member)
+                .and_then(Value::as_array)
+                .map(|items| {
+                    items
+                        .iter()
+                        .filter_map(Value::as_str)
+                        .map(str::to_owned)
+                        .collect()
+                })
+                .unwrap_or_default()
+        };
+        let body = explicit.get("body").map(|body| match body {
+            Value::Null => Vec::new(),
+            Value::Array(items) => items
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect(),
+            _ => Vec::new(),
+        });
+        return Bindings {
+            path: list("path"),
+            query: list("query"),
+            body,
+        };
+    }
+    let has_body = !matches!(method, "GET" | "HEAD" | "OPTIONS" | "DELETE");
+    let query = if has_body {
+        Vec::new()
+    } else {
+        input
+            .get("properties")
+            .and_then(Value::as_object)
+            .map(|properties| {
+                properties
+                    .keys()
+                    .filter(|key| !template.iter().any(|bound| bound == key.as_str()))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    Bindings {
+        path: template,
+        query,
+        body: if has_body { None } else { Some(Vec::new()) },
+    }
+}
+
+/// The boot rule: every approved row is either a compiled action or a valid imported contract.
 ///
-/// A compiled action passes; an imported external action passes when its stored spec resolves
-/// (that is the change S04 makes — a DB-only action is no longer a boot failure); the service's
-/// base URL must still be configured, and a workflow row still requires a compiled handler.
-///
-/// Lives here rather than in the serve binary so the gate is testable: `serve` calls it before
-/// bind, and `action_resolution.rs` calls it directly.
-pub async fn assert_served_registry(
-    pool: &sqlx::PgPool,
-    compiled: &crate::registry::Registry,
-) -> Result<(), BootRefusal> {
-    for tenant in conveyor_store::tenants::active_ids(pool).await? {
-        let mut tx = conveyor_store::begin_scoped_read_only(pool, tenant).await?;
-        let rows = conveyor_store::actions::approved_registry(&mut tx).await?;
+/// A compiled name keeps its old checks (a configured service, a compiled workflow). An
+/// imported row must resolve through [`ResolvedAction::from_row`], must be external — this
+/// binary has no engine for an imported workflow — and must name a service with a configured
+/// base URL. Returns the first refusal as a message the caller maps to its own error type.
+pub async fn assert_boot_registry(pool: &PgPool) -> Result<(), String> {
+    for tenant in conveyor_store::tenants::active_ids(pool)
+        .await
+        .map_err(|error| format!("read the active tenants: {error}"))?
+    {
+        let mut tx = conveyor_store::begin_scoped(pool, tenant)
+            .await
+            .map_err(|error| format!("scope tenant {tenant}: {error}"))?;
+        let rows = actions::approved_registry(&mut tx)
+            .await
+            .map_err(|error| format!("read the approved registry: {error}"))?;
         let _ = tx.rollback().await;
         for row in rows {
-            let resolved = match compiled.get(&row.name) {
-                Some(spec) => ResolvedAction::Compiled(spec),
-                None => match resolve_row(&row) {
-                    Ok(spec) => ResolvedAction::Imported(Box::new(spec)),
-                    Err(source) => {
-                        return Err(BootRefusal::Unresolvable {
-                            name: row.name,
-                            source,
-                        });
-                    }
-                },
-            };
-            if let HandlerRef::External { service, .. } = &resolved.handler
-                && crate::invoke::service_url(service).is_none()
-            {
-                return Err(BootRefusal::Unconfigured {
-                    name: row.name,
-                    service: row.service,
-                });
+            if let Some(spec) = crate::registry::registry().get(&row.name) {
+                if let crate::spec::HandlerRef::External { service, .. } = &spec.handler
+                    && crate::invoke::service_url(service.as_ref()).is_none()
+                {
+                    return Err(format!(
+                        "action {:?} names service {:?}, which has no configured base URL",
+                        row.name, row.service
+                    ));
+                }
+                if row.kind == "workflow"
+                    && !matches!(spec.handler, crate::spec::HandlerRef::Workflow)
+                {
+                    return Err(format!(
+                        "action {:?} is stored as a workflow but compiled without one",
+                        row.name
+                    ));
+                }
+                continue;
             }
-            if row.kind == "workflow" && !matches!(&resolved.handler, HandlerRef::Workflow) {
-                return Err(BootRefusal::Workflow { name: row.name });
+            let action = ResolvedAction::from_row(&row).map_err(|error| error.to_string())?;
+            if action.kind == ActionKind::Workflow {
+                return Err(format!(
+                    "action {:?} is an imported workflow, which this binary cannot run",
+                    row.name
+                ));
+            }
+            if let ResolvedHandler::External(external) = &action.handler
+                && crate::invoke::service_url(&external.service).is_none()
+            {
+                return Err(format!(
+                    "action {:?} names service {:?}, which has no configured base URL",
+                    row.name, row.service
+                ));
             }
         }
     }
     Ok(())
+}
+
+/// One action by name: compiled first, then the tenant's approved imported row.
+///
+/// A name with registry versions but no approved row is **revoked**, not unknown: it answers
+/// `404 action_unavailable` so a caller can tell "never existed" from "exists, not approved".
+pub async fn get(
+    pool: &PgPool,
+    tenant: TenantId,
+    name: &str,
+) -> Result<ResolvedAction, ActionError> {
+    if let Some(spec) = crate::registry::registry().get(name) {
+        return Ok(ResolvedAction::from_spec(spec));
+    }
+    let mut tx = conveyor_store::begin_scoped(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, action = name, "resolve: begin tenant transaction");
+            ActionError::internal()
+        })?;
+    let approved = actions::approved_registry_by_name(&mut tx, name)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, action = name, "resolve: approved row");
+            ActionError::internal()
+        })?;
+    let versions = if approved.is_none() {
+        actions::registry_versions(&mut tx, name)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, action = name, "resolve: registry versions");
+                ActionError::internal()
+            })?
+    } else {
+        Vec::new()
+    };
+    let _ = tx.rollback().await;
+    match approved {
+        Some(row) => ResolvedAction::from_row(&row).map_err(|error| {
+            tracing::error!(%error, action = name, "resolve: malformed row");
+            ActionError::internal()
+        }),
+        None if !versions.is_empty() => Err(ActionError::new(
+            404,
+            "action_unavailable",
+            format!("{name} exists but no version is approved for this tenant"),
+        )),
+        None => Err(ActionError::not_found(name)),
+    }
+}
+
+/// Every action this tenant may resolve: the compiled table plus its approved imported rows,
+/// ordered by name.
+pub async fn list(pool: &PgPool, tenant: TenantId) -> Result<Vec<ResolvedAction>, ActionError> {
+    let mut actions: Vec<ResolvedAction> = crate::registry::registry()
+        .iter()
+        .map(ResolvedAction::from_spec)
+        .collect();
+    actions.extend(imported(pool, tenant).await?);
+    actions.sort_by(|left, right| left.name.cmp(&right.name));
+    Ok(actions)
+}
+
+/// The tenant's approved imported actions, ordered by name.
+///
+/// One malformed row must not empty every surface: it is reported and skipped, and a direct
+/// call to it still fails as malformed through [`get`].
+pub async fn imported(pool: &PgPool, tenant: TenantId) -> Result<Vec<ResolvedAction>, ActionError> {
+    let mut tx = conveyor_store::begin_scoped(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "resolve: begin tenant transaction");
+            ActionError::internal()
+        })?;
+    let rows = actions::approved_registry(&mut tx).await.map_err(|error| {
+        tracing::error!(%error, "resolve: approved registry");
+        ActionError::internal()
+    })?;
+    let _ = tx.rollback().await;
+    let mut actions = Vec::with_capacity(rows.len());
+    for row in rows {
+        match ResolvedAction::from_row(&row) {
+            Ok(action) => actions.push(action),
+            Err(error) => tracing::warn!(%error, "resolve: skipping a malformed approved row"),
+        }
+    }
+    actions.sort_by(|left, right| left.name.cmp(&right.name));
+    Ok(actions)
+}
+
+/// The authorisation and input checks an invocation runs before any work starts, against a
+/// resolved action (compiled or imported).
+pub fn precheck(
+    action: &ResolvedAction,
+    request: &InvokeRequest,
+) -> Result<(Value, Option<Precondition>), ActionError> {
+    if request.depth > MAX_DEPTH {
+        return Err(ActionError::recursion(request.depth));
+    }
+    let permitted = match &request.authority {
+        Authority::Channel(authority) => {
+            !action.machine_forbidden() && crate::channel::allows(authority, &action.name)
+        }
+        Authority::Role => {
+            request.actor_kind == "user" && action.permits_with(request.role, &request.policy)
+        }
+        Authority::Internal => action.permits_with(request.role, &request.policy),
+    };
+    if !permitted {
+        return Err(ActionError::forbidden(&action.name));
+    }
+    if action.kind == ActionKind::Workflow {
+        return Err(ActionError::workflow(&action.name));
+    }
+
+    let mut input = request.input.clone();
+    let mut precondition = request.precondition.clone();
+    if let Some(object) = input.as_object_mut()
+        && let Some(raw) = object.remove("_version")
+    {
+        let from_body = match raw {
+            Value::Number(_) => raw.as_i64().map(Precondition::Version),
+            Value::String(text) => Some(Precondition::Tag(text)),
+            _ => None,
+        };
+        if precondition.is_some() && from_body.is_some() && precondition != from_body {
+            return Err(ActionError::new(
+                400,
+                "bad_request",
+                "If-Match and _version name different preconditions",
+            ));
+        }
+        precondition = precondition.or(from_body);
+    }
+    let field_errors = validate_input(&action.input, &input);
+    if !field_errors.is_empty() {
+        return Err(ActionError::invalid_input(field_errors));
+    }
+    Ok((input, precondition))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn row(name: &str, method: &str, path: &str, spec_extra: Value) -> RegistryRow {
+        let mut spec = json!({
+            "method": method,
+            "path": path,
+            "input": {"type": "object", "properties": {"id": {"type": "string"}, "q": {"type": "string"}}, "required": ["id"]},
+            "output": {"type": "object"},
+            "required": ["id"],
+            "schema_hash": "abc",
+        });
+        if let Some(extra) = spec_extra.as_object() {
+            for (key, value) in extra {
+                spec[key] = value.clone();
+            }
+        }
+        RegistryRow {
+            id: uuid::Uuid::now_v7(),
+            name: name.to_owned(),
+            spec_version: 3,
+            kind: "external".to_owned(),
+            service: "fixtures".to_owned(),
+            spec,
+            schema_hash: "abc".to_owned(),
+            timeout_ms: 200,
+            idempotent: false,
+            approved_at: Some(chrono::Utc::now()),
+            approved_by: None,
+        }
+    }
+
+    #[test]
+    fn a_get_row_defaults_to_read_and_a_query_binding() {
+        let action =
+            ResolvedAction::from_row(&row("fixtures.echo", "GET", "/api/echo/{id}", json!({})))
+                .expect("a valid row");
+        assert_eq!(action.effect, Effect::Read);
+        assert_eq!(action.scopes, vec![Scope::ActionsRead]);
+        assert_eq!(action.timeout_ms, 200);
+        let ResolvedHandler::External(external) = &action.handler else {
+            panic!("an external handler");
+        };
+        assert_eq!(external.bindings.path, vec!["id".to_owned()]);
+        assert_eq!(external.bindings.query, vec!["q".to_owned()]);
+        assert_eq!(external.bindings.body, Some(Vec::new()));
+    }
+
+    #[test]
+    fn a_post_row_defaults_to_write_and_a_body() {
+        let action =
+            ResolvedAction::from_row(&row("fixtures.create", "POST", "/api/things", json!({})))
+                .expect("a valid row");
+        assert_eq!(action.effect, Effect::Write);
+        assert_eq!(action.scopes, vec![Scope::ActionsWrite]);
+        let ResolvedHandler::External(external) = &action.handler else {
+            panic!("an external handler");
+        };
+        assert_eq!(external.bindings.body, None, "the whole input is the body");
+    }
+
+    #[test]
+    fn a_runtime_block_overrides_the_defaults_and_an_unknown_scope_is_refused() {
+        let action = ResolvedAction::from_row(&row(
+            "fixtures.delete",
+            "DELETE",
+            "/api/things/{id}",
+            json!({"runtime": {"effect": "spend", "confirm": "card", "tenancy": "tenant", "scopes": ["actions:write"], "auth": "fixture-token"}}),
+        ))
+        .expect("a valid row");
+        assert_eq!(action.effect, Effect::Spend);
+        assert_eq!(action.confirm, Confirm::Card);
+        assert_eq!(action.scopes, vec![Scope::ActionsWrite]);
+        let ResolvedHandler::External(external) = &action.handler else {
+            panic!("an external handler");
+        };
+        assert_eq!(external.auth.as_deref(), Some("fixture-token"));
+        assert!(!external.auth_optional);
+
+        let bad = ResolvedAction::from_row(&row(
+            "fixtures.bad",
+            "GET",
+            "/api/things",
+            json!({"runtime": {"scopes": ["nonsense:read"]}}),
+        ));
+        assert!(matches!(bad, Err(ResolveError::Malformed { .. })));
+    }
+
+    #[test]
+    fn a_workflow_row_resolves_to_workflow() {
+        let mut workflow = row("fixtures.run", "POST", "/api/run", json!({}));
+        workflow.kind = "workflow".to_owned();
+        let action = ResolvedAction::from_row(&workflow).expect("a valid row");
+        assert!(matches!(action.handler, ResolvedHandler::Workflow));
+    }
+
+    #[test]
+    fn a_missing_method_is_malformed() {
+        let mut broken = row("fixtures.broken", "GET", "/x", json!({}));
+        broken
+            .spec
+            .as_object_mut()
+            .expect("an object")
+            .remove("method");
+        assert!(matches!(
+            ResolvedAction::from_row(&broken),
+            Err(ResolveError::Malformed { .. })
+        ));
+    }
+
+    #[test]
+    fn scope_parse_round_trips_every_variant() {
+        for scope in Scope::ALL {
+            assert_eq!(Scope::parse(scope.as_str()), Some(scope));
+        }
+        assert_eq!(Scope::parse("nonsense:read"), None);
+    }
 }

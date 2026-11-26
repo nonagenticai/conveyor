@@ -166,8 +166,8 @@
 </tr>
 <tr>
 <td>the forum type carries an active v2</td>
-<td><code>live-gate.json.policy</code></td>
-<td><strong>blocked</strong> — the review needs a human decision (see the gap below)</td>
+<td>v2 <code>01a211da-c391-7867-86dd-d22f9cfed5d5</code>, human gate <code>01a211d8-001f-7296-bbc1-ccb13835a3ef</code> (<code>gate/05b-human-decision.md</code>, <code>gate/07-authoring-publish.md</code>, <code>live-gate.json.policy</code>)</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the sitting's approval is <code>approved</code> with exactly one <code>via.surface='meeting'</code> decision row naming the chair</td>
@@ -186,9 +186,9 @@
 </tr>
 </tbody>
 </table>
-<p>The gate run is <code>docs/evidence/t19f/live-gate-check.txt</code>; its state is <code>live-gate.json</code>. Eleven of the twelve invariants pass; the twelfth is blocked on the human review the authoring gate requires (a service decision is refused verbatim), recorded in the same file.</p>
+<p>The gate run is <code>docs/evidence/t19f/live-gate-check.txt</code>; its state is <code>live-gate.json</code>. Every assertion passes (13 PASS, 0 FAIL). The twelfth acceptance invariant — the forum type carrying an active v2 — was the one blocked in the first proof: the admin CLI records <code>service</code> and <code>authoring.review</code> refuses a machine-only review, so the close-out (#722) requested a fresh gate from the distinct <code>conveyor-approver</code> seat and the human <code>app_user</code> FR Test decided it in the signed-in console (<code>decided_by_kind='human'</code>, <code>via.channel='web'</code>, <code>gate/05b-human-decision.md</code>). <code>--apply</code> then completed <code>authoring.review</code> and <code>authoring.publish</code>; the v1-pinned meeting still resolves v1.</p>
 <h3 id="the-publication">The publication</h3>
-<p><code>docs/design/scripts/publish-data.sh</code> regenerated the pack from the live database through the deployed binary (<code>docs/evidence/t19f/publish-final.log</code>). The strict gate is red on programme-wide debt that predates this unit (T5/T6/T8/T15/T17 closed since the accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared <code>project_in_unauthorised_tranche</code> P1 (active in tranche 6, whose authorisation is #526's unit, and the plan requires T19F to stay active until the tranche-6 review). The pack was therefore published report-only, with the exact findings in the log and in <code>conformance.json</code>.</p>
+<p><code>docs/design/scripts/publish-data.sh</code> regenerated the pack from the live database through the deployed binary (<code>docs/evidence/t19f/publish-final.log</code>). That publish was report-only: the strict gate is red on programme-wide debt that predates this unit (T5/T6/T8/T15/T17 closed since the accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared <code>project_in_unauthorised_tranche</code> P1 (active in tranche 6, whose authorisation is #526's unit, and the plan requires T19F to stay active until the tranche-6 review). The strict remediation — the five published closure records, the declared evidence, the baseline reconcile and the strict publish — is the follow-on conformance unit (#726): it ran <code>publish-data.sh</code> strict on the 2026-11-25 snapshot and the audit reported <strong>strict audit OK</strong>; the pack committed with that run is the programme record.</p>
 <h2 id="the-governance-chain-issue-684">The governance chain (issue #684)</h2>
 <p><code>scripts/governance-chain.py --project T19F --check</code> asserts the T19F record: seven approved artefacts, both live contracts with a requester distinct from the approver, B7 read back and not overwritten, one Phase-G compliance review per contract (read from the published <code>architecture.json</code>), and the published <code>architecture-artifact</code> document with its four headings. Evidence under <code>docs/evidence/t19f/gov/</code>.</p>
 <table>

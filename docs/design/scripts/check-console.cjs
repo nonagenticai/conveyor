@@ -1882,18 +1882,26 @@ function startServer({ config, state, snapshot, outputs, standards, rework }) {
           "repositories.update",
           "secrets.create",
         ];
-        return json(res, 200, {
-          actions: names.map((name) => ({
-            name,
-            version: 1,
-            kind: "internal",
-            spec_hash: "0".repeat(64),
-            scopes: ["cards:write"],
-            idempotent: false,
-            timeout_ms: 30000,
-          })),
-          generated_at: "2026-11-13T00:00:00Z",
-        });
+        const answer = () =>
+          json(res, 200, {
+            actions: names.map((name) => ({
+              name,
+              version: 1,
+              kind: "internal",
+              spec_hash: "0".repeat(64),
+              scopes: ["cards:write"],
+              idempotent: false,
+              timeout_ms: 30000,
+            })),
+            generated_at: "2026-11-13T00:00:00Z",
+          });
+        if (state.manifestGate) {
+          // #738 — a case holds this response so a render can land after the token but
+          // before the capability set exists; the loader must wait for the manifest.
+          state.manifestGate.promise.then(answer);
+          return;
+        }
+        return answer();
       }
       if (pathname === "/api/projects" && req.method === "GET") {
         if (state.failProjects) return json(res, state.failProjects, { title: "Unauthorized", detail: "authentication required" });
@@ -3218,7 +3226,7 @@ function startServer({ config, state, snapshot, outputs, standards, rework }) {
     fs.createReadStream(file).pipe(res);
   });
   return new Promise((resolve) => {
-    server.listen(0, "127.0.0.1", () => resolve({ server, port: server.address().port }));
+    server.listen(0, "127.0.0.1", () => resolve({ server, port: server.address().port, state }));
   });
 }
 
@@ -4978,6 +4986,32 @@ function readBody(req, done) {
       assert.match(await page.locator("#main").innerText(), /No published snapshot is loaded|Sign in to operate/);
       assert.equal(errors.length, 0, "no unhandled page error: " + errors.join("; "));
       await page.screenshot({ path: shot("console-signed-in.png"), fullPage: true });
+      await page.close();
+    }
+
+    /* 2c-race — #738: a render that lands after the token but before the capability
+       manifest must not settle the Procedures list empty for the life of the page.
+       Hold /api/actions, change the route once boot has asked for it, release, and
+       require the row. Without the loader's guard the fetch never happens and this
+       times out. */
+    {
+      let release;
+      const held = new Promise((resolve) => {
+        release = resolve;
+      });
+      consoleState.manifestGate = { promise: held };
+      const page = await browser.newPage();
+      // Issued only after the token exists (boot: token → /api/me → /api/actions).
+      const asked = page.waitForRequest(`http://127.0.0.1:${signedIn.port}/api/actions`);
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#plan`);
+      await asked;
+      await page.evaluate(() => {
+        location.hash = "#procedures";
+      });
+      await page.waitForTimeout(150); // the hashchange render lands with `can()` still false
+      consoleState.manifestGate = null;
+      release();
+      await page.waitForSelector("text=Synthetic receiving SOP");
       await page.close();
     }
 

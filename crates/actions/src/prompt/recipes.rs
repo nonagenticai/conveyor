@@ -53,12 +53,11 @@ pub struct PromptCreateIn {
     pub key: String,
     /// The human title.
     pub title: String,
-    /// The recipe's sections.
-    pub sections: Vec<PromptSectionIn>,
-    /// The compiled prompt text's character ceiling; absent means unbounded. A compile that
-    /// renders more is refused with the measured size, never truncated.
+    /// The whole-prompt character ceiling; absent means unbounded.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub budget_chars: Option<u32>,
+    /// The recipe's sections.
+    pub sections: Vec<PromptSectionIn>,
 }
 
 /// `prompt_recipes.get`'s input.
@@ -185,7 +184,7 @@ async fn prompt_recipes_create(
         return Err(invalid(
             "budget_chars",
             "invalid_value",
-            "a budget must be greater than 0",
+            "a character ceiling must be at least 1",
         ));
     }
     let mut seen = std::collections::BTreeSet::new();
@@ -213,8 +212,8 @@ async fn prompt_recipes_create(
         &store::prompt::NewPrompt {
             key: input.key,
             title: input.title.trim().to_owned(),
-            sections,
             budget_chars: input.budget_chars,
+            sections,
         },
     )
     .await

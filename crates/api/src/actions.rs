@@ -51,19 +51,16 @@ pub async fn manifest(
     _licence: RequireLicence,
     headers: HeaderMap,
 ) -> Response {
-    // The compiled surface plus the tenant's approved imported actions, projected through the
-    // same manifest entry (S04 P1.1). An imported action a role cannot call is absent, the same
-    // rule the compiled manifest applies.
     let mut entries = registry().manifest(caller.role);
-    match conveyor_actions::resolve::approved_actions(&state.pool, caller.tenant).await {
-        Ok(specs) => entries.extend(
-            specs
-                .iter()
-                .filter(|spec| spec.permits(caller.role))
-                .map(conveyor_actions::registry::manifest_entry),
-        ),
-        Err(error) => {
-            tracing::error!(%error, "list the tenant's approved imported actions");
+    // S04 P1: the tenant's approved imported actions are entries of the SAME manifest, and the
+    // ETag covers them too, so a refresh or a revocation changes the document.
+    if let Ok(imported) = conveyor_actions::resolve::imported(&state.pool, caller.tenant).await {
+        for action in imported {
+            if action.permits_role(caller.role)
+                && let Ok(value) = serde_json::to_value(action.manifest_entry())
+            {
+                entries.push(value);
+            }
         }
     }
     let entries = Value::Array(entries);

@@ -7,7 +7,13 @@ import { invoke } from "./helpers";
 // stops. The test sets the policy it is asserting (required / self-approval forbidden), drives
 // the screen, and reads the gate list through the API — the refusal is the engine's, not the UI's.
 
-type Gate = { id: string; gate: string; status: string; target?: string };
+type Gate = {
+  id: string;
+  gate: string;
+  status: string;
+  target?: string;
+  evidence?: { kind: string; id: string }[];
+};
 
 async function setPolicy(
   request: APIRequestContext,
@@ -60,6 +66,51 @@ test("a destructive write needs the approvals", async ({ page, request }) => {
   const opened = after.find((gate) => !before.some((old) => old.id === gate.id));
   expect(opened, "the attempt opened exactly one new gate").toBeTruthy();
   expect(opened!.target ?? "").toContain("E2E_FLAG=true");
+});
+
+// #572 — the operator attaches the gate's typed evidence in the destructive flow, the gate
+// records what it resolved, and the approver reads it on the row. The evidence is the record the
+// gate protects, not a free-text paraphrase.
+test("a destructive gate records the evidence the operator attached", async ({ page, request }) => {
+  await setPolicy(request, "ops.flag_flip", "required", "forbidden");
+
+  // One approved governed asset, unique enough to search and rank first.
+  const title = `Console evidence ${Date.now()}`;
+  const asset = await invoke<{ id: string }>(request, "requirements.create", { title });
+  await invoke(request, "requirements.transition", { id: asset.id, to: "in_review" });
+  await invoke(request, "requirements.transition", { id: asset.id, to: "approved" });
+
+  await page.goto("/operations");
+  await expect(page.getByRole("heading", { name: "Operations" })).toBeVisible();
+  await page.getByRole("tab", { name: "Flag changes" }).click();
+
+  await page.getByLabel("Namespace").fill("conveyor");
+  await page.getByLabel("Deployment").fill("conveyor");
+  await page.getByLabel("Flag (environment variable)").fill("E2E_EVIDENCE");
+  await page.getByLabel("Value", { exact: true }).fill("true");
+
+  await page.getByLabel("Evidence search").fill(title);
+  await page.getByRole("button", { name: "Find approved assets" }).click();
+  const hit = page.getByTestId("evidence-hits").locator("li", { hasText: title });
+  await expect(hit).toBeVisible();
+  await hit.getByRole("button", { name: "Attach" }).click();
+  await expect(page.getByTestId("evidence-attached")).toContainText(asset.id);
+
+  const before = (await pendingGates(request)).filter((gate) => gate.gate === "ops.flag_flip");
+  await page.getByRole("button", { name: "Flip the flag" }).click();
+  await expect(notice(page)).toContainText("Blocked: a gate");
+
+  // The gate carries the evidence the operator attached, resolved by the action.
+  const after = (await pendingGates(request)).filter((gate) => gate.gate === "ops.flag_flip");
+  const opened = after.find((gate) => !before.some((old) => old.id === gate.id));
+  expect(opened, "the attempt opened exactly one new gate").toBeTruthy();
+  expect(opened!.evidence).toEqual([{ kind: "governed_asset", id: asset.id }]);
+
+  // The approver reads it on the row, beside the target.
+  await page.goto("/approvals");
+  const row = page.locator(`[data-approval="${opened!.id}"]`);
+  await expect(row).toBeVisible();
+  await expect(row.getByTestId("approval-evidence")).toContainText(asset.id);
 });
 
 test("the operations screen has no horizontal page scroll at 1280 and 390", async ({ page }) => {

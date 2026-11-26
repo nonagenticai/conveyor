@@ -155,6 +155,15 @@ pub struct RunOut {
     /// The workflow node this run is a child of, when its parent runs a workflow (0037).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub workflow_step_id: Option<String>,
+    /// The job binding this run pinned (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<String>,
+    /// The release the binding pinned (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_hash: Option<String>,
+    /// The executor kind pinned when the run was created (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub executor_kind: Option<String>,
     /// When the run row was created.
     pub created_at: DateTime<Utc>,
     /// The run's declared outputs, keyed by the process's `outputs` names (S18 P3b).
@@ -378,6 +387,20 @@ pub struct ApprovalRequestIn {
     /// empty reason is not a waiver, so a gate that requires evidence is refused.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evidence_waiver_reason: Option<String>,
+    /// Evidence kinds this gate refuses to open without (#746).
+    ///
+    /// `require_evidence` only refuses an *empty* list, so a caller that omits the proof is still
+    /// accepted — advisory, not a gate. Naming a kind here is what makes it required: the
+    /// programme release gate names `lean_proof`.
+    #[serde(default)]
+    pub required_kinds: Vec<String>,
+    /// The specification digest a `lean_proof` evidence item must answer (#744).
+    ///
+    /// Stored in `meta.pinned_spec_sha256` beside the resolved evidence. A `lean_proof` item on
+    /// a gate without a pin is refused: a certificate proves a statement about a named
+    /// specification, and an unnamed one can be satisfied by any proof at all.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pinned_spec_sha256: Option<String>,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.
@@ -450,6 +473,13 @@ pub struct ApprovalOut {
     /// The input the approved call will run with (`meta.proposed_input`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_input: Option<Value>,
+    /// The typed evidence the gate resolved (`meta.evidence`): `[{kind, id}]`.
+    ///
+    /// A gate asked to resolve evidence records what it resolved (T3), so an approver reads the
+    /// record the gate protects, not only the requester's description. Absent on a gate that
+    /// carried none — never an empty list pretending the question was asked.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub evidence: Vec<Value>,
     /// Who posed the gate, when a person did.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub requested_by: Option<String>,

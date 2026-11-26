@@ -834,21 +834,22 @@ pub async fn approved_registry(conn: &mut PgConnection) -> Result<Vec<RegistryRo
     .await
 }
 
-/// The tenant's newest APPROVED row for one action name.
+/// The highest **approved** spec version for `name`, or `None` when the tenant has no approved
+/// row under it.
 ///
-/// The resolution model's single read: an imported action serves only when its highest approved
-/// `spec_version` exists (S04 P1, issue #3).
-pub async fn approved_action_tx(
+/// This is the imported-action resolution: it runs inside a tenant-scoped transaction, so RLS
+/// (not a parameter) is what confines the answer to the caller's tenant.
+pub async fn approved_registry_by_name(
     conn: &mut PgConnection,
     name: &str,
 ) -> Result<Option<RegistryRow>, sqlx::Error> {
     sqlx::query_as(
-        "SELECT id, name, spec_version, kind, service, spec, schema_hash, timeout_ms,
+        "SELECT DISTINCT ON (name)
+                id, name, spec_version, kind, service, spec, schema_hash, timeout_ms,
                 idempotent, approved_at, approved_by
            FROM action_registry
-          WHERE name = $1 AND approved_at IS NOT NULL
-          ORDER BY spec_version DESC
-          LIMIT 1",
+          WHERE approved_at IS NOT NULL AND name = $1
+          ORDER BY name, spec_version DESC",
     )
     .bind(name)
     .fetch_optional(conn)

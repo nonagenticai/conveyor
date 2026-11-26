@@ -4,6 +4,11 @@ erDiagram
   DEPARTMENT ||--o{ JOB_CATALOGUE : places
   JOB_CATALOGUE ||--o{ JOB_RELEASE : publishes
   JOB_RELEASE ||--o{ JOB_BINDING : pinned_by
+  TENANT ||--o{ ORGANISATION_LAYER : owns
+  INDUSTRY ||--o{ ORGANISATION_LAYER : layers
+  DEPARTMENT ||--o{ ORGANISATION_LAYER : layers
+  JOB_CATALOGUE ||--o{ ORGANISATION_LAYER : layers
+  JOB_RELEASE ||--o{ ORGANISATION_LAYER : resolves
   TENANT ||--o{ PROGRAMME : owns
   PROGRAMME ||--o{ PROJECT : groups
   PROJECT ||--o{ WBS_NODE : plans

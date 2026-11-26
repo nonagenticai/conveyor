@@ -6546,6 +6546,12 @@ window.installV2 = function (api, enterprise) {
   async function consoleLoadProcedures() {
     const p = procState();
     if (!consoleOn() || p.loading || p.loaded) return;
+    // The manifest is fetched after the token: `consoleOn()` is already true while
+    // `C.can()` is still false for every action. Reading that as "not permitted" would
+    // settle this list empty for the life of the page (#738). Instead, wait for the
+    // manifest; boot's completion emits an onChange, which re-renders and calls this
+    // again. A lost session clears the token, so the guard above already covers it.
+    if (!C.manifest()) return;
     p.loading = true;
     p.error = null;
     try {

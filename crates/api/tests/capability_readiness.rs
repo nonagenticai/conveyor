@@ -218,7 +218,7 @@ async fn a_blocked_capability_refuses_the_same_projection_before_any_run_row() {
         &seeded,
         &process,
         &["cards.claim", "does.not_exist"],
-        None,
+        Some("agent@1"),
     )
     .await;
 
@@ -454,8 +454,10 @@ async fn a_bound_process_starts_while_the_unbound_capability_stays_ambiguous() {
     .expect("seed capability");
     let bound_agent: Uuid = sqlx::query_scalar(
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, process_key, status, model_ref, allowed_actions)
-         VALUES ($1, $2, $3, 'process_agent', $4, 'active', 'local-llm', '{}') RETURNING id",
+             (tenant_id, capability_id, key, role, process_key, status, model_ref, prompt_ref,
+              allowed_actions)
+         VALUES ($1, $2, $3, 'process_agent', $4, 'active', 'local-llm', 'agent@1', '{}')
+         RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(capability)
@@ -467,8 +469,9 @@ async fn a_bound_process_starts_while_the_unbound_capability_stays_ambiguous() {
     for _ in 0..2 {
         sqlx::query(
             "INSERT INTO capability_agent
-                 (tenant_id, capability_id, key, role, status, model_ref, allowed_actions)
-             VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', '{}')",
+                 (tenant_id, capability_id, key, role, status, model_ref, prompt_ref,
+                  allowed_actions)
+             VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', 'agent@1', '{}')",
         )
         .bind(seeded.tenant_id)
         .bind(capability)

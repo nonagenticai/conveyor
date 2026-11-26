@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Proof of delivery — the Lean certificate corpus · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="proof-of-delivery--the-lean-certificate-corpus">Proof of delivery — the Lean certificate corpus</h1>
+<p>Part of #746, extended by #762. This document records what was actually measured, on which artefact, and what was <strong>not</strong> run. It is a delivery record, not a claim of completeness: § Live on the released engine holds the drills against the deployed engine, and the assumption no certificate removes.</p>
+<h2 id="artefacts">Artefacts</h2>
+<table>
+<thead>
+<tr>
+<th>Thing</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td><code>docs/spec/lean/DeliveryModel.lean</code>, 3 179 bytes, <code>sha256 d19f8ad3…baca504</code></td>
+</tr>
+<tr>
+<td>Specification pin</td>
+<td><code>docs/SPEC_V2.md</code>, <code>sha256 fc0fe31a…a99b99e2</code></td>
+</tr>
+<tr>
+<td>Toolchain</td>
+<td><code>leanprover/lean4:v4.30.0-rc2</code>, the prover application's own lake project</td>
+</tr>
+<tr>
+<td>Reduction</td>
+<td>kernel only — <code>by decide</code> and <code>simp</code>, no compiler-native reduction, no Mathlib import</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-the-checks-were-run">How the checks were run</h2>
+<p>Two lanes, and they are deliberately different:</p>
+<ul>
+<li><strong>The corpus and the renderer's exact output</strong> were checked by running <code>lake env lean &lt;file&gt;</code> inside the prover's own pod, against its own lake project, with the file streamed in and removed afterwards. That is the same command the prover's runner issues, so "valid" here means the same thing the API would answer — without going through the HTTP layer.</li>
+<li><strong>The engine path</strong> (the declared <code>lean4.check</code> external, the sealed credential, the persisted invocation, <code>proofs.record</code> and <code>proofs.reverify</code>) is proven by integration tests against a real PostgreSQL 18 and a stub prover: <code>crates/actions/tests/proofs_record.rs</code>, <code>proofs_reverify.rs</code>, <code>pm_gate_proof.rs</code>.</li>
+<li><strong>The live drills</strong> (§ Live on the released engine) run that same engine path against the deployed engine and the real prover, through the public API, with a real tenant bearer.</li>
+</ul>
+<h2 id="measurement--kernel-checks-on-the-exact-artefacts">Measurement — kernel checks on the exact artefacts</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Bytes</th>
+<th>Exit</th>
+<th>Wall clock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The model alone (definitions + three universal theorems)</td>
+<td>3 179</td>
+<td>0</td>
+<td>10 242 ms (first run after the pod restarted; every later run is ~1.4 s)</td>
+</tr>
+<tr>
+<td>Slice certificate — a closed slice with its evidence</td>
+<td>—</td>
+<td>0</td>
+<td>1 462 ms</td>
+</tr>
+<tr>
+<td>Slice with one required evidence item removed</td>
+<td>—</td>
+<td>1</td>
+<td>1 399 ms</td>
+</tr>
+<tr>
+<td>Model with an escape transition out of <code>closed</code></td>
+<td>—</td>
+<td>1</td>
+<td>1 413 ms</td>
+</tr>
+<tr>
+<td>Programme bundle, 20 leaves, final model</td>
+<td>5 143</td>
+<td>0</td>
+<td>3 107 ms</td>
+</tr>
+<tr>
+<td>Programme bundle, one leaf dropped</td>
+<td>—</td>
+<td>1</td>
+<td>1 925 ms</td>
+</tr>
+<tr>
+<td>Bundle with two slices sharing one certificate digest</td>
+<td>—</td>
+<td>1</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The renderer's own emission format was checked the same way, once per kind: a rendered <code>slice</code>, a rendered <code>programme</code> bundle and a rendered <code>package</code> manifest each exit 0, including the <code>checks := [("name", true)]</code> pair list. The negative runs are what stop the corpus being vacuous: a model that is not a model, a slice missing its evidence, a bundle missing a leaf, and a bundle that reuses one certificate for two slices are all refused by the kernel, not by us.</p>
+<p>Earlier on the same day, through the prover's HTTP API with a licence token, the same shapes measured: model 1 466 ms, slice 1 462 ms, package 1 598 ms, 20-leaf bundle 6 149 ms, and the same four negatives refused. The HTTP answer agreed with the kernel answer in every case.</p>
+<h2 id="what-the-certificate-says-and-what-it-does-not">What the certificate says, and what it does not</h2>
+<p>A certificate is an instance proof over canonical facts plus a universal proof over a hand-written model. It proves that the facts, as recorded, satisfy <code>checkSlice</code> / <code>checkProgramme</code> / <code>checkPackage</code>, and that a closed item is terminal with an accepted path always carrying evidence.</p>
+<p>It does <strong>not</strong> prove that the engine's facts describe what actually happened in the database. That refinement is assumed, and every certificate names the assumption, the specification digest and the model digest. <code>README.md</code> in <code>docs/spec/lean/</code> states this in the same words a reader of a certificate would need.</p>
+<h2 id="the-engines-refusals-measured-by-test">The engine's refusals, measured by test</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Refusal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A caller writes the Lean source instead of the renderer</td>
+<td><code>422 proof_source_not_rendered</code></td>
+</tr>
+<tr>
+<td>Facts that name a different model than the binary embeds</td>
+<td><code>422 proof_model_mismatch</code></td>
+</tr>
+<tr>
+<td>Facts and certificate pinning different specifications</td>
+<td><code>422 proof_spec_mismatch</code></td>
+</tr>
+<tr>
+<td>Facts missing a required item</td>
+<td><code>422 proof_facts_incomplete</code>, naming the item</td>
+</tr>
+<tr>
+<td>A certificate reused for a different engine invocation</td>
+<td><code>422 proof_invocation_already_recorded</code></td>
+</tr>
+<tr>
+<td>A stored row rewritten and its digest recomputed</td>
+<td><code>422 proof_source_not_rendered</code> on re-verification</td>
+</tr>
+<tr>
+<td>A gate that names <code>lean_proof</code> required, opened without one</td>
+<td><code>422 gate_evidence_missing</code>, naming the kind</td>
+</tr>
+<tr>
+<td>A gate requiring a kind that is not typed</td>
+<td><code>422 gate_evidence_unknown_kind</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="live-on-the-released-engine">Live on the released engine</h2>
+<p>Measured 2026-11-26 against the deployed engine — the image carrying <code>0076</code>, #746 and <code>CONVEYOR_EXTERNAL_LEAN4_URL</code> from the private infrastructure repository — with a real tenant bearer from the application's own OIDC login. Every body below is the deployed engine's answer; none of it is a test double.</p>
+<h3 id="the-credential">The credential</h3>
+<p>The tenant's prover bearer is a licence token minted on the tenant's <strong>own <code>conveyor</code> licence</strong> and sealed with <code>conveyor admin upstream-token --tenant … --service lean4 --token-stdin</code>. The engine reads it as the <code>lean4.token</code> secret and sends <code>Authorization: Bearer …</code>; the prover introspects it and takes the tenant from the licence, never from a header. A dedicated <code>lean4-prover</code> licence app does not exist, so the self-service mint (<code>--mint</code>) is tracked as #776.</p>
+<h3 id="the-measurements">The measurements</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Request</th>
+<th>Deployed engine's answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prover reachability</td>
+<td><code>lean4.check</code>, <code>{"source": "theorem smoke_ok : 2 + 2 = 4 := by decide"}</code></td>
+<td><code>200</code>; <code>{"valid": true, "computation_time_ms": 835.01, "diagnostics": [], "stderr": "", "stdout": ""}</code></td>
+</tr>
+<tr>
+<td>The renderer's own output</td>
+<td><code>lean4.check</code>, the slice certificate <code>render</code> emits from the facts below (3 537 characters)</td>
+<td><code>200</code>; <code>{"valid": true, "computation_time_ms": 1509.88}</code></td>
+</tr>
+<tr>
+<td>Negative control</td>
+<td><code>lean4.check</code>, <code>theorem nope : 1 = 2 := by decide</code></td>
+<td><code>200</code>; <code>{"valid": false, "computation_time_ms": 836.15}</code>, the tactic's message in <code>stdout</code></td>
+</tr>
+<tr>
+<td>The certificate</td>
+<td><code>proofs.record</code> naming that invocation, the facts and <code>theorem delivery_ok</code>, <code>trust: kernel</code></td>
+<td><code>201</code>; <code>{"verdict": "proven", "certificate_sha256": "31feb1ba…33e4648", "facts_sha256": "7c7daf3a…ddc4f0f", "computation_time_ms": 1509.88}</code></td>
+</tr>
+<tr>
+<td>The gate, without the certificate</td>
+<td><code>approvals.request</code>, <code>required_kinds: ["lean_proof"]</code>, <code>require_evidence: true</code>, <code>pinned_spec_sha256</code>, <code>evidence: []</code></td>
+<td><code>422</code>; <code>"type": "gate_evidence_missing"</code>, <code>"detail": "this gate requires a \"lean_proof\" evidence item to open; the request names none"</code></td>
+</tr>
+<tr>
+<td>The gate, with it</td>
+<td>the same request plus <code>evidence: [{"kind": "lean_proof", "id": "&lt;certificate&gt;"}]</code></td>
+<td><code>200</code>; the approval's <code>evidence[0]</code> is <code>{"kind": "lean_proof", "id": "01a219b7…cfea658", "certificate_sha256": "31feb1ba…33e4648", "spec_sha256": "fc0fe31a…a99b99e2"}</code></td>
+</tr>
+<tr>
+<td>The tamper drill</td>
+<td>the stored <code>facts_canonical</code> edited (one evidence item renamed) <strong>with</strong> <code>facts_sha256</code> and <code>certificate_sha256</code> recomputed, so the row is internally consistent; a fresh <code>lean4.check</code> of the unchanged source answers <code>valid: true</code>, then <code>proofs.reverify</code> on the rewritten row</td>
+<td><code>422</code>; <code>"type": "proof_source_not_rendered"</code>, <code>"detail": "proof_id: the stored source is not this rendering of the stored facts"</code></td>
+</tr>
+<tr>
+<td>The refusal is recorded</td>
+<td>the engine's own record of the call above</td>
+<td><code>action_invocation</code> row `proofs.reverify</td>
+</tr>
+</tbody>
+</table>
+<p>The facts the certificate carries name the model digest <code>d19f8ad3…baca504</code> and the specification pin <code>fc0fe31a…a99b99e2</code>; <code>proofs.record</code> re-rendered the facts and refused nothing, which is what makes the row's <code>lean_source</code> the renderer's output rather than a caller's claim.</p>
+<p>An approval must belong to a project, card or run, so the two live gate calls name a project; the earlier attempts on the same morning that omit it are input validation, not the gate.</p>
+<h3 id="a-prover-defect-this-exposed">A prover defect this exposed</h3>
+<p>A check that fails returns <code>valid: false</code> with <code>diagnostics: []</code> and Lean's message in <strong><code>stdout</code></strong>: <code>apps/lean4-prover/src/runner.rs</code> parses only <code>stderr</code> (three call sites). Certificates are unaffected — <code>valid</code> comes from the exit code — but the diagnostic channel is empty for every failure. Worth its own fix; it is not #746's.</p>
+<h3 id="what-this-still-does-not-prove">What this still does not prove</h3>
+<ul>
+<li>That the facts in a certificate describe what actually happened in the database. That refinement is the assumption every certificate names (see <code>docs/spec/lean/README.md</code>); proving it is Verus/Kani work, not part of the corpus.</li>
+<li>The self-service mint path: the credential above was minted and sealed by an operator, and <code>--mint</code> still needs the dedicated client and the licence-app decision (#776).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/proof-of-delivery.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

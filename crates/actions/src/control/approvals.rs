@@ -555,6 +555,14 @@ async fn approvals_request(
     if let Some(proposed) = input.proposed_input {
         meta.insert("proposed_input".to_owned(), proposed);
     }
+    // #744: a gate that accepts a `lean_proof` names the specification the certificate must
+    // answer, so the pin is on the row beside the evidence it was checked against.
+    if let Some(pin) = input.pinned_spec_sha256.as_deref() {
+        meta.insert(
+            "pinned_spec_sha256".to_owned(),
+            Value::String(pin.to_owned()),
+        );
+    }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
     //
@@ -580,6 +588,8 @@ async fn approvals_request(
         ctx.tenant,
         &input.evidence,
         require && !(input.evidence.is_empty() && waiver.is_some()),
+        &input.required_kinds,
+        input.pinned_spec_sha256.as_deref(),
     )
     .await?;
     if !evidence.is_empty() {
@@ -1015,6 +1025,12 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
             .is_some_and(|value| value.as_bool() == Some(true) || value.as_str() == Some("true")),
         allowed_decisions: record.meta.get("allowed_decisions").cloned(),
         proposed_input: record.meta.get("proposed_input").cloned(),
+        evidence: record
+            .meta
+            .get("evidence")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default(),
         requested_by: record.requested_by.map(|id| id.to_string()),
         requested_by_label: record.requested_by_label.clone(),
         required_decisions: approval.required_decisions,

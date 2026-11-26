@@ -3,8 +3,11 @@
 //! score is the source's category-weighted mean.
 
 use conveyor_analysis::app::ux::UxClaim;
-use conveyor_analysis::app::{HttpEvidence, PageEvidence, TlsEvidence, analyse, analyse_with_ux};
-use conveyor_analysis::model::{Category, Document, Severity};
+use conveyor_analysis::app::{
+    DESTINATIONS, HttpEvidence, PageEvidence, RouteEvidence, TlsEvidence, analyse, analyse_with_ux,
+    coverage,
+};
+use conveyor_analysis::model::{Category, Document, Report, Severity};
 
 fn bundle() -> PageEvidence {
     let html = r#"<html>
@@ -270,5 +273,100 @@ fn a_strength_is_not_an_issue() {
             .findings
             .iter()
             .all(|finding| finding.category != Category::Ux)
+    );
+}
+
+fn route_evidence(served: &[&str], unserved: &[&str], extra_served: &[&str]) -> Vec<RouteEvidence> {
+    let mut routes = Vec::new();
+    for (name, path) in DESTINATIONS {
+        if served.contains(&name) {
+            routes.push(RouteEvidence {
+                path: path.to_owned(),
+                served: true,
+            });
+        } else if unserved.contains(&name) {
+            routes.push(RouteEvidence {
+                path: path.to_owned(),
+                served: false,
+            });
+        }
+    }
+    for path in extra_served {
+        routes.push(RouteEvidence {
+            path: (*path).to_owned(),
+            served: true,
+        });
+    }
+    routes
+}
+
+fn has_evidence(report: &Report, check_id: &str, evidence: &str) -> bool {
+    report.findings.iter().any(|finding| {
+        finding.check_id() == check_id
+            && finding
+                .evidence
+                .as_deref()
+                .is_some_and(|value| value == evidence)
+    })
+}
+
+#[test]
+fn the_destination_table_is_measured_against_the_route_table() {
+    // Every destination served except Authoring (no row) and Tools (a row, unserved), plus one
+    // served route that is not a §10.5 destination at all.
+    let mut served: Vec<&str> = Vec::new();
+    for (name, _) in DESTINATIONS {
+        if name != "Authoring" && name != "Tools" {
+            served.push(name);
+        }
+    }
+    let routes = route_evidence(&served, &["Tools"], &["/settings"]);
+    let page = Document::new(
+        "https://example.test/",
+        r#"<a href="/organisation">organisation</a><a href="/portfolio/42">portfolio</a>"#,
+    );
+    let report = coverage(&routes, &[page]);
+
+    assert!(has_evidence(
+        &report,
+        "app-destination-missing",
+        "/authoring"
+    ));
+    assert!(has_evidence(&report, "app-destination-unserved", "/tools"));
+    assert!(
+        !report
+            .findings
+            .iter()
+            .any(|finding| finding.check_id() == "app-destination-missing"
+                && finding.evidence.as_deref() == Some("/tools")),
+        "a row that exists but is not served is not a missing route"
+    );
+    assert!(has_evidence(
+        &report,
+        "app-destination-unreachable",
+        "/procedures"
+    ));
+    assert!(
+        !report.findings.iter().any(
+            |finding| finding.check_id() == "app-destination-unreachable"
+                && matches!(
+                    finding.evidence.as_deref(),
+                    Some("/organisation") | Some("/portfolio")
+                )
+        ),
+        "a linked destination is reachable, including a path under it"
+    );
+    assert!(has_evidence(&report, "app-route-unmapped", "/settings"));
+}
+
+#[test]
+fn the_same_evidence_twice_is_the_same_report() {
+    let routes = route_evidence(&["Organisation"], &["Tools"], &[]);
+    let page = Document::new("https://example.test/", r#"<a href="/organisation">o</a>"#);
+    let first = coverage(&routes, std::slice::from_ref(&page));
+    let second = coverage(&routes, &[page]);
+    assert_eq!(
+        serde_json::to_string(&first).expect("serialisable"),
+        serde_json::to_string(&second).expect("serialisable")
     );
 }

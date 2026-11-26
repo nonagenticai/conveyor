@@ -1,6 +1,6 @@
 ---
 document: T19F/evidence
-version: 2
+version: 4
 status: published
 project: T19F
 category: evidence
@@ -61,24 +61,32 @@ evidence file under `docs/evidence/t19f/gate/`; the ids are `docs/evidence/t19f/
 | Invariant | Evidence | Result |
 |---|---|---|
 | the v1-pinned meeting still resolves version 1 after the v2 route is exercised | meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8`, `live-gate.json.policy` | pass |
-| the forum type carries an active v2 | `live-gate.json.policy` | **blocked** — the review needs a human decision (see the gap below) |
+| the forum type carries an active v2 | v2 `01a211da-c391-7867-86dd-d22f9cfed5d5`, human gate `01a211d8-001f-7296-bbc1-ccb13835a3ef` (`gate/05b-human-decision.md`, `gate/07-authoring-publish.md`, `live-gate.json.policy`) | pass |
 | the sitting's approval is `approved` with exactly one `via.surface='meeting'` decision row naming the chair | approval `01a210c8-9273-7964-9b97-0f3dd810bcf3`, `live-gate.json.sitting` | pass |
 | the sitting's agenda item closed as `decision` | item `01a210c8-97c5-7850-8270-16b37a07d8ce` | pass |
 | the cadence meeting carries the bound type and the slot, non-cancelled | meeting `01a210c9-2397-73f1-8d07-7e8e807e524f` (materialised twice from one cadence) | pass |
 
-The gate run is `docs/evidence/t19f/live-gate-check.txt`; its state is `live-gate.json`. Eleven of
-the twelve invariants pass; the twelfth is blocked on the human review the authoring gate requires
-(a service decision is refused verbatim), recorded in the same file.
+The gate run is `docs/evidence/t19f/live-gate-check.txt`; its state is `live-gate.json`. Every
+assertion passes (13 PASS, 0 FAIL). The twelfth acceptance invariant — the forum type carrying an
+active v2 — was the one blocked in the first proof: the admin CLI records `service` and
+`authoring.review` refuses a machine-only review, so the close-out (#722) requested a fresh gate
+from the distinct `conveyor-approver` seat and the human `app_user` FR Test decided it in the
+signed-in console (`decided_by_kind='human'`, `via.channel='web'`, `gate/05b-human-decision.md`).
+`--apply` then completed `authoring.review` and `authoring.publish`; the v1-pinned meeting still
+resolves v1.
 
 ### The publication
 
 `docs/design/scripts/publish-data.sh` regenerated the pack from the live database through the
-deployed binary (`docs/evidence/t19f/publish-final.log`). The strict gate is red on programme-wide
-debt that predates this unit (T5/T6/T8/T15/T17 closed since the accepted baseline; S18/S21/SPEC-V2
-ledger rows) plus T19F's declared `project_in_unauthorised_tranche` P1 (active in tranche 6, whose
-authorisation is #526's unit, and the plan requires T19F to stay active until the tranche-6
-review). The pack was therefore published report-only, with the exact findings in the log and in
-`conformance.json`.
+deployed binary (`docs/evidence/t19f/publish-final.log`). That publish was report-only: the strict
+gate is red on programme-wide debt that predates this unit (T5/T6/T8/T15/T17 closed since the
+accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared
+`project_in_unauthorised_tranche` P1 (active in tranche 6, whose authorisation is #526's unit, and
+the plan requires T19F to stay active until the tranche-6 review). The strict remediation — the
+five published closure records, the declared evidence, the baseline reconcile and the strict
+publish — is the follow-on conformance unit (#726): it ran `publish-data.sh` strict on the
+2026-11-25 snapshot and the audit reported **strict audit OK**; the pack committed with that run
+is the programme record.
 
 ## The governance chain (issue #684)
 

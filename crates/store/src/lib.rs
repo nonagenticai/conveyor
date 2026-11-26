@@ -140,6 +140,8 @@ pub mod procedure;
 pub mod process_map;
 pub mod project;
 pub mod project_request;
+// SPEC_V2 §5.3/§5.4 (#744): the delivery-proof certificate a gate resolves as typed evidence.
+pub mod proof;
 // SPEC D27: the prompt catalogue — the recipe read by pin, and the facts a compile draws from.
 pub mod prompt;
 // SPEC D27: the built-in prompt texts, seed material for the catalogue.

@@ -14,6 +14,7 @@
 
 pub mod kata;
 pub mod lesson;
+pub mod proof;
 pub mod redis;
 
 use std::net::SocketAddr;
@@ -24,7 +25,7 @@ use std::time::Duration;
 
 use axum::Router;
 use axum::extract::State;
-use axum::routing::{any, post};
+use axum::routing::{any, get, post};
 use conveyor_api::{AppState, Config};
 use conveyor_domain::TenantId;
 use conveyor_store::begin_scoped;
@@ -957,6 +958,8 @@ impl Stub {
             .route("/slow", post(slow))
             .route("/fail", post(fail))
             .route("/timeout", post(timeout))
+            // S04 P3: echoes what an imported action's path/query/credential bindings sent.
+            .route("/probe/{id}", get(probe))
             // `strata_ingest`'s accepted answer, so `documents.ingest`'s real path (202 with a job id) is
             // exercised rather than its refusal path.
             .route("/api/ingest/jobs", post(ingest_accepted))
@@ -1078,6 +1081,23 @@ async fn external_answer(
     axum::Json(serde_json::json!({
         "stub": true,
         "path": uri.path(),
+    }))
+}
+
+/// S04 P3.1: what the upstream actually received — the substituted path, the query and the
+/// bearer the engine opened from the tenant's sealed secret.
+async fn probe(
+    axum::extract::Path(id): axum::extract::Path<String>,
+    axum::extract::Query(query): axum::extract::Query<std::collections::BTreeMap<String, String>>,
+    headers: axum::http::HeaderMap,
+) -> axum::Json<Value> {
+    axum::Json(json!({
+        "id": id,
+        "query": query,
+        "authorization": headers
+            .get("authorization")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or(""),
     }))
 }
 

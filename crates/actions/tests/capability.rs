@@ -336,6 +336,7 @@ async fn readiness_reports_each_blocking_fact() {
         json!({
             "status": "active",
             "allowed_actions": ["cards.claim", "widgets.invoke"],
+            "prompt_ref": "agent@1",
         }),
     )
     .await;
@@ -690,7 +691,7 @@ async fn agent_update_is_a_patch_behind_if_match() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body).get("prompt_ref"), None);
 
-    // The status machine is real: retired is terminal.
+    // SPEC_V2 §7.7 (S21 step 11, #697): activation needs a prompt again.
     let (status, _headers, body) = running
         .invoke_full(
             "capability_agents.update",
@@ -701,12 +702,32 @@ async fn agent_update_is_a_patch_behind_if_match() {
             None,
         )
         .await;
+    assert_eq!(status, 422, "an active agent must name a prompt: {body}");
+    assert!(body.to_string().contains("prompt_ref_required"), "{body}");
+
+    let (status, headers, body) = running
+        .invoke_full(
+            "capability_agents.update",
+            TOKEN,
+            json!({"agent_id": id, "prompt_ref": "audit@1"}),
+            Some("\"3\""),
+            None,
+            None,
+        )
+        .await;
     assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        headers.get("etag").map(String::as_str),
+        Some("\"4\""),
+        "the restored prompt is version 4"
+    );
+
+    // The status machine is real: retired is terminal.
     let (status, _headers, body) = running
         .invoke_full(
             "capability_agents.update",
             TOKEN,
-            json!({"agent_id": id, "status": "retired"}),
+            json!({"agent_id": id, "status": "active"}),
             Some("\"4\""),
             None,
             None,
@@ -717,8 +738,19 @@ async fn agent_update_is_a_patch_behind_if_match() {
         .invoke_full(
             "capability_agents.update",
             TOKEN,
-            json!({"agent_id": id, "status": "active"}),
+            json!({"agent_id": id, "status": "retired"}),
             Some("\"5\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, _headers, body) = running
+        .invoke_full(
+            "capability_agents.update",
+            TOKEN,
+            json!({"agent_id": id, "status": "active"}),
+            Some("\"6\""),
             None,
             None,
         )
@@ -956,4 +988,77 @@ async fn the_agent_tool_surface_is_the_four_reads() {
             "{write} configures an executor and must not be agent-reachable"
         );
     }
+}
+
+// ── S21 step 11 (issue #697): no model call without compiled text ─────────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_active_agent_without_a_prompt_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (_code, capability) = first_capability(&running, TOKEN).await;
+    let (status, _headers, body) = create_agent(
+        &running,
+        TOKEN,
+        &capability,
+        "no_prompt_active",
+        json!({"status": "active"}),
+    )
+    .await;
+    assert_eq!(status, 422, "an active agent needs a prompt: {body}");
+    assert!(
+        error_fields(&body)
+            .iter()
+            .any(|field| field == "prompt_ref"),
+        "the refusal names the field: {body}"
+    );
+    assert!(
+        body.to_string().contains("prompt_ref_required"),
+        "the refusal names the contract: {body}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn activating_an_agent_without_a_prompt_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (_code, capability) = first_capability(&running, TOKEN).await;
+    let (status, headers, body) =
+        create_agent(&running, TOKEN, &capability, "draft_no_prompt", json!({})).await;
+    assert_eq!(status, 201, "a draft agent may name no prompt: {body}");
+    let agent = text(output(&body), "id");
+    let etag = headers.get("etag").expect("an ETag on create").clone();
+    let (status, _headers, body) = running
+        .invoke_full(
+            "capability_agents.update",
+            TOKEN,
+            json!({"agent_id": agent, "status": "active"}),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "activation needs a prompt: {body}");
+    assert!(body.to_string().contains("prompt_ref_required"), "{body}");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn readiness_blocks_an_agent_with_no_prompt() {
+    let (pg, running, seeded) = fixture().await;
+    let (code, capability) = first_capability(&running, TOKEN).await;
+    let (status, _headers, body) =
+        create_agent(&running, TOKEN, &capability, "row_before_guard", json!({})).await;
+    assert_eq!(status, 201, "{body}");
+    let agent = text(output(&body), "id");
+    // A row written before the guard: active, with no prompt to compile.
+    sqlx::query("UPDATE capability_agent SET status = 'active' WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(Uuid::parse_str(&agent).expect("a uuid"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("activate");
+    let (status, body) = get_by_code(&running, &code).await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        blocker_codes(output(&body)).contains(&"prompt_not_configured".to_owned()),
+        "readiness names the missing prompt: {body}"
+    );
 }

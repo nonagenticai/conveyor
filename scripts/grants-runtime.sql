@@ -86,3 +86,8 @@ REVOKE UPDATE, DELETE ON kata_revert, kata_adoption FROM conveyor_runtime;
 -- closure links what was delivered; UPDATE and DELETE are withheld so an application bug cannot
 -- rewrite either. The `development_project` charter row stays mutable for its status.
 REVOKE UPDATE, DELETE ON development_step, development_closure FROM conveyor_runtime;
+
+-- Delivery proofs (#744, 0076): a certificate is the evidence a gate resolves, so it is written
+-- once and never edited. A re-verification re-reads the row; neither UPDATE nor DELETE is granted,
+-- because either would make a stored certificate describable as something the prover never said.
+REVOKE UPDATE, DELETE ON proof FROM conveyor_runtime;

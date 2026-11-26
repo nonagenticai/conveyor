@@ -419,22 +419,10 @@ mod tests {
         // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
         // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
         // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
-        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551. T15 (#86) adds ten
-        // internal authoring/BYO actions: 551 -> 561. T6 (#80) adds ten internal
-        // development-project actions and `cards.assign`; the lane adds its own families
-        // (`__lessons_namespace__` keeps SPEC §D36's `lessons.*`). The merged registry is 596:
-        // 577 internal, 19 external.
-        // The lane's actual registry is 599 (580 internal, 19 external — the older 596 comment
-        // above predates pm.status and the job-authority actions). The main a94d2634 merge adds
-        // four more: T12's kata.standardise|stretch|sustain (3) and #655's authoring.intakes (1).
-        // S21 step 10's ladder.case, ladder.precheck and decision_option_sets.get|set are retired
-        // with the duplicate ladder path. T11's metrics.reconciliation read adds one internal
-        // action and T11's billing shim adds one external read (`billing.rollup`) — the merged
-        // registry is 619: 594 internal, 25 external after the main merge. v1-w2c-5's
-        // `trace_links.view` adds one internal read: 620 (595 internal, 25 external).
+        // The merged registry: 602 internal + 28 external.
         assert_eq!(
             registry.len(),
-            620,
+            630,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

@@ -24,7 +24,7 @@ use uuid::Uuid;
 use super::{
     ALLOWED_CONTENT_TYPES, DOCUMENT_CREATED, DOCUMENT_DELETED, DOCUMENT_PUBLISHED,
     DOCUMENT_PURGE_KIND, DOCUMENT_UNPUBLISHED, DOCUMENT_UPDATED, MAX_OUTPUT_BYTES,
-    MAX_UPLOAD_BYTES, document_error, emit_document_event, invalid,
+    MAX_UPLOAD_BYTES, document_error, emit_document_event, emit_document_event_call, invalid,
 };
 use crate::integrations::objects::{Objects, key_for};
 use crate::invoke::{ActionError, HandlerCtx};
@@ -191,7 +191,7 @@ pub(super) fn can_publish(ctx: &HandlerCtx) -> bool {
 pub(super) async fn document_out_with_names(
     conn: &mut PgConnection,
     record: store::document::DocumentRecord,
-    action: &'static str,
+    action: &str,
 ) -> Result<DocumentOut, ActionError> {
     let names = names_for(conn, std::slice::from_ref(&record), action).await?;
     Ok(DocumentOut::from_record(record, &names))
@@ -216,7 +216,7 @@ pub(super) async fn documents_out_with_names(
 /// fills it for an external action's declared artefact. See [`create_from_bytes`].
 pub(crate) struct NewBytesDocument<'a> {
     /// The action storing them, for the error surface only (`documents.create`, `media.generate_image`).
-    pub action: &'static str,
+    pub action: &'a str,
     /// The display title.
     pub title: &'a str,
     /// The declared MIME type; it must be on the allowlist and match the bytes.
@@ -246,7 +246,7 @@ pub(crate) struct NewBytesDocument<'a> {
 /// (best effort) when that insert fails.
 pub(crate) async fn create_from_bytes(
     tx: &mut PgConnection,
-    ctx: &HandlerCtx,
+    ctx: &crate::invoke::CallContext,
     document: NewBytesDocument<'_>,
     bytes: Vec<u8>,
 ) -> Result<(DocumentOut, u64), ActionError> {
@@ -363,7 +363,7 @@ pub(crate) async fn create_from_bytes(
     .map_err(|error| document_error(error, action))?;
 
     let version = created.version.get();
-    emit_document_event(
+    emit_document_event_call(
         &mut *tx,
         ctx,
         DOCUMENT_CREATED,
@@ -381,7 +381,7 @@ pub(crate) async fn create_from_bytes(
 async fn names_for(
     conn: &mut PgConnection,
     records: &[store::document::DocumentRecord],
-    action: &'static str,
+    action: &str,
 ) -> Result<HashMap<Uuid, String>, ActionError> {
     let mut ids: Vec<Uuid> = records
         .iter()
@@ -484,7 +484,7 @@ async fn documents_create(
     let category = canonical_category_slot(category)?;
     let (created, version) = create_from_bytes(
         &mut *tx,
-        &ctx,
+        &ctx.call(),
         NewBytesDocument {
             action,
             title,
@@ -1392,7 +1392,7 @@ pub async fn fetch_bytes(
     conn: &mut sqlx::PgConnection,
     tenant: conveyor_domain::TenantId,
     id: Uuid,
-    action: &'static str,
+    action: &str,
 ) -> Result<LoadedDocument, ActionError> {
     let record = store::document::get_document_tx(&mut *conn, tenant, id)
         .await

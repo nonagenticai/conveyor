@@ -285,7 +285,7 @@ jobs:
           tar -xzf "$tmp/actionlint.tar.gz" -C "$tmp" actionlint
           "$tmp/actionlint" -color
 
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
           enable-cache: false
 
@@ -314,9 +314,10 @@ jobs:
   # Playwright is pinned and installed here: six checks launch a headless chromium, and the
   # pack has no package.json of its own.
   design-pack:
-    # Not a required context and up to 20 minutes long: on a merge_group run it would sit on the
-    # queue's critical path for no gate. The pull_request run is where the pack is validated.
-    if: ${{ !github.event.repository.private && github.event_name != 'merge_group' }}
+    # A required context (#789): the merge queue evaluates required checks on the merge-group ref,
+    # so this job must run there or every queued PR waits forever. Measured 2m56s on PR #775
+    # against the 20-minute cap; the pull_request run remains the pre-queue verdict.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -345,6 +346,7 @@ jobs:
           docs/design/scripts/publish-standards.sh --check
           bash scripts/ci/tests/standards_pack.sh
           bash scripts/ci/tests/publish_audit.sh
+          bash scripts/ci/tests/build_docs_preserve.sh
           python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
@@ -620,7 +622,7 @@ jobs:
           persist-credentials: false
 
       - name: set up buildx (a cache mount is a BuildKit feature)
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       # ⛔ A CACHE MOUNT IS NOT A CACHE ACROSS RUNS. The Dockerfile's
       # `--mount=type=cache,target=/src/target` lives on the BUILDER, and a GitHub-hosted runner

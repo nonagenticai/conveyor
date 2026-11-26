@@ -10,6 +10,10 @@ anything. The shape is `.github/ISSUE_TEMPLATE/unit.md`.
 
 ## Steps
 
+**Before you start:** if the source is a proposed project with no P0 §4 brief or P0 §5 inception,
+load `business-analyst` first — `issue-create` converts a defined plan, it does not define one. The
+live register, not a plan's status label, decides whether the project is proposed.
+
 1. **Read the source.** The slice plan `docs/plans/slices/S##-*.md` (all sections), its row in
    `docs/plans/00-INDEX.md`, and the relevant `W`/`V` section of
    `docs/evidence/2026-11-10-plan-audit.md`. Note the measured state (sha, `file:symbol`) — the
@@ -62,8 +66,15 @@ anything. The shape is `.github/ISSUE_TEMPLATE/unit.md`.
    Evidence at completion (empty table).
    One paraphrased sentence per part; the plan and audit are linked, never pasted.
 
+   Every body also carries the `## Programme` table exactly as
+   `.github/ISSUE_TEMPLATE/unit.md`: `Tranche`, `Brief`, `ADM phase/plateau`, `Benefits`. Each
+   value names a live row/document or `pending #N`; a bare `—` is empty (the template's ready
+   placeholder).
+
 6. **Self-check before create** — all must pass; fix the body, do not create yet:
    - every required heading is present;
+   - the four `## Programme` rows are present and non-empty, each naming a live row/document or
+     `pending #N`;
    - every cited path resolves at its ref (`git cat-file -e`), every `#N` resolves;
    - every part has ≥1 scenario carrying a `Verify:` command or test target;
    - the chosen state label matches the Dependencies table (`status:blocked` iff a `blocked-by` is
@@ -80,6 +91,8 @@ anything. The shape is `.github/ISSUE_TEMPLATE/unit.md`.
      --label unit --label S## --label status:ready|blocked|needs-human \
      --body-file -
    ```
+   Then run `python3 scripts/ci/board.py --repo <owner/name> --dor <new-number>`; exit 0 is the
+   gate. Fix the body in place if it fails.
    Labels must exist first (`gh label create`); see `03-DELIVERY.md`. Never use `--add-assignee`
    (the GitHub App token cannot assign). A plan that spans two plans carries two slice labels.
    A docs-only unit (`docs/**`, any `*.md`, `.claude/**`) is budgeted as one short PR run; its merge

@@ -66,7 +66,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* found (kata.adopt, kata.analyse, kata.close…)<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
 | `actions:development` | §10.4 | actions | development | `new` | actions: dev.* absent |
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
-| `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.site, analyse.video) |
+| `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.app, analyse.brand, analyse.content…) |
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
 | `actions:tools` | §10.4 | actions | tools | `exists` | actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)<br>actions: tool_calls.* found (tool_calls.list)<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.list…)<br>actions: tools.* found (tools.get, tools.list, tools.probe…) |
 | `actions:memory` | §10.4 | actions | memory | `exists` | actions: lessons.* found (lessons.promote, lessons.propose, lessons.review) |

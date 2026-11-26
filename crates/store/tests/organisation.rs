@@ -791,3 +791,393 @@ async fn ahtapol_receives_only_its_industry() {
     .expect("count industries");
     assert_eq!(industries, 1);
 }
+
+// ── S21 step 11 (issue #697): the release compiles the knowledge layers (SPEC_V2 §4.1) ─────
+
+#[allow(clippy::too_many_arguments)]
+async fn set_layer(
+    db: &support::TestDb,
+    tenant: TenantId,
+    level: &str,
+    industry: Option<Uuid>,
+    department: Option<Uuid>,
+    job: Option<Uuid>,
+    kind: &str,
+    value: Option<serde_json::Value>,
+    required: bool,
+) {
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    conveyor_store::organisation::set_layer_tx(
+        &mut tx,
+        tenant,
+        &conveyor_store::organisation::LayerSet {
+            level: level.to_owned(),
+            industry_id: industry,
+            department_id: department,
+            job_id: job,
+            kind: kind.to_owned(),
+            value,
+            required,
+        },
+    )
+    .await
+    .expect("author the layer");
+    tx.commit().await.expect("commit the layer");
+}
+
+async fn publish(
+    db: &support::TestDb,
+    tenant: TenantId,
+    job: Uuid,
+) -> Result<conveyor_store::organisation::ReleaseRow, OrganisationStoreError> {
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    match job_release_publish_tx(&mut tx, tenant, job).await {
+        Ok(row) => {
+            tx.commit().await.expect("commit the publish");
+            Ok(row)
+        }
+        Err(error) => {
+            tx.rollback().await.ok();
+            Err(error)
+        }
+    }
+}
+
+/// A parented department pair: an archetype and one child the job is placed in.
+async fn archetype_fixture(db: &support::TestDb, slug: &str) -> (TenantId, Uuid, Uuid, Uuid, Uuid) {
+    let seeded = support::seed_tenant(&db.super_pool, slug).await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("non-nil tenant");
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let industry = industry_create_tx(
+        &mut tx,
+        tenant,
+        &NewIndustry {
+            key: format!("ind-{slug}"),
+            name: "Layer industry".to_owned(),
+            meta: json!({}),
+        },
+    )
+    .await
+    .expect("industry");
+    let archetype = department_create(
+        &mut tx,
+        tenant,
+        &NewDepartment {
+            name: "engineering-archetype",
+            parent_id: None,
+            industry_id: Some(industry.id),
+            ordinal: Some(1),
+            is_primary: false,
+        },
+    )
+    .await
+    .expect("archetype");
+    let child = department_create(
+        &mut tx,
+        tenant,
+        &NewDepartment {
+            name: "delivery",
+            parent_id: Some(archetype.id),
+            industry_id: Some(industry.id),
+            ordinal: Some(2),
+            is_primary: true,
+        },
+    )
+    .await
+    .expect("child");
+    let job = job_create_tx(
+        &mut tx,
+        tenant,
+        &NewJob {
+            job_key: format!("job_{}", slug.replace('-', "_")),
+            industry_id: industry.id,
+            family: "engineering".to_owned(),
+            title: "Layer job".to_owned(),
+            status: "active".to_owned(),
+            definition: json!({"charter": "prove the layers"}),
+            meta: json!({}),
+            departments: vec![PlacementIn {
+                department_id: child.id,
+                ordinal: 1,
+                is_primary: true,
+            }],
+        },
+    )
+    .await
+    .expect("job");
+    tx.commit().await.expect("commit fixture");
+    (tenant, industry.id, archetype.id, child.id, job.id)
+}
+
+#[tokio::test]
+async fn the_release_resolves_layers_in_declared_order() {
+    let db = support::TestDb::fresh().await;
+    let (tenant, industry, archetype, child, job) = archetype_fixture(&db, "layer-order").await;
+    for (level, scope, value) in [
+        ("base", None, "base-style"),
+        ("industry", Some(industry), "industry-style"),
+        ("department_archetype", Some(archetype), "archetype-style"),
+        ("department", Some(child), "department-style"),
+    ] {
+        set_layer(
+            &db,
+            tenant,
+            level,
+            if level == "industry" { scope } else { None },
+            if level.starts_with("department") {
+                scope
+            } else {
+                None
+            },
+            None,
+            "style",
+            Some(json!(value)),
+            false,
+        )
+        .await;
+    }
+    // A second kind set only at the industry layer keeps that layer's source.
+    set_layer(
+        &db,
+        tenant,
+        "industry",
+        Some(industry),
+        None,
+        None,
+        "tone",
+        Some(json!("plain")),
+        false,
+    )
+    .await;
+    set_layer(
+        &db,
+        tenant,
+        "job",
+        None,
+        None,
+        Some(job),
+        "style",
+        Some(json!("job-style")),
+        false,
+    )
+    .await;
+
+    // A second write to the same (level, scope, kind) is the one row's version bump, not a
+    // second row: the later value wins.
+    set_layer(
+        &db,
+        tenant,
+        "job",
+        None,
+        None,
+        Some(job),
+        "style",
+        Some(json!("job-style-2")),
+        false,
+    )
+    .await;
+
+    let release = publish(&db, tenant, job).await.expect("publish");
+    let layers = &release.release_snapshot["layers"];
+    assert_eq!(layers["style"]["value"], json!("job-style-2"));
+    assert_eq!(layers["style"]["level"], json!("job"));
+    assert_eq!(layers["style"]["source"], json!("job_layer_order"));
+    assert_eq!(
+        layers["tone"]["level"],
+        json!("industry"),
+        "a kind the job does not set keeps its industry source: {layers}"
+    );
+    assert_eq!(layers["tone"]["source"], json!("ind-layer-order"));
+}
+
+#[tokio::test]
+async fn required_only_tightens_downward() {
+    let db = support::TestDb::fresh().await;
+    let (tenant, industry, _archetype, child, job) = archetype_fixture(&db, "layer-required").await;
+    set_layer(
+        &db,
+        tenant,
+        "industry",
+        Some(industry),
+        None,
+        None,
+        "policy",
+        Some(json!("industry-policy")),
+        true,
+    )
+    .await;
+    // A lower layer cannot loosen it: value overridden, required stays true.
+    set_layer(
+        &db,
+        tenant,
+        "department",
+        None,
+        Some(child),
+        None,
+        "policy",
+        Some(json!("department-policy")),
+        false,
+    )
+    .await;
+    set_layer(
+        &db,
+        tenant,
+        "job",
+        None,
+        None,
+        Some(job),
+        "extra",
+        Some(json!("job-extra")),
+        true,
+    )
+    .await;
+
+    let release = publish(&db, tenant, job).await.expect("publish");
+    let layers = &release.release_snapshot["layers"];
+    assert_eq!(layers["policy"]["value"], json!("department-policy"));
+    assert_eq!(
+        layers["policy"]["required"],
+        json!(true),
+        "required is the OR over the path"
+    );
+    assert_eq!(layers["extra"]["required"], json!(true));
+}
+
+#[tokio::test]
+async fn an_unresolved_required_kind_refuses_publish() {
+    let db = support::TestDb::fresh().await;
+    let (tenant, _industry, _archetype, child, job) =
+        archetype_fixture(&db, "layer-not-ready").await;
+    // A declaration with no value anywhere on the path.
+    set_layer(
+        &db,
+        tenant,
+        "department",
+        None,
+        Some(child),
+        None,
+        "compliance",
+        None,
+        true,
+    )
+    .await;
+    match publish(&db, tenant, job).await {
+        Err(OrganisationStoreError::LayerReleaseNotReady { kind, department }) => {
+            assert_eq!(kind, "compliance");
+            assert_eq!(department, "delivery");
+        }
+        other => panic!("expected LayerReleaseNotReady, got {other:?}"),
+    }
+    let releases: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM job_release WHERE tenant_id = $1 AND job_id = $2")
+            .bind(tenant.as_uuid())
+            .bind(job)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count releases");
+    assert_eq!(releases, 0, "a refusal writes no release row");
+}
+
+#[tokio::test]
+async fn sibling_departments_conflict_unless_the_job_resolves() {
+    let db = support::TestDb::fresh().await;
+    let org = org_fixture(&db, "layer-conflict").await;
+    set_layer(
+        &db,
+        org.tenant,
+        "department",
+        None,
+        Some(org.delivery),
+        None,
+        "region",
+        Some(json!("eu")),
+        false,
+    )
+    .await;
+    set_layer(
+        &db,
+        org.tenant,
+        "department",
+        None,
+        Some(org.verification),
+        None,
+        "region",
+        Some(json!("us")),
+        false,
+    )
+    .await;
+    match publish(&db, org.tenant, org.job).await {
+        Err(OrganisationStoreError::LayerDepartmentConflict { kind, departments }) => {
+            assert_eq!(kind, "region");
+            assert_eq!(
+                departments,
+                vec!["delivery".to_owned(), "verification".to_owned()]
+            );
+        }
+        other => panic!("expected LayerDepartmentConflict, got {other:?}"),
+    }
+
+    // The job-layer row resolves it.
+    set_layer(
+        &db,
+        org.tenant,
+        "job",
+        None,
+        None,
+        Some(org.job),
+        "region",
+        Some(json!("global")),
+        false,
+    )
+    .await;
+    let release = publish(&db, org.tenant, org.job).await.expect("publish");
+    assert_eq!(
+        release.release_snapshot["layers"]["region"]["value"],
+        json!("global")
+    );
+    assert_eq!(
+        release.release_snapshot["layers"]["region"]["level"],
+        json!("job")
+    );
+}
+
+#[tokio::test]
+async fn two_identical_publishes_hash_identically() {
+    let db = support::TestDb::fresh().await;
+    let (tenant, industry, _archetype, child, job) = archetype_fixture(&db, "layer-hash").await;
+    set_layer(
+        &db,
+        tenant,
+        "industry",
+        Some(industry),
+        None,
+        None,
+        "style",
+        Some(json!("industry-style")),
+        true,
+    )
+    .await;
+    set_layer(
+        &db,
+        tenant,
+        "department",
+        None,
+        Some(child),
+        None,
+        "style",
+        Some(json!("department-style")),
+        false,
+    )
+    .await;
+    let first = publish(&db, tenant, job).await.expect("first publish");
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let second = compile_release_tx(&mut tx, tenant, job)
+        .await
+        .expect("compile");
+    tx.commit().await.expect("commit");
+    assert_eq!(first.release_hash, release_hash(&second));
+    assert_eq!(
+        first.release_snapshot["layers"], second["layers"],
+        "the layer section is stable"
+    );
+}

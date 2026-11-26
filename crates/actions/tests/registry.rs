@@ -131,28 +131,16 @@ use serde_json::{Value, json};
 /// replay's read adds 560.
 /// **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
-/// `minutes_publish|list|get`) — 518 → **530** (T19, #606). **S21 step 9 (#649) adds 1
-/// internal**: `cards.assign`, the card handoff. 530 → **531**. **T5 (#77) adds 8 internal**:
-/// P1's `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
-/// 531 → **539**. **T6 (#80) adds 9 internal**: the `development_projects.*` self-development
-/// family and its gates. 539 → **548**. **T8 (#79) adds 3 internal**:
-/// `lessons.propose|review|promote`. 548 → **551**. **T15 (#86) adds 10 internal**: the
-/// toolkit/authoring/BYO family and the broker's `tools.dispatch`. 551 → **561**.
-/// **T12 (#88) adds 3 internal**: `kata.standardise|sustain|stretch`. 561 → **564**.
-/// **#655 (T17b) adds 1 internal**: `authoring.intakes`. 564 → **565**.
-///
-/// **The #526 merge keeps both families**: the lane's `ladder.prepare` (internal) and
-/// `laya.classify` (external), and main's T12 kata Gets and `authoring.intakes`. Main's
-/// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
-/// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
-/// one internal action and T11's billing shim adds one external read (`billing.rollup`):
-/// **619: 594 internal, 25 external**.
-/// **v1-w2c-5 adds 1 internal**: `trace_links.view`, the bounded requirement/run chain read.
-/// 619 → **620: 595 internal, 25 external**.
-const EXPECTED: [&str; 620] = [
+/// Every action the registry serves, in the order `registry().names()` returns it.
+/// Regenerated at the main merge; the per-lane history above is superseded.
+const EXPECTED: [&str; 630] = [
     "actions.describe",
     "actions.list",
     "agent.run",
+    "analyse.app",
+    "analyse.brand",
+    "analyse.content",
+    "analyse.report",
     "analyse.site",
     "analyse.video",
     "andon.engage",
@@ -542,6 +530,8 @@ const EXPECTED: [&str; 620] = [
     "ops.rollback",
     "ops.scale",
     "ops.triage",
+    "organisation_layers.list",
+    "organisation_layers.set",
     "pm.charter",
     "pm.close",
     "pm.get",
@@ -626,6 +616,10 @@ const EXPECTED: [&str; 620] = [
     "prompt_recipes.get",
     "prompt_recipes.list",
     "prompt_recipes.retire",
+    "proofs.get",
+    "proofs.list",
+    "proofs.record",
+    "proofs.reverify",
     "providers.list",
     "publish.start",
     "publish.status",
@@ -863,22 +857,36 @@ fn the_registry_is_exactly_the_declared_set() {
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    // The lane's later additions (T19 meetings, cards.assign, T5/T6/T8/T15 families,
-    // `job_authorities.*`, the programme registers and the governance/storage/tool families)
-    // bring the lane to 599 actions: 580 internal, 19 external.
-    // The merge keeps main's T12 kata Gets (`kata.standardise|sustain|stretch`) and
-    // `authoring.intakes` — four internal actions — and retires main's #656
-    // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
-    // T11's `metrics.reconciliation` read adds one internal action.
-    // T11's billing shim adds one external read (`billing.rollup`).
-    // v1-w2c-5's `trace_links.view` adds one internal read.
-    // Final: 595 internal + 25 external = 620.
-    assert_eq!((internal, external), (595, 25));
+    // The merged registry: 602 internal + 28 external.
+    assert_eq!((internal, external), (602, 28));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
         internal,
         external
+    );
+}
+
+#[test]
+fn the_analysis_family_is_the_six_declared_verbs() {
+    let registry = assert_registry_consistent().expect("the compiled registry is consistent");
+    let mut names: Vec<&str> = registry
+        .names()
+        .into_iter()
+        .filter(|name| name.starts_with("analyse."))
+        .collect();
+    names.sort_unstable();
+    assert_eq!(
+        names,
+        [
+            "analyse.app",
+            "analyse.brand",
+            "analyse.content",
+            "analyse.report",
+            "analyse.site",
+            "analyse.video",
+        ],
+        "SPEC_V2 §10.4 declares exactly six analysis verbs"
     );
 }
 

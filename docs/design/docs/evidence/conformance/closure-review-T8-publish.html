@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T8 closure-review — publish · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T8-publish.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t8-closure-review--publish">T8 closure-review — publish</h1>
+<p><code>documents.publish</code> for <code>01a2121a-9742-7122-920e-f4a051cff757</code> (admin act, If-Match). The standard's required headings are checked on this transition.</p>
+<pre><code>== write: documents.publish ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T8/closure-review\nversion: 1\nstatus: published\nproject: T8\ncategory: closure-review\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: closure-review\nphase: G\nplateau: capability\n---\n\n# T8 \u2014 Organisational memory: closure review\n\nWhether the project delivered its acceptance, on its evidence, and the decision that follows.\n\n## Outcome vs acceptance\n\n| Acceptance criterion | Evidence | Result |\n|---|---|---|\n| A lesson with one evidence reference is refused | `crates/actions/tests/lessons.rs::one_evidence_ref_is_refused`; `crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref`; migration `0069_lesson_lifecycle.sql` | pass |\n| Two independent references and a human review promote a source draft | `crates/actions/tests/lessons.rs::two_independent_refs_and_a_human_review_promote_a_source_draft` | pass |\n| A bad run records a lesson that is not doctrine | `crates/actions/tests/lessons.rs::a_failed_run_records_a_lesson_that_is_not_doctrine` | pass |\n| The delivery is on main and gated | issue #79 closed by PR #664, merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` (head `9e2b7f57`); preflight run 45393424722 success | pass |\n\n## Evidence\n\n- Delivery merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f`; migration\n  `migrations/0069_lesson_lifecycle.sql`.\n- Behaviour: the named `lessons.rs` and `store/tests/lesson.rs` scenarios.\n- The brief: `docs/plans/T8/project-brief.md` (authored at closure from SPEC \u00a712 T8 and D36).\n\n## Open items\n\n- This closure review is the project&#39;s first; no earlier closure record existed.\n- Incident-reference lessons are a typed `422` until T7&#39;s table \u2014 T7&#39;s scope, not a T8 gap.\n- `strata_rag` publishing/embeddings were never in T8&#39;s scope; #84&#39;s promotion rate and #82&#39;s\n  retro authoring are separate units; the live loop is #88/T12.\n- The tranche-11 authorisation is **not** claimed here; it is the #526 programme chain&#39;s act.\n\n## Decision\n\nClose. Acceptance is met on the evidence above; the listed items are other projects&#39; scope, and\nthis review does not manufacture a tranche authorisation.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;closure-review&quot;,
+  &quot;content_hash&quot;: &quot;f20f70081bc2ba1382f0e7acd1f05aaf9b7b190adc4f3922bf1e3dbbbe7cad7a&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:47:42.160617Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121a-9742-7122-920e-f4a051cff757&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;closure-review&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;f20f70081bc2ba1382f0e7acd1f05aaf9b7b190adc4f3922bf1e3dbbbe7cad7a&quot;,
+    &quot;size_bytes&quot;: 2132,
+    &quot;unit&quot;: &quot;T8&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d35-76bb-a22e-be49e3e95d16&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:47:47.262161Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 2132,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Closure review \u2014 T8 Organisational memory&quot;,
+  &quot;unit&quot;: &quot;T8&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:47:47.262161Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T8/closure-review\nversion: 1\nstatus: published\nproject: T8\ncategory: closure-review\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: closure-review\nphase: G\nplateau: capability\n---\n\n# T8 \u2014 Organisational memory: closure review\n\nWhether the project delivered its acceptance, on its evidence, and the decision that follows.\n\n## Outcome vs acceptance\n\n| Acceptance criterion | Evidence | Result |\n|---|---|---|\n| A lesson with one evidence reference is refused | `crates/actions/tests/lessons.rs::one_evidence_ref_is_refused`; `crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref`; migration `0069_lesson_lifecycle.sql` | pass |\n| Two independent references and a human review promote a source draft | `crates/actions/tests/lessons.rs::two_independent_refs_and_a_human_review_promote_a_source_draft` | pass |\n| A bad run records a lesson that is not doctrine | `crates/actions/tests/lessons.rs::a_failed_run_records_a_lesson_that_is_not_doctrine` | pass |\n| The delivery is on main and gated | issue #79 closed by PR #664, merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f` (head `9e2b7f57`); preflight run 45393424722 success | pass |\n\n## Evidence\n\n- Delivery merge `57d8ef8fe07de413e6a73430584ddd2cf2d59d7f`; migration\n  `migrations/0069_lesson_lifecycle.sql`.\n- Behaviour: the named `lessons.rs` and `store/tests/lesson.rs` scenarios.\n- The brief: `docs/plans/T8/project-brief.md` (authored at closure from SPEC \u00a712 T8 and D36).\n\n## Open items\n\n- This closure review is the project&#39;s first; no earlier closure record existed.\n- Incident-reference lessons are a typed `422` until T7&#39;s table \u2014 T7&#39;s scope, not a T8 gap.\n- `strata_rag` publishing/embeddings were never in T8&#39;s scope; #84&#39;s promotion rate and #82&#39;s\n  retro authoring are separate units; the live loop is #88/T12.\n- The tranche-11 authorisation is **not** claimed here; it is the #526 programme chain&#39;s act.\n\n## Decision\n\nClose. Acceptance is met on the evidence above; the listed items are other projects&#39; scope, and\nthis review does not manufacture a tranche authorisation.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;closure-review&quot;,
+  &quot;content_hash&quot;: &quot;f20f70081bc2ba1382f0e7acd1f05aaf9b7b190adc4f3922bf1e3dbbbe7cad7a&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:47:42.160617Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121a-9742-7122-920e-f4a051cff757&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;closure-review&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;f20f70081bc2ba1382f0e7acd1f05aaf9b7b190adc4f3922bf1e3dbbbe7cad7a&quot;,
+    &quot;size_bytes&quot;: 2132,
+    &quot;unit&quot;: &quot;T8&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d35-76bb-a22e-be49e3e95d16&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:47:47.262161Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 2132,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Closure review \u2014 T8 Organisational memory&quot;,
+  &quot;unit&quot;: &quot;T8&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:47:47.262161Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/conformance/closure-review-T8-publish.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -162,13 +162,17 @@ programme at the stated date:
   authorisation (P0), which belongs to the #526 retrospective chain; the `meeting_type` authoring
   route and the T9/T10 binding are the T19F follow-on (below). The T18 UI lane (#562–#566) is in
   flight and independent.
-- **T19F (decision-forum governance) is proposed at tranche 6** — the follow-on T19's closure
-  review named. The plan and the MSP/TOGAF/SAFe artefact set are
-  `docs/plans/T19F-meeting-bindings.md` and `docs/plans/T19F/`; **#683** implements the versioned
-  policy authoring through T17's route, the board sitting and the cadence materialisation;
-  **#684** proves them on the deployed engine. The project stays `active`: its closure review
-  defers closure to the tranche-6 review, so no unledgered P0 is manufactured. T19's ledgered
-  tranche-4 P0 remains the #526 chain's.
+- **T19F (decision-forum governance) is built and active at tranche 6** — the follow-on T19's
+  closure review named. The plan and the MSP/TOGAF/SAFe artefact set are
+  `docs/plans/T19F-meeting-bindings.md` and `docs/plans/T19F/`; **#682/#683/#684** delivered the
+  plan (PR #686), the versioned policy authoring through T17's route, the board sitting and the
+  cadence materialisation (PR #700), and the live proof (PR #711). The close-out (#722) recorded
+  the human `authoring.review` decision by FR Test in the signed-in console and took the live gate
+  to 12/12: the policy v2 is published, the v1-pinned meeting still resolves v1, the sitting
+  decided `via='meeting'` and the cadence materialised once. The project stays `active`: its
+  closure review defers closure to the tranche-6 review, so no unledgered P0 is manufactured.
+  T19's ledgered tranche-4 P0 remains the #526 chain's; the strict conformance remediation is the
+  follow-on unit.
 - **Architecture contracts remain a large open gap, one project smaller.** Twelve delivery
   projects (T3, T5–T8, T12, T14–T19) had no live contract at the last audit; T19 now carries one,
   live and board-approved, so the count is eleven. The board's approval is the authority act, and
@@ -225,6 +229,33 @@ The programme's claims rest on four rules that are enforced in code, not prose:
 These are the mechanisms that let a tranche review or a benefit realization be taken on evidence.
 They are deliberately narrow: rows, gates and read models, with no certification badge and no
 second register.
+
+### 6.1 The strict conformance gate, measured 2026-11-25
+
+`docs/design/scripts/publish-data.sh` runs the conformance audit strict (`--strict --fail-on
+P0,P1 --baseline docs/evidence/conformance-baseline.json`) before it replaces the pack. The
+publish of 2026-11-25T09:52Z passed: **strict audit OK**. The remediation that made it pass was
+records, not waivers:
+
+- the five closed projects **T5, T6, T8, T15 and T17** published their declared `closure-review`,
+  and **T5, T6, T12, T15 and T17** their declared `evidence`; T8 also published the brief its
+  declaration names;
+- the ledger gained one time-boxed entry — **T19F `project_in_unauthorised_tranche` P1**,
+  disposition `rework`, owner `programme owner`, expires 2027-02-18 — because T19F stays active at
+  tranche 6 until the tranche-6 review; T12's tranche-13 P1 is ledgered the same way;
+- the baseline's severity for the five closed projects' tranche gaps moved to **P0** (they closed
+  before their tranches were authorised — still #526's chain), and eight resolved entries
+  (S18/S21/SPEC-V2 closure records; T5/T6/T8 seed drift) were removed;
+- two further time-boxed entries accept **seed/live drifts** that the registry refresh surfaced:
+  T14's and S21's seeds derive `closed` from their closed unit issues while the live rows stay
+  `active`; closing them in planned tranches 13 and 9 would manufacture tranche P0s, so each
+  synchronisation waits on its tranche's authorisation (#526 chain) or a seed install;
+- `scripts/programme_state.py` honours a declared `closure_deferred_to_tranche`, so T19F's
+  deferred closure keeps it active instead of deriving `closed` from its closed issues, and
+  `seed/programme-definition.json` carries the declaration.
+
+The strict set is 162 P0/P1 gaps (29 P0, 133 P1): each is either fixed or an accepted, owned and
+expiring ledger entry. No tranche is authorised by this record.
 
 ## 7. What this study does not claim
 

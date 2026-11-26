@@ -2755,6 +2755,38 @@ def self_test() -> None:
 
     expect(no_contract, "contract_missing")
 
+    def delivery_contract_reviewed(data: Dataset) -> None:
+        data.by_key["T1"]["status"] = "closed"
+        data.contracts.append(
+            {
+                "id": "c2",
+                "project_id": "t1",
+                "kind": "delivery_contract",
+                "phase_code": "f",
+                "status": "live",
+                "approved_at": "2026-11-20T01:30:00+00:00",
+                "approved_by": "u1",
+                "requested_by": "u2",
+            }
+        )
+        data.reviews_arch[0]["contract_id"] = "c2"
+
+    # A Phase-G review of the delivery contract satisfies the rule; the live SoAW is not a
+    # compliance subject, so its having no review is not a gap.
+    expect_absent(delivery_contract_reviewed, "compliance_review_missing")
+
+    def delivery_contract_unreviewed(data: Dataset) -> None:
+        delivery_contract_reviewed(data)
+        data.reviews_arch[0]["contract_id"] = "c1"
+
+    expect(delivery_contract_unreviewed, "compliance_review_missing")
+
+    def soaw_only(data: Dataset) -> None:
+        data.by_key["T1"]["status"] = "closed"
+        data.reviews_arch.clear()
+
+    expect_absent(soaw_only, "compliance_review_missing")
+
     def draft_board(data: Dataset) -> None:
         data.architecture["board"][0]["status"] = "draft"
 

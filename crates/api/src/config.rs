@@ -90,6 +90,11 @@ pub struct Config {
     pub service_client_id: Option<String>,
     /// `SERVICE_CLIENT_SECRET` — the secure-apps client secret.
     pub service_client_secret: Option<Secret>,
+    /// `BUNDLE_MINTER_CLIENT_ID` — the platform-owned `conveyor-bundle-minter`, the only client
+    /// the licences mint route accepts a request from.
+    pub bundle_minter_client_id: Option<String>,
+    /// `BUNDLE_MINTER_CLIENT_SECRET` — that client's secret.
+    pub bundle_minter_client_secret: Option<Secret>,
     /// `PROVISIONING_BASE_URL` — the Platform wizard's provision call.
     pub provisioning_base_url: Option<String>,
     /// `BILLING_BASE_URL` — the cost/usage reads.
@@ -168,6 +173,8 @@ impl Config {
             service_token_url: get("SERVICE_TOKEN_URL"),
             service_client_id: get("SERVICE_CLIENT_ID"),
             service_client_secret: get("SERVICE_CLIENT_SECRET").map(Secret),
+            bundle_minter_client_id: get("BUNDLE_MINTER_CLIENT_ID"),
+            bundle_minter_client_secret: get("BUNDLE_MINTER_CLIENT_SECRET").map(Secret),
             provisioning_base_url: get("PROVISIONING_BASE_URL"),
             billing_base_url: get("BILLING_BASE_URL"),
             keycloak_admin_url: get("KEYCLOAK_ADMIN_URL"),
@@ -212,6 +219,36 @@ impl Config {
                 .map(Secret::expose)
                 .unwrap_or_default(),
         )
+    }
+
+    /// The mint's own credential (`conveyor-bundle-minter`), or the name of the setting it is
+    /// missing.
+    ///
+    /// The mint must **not** authenticate as the backend: the licences mint route is owner-scoped
+    /// and `conveyor-backend`'s `api_client` row belongs to `fr`, so a role grant alone would still
+    /// be refused. A missing setting is the error — never a fallback to
+    /// [`Self::service_credentials`], which would seal a token nobody asked for.
+    pub fn bundle_minter_credentials(&self) -> Result<conveyor_auth::ClientCredentials, String> {
+        let missing = |name: &str| format!("bundle minter credential not configured: {name}");
+        let client_id = self
+            .bundle_minter_client_id
+            .as_deref()
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| missing("BUNDLE_MINTER_CLIENT_ID"))?;
+        let secret = self
+            .bundle_minter_client_secret
+            .as_ref()
+            .map(Secret::expose)
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| missing("BUNDLE_MINTER_CLIENT_SECRET"))?;
+        conveyor_auth::ClientCredentials::new(
+            self.service_token_url.as_deref().unwrap_or_default(),
+            client_id,
+            secret,
+        )
+        .map_err(|error| format!("bundle minter credential: {error}"))
     }
 
     /// The realm-`conveyor` admin credential. Its token endpoint is derived from the realm
@@ -403,5 +440,43 @@ mod tests {
         // Not a development value the allowlist knows: production, not a third mode.
         assert!(cfg(&[("APP_ENV", "staging")]).unwrap().is_production());
         assert!(cfg(&[("APP_ENV", "production")]).unwrap().is_production());
+    }
+
+    /// #776: the mint authenticates as its own client, and a deployment that forgot it is told
+    /// which variable is absent instead of silently minting as the backend.
+    #[test]
+    fn the_minter_uses_its_own_credential_and_refuses_without_one() {
+        const TOKEN_URL: &str =
+            "https://auth.example/realms/secure-apps/protocol/openid-connect/token";
+
+        let c = cfg(&[
+            ("SERVICE_TOKEN_URL", TOKEN_URL),
+            ("BUNDLE_MINTER_CLIENT_ID", "conveyor-bundle-minter"),
+            ("BUNDLE_MINTER_CLIENT_SECRET", "minter-secret"),
+        ])
+        .unwrap();
+        assert_eq!(
+            c.bundle_minter_credentials().unwrap().client_id(),
+            "conveyor-bundle-minter"
+        );
+
+        // The backend credential is configured and must NOT be used as a fallback.
+        let c = cfg(&[
+            ("SERVICE_TOKEN_URL", TOKEN_URL),
+            ("SERVICE_CLIENT_ID", "conveyor-backend"),
+            ("SERVICE_CLIENT_SECRET", "backend-secret"),
+            ("BUNDLE_MINTER_CLIENT_ID", "conveyor-bundle-minter"),
+        ])
+        .unwrap();
+        assert_eq!(
+            c.bundle_minter_credentials().unwrap_err(),
+            "bundle minter credential not configured: BUNDLE_MINTER_CLIENT_SECRET"
+        );
+
+        let c = cfg(&[("SERVICE_TOKEN_URL", TOKEN_URL)]).unwrap();
+        assert_eq!(
+            c.bundle_minter_credentials().unwrap_err(),
+            "bundle minter credential not configured: BUNDLE_MINTER_CLIENT_ID"
+        );
     }
 }

@@ -86,9 +86,16 @@ applied.
 
 **Definition of done** — the merge gate: every scenario passes at the PR head with a row in
 `Evidence at completion` · the repo gate is green at the exact head · tests added/updated per part,
-none skipped · docs updated · migrations/ledger and `--check-lock` handled when touched · live
-verification recorded where deployment is a prerequisite · every CARRIED-BY-#9 part re-checked on
-merged main · one PR `Closes #N` MERGED, issue closed, branch deleted.
+none skipped · docs updated · migrations/ledger and `--check-lock` handled when touched · a unit
+that closes the slice's last open issue updates that slice's `scripts/v2-slice-artefacts.json` row
+to the measured shape (tables/actions/modules) and runs
+`python3 scripts/build-coverage.py --check` · live verification recorded where deployment is a
+prerequisite · every CARRIED-BY-#9 part re-checked on merged main · one PR `Closes #N` MERGED,
+issue closed, branch deleted.
+
+The `design-pack` job runs `python3 scripts/build-coverage.py --check`. A failure naming `a
+non-built project has no open unit` means the slice that just closed still carries a curated row:
+update its `scripts/v2-slice-artefacts.json` entry to the measured shape and re-run the check.
 
 A `status:blocked` issue carries a plain line starting `Blocker: #N`; a `Blocker:` mention inside
 prose or a checklist is not a blocker line. The number is an issue, never a PR.
@@ -276,6 +283,12 @@ gate.
 | docs/skills only | `git diff --check` + every relative Markdown link resolves |
 
 - Paste the command, result and SHA into the PR body. **No PR until green.**
+- A unit that adds or removes an action, **or changes an action's input schema**, also runs and
+  names in its acceptance: the `registry` and `parity_http_mcp` suites, `--print-openapi
+  --check-lock` (refresh `served-spec.lock.json` when it reports), `python3 scripts/build-coverage.py`
+  (refresh `docs/design/data/actions.json`), and the design-pack index when a document is added.
+  This is the correction for #744, whose two PR reds were exactly a missing parity sample and a
+  stale served-spec lock — both invisible to a gate that ran only the crate's own tests.
 
 ## Enforcement
 

@@ -337,6 +337,49 @@ async fn a_live_contract_resolves_the_gate() {
     fixture.running.shutdown().await;
 }
 
+/// P4.1 (wire) — the evidence the gate resolved is readable through `approvals.list`, so an
+/// approver sees the record the gate protects and not only the requester's description (#572).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_gate_reads_back_the_evidence_it_resolved() {
+    let fixture = fixture().await;
+    let asset = create_asset(&fixture.running, "Readable design requirement").await;
+    approve_asset(&fixture.running, asset).await;
+
+    let (status, body) = route_gate(
+        &fixture,
+        "design",
+        json!([{ "kind": "governed_asset", "id": asset }]),
+    )
+    .await;
+    assert_eq!(status, 201, "a live approved asset opens the gate: {body}");
+    let approval_id = id_of(output(&body), "approval_id");
+
+    let (status, body) = fixture
+        .running
+        .invoke(
+            "approvals.list",
+            "dev:alice",
+            json!({ "status": "pending", "limit": 50 }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "approvals.list: {body}");
+    let items = output(&body)["items"].as_array().expect("items");
+    let row = items
+        .iter()
+        .find(|row| row["id"] == approval_id.to_string())
+        .unwrap_or_else(|| panic!("the routed gate is in the pending list: {body}"));
+    assert_eq!(
+        row["evidence"],
+        json!([{ "kind": "governed_asset", "id": asset }]),
+        "the wire document carries the evidence the gate resolved: {row}"
+    );
+
+    fixture.running.shutdown().await;
+}
+
 /// P4.2 — an asset that is not live (draft, or superseded) is refused with a code that names its
 /// state, and no gate is opened.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

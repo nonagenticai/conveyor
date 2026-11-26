@@ -7,7 +7,10 @@
 
 use std::collections::BTreeMap;
 
-use crate::model::{Category, Finding, Grade, Severity};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+use crate::model::{Category, Document, Finding, Grade, Report, Scorecard, Severity};
 use crate::rubric::{Rubric, grade, round_1dp};
 
 /// The mechanical summary of a finding set.
@@ -230,6 +233,94 @@ fn keys(findings: &[Finding]) -> std::collections::BTreeSet<String> {
             }
         })
         .collect()
+}
+
+/// One claim and the reference that must support it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct ClaimRef {
+    /// The statement the report makes.
+    pub claim: String,
+    /// The quotation or URL that must occur in the page for the claim to be supported.
+    pub reference: String,
+}
+
+/// Check every claim against the page's visible text.
+///
+/// The reference is matched after whitespace normalisation and lowercasing, so a quotation may
+/// span line breaks in the markup. One finding per unsupported or empty claim; a fully referenced
+/// claim table produces a clean report and scores 100. No dedupe: each claim is a distinct item,
+/// and the rubric's dedupe keys on `check_id`, which would leave only the first failure.
+pub fn analyse(document: &Document, claims: &[ClaimRef]) -> Report {
+    let text = visible_text(&document.html);
+    let mut findings = Vec::new();
+
+    for (index, claim) in claims.iter().enumerate() {
+        let claim_text = claim.claim.trim();
+        let reference = normalise(&claim.reference);
+        if claim_text.is_empty() || reference.is_empty() {
+            findings.push(claim_finding(
+                "report-claim-empty",
+                Severity::High,
+                format!("claim {} is empty", index + 1),
+                "A claim row needs both a claim and a reference.",
+                format!("claim {index}"),
+            ));
+            continue;
+        }
+        if !text.contains(&reference) {
+            findings.push(claim_finding(
+                "report-claim-unverified",
+                Severity::High,
+                format!("the claim {claim_text:?} is not supported"),
+                "The reference does not occur in the page's visible text.",
+                format!("claim {index}: {}", claim.reference),
+            ));
+        }
+    }
+
+    let summary = summarise(&findings);
+    let scorecard = Scorecard {
+        overall_score: summary.overall_score,
+        grade: summary.grade,
+        buckets: summary.scores,
+    };
+    Report {
+        url: document.url.clone(),
+        findings,
+        scorecard,
+    }
+}
+
+fn claim_finding(
+    check_id: &str,
+    severity: Severity,
+    title: impl Into<String>,
+    description: impl Into<String>,
+    evidence: impl Into<String>,
+) -> Finding {
+    Finding {
+        check_id: Some(check_id.to_owned()),
+        category: Category::Content,
+        severity,
+        title: title.into(),
+        description: description.into(),
+        evidence: Some(evidence.into()),
+        source_tool: Some("report_claims".to_owned()),
+        scanner_count: 1,
+        ..Finding::default()
+    }
+}
+
+fn visible_text(html: &str) -> String {
+    let document = scraper::Html::parse_document(html);
+    normalise(&document.root_element().text().collect::<Vec<_>>().join(" "))
+}
+
+fn normalise(text: &str) -> String {
+    text.split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_ascii_lowercase()
 }
 
 #[cfg(test)]
