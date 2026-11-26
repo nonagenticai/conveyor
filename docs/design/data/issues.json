@@ -530,7 +530,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T11:49:48Z",
+      "updatedAt": "2026-11-26T12:22:47Z",
       "labels": [
         {
           "name": "programme",
@@ -6287,9 +6287,9 @@
     {
       "number": 2,
       "title": "S02 \u2014 prove long-job lease/recovery under two workers",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/2",
-      "updatedAt": "2026-11-13T06:31:40Z",
+      "updatedAt": "2026-11-26T12:49:40Z",
       "labels": [
         {
           "name": "unit",
