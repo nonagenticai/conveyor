@@ -36,7 +36,7 @@ const PM_JOB_KEY: &str = "pm";
 /// One typed evidence reference a gate is asked to resolve.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EvidenceRef {
-    /// `governed_asset | baseline` (T9 adds `architecture_contract`).
+    /// `governed_asset | baseline | lean_proof` (`architecture_contract` lands with T9).
     pub kind: String,
     /// The row in that kind's table.
     pub id: Uuid,
@@ -46,12 +46,19 @@ pub struct EvidenceRef {
 /// absent, not in a qualifying state, or of an unknown kind.
 ///
 /// Qualifying state: a governed asset must be `approved`; a baseline must be `approved`
-/// (`approved_by IS NOT NULL`). `require` turns an empty list into `gate_evidence_missing`.
+/// (`approved_by IS NOT NULL`); a `lean_proof` certificate must be `proven`, on the gate's
+/// `spec_pin`, with a digest that still describes its own columns. `require` turns an empty list
+/// into `gate_evidence_missing`.
+///
+/// `spec_pin` is the gate's pinned specification digest (#744). It is consulted only by the
+/// `lean_proof` arm — the other kinds answer to their own columns — and a proof presented to a
+/// gate with no pin is refused rather than accepted against an unnamed specification.
 pub(crate) async fn resolve_evidence(
     conn: &mut PgConnection,
     tenant: store::TenantId,
     evidence: &[EvidenceRef],
     require: bool,
+    spec_pin: Option<&str>,
 ) -> Result<Vec<Value>, ActionError> {
     if require && evidence.is_empty() {
         return Err(ActionError::new(
@@ -114,13 +121,88 @@ pub(crate) async fn resolve_evidence(
                     ));
                 }
             }
+            "lean_proof" => {
+                let proof = store::proof::get_tx(&mut *conn, tenant, item.id)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, "gate evidence: read proof");
+                        ActionError::internal()
+                    })?
+                    .ok_or_else(|| {
+                        ActionError::new(
+                            422,
+                            "gate_evidence_not_found",
+                            format!("no proof {} in this tenant", item.id),
+                        )
+                    })?;
+                // Each refusal names which check failed: a gate that answers only "invalid" is
+                // useless to the person who has to fix the evidence (§5.4).
+                if !proof.is_proven() {
+                    return Err(ActionError::new(
+                        422,
+                        "gate_evidence_proof_unproven",
+                        format!(
+                            "proof {} records verdict {}; a gate needs a proven certificate",
+                            item.id, proof.verdict
+                        ),
+                    ));
+                }
+                let pin = spec_pin.ok_or_else(|| {
+                    ActionError::new(
+                        422,
+                        "gate_evidence_proof_unpinned",
+                        "a lean_proof reference needs the gate's pinned_spec_sha256; a proof of \
+                         an unnamed specification evidences nothing",
+                    )
+                })?;
+                if proof.spec_sha256 != pin {
+                    return Err(ActionError::new(
+                        422,
+                        "gate_evidence_proof_wrong_spec",
+                        format!(
+                            "proof {} answers specification {}, not the gate's pinned {}",
+                            item.id, proof.spec_sha256, pin
+                        ),
+                    ));
+                }
+                // A row whose digest no longer describes its columns was rewritten after the
+                // prover answered. Certifying it would launder a tampered record into a pass.
+                if !proof.digest_matches() {
+                    return Err(ActionError::new(
+                        422,
+                        "gate_evidence_proof_digest",
+                        format!(
+                            "proof {}: certificate_sha256 does not describe the stored columns",
+                            item.id
+                        ),
+                    ));
+                }
+                if !proof.facts_match() {
+                    return Err(ActionError::new(
+                        422,
+                        "gate_evidence_proof_facts",
+                        format!(
+                            "proof {}: facts_sha256 does not describe the stored facts",
+                            item.id
+                        ),
+                    ));
+                }
+                let entry = json!({
+                    "kind": item.kind,
+                    "id": item.id,
+                    "spec_sha256": proof.spec_sha256,
+                    "certificate_sha256": proof.certificate_sha256,
+                });
+                stored.push(entry);
+                continue;
+            }
             other => {
                 return Err(ActionError::new(
                     422,
                     "gate_evidence_unknown_kind",
                     format!(
-                        "evidence kind {other:?} is not typed; use governed_asset or baseline \
-                         (the architecture_contract kind lands with T9)"
+                        "evidence kind {other:?} is not typed; use governed_asset, baseline or \
+                         lean_proof (the architecture_contract kind lands with T9)"
                     ),
                 ));
             }
@@ -606,6 +688,13 @@ pub struct PmGateIn {
     /// What is being asked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+    /// The specification digest a `lean_proof` evidence item must answer (#744).
+    ///
+    /// Stored in the gate's `meta` beside the resolved evidence, so a reader can see what the
+    /// certificate was checked against rather than trusting that it was checked against
+    /// something.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pinned_spec_sha256: Option<String>,
 }
 
 /// `pm.route_gate`'s result.
@@ -676,21 +765,18 @@ async fn pm_route_gate(
         ctx.tenant,
         &input.evidence,
         input.require_evidence,
+        input.pinned_spec_sha256.as_deref(),
     )
     .await?;
-    let approval_id = open_gate(
-        &mut *tx,
-        &ctx,
-        input.project_id,
-        gate,
-        kind,
-        required,
-        json!({
-            "description": input.description,
-            "evidence": evidence,
-        }),
-    )
-    .await?;
+    let mut meta = json!({
+        "description": input.description,
+        "evidence": evidence,
+    });
+    if let Some(pin) = input.pinned_spec_sha256.as_deref() {
+        meta["pinned_spec_sha256"] = Value::String(pin.to_owned());
+    }
+    let approval_id =
+        open_gate(&mut *tx, &ctx, input.project_id, gate, kind, required, meta).await?;
     Ok(HandlerOutput::created(PmGateOut { approval_id }))
 }
 
@@ -997,6 +1083,9 @@ async fn changes_request(
             id: input.baseline_id,
         }],
         true,
+        // A change gate is about a baseline, not a specification: no proof can answer it, so
+        // there is no pin to compare and a `lean_proof` item here would be refused.
+        None,
     )
     .await?;
     let change = store::spine::insert_register_tx(

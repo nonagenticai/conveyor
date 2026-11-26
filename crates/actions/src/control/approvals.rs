@@ -482,6 +482,14 @@ async fn approvals_request(
     if let Some(proposed) = input.proposed_input {
         meta.insert("proposed_input".to_owned(), proposed);
     }
+    // #744: a gate that accepts a `lean_proof` names the specification the certificate must
+    // answer, so the pin is on the row beside the evidence it was checked against.
+    if let Some(pin) = input.pinned_spec_sha256.as_deref() {
+        meta.insert(
+            "pinned_spec_sha256".to_owned(),
+            Value::String(pin.to_owned()),
+        );
+    }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
     let evidence = crate::pm::resolve_evidence(
@@ -489,6 +497,7 @@ async fn approvals_request(
         ctx.tenant,
         &input.evidence,
         input.require_evidence,
+        input.pinned_spec_sha256.as_deref(),
     )
     .await?;
     if !evidence.is_empty() {

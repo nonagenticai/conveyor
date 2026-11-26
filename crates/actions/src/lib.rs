@@ -97,6 +97,10 @@ pub mod process_map;
 mod programme;
 // SPEC D27: prompt compilation — one catalogue, three surfaces (agent.run, copilot, prompt audit).
 pub mod prompt;
+// #744 (SPEC_V2 §5.3/§5.4): the delivery-proof certificate — record, re-verify, read. A
+// certificate is built from an engine-persisted `lean4.check|prove` invocation, never from a
+// caller-supplied verdict.
+pub mod proof;
 // S16: the prompt-audit surface and its deterministic scan.
 pub mod prompt_audit;
 pub mod publish;

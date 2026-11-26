@@ -32,6 +32,12 @@ pub enum UpstreamService {
     Laya,
     /// The inference router (`inference.chat`, `completions.create`).
     Inference,
+    /// The Lean prover (`lean4.check`, `lean4.elaborate`, `lean4.prove`).
+    ///
+    /// Its own app key and its own secret: the prover is a separate service with a separate
+    /// licence, so rotating one tenant's prover credential cannot touch its inference one.
+    #[value(name = "lean4")]
+    Lean4,
 }
 
 impl UpstreamService {
@@ -40,6 +46,7 @@ impl UpstreamService {
         match self {
             Self::Laya => conveyor_actions::process::judge::LAYA_TOKEN_SECRET,
             Self::Inference => conveyor_actions::integrations::inference::INFERENCE_TOKEN_SECRET,
+            Self::Lean4 => conveyor_actions::integrations::lean4::LEAN4_TOKEN_SECRET,
         }
     }
 
@@ -48,6 +55,7 @@ impl UpstreamService {
         match self {
             Self::Laya => "laya",
             Self::Inference => "inference-router",
+            Self::Lean4 => "lean4-prover",
         }
     }
 }

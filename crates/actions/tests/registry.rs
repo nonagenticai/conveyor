@@ -141,7 +141,11 @@ use serde_json::{Value, json};
 /// `architecture.board_sit_open|board_sit_decide`, `cadences.materialise` — 582 → **587**.
 /// **S21 step 11 (#697) adds 2 internal**: `organisation_layers.list|set` — 587 → **589**,
 /// internal 563 → 565, external stays 24.
-const EXPECTED: [&str; 593] = [
+/// **#745 adds 4 internal**: `analyse.app|brand|content|report` — 589 → **593**, internal
+/// 565 → 569, external stays 24.
+/// **Delivery proofs (#744) adds 4 internal**: `proofs.record|reverify|get|list` — 593 →
+/// **597**, internal 569 → 573, external stays 24.
+const EXPECTED: [&str; 597] = [
     "actions.describe",
     "actions.list",
     "analyse.app",
@@ -605,6 +609,10 @@ const EXPECTED: [&str; 593] = [
     "prompt_recipes.get",
     "prompt_recipes.list",
     "prompt_recipes.retire",
+    "proofs.get",
+    "proofs.list",
+    "proofs.record",
+    "proofs.reverify",
     "providers.list",
     "publish.start",
     "publish.status",
@@ -868,7 +876,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // #745 adds four internal read actions (`analyse.app|brand|content|report`):
     // internal 565 -> 569; external stays 24 — each is a pure function of stored documents and
     // caller-supplied evidence.
-    assert_eq!((internal, external), (569, 24));
+    // Delivery proofs (#744) add four internal actions (`proofs.record|reverify|get|list`):
+    // internal 569 -> 573; external stays 24 — the prover calls are the declared `lean4.*`
+    // externals from T14, and a certificate is written from what the engine recorded, not a new
+    // outbound call.
+    assert_eq!((internal, external), (573, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

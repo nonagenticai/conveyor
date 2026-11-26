@@ -372,6 +372,13 @@ pub struct ApprovalRequestIn {
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,
+    /// The specification digest a `lean_proof` evidence item must answer (#744).
+    ///
+    /// Stored in `meta.pinned_spec_sha256` beside the resolved evidence. A `lean_proof` item on
+    /// a gate without a pin is refused: a certificate proves a statement about a named
+    /// specification, and an unnamed one can be satisfied by any proof at all.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pinned_spec_sha256: Option<String>,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.
