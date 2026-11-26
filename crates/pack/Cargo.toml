@@ -9,6 +9,7 @@ publish.workspace = true
 
 [dependencies]
 chrono = { workspace = true }
+conveyor-actions = { path = "../actions" }
 conveyor-domain = { path = "../domain" }
 conveyor-store = { path = "../store" }
 # Platform outputs: the Markdown -> HTML renderer.

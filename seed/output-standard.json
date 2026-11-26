@@ -837,13 +837,9 @@
             "file": "artefacts.json",
             "pointer": "/governed_assets",
             "match": {
-              "kind": "blueprint-states"
+              "kind": "adr",
+              "key": "blueprint_states"
             }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the blueprint's current, intermediate and target states: a governed asset of kind blueprint-states"
           }
         ]
       },
@@ -913,25 +909,31 @@
             "file": "artefacts.json",
             "pointer": "/governed_assets",
             "match": {
-              "kind": "licensing_frame"
+              "kind": "adr",
+              "key": "licensing_frame"
             }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the programme's licensing frame: a governed asset of kind licensing_frame stating the public, opt-in and tenant boundary"
           }
         ],
         "Options, including doing nothing": [
           {
-            "kind": "absence",
-            "record": "the options appraisal: a decision with its options, including doing nothing, and their appraisal"
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr",
+              "key": "options_appraisal"
+            }
           }
         ],
         "Investment appraisal and cash flow": [
           {
-            "kind": "absence",
-            "record": "the programme cost model: the investment appraisal and cash-flow schedule with its basis"
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr",
+              "key": "programme_appraisal"
+            }
           }
         ],
         "Capabilities the benefits depend on": [
@@ -1690,6 +1692,10 @@
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "tranche",
+      "scope": "tranche",
+      "due_states": [
+        "closed"
+      ],
       "mandatory": true,
       "spec": "§8.3",
       "document_category": "tranche-review",
@@ -2506,8 +2512,13 @@
         ],
         "Cost, timescale and effort": [
           {
-            "kind": "absence",
-            "record": "the programme cost, effort and timescale model: its estimate, basis and cash flow"
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr",
+              "key": "programme_appraisal"
+            }
           }
         ],
         "Risks and support": [
@@ -2919,7 +2930,7 @@
             "file": "msp.json",
             "pointer": "/benefit_transitions",
             "match": {
-              "benefit_profile_id": "$subject_id"
+              "benefit_id": "$subject_id"
             }
           }
         ],
@@ -2929,7 +2940,7 @@
             "file": "msp.json",
             "pointer": "/benefit_transitions",
             "match": {
-              "benefit_profile_id": "$subject_id"
+              "benefit_id": "$subject_id"
             }
           }
         ],
@@ -2939,7 +2950,7 @@
             "file": "msp.json",
             "pointer": "/benefit_transitions",
             "match": {
-              "benefit_profile_id": "$subject_id"
+              "benefit_id": "$subject_id"
             }
           }
         ],
@@ -2949,7 +2960,7 @@
             "file": "msp.json",
             "pointer": "/benefit_transitions",
             "match": {
-              "benefit_profile_id": "$subject_id"
+              "benefit_id": "$subject_id"
             }
           }
         ],
@@ -2959,7 +2970,7 @@
             "file": "msp.json",
             "pointer": "/benefit_transitions",
             "match": {
-              "benefit_profile_id": "$subject_id"
+              "benefit_id": "$subject_id"
             }
           }
         ]
@@ -3429,8 +3440,13 @@
         ],
         "Solution intent": [
           {
-            "kind": "absence",
-            "record": "the solution-intent record: the ART's intended outcomes, measures and constraints"
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr",
+              "key": "solution_intent"
+            }
           }
         ],
         "Backlog with WSJF": [

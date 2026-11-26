@@ -4526,6 +4526,9 @@ pub struct LessonProposeIn {
     pub statement: String,
     /// The evidence refs behind the lesson.
     pub evidence: Value,
+    /// Free-form metadata (the kata marker a retro lesson carries, §9.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
 }
 
 /// `programme_lessons.list`.
@@ -4581,6 +4584,7 @@ async fn lessons_propose(
         input.finding_key.trim(),
         &statement,
         &input.evidence,
+        &input.meta.unwrap_or_else(|| serde_json::json!({})),
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;

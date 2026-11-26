@@ -30,6 +30,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DELEGATION = "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
 UUID = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b")
+# A benefit profile's reference (`B1`–`B7`), the transition record's join key.
+REFERENCE = re.compile(r"B\d+")
 REQUIRED_ARTEFACTS = [
     ("a", "psa", "matrix"),
     ("a", "psa", "catalog"),
@@ -255,6 +257,68 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
             check_authored(
                 body, list((categories[category] or {}).get("required") or []), label, problems
             )
+
+    # Programme-level governed decision records the MSP sections source. The generic
+    # `governed_assets.compose` family composes ADR-kind records without a new migration.
+    assets = content.get("assets") or []
+    expect(isinstance(assets, list), "assets must be a list")
+    for asset in assets:
+        label = f"asset {asset.get('title')!r}"
+        expect(str(asset.get("kind") or "adr") == "adr",
+               f"{label}: the generic family composes kind adr here")
+        expect(isinstance(asset.get("title"), str) and bool(str(asset["title"]).strip()),
+               f"{label} needs a title")
+        body = asset.get("body")
+        expect(isinstance(body, str) and len(body.strip()) > 200,
+               f"{label} needs an authored body")
+
+    # The benefit realization records (§8.3): the row the transition and evaluation
+    # standards resolve all their sections from.
+    transitions = content.get("benefit_transitions") or []
+    expect(isinstance(transitions, list), "benefit_transitions must be a list")
+    seen_refs: set[str] = set()
+    for item in transitions:
+        reference = str(item.get("reference") or "")
+        expect(bool(REFERENCE.fullmatch(reference)),
+               f"benefit transition {reference!r} needs a B<n> reference")
+        expect(reference not in seen_refs, f"benefit transition {reference} is repeated")
+        seen_refs.add(reference)
+        expect(isinstance(item.get("baseline_measured_at"), str),
+               f"benefit transition {reference} needs baseline_measured_at")
+        expect(isinstance(item.get("readiness"), dict),
+               f"benefit transition {reference} needs a readiness object")
+        expect(item.get("evidence") is not None,
+               f"benefit transition {reference} needs evidence")
+
+    shared = content.get("programme_shared_config")
+    if shared is not None:
+        expect(isinstance(shared, dict), "programme_shared_config must be an object")
+        if isinstance(shared, dict):
+            expect(isinstance(shared.get("values"), dict) and bool(shared["values"]),
+                   "programme_shared_config needs a non-empty values object")
+            if "locked" in shared:
+                expect(isinstance(shared["locked"], list),
+                       "programme_shared_config.locked must be a list")
+
+    # Declarative record corrections: a small typed vocabulary, never a free-form action.
+    fixes = content.get("record_fixes") or []
+    expect(isinstance(fixes, list), "record_fixes must be a list")
+    for fix in fixes:
+        kind = str(fix.get("kind") or "")
+        expect(kind in {"register", "wbs", "tranche"},
+               f"record fix {kind!r} is not register|wbs|tranche")
+        if kind in {"register", "wbs"}:
+            expect(isinstance(fix.get("match"), dict) and bool(fix["match"]),
+                   f"record fix {kind} needs a match object")
+        if kind == "register":
+            expect(isinstance(fix.get("set"), dict) and bool(fix["set"]),
+                   "a register fix needs a non-empty set object")
+        if kind == "wbs":
+            expect(any(key in fix for key in ("acceptance", "evidence", "status")),
+                   "a wbs fix needs acceptance, evidence or status")
+        if kind == "tranche":
+            expect(fix.get("number") is not None and isinstance(fix.get("review_at"), str),
+                   "a tranche fix needs number and review_at")
 
     registers = content.get("registers")
     expect(isinstance(registers, dict) and bool(registers),

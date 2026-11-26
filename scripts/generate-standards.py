@@ -1563,6 +1563,13 @@ def applies(
     if template.get("subject_kind") != subject["kind"]:
         return False
     if subject["kind"] in {"programme", "capability", "tranche", "benefit"}:
+        if subject["kind"] == "tranche" and category == "tranche-review":
+            # The review is the tranche's closing record, not its opening one: a planned or
+            # authorised tranche is not missing a review. A closed tranche's missing review is
+            # the `tranche_plan` rule's finding (and its review row, once recorded, evidences
+            # this artefact).
+            due = template.get("due_states") or ["closed"]
+            return str((subject.get("meta") or {}).get("state") or "") in due
         return True
     if subject["kind"] == "phase":
         # A phase document is the record of that phase, not a copy in every other phase. The
@@ -2553,7 +2560,7 @@ def self_test_fixture() -> dict[str, Any]:
              "created_at": "2026-11-20T00:00:00Z", "title": "PI plan"},
             {"id": "d7", "category": "pi-objectives", "project_id": "p1", "publishable": True,
              "created_at": "2026-11-20T00:00:00Z", "title": "PI objectives"},
-        ]},
+        ], "governed_assets": []},
     }
 
 

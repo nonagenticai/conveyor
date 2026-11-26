@@ -1065,6 +1065,7 @@ name = "conveyor-pack"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "conveyor-actions",
  "conveyor-domain",
  "conveyor-render",
  "conveyor-store",

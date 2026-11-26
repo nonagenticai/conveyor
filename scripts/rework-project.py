@@ -118,6 +118,7 @@ class Runner:
         self.snapshot = ""
         self.baseline_approval: str | None = None
         self.board = ""
+        self.programme_id = ""
         self.head = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
         ).stdout.strip()
@@ -482,6 +483,15 @@ class Runner:
             if row.get("key") == self.project
         )
         self.project_id = project["id"]
+        self.programme_id = str(
+            next(
+                (
+                    row.get("id")
+                    for row in self.snapshot_json("programme.json").get("programme") or []
+                ),
+                "",
+            )
+        )
         board = self._read("architecture.board_list", {})
         self.board = board["items"][0]["id"]
 
@@ -788,6 +798,15 @@ class Runner:
         # 6b. the six-section project register, before the baseline freezes it (§8.4)
         self.ensure_registers()
 
+        # 6c. the programme's governed decision records (the licensing frame, the blueprint
+        # states, the options and programme appraisals, the solution intent) that the MSP
+        # standards' sections source, and the programme's shared configuration.
+        self.ensure_assets()
+
+        # 6d. the benefit realization records: one per profile, the row all five
+        # benefit-transition sections and both evaluation sections resolve from (§8.3).
+        self.ensure_benefit_transitions()
+
         # 7. baseline with the project's one WBS deliverable
         baselines = [
             b for b in self.snapshot_json("msp.json").get("project_baselines", [])
@@ -1012,6 +1031,12 @@ class Runner:
                 "approve the change that records the retrospective rework",
             )
 
+        # 10e. the pack's declarative record corrections: the probe rows retired, the
+        # ownerless risks backfilled, the empty work packages completed, a tranche's review
+        # date set, the programme's shared configuration written. Every write is a product
+        # action with a read-back, and the approved change above authorises the WBS edits.
+        self.ensure_record_fixes()
+
         # 10d. discharge the project's own rework cards whose packages this run cleared.
         # The close gate reads the board, not the register: without this the project stays
         # open on its own P0 card even when the receipt's product check is green
@@ -1181,6 +1206,249 @@ class Runner:
                     read_input={"project_id": self.project_id},
                     read_match=[f"kind={kind}", f"title={title}"],
                 )
+
+    # ── the programme's governed decision records ──────────────────────────────────
+
+    def ensure_assets(self) -> None:
+        """Write the pack's programme governed assets and the shared configuration.
+
+        The MSP standards' sections that name a record no row carries — the licensing frame,
+        the blueprint's states, the options and the programme appraisal, the solution intent —
+        source a governed asset by kind and key. Composing the asset here is what makes the
+        source real: an absent record is not a section. The assets are ADR-kind decision
+        records, the one governed kind the generic family composes without a new migration.
+        """
+        rows = self.content.get("assets") or []
+        if rows:
+            existing = {
+                str(row.get("key")): row
+                for row in self._read("governed_assets.list", {}).get("items") or []
+            }
+            for item in rows:
+                kind = str(item.get("kind") or "adr").strip()
+                title = str(item.get("title") or "").strip()
+                body = str(item.get("body") or "")
+                if not title or not body.strip():
+                    fail("assets: every asset needs a title and a body")
+                found = next(
+                    (row for row in existing.values() if str(row.get("title")) == title),
+                    None,
+                )
+                if found is None:
+                    asset = self.invoke(
+                        "governed_assets.compose",
+                        {
+                            "kind": kind,
+                            "title": title,
+                            "body": body,
+                            "project_id": self.project_id,
+                        },
+                        read_action="governed_assets.get",
+                        read_id_from_output="id",
+                    )
+                else:
+                    asset = found
+                    print(f"  governed asset {title}: already present")
+                status = str(asset.get("status") or "")
+                if status == "draft":
+                    self.invoke(
+                        "governed_assets.submit",
+                        {"id": asset["id"]},
+                        read_action="governed_assets.get",
+                        read_input={"id": asset["id"]},
+                    )
+                    status = "in_review"
+                if status == "in_review":
+                    self.invoke(
+                        "governed_assets.approve",
+                        {"id": asset["id"]},
+                        read_action="governed_assets.get",
+                        read_input={"id": asset["id"]},
+                    )
+        shared = self.content.get("programme_shared_config")
+        if shared:
+            self.write_shared_config(shared)
+
+    def write_shared_config(self, shared: dict) -> None:
+        """Set the programme's shared configuration (§8.2), if the pack carries one."""
+        row = next(
+            (r for r in self.snapshot_json("programme.json").get("programme") or []),
+            None,
+        )
+        if row is None:
+            fail(f"{self.project}: no programme row to carry shared_config")
+        if row.get("shared_config") == shared:
+            print("  programme shared_config: already set")
+            return
+        self.invoke(
+            "programmes.update",
+            {"id": row["id"], "shared_config": shared},
+            read_action="programmes.get",
+            read_input={"id": row["id"]},
+            if_match=row.get("version", 1),
+        )
+
+    # ── benefit realization records (SPEC_V2 §8.3) ─────────────────────────────────
+
+    def ensure_benefit_transitions(self) -> None:
+        """Write one realization record per benefit profile the pack names.
+
+        The benefit-transition and benefit-evaluation standards resolve all seven of their
+        sections from `msp.json#/benefit_transitions`; an empty table makes fourteen
+        mandatory artefacts absent however good their prose. The row is the measurement
+        record: the baseline, the readiness, the enactment, the post reading and the
+        legacy retirement, with the evidence behind each date.
+        """
+        rows = self.content.get("benefit_transitions") or []
+        if not rows:
+            print("  benefit transitions: none in the content")
+            return
+        benefits = self._read(
+            "benefits.list", {"programme_id": self.programme_id}
+        ).get("items") or []
+        by_ref = {str(row.get("reference") or ""): row for row in benefits}
+        existing = {
+            str(row.get("benefit_id")): row
+            for row in self._read(
+                "benefits.transition_list", {"programme_id": self.programme_id}
+            ).get("items") or []
+        }
+        for item in rows:
+            reference = str(item.get("reference") or "").strip()
+            benefit = by_ref.get(reference)
+            if benefit is None:
+                fail(f"benefit transition {reference}: no benefit profile with that reference")
+            payload = {
+                "benefit_id": benefit["id"],
+                "baseline_measured_at": item.get("baseline_measured_at"),
+                "readiness": item.get("readiness"),
+                "enacted_at": item.get("enacted_at"),
+                "post_measured_at": item.get("post_measured_at"),
+                "retired_at": item.get("retired_at"),
+                "evidence": item.get("evidence"),
+            }
+            current = existing.get(str(benefit["id"]))
+            if current is None:
+                self.invoke(
+                    "benefits.transition_upsert",
+                    payload,
+                    read_action="benefits.transition_list",
+                    read_input={"programme_id": self.programme_id},
+                    read_match=[f"benefit_id={benefit['id']}"],
+                )
+            else:
+                print(f"  benefit transition {reference}: already present")
+                self.invoke(
+                    "benefits.transition_upsert",
+                    payload,
+                    read_action="benefits.transition_list",
+                    read_input={"programme_id": self.programme_id},
+                    read_match=[f"benefit_id={benefit['id']}"],
+                    if_match=current.get("version", 1),
+                )
+
+    # ── declarative record corrections ─────────────────────────────────────────────
+
+    def ensure_record_fixes(self) -> None:
+        """Apply the pack's `record_fixes` through the product actions.
+
+        The vocabulary is small and typed — a register row retired or backfilled, a work
+        package completed, a tranche's review date set — because a free-form action list
+        would let the pack write anything the factory has not verified. Every write reads
+        the row back; the approved change the rework already recorded authorises the WBS
+        edits against the frozen scope baseline.
+        """
+        fixes = self.content.get("record_fixes") or []
+        if not fixes:
+            print("  record fixes: none in the content")
+            return
+        project_ids = {
+            str(row.get("key")): str(row.get("id"))
+            for row in self.snapshot_json("programme.json").get("projects") or []
+        }
+        change_id: str | None = None
+        for fix in fixes:
+            kind = str(fix.get("kind") or "")
+            match = fix.get("match") or {}
+            if kind == "register":
+                project_key = str(fix.get("project") or self.project)
+                project_id = project_ids.get(project_key)
+                if not project_id:
+                    fail(f"record fix: no project {project_key}")
+                rows = self._read(
+                    "registers.list", {"project_id": project_id}
+                ).get("items") or []
+                row = next(
+                    (
+                        r for r in rows
+                        if all(str(r.get(k)) == str(v) for k, v in match.items())
+                    ),
+                    None,
+                )
+                if row is None:
+                    fail(f"record fix: no register row matches {match}")
+                payload = {"id": row["id"], **(fix.get("set") or {})}
+                self.invoke(
+                    "registers.update",
+                    payload,
+                    read_action="registers.get",
+                    read_input={"id": row["id"]},
+                    if_match=row.get("version", 1),
+                )
+            elif kind == "wbs":
+                rows = self._read(
+                    "wbs.list", {"project_id": self.project_id}
+                ).get("items") or []
+                row = next(
+                    (
+                        r for r in rows
+                        if all(str(r.get(k)) == str(v) for k, v in match.items())
+                    ),
+                    None,
+                )
+                if row is None:
+                    fail(f"record fix: no WBS node matches {match}")
+                if change_id is None:
+                    changes = [
+                        r
+                        for r in self._read(
+                            "registers.list", {"project_id": self.project_id}
+                        ).get("items") or []
+                        if r.get("kind") == "change"
+                    ]
+                    if not changes:
+                        fail("record fix: a WBS edit needs the approved change row")
+                    change_id = str(changes[0]["id"])
+                payload = {"id": row["id"], "change_id": change_id, **{
+                    key: fix[key] for key in ("acceptance", "evidence", "status") if key in fix
+                }}
+                self.invoke(
+                    "wbs.update",
+                    payload,
+                    read_action="wbs.get",
+                    read_input={"id": row["id"]},
+                    if_match=row.get("version", 1),
+                )
+            elif kind == "tranche":
+                rows = self._read(
+                    "tranches.list", {"programme_id": self.programme_id}
+                ).get("items") or []
+                row = next(
+                    (r for r in rows if str(r.get("number")) == str(fix.get("number"))),
+                    None,
+                )
+                if row is None:
+                    fail(f"record fix: no tranche {fix.get('number')}")
+                payload = {"id": row["id"], "review_at": fix.get("review_at")}
+                self.invoke(
+                    "tranches.update",
+                    payload,
+                    read_action="tranches.list",
+                    read_input={"programme_id": self.programme_id},
+                    if_match=row.get("version", 1),
+                )
+            else:
+                fail(f"record fix: unknown kind {kind!r}")
 
     def ensure_extra_baselines(self) -> None:
         """Take the schedule and cost baselines the PMP baseline rule reads.

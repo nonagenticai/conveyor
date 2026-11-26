@@ -4344,6 +4344,7 @@ pub async fn propose_lesson_tx(
     finding_key: &str,
     statement: &str,
     evidence: &Value,
+    meta: &Value,
 ) -> Result<Uuid, PlanStoreError> {
     ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme_id)
         .await
@@ -4370,8 +4371,8 @@ pub async fn propose_lesson_tx(
     }
     sqlx::query_scalar(
         "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement,
-                             evidence, independent_count)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+                             evidence, independent_count, meta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(programme_id)
@@ -4380,6 +4381,7 @@ pub async fn propose_lesson_tx(
     .bind(statement.trim())
     .bind(evidence)
     .bind(independent_count)
+    .bind(meta)
     .fetch_one(&mut *conn)
     .await
     .map_err(PlanStoreError::Database)

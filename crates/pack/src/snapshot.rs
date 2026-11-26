@@ -309,6 +309,25 @@ pub async fn run_with_pool(
         with_header(data.measure, SCHEMA, &generated_at),
         &mut files,
     )?;
+    // The served action registry, the same strings `docs/design/data/actions.json` carries.
+    // A standard whose source is the registry (`blueprint`'s Action registry and data model)
+    // can only resolve when the snapshot it is audited against projects it; a design pack's
+    // committed dump is not the live record.
+    write_file(
+        &args.out,
+        "actions.json",
+        with_header(
+            json!({
+                "actions": conveyor_actions::registry()
+                    .iter()
+                    .map(|spec| spec.name)
+                    .collect::<Vec<_>>(),
+            }),
+            SCHEMA,
+            &generated_at,
+        ),
+        &mut files,
+    )?;
     write_file(
         &args.out,
         "secrets.json",

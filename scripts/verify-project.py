@@ -773,12 +773,38 @@ def _planned_tranches(snapshot: Snapshot) -> set[int]:
     return planned
 
 
-def _package_due(package: dict[str, Any], planned: set[int]) -> bool:
-    """A tranche-scope package is due only once its tranche is authorised."""
-    if not planned:
-        return True
+def _tranche_states(snapshot: Snapshot) -> dict[int, str]:
+    """Each tranche's recorded state, by number."""
+    states: dict[int, str] = {}
+    for row in (snapshot.msp or {}).get("tranches") or []:
+        try:
+            number = int(row.get("number"))
+        except (TypeError, ValueError):
+            continue
+        states[number] = str(row.get("state") or "")
+    return states
+
+
+def _package_due(
+    package: dict[str, Any], planned: set[int], states: dict[int, str]
+) -> bool:
+    """A tranche-scope package is due only once its tranche is authorised.
+
+    A tranche's review is its closing act, not its opening one: it is due only when the
+    tranche is **closed**. A review demanded for a planned or authorised tranche would
+    gate every member on work the programme's own sequence forbids it from doing yet.
+    """
     scope = str(package.get("scope") or "")
     match = re.fullmatch(r"tranche-(\d+)", scope)
+    if str(package.get("artefact") or "") == "tranche-review":
+        number: int | None = int(match.group(1)) if match else None
+        if number is None:
+            named = re.search(r"tranche-review-tranche-(\d+)", str(package.get("key") or ""))
+            number = int(named.group(1)) if named else None
+        if number is not None:
+            return states.get(number) == "closed"
+    if not planned:
+        return True
     if not match:
         return True
     return int(match.group(1)) not in planned
@@ -817,6 +843,7 @@ def check_artefact_standard(
     row = snapshot.project(key)
     owners = {key, str(row["id"])}
     planned = _planned_tranches(snapshot)
+    states = _tranche_states(snapshot)
     open_keys: list[str] = []
     not_due: list[str] = []
     for package in register["packages"]:
@@ -826,7 +853,7 @@ def check_artefact_standard(
             or _gate_owner(package) not in owners
         ):
             continue
-        target = open_keys if _package_due(package, planned) else not_due
+        target = open_keys if _package_due(package, planned, states) else not_due
         target.append(str(package.get("key")))
     if open_keys:
         preview = ", ".join(open_keys[:8])
@@ -854,6 +881,7 @@ def check_rework_resolution(
     row = snapshot.project(key)
     owners = {key, str(row["id"])}
     planned = _planned_tranches(snapshot)
+    states = _tranche_states(snapshot)
     blocking: list[str] = []
     not_due: list[str] = []
     for package in register["packages"]:
@@ -866,7 +894,7 @@ def check_rework_resolution(
         if severity == "P2":
             continue
         entry = f"{package.get('key')} ({severity})"
-        (blocking if _package_due(package, planned) else not_due).append(entry)
+        (blocking if _package_due(package, planned, states) else not_due).append(entry)
     if blocking:
         preview = ", ".join(blocking[:8])
         more = "" if len(blocking) <= 8 else f", +{len(blocking) - 8} more"

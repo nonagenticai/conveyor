@@ -112,6 +112,7 @@ async fn lesson(db: &support::TestDb, f: &Fixture, key: &str) -> Uuid {
         &format!("lesson for {key}"),
         // T8's rule applies to a retro proposal too: one referenced object is not evidence.
         &json!([{ "run_id": "r-1" }, { "run_id": "r-2" }]),
+        &json!({}),
     )
     .await
     .expect("propose a lesson");
@@ -233,6 +234,7 @@ async fn a_lesson_needs_evidence() {
             "F1",
             "a lesson",
             &empty,
+            &json!({}),
         )
         .await;
         tx.rollback().await.expect("rollback");
