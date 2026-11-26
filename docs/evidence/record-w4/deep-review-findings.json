@@ -221,7 +221,12 @@
       "title": "A published change row admits that B1-B6 carry a placeholder baseline",
       "evidence": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
       "acceptance": "The B1-B6 benefit profiles carry measured baselines with complete groups, or the change record names the missing measurement as an open action; no published body states that its own data is a placeholder.",
-      "artifact": "seed/output-standard.json#change-control"
+      "artifact": "seed/output-standard.json#change-control",
+      "resolved_by": {
+        "commit": "3aa7ff6e",
+        "test": "cargo test -p conveyor-actions --test benefit_lifecycle (20 passed)",
+        "evidence": "The seven benefit profiles carry measured baselines with complete six field groups: value, unit, measured_at, method and evidence, written by benefits.measure on 2026-11-26 and read back through benefits.get and the 1126k snapshot. The change row 01a216d0-859e-7b45-b353-58e21b46c2e6 was corrected through registers.update (version 4) on the same day, so no published change-control body states that its own data is a placeholder."
+      }
     },
     {
       "key": "w4-proj-delivery-contract-commitments",

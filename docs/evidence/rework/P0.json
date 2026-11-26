@@ -34,10 +34,10 @@
     {
       "check": "closure_outputs",
       "description": "the declared closure outputs are declared and published",
-      "detail": "the project declares no closure_outputs",
+      "detail": "1 closure outputs published",
       "id": "P0-closure-outputs",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a1fdd7-8227-7441-8f43-385bd3e186fa (compliant) of the live contract cites the published delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+      "detail": "review 01a21732-a905-7c74-a7d9-5e737f316515 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "P0-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda decided by a distinct approver",
+      "detail": "latest closure gate 01a21732-e958-7ae1-885d-a28ae2cdad9a decided by a distinct approver",
       "id": "P0-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -79,10 +79,10 @@
     {
       "check": "benefit_baseline",
       "description": "the programme's six benefit baselines are measured",
-      "detail": "benefit 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf baseline is missing evidence",
+      "detail": "7 benefit baselines are measured",
       "id": "P0-benefit-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -151,7 +151,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "16 mandatory artefact package(s) open: closure_outputs_undeclared:P0, std-pmp-closure-review-p0:P0, std-pmp-project-brief-p0:P0, std-togaf-benefits-diagram-p0:P0, std-togaf-candidate-solutions-p0:P0, std-togaf-phase-h-p0-h:P0, std-togaf-project-context-diagram-p0:P0, dr-w4-proj-change-control-placeholder:P0, +8 more",
+      "detail": "1 mandatory artefact package(s) open: dr-w4-proj-change-control-placeholder:P0",
       "id": "P0-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -160,16 +160,16 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "7 unresolved P0/P1 package(s): closure_outputs_undeclared:P0 (P1), std-pmp-closure-review-p0:P0 (P1), std-pmp-project-brief-p0:P0 (P1), std-togaf-benefits-diagram-p0:P0 (P1), std-togaf-candidate-solutions-p0:P0 (P1), std-togaf-phase-h-p0-h:P0 (P1), std-togaf-project-context-diagram-p0:P0 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "P0-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
+      "detail": "the gate check 'P0-artefact-standard' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -186,24 +186,21 @@
     }
   ],
   "failures": [
-    "P0-closure-outputs (P0): the project declares no closure_outputs",
-    "P0-benefit-baseline (P1): benefit 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf baseline is missing evidence",
-    "P0-artefact-standard (P1): 16 mandatory artefact package(s) open: closure_outputs_undeclared:P0, std-pmp-closure-review-p0:P0, std-pmp-project-brief-p0:P0, std-togaf-benefits-diagram-p0:P0, std-togaf-candidate-solutions-p0:P0, std-togaf-phase-h-p0-h:P0, std-togaf-project-context-diagram-p0:P0, dr-w4-proj-change-control-placeholder:P0, +8 more",
-    "P0-rework (P0): 7 unresolved P0/P1 package(s): closure_outputs_undeclared:P0 (P1), std-pmp-closure-review-p0:P0 (P1), std-pmp-project-brief-p0:P0 (P1), std-togaf-benefits-diagram-p0:P0 (P1), std-togaf-candidate-solutions-p0:P0 (P1), std-togaf-phase-h-p0-h:P0 (P1), std-togaf-project-context-diagram-p0:P0 (P1)",
-    "gate (P0): the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
+    "P0-artefact-standard (P1): 1 mandatory artefact package(s) open: dr-w4-proj-change-control-placeholder:P0",
+    "gate (P0): the gate check 'P0-artefact-standard' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-25T10:37:50.692856+00:00",
+  "generated_at": "2026-11-26T09:32:46.572090+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
   "project": "P0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-26T09:32:27.025161+00:00",
+    "git_sha": "afe96408",
+    "path": "retained-snapshot/afe96408"
   },
   "verdict": "red",
   "warnings": []

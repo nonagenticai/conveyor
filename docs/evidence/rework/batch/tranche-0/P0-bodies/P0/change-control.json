@@ -1,0 +1,59 @@
+{
+  "body_sha256": "fd47018c0ef02c2d7c129a25c8f950683d0074bd3615b9f2377d631d87c5fd5b",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 5,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 5,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 5,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+    "key": "P0",
+    "kind": "project",
+    "title": "Programme definition \u2014 vision, blueprint, plan and project briefs"
+  },
+  "title": "Change Control \u2014 Programme definition \u2014 vision, blueprint, plan and project briefs"
+}

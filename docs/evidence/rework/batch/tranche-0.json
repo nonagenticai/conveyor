@@ -1,15 +1,40 @@
 {
-  "blocked": 1,
-  "generated_at": "2026-11-26T08:45:16+00:00",
+  "blocked": 0,
+  "generated_at": "2026-11-26T09:32:46+00:00",
   "green": 0,
   "members": [
     {
-      "gaps": [],
+      "factory_exit": 0,
+      "gaps": [
+        {
+          "detail": "1 mandatory artefact package(s) open: dr-w4-proj-change-control-placeholder:P0",
+          "gap": "record",
+          "id": "P0-artefact-standard",
+          "kind": "snapshot",
+          "severity": "P1"
+        },
+        {
+          "detail": "the gate check 'P0-artefact-standard' did not pass",
+          "gap": "code",
+          "id": "gate",
+          "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
+        }
+      ],
       "key": "P0",
-      "state": "BLOCKED"
+      "log": "docs/evidence/rework/batch/tranche-0/P0.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_RED"
     }
   ],
-  "red": 0,
-  "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9",
+  "red": 1,
+  "snapshot_sha": "afe96408",
   "tranche": 0
 }
