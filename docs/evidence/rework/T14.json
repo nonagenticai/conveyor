@@ -133,38 +133,35 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-w3c-2:T14 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T14-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T14-rework' did not pass",
+      "detail": "gate discharged by executable checks: T14-project, T14-baseline, T14-charter, T14-contract, T14-review, T14-waivers, T14-pi-cadence, T14-pi-plan, T14-pi-objectives, T14-wsjf, T14-demo-credits, T14-lessons, T14-product, T14-artefact-standard, T14-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T14-rework (P0): 1 unresolved P0/P1 package(s): v1-w3c-2:T14 (P1)",
-    "gate (P0): the gate check 'T14-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-26T21:58:20.684577+00:00",
+  "generated_at": "2026-11-26T22:52:42.119828+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",
   "project": "T14",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T21:58:16.568374+00:00",
-    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
-    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
+    "generated_at": "2026-11-26T22:52:37.944463+00:00",
+    "git_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
+    "path": "retained-snapshot/18276de5e8ad4d19fa4c783109dbada1aa107be9"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

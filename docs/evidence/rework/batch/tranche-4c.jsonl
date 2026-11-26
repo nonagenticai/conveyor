@@ -27,3 +27,6 @@
 {"factory_exit": 0, "gaps": [], "key": "T4", "log": "docs/evidence/rework/batch/tranche-4/T4.log", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:51:17+00:00"}
 {"key": "T9", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:51:17+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "T9", "log": "docs/evidence/rework/batch/tranche-4/T9.log", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:51:38+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-4/rework-content-T14.json", "key": "T14", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-26T22:52:22+00:00"}
+{"key": "T14", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:52:22+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T14", "log": "docs/evidence/rework/batch/tranche-4/T14.log", "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:52:42+00:00"}

@@ -1,0 +1,23 @@
+{
+  "contract_id": "01a219dd-4673-70da-b701-3f43675b4fa6",
+  "evidence": {
+    "acceptance_manifest": "acceptance/programme/T14.toml",
+    "authorising_review": "01a216d0-d634-738e-985a-00a85cfd48d9",
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+    "manifest": "acceptance/programme/T14.toml",
+    "pi_cadence": "01a202a1-dbb9-7e49-b64a-cf97c3fab095",
+    "project": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+    "refinement_cadence": "01a202a2-2705-7392-a2d1-03ca2b3a174e",
+    "register_item": "01a1fbad-8c5f-7086-b569-28e8f0cf6fac",
+    "sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
+    "tranche": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce"
+  },
+  "findings": "This Phase-G review records the level compliant for T14 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, written after the live gate executed on 2026-11-26. The 2026-11-24 retrospective wrote consistent because the snapshot carried none of the four gate receipts; that verdict is superseded by measurement, not by assertion. The record now supports compliant: toolkits.publish published six toolkits (coding, speech, transcription, image_gen, retrieval, scientific), tools.probe answered live (http 200) for every published toolkit version, and each published toolkit has one recorded tools.call with a real destination answer — speech 01a21a03-69b2-71d3-930f-ac6d5bec70d7 (320 KB audio, document the audio document it stored), transcription 01a21a03-7d75-7ad3-94de-ec38ea8ad4ca (transcript returned), coding 01a21a03-f612-75c9-9fa2-12a6b0c2b95b (job a check job queued queued), image_gen 01a21a04-03b3-7f69-9a7c-f570fb0fe8e5 (512x512 PNG, document the image document it stored), scientific 01a21a05-2417-7472-9e2a-aaf4c3a88770 (pooled effect 0.3) and retrieval 01a21a06-aea7-7f8a-9d81-c4b02971fa4b (a real strata_rag answer; zero hits because this tenant has no indexed leaves). The scientific_processor scale-up/scale-back receipts (23-scale-zero.log through 34-scale-restore-2.log), the zero-use report (tools.usage, 02b-zero-use-after.json) and the outage-unbind receipts (32-probe-outage-2.json, 33-call-outage-2.json, plus crates/actions/tests/estate_toolkits.rs::an_in_flight_run_finishes_after_the_unbind for the in-flight half) are the remaining clauses, and the receipts are addressable from this pack's published evidence output and docs/evidence/t14/live/. The credentials are the tenant's sealed licence.token for speech, transcription and scientific, and the sealed strata.token (the strata-rag service token, chosen by the owner on 2026-11-26) for retrieval; the scientific and retrieval bindings carry the sealed credential alias. Two code deltas were forced by the gate: retrieval.query now declares a closed {query, top_k} body, and a toolkit binding can carry the tenant's sealed credential (auth_adapter sealed-profile). Nothing in the record shows a refused gate, and the project stays active: acceptance/programme/T14.toml pins it active, so closure is not part of this acceptance.",
+  "id": "01a21a10-19b3-704b-b52a-2b85e9f4930d",
+  "level": "compliant",
+  "outcome": null,
+  "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+  "reviewed_at": "2026-11-26T22:53:12.493450Z",
+  "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+  "version": 1
+}
