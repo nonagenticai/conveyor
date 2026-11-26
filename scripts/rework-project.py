@@ -30,6 +30,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from rework_register import RegisterError, build as build_rework_register  # noqa: E402
+
 HARNESS = ROOT / "scripts" / "programme-record.py"
 PROGRAMME = "01a1d039-0d24-7d16-ae52-4841e96ccfac"
 DELEGATION = "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
@@ -279,6 +282,174 @@ class Runner:
                 keys += ARCHITECTURE_ARTEFACT_KEYS
             break
         return keys
+
+    # ── rework cards ────────────────────────────────────────────────────────────────
+    #
+    # The audit materialises every open gap as a card on the owning project's board
+    # (`scripts/materialise-rework.py`), and `projects.close` refuses while a P0 card is open
+    # (`crates/actions/src/programme.rs`). Nothing moved those cards when the factory performed
+    # their work, so a project whose receipt was clear could not close. The discharge is the
+    # missing driver: the card's own Definition of Done is the audit's clearance of its package,
+    # read from a snapshot taken after the factory's writes.
+
+    def board_cards(self, board_id: str) -> list[dict]:
+        cards: list[dict] = []
+        cursor = None
+        for _ in range(50):  # a board with more than 10 000 cards is not a real board
+            page: dict = {"limit": 200}
+            if cursor:
+                page["cursor"] = cursor
+            document = self._read("cards.list", {"board_id": board_id, "page": page})
+            cards.extend(document.get("items") or [])
+            cursor = document.get("next_cursor")
+            if not cursor:
+                break
+        return cards
+
+    def owned_rework_cards(self) -> list[dict]:
+        """The project's open rework cards, wherever the register materialised them.
+
+        A package is materialised on its `apply_to` project's board — `owner_project` names the
+        subject the close gate reads, so DESIGN-PUBLISH's cards sit on PLATFORM's board. The
+        snapshot projects the cards but not their meta, so the cards are listed live; the
+        boards are exactly the ones carrying a `Conformance rework` lane.
+        """
+        work = self.snapshot_json("work.json")
+        lanes = work.get("lists") or []
+        kinds_by_id = {
+            str(lane.get("id")): str(lane.get("kind") or "") for lane in lanes
+        }
+        lanes_by_board: dict[str, dict[str, dict]] = {}
+        board_ids = set()
+        for lane in lanes:
+            board_id = str(lane.get("board_id") or "")
+            lanes_by_board.setdefault(board_id, {}).setdefault(
+                str(lane.get("kind") or ""), lane
+            )
+            if str(lane.get("name") or "") == "Conformance rework":
+                board_ids.add(board_id)
+        found: list[dict] = []
+        for board_id in sorted(board_ids):
+            active = lanes_by_board.get(board_id, {}).get("active")
+            done = lanes_by_board.get(board_id, {}).get("done")
+            if active is None or done is None:
+                continue
+            for card in self.board_cards(board_id):
+                meta = card.get("meta") or {}
+                key = str(meta.get("rework_key") or "")
+                if not key or str(meta.get("owner_project") or "") != self.project:
+                    continue
+                if kinds_by_id.get(str(card.get("list_id") or ""), "") not in {
+                    "intake", "active", "waiting",
+                }:
+                    continue
+                found.append({"card": card, "key": key, "active": active, "done": done})
+        return found
+
+    def approved_card_done(self, card_id: str) -> str | None:
+        approvals = self._read(
+            "approvals.list", {"card_id": card_id, "status": "approved"}
+        ).get("items") or []
+        for approval in approvals:
+            if approval.get("gate") == "card_done":
+                return str(approval.get("id"))
+        return None
+
+    def discharge_card(self, card: dict, key: str, active: dict, done: dict) -> None:
+        """Comment the evidence, approve the Definition of Done, move intake→active→done."""
+        card_id = str(card["id"])
+        body = (
+            f"Rework package `{key}` is cleared. The factory rebuilt the conformance register "
+            f"from its post-write snapshot and the fresh standards findings; the register "
+            f"carries no package for this key, and the package's own acceptance rule is the "
+            f"gap's disappearance from that audit. The card's Definition of Done is met by the "
+            f"record, not by this comment. Cleared by the retrospective rework of "
+            f"{self.tranche_label} (#526)."
+        )
+        approval = self.approved_card_done(card_id)
+        if approval is None:
+            payload: dict = {
+                "card_id": card_id,
+                "gate": "card_done",
+                "kind": "card_dod",
+                "description": body,
+            }
+            if key.startswith("closed_without_closure_review") and self.closure_asset:
+                payload["evidence"] = [
+                    {"kind": "governed_asset", "id": self.closure_asset}
+                ]
+            else:
+                payload["require_evidence"] = True
+                payload["evidence_waiver_reason"] = (
+                    f"the rework package {key} is a materialised view of its audit finding; "
+                    f"the fresh audit of the project's post-write record reports no open "
+                    f"package for this key, and that clearance is the card's Definition of Done"
+                )
+            approval = str(
+                self.invoke(
+                    "approvals.request",
+                    payload,
+                    read_action="approvals.list",
+                    read_input={"card_id": card_id},
+                    read_match=["gate=card_done", "status=pending"],
+                )["id"]
+            )
+            self.decide(approval, "approve the card's Definition of Done")
+        self.invoke(
+            "cards.comment",
+            {"id": card_id, "body": body},
+            read_action="cards.get",
+            read_input={"id": card_id},
+        )
+        if str(card.get("list_id") or "") != str(active["id"]):
+            self.invoke(
+                "cards.move",
+                {"id": card_id, "list_id": str(active["id"])},
+                read_action="cards.get",
+                read_input={"id": card_id},
+            )
+        self.invoke(
+            "cards.move",
+            {"id": card_id, "list_id": str(done["id"])},
+            read_action="cards.get",
+            read_input={"id": card_id},
+        )
+
+    def discharge_rework_cards(self) -> int:
+        """Discharge every rework card whose package the fresh audit no longer reports open.
+
+        The rule is the one `--rework-check` publishes: a key absent from the register's
+        packages is cleared. A card whose package is still open — or suppressed, which ADR 0012
+        counts as unresolved — stays exactly where it is.
+        """
+        candidates = self.owned_rework_cards()
+        if not candidates:
+            print("  card discharge: no open rework card owned by the project")
+            return 0
+        if self.dry_run:
+            print(f"  card discharge: dry run over {len(candidates)} card(s)")
+            return 0
+        snapshot = self.snapshot_now("discharge")
+        try:
+            register = build_rework_register(
+                Path(snapshot), Path(snapshot).parent / "docs"
+            )
+        except RegisterError as error:
+            fail(f"{self.project}: the discharge register failed: {error}")
+        open_keys = {
+            str(package.get("key")) for package in register.get("packages") or []
+        }
+        cleared = 0
+        for candidate in candidates:
+            if candidate["key"] in open_keys:
+                continue
+            self.discharge_card(
+                candidate["card"], candidate["key"], candidate["active"], candidate["done"]
+            )
+            cleared += 1
+            print(f"  card cleared: {candidate['key']}")
+        print(f"  card discharge: {cleared} card(s) cleared of {len(open_keys)} open package(s)")
+        return cleared
 
     # ── lifecycle ───────────────────────────────────────────────────────────────────
 
@@ -799,6 +970,12 @@ class Runner:
                 "approve the change that records the retrospective rework",
             )
 
+        # 10d. discharge the project's own rework cards whose packages this run cleared.
+        # The close gate reads the board, not the register: without this the project stays
+        # open on its own P0 card even when the receipt's product check is green
+        # (measured 2026-11-26 on DESIGN-PUBLISH).
+        self.discharge_rework_cards()
+
         # 11. closure request -> decision -> the destructive close gate -> close
         row = self.project_row()
         if not self.closes_project():
@@ -1295,6 +1472,89 @@ def self_test() -> None:
         )
     if payload.get("decision") != "approve" or payload.get("approval_id") != "01a2":
         raise SystemExit(f"self-test: the decision payload lost its shape: {payload}")
+
+    # The discharge: only a card whose package the fresh register no longer carries moves.
+    class FakeRunner(Runner):
+        def __init__(self, *, dry_run: bool) -> None:
+            super().__init__(
+                "S00", {}, ROOT / "docs" / "evidence" / "rework" / "S00" / "acts.md", dry_run
+            )
+            self.project_id = "p1"
+            self.snapshot = "/tmp/self-test-snap/data"
+            self.invoked: list[tuple[str, dict]] = []
+
+        def snapshot_json(self, name: str) -> dict:
+            if name != "work.json":
+                return {}
+            return {
+                "boards": [{"id": "b1", "project_id": "p1", "position": 0}],
+                "lists": [
+                    {"id": "l-intake", "board_id": "b1", "kind": "intake",
+                     "name": "Conformance rework"},
+                    {"id": "l-active", "board_id": "b1", "kind": "active", "name": "Active"},
+                    {"id": "l-done", "board_id": "b1", "kind": "done", "name": "Done"},
+                ],
+            }
+
+        def board_cards(self, board_id: str) -> list[dict]:
+            return [
+                {"id": "c-open", "list_id": "l-intake",
+                 "meta": {"rework_key": "open:1", "owner_project": "S00"}},
+                {"id": "c-clear", "list_id": "l-intake",
+                 "meta": {"rework_key": "clear:1", "owner_project": "S00"}},
+                {"id": "c-done", "list_id": "l-done",
+                 "meta": {"rework_key": "clear:2", "owner_project": "S00"}},
+                {"id": "c-other", "list_id": "l-intake",
+                 "meta": {"rework_key": "clear:3", "owner_project": "OTHER"}},
+            ]
+
+        def snapshot_now(self, label: str) -> str:
+            return "/tmp/self-test-snap/data"
+
+        def _read(self, action: str, payload: dict) -> dict:
+            if action == "approvals.list":
+                return {"items": []}
+            raise SystemExit(f"self-test: unexpected read {action}")
+
+        def invoke(self, action: str, payload: dict, **kwargs) -> dict:
+            self.invoked.append((action, payload))
+            if action == "approvals.request":
+                return {"id": "gate-1"}
+            return {"id": payload.get("id")}
+
+        def decide(self, approval_id: str, note: str, close_gate: bool = False) -> dict:
+            self.invoked.append(("approvals.decide", {"approval_id": approval_id}))
+            return {}
+
+    original_build = globals()["build_rework_register"]
+    globals()["build_rework_register"] = lambda *args, **kwargs: {
+        "packages": [{"key": "open:1", "status": "open"}]
+    }
+    try:
+        fake = FakeRunner(dry_run=False)
+        cleared = fake.discharge_rework_cards()
+        if cleared != 1:
+            raise SystemExit(f"self-test: the discharge cleared {cleared} cards, not one")
+        actions = [action for action, _ in fake.invoked]
+        if actions != [
+            "approvals.request", "approvals.decide", "cards.comment",
+            "cards.move", "cards.move",
+        ]:
+            raise SystemExit(f"self-test: the discharge sequence is {actions}")
+        request = fake.invoked[0][1]
+        if not request.get("evidence_waiver_reason") or not request.get("require_evidence"):
+            raise SystemExit("self-test: the discharge waiver is not carried")
+        moves = [payload["list_id"] for action, payload in fake.invoked if action == "cards.move"]
+        if moves != ["l-active", "l-done"]:
+            raise SystemExit(f"self-test: the discharge moved to {moves}")
+        if any(payload.get("id") == "c-open" for _, payload in fake.invoked):
+            raise SystemExit("self-test: an open package's card was discharged")
+
+        dry = FakeRunner(dry_run=True)
+        if dry.discharge_rework_cards() != 0 or dry.invoked:
+            raise SystemExit("self-test: a dry run wrote a card")
+    finally:
+        globals()["build_rework_register"] = original_build
     print("rework-project: self-test ok")
 
 

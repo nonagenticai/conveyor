@@ -56,6 +56,9 @@ from pathlib import Path
 from typing import Any, Callable, NoReturn
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from rework_register import RegisterError, build as build_rework_register  # noqa: E402
+
 DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
 MANIFEST_DIR = ROOT / "acceptance" / "programme"
 DEFAULT_EVIDENCE = ROOT / "docs" / "evidence" / "rework"
@@ -676,91 +679,23 @@ _REWORK_ERROR: str | None = None
 def rework_register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
     """Build the one rework register from the same snapshot under verification.
 
-    The register is derived, never stored: the conformance audit, the fresh standards
-    findings and the checked-in v1 ledger are merged by `audit --rework-out`. One build per
-    verifier process is enough; every project check reads the same result.
+    The register is derived, never stored; `scripts/rework_register.py` owns the build so the
+    factory's card discharge and this receipt read the same document. One build per verifier
+    process is enough; every project check reads the same result.
     """
     global _REWORK_CACHE, _REWORK_ERROR
     if _REWORK_CACHE is not None:
         return _REWORK_CACHE, None
     if _REWORK_ERROR is not None:
         return None, _REWORK_ERROR
-    work = Path(tempfile.mkdtemp(prefix="verify-rework-"))
     try:
-        conformance = work / "conformance"
-        conformance.mkdir()
-        audit = [
-            sys.executable,
-            str(ROOT / "scripts" / "audit-programme-conformance.py"),
-            "--snapshot",
-            str(snapshot.path),
-            "--out",
-            str(conformance),
-            "--report",
-        ]
-        completed = subprocess.run(audit, capture_output=True, text=True)
-        if completed.returncode != 0:
-            _REWORK_ERROR = (
-                "the conformance audit failed: "
-                + (completed.stderr.strip() or completed.stdout.strip())[:300]
-            )
-            return None, _REWORK_ERROR
-        standards = work / "standards-findings.json"
-        completed = subprocess.run(
-            [
-                sys.executable,
-                str(ROOT / "scripts" / "generate-standards.py"),
-                "--snapshot",
-                str(snapshot.path),
-                "--outputs-dir",
-                str(snapshot.path.parent / "docs"),
-                "--gaps",
-                str(conformance / "conformance-gap-register.json"),
-                "--findings-out",
-                str(standards),
-            ],
-            capture_output=True,
-            text=True,
+        _REWORK_CACHE = build_rework_register(
+            Path(snapshot.path), Path(snapshot.path).parent / "docs"
         )
-        if completed.returncode != 0:
-            _REWORK_ERROR = (
-                "the standards generator failed: "
-                + (completed.stderr.strip() or completed.stdout.strip())[:300]
-            )
-            return None, _REWORK_ERROR
-        register_path = work / "rework.json"
-        register_out = work / "register-conformance"
-        register_out.mkdir()
-        command = [
-            sys.executable,
-            str(ROOT / "scripts" / "audit-programme-conformance.py"),
-            "--snapshot",
-            str(snapshot.path),
-            "--out",
-            str(register_out),
-            "--report",
-            "--rework-out",
-            str(register_path),
-            "--findings",
-            str(ROOT / "docs" / "evidence" / "v1-conformance-findings.json"),
-            "--findings",
-            str(standards),
-            "--deep-review",
-            str(ROOT / "docs" / "evidence" / "record-w3" / "deep-review-findings.json"),
-            "--deep-review",
-            str(ROOT / "docs" / "evidence" / "record-w4" / "deep-review-findings.json"),
-        ]
-        completed = subprocess.run(command, capture_output=True, text=True)
-        if completed.returncode != 0:
-            _REWORK_ERROR = (
-                "the rework register failed: "
-                + (completed.stderr.strip() or completed.stdout.strip())[:300]
-            )
-            return None, _REWORK_ERROR
-        _REWORK_CACHE = json.loads(register_path.read_text(encoding="utf-8"))
-        return _REWORK_CACHE, None
-    finally:
-        shutil.rmtree(work, ignore_errors=True)
+    except RegisterError as error:
+        _REWORK_ERROR = str(error)
+        return None, _REWORK_ERROR
+    return _REWORK_CACHE, None
 
 
 def check_product_findings(
