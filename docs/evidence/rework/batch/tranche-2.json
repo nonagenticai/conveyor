@@ -1,40 +1,18 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T13:33:25+00:00",
-  "green": 0,
+  "generated_at": "2026-11-26T13:34:37+00:00",
+  "green": 1,
   "members": [
     {
       "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "1 mandatory artefact package(s) open: std-togaf-delivery-contract-t2:T2",
-          "gap": "record",
-          "id": "T2-artefact-standard",
-          "kind": "snapshot",
-          "severity": "P1"
-        },
-        {
-          "detail": "the gate check 'T2-artefact-standard' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        },
-        {
-          "detail": "the project is closed while its manifest is red",
-          "gap": "record",
-          "id": "closed-on-red",
-          "kind": "snapshot",
-          "severity": "P0"
-        }
-      ],
+      "gaps": [],
       "key": "T2",
       "log": "docs/evidence/rework/batch/tranche-2/T2.log",
       "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "state": "RECEIPT_GREEN"
     }
   ],
-  "red": 1,
+  "red": 0,
   "snapshot_sha": "c6341a8aa06349cf8fb6974b34d8979afba79a1e",
   "tranche": 2
 }

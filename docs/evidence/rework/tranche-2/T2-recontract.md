@@ -1,58 +1,58 @@
 # T2 — the superseding delivery contract and its Phase-G re-review
 
-**Recorded 2026-11-22.** T2's live delivery contract `01a2005c-18e4-75a7-9c20-2d83728194e0` carries
-a Phase-G review at level `non_conformant` (`01a2005d-20eb-72af-a5de-4606c0b16008`). That level was
-honest when it was recorded: it named `v1-t2-1` (P0) — `documents.compose` attached a generated draft
-to a card with no gate. The P0 is fixed at `920a1dcb` with `crates/actions/tests/documents_compose_gate.rs`.
-A level is fixed per contract and `review_for_contract_tx` reads one review per contract, so the
-correction is a superseding contract with the re-review at the new head — never a second review
-attached to the old one.
+**Recorded 2026-11-22; corrected 2026-11-26.** The original note recorded a compliant re-review
+that carried `v1-w1c-3` and `v1-w1c-4` as deviations. Both are now resolved on the lane
+(`864e71c4` and `78cdf4eb`), and every one of the six findings the 2026-11-21 review admitted has
+a resolution commit and a test. The 2026-11-26 re-review therefore records `compliant` with no open
+finding — the earlier note's deviation table is superseded, not re-dated.
+
+A compliance review is unique per contract and immutable (`review_for_contract_tx` reads one), so a
+stale level cannot be replaced in place. T2 held two live contracts from earlier passes
+(`01a2005a`, the retrospective SoAW, and `01a217f8`, a delivery contract carrying the stale
+`non_conformant` review). Both were superseded through `architecture.contracts_supersede`; the
+factory then recreated the SoAW and the delivery contract from the corrected pack and recorded the
+re-review on the new contract.
 
 ## What the re-review records
 
-**Level:** `compliant`, with the deviations below recorded in its findings. The policy applied is the
-one written in the programme plan: `compliant` when no P0 is open and no mandatory artefact is
-absent; `non_conformant` only for an open P0 or an absent mandatory artefact.
+**Level:** `compliant`. Every admitted finding is resolved at its cited commit and test:
 
-**Evidence:** the acceptance manifest `acceptance/programme/T2.toml` (which now asserts
-`status = "closed"`), the full-fidelity snapshot built from the live database, the fix commit
-`920a1dcb` and its test, and `docs/evidence/rework/tranche-2/lessons.md`.
+| Finding | Disposition | Commit | Test |
+|---|---|---|---|
+| `v1-t2-1` (P0) | fixed | `920a1dcb` | `documents_compose_gate.rs` |
+| `v1-t2-2` | duplicate of `v1-w1c-3`, resolved | `864e71c4` | `decision_ladder::a_confidence_posted_directly_cannot_produce_a_laya_decision` |
+| `v1-t2-3` (P1) | fixed | `fcb96fa9` | `decision_ladder.rs` |
+| `v1-t2-4` | duplicate of `v1-w1c-4`, resolved | `78cdf4eb` | `decision_ladder::a_caller_cannot_supply_its_own_options` |
+| `v1-t2-5` (P2) | fixed | `624abeb4` | `tool_budget.rs` |
+| `v1-t2-6` (P1) | fixed | `1167127d` | `ladder_human_gate.rs` |
 
-## The deviations carried, not waived away
+The re-review also found and fixed one defect of its own at `c6341a8a`:
+`decision_policies.update` could not clear `fire_when` because serde read JSON `null` as an absent
+member (`decision_ladder::a_policy_fire_when_is_validated_and_can_be_cleared`).
 
-| Finding | Severity | What is still true |
-|---|---|---|
-| `v1-w1c-3` | P1 | L1 never calls laya: `ladder.evaluate` stamps `rung=laya` on a caller-supplied answer; no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. |
-| `v1-w1c-4` | P1 | Options and questions are inline request text, not authored, versioned rows; the answer is never checked against a stored option set. |
-| `v1-p101-1` | P1 | A per-step judge verdict is a second decision store beside the ladder. |
-| `v1-t2-5` | P2 | The budget refusal code is `tool_budget_exceeded`, not the spec's `budget_exceeded`. |
-| `v1-w1c-5` | P2 | `fail_policy` and the Unavailable outcome are stored but never applied; a laya outage does not take the declared failure action. |
-| `v1-p102-1` | P2 | laya's 3-second hard budget is enforced as 30 seconds. |
-| `std-pmp-project-brief-t2` | P2 | The project brief is partial: the `Plan` section is missing. |
-| `std-togaf-architecture-artifact-t2` | P2 | The architecture artefact is partial: `Metadata`, `Entries` and `Document` sections are missing. |
+**Evidence:** `acceptance/programme/T2.toml`; `docs/evidence/v1-conformance-findings.json`
+(`resolved_by` per finding); the four cited targets re-run at `c6341a8a` — decision_ladder 26/26,
+ladder_human_gate 10/10, documents_compose_gate 7/7, tool_budget 14/14 — and the independent
+receipt re-run on a fresh post-run snapshot.
 
-No finding above is P0. None is waived: they are recorded as deviations of a compliant
-implementation, which is what a TOGAF Phase-G review exists to say. The two artefact findings are
-the next artefact work on this project, tracked in the standards register.
-
-## The chain
-
-1. `architecture.contracts_request` — `delivery_contract`, phase `f`, `supersedes_id` = the old
-   contract, body carrying this assessment.
-2. `architecture.board_decide` — `approved`, `subject_kind = contract`, `subject_id` = the new
-   contract, evidence naming the delegation.
-3. `architecture.contracts_approve` — the board decision, acted by an actor other than the
-   requester.
-4. `architecture.reviews_record` — level `compliant`, the deviations above in `findings`, the
-   manifest and snapshot in `evidence`, acted by an actor other than the requester.
-
-Each write is read back; the rows are cited in the tranche-2 acts record.
-
-## The rows
+## The rows (2026-11-26)
 
 | Act | Action | Row |
 |---|---|---|
-| superseding contract | `architecture.contracts_request` | `01a2009a-7bce-7a8f-96fd-f5159286a09e` (live; `01a2005c` superseded) |
-| board decision | `architecture.board_decide` | `01a2009a-a7fa-7a68-a539-32dc78e5a221` (approved, subject = the contract) |
-| contract approval | `architecture.contracts_approve` | the same contract, approved by `conveyor-approver` ≠ requester |
-| Phase-G review | `architecture.reviews_record` | `01a2009b-0768-72c1-bba1-2a8a3a8dae59` (level `compliant`) |
+| supersede the stale retrospective SoAW | `architecture.contracts_supersede` | `01a2005a` → superseded |
+| supersede the stale delivery contract | `architecture.contracts_supersede` | `01a217f8` → superseded |
+| fresh retrospective SoAW | `architecture.contracts_request` / `_approve` | `01a2180f-15fe` (live) |
+| first fresh delivery contract | `architecture.contracts_request` / `_approve` | `01a2180f-1c53` (superseded by the revision) |
+| delivery contract carrying `commitments` | `architecture.contracts_request` / `_approve` | `01a21810-707f` (live) |
+| Phase-G re-review | `architecture.reviews_record` | `01a21810-7eab` (level `compliant`) |
+
+The stale `non_conformant` review remains attached to the superseded `01a217f8`; that is history
+and is not read by the live close gate.
+
+## The chain
+
+1. `architecture.contracts_supersede` on every live contract carrying a stale review.
+2. The factory's step 6 requests a superseding delivery contract when the live body lacks a field
+   the standard's page reads (measured here: `commitments`) and approves it with a board decision.
+3. `architecture.reviews_record` on the new contract, level `compliant`, the dispositions above.
+4. `projects.close` — closure decision by a distinct approver, then the close gate.

@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a2180f-2a04-72d7-86b4-4c75a31b85ee (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a21810-7eab-74d4-a45a-c36ab4f09fe6 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T2-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a217f9-c9b1-790a-a5d1-b381f3da9049 decided by a distinct approver",
+      "detail": "latest closure gate 01a21810-9474-7c21-987c-cfc4ab63c27c decided by a distinct approver",
       "id": "T2-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,10 +142,10 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "1 mandatory artefact package(s) open: std-togaf-delivery-contract-t2:T2",
+      "detail": "no open standard artefact package for this project",
       "id": "T2-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -160,29 +160,16 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T2-artefact-standard' did not pass",
+      "detail": "gate discharged by executable checks: T2-project, T2-baseline, T2-charter, T2-closure-outputs, T2-contract, T2-review, T2-closure-gate, T2-waivers, T2-pi-cadence, T2-pi-plan, T2-pi-objectives, T2-wsjf, T2-demo-credits, T2-lessons, T2-product, T2-artefact-standard, T2-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T2-artefact-standard (P1): 1 mandatory artefact package(s) open: std-togaf-delivery-contract-t2:T2",
-    "gate (P0): the gate check 'T2-artefact-standard' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
-  "generated_at": "2026-11-26T13:33:25.768196+00:00",
+  "generated_at": "2026-11-26T13:34:37.500250+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T2.toml",
   "name": "Decision ladder",
@@ -193,6 +180,6 @@
     "git_sha": "c6341a8aa06349cf8fb6974b34d8979afba79a1e",
     "path": "retained-snapshot/c6341a8aa06349cf8fb6974b34d8979afba79a1e"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
