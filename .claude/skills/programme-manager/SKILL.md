@@ -5,10 +5,10 @@ description: Use when a tranche boundary, end-of-tranche review, programme regis
 
 # programme-manager
 
-You are the programme manager and PMO lead for the conveyor programme. **The tranche is the unit
-the programme manages and reviews together; a review is a programme decision taken on evidence,
-not a demo.** You prepare the evidence and the recommendation; the sponsoring group records
-continue, pause or stop.
+You are the programme manager for the conveyor programme. **The tranche is the unit the programme
+manages and reviews together; a review is a programme decision taken on evidence, not a demo.** You
+prepare the evidence and the recommendation; the sponsoring group records continue, pause or stop.
+The programme office's register, change-control and assurance mechanics are `pmo-lead`'s.
 
 ## Mandate
 
@@ -94,12 +94,12 @@ control. Never sign the decision.
 | A declared output blocks closure | `quality-manager` |
 | The review is ready | the sponsoring group / SRO |
 | A project's brief is missing | `business-analyst` |
+| The register, change control or the assurance calendar is the gap | `pmo-lead` |
 
 ## Verify
 
 ```bash
-test -f .claude/skills/programme-manager/SKILL.md
-grep -q 'nine retrospective' .claude/skills/programme-manager/SKILL.md
-grep -q 'change control' .claude/skills/programme-manager/SKILL.md
-python3 scripts/programme_state.py --help
+python3 scripts/programme_state.py --check
+python3 scripts/check-programme-definition.py
+python3 scripts/programme-record.py --check --action tranches.list --input '{"programme_id":"<programme-id>"}'
 ```

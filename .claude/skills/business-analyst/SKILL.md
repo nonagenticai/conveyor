@@ -96,12 +96,13 @@ the live register says is not built — and stop a build issue that would skip t
 | Architecture inception or contract is the gap | `programme-architect` |
 | The project is already delivered | `programme-manager` (change control) |
 | The project claims a benefit | `benefits-manager` |
+| The project must be chartered and planned | `project-manager` |
+| The delivery-level design or the contract request is the gap | `solution-architect` |
 
 ## Verify
 
 ```bash
-test -f .claude/skills/business-analyst/SKILL.md
-grep -q 'live register' .claude/skills/business-analyst/SKILL.md
 test -f docs/plans/T19/project-brief.md
 test -f docs/plans/T19/inception-analysis.md
+test -f docs/plans/inception/T12/01-inception-analysis.md
 ```
