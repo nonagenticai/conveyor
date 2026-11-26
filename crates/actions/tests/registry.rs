@@ -145,7 +145,7 @@ use serde_json::{Value, json};
 /// 565 → 569, external stays 24.
 /// **Delivery proofs (#744) adds 4 internal**: `proofs.record|reverify|get|list` — 593 →
 /// **597**, internal 569 → 573, external stays 24.
-const EXPECTED: [&str; 597] = [
+const EXPECTED: [&str; 598] = [
     "actions.describe",
     "actions.list",
     "analyse.app",
@@ -305,6 +305,7 @@ const EXPECTED: [&str; 597] = [
     "development_projects.close",
     "development_projects.deploy_gate",
     "development_projects.get",
+    "development_projects.list",
     "development_projects.merge_gate",
     "development_projects.record_step",
     "development_projects.review_gate",
@@ -880,7 +881,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 569 -> 573; external stays 24 — the prover calls are the declared `lean4.*`
     // externals from T14, and a certificate is written from what the engine recorded, not a new
     // outbound call.
-    assert_eq!((internal, external), (573, 24));
+    // #779 adds one internal action (`development_projects.list`, the unit-record read):
+    // internal 573 -> 574; external stays 24.
+    assert_eq!((internal, external), (574, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

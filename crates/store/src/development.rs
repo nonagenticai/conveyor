@@ -23,9 +23,9 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 /// The development project columns every read returns, in one spelling.
-const PROJECT_COLUMNS: &str = "id, tenant_id, project_id, repo, lane, implementer_id, gate_set, \
-                               instrument_ref, acceptance_command, status, created_by, version, \
-                               created_at, updated_at";
+const PROJECT_COLUMNS: &str = "id, tenant_id, project_id, repo, lane, issue_ref, implementer_id, \
+                               gate_set, instrument_ref, acceptance_command, status, created_by, \
+                               version, created_at, updated_at";
 
 const STEP_COLUMNS: &str =
     "id, tenant_id, development_project_id, step, evidence, recorded_by, created_at";
@@ -45,6 +45,8 @@ pub struct DevelopmentProjectRow {
     pub repo: String,
     /// The one lane the project delivers on.
     pub lane: String,
+    /// The GitHub issue that carries the unit's intent (`owner/name#N`), when one does.
+    pub issue_ref: Option<String>,
     /// The implementing principal (§5.4: it cannot decide its own gates).
     pub implementer_id: Uuid,
     /// The gate set copied into the charter before any branch.
@@ -99,6 +101,7 @@ pub struct NewDevelopmentProject {
     pub project_id: Uuid,
     pub repo: String,
     pub lane: String,
+    pub issue_ref: Option<String>,
     pub implementer_id: Uuid,
     pub gate_set: Value,
     pub instrument_ref: Option<String>,
@@ -115,6 +118,8 @@ pub enum DevelopmentStoreError {
     NotFound(Uuid),
     /// The project already carries a development charter.
     ProjectAlreadyChartered(Uuid),
+    /// Another unit already carries this GitHub issue reference.
+    IssueAlreadyChartered(String),
     /// The implementer is not a member of this tenant.
     ImplementerNotFound(Uuid),
     /// A step is evidence: it is written once.
@@ -152,10 +157,10 @@ pub async fn insert_tx(
         ));
     }
     let sql = format!(
-        "INSERT INTO development_project (tenant_id, project_id, repo, lane, implementer_id, \
-                                           gate_set, instrument_ref, acceptance_command, \
-                                           created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        "INSERT INTO development_project (tenant_id, project_id, repo, lane, issue_ref, \
+                                           implementer_id, gate_set, instrument_ref, \
+                                           acceptance_command, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          RETURNING {PROJECT_COLUMNS}"
     );
     let row: DevelopmentProjectRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -163,6 +168,7 @@ pub async fn insert_tx(
         .bind(input.project_id)
         .bind(&input.repo)
         .bind(&input.lane)
+        .bind(&input.issue_ref)
         .bind(input.implementer_id)
         .bind(&input.gate_set)
         .bind(&input.instrument_ref)
@@ -171,14 +177,18 @@ pub async fn insert_tx(
         .fetch_one(&mut *conn)
         .await
         .map_err(|error| {
-            if error
-                .as_database_error()
-                .is_some_and(sqlx::error::DatabaseError::is_unique_violation)
+            if let Some(database) = error.as_database_error()
+                && database.is_unique_violation()
             {
-                DevelopmentStoreError::ProjectAlreadyChartered(input.project_id)
-            } else {
-                DevelopmentStoreError::Database(error)
+                return if database.constraint() == Some("uq_development_project_issue") {
+                    DevelopmentStoreError::IssueAlreadyChartered(
+                        input.issue_ref.clone().unwrap_or_default(),
+                    )
+                } else {
+                    DevelopmentStoreError::ProjectAlreadyChartered(input.project_id)
+                };
             }
+            DevelopmentStoreError::Database(error)
         })?;
     Ok(row)
 }
@@ -198,6 +208,81 @@ pub async fn get_tx(
         .fetch_optional(&mut *conn)
         .await?;
     Ok(row)
+}
+
+/// Read the charter that an ordinary project carries, when it carries one.
+///
+/// A charter is keyed by the project row: a caller that found the project by its tenant-unique
+/// key (the idempotent-replay path) needs the development half without a second caller input.
+pub async fn get_by_project_id_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Option<DevelopmentProjectRow>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {PROJECT_COLUMNS} FROM development_project
+          WHERE tenant_id = $1 AND project_id = $2"
+    );
+    let row: Option<DevelopmentProjectRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    Ok(row)
+}
+
+/// One unit as `development_projects.list` returns it: the charter, the ordinary project's key
+/// and the latest recorded step.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct DevelopmentUnitRow {
+    pub id: Uuid,
+    pub project_id: Uuid,
+    pub project_key: String,
+    pub repo: String,
+    pub lane: String,
+    pub issue_ref: Option<String>,
+    pub status: String,
+    pub created_at: DateTime<Utc>,
+    pub latest_step: Option<String>,
+    pub latest_step_at: Option<DateTime<Utc>>,
+}
+
+/// List the tenant's units, newest first, filtered by repo, status or issue.
+///
+/// The project key comes from the ordinary project row, and the latest step from a lateral read
+/// of the immutable step table: a unit with no step renders `null`, never a guessed `branch`.
+pub async fn list_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    repo: Option<&str>,
+    status: Option<&str>,
+    issue_ref: Option<&str>,
+    limit: i64,
+) -> Result<Vec<DevelopmentUnitRow>, sqlx::Error> {
+    let sql = "SELECT d.id, d.project_id, p.key AS project_key, d.repo, d.lane, d.issue_ref, \
+                      d.status, d.created_at, s.step AS latest_step, \
+                      s.created_at AS latest_step_at \
+                 FROM development_project d \
+                 JOIN project p ON p.id = d.project_id AND p.tenant_id = d.tenant_id \
+                 LEFT JOIN LATERAL ( \
+                     SELECT step, created_at FROM development_step \
+                      WHERE tenant_id = d.tenant_id AND development_project_id = d.id \
+                      ORDER BY created_at DESC, id DESC LIMIT 1 \
+                 ) s ON true \
+                WHERE d.tenant_id = $1 \
+                  AND ($2::text IS NULL OR d.repo = $2) \
+                  AND ($3::text IS NULL OR d.status = $3) \
+                  AND ($4::text IS NULL OR d.issue_ref = $4) \
+                ORDER BY d.created_at DESC, d.id DESC \
+                LIMIT $5";
+    sqlx::query_as(sql)
+        .bind(tenant.as_uuid())
+        .bind(repo)
+        .bind(status)
+        .bind(issue_ref)
+        .bind(limit.max(1))
+        .fetch_all(&mut *conn)
+        .await
 }
 
 /// Record one step's evidence.

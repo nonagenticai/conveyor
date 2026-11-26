@@ -89,6 +89,9 @@ pub struct DevelopmentCharterIn {
     pub repo: String,
     /// The one lane (branch) the project delivers on.
     pub lane: String,
+    /// The GitHub issue that carries this unit's intent (`owner/name#N`), when one does.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub issue_ref: Option<String>,
     /// The implementing principal. It cannot decide the gates that judge its work.
     pub implementer_id: Uuid,
     /// The project's own acceptance command, run at the live check.
@@ -189,6 +192,8 @@ pub struct DevelopmentProjectOut {
     pub repo: String,
     /// The one lane.
     pub lane: String,
+    /// The GitHub issue that carries this unit's intent, when one does.
+    pub issue_ref: Option<String>,
     /// The implementing principal.
     pub implementer_id: String,
     /// The gate set the project is judged by.
@@ -304,6 +309,11 @@ fn development_error(error: DevelopmentStoreError, action: &str) -> ActionError 
             "development_project_exists",
             format!("{action}: project {project} already carries a development charter"),
         ),
+        DevelopmentStoreError::IssueAlreadyChartered(issue) => ActionError::new(
+            409,
+            "issue_already_chartered",
+            format!("{action}: issue {issue} already carries a development unit"),
+        ),
         DevelopmentStoreError::ImplementerNotFound(id) => {
             ActionError::resource_not_found(&format!("such implementer ({id})"))
         }
@@ -339,6 +349,7 @@ fn policy_from_row(row: &DevelopmentProjectRow) -> DevelopmentProjectOut {
         project_id: row.project_id.to_string(),
         repo: row.repo.clone(),
         lane: row.lane.clone(),
+        issue_ref: row.issue_ref.clone(),
         implementer_id: row.implementer_id.to_string(),
         gate_set: row.gate_set.clone(),
         instrument_ref: row.instrument_ref.clone(),
@@ -663,6 +674,33 @@ async fn development_projects_charter(
             "one lane (branch name), with no whitespace",
         ));
     }
+    let issue_ref = match input.issue_ref.as_deref() {
+        None => None,
+        Some(raw) => {
+            let candidate = raw.trim();
+            let shape = candidate.rsplit_once('#').and_then(|(slug, number)| {
+                let (owner, name) = slug.split_once('/')?;
+                let part_ok = |value: &str| {
+                    !value.is_empty()
+                        && value
+                            .chars()
+                            .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.'))
+                };
+                let number_ok = number.parse::<u64>().is_ok_and(|number| number > 0);
+                (part_ok(owner) && part_ok(name) && number_ok).then_some(candidate)
+            });
+            match shape {
+                Some(issue) => Some(issue.to_owned()),
+                None => {
+                    return Err(invalid(
+                        "issue_ref",
+                        "issue_ref_invalid",
+                        "expected owner/name#N, a public repository slug and a positive issue number",
+                    ));
+                }
+            }
+        }
+    };
     let acceptance = input.acceptance_command.trim();
     if acceptance.is_empty() {
         return Err(invalid(
@@ -703,9 +741,66 @@ async fn development_projects_charter(
     };
 
     let key = match input.key.as_deref() {
-        Some(raw) => conveyor_domain::Code::parse(raw)
-            .map_err(|error| invalid("key", "invalid_value", error.to_string()))?
-            .to_string(),
+        Some(raw) => {
+            let key = conveyor_domain::Code::parse(raw)
+                .map_err(|error| invalid("key", "invalid_value", error.to_string()))?
+                .to_string();
+            // A replay names the same charter and gets the same row. The key is the tenant's
+            // project key, so the read is the unique index and cannot race the insert: two
+            // first-time charters with one key serialise on the project insert itself.
+            if let Some(project) = store::project::get_project_by_key_tx(&mut *tx, ctx.tenant, &key)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "read the development project by key");
+                    ActionError::internal()
+                })?
+            {
+                let existing = store::development::get_by_project_id_tx(
+                    &mut *tx, ctx.tenant, project.id,
+                )
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "read the development charter by project");
+                    ActionError::internal()
+                })?
+                .ok_or_else(|| {
+                    ActionError::new(
+                        409,
+                        "project_exists_without_charter",
+                        format!(
+                            "development_projects.charter: project {key} exists but carries no \
+                             development charter"
+                        ),
+                    )
+                })?;
+                let mut mismatched = Vec::new();
+                if existing.repo != repo {
+                    mismatched.push("repo");
+                }
+                if existing.lane != lane {
+                    mismatched.push("lane");
+                }
+                if existing.implementer_id != input.implementer_id {
+                    mismatched.push("implementer_id");
+                }
+                if issue_ref.is_some() && existing.issue_ref != issue_ref {
+                    mismatched.push("issue_ref");
+                }
+                if !mismatched.is_empty() {
+                    return Err(ActionError::new(
+                        409,
+                        "charter_mismatch",
+                        format!(
+                            "development_projects.charter: key {key} is already chartered with a \
+                             different {}; a replay must name the same charter",
+                            mismatched.join(", ")
+                        ),
+                    ));
+                }
+                return Ok(HandlerOutput::ok(policy_from_row(&existing)));
+            }
+            key
+        }
         None => store::project::derive_project_key_tx(&mut *tx, ctx.tenant, title)
             .await
             .map_err(|error| match error {
@@ -750,6 +845,7 @@ async fn development_projects_charter(
             project_id: project.id,
             repo: repo.to_owned(),
             lane: lane.to_owned(),
+            issue_ref,
             implementer_id: input.implementer_id,
             gate_set,
             instrument_ref: input.instrument_ref,
@@ -1592,6 +1688,128 @@ async fn development_projects_get(
     out.gates = gates;
     out.closure = closure.as_ref().map(closure_out);
     Ok(out)
+}
+
+// ── development_projects.list ───────────────────────────────────────────────────────────
+
+/// `development_projects.list` input.
+#[derive(Clone, Debug, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct DevelopmentListIn {
+    /// Only units delivering through this repository (`owner/name`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repo: Option<String>,
+    /// Only units in this status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// Only the unit carrying this GitHub issue (`owner/name#N`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub issue_ref: Option<String>,
+    /// At most this many units (default 100, capped at 500).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+/// One unit in `development_projects.list`: the charter and the latest step.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DevelopmentUnitOut {
+    /// The development project row id.
+    pub id: String,
+    /// The ordinary project row it charters.
+    pub project_id: String,
+    /// The ordinary project's tenant-unique key.
+    pub project_key: String,
+    /// The one repository.
+    pub repo: String,
+    /// The one lane.
+    pub lane: String,
+    /// The GitHub issue that carries the unit's intent, when one does.
+    pub issue_ref: Option<String>,
+    /// `chartered | in_progress | merged | deployed | verified | closed | refused`.
+    pub status: String,
+    /// The last step recorded, in the step order; `null` when none is.
+    pub latest_step: Option<String>,
+    /// When that step was recorded.
+    pub latest_step_at: Option<DateTime<Utc>>,
+    /// When the unit was chartered.
+    pub created_at: DateTime<Utc>,
+}
+
+/// The tenant's delivery units, newest first.
+#[crate::action(
+    name = "development_projects.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn development_projects_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DevelopmentListIn,
+) -> Result<Vec<DevelopmentUnitOut>, ActionError> {
+    let status = match input.status.as_deref() {
+        None => None,
+        Some(raw) => {
+            let candidate = raw.trim();
+            if !matches!(
+                candidate,
+                "chartered"
+                    | "in_progress"
+                    | "merged"
+                    | "deployed"
+                    | "verified"
+                    | "closed"
+                    | "refused"
+            ) {
+                return Err(invalid(
+                    "status",
+                    "invalid_value",
+                    "unknown development status; expected one of chartered, in_progress, merged, \
+                     deployed, verified, closed, refused",
+                ));
+            }
+            Some(candidate)
+        }
+    };
+    let repo = input
+        .repo
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+    let issue_ref = input
+        .issue_ref
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+    let limit = i64::from(input.limit.unwrap_or(100).clamp(1, 500));
+    let rows = store::development::list_tx(&mut *tx, ctx.tenant, repo, status, issue_ref, limit)
+        .await
+        .map_err(|error| {
+            development_error(
+                DevelopmentStoreError::Database(error),
+                "development_projects.list",
+            )
+        })?;
+    Ok(rows
+        .into_iter()
+        .map(|row| DevelopmentUnitOut {
+            id: row.id.to_string(),
+            project_id: row.project_id.to_string(),
+            project_key: row.project_key,
+            repo: row.repo,
+            lane: row.lane,
+            issue_ref: row.issue_ref,
+            status: row.status,
+            latest_step: row.latest_step,
+            latest_step_at: row.latest_step_at,
+            created_at: row.created_at,
+        })
+        .collect())
 }
 
 // ── development_projects.change_judging_surface ────────────────────────────────────────
