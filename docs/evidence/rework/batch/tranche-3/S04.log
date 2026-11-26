@@ -1,0 +1,272 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S04 --content docs/evidence/rework/tranche-3/rework-content-S04.json --tranche-label tranche 3 --demo-cadence 01a20280-ef3f-7aac-8fad-3840a7995847
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: S04 Stakeholder Map already present
+  artefact: S04 Driver, Goal and Objective Catalogue already present
+  artefact: S04 Requirements Catalogue already present
+  artefact: S04 Solution Concept Diagram already present
+  artefact: S04 Business Capability Map already present
+  artefact: S04 Data Entity Catalogue already present
+  artefact: S04 Technology Standards Catalogue already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: A projection reads a second source and the four surfaces drift apart already present
+  register risk: An approved imported action is executable by a tenant that should not see it already present
+  register issue: The parity contract does not yet name S04's actions already present
+  register issue: The pre-rework receipt was red on the delivery contract and the artefact set already present
+  register assumption: The record's own artefact rows are the slice's content of record already present
+  register assumption: The library gate remains the slice's only construction proof already present
+  register dependency: S02 supplies the tenancy, audit and idempotency spine S04 invokes through already present
+  register dependency: Every later slice adds actions through this registry, never a surface already present
+  08 registers.create ok
+  09 registers.create ok
+  benefit transitions: none in the content
+  baseline: already taken
+  10 projects.baseline ok
+  11 approvals.decide ok
+  12 projects.baseline ok
+  13 approvals.decide ok
+  14 documents.compose ok
+  15 documents.publish ok
+  16 documents.publish ok
+  17 documents.update ok
+  18 documents.publish ok
+  project-brief output: body corrected and republished
+  19 documents.publish ok
+  20 documents.update ok
+  21 documents.publish ok
+  evidence output: body corrected and republished
+  22 architecture.reviews_record ok
+  23 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  record fixes: none in the content
+  24 approvals.request ok
+  25 approvals.decide ok
+  26 cards.comment ok
+  27 cards.move ok
+  28 cards.move ok
+  card cleared: unpublished_declared_output:tranche-3
+  29 approvals.request ok
+  30 approvals.decide ok
+  31 cards.comment ok
+  32 cards.move ok
+  33 cards.move ok
+  card cleared: contract_missing:tranche-3
+  34 approvals.request ok
+  35 approvals.decide ok
+  36 cards.comment ok
+  37 cards.move ok
+  38 cards.move ok
+  card cleared: std-togaf-delivery-contract-s04:S04
+  39 approvals.request ok
+  40 approvals.decide ok
+  41 cards.comment ok
+  42 cards.move ok
+  43 cards.move ok
+  card cleared: std-pmp-project-registers-s04:S04
+  44 approvals.request ok
+  45 approvals.decide ok
+  46 cards.comment ok
+  47 cards.move ok
+  48 cards.move ok
+  card cleared: std-togaf-architecture-artifact-s04:S04
+  49 approvals.request ok
+  50 approvals.decide ok
+  51 cards.comment ok
+  52 cards.move ok
+  53 cards.move ok
+  card cleared: std-togaf-compliance-review-s04:S04
+  54 approvals.request ok
+  55 approvals.decide ok
+  56 cards.comment ok
+  57 cards.move ok
+  58 cards.move ok
+  card cleared: std-togaf-phase-b-s04-b:S04
+  59 approvals.request ok
+  60 approvals.decide ok
+  61 cards.comment ok
+  62 cards.move ok
+  63 cards.move ok
+  card cleared: std-togaf-phase-c-s04-c:S04
+  64 approvals.request ok
+  65 approvals.decide ok
+  66 cards.comment ok
+  67 cards.move ok
+  68 cards.move ok
+  card cleared: std-togaf-phase-d-s04-d:S04
+  69 approvals.request ok
+  70 approvals.decide ok
+  71 cards.comment ok
+  72 cards.move ok
+  73 cards.move ok
+  card cleared: std-togaf-phase-f-s04-f:S04
+  card discharge: 10 card(s) cleared of 435 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  74 projects.close ok
+  closed S04: 01a1d039-0d28-7eb6-a62a-f420e742595c
+S04: 74 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S04 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S04-snap-lw_h1irq/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S04-snap-lw_h1irq/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-3/S04-bodies --local-bin /tmp/conv526-bin-8111c984
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S04",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

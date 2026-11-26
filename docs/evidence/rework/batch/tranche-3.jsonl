@@ -4,3 +4,6 @@
 {"blocked": null, "content": "docs/evidence/rework/tranche-3/rework-content-S04.json", "key": "S04", "snapshot_sha": "8111c984", "state": "PREFLIGHTED", "tranche": 3, "ts": "2026-11-26T21:31:36+00:00"}
 {"key": "S04", "snapshot_sha": "8111c984", "state": "RUNNING", "tranche": 3, "ts": "2026-11-26T21:31:36+00:00"}
 {"factory_exit": 1, "gaps": [{"detail": "rework: registers.create refused at act 55: error: registers.create refused (422): the input does not match the action schema [links: links must be an object with `cards`, `requirements` and `decisions` arrays (links_invalid)]", "gap": "instrument", "id": null}], "key": "S04", "log": "docs/evidence/rework/batch/tranche-3/S04.log", "snapshot_sha": "8111c984", "state": "BLOCKED", "tranche": 3, "ts": "2026-11-26T21:31:47+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-3/rework-content-S04.json", "key": "S04", "snapshot_sha": "8111c984", "state": "PREFLIGHTED", "tranche": 3, "ts": "2026-11-26T21:32:02+00:00"}
+{"key": "S04", "snapshot_sha": "8111c984", "state": "RUNNING", "tranche": 3, "ts": "2026-11-26T21:32:02+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "S04", "log": "docs/evidence/rework/batch/tranche-3/S04.log", "snapshot_sha": "8111c984", "state": "RECEIPT_GREEN", "tranche": 3, "ts": "2026-11-26T21:32:36+00:00"}
