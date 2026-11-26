@@ -52,10 +52,10 @@ fn the_expected_set_is_the_slice_table() {
         if !inside {
             continue;
         }
-        if let Some(rest) = line.strip_prefix("| **") {
-            if let Some(end) = rest.find("**") {
-                slices.push(rest[..end].to_owned());
-            }
+        if let Some(rest) = line.strip_prefix("| **")
+            && let Some(end) = rest.find("**")
+        {
+            slices.push(rest[..end].to_owned());
         }
     }
 
