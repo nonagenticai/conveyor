@@ -397,7 +397,83 @@ def preflight(plan: list[dict], snapshot: Path, dry_run: bool) -> list[dict]:
     return ready
 
 
-def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool, publish: bool) -> dict:
+def crash_detail(log: Path, code: int) -> str:
+    """The factory's own last word: its first `rework:` line, else the log's last line.
+
+    A non-zero factory exit is a stop, not a measurement. The run either refused before its first
+    act (usually the environment) or halted on the act it names; either way nothing the publisher
+    or the verifier would read afterwards is the project's state.
+    """
+    try:
+        lines = [
+            line.strip()
+            for line in log.read_text(encoding="utf-8", errors="replace").splitlines()
+        ]
+    except OSError:
+        lines = []
+    for line in lines:
+        if line.startswith("rework:"):
+            return line[:300]
+    tail = [line for line in lines if line]
+    return tail[-1][:300] if tail else f"the factory exited {code} without a message"
+
+
+def fresh_snapshot(sha: str, label: str) -> tuple[Path | None, str | None]:
+    """Take a post-run snapshot so the receipt sees what the last write put in the record.
+
+    The verifier derives its whole package register from the snapshot it is handed
+    (`verify-project.py` shells the conformance audit against it), so a receipt rendered from a
+    pre-run snapshot reports the previous state with full confidence — and a tranche run would
+    judge member *n* on a snapshot taken before members 1..n-1 wrote. The factory needs the same
+    two variables.
+    """
+    database = os.environ.get("SNAPSHOT_DATABASE_URL")
+    binary = os.environ.get("PROGRAMME_RECORD_BIN")
+    if not database or not binary:
+        return None, (
+            "SNAPSHOT_DATABASE_URL and PROGRAMME_RECORD_BIN are required to re-render a receipt "
+            "after a write"
+        )
+    directory = Path(tempfile.mkdtemp(prefix=f"rework-{label}-snap-"))
+    (directory / "data").mkdir()
+    (directory / "docs").mkdir()
+    completed = subprocess.run(
+        [
+            binary,
+            "snapshot",
+            "--tenant",
+            os.environ.get("TENANT") or "nonagentic",
+            "--out",
+            str(directory / "data"),
+            "--outputs-dir",
+            str(directory / "docs"),
+            "--git-sha",
+            sha,
+            "--issues",
+            "docs/design/data/issues.json",
+            "--database-url",
+            database,
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        return None, "the post-run snapshot failed: " + (
+            completed.stderr.strip() or completed.stdout.strip()
+        )[:300]
+    return directory / "data", None
+
+
+def run_one(
+    member: dict,
+    msp: dict,
+    number: int,
+    snapshot: Path,
+    sha: str,
+    dry_run: bool,
+    publish: bool,
+) -> dict:
     key = member["key"]
     log = EVIDENCE / "batch" / f"tranche-{number}" / f"{key}.log"
     if not dry_run:
@@ -418,7 +494,30 @@ def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool,
         factory.append("--keep-active")
     code = run_command(factory, log=log, dry_run=dry_run)
     if code != 0:
-        member["factory_exit"] = code
+        # Measured 2026-11-26: a three-second environment abort was published as "the factory ran
+        # and closed one package", because the publisher and the receipt ran anyway. A crash is
+        # BLOCKED with the factory's own line; nothing downstream may read the untouched rows.
+        return {
+            "key": key,
+            "state": "BLOCKED",
+            "factory_exit": code,
+            "publish_exit": None,
+            "gaps": [{"id": None, "gap": "instrument", "detail": crash_detail(log, code)}],
+            "log": str(log.relative_to(ROOT)),
+        }
+    receipt_snapshot = snapshot
+    if not dry_run:
+        fresh, error = fresh_snapshot(sha, key)
+        if error:
+            return {
+                "key": key,
+                "state": "BLOCKED",
+                "factory_exit": 0,
+                "publish_exit": None,
+                "gaps": [{"id": None, "gap": "instrument", "detail": error}],
+                "log": str(log.relative_to(ROOT)),
+            }
+        receipt_snapshot = fresh
     if publish and not dry_run:
         # The publisher refuses without its snapshot, its outputs directory and the record
         # binary. A publish that cannot run is a recorded failure, never a silently skipped
@@ -431,9 +530,9 @@ def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool,
                 "--project",
                 key,
                 "--snapshot",
-                str(snapshot),
+                str(receipt_snapshot),
                 "--outputs-dir",
-                str(snapshot.parent / "docs"),
+                str(receipt_snapshot.parent / "docs"),
                 "--bodies-out",
                 str(EVIDENCE / "batch" / f"tranche-{number}" / f"{key}-bodies"),
                 "--local-bin",
@@ -444,7 +543,19 @@ def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool,
         )
         if code != 0:
             member["publish_exit"] = code
-    verdict, gaps = verify_member(key, snapshot, dry_run)
+        # The publisher writes documents too; the receipt must see them.
+        after, error = fresh_snapshot(sha, key)
+        if error:
+            return {
+                "key": key,
+                "state": "BLOCKED",
+                "factory_exit": 0,
+                "publish_exit": member.get("publish_exit", 0),
+                "gaps": [{"id": None, "gap": "instrument", "detail": error}],
+                "log": str(log.relative_to(ROOT)),
+            }
+        receipt_snapshot = after
+    verdict, gaps = verify_member(key, receipt_snapshot, dry_run)
     return {
         "key": key,
         "state": verdict,
@@ -609,7 +720,7 @@ def execute(args: argparse.Namespace) -> int:
                     "state": "RUNNING",
                 }
             )
-            result = run_one(member, msp, args.tranche, snapshot, args.dry_run, args.publish)
+            result = run_one(member, msp, args.tranche, snapshot, sha, args.dry_run, args.publish)
             record(
                 {
                     "key": member["key"],
@@ -760,6 +871,28 @@ def self_test() -> None:
         )
         assert [gap["gap"] for gap in gaps] == ["record", "instrument", "code"]
 
+        # A crash is BLOCKED with the factory's own line — never a receipt over untouched rows.
+        crash_log = root / "crash.log"
+        crash_log.write_text(
+            "rework: SNAPSHOT_DATABASE_URL is required to build the review read-back snapshot\n",
+            encoding="utf-8",
+        )
+        assert crash_detail(crash_log, 1).startswith("rework: SNAPSHOT_DATABASE_URL is required")
+        assert crash_detail(root / "absent.log", 7).endswith("without a message")
+
+        # A receipt without a post-run snapshot would measure the previous run's rows.
+        saved = {
+            name: os.environ.pop(name, None)
+            for name in ("SNAPSHOT_DATABASE_URL", "PROGRAMME_RECORD_BIN")
+        }
+        try:
+            path, error = fresh_snapshot("abc123", "A")
+            assert path is None and error and "SNAPSHOT_DATABASE_URL" in error
+        finally:
+            for name, value in saved.items():
+                if value is not None:
+                    os.environ[name] = value
+
         fd = lock_journal(journal)
         try:
             try:
@@ -779,7 +912,7 @@ def self_test() -> None:
             {},
         )
         assert missing.get("blocked") == "no content pack"
-    print("rework-batch: self-test ok — roster, refusal, resume, classification, lock")
+    print("rework-batch: self-test ok — roster, refusal, resume, classification, crash, snapshot, lock")
 
 
 def main() -> None:
