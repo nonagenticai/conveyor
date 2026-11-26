@@ -3317,7 +3317,12 @@
             ],
             "failure_scenario": "An author ingests a procedure whose step needs an operation no tool provides. The intake is refused with no record of what was missing, and no card is opened; the procedure can never acquire the tool, so it stays permanently invalid and the gap is invisible to the tool estate.",
             "acceptance": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
-            "owner_project": "T13"
+            "owner_project": "T13",
+            "resolved_by": {
+                "commit": "2e159efac9ff422020794cf1d8366c9149fe4521",
+                "test": "crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_rebinds",
+                "evidence": "cargo test -p conveyor-actions --test sop_ingestion: 14/14 pass at this commit (including an_sop_cannot_grant_a_tool and a_missing_operation_opens_a_tool_request_and_rebinds); audit-programme-conformance --rework-check v1-p116-1:T13 reports is cleared"
+            }
         },
         {
             "id": "v1-p119-1",
