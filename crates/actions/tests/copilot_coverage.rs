@@ -27,8 +27,8 @@ fn every_mutating_action_is_in_the_owners_copilot_surface() {
     let mut missing = Vec::new();
     for spec in registry().iter() {
         let exposed_kind = matches!(spec.kind, ActionKind::Internal | ActionKind::External);
-        if exposed_kind && spec.effect != Effect::Read && !names.contains(spec.name) {
-            missing.push(spec.name);
+        if exposed_kind && spec.effect != Effect::Read && !names.contains(spec.name.as_ref()) {
+            missing.push(spec.name.as_ref());
         }
     }
     assert!(
@@ -93,7 +93,7 @@ fn a_proposal_projection_redacts_every_secret_property() {
         if paths.is_empty() {
             continue;
         }
-        checked.push(spec.name);
+        checked.push(spec.name.as_ref());
         let mut input = serde_json::json!({});
         for path in &paths {
             plant(&mut input, path, CANARY);
