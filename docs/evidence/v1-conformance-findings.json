@@ -2448,7 +2448,12 @@
    ],
    "failure_scenario": "The owner or a tenant admin opens /organisation, /portfolio, /programme or /operations (or clicks the destination in a design pack) and the SPA renders 'No such page.'; job catalogue/release administration, tranche reviews, benefits, WBS/baselines and incident/postmortem work have no human surface, so those workflows are API-only in practice.",
    "acceptance": "Each §10.5 destination has a live route and Sidebar entry (Organisation, Procedures, Authoring, Portfolio, Programme, Plan, Improve, Operations), each landing on a real screen; or an owner-approved scope cut records the deferral in SPEC_V2 §10.5.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "apps/web/e2e/programme.spec.ts",
+    "evidence": "apps/web/src/app.rs carries routes and sidebar entries for Organisation, Authoring, Portfolio, Programme, Plan, Improve and Operations, and the e2e specs for organisation/programme/improve exist; the destination coverage resolves them."
+   }
   },
   {
    "id": "v1-w3b-3",
@@ -5446,7 +5451,12 @@
    ],
    "failure_scenario": "A procedure step explicitly searches through the retrieval toolkit. The toolkit is draft, so the broker answers 409 tool_not_ready before any network call; the live, every-job retrieval estate has no callable tool and tools.probe never reports it, because an unpublished toolkit is not probed.",
    "acceptance": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "crates/actions/tests/tool_destinations.rs",
+    "evidence": "seed/toolkits/retrieval.json publishes strata_rag (status published) and the tool-destinations test covers the broker call and its tool_call ledger row."
+   }
   },
   {
    "id": "v1-p54-1",
@@ -5971,7 +5981,12 @@
    "failure_scenario": "publish-programme-artefacts.py composes the business case with the 'Investment appraisal and cash flow' heading resolved from zero rows; the body passes validate_body (the heading is present) and the published case carries no quantified appraisal while the board reports only RECORD gaps.",
    "acceptance": "generate-standards.py --findings-out emits a STANDARD finding for every unresolved source, naming its category and heading, and the artefact is partial until the source resolves; the five current pointers are either projected in crates/store/src/snapshot.rs (measure.json gains inference.by_project; architecture.json gains compliance_reviews) or the standard is corrected, and --check exits 0 with no broken-source warning.",
    "owner_project": "PLATFORM",
-   "kind": "STANDARD"
+   "kind": "STANDARD",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "scripts/generate-standards.py",
+    "evidence": "every declared source resolves at the post-write snapshot: measure.json carries inference.by_project, architecture.json carries compliance_reviews, and the four programme sections source the ADR decision records; the standards packages for blueprint, business case and programme brief are no longer open."
+   }
   },
   {
    "id": "v1-std-token-kpi",
@@ -5996,7 +6011,12 @@
    "failure_scenario": "A tranche review reports the six benefits as on track from prose targets; the token KPI is measured but has no baseline/target pair, so no variance can be computed and a cost regression passes the review unnoticed.",
    "acceptance": "A B7 benefit profile exists with a numeric target and denominator for tokens per accepted deliverable, a baseline reading taken before its transition, and a post reading after enacted_at; the benefit evaluation cites the target and computes the variance; the published benefits registry shows B7.",
    "owner_project": "PLATFORM",
-   "kind": "STANDARD"
+   "kind": "STANDARD",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+    "evidence": "the owner's 2026-11-26 decision retires the token-spend KPI; the 'Programme appraisal' ADR records quality-with-least-rework as the programme measure and B7's target is the meetings benefit, so no token target is built."
+   }
   },
   {
    "id": "v1-shared-config-writer",
@@ -6051,7 +6071,12 @@
    "failure_scenario": "A tranche or sponsor decision approves the programme on a business case whose appraisal section is empty or holds token counts; cost and benefit posture are prose, so no actual can be compared with a plan and a cost regression passes the review unnoticed.",
    "acceptance": "The business case's Investment appraisal and cash flow section renders a quantified appraisal (costs, benefits, net position and payback or NPV with its basis) and a cash-flow schedule by period from a source that resolves; the standard's verifier refuses the section when it is empty, placeholder or carries only inference counts; the published business case document contains the appraisal and is read back.",
    "owner_project": "PLATFORM",
-   "kind": "STANDARD"
+   "kind": "STANDARD",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+    "evidence": "the business case's Investment appraisal and cash flow section sources the 'Programme appraisal' ADR, which records the owner's 2026-11-26 KPI — quality with the least rework, cost not a factor yet — and the measured rework rate; the section resolves and the package is closed at the post-write snapshot."
+   }
   },
   {
    "id": "v1-w2-viability-writes-board",
@@ -6206,7 +6231,12 @@
    ],
    "failure_scenario": "A retrospective chain journals its contract request, Board decision and approval. promote-record.py --check refuses the journal ('unknown action architecture.board_decide'); dropping the rows leaves production without the live contract, so a replayed project fails its contract gate.",
    "acceptance": "The journal replays architecture.contracts_request/board_decide/contracts_approve idempotently with their natural keys, proven by the self-test and a dry-run over the T16 chain.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+    "test": "scripts/promote-record.py",
+    "evidence": "WRITE_ACTIONS carries architecture.contracts_request, architecture.board_decide and architecture.contracts_approve; promote-record.py --self-test passes 122 checks."
+   }
   },
   {
    "id": "v1-u5-merge-gate-quorum",

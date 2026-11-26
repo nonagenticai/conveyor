@@ -1864,13 +1864,17 @@ def build_findings(
             # PARTIAL artefact is different: its missing sections are section-level findings the
             # gap rules do not see, so it keeps its own package.
             continue
-        missing = [
-            section["heading"] for section in artefact["sections"] if section["status"] != "evidenced"
+        missing_sections = [
+            section for section in artefact["sections"] if section["status"] != "evidenced"
         ]
+        required_missing = [section for section in missing_sections if section.get("required", True)]
+        if not required_missing:
+            # Every required section resolves; an optional section with no row is the page's
+            # honest absence, not a mandatory artefact gap (the template declared it optional).
+            continue
+        missing = [section["heading"] for section in required_missing]
         hints: list[str] = []
-        for section in artefact["sections"]:
-            if section["status"] == "evidenced":
-                continue
+        for section in required_missing:
             for source in section["sources"]:
                 if source.get("file") and source.get("pointer"):
                     hints.append(f"{source['file']}#{source['pointer']}")

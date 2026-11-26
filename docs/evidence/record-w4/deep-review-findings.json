@@ -71,7 +71,12 @@
       "title": "A published driver is the test row 'schema probe — delete me'",
       "evidence": "The mandate's Drivers section publishes the row 'schema probe — delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
       "acceptance": "The probe row is retired or replaced by a real driver with severity, owner and detail in the live record; the mandate and programme-strategies bodies no longer carry it; a query over accepted drivers refuses an empty detail/owner at read time.",
-      "artifact": "seed/output-standard.json#mandate"
+      "artifact": "seed/output-standard.json#mandate",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the schema-probe row 01a1fbb0-8d6a-73c8-9d78-7024e80222b5 was cancelled through registers.update (act 37, 2026-11-26); the post-write snapshot carries status cancelled and the mandate's Drivers section no longer resolves an accepted probe row."
+      }
     },
     {
       "key": "w4-prog-brief-cost",
@@ -96,7 +101,12 @@
       "title": "Three uncoded risks have neither an owner nor a review date",
       "evidence": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
       "acceptance": "Every risk row carries an owner and a next-review date, or the row is refused at creation; the published register's Owners and review dates section resolves from those fields with no empty row.",
-      "artifact": "seed/output-standard.json#programme-risk-register"
+      "artifact": "seed/output-standard.json#programme-risk-register",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the three uncoded risks 01a1ffa9-032a/1b48/3907 were backfilled with meta.owner and review_at 2026-12-15 through registers.update (acts 38-40); the post-write snapshot carries no ownerless, undated risk on the programme register."
+      }
     },
     {
       "key": "w4-prog-safe-portfolio-count",
@@ -196,7 +206,12 @@
       "title": "Every published work package carries empty acceptance and evidence arrays presented as content",
       "evidence": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
       "acceptance": "A published work package carries a non-empty acceptance and at least one evidence reference, or the WBS row is refused at creation; the body never renders a zero-row block as its acceptance content.",
-      "artifact": "seed/output-standard.json#project-wbs"
+      "artifact": "seed/output-standard.json#project-wbs",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "all five PLATFORM WBS nodes now carry acceptance and evidence (wbs.update, with the card migration 0097 requires for the four work packages); the post-write snapshot shows non-empty arrays on every node."
+      }
     },
     {
       "key": "w4-proj-change-control-impact",

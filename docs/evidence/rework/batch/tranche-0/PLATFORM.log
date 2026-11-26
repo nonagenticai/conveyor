@@ -54,6 +54,12 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   document project-context-diagram: already present
   document benefits-diagram: already present
   document architecture-artifact: already present
+  29 documents.compose ok
+  30 documents.publish ok
+  document safe-art: published
+  31 documents.compose ok
+  32 documents.publish ok
+  document inspect-adapt: published
   delivery contract: already live
   register risk: The platform's dependency on a single CI node is a single point of failure for every tranche already present
   register risk: The standby has not been promoted in a drill, so the recovery path is documented but unproven already present
@@ -68,19 +74,19 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   governed asset Solution intent: already present
   programme shared_config: already set
   benefit transition B1: already present
-  29 benefits.transition_upsert ok
-  benefit transition B2: already present
-  30 benefits.transition_upsert ok
-  benefit transition B3: already present
-  31 benefits.transition_upsert ok
-  benefit transition B4: already present
-  32 benefits.transition_upsert ok
-  benefit transition B5: already present
   33 benefits.transition_upsert ok
-  benefit transition B6: already present
+  benefit transition B2: already present
   34 benefits.transition_upsert ok
-  benefit transition B7: already present
+  benefit transition B3: already present
   35 benefits.transition_upsert ok
+  benefit transition B4: already present
+  36 benefits.transition_upsert ok
+  benefit transition B5: already present
+  37 benefits.transition_upsert ok
+  benefit transition B6: already present
+  38 benefits.transition_upsert ok
+  benefit transition B7: already present
+  39 benefits.transition_upsert ok
   baseline: already taken
   schedule baseline: already taken
   cost baseline: already taken
@@ -88,390 +94,32 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  36 cadences.credit_demo ok
+  40 cadences.credit_demo ok
   baseline approval: none pending
   change control: 3 change row(s) present
-  37 registers.update ok
-  38 registers.update ok
-  39 registers.update ok
-  40 registers.update ok
-  41 cards.create ok
-  42 wbs.update ok
-  43 cards.create ok
-  44 wbs.update ok
-  45 cards.create ok
+  41 registers.update ok
+  42 registers.update ok
+  43 registers.update ok
+  44 registers.update ok
+  45 wbs.update ok
   46 wbs.update ok
-  47 cards.create ok
+  47 wbs.update ok
   48 wbs.update ok
   49 wbs.update ok
   50 tranches.update ok
-  51 approvals.request ok
-  52 approvals.decide ok
-  53 cards.comment ok
-  54 cards.move ok
-  55 cards.move ok
-  card cleared: v1-p5-1:PLATFORM
-  56 approvals.request ok
-  57 approvals.decide ok
-  58 cards.comment ok
-  59 cards.move ok
-  60 cards.move ok
-  card cleared: v1-pack-6:PLATFORM
-  61 approvals.request ok
-  62 approvals.decide ok
-  63 cards.comment ok
-  64 cards.move ok
-  65 cards.move ok
-  card cleared: closure_outputs_undeclared:tranche-0
-  66 approvals.request ok
-  67 approvals.decide ok
-  68 cards.comment ok
-  69 cards.move ok
-  70 cards.move ok
-  card cleared: closure_outputs_undeclared:tranche-2
-  71 approvals.request ok
-  72 approvals.decide ok
-  73 cards.comment ok
-  74 cards.move ok
-  75 cards.move ok
-  card cleared: closure_outputs_undeclared:tranche-6
-  76 approvals.request ok
-  77 approvals.decide ok
-  78 cards.comment ok
-  79 cards.move ok
-  80 cards.move ok
-  card cleared: closure_outputs_undeclared:tranche-9
-  81 approvals.request ok
-  82 approvals.decide ok
-  83 cards.comment ok
-  84 cards.move ok
-  85 cards.move ok
-  card cleared: std-msp-benefit-transition-b1:PLATFORM
-  86 approvals.request ok
-  87 approvals.decide ok
-  88 cards.comment ok
-  89 cards.move ok
-  90 cards.move ok
-  card cleared: std-msp-benefit-transition-b2:PLATFORM
-  91 approvals.request ok
-  92 approvals.decide ok
-  93 cards.comment ok
-  94 cards.move ok
-  95 cards.move ok
-  card cleared: std-msp-benefit-transition-b3:PLATFORM
-  96 approvals.request ok
-  97 approvals.decide ok
-  98 cards.comment ok
-  99 cards.move ok
-  100 cards.move ok
-  card cleared: std-msp-benefit-transition-b4:PLATFORM
-  101 approvals.request ok
-  102 approvals.decide ok
-  103 cards.comment ok
-  104 cards.move ok
-  105 cards.move ok
-  card cleared: std-msp-benefit-transition-b5:PLATFORM
-  106 approvals.request ok
-  107 approvals.decide ok
-  108 cards.comment ok
-  109 cards.move ok
-  110 cards.move ok
-  card cleared: std-msp-benefit-transition-b6:PLATFORM
-  111 approvals.request ok
-  112 approvals.decide ok
-  113 cards.comment ok
-  114 cards.move ok
-  115 cards.move ok
-  card cleared: std-msp-benefit-transition-b7:PLATFORM
-  116 approvals.request ok
-  117 approvals.decide ok
-  118 cards.comment ok
-  119 cards.move ok
-  120 cards.move ok
-  card cleared: std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  121 approvals.request ok
-  122 approvals.decide ok
-  123 cards.comment ok
-  124 cards.move ok
-  125 cards.move ok
-  card cleared: std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  126 approvals.request ok
-  127 approvals.decide ok
-  128 cards.comment ok
-  129 cards.move ok
-  130 cards.move ok
-  card cleared: std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  131 approvals.request ok
-  132 approvals.decide ok
-  133 cards.comment ok
-  134 cards.move ok
-  135 cards.move ok
-  card cleared: std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  136 approvals.request ok
-  137 approvals.decide ok
-  138 cards.comment ok
-  139 cards.move ok
-  140 cards.move ok
-  card cleared: unpublished_declared_output:tranche-6
-  141 approvals.request ok
-  142 approvals.decide ok
-  143 cards.comment ok
-  144 cards.move ok
-  145 cards.move ok
-  card cleared: unpublished_declared_output:tranche-9
-  146 approvals.request ok
-  147 approvals.decide ok
-  148 cards.comment ok
-  149 cards.move ok
-  150 cards.move ok
-  card cleared: seed_live_drift:programme
-  151 approvals.request ok
-  152 approvals.decide ok
-  153 cards.comment ok
-  154 cards.move ok
-  155 cards.move ok
-  card cleared: v1-p105-1:PLATFORM
-  156 approvals.request ok
-  157 approvals.decide ok
-  158 cards.comment ok
-  159 cards.move ok
-  160 cards.move ok
-  card cleared: v1-p105-2:PLATFORM
-  161 approvals.request ok
-  162 approvals.decide ok
-  163 cards.comment ok
-  164 cards.move ok
-  165 cards.move ok
-  card cleared: v1-p105-3:PLATFORM
-  166 approvals.request ok
-  167 approvals.decide ok
-  168 cards.comment ok
-  169 cards.move ok
-  170 cards.move ok
-  card cleared: v1-p105-4:PLATFORM
-  171 approvals.request ok
-  172 approvals.decide ok
-  173 cards.comment ok
-  174 cards.move ok
-  175 cards.move ok
-  card cleared: v1-p105-5:PLATFORM
-  176 approvals.request ok
-  177 approvals.decide ok
-  178 cards.comment ok
-  179 cards.move ok
-  180 cards.move ok
-  card cleared: v1-w1b-5:PLATFORM
-  181 approvals.request ok
-  182 approvals.decide ok
-  183 cards.comment ok
-  184 cards.move ok
-  185 cards.move ok
-  card cleared: v1-w3b-3:PLATFORM
-  186 approvals.request ok
-  187 approvals.decide ok
-  188 cards.comment ok
-  189 cards.move ok
-  190 cards.move ok
-  card cleared: std-togaf-delivery-contract-platform:PLATFORM
-  191 approvals.request ok
-  192 approvals.decide ok
-  193 cards.comment ok
-  194 cards.move ok
-  195 cards.move ok
-  card cleared: std-togaf-phase-e-platform-e:PLATFORM
-  196 approvals.request ok
-  197 approvals.decide ok
-  198 cards.comment ok
-  199 cards.move ok
-  200 cards.move ok
-  card cleared: std-togaf-phase-g-platform-g:PLATFORM
-  201 approvals.request ok
-  202 approvals.decide ok
-  203 cards.comment ok
-  204 cards.move ok
-  205 cards.move ok
-  card cleared: std-togaf-phase-h-platform-h:PLATFORM
-  206 approvals.request ok
-  207 approvals.decide ok
-  208 cards.comment ok
-  209 cards.move ok
-  210 cards.move ok
-  card cleared: v1-p76-1:PLATFORM
-  211 approvals.request ok
-  212 approvals.decide ok
-  213 cards.comment ok
-  214 cards.move ok
-  215 cards.move ok
-  card cleared: v1-p77-1:PLATFORM
-  216 approvals.request ok
-  217 approvals.decide ok
-  218 cards.comment ok
-  219 cards.move ok
-  220 cards.move ok
-  card cleared: v1-pack-3:PLATFORM
-  221 approvals.request ok
-  222 approvals.decide ok
-  223 cards.comment ok
-  224 cards.move ok
-  225 cards.move ok
-  card cleared: v1-pack-4:PLATFORM
-  226 approvals.request ok
-  227 approvals.decide ok
-  228 cards.comment ok
-  229 cards.move ok
-  230 cards.move ok
-  card cleared: v1-pack-5:PLATFORM
-  231 approvals.request ok
-  232 approvals.decide ok
-  233 cards.comment ok
-  234 cards.move ok
-  235 cards.move ok
-  card cleared: std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  236 approvals.request ok
-  237 approvals.decide ok
-  238 cards.comment ok
-  239 cards.move ok
-  240 cards.move ok
-  card cleared: std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  241 approvals.request ok
-  242 approvals.decide ok
-  243 cards.comment ok
-  244 cards.move ok
-  245 cards.move ok
-  card cleared: std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM
-  246 approvals.request ok
-  247 approvals.decide ok
-  248 cards.comment ok
-  249 cards.move ok
-  250 cards.move ok
-  card cleared: std-pmp-project-registers-platform:PLATFORM
-  251 approvals.request ok
-  252 approvals.decide ok
-  253 cards.comment ok
-  254 cards.move ok
-  255 cards.move ok
-  card cleared: v1-p105-6:PLATFORM
-  256 approvals.request ok
-  257 approvals.decide ok
-  258 cards.comment ok
-  259 cards.move ok
-  260 cards.move ok
-  card cleared: v1-p118-1:PLATFORM
-  261 approvals.request ok
-  262 approvals.decide ok
-  263 cards.comment ok
-  264 cards.move ok
-  265 cards.move ok
-  card cleared: v1-p77-2:PLATFORM
-  266 approvals.request ok
-  267 approvals.decide ok
-  268 cards.comment ok
-  269 cards.move ok
-  270 cards.move ok
-  card cleared: v1-pack-2:PLATFORM
-  271 approvals.request ok
-  272 approvals.decide ok
-  273 cards.comment ok
-  274 cards.move ok
-  275 cards.move ok
-  card cleared: v1-w3b-5:PLATFORM
-  276 approvals.request ok
-  277 approvals.decide ok
-  278 cards.comment ok
-  279 cards.move ok
-  280 cards.move ok
-  card cleared: wbs_absent:programme
-  281 approvals.request ok
-  282 approvals.decide ok
-  283 cards.comment ok
-  284 cards.move ok
-  285 cards.move ok
-  card cleared: std-togaf-architecture-artifact-platform:PLATFORM
-  286 approvals.request ok
-  287 approvals.decide ok
-  288 cards.comment ok
-  289 cards.move ok
-  290 cards.move ok
-  card cleared: std-togaf-phase-b-platform-b:PLATFORM
-  291 approvals.request ok
-  292 approvals.decide ok
-  293 cards.comment ok
-  294 cards.move ok
-  295 cards.move ok
-  card cleared: std-togaf-phase-c-platform-c:PLATFORM
-  296 approvals.request ok
-  297 approvals.decide ok
-  298 cards.comment ok
-  299 cards.move ok
-  300 cards.move ok
-  card cleared: std-togaf-phase-d-platform-d:PLATFORM
-  301 approvals.request ok
-  302 approvals.decide ok
-  303 cards.comment ok
-  304 cards.move ok
-  305 cards.move ok
-  card cleared: std-togaf-phase-f-platform-f:PLATFORM
-  card discharge: 51 card(s) cleared of 515 open package(s)
+  51 programme_lessons.propose ok
+  card discharge: 0 card(s) cleared of 513 open package(s)
   closure: not applicable (the project stays active)
-PLATFORM: 305 acts recorded
+PLATFORM: 51 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-rvr60xgl/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-rvr60xgl/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-4a6iiur3/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-4a6iiur3/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "change-control",
-      "document_id": "01a2176a-a583-7012-941b-a306a9d4ada5",
-      "natural_key": "artefact:PLATFORM:change-control:103b904f4bf41829",
-      "body_sha256": "103b904f4bf41829d1bf8bbdef40c396728558e90dc98240a0b4ba6d804f73ea"
-    },
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "delivery-contract",
-      "document_id": "01a2176a-a73b-7524-b1de-fb1c41e3a789",
-      "natural_key": "artefact:PLATFORM:delivery-contract:4423968b5899df14",
-      "body_sha256": "4423968b5899df1410b8f7bf1e975bdcd99ade4adeb4901d81ee94fb6f4f3ad8"
-    },
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "project-baseline",
-      "document_id": "01a2176a-a8d9-75b2-8b1c-f20354e0d912",
-      "natural_key": "artefact:PLATFORM:project-baseline:62266a335d3ba587",
-      "body_sha256": "62266a335d3ba5870f2c331228ee3578375d8dc6d0f26cc26e174d0412f96857"
-    },
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "project-registers",
-      "document_id": "01a2176a-aa6b-7583-920b-46fb44f8cf6c",
-      "natural_key": "artefact:PLATFORM:project-registers:ddbfa796d7939a3e",
-      "body_sha256": "ddbfa796d7939a3e0d5905378fa952e6719439b3c5517487d47b10489fb70b98"
-    },
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "project-wbs",
-      "document_id": "01a2176a-ac11-746e-80ca-fdfb73c4a7fe",
-      "natural_key": "artefact:PLATFORM:project-wbs:74b8150f5bbb56d0",
-      "body_sha256": "74b8150f5bbb56d0ccacf4f7d3daae8b9ddd19f2be4de507f97f1c274f15a7f3"
-    },
-    {
-      "project_key": "PLATFORM",
-      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a2176a-adbb-757b-97b9-e1ed2c1650a8",
-      "natural_key": "artefact:PLATFORM:statement-of-architecture-work:b385e7d374fc2578",
-      "body_sha256": "b385e7d374fc2578c907bce43b2a2313b3edd14d4fc0e28feb2a11d41d9bed77"
-    }
-  ],
+  "applied": [],
   "skipped": [
     {
       "project_key": "PLATFORM",
@@ -500,6 +148,14 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "PLATFORM",
       "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
       "category": "compliance-review",
       "mandatory": true,
       "trigger": null,
@@ -508,10 +164,26 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "PLATFORM",
       "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
       "category": "gap-analysis",
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     },
     {
       "project_key": "PLATFORM",
@@ -528,6 +200,30 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     }
   ],
   "refused": [
@@ -593,10 +289,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     }
   ],
   "counts": {
-    "due": 11,
-    "present": 0,
+    "due": 5,
+    "present": 4,
     "missing-edge": 0,
-    "stale": 7,
+    "stale": 9,
     "ambiguous": 0
   }
 }

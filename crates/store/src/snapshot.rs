@@ -463,10 +463,27 @@ pub async fn snapshot_tx(
     .await?;
     let benefit_transitions = rows(
         &mut *conn,
+        // The realization record carries the measured values its dates refer to: the latest
+        // `baseline` reading and the latest `post` reading per benefit. A record with timestamps
+        // but no values cannot be checked for variance (`transition_order`'s provable rule).
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.benefit_id, t.created_at, t.id), '[]'::jsonb) FROM (
-             SELECT id, benefit_id, baseline_measured_at, readiness, enacted_at, post_measured_at,
-                    retired_at, evidence, version, created_at, updated_at
-               FROM benefit_transition WHERE tenant_id = $1
+             SELECT t.id, t.benefit_id, t.baseline_measured_at, t.readiness, t.enacted_at,
+                    t.post_measured_at, t.retired_at, t.evidence, t.version, t.created_at,
+                    t.updated_at, b.actual_value AS baseline_value, p.actual_value AS post_value
+               FROM benefit_transition t
+               LEFT JOIN LATERAL (
+                    SELECT m.actual_value FROM benefit_measurement m
+                     WHERE m.tenant_id = t.tenant_id AND m.benefit_id = t.benefit_id
+                       AND m.kind = 'baseline'
+                     ORDER BY m.measured_at DESC, m.id DESC LIMIT 1
+               ) b ON TRUE
+               LEFT JOIN LATERAL (
+                    SELECT m.actual_value FROM benefit_measurement m
+                     WHERE m.tenant_id = t.tenant_id AND m.benefit_id = t.benefit_id
+                       AND m.kind = 'post'
+                     ORDER BY m.measured_at DESC, m.id DESC LIMIT 1
+               ) p ON TRUE
+              WHERE t.tenant_id = $1
          ) t",
         tenant_id,
     )

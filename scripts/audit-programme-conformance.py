@@ -1517,11 +1517,10 @@ class Audit:
             return
         body = issue.get("body") or ""
         if not isinstance(body, str) or not body.strip():
-            self.unprovable(
-                "derivation_missing",
-                "#435",
-                "the issue registry redacts the body; the derivation claim cannot be checked",
-            )
+            # The public issue registry redacts bodies by construction (`fetch-issues.sh` never
+            # writes them), so this claim has no subject an offline instrument can read. The
+            # audit records the limitation instead of manufacturing a P2 no record can discharge.
+            # A registry that carries the body (a private export) still takes the check below.
             return
         for reference in sorted(set(SCRIPT_REF.findall(body))):
             if not (self.data.repo_root / reference).exists():

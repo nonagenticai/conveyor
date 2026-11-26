@@ -26,7 +26,12 @@
       "title": "programme.shared_config is {} and no action sets it",
       "evidence": "psql on the staging copy: coalesce(shared_config::text,'<null>')='{}'; the served action surface has no programmes.* update; safe-art's Shared configuration source is computed from this column and yields no rows.",
       "acceptance": "the programme's shared_config carries the keys the programmes share, is read back through an action, and safe-art's Shared configuration section is evidenced",
-      "artifact": "seed/output-standard.json#safe-art"
+      "artifact": "seed/output-standard.json#safe-art",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "programmes.update wrote the programme's shared_config (act 44, 2026-11-26); the post-write snapshot carries values and locked, and the safe-art Shared configuration section resolves."
+      }
     },
     {
       "key": "w3-lessons-1",
@@ -36,7 +41,12 @@
       "title": "inspect-adapt has no kata candidates because no retro lesson exists",
       "evidence": "msp.json in the fresh snapshot carries lessons: [] (and demo credits are present); kata_candidate_rows reads msp.lessons meta.kata_candidate; the SAFe inspect-adapt template's Kata candidates section is the only programme-level section still un-evidenced.",
       "acceptance": "one retro lesson with a typed meta.kata_candidate is recorded for a cadence and inspect-adapt's Kata candidates section is evidenced",
-      "artifact": "seed/output-standard.json#inspect-adapt"
+      "artifact": "seed/output-standard.json#inspect-adapt",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "L-PLATFORM-1 is proposed through programme_lessons.propose with meta.kata_candidate (signature enum-mirrors-check); inspect-adapt's Kata candidates section resolves from it."
+      }
     },
     {
       "key": "w3-standard-register-fields-1",
@@ -47,7 +57,12 @@
       "evidence": "information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
       "acceptance": "the template maps Categories to kind (or retires the heading) and Escalations to meta.escalation, and generate-standards --check is green",
       "acceptance_test": "python3 -I scripts/generate-standards.py --self-test",
-      "artifact": "seed/output-standard.json#programme-risk-register"
+      "artifact": "seed/output-standard.json#programme-risk-register",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "scripts/generate-standards.py",
+        "evidence": "Categories and Escalations are retired as required headings (seed/output-standard.json) — the register model has no category or escalation column — and the published body states the mapping to kind and meta.escalation; generate-standards --self-test passes."
+      }
     },
     {
       "key": "w3-action-registry-projection-1",
@@ -57,7 +72,12 @@
       "title": "the product snapshot does not project the action registry",
       "evidence": "the live snapshot carries 13 files and no actions.json; the blueprint's Action registry section is sourced from actions.json with projection: live, and is authored as a pointer to the design pack.",
       "acceptance": "the product snapshot projects the served action registry and the blueprint section is row-evidenced",
-      "artifact": "seed/output-standard.json#blueprint"
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "apps/server/tests/snapshot_deterministic.rs",
+        "evidence": "the snapshot command now writes actions.json from conveyor_actions::registry() (crates/pack/src/snapshot.rs, commit 552cb493's parent chain); the post-write snapshot carries the served action names and the blueprint's Action registry section resolves."
+      }
     },
     {
       "key": "w3-licensing-frame-1",
@@ -67,7 +87,12 @@
       "title": "the product snapshot does not project the licensing frame",
       "evidence": "business-case's Licensing frame has no source in the snapshot; the document states the gap; the licences service holds the facts.",
       "acceptance": "the licensing frame is projected (or a governed asset carries it) and the business-case section is row-evidenced",
-      "artifact": "seed/output-standard.json#business-case"
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the governed asset 'Licensing frame' (ADR kind) carries the public/opt-in/tenant boundary and the business case's Licensing frame section resolves from it; the standard package is no longer open at the post-write snapshot."
+      }
     },
     {
       "key": "w3-verdict-t18-1",
