@@ -999,6 +999,22 @@ class Runner:
         ]
         if changes:
             print(f"  change control: {len(changes)} change row(s) present")
+            # The composer refuses a register row with an empty code (`EMPTY_REGISTER_CODE`),
+            # and a change row is a register row: `changes.request` writes none, so a row an
+            # earlier run created is named here (measured on S07/S09, tr4 repair 2026-11-26:
+            # project-registers and change-control stayed refused on the empty code).
+            for row in changes:
+                if str(row.get("code") or "").strip():
+                    continue
+                self.invoke(
+                    "registers.update",
+                    {
+                        "id": str(row["id"]),
+                        "code": f"CH-{self.project}-{str(row['id'])[-6:]}",
+                    },
+                    read_action="registers.get",
+                    read_input={"id": str(row["id"])},
+                )
         else:
             baseline = None
             for row in self._read(
