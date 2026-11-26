@@ -18,7 +18,8 @@ use tokio::net::TcpListener;
 use uuid::Uuid;
 
 use conveyor_server::{
-    admin, bus_relay, export, programme_export, seed, shutdown, snapshot, telemetry, worker,
+    admin, bus_relay, export, programme_export, seed, session, shutdown, snapshot, telemetry,
+    worker,
 };
 
 #[derive(Debug, Parser)]
@@ -128,6 +129,11 @@ enum Command {
         #[command(subcommand)]
         command: ProgrammeCommand,
     },
+    /// Mint the session's machine-channel credential (an opaque licence bearer).
+    Auth {
+        #[command(subcommand)]
+        command: AuthCommand,
+    },
 }
 
 /// `conveyor programme …` — the public programme tree.
@@ -147,6 +153,26 @@ enum ProgrammeCommand {
         /// The read-only database URL. Defaults to `DATABASE_URL`.
         #[arg(long)]
         database_url: Option<String>,
+    },
+}
+
+/// `conveyor auth …` — the session's machine channel (#760).
+#[derive(Debug, Subcommand)]
+enum AuthCommand {
+    /// Mint (or reuse) an opaque licence bearer for a tenant and cache it owner-only.
+    Token {
+        /// The tenant slug.
+        #[arg(long)]
+        tenant: String,
+        /// Days until the minted token expires.
+        #[arg(long, default_value_t = session::DEFAULT_EXPIRES_DAYS)]
+        expires_days: u32,
+        /// Where to write the cache. Defaults to `~/.conveyor/<tenant>.token`.
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// Mint even when the cached token is still fresh.
+        #[arg(long)]
+        force: bool,
     },
 }
 
@@ -294,6 +320,25 @@ enum AdminCommand {
     },
     /// Seal every pre-`0014` plaintext webhook signing secret under the tenant KEK. Idempotent.
     ResealWebhooks,
+    /// Provision the machine principal a licence bearer resolves to (#760).
+    MachinePrincipal {
+        #[command(subcommand)]
+        command: MachinePrincipalCommand,
+    },
+}
+
+/// `conveyor admin machine-principal …` — the row a licence bearer resolves to (#760).
+#[derive(Debug, Subcommand)]
+enum MachinePrincipalCommand {
+    /// Create or verify the `app_user` row and membership for a live token's subject.
+    Ensure {
+        /// The tenant slug.
+        #[arg(long)]
+        tenant: String,
+        /// The token file: the `conveyor auth token` cache, or a bare token.
+        #[arg(long)]
+        token_file: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -538,6 +583,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             process_catalogue,
         } => migrate(dev_seed, seed_catalogue, tenant, process_catalogue).await,
         Command::Worker => worker().await,
+        Command::Auth { command } => auth(command).await,
         Command::Snapshot {
             tenant,
             out,
@@ -783,6 +829,24 @@ async fn migrate(
         }
     }
     pool.close().await;
+    Ok(())
+}
+
+async fn auth(command: AuthCommand) -> Result<(), RunError> {
+    let config = Config::from_env()?;
+    let pool = store::connect(&config.database_migrate_url).await?;
+    match command {
+        AuthCommand::Token {
+            tenant,
+            expires_days,
+            out,
+            force,
+        } => {
+            session::token_command(&config, &pool, &tenant, expires_days, out, force)
+                .await
+                .map_err(RunError::Refused)?;
+        }
+    }
     Ok(())
 }
 
@@ -1068,6 +1132,24 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 })
             );
         }
+        AdminCommand::MachinePrincipal { command } => match command {
+            MachinePrincipalCommand::Ensure { tenant, token_file } => {
+                let raw = std::fs::read_to_string(&token_file)?;
+                let token = session::token_from_file(&raw);
+                let ensured = admin::machine_principal::ensure(&pool, &config, &tenant, &token)
+                    .await
+                    .map_err(RunError::Refused)?;
+                println!(
+                    "{}",
+                    serde_json::json!({
+                        "subject": ensured.subject,
+                        "user_id": ensured.user_id.to_string(),
+                        "role": ensured.role,
+                        "created": ensured.created,
+                    })
+                );
+            }
+        },
         AdminCommand::RetirePlanSeed { tenant } => {
             let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
                 .await?
