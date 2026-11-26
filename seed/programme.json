@@ -57,7 +57,7 @@
       "key": "S02",
       "name": "Skeleton — workspace, tenancy, auth, jobs, SSE",
       "description": "Plan: docs/plans/slices/S02-skeleton.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S02-skeleton.md",
