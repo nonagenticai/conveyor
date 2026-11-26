@@ -929,6 +929,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
     },
     {
+      "title": "Proof of delivery — the Lean certificate corpus",
+      "path": "docs/evidence/proof-of-delivery.html",
+      "source": "docs/evidence/proof-of-delivery.md",
+      "section": "Evidence",
+      "sha256": "c9aece424d7f697aa537425056244da07e3fe64bde63fccd1d2ad6a53edd2e82",
+      "bytes": 5124,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
+    },
+    {
       "title": "T19 — Business capability map — approval",
       "path": "docs/evidence/t19/gov/approve-business_capability_map.html",
       "source": "docs/evidence/t19/gov/approve-business_capability_map.md",
@@ -1734,8 +1743,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "fc4c0d0b74daec0a08083342993b3d481409ed6e0d5334a22ba6f14777905882",
-      "bytes": 25579,
+      "sha256": "12514c99588f9b8c02f46592384bd62878cb350d8948fbfa9f9df9987ca26fc0",
+      "bytes": 26151,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
