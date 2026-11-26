@@ -206,7 +206,12 @@
       "title": "The Waivers heading in all twelve sampled compliance reviews is the template sentence only",
       "evidence": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
       "acceptance": "The Waivers heading resolves from the project's waiver rows with their reason and reassessment date, or states an explicit 'none' with the count that proves it; the composer refuses a heading whose source list is empty unless the template declares an explicit-none form.",
-      "artifact": "seed/output-standard.json#compliance-review"
+      "artifact": "seed/output-standard.json#compliance-review",
+      "resolved_by": {
+        "commit": "152e7c63356284b27dfd0109d0a77521cb30c666",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "waiver_status now returns an explicit-none row with the count (\"None recorded — 0 waivers for this project\") when the project has no waiver rows, and a row naming the reason and reassessment date when it has them; resolve_section no longer falls back to the artefact’s own document for a declared source that resolves to zero rows. scripts/generate-standards.py --self-test case computed-sources proves both shapes, and the composed T2 compliance review carries the explicit-none block."
+      }
     },
     {
       "key": "w4-proj-compliance-decision",
@@ -216,7 +221,12 @@
       "title": "Compliance review Decision publishes non_conformant and compliant reviews with no governing outcome",
       "evidence": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
       "acceptance": "Each published review carries a typed outcome and its conditions; the Decision heading selects the governing review (the latest per project) and names it; a read-time query refuses a review row with a null outcome.",
-      "artifact": "seed/output-standard.json#compliance-review"
+      "artifact": "seed/output-standard.json#compliance-review",
+      "resolved_by": {
+        "commit": "152e7c63356284b27dfd0109d0a77521cb30c666",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "governing_review selects the latest review per project and publishes its level as the typed decision (decision=compliant), conditions explicitly (none recorded), and the phase-H outcome as not recorded — the outcome column is Phase H’s change/kata outcome (migration 0054), not a phase-G decision. scripts/generate-standards.py --self-test case computed-sources proves the latest governs and names it, and the composed T2 compliance review names the governing review and its level."
+      }
     },
     {
       "key": "w4-proj-wbs-empty",
