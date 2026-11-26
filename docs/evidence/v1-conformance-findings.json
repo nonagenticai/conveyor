@@ -2949,7 +2949,12 @@
    ],
    "failure_scenario": "A toolkit is published and bound from unit code alone; its backend is unreachable or its schema drifted. Jobs bind an unprobed tool, calls fail mid-run, and the zero-use/outage behaviour was never exercised. The estate coverage claim is false until a live call is recorded.",
    "acceptance": "T14 reopens unless the closure evidence carries: one live probe + live call receipt per published toolkit; the scientific_processor scale-up/scale-back log; a zero-use report; and a recorded outage-unbind test. Every receipt is addressable from the public output index.",
-   "owner_project": "T14"
+   "owner_project": "T14",
+   "resolved_by": {
+    "commit": "e8bb527d12d5bdea017adb92d154193417dcac5d",
+    "test": "crates/actions/tests/t14_live_receipts.rs",
+    "evidence": "Six live receipts under docs/evidence/t14/live/2026-11-26/: one tools.probe row per published toolkit (01-probe.json) and one tools.call per published toolkit — speech run 01a21a03-69b2-71d3-930f-ac6d5bec70d7 (320 KB WAV + document), transcription run 01a21a03-7d75-7ad3-94de-ec38ea8ad4ca (transcript text), coding run 01a21a03-f612-75c9-9fa2-12a6b0c2b95b (job 7104f3e6 queued), image_gen run 01a21a04-03b3-7f69-9a7c-f570fb0fe8e5 (512x512 PNG + document), scientific run 01a21a05-2417-7472-9e2a-aaf4c3a88770 (pooled effect 0.3), retrieval run 01a21a06-aea7-7f8a-9d81-c4b02971fa4b (strata_rag answer). The scientific_processor scale receipts (23- through 34-scale-*.log), the outage-unbind receipts (32-probe-outage-2.json, 33-call-outage-2.json) and the zero-use report (02b-zero-use-after.json) are checked in beside them; the T14 pack's published evidence output indexes all of it. The rework check is --rework-check v1-w3c-2:T14."
+   }
   },
   {
    "id": "v1-w3c-4",
@@ -4751,8 +4756,8 @@
    "evidence": [
     {
      "path": "crates/actions/src/procedure/ingest.rs",
-     "line": 84,
-     "quote": "    pub source: SourceIn,"
+     "line": 77,
+     "quote": "pub struct IngestSopIn {"
     }
    ],
    "failure_scenario": "Onboarding 200 SOPs forces 200 calls; a mid-run failure leaves a partially ingested set with no batch record, and the guarantee that a batch never publishes itself has no batch to enforce.",
@@ -6274,12 +6279,12 @@
     {
      "path": "crates/api/src/copilot/proposal.rs",
      "line": 232,
-     "quote": "    let mut new = NewApproval::new(request.spec.name, KIND);"
+     "quote": "    let mut new = NewApproval::new(request.spec.name.to_string(), KIND);"
     },
     {
      "path": "crates/actions/src/control/approvals.rs",
-     "line": 794,
-     "quote": "    require_approval_tx(tx, ctx, spec.name, &target, ctx.approval_id)"
+     "line": 798,
+     "quote": "    require_approval_tx(tx, ctx, spec.static_name(), &target, ctx.approval_id)"
     }
    ],
    "failure_scenario": "A tenant sets a destructive action's policy to 2 decisions; a copilot proposal opens at 1 and one approval authorises the execution.",
