@@ -46,9 +46,249 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   25 architecture.artifacts_link ok
   26 architecture.artifacts_link ok
   27 architecture.artifacts_link ok
+  28 documents.update ok
+  29 documents.publish ok
+  document project-brief: published (draft replaced by the pack's body)
+  document benefits-diagram: already present and published
+  document candidate-solutions: already present and published
+  document project-context-diagram: already present and published
+  document architecture-artifact: already present and published
+  30 documents.compose ok
+  31 documents.publish ok
+  document gap-analysis: published
+  32 documents.compose ok
+  33 documents.publish ok
+  document project-registers: published
+  delivery contract: already live
+  register risk: The organisation spine ships before any tenant uses it already present
+  register risk: Gates that cannot fail already present
+  register risk: The decision trail drifts back into prompts already present
+  register risk: Meeting theatre after the 2026-11-22 ruling already present
+  register issue: D61, D62 and D63 are proposed, not accepted already present
+  register issue: The spec grew after the rework record already present
+  register assumption: The 2026-11-17 closure stays unattributed already present
+  register assumption: The plan remains the active plan the records cite already present
+  register dependency: Every meta-job depends on the organisation and tool spines already present
+  register dependency: The board and cadence binding to meetings depends on T19F already present
+  register benefit: Auditability at the level of a single decision already present
+  register benefit: A measurable benefit rather than a wished one already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  spec output: current
+  Phase-G review: already recorded
+  34 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  35 approvals.request ok
+  36 approvals.decide ok
+  37 cards.comment ok
+  38 cards.move ok
+  39 cards.move ok
+  card cleared: std-togaf-phase-e-spec-v2-e:SPEC-V2
+  card discharge: 1 card(s) cleared of 480 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  40 projects.close ok
+  closed SPEC-V2: 01a1d039-0d39-7f3b-bd04-211f7dfe1e50
+SPEC-V2: 40 acts recorded
 
-rework: documents.publish refused at act 28: error: documents.publish refused (409): the output is missing required sections: Plan [body: missing required section: Plan (output_incomplete)]
-FAILED: documents.publish: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project SPEC-V2 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-SPEC-V2-snap-6q7t1_ar/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-SPEC-V2-snap-6q7t1_ar/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "SPEC-V2",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 5,
+    "present": 6,
+    "missing-edge": 0,
+    "stale": 8,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 

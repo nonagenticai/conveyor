@@ -1,21 +1,15 @@
 {
-  "blocked": 1,
-  "generated_at": "2026-11-26T11:46:40+00:00",
-  "green": 0,
+  "blocked": 0,
+  "generated_at": "2026-11-26T11:47:50+00:00",
+  "green": 1,
   "members": [
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: documents.publish refused at act 28: error: documents.publish refused (409): the output is missing required sections: Plan [body: missing required section: Plan (output_incomplete)]",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "SPEC-V2",
       "log": "docs/evidence/rework/batch/tranche-0/SPEC-V2.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,
