@@ -1,0 +1,87 @@
+{
+  "body_sha256": "f6576daff78d9346f6a6d868da7c39b06b2c8c9964719b4d900fe4a6effaacb7",
+  "category": "project-baseline",
+  "headings": [
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Schedule",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "absent"
+    },
+    {
+      "heading": "Cost",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/project_baselines"
+        },
+        {
+          "category": "project-baseline",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        }
+      ],
+      "status": "absent"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-baseline",
+          "count": 1,
+          "file": "work.json",
+          "kind": "rows",
+          "pointer": "/approvals"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "867f2ff6871888a0419142381b8cf4e10506ee1da0017d3e5d6776613f6eb7db",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+    "key": "DESIGN-PUBLISH",
+    "kind": "project",
+    "title": "Publish the SPEC_V2 studio design pack, live"
+  },
+  "title": "Project Baseline \u2014 Publish the SPEC_V2 studio design pack, live"
+}

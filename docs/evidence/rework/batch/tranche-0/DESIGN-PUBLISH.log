@@ -1,0 +1,225 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project DESIGN-PUBLISH --content docs/evidence/rework/tranche-0/rework-content-DESIGN-PUBLISH.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+
+rework: SNAPSHOT_DATABASE_URL is required to build the review read-back snapshot
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project DESIGN-PUBLISH --snapshot /tmp/conv526-snap-1126b/data --outputs-dir /tmp/conv526-snap-1126b/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "change-control",
+      "document_id": "01a216d8-3496-7074-a7c1-33f9c9fd016e",
+      "natural_key": "artefact:DESIGN-PUBLISH:change-control:464a770d31d8610b",
+      "body_sha256": "464a770d31d8610bf23ff26a8d15c91ca026365978a27efff243ba7743554d20"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "compliance-review",
+      "document_id": "01a216d8-365c-76fb-bfbe-b6d840eae41b",
+      "natural_key": "artefact:DESIGN-PUBLISH:compliance-review:294f6e86096ea477",
+      "body_sha256": "294f6e86096ea477426b18802d39c5ea9a25dcdd8a4e0a058bf7b61613222ea1"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "delivery-contract",
+      "document_id": "01a216d8-380e-75b3-b1fe-13c369727be8",
+      "natural_key": "artefact:DESIGN-PUBLISH:delivery-contract:88707a97f42e4fde",
+      "body_sha256": "88707a97f42e4fde1f5c21715c02eeb1f71496f9473d751ecad6608ffc6ef212"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-baseline",
+      "document_id": "01a216d8-39c1-72b6-b948-53791e6ac44b",
+      "natural_key": "artefact:DESIGN-PUBLISH:project-baseline:f6576daff78d9346",
+      "body_sha256": "f6576daff78d9346f6a6d868da7c39b06b2c8c9964719b4d900fe4a6effaacb7"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-wbs",
+      "document_id": "01a216d8-3b69-72a3-a04f-fd968547ccdc",
+      "natural_key": "artefact:DESIGN-PUBLISH:project-wbs:6252e97c228893a9",
+      "body_sha256": "6252e97c228893a920f9f1474927a0227c20a5fd9ef20d263659513b60a813a5"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a216d8-3d0a-7579-9b45-fab608445ae9",
+      "natural_key": "artefact:DESIGN-PUBLISH:statement-of-architecture-work:26242559cdfa8060",
+      "body_sha256": "26242559cdfa8060b92d85a92f5c94286edd81ba55f91f66b9c59ec2a151b450"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Document' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Goals and outcomes' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Candidates' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Baseline' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Risks' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 17,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 2,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

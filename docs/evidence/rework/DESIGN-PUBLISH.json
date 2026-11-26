@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "12 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +4 more",
+      "detail": "11 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +3 more",
       "id": "DESIGN-PUBLISH-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -150,22 +150,22 @@
     }
   ],
   "failures": [
-    "DESIGN-PUBLISH-artefact-standard (P1): 12 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +4 more",
+    "DESIGN-PUBLISH-artefact-standard (P1): 11 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH, +3 more",
     "DESIGN-PUBLISH-rework (P0): 4 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
     "gate (P0): the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T10:37:50.607886+00:00",
+  "generated_at": "2026-11-26T07:53:49.815078+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
   "name": "Publish the SPEC_V2 studio design pack, live",
   "project": "DESIGN-PUBLISH",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-26T07:53:20.026933+00:00",
+    "git_sha": "3e10fc52830ac80ac33071a32b8d25eb4430d337",
+    "path": "retained-snapshot/3e10fc52830ac80ac33071a32b8d25eb4430d337"
   },
   "verdict": "red",
   "warnings": []
