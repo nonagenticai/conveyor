@@ -92,7 +92,7 @@ const DESTINATIONS: &[Destination] = &[
     },
 ];
 
-fn external_services(registry: &Registry) -> BTreeSet<&'static str> {
+fn external_services(registry: &Registry) -> BTreeSet<&str> {
     registry
         .iter()
         .filter(|spec| spec.kind == ActionKind::External)
