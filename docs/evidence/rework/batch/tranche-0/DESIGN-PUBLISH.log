@@ -43,9 +43,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   22 architecture.artifacts_link ok
   23 architecture.artifacts_link ok
   24 architecture.artifacts_link ok
-  25 documents.compose ok
-  26 documents.publish ok
-  document architecture-artifact: published
+  document architecture-artifact: already present
   document benefits-diagram: already present
   document candidate-solutions: already present
   document project-context-diagram: already present
@@ -64,14 +62,15 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  27 cadences.credit_demo ok
+  25 cadences.credit_demo ok
   baseline approval: none pending
   change control: 2 change row(s) present
-  closure gate: already approved
-  destructive gate: already approved
+  26 approvals.request ok
+  27 approvals.decide ok
+  28 cards.comment ok
 
-rework: projects.close refused at act 28: error: projects.close refused (409): project DESIGN-PUBLISH owns open P0 work (open: closed_without_closure_review:DESIGN-PUBLISH)
-FAILED: projects.close: transport exited 1
+rework: cards.move refused at act 29: error: cards.move refused (412): cards.move replaces an existing row: If-Match (or `_version`) is required
+FAILED: cards.move: transport exited 1
 
 [exit 1]
 

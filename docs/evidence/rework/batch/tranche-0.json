@@ -1,13 +1,13 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T08:21:59+00:00",
+  "generated_at": "2026-11-26T08:43:44+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 28: error: projects.close refused (409): project DESIGN-PUBLISH owns open P0 work (open: closed_without_closure_review:DESIGN-PUBLISH)",
+          "detail": "rework: cards.move refused at act 29: error: cards.move refused (412): cards.move replaces an existing row: If-Match (or `_version`) is required",
           "gap": "instrument",
           "id": null
         }
@@ -19,6 +19,6 @@
     }
   ],
   "red": 0,
-  "snapshot_sha": "f818d9e1805009d1b8495a0feda35d23cffaef5d",
+  "snapshot_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9",
   "tranche": 0
 }
