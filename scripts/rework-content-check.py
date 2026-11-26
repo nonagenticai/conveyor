@@ -234,6 +234,28 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
                    f"{label} link {index} kind {link.get('kind')!r} is not one of "
                    f"{sorted(LINK_KINDS)}")
 
+    # The authored category documents. The close gate reads a published document per mandatory
+    # category, and four TOGAF categories resolve their template headings from a document of
+    # their own category — nothing else in the record can satisfy them. `documents.compose`
+    # refuses a body missing a required section, so the check is the same rule one step earlier.
+    documents = content.get("documents") or []
+    categories = template_standard.get("templates") or {}
+    declared = set(template_standard.get("categories") or [])
+    seen_categories: set[str] = set()
+    for document in documents:
+        label = f"document {document.get('title')!r}"
+        category = str(document.get("category") or "")
+        expect(category in categories and (not declared or category in declared),
+               f"{label} names an unknown category {category!r}")
+        expect(category not in seen_categories, f"{label} repeats the category {category!r}")
+        seen_categories.add(category)
+        body = document.get("body")
+        expect(isinstance(body, str) and bool(str(body).strip()), f"{label} needs an authored body")
+        if category in categories and isinstance(body, str) and body.strip():
+            check_authored(
+                body, list((categories[category] or {}).get("required") or []), label, problems
+            )
+
     registers = content.get("registers")
     expect(isinstance(registers, dict) and bool(registers),
            "registers must be a {kind: [rows]} object (§8.4)")

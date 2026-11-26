@@ -502,6 +502,7 @@ class Runner:
             )
             artefact_ids[artefact["title"]] = str(created["id"])
         self.ensure_artefact_links(artefact_ids)
+        self.ensure_documents()
 
         # 6. the delivery contract
         contract = next(
@@ -986,6 +987,49 @@ class Runner:
                 read_id_from_output="baseline_id",
             )
             self.decide(taken["approval_id"], f"approve the {kind} baseline")
+
+    def ensure_documents(self) -> None:
+        """Publish the pack's authored category documents.
+
+        The close gate reads a published document for every mandatory category the output
+        standard binds, and four TOGAF categories (benefits-diagram, candidate-solutions,
+        project-context-diagram, gap-analysis) resolve their template headings from a document
+        of their own category — no other row in the record can satisfy them. The pack authors
+        those bodies; this publishes one per (project, category), never a second body, because
+        the publisher's own lookup refuses two bodies for one category.
+        """
+        documents = self.content.get("documents") or []
+        for document in documents:
+            category = str(document.get("category") or "").strip()
+            title = str(document.get("title") or "").strip()
+            body = str(document.get("body") or "")
+            if not category or not title or not body.strip():
+                fail("documents: every document needs a title, a category and a body")
+            existing = self._read(
+                "documents.list", {"project_id": self.project_id, "category": category}
+            ).get("items") or []
+            if any(str(row.get("category") or "") == category for row in existing):
+                print(f"  document {category}: already present")
+                continue
+            doc = self.invoke(
+                "documents.compose",
+                {
+                    "title": title,
+                    "project_id": self.project_id,
+                    "body": body,
+                    "category": category,
+                    "publishable": True,
+                },
+                read_action="documents.get",
+                read_id_from_output="id",
+            )
+            self.invoke(
+                "documents.publish",
+                {"id": doc["id"], "publish": True},
+                read_input={"id": doc["id"]},
+                if_match=doc.get("version", 1),
+            )
+            print(f"  document {category}: published")
 
     def publish_artefact_document(self, artefact: dict) -> str:
         """Compose and publish the artefact's own document, once.
