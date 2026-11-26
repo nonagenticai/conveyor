@@ -12,7 +12,9 @@
 //!
 //! The credential is the dedicated `<session-client>` service account when both env vars are set;
 //! otherwise the deployment's existing service credential is used, which is the local shape and
-//! works only where that client already holds the licences mint role.
+//! works only where that client already holds the licences mint role. The dedicated client holds
+//! `license-manager` (mint) and `license-reader` (resolve the tenant's active licence id) — the
+//! licences read set does not include `license-manager`.
 
 use std::fs;
 use std::io::Write;
@@ -73,9 +75,16 @@ pub fn read_cache(path: &Path) -> Option<CachedToken> {
 
 /// Write the cache file and its directory, both owner-only.
 pub fn write_cache(path: &Path, token: &str, expires_at: &str) -> Result<(), String> {
-    if let Some(dir) = path.parent() {
+    if let Some(dir) = path.parent()
+        && !dir.as_os_str().is_empty()
+    {
+        // Only tighten a directory we create: an existing parent (a caller's `--out /tmp/x`)
+        // belongs to the caller, and chmod on it can fail outright.
+        let created = !dir.exists();
         fs::create_dir_all(dir).map_err(|error| format!("create {}: {error}", dir.display()))?;
-        set_mode(dir, 0o700)?;
+        if created {
+            set_mode(dir, 0o700)?;
+        }
     }
     let body = serde_json::to_vec(&CachedToken {
         token: token.to_owned(),
@@ -251,6 +260,22 @@ mod tests {
         assert_eq!(token_from_file("  abc123\n"), "abc123");
         let json = serde_json::json!({"token": "abc123", "expires_at": "2026-11-27T00:00:00Z"});
         assert_eq!(token_from_file(&json.to_string()), "abc123");
+    }
+
+    #[test]
+    fn writing_into_an_existing_directory_succeeds_and_the_file_is_owner_only() {
+        // The parent is the OS temp dir: it must not be chmod'ed, and the write must still work.
+        let path =
+            std::env::temp_dir().join(format!("conveyor-session-file-{}", uuid::Uuid::now_v7()));
+        write_cache(&path, "secret-token", "2026-11-27T00:00:00Z").unwrap();
+        assert_eq!(read_cache(&path).expect("round trip").token, "secret-token");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mode = fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(mode, 0o600);
+        }
+        fs::remove_file(&path).ok();
     }
 
     #[test]

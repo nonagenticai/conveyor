@@ -216,6 +216,51 @@ async fn active_license_id_reads_the_id_and_an_inactive_body_answers_none() {
 }
 
 #[tokio::test]
+async fn active_license_id_sends_the_tenant_header() {
+    let seen = Arc::new(Mutex::new(None));
+    let app = Router::new().route(
+        "/licenses/active",
+        get({
+            let seen = seen.clone();
+            move |headers: axum::http::HeaderMap| {
+                let seen = seen.clone();
+                async move {
+                    *seen.lock().expect("stub lock") = headers
+                        .get("x-tenant-id")
+                        .and_then(|value| value.to_str().ok())
+                        .map(str::to_owned);
+                    (StatusCode::OK, r#"{"active":true,"license_id":"lic-1"}"#)
+                }
+            }
+        }),
+    );
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the active stub");
+    let addr = listener.local_addr().expect("stub addr");
+    tokio::spawn(async move {
+        axum::serve(listener, app)
+            .await
+            .expect("active stub server");
+    });
+    let client = LicenceSyncClient::new(&format!("http://{addr}")).expect("client");
+    let t = tenant();
+    assert_eq!(
+        client
+            .active_license_id(t, "conveyor")
+            .await
+            .expect("active")
+            .as_deref(),
+        Some("lic-1")
+    );
+    let expected = t.to_string();
+    assert_eq!(
+        seen.lock().expect("lock").as_deref(),
+        Some(expected.as_str())
+    );
+}
+
+#[tokio::test]
 async fn create_license_token_sends_the_tenant_and_parses_the_mint() {
     let seen = Arc::new(Mutex::new(None));
     let base = mint_stub(seen.clone()).await;

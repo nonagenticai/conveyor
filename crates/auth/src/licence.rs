@@ -312,7 +312,14 @@ impl LicenceSyncClient {
             urlencode(&tenant.to_string()),
             urlencode(app_key)
         );
-        let mut builder = self.http.get(&url);
+        // `GET /licenses/active` refuses a bare `license-reader` with "Missing tenant context":
+        // the route's tenant-scope gate resolves the caller's tenant from the `tenant_id` claim
+        // or this header. A service account carries no claim, so it names the tenant it is acting
+        // for; the route still refuses a tenant the caller's owner cannot reach.
+        let mut builder = self
+            .http
+            .get(&url)
+            .header("x-tenant-id", tenant.to_string());
         if let Some(creds) = &self.creds {
             let header = creds
                 .authorization()

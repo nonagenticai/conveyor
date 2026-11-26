@@ -67,6 +67,13 @@ pub async fn ensure(
         .begin()
         .await
         .map_err(|error| format!("begin: {error}"))?;
+    // `membership` carries FORCE RLS keyed on `app_current_tenant()`. An admin command is not
+    // the action engine, which sets this per transaction itself, so it names the tenant here.
+    sqlx::query("SELECT set_config('app.current_tenant', $1, true)")
+        .bind(tenant.as_uuid().to_string())
+        .execute(&mut *tx)
+        .await
+        .map_err(|error| format!("set tenant context: {error}"))?;
     let existing: Option<(Uuid, String)> =
         sqlx::query_as("SELECT id, kind FROM app_user WHERE oidc_subject = $1")
             .bind(&identity.subject)
