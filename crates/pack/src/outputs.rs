@@ -69,6 +69,55 @@ pub struct AttachmentEntry {
     pub path: String,
 }
 
+/// The provenance one published output carries: what the row itself records.
+///
+/// Every field except `status` and `version` is optional because the rows written before the
+/// write path carried no provenance; the page says `unrecorded` rather than inventing a value.
+/// `commit` is the commit the pack was rendered from (`CONVEYOR_GIT_SHA`), not the author's
+/// commit, which the engine never sees.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Provenance {
+    /// The output-standard kind the row was published under (`document.category`).
+    pub kind: Option<String>,
+    /// The row's optimistic-concurrency version at render time.
+    pub version: u64,
+    /// The sha256 of the body or the stored bytes.
+    pub hash: Option<String>,
+    /// The row's status (`active`, `rejected`, `failed`).
+    pub status: String,
+    /// The author's display name, when one is recorded.
+    pub owner: Option<String>,
+    /// The gate the output was published under, when the row names one.
+    pub gate: Option<String>,
+    /// The commit the pack was rendered from.
+    pub commit: Option<String>,
+}
+
+impl Provenance {
+    /// Build from a record; `owner` is the author's resolved display name.
+    pub fn of(record: &DocumentRecord, owner: Option<&str>, commit: Option<&str>) -> Self {
+        Self {
+            kind: record.category.clone(),
+            version: record.version.get(),
+            hash: record.content_hash.clone(),
+            status: record.status.clone(),
+            owner: owner.map(str::to_owned),
+            gate: record
+                .meta
+                .get("gate")
+                .and_then(serde_json::Value::as_str)
+                .map(str::to_owned),
+            commit: commit.map(str::to_owned),
+        }
+    }
+
+    /// Whether the row carried any provenance at all.
+    #[must_use]
+    pub fn recorded(&self) -> bool {
+        self.kind.is_some() || self.hash.is_some() || self.gate.is_some()
+    }
+}
+
 /// One entry of `outputs.js`.
 #[derive(Clone, Debug, Serialize)]
 pub struct OutputEntry {
@@ -96,6 +145,8 @@ pub struct OutputEntry {
     pub published_at: Option<String>,
     /// When the output last changed.
     pub updated_at: String,
+    /// What the row itself records about its own provenance.
+    pub provenance: Provenance,
 }
 
 /// Render one output and write `output-<id>.html` files and `outputs.js` into `out`.
@@ -115,7 +166,14 @@ pub async fn write_outputs(
     let names = author_names(&mut tx, &records).await?;
     tx.rollback().await?;
 
-    let (index, pages) = render_outputs(&records, &projects, &attachments, &names, generated_at)?;
+    let (index, pages) = render_outputs(
+        &records,
+        &projects,
+        &attachments,
+        &names,
+        generated_at,
+        rendered_commit().as_deref(),
+    )?;
 
     std::fs::create_dir_all(out)?;
     for (id, page) in &pages {
@@ -136,6 +194,7 @@ pub fn render_outputs(
     attachments: &[DocumentRecord],
     names: &HashMap<Uuid, String>,
     generated_at: &str,
+    commit: Option<&str>,
 ) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
     let projects: HashMap<Uuid, (String, String)> = projects
         .iter()
@@ -181,6 +240,7 @@ pub fn render_outputs(
                     .collect()
             })
             .unwrap_or_default();
+        let provenance = Provenance::of(record, author.as_deref(), commit);
         let page = output_page(
             &record.title,
             &render_markdown(body),
@@ -188,6 +248,7 @@ pub fn render_outputs(
             project_label,
             author.as_deref(),
             &attachment_entries,
+            &provenance,
         );
         pages.insert(record.id, page);
         entries.push(OutputEntry {
@@ -203,6 +264,7 @@ pub fn render_outputs(
             path: format!("docs/output-{}.html", record.id),
             published_at: record.published_at.map(|at| at.to_rfc3339()),
             updated_at: record.updated_at.to_rfc3339(),
+            provenance,
         });
     }
     Ok((outputs_js(&entries, generated_at)?, pages))
@@ -246,6 +308,7 @@ pub fn output_page(
     project: Option<&str>,
     author: Option<&str>,
     attachments: &[AttachmentEntry],
+    provenance: &Provenance,
 ) -> String {
     let mut source = match project {
         Some(project) => format!("{project} · conveyor output · published {generated_at}"),
@@ -255,7 +318,8 @@ pub fn output_page(
         source.push_str(&format!(" · {author}"));
     }
     let body_html = format!(
-        "{body_html}{}{}",
+        "{}{body_html}{}{}",
+        provenance_html(provenance),
         attachments_html(attachments),
         feedback_html()
     );
@@ -275,6 +339,62 @@ pub fn output_page(
         )
         .replace("at build time.</span>", "at publish time.</span>")
         .replace("$body$", &body_html)
+}
+
+/// The commit the pack is rendered from. A publish sets `CONVEYOR_GIT_SHA`; a local run has none,
+/// and the page says `unrecorded` rather than naming a commit it cannot know.
+#[must_use]
+pub fn rendered_commit() -> Option<String> {
+    std::env::var("CONVEYOR_GIT_SHA")
+        .ok()
+        .filter(|sha| !sha.trim().is_empty())
+}
+
+/// The provenance block every output page carries, before the body.
+///
+/// It is machine-readable: the `<dl>` carries one `data-provenance-<field>` attribute per field, so
+/// a reader (or a test) can assert a value without parsing prose. A field the row never recorded
+/// renders `unrecorded` — the block is never omitted and never guessed.
+fn provenance_html(provenance: &Provenance) -> String {
+    let shown = |value: Option<&str>| -> String {
+        value
+            .filter(|text| !text.trim().is_empty())
+            .unwrap_or("unrecorded")
+            .to_owned()
+    };
+    let status = if provenance.recorded() {
+        shown(Some(provenance.status.as_str()))
+    } else {
+        "unrecorded".to_owned()
+    };
+    let kind = shown(provenance.kind.as_deref());
+    let hash = shown(provenance.hash.as_deref());
+    let owner = shown(provenance.owner.as_deref());
+    let gate = shown(provenance.gate.as_deref());
+    let commit = shown(provenance.commit.as_deref());
+    let version = provenance.version.to_string();
+    format!(
+        "<dl class=\"output-provenance\" \
+         data-provenance-kind=\"{kind_attr}\" data-provenance-version=\"{version_attr}\" \
+         data-provenance-hash=\"{hash_attr}\" data-provenance-status=\"{status_attr}\" \
+         data-provenance-owner=\"{owner_attr}\" data-provenance-gate=\"{gate_attr}\" \
+         data-provenance-commit=\"{commit_attr}\">\
+         <div><dt>Kind</dt><dd>{kind}</dd></div>\
+         <div><dt>Version</dt><dd>{version}</dd></div>\
+         <div><dt>SHA-256</dt><dd>{hash}</dd></div>\
+         <div><dt>Status</dt><dd>{status}</dd></div>\
+         <div><dt>Owner</dt><dd>{owner}</dd></div>\
+         <div><dt>Gate</dt><dd>{gate}</dd></div>\
+         <div><dt>Rendered from</dt><dd>{commit}</dd></div>\
+         </dl>",
+        kind_attr = escape_html(&kind),
+        version_attr = escape_html(&version),
+        hash_attr = escape_html(&hash),
+        status_attr = escape_html(&status),
+        owner_attr = escape_html(&owner),
+        gate_attr = escape_html(&gate),
+        commit_attr = escape_html(&commit),
+    )
 }
 
 /// The attachments block appended to a rendered body. Names are escaped and every link is a
@@ -346,6 +466,7 @@ mod tests {
             Some("T1"),
             Some("Alice"),
             &[],
+            &Provenance::default(),
         );
         assert!(
             html.contains("https://github.com/nonagenticai/conveyor/discussions"),
@@ -354,6 +475,70 @@ mod tests {
         assert!(html.contains("Discuss this output"), "{html}");
         assert!(!html.contains("data/programme.json"), "{html}");
         assert!(!html.contains("data/manifest.json"), "{html}");
+    }
+
+    #[test]
+    fn output_page_renders_provenance() {
+        let provenance = Provenance {
+            kind: Some("project-brief".to_owned()),
+            version: 3,
+            hash: Some("abc123".to_owned()),
+            status: "active".to_owned(),
+            owner: Some("Alice".to_owned()),
+            gate: Some("pm.charter".to_owned()),
+            commit: Some("ba56759a".to_owned()),
+        };
+        let html = output_page(
+            "T",
+            "<p>b</p>",
+            "2026-11-26",
+            Some("P0"),
+            Some("Alice"),
+            &[],
+            &provenance,
+        );
+        assert!(
+            html.contains("data-provenance-kind=\"project-brief\""),
+            "{html}"
+        );
+        assert!(html.contains("data-provenance-version=\"3\""), "{html}");
+        assert!(html.contains("data-provenance-hash=\"abc123\""), "{html}");
+        assert!(html.contains("data-provenance-status=\"active\""), "{html}");
+        assert!(html.contains("data-provenance-owner=\"Alice\""), "{html}");
+        assert!(
+            html.contains("data-provenance-gate=\"pm.charter\""),
+            "{html}"
+        );
+        assert!(
+            html.contains("data-provenance-commit=\"ba56759a\""),
+            "{html}"
+        );
+    }
+
+    #[test]
+    fn output_page_marks_unrecorded_provenance() {
+        let provenance = Provenance {
+            status: "active".to_owned(),
+            version: 1,
+            ..Provenance::default()
+        };
+        let html = output_page("T", "<p>b</p>", "2026-11-26", None, None, &[], &provenance);
+        assert!(
+            html.contains("data-provenance-kind=\"unrecorded\""),
+            "a legacy row must not invent a kind: {html}"
+        );
+        assert!(
+            html.contains("data-provenance-status=\"unrecorded\""),
+            "a row with no kind, hash or gate has no recorded status: {html}"
+        );
+        assert!(
+            html.contains("data-provenance-gate=\"unrecorded\""),
+            "{html}"
+        );
+        assert!(
+            html.contains("data-provenance-commit=\"unrecorded\""),
+            "{html}"
+        );
     }
 
     #[test]
@@ -389,6 +574,7 @@ mod tests {
             Some("S02"),
             Some("A Person"),
             &attachments,
+            &Provenance::default(),
         );
         assert!(
             page.contains("href=\"attachment-a-1\""),
@@ -426,6 +612,7 @@ mod tests {
             path: "docs/output-id-1.html".to_owned(),
             published_at: Some("2026-11-13T00:00:00Z".to_owned()),
             updated_at: "2026-11-13T00:00:00Z".to_owned(),
+            provenance: Provenance::default(),
         }];
         let js = outputs_js(&entries, "2026-11-13T00:00:00Z").expect("index");
         assert!(js.starts_with("window.CONVEYOR_OUTPUTS = {"), "{js}");

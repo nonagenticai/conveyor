@@ -138,6 +138,7 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         &redacted_attachments,
         &names,
         &generated_at,
+        crate::outputs::rendered_commit().as_deref(),
     )?;
 
     Ok(SiteView {
