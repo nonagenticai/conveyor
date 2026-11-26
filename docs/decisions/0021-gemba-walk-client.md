@@ -1,6 +1,8 @@
 # 0021 — The Gemba Walk is a separate client, a candidate primary UI
 
-Status: Proposed · Date: 2026-11-26 · Owner direction: 2026-11-26 · Spec: SPEC_V2 §10.5.11, §15.1 D67
+Status: Accepted · Date: 2026-11-26 · Approved: 2026-11-26, rule decision under the published
+delegation of 2026-11-22 (expiry 2027-02-18) — a delegated approval, not a human signature · Owner
+direction: 2026-11-26 · Spec: SPEC_V2 §10.5.11, §15.1 D67
 Supersedes in part: ADR 0013 decision 1 and its rejected "second frontend" alternative; D64
 
 ## Context
@@ -97,10 +99,11 @@ decision open until it can be measured.
   contract. The parity instrument and per-destination specs are the mitigation, and a change that
   updates one client without the other is visible in CI.
 - Delivery: `docs/plans/03-DELIVERY.md` defaults to one plan = one issue. The walk is
-  multi-session by shape, so the plan proposes a five-issue split — a dependency-bearing parent
-  and four file-disjoint wings — which the owner must approve as the written exception at W0.
-  Without that approval the whole plan is one issue. `lane/` branches are not used; the parent
-  issue is claimed before any branch.
+  multi-session by shape; the plan's five-issue split — a dependency-bearing parent G0 and four
+  file-disjoint wings S1–S4 — is **approved 2026-11-26** as the written exception (rule decision
+  under the published delegation). The inception unit (#792) is the P0 §5 definition step, not a
+  sixth split. `lane/` branches are not used for new work; the inception issue adopted the
+  in-flight docs lane.
 - Serving: a scoped `/walk/*` fallback in `crates/api/src/web.rs` (GET/HEAD only, non-asset paths)
   and a Dockerfile copy of the static output; both are serving changes, not API surface. Without the
   fallback, a walk deep link currently renders the operator app's `index.html`.
@@ -120,5 +123,6 @@ decision open until it can be measured.
 ## Links
 
 ADR 0001 (CSR by measurement) · ADR 0013 and D64 (the app is the UI) · SPEC_V2 §10.5, §10.5.11,
-§15.1 D66/D67 · `docs/design/GEMBA-WALK-SPEC.md` · `docs/plans/GEMBA-WALK.md` · the parent issue
-is created by the plan's §8.1 runbook after the owner accepts this ADR.
+§15.1 D66/D67 · `docs/design/GEMBA-WALK-SPEC.md` · `docs/plans/GEMBA-WALK.md` ·
+`docs/plans/inception/GEMBA-WALK/` (the published inception set) · accepted 2026-11-26; the
+inception unit #792 publishes the set and the build issues are created after it.

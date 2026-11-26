@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
     <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
-    <title>Inception record — the five proposed V2 projects · conveyor documents</title>
+    <title>Inception record · conveyor documents</title>
     <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../../assets/plex-sans.css" />
     <link rel="stylesheet" href="../../../assets/plex-mono.css" />
@@ -23,8 +23,8 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="inception-record--the-five-proposed-v2-projects">Inception record — the five proposed V2 projects</h1>
-<p>This folder holds the durable inception artefacts for the five proposed V2 projects: <strong>T5 Kata</strong>, <strong>T6 Development project</strong>, <strong>T12 One organisation loop</strong>, <strong>T15 Tool authoring and BYO</strong> and <strong>T17 Tenant asset authoring</strong>.</p>
+    <main class="doc-body"><h1 id="inception-record">Inception record</h1>
+<p>This folder holds the durable inception artefacts for the proposed projects. The five proposed V2 projects are <strong>T5 Kata</strong>, <strong>T6 Development project</strong>, <strong>T12 One organisation loop</strong>, <strong>T15 Tool authoring and BYO</strong> and <strong>T17 Tenant asset authoring</strong>. The sixth is <strong>GEMBA-WALK</strong>, the separate game-style client authorised by ADR 0021 (programme track, cross-cutting); its fuller MSP/TOGAF/SAFe set is in <a href="GEMBA-WALK/README.html"><code>GEMBA-WALK/</code></a>.</p>
 <p>All fifteen are <strong>published</strong> (2026-11-21) under the owner's direction in #527. The inception gate (<code>crates/actions/src/programme.rs::assert_inception_published</code>) is met for each project; this record authorises no tranche and claims no completion.</p>
 <h2 id="the-standard">The standard</h2>
 <p>Each project carries the three categories its <code>v2-proposed</code> class declares in <code>seed/output-standard.json</code>:</p>
@@ -55,7 +55,8 @@
 </tbody>
 </table>
 <p>Each file opens with the SPEC_V2 §8.1 common metadata (status, version, author/date, reviewer/review date, related project, rationale, published document/contract, phase/plateau, entries, links). Current-state rows cite <code>path:symbol</code>; every future claim is phrased as plan.</p>
-<p><code>statement-of-architecture-work</code> is <strong>not</strong> part of this set: it is a T9-only contract kind.</p>
+<p><code>statement-of-architecture-work</code> is <strong>not</strong> part of the V2 five's set: it is a T9-only contract kind.</p>
+<p><strong>GEMBA-WALK</strong> is the exception to the three-category shape: its <code>programme</code> class requires the brief and evidence, and ADR 0021's architecture adds the PSA/HLD set, the artefact register, the MSP profile, the SAFe epic and the Phase-A statement of architecture work. Its documents are drafts until the inception unit (#792) publishes them; the live ids are recorded there.</p>
 <h2 id="the-live-record">The live record</h2>
 <p>The bodies were written and independently reviewed under #347 (2026-11-18). That unit closed on <code>publishable = true</code>, while the inception gate reads <code>published_at IS NOT NULL</code> — so the documents were never actually published and the public index carried them as publishable drafts. This unit makes the bodies durable here, corrects the briefs, updates the live rows to the exact file bytes, and publishes all fifteen through <code>documents.publish</code> (2026-11-21). It also fixes the snapshot and outputs-index filters that treated <code>publishable</code> as publication.</p>
 <table>

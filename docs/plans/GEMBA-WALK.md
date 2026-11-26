@@ -1,7 +1,7 @@
 ---
 project: GEMBA-WALK
 title: The Gemba Walk — a game-style candidate primary UI
-status: proposed
+status: approved
 depends_on: [P0, T18, T19]
 spec_sections: ["§10.5", "§10.5.11", "§15.1 D64/D66/D67"]
 adds_tables: []
@@ -13,15 +13,17 @@ parity_ids: []
 
 # GEMBA-WALK — the Gemba Walk client
 
-Owner direction: 2026-11-26 · ADR: `docs/decisions/0021-gemba-walk-client.md` · Spec:
-`docs/design/GEMBA-WALK-SPEC.md` · Baseline measured at `main@d958824f8` on 2026-11-26 and
-re-verified at `main@0d6db794b` on 2026-11-26 (counts unchanged).
+Owner direction: 2026-11-26 · ADR: `docs/decisions/0021-gemba-walk-client.md` (**Accepted**
+2026-11-26 as a delegated rule decision) · Spec: `docs/design/GEMBA-WALK-SPEC.md` · Procedural set:
+`docs/plans/inception/GEMBA-WALK/` · Baseline measured at `main@d958824f8` and re-verified at
+`main@0d6db794b` (counts unchanged) and `main@cedd84980` on 2026-11-26.
 
 This plan is deliberately **not** a SPEC_V2 §12 `T##` slice. The programme-seed generator parses
 only `docs/plans/slices/S*.md` and `**(T##)**` rows in §12, so a T-row would silently change
 `seed/programme.json` and fail `build-programme-seed.py --check`. The walk is registered as a
-cross-cutting project in `docs/plans/00-INDEX.md`; the parent issue and the programme registration
-are W0, taken only once the owner accepts ADR 0021.
+cross-cutting project in `docs/plans/00-INDEX.md`; the inception unit (#792) publishes the
+MSP/TOGAF/SAFe set and registers the project, and the build issues G0/S1–S4 are created after the
+publication gate.
 
 ## 1. Objective and gate
 
@@ -70,11 +72,10 @@ pre-empted. It is not defined as pixel or copy parity with either existing clien
 
 ## 4. Relationship to the programme
 
-- Not a §12 `T##` slice and not in `seed/programme.json` in this unit.
-- W0 creates the parent issue and registers the programme project once ADR 0021 is accepted; the
-  registration is a reviewable data change through `scripts/build-programme-seed.py` and
-  `seed/programme-definition.json`, never a hand-edit of `seed/programme.json` or
-  `docs/design/data/issues.json` (see §8.1).
+- Not a §12 `T##` slice. The inception unit (#792) registers the project and publishes the
+  inception set before any build issue is created; the registration is a reviewable data change
+  through `scripts/build-programme-seed.py` and `seed/programme-definition.json`, never a
+  hand-edit of `seed/programme.json` or `docs/design/data/issues.json` (see §8.1).
 - The V2 coverage instrument (D65, `scripts/build-v2-coverage.py`) continues to measure `apps/web`
   and is not touched. The walk's evidence is `docs/evidence/walk-coverage.json`.
 - The design pack (`/design/`) keeps its public role and is not rebuilt or embedded.
@@ -184,12 +185,14 @@ repository's `CLAUDE.md`. The spike's throwaway workflow is deleted with the spi
 
 **The repository rule.** `docs/plans/03-DELIVERY.md` is the authority: one plan = one issue = one
 branch = exactly one PR by default; a plan may be split into at most **five** file-disjoint
-siblings only with the owner's written exception, and `lane/` branches are retired. This plan is
-therefore **one unit** unless the owner approves the split below.
+siblings only with the written exception, and `lane/` branches are retired. The exception below is
+approved.
 
-**Proposed exception — one parent + four siblings (5 total).** The walk is multi-session by shape
-(43 screens, 597 actions), so the parent keeps the dependency-bearing foundation and the siblings
-own disjoint destination wings:
+**Approved exception (2026-11-26) — one parent + four siblings (5 total).** Approved as the written
+exception by the build's rule approver under the published delegation; the inception unit (#792) is
+the P0 §5 definition step, not a sixth split. The walk is multi-session by shape (43 screens, 597
+actions), so the parent keeps the dependency-bearing foundation and the siblings own disjoint
+destination wings:
 
 | Issue | Contains | Files it owns | Acceptance |
 |---|---|---|---|
@@ -224,49 +227,42 @@ work; every hand-edited file stays disjoint.
 sibling that needs a seam change stops and asks the parent's owner rather than forking the
 contract.
 
-**If the owner declines the split.** The whole plan is one issue (`GEMBA-WALK`), the stages are
-commits on one `issue/<n>-gemba-walk` branch, and the P6 gate closes the same PR. The plan states
-both paths so no session has to improvise.
+**If the split is withdrawn** by change control, the whole plan is one issue (`GEMBA-WALK`), the
+stages are commits on one `issue/<n>-gemba-walk` branch, and the P6 gate closes the same PR. The
+plan states both paths so no session has to improvise.
 
-### 8.1 W0 runbook — the first session
+### 8.1 Inception and build runbook
 
-1. **Precondition.** The owner has accepted ADR 0021 in writing — either by directing its status
-   line (`docs/decisions/0021-gemba-walk-client.md:3`) to `Accepted` in this docs PR before it
-   merges, or in the W0 branch's first commit — after reviewing the "supersedes in part" wording,
-   and the docs are on `main`. Until then the parent issue is `status:blocked`; a session must not
-   start W0 on a Proposed ADR.
-2. **Create the label and the parent issue.** Create the `GEMBA-WALK` label if absent
-   (`gh label create GEMBA-WALK ...`), then create the parent issue from
-   `.github/ISSUE_TEMPLATE/unit.md` with that label and `status:ready` once step 1 is true
-   (otherwise `status:blocked`):
-   - Goal: the walk foundation is buildable, measured and served at `/walk/`.
-   - Plan source: `docs/plans/GEMBA-WALK.md` §7–§8.
-   - Programme: Tranche `unmapped` — this is a cross-cutting programme unit with no programme
-     tranche (the convention #760 and #745 use; tranche 0 is closed); Brief
-     `docs/decisions/0021-gemba-walk-client.md` and this plan; ADM `Preliminary` / `definition`;
-     Benefits `enabling — no direct benefit` with one sentence of reason.
-   - Baseline: `main@<sha>` measured at claim time; doc blob shas from
-     `git rev-parse main:docs/plans/GEMBA-WALK.md` and
-     `main:docs/design/GEMBA-WALK-SPEC.md`.
-   - Parts: W0, W1 and W2 from §7–§8, each with at least one BDD `Verify:` command.
-   - Dependencies: the plan's `depends_on` edges ([P0, T18, T19]), each resolved to a live issue
-     at claim time (a closed slice is a `related` note, not a blocker); the OIDC registration as
-     an external `acceptance-blocked-by` (owner/ops; not an issue and not a `status:needs-human`
-     label); the sibling edges from the table above.
-3. **Register the project** (a reviewable data change, not prose). The label is what
-   `project_for_issue()` matches, so it must exist before the seed is regenerated:
+1. **Precondition — done.** ADR 0021 is Accepted (2026-11-26, delegated rule decision) and this
+   docs unit (#792) carries the inception set. The set is published on the project by #792 before
+   any build issue is claimed: P0 §5 makes an unpublished inception a hard gate, not a waiver.
+2. **The inception unit (#792) registers the project** (a reviewable data change, not prose):
    - add `GEMBA-WALK` to `CROSS_CUTTING` in `scripts/build-programme-seed.py` (name, plan path,
-     `track: "programme"`, issue numbers) and to `seed/programme-definition.json` under
-     `projects` with `{"adm_phase": "Preliminary", "plateau": "definition"}`;
-   - run `python3 scripts/build-programme-seed.py` and
-     `python3 scripts/check-programme-definition.py`; never hand-edit
-     `docs/design/data/issues.json` — `.github/workflows/issue-registry.yml` owns it.
-4. **Freeze the census and build the instrument** exactly as §6. Commit
+     `track: "programme"`, the inception issue number) and to `seed/programme-definition.json`
+     under `projects` with `{"adm_phase": "Preliminary", "plateau": "definition"}`;
+   - run `python3 scripts/build-programme-seed.py`, `scripts/build-coverage.py`,
+     `scripts/check-programme-definition.py`, `scripts/programme_state.py --check`; fetch the
+     issue registry in-branch and run `node docs/design/scripts/check-coverage.cjs` — an unknown
+     unit here is the early failure. Never hand-edit `docs/design/data/issues.json` —
+     `.github/workflows/issue-registry.yml` owns it.
+   - the `CROSS_CUTTING` convention puts the project in tranche 0; the issue's Programme field says
+     `Tranche 0 (cross-cutting)`.
+3. **Publish the inception set** on the project (`documents.compose` → `documents.publish`), verify
+   the bodies hash-equal to `docs/plans/inception/GEMBA-WALK/`, create the 10 typed artefact rows,
+   and record the Phase-A SoAW through the Board with a distinct approver. Publish the benefit
+   profile with the baseline `unmeasured`. This is the gate before step 4.
+4. **Create G0 and S1–S4 after publication.** Create them from `.github/ISSUE_TEMPLATE/unit.md` with
+   the `GEMBA-WALK` label; do not create them before `CROSS_CUTTING` is on `main` (the registry
+   would map them to PLATFORM). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the
+   published `project-brief` + ADR 0021 + this plan; ADM `Preliminary`/`definition`; Benefits
+   B-WALK-1 (enabling). Parts W0/W1/W2, each with a BDD `Verify:`; dependencies as in §8; the OIDC
+   registration as an external `acceptance-blocked-by`.
+5. **G0's W0 freezes the census and builds the instrument** exactly as §6. Commit
    `docs/evidence/walk-census.json`, `docs/evidence/walk-exemptions.json` and
    `scripts/build-walk-coverage.py`. Acceptance: the script reproduces 52 routes and 597 actions;
    `--check` returns non-zero for a missing registry row, an unreachable action, a missing spec
    and an expired exemption; it runs with no server or database.
-5. **Record the spike and the engine ADR** (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).
+6. **Record the spike and the engine ADR** (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).
 
 ## 9. Parity matrix (initial state at the baseline)
 
@@ -332,6 +328,7 @@ the truth and `apps/web` remains normative.
 
 **Read order** — `CLAUDE.md` → `docs/SPEC.md` → `docs/plans/00-INDEX.md` →
 `docs/plans/03-DELIVERY.md` → `docs/decisions/0021-gemba-walk-client.md` →
+`docs/plans/inception/GEMBA-WALK/README.md` (the MSP/TOGAF/SAFe set) →
 `docs/design/GEMBA-WALK-SPEC.md` → this plan → SPEC_V2 §10.5 (the destination contracts) →
 `apps/web/src/api.rs` and `apps/web/src/auth.rs` (the client contract) → the owning slice's plan
 for the destination.
@@ -368,4 +365,5 @@ python3 docs/design/scripts/build-docs.py && node docs/design/scripts/check-docs
 
 A second backend or decision store; SSR; a native mobile app; chat/AV; customer care; replacing the
 design pack; a public unauthenticated v1; pixel parity with the mock; retiring `apps/web` before the
-P6 gate; adding a SPEC_V2 §12 `T##` row or changing `seed/programme.json` in this unit.
+P6 gate; adding a SPEC_V2 §12 `T##` row. The only seed change is the sanctioned GEMBA-WALK
+registration in the inception unit (#792); no other project's row moves.

@@ -22,7 +22,8 @@ V2 coverage record (`docs/evidence/v2-coverage.json`) measures the app's routes 
 **A separate client, specified here.** [GEMBA-WALK-SPEC.md](GEMBA-WALK-SPEC.md) specifies the Gemba
 Walk at `/walk/` — a candidate primary UI (ADR 0021, D67) that is **not** a page in this pack and is
 never served at `/design/`. The pack remains the public site; the app remains normative until the
-walk's measured parity gate.
+walk's measured parity gate. Its MSP/TOGAF/SAFe inception set is
+[`docs/plans/inception/GEMBA-WALK/`](../plans/inception/GEMBA-WALK/README.md).
 
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
 is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,
