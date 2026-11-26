@@ -43,6 +43,11 @@ P (reports) a `unit` issue created on or after PROGRAMME_SINCE with no `## Progr
             (tranche, brief, ADM phase/plateau, benefits) part of the Definition of ready for
             issues created on/after that date; the report is how a skipped field is seen.
             Issues created before the change are exempt until claimed (forward-only rule).
+Q (writes with --apply)
+            the full issue content contract for one unit, on the event that changes the body:
+            every contract section present, the Programme rows filled, and at least one
+            `Verify:` line. The `issue-dor` workflow runs it on `issues: opened, edited`; the
+            heading parser accepts `##` and `###`, because the GitHub issue form renders h3.
 
 A rule's evidence is always printed. A wrong fix is silent; a printed verdict is not, and
 the job summary is the record a later session reads.
@@ -51,11 +56,15 @@ USAGE
     board.py --repo nonagenticai/conveyor            # apply A and stale B, report C and P
     board.py --repo nonagenticai/conveyor --dry-run  # print the plan, write nothing
     board.py --repo nonagenticai/conveyor --dor N    # check issue N's Definition of ready
+    board.py --repo nonagenticai/conveyor --contract N [--apply]
+                                                     # the full issue content contract; --apply
+                                                     # writes status:not-ready and one comment
+    board.py --contract-body PATH                    # the same check over a body file (offline)
     board.py --self-test                             # fixtures only, no network, no git
 
 EXIT CODES
-    0  clean, or every fix applied; `--dor` found no gap
-    1  --dry-run found a fix pending, a fix failed, or `--dor` found a Programme gap
+    0  clean, or every fix applied; `--dor`/`--contract` found no gap
+    1  --dry-run found a fix pending, a fix failed, or `--dor`/`--contract` found a gap
     2  the instrument is broken (gh failed, git failed, malformed input)
 
 The fallbacks are deliberately unlike the reaper's. This script fails OPEN on a lookup it
@@ -83,8 +92,39 @@ UNIT = "unit"
 # `03-DELIVERY.md` § "Issue content contract": the programme context is required for issues
 # created on/after this date; an earlier issue gains it at its next claim. Keep the two in step.
 PROGRAMME_SINCE = dt.date(2026, 11, 18)
-PROGRAMME_HEADING = "## Programme"
 PROGRAMME_FIELDS = ("Tranche", "Brief", "ADM phase/plateau", "Benefits")
+
+# The issue content contract's sections, in the template's order. Both `##` and `###` headings
+# count: the Markdown template and older issues use h2, and a GitHub issue form renders every
+# field as h3 (`### Goal`), so one parser must read both or the form could never satisfy it.
+CONTRACT_SECTIONS = (
+    "Goal",
+    "Programme",
+    "References",
+    "Baseline",
+    "Parts and acceptance criteria",
+    "Dependencies",
+    "Definition of ready",
+    "Definition of done",
+)
+SECTION_RE = re.compile(r"^(#{2,3})\s+(.*?)\s*#*\s*$")
+
+# Every heading the unit template (and so the form) can carry. A same-level heading in this set
+# ends the section it follows; any other same-level heading is an author's subheading.
+KNOWN_SECTIONS = tuple(name.lower() for name in CONTRACT_SECTIONS) + (
+    "plan / audit source",
+    "claim",
+    "current state (measured)",
+    "out of scope",
+    "deployment prerequisite",
+    "open questions",
+    "evidence at completion",
+)
+
+# The label and the comment the event workflow applies (#780 P2). The marker makes the comment a
+# single, updatable record rather than one new comment per edit.
+DOR_LABEL = "status:not-ready"
+DOR_MARKER = "<!-- issue-dor -->"
 
 # `03-DELIVERY.md`: "A `status:blocked` issue carries a plain line STARTING `Blocker: #N`;
 # a `Blocker:` mention inside prose or a checklist is not a blocker line." So the line must
@@ -125,24 +165,72 @@ def blockers_of(body: str) -> list[int]:
     return seen
 
 
+def section_lines(body: str, heading: str) -> list[str] | None:
+    """The lines under a `## Heading` or `### Heading`, or None when it is absent.
+
+    The section ends at the next heading of the same or a shallower level, so an h3 section ends
+    at the next `###` or `##`, and an h2 section ends at the next `##` or `#`.
+    """
+    lines = body.splitlines()
+    wanted = heading.strip().lower()
+    known = set(KNOWN_SECTIONS)
+    for index, line in enumerate(lines):
+        match = SECTION_RE.match(line)
+        if not match or match.group(2).strip().lower() != wanted:
+            continue
+        level = len(match.group(1))
+        content: list[str] = []
+        for following in lines[index + 1 :]:
+            next_match = SECTION_RE.match(following)
+            if next_match:
+                next_level = len(next_match.group(1))
+                next_name = next_match.group(2).strip().lower()
+                # A shallower heading always ends the section. A heading at the same level ends
+                # it only when it names another contract section: the issue form renders
+                # `### Parts…` and the author's `### P1 — …` subheadings inside it must stay.
+                if next_level < level or (next_level == level and next_name in known):
+                    break
+            content.append(following)
+        return content
+    return None
+
+
+def contract_gaps(body: str) -> list[str]:
+    """Every section or field the issue content contract requires and this body lacks.
+
+    A gap names the missing thing, not a rule number: the report is posted on the issue, where a
+    reader has the body in front of them.
+    """
+    gaps: list[str] = []
+    for name in CONTRACT_SECTIONS:
+        content = section_lines(body, name)
+        if content is None:
+            gaps.append(f"`{name}` section")
+        elif not "\n".join(content).strip():
+            gaps.append(f"`{name}` section is empty")
+    missing = programme_gaps(body)
+    if missing:
+        gaps.append(f"`Programme` rows: {', '.join(missing)}")
+    parts = section_lines(body, "Parts and acceptance criteria") or []
+    if not any(line.strip().startswith("Verify:") for line in parts):
+        gaps.append("a `Verify:` line in `Parts and acceptance criteria`")
+    return gaps
+
+
 def programme_gaps(body: str) -> list[str]:
     """The programme fields this body is missing or leaves empty.
 
-    `[]` means the section is present and all four rows carry a value. A body with no
-    `## Programme` heading returns every field name, so the report says what to add rather than
-    only that something is absent. A row value of `—` (the template's ready-state placeholder)
-    counts as empty: the template's own blank must not pass as a filled field.
+    `[]` means the section is present and all four rows carry a value. A body with no Programme
+    heading returns every field name, so the report says what to add rather than only that
+    something is absent. A row value of `—` (the template's ready-state placeholder) counts as
+    empty: the template's own blank must not pass as a filled field.
     """
-    lines = body.splitlines()
-    try:
-        start = next(i for i, line in enumerate(lines) if line.strip() == PROGRAMME_HEADING)
-    except StopIteration:
+    content = section_lines(body, "Programme")
+    if content is None:
         return list(PROGRAMME_FIELDS)
     gaps: list[str] = []
     found: set[str] = set()
-    for line in lines[start + 1 :]:
-        if line.startswith("## "):
-            break
+    for line in content:
         # Template rows: `| Field | Value |`. The heading row and the separator are skipped by
         # the field-name match; a value that is the placeholder or blank is a gap.
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
@@ -471,6 +559,103 @@ def check_dor(repo: str, number: int) -> int:
     return 0
 
 
+def contract_message(gaps: list[str]) -> str:
+    """The one comment the event workflow posts (and later updates) on a not-ready body."""
+    lines = [
+        DOR_MARKER,
+        'The issue body does not yet meet `docs/plans/03-DELIVERY.md` § "Issue content contract":',
+        "",
+        *[f"- {gap}" for gap in gaps],
+        "",
+        "Edit the issue; this comment is updated in place, and `status:not-ready` comes off when",
+        "every item is present.",
+    ]
+    return "\n".join(lines)
+
+
+def marked_comment(repo: str, number: int) -> int | None:
+    """The id of the contract comment already on the issue, if any."""
+    try:
+        comments = json.loads(gh("api", f"repos/{repo}/issues/{number}/comments?per_page=100"))
+    except (RuntimeError, json.JSONDecodeError):
+        return None
+    for comment in comments:
+        if (comment.get("body") or "").startswith(DOR_MARKER):
+            return int(comment["id"])
+    return None
+
+
+def mark_not_ready(repo: str, number: int, body: str) -> None:
+    """Apply `status:not-ready` and upsert the one marked comment."""
+    try:
+        gh(
+            "label", "create", DOR_LABEL, "--repo", repo, "--color", "B60205",
+            "--description", "The issue body does not yet meet the content contract",
+        )
+    except RuntimeError:
+        pass  # it already exists; creating it is an idempotent convenience
+    gh("issue", "edit", str(number), "--repo", repo, "--add-label", DOR_LABEL)
+    existing = marked_comment(repo, number)
+    if existing is None:
+        gh("issue", "comment", str(number), "--repo", repo, "--body", body)
+    else:
+        gh("api", "-X", "PATCH", f"repos/{repo}/issues/comments/{existing}", "-f", f"body={body}")
+
+
+def clear_not_ready(repo: str, number: int) -> None:
+    """Remove the label and the marked comment once the body is complete."""
+    try:
+        gh("issue", "edit", str(number), "--repo", repo, "--remove-label", DOR_LABEL)
+    except RuntimeError:
+        pass  # the label was not set
+    existing = marked_comment(repo, number)
+    if existing is not None:
+        try:
+            gh("api", "-X", "DELETE", f"repos/{repo}/issues/comments/{existing}")
+        except RuntimeError:
+            pass
+
+
+def check_contract(repo: str, number: int, apply: bool) -> int:
+    """`--contract N`: the full issue content contract, on the event that changes the body.
+
+    Exit 1 names every missing section/field; exit 0 means the body satisfies the contract. With
+    `--apply` it also sets `status:not-ready` and one marked comment on a gap, and clears both
+    when the body is complete. Forward-only like `--dor`: an issue created before PROGRAMME_SINCE
+    is exempt, and a non-unit issue has no contract requirement.
+    """
+    try:
+        raw = json.loads(
+            gh(
+                "issue", "view", str(number), "--repo", repo,
+                "--json", "number,labels,createdAt,body",
+            )
+        )
+    except (RuntimeError, json.JSONDecodeError) as error:
+        print(f"board: {error}", file=sys.stderr)
+        return 2
+    labels = {label["name"] for label in raw["labels"]}
+    if UNIT not in labels:
+        print(f"#{number}: not a `{UNIT}` issue; no contract requirement.")
+        return 0
+    created = parse_ts(raw["createdAt"]).date()
+    if created < PROGRAMME_SINCE:
+        print(f"#{number}: created {created}, before {PROGRAMME_SINCE}; exempt (forward-only).")
+        return 0
+    gaps = contract_gaps(raw.get("body") or "")
+    if not gaps:
+        if apply:
+            clear_not_ready(repo, number)
+        print(f"#{number}: the issue content contract is complete.")
+        return 0
+    if apply:
+        mark_not_ready(repo, number, contract_message(gaps))
+        print(f"#{number}: not ready — {len(gaps)} gap(s) named in the issue comment.")
+    else:
+        print(f"#{number}: not ready — missing {', '.join(gaps)}")
+    return 1
+
+
 # --------------------------------------------------------------------------- output
 
 
@@ -763,6 +948,70 @@ def self_test() -> int:
                 f"reports {got_reports} != {want_reports})"
             )
 
+    # The issue content contract (#780 P2). The GitHub form renders every field as `### Label`,
+    # so a conforming body must parse at h3 as well as h2, and a part's `### P1` subheading must
+    # not end its section. A missing section or Verify line is named field by field.
+    programme = (
+        "| Field | Value |\n|---|---|\n"
+        "| Tranche | 1 |\n"
+        "| Brief | project-brief-p0 |\n"
+        "| ADM phase/plateau | — (no architecture change) |\n"
+        "| Benefits | enabling — no direct benefit |\n"
+    )
+
+    def contract_body(level: str) -> str:
+        sections = [
+            ("Goal", "One outcome that is true after this lands."),
+            ("Programme", programme),
+            ("References", "| Kind | Reference | Resolves at |\n|---|---|---|"),
+            ("Baseline", "- Code: `main@abc1234`, measured 2026-11-26"),
+            (
+                "Parts and acceptance criteria",
+                "### P1 — the part\n- **P1.1** Given a state, when an act, then an outcome.\n"
+                "  Verify: `true`",
+            ),
+            ("Dependencies", "| Relation | Issue | Why | State |\n|---|---|---|---|"),
+            ("Definition of ready", "- [x] Baseline recorded"),
+            ("Definition of done", "- [ ] One PR `Closes #N` merged"),
+        ]
+        return "\n\n".join(f"{level} {name}\n{text}" for name, text in sections)
+
+    contract_cases = [
+        ("conforming h2 body", contract_body("##"), []),
+        ("conforming issue-form body (h3)", contract_body("###"), []),
+        (
+            "a missing section",
+            contract_body("###").replace("### Baseline", "### Base line"),
+            ["`Baseline` section"],
+        ),
+        (
+            "no Verify line",
+            contract_body("###").replace("Verify:", "verify later"),
+            ["a `Verify:` line"],
+        ),
+        (
+            "an empty Programme value",
+            contract_body("###").replace("| Tranche | 1 |", "| Tranche | — |"),
+            ["`Programme` rows: Tranche"],
+        ),
+        (
+            "an empty section",
+            contract_body("###").replace(
+                "### Baseline\n- Code: `main@abc1234`, measured 2026-11-26", "### Baseline"
+            ),
+            ["`Baseline` section is empty"],
+        ),
+    ]
+    for name, text, wanted in contract_cases:
+        total += 1
+        gaps = contract_gaps(text)
+        joined = "; ".join(gaps)
+        if all(item in joined for item in wanted) and (wanted or not gaps):
+            print(f"ok: contract — {name}")
+        else:
+            failures += 1
+            print(f"FAIL: contract — {name}: gaps {gaps!r}")
+
     # The comment is the only thing a human reads on the issue; it must name its evidence.
     fix = {"number": 149, "branch": "issue/149-work-store", "pr": 150,
            "evidence": ["branch `issue/149-work-store`", "open PR #150"]}
@@ -849,12 +1098,42 @@ def main() -> int:
     parser.add_argument(
         "--dor", type=int, metavar="N", help="check issue N's Programme Definition of ready"
     )
+    parser.add_argument(
+        "--contract",
+        type=int,
+        metavar="N",
+        help="check issue N against the full issue content contract",
+    )
+    parser.add_argument(
+        "--contract-body",
+        metavar="PATH",
+        help="the same contract check over a body file (offline; tests and previews)",
+    )
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="with --contract: set status:not-ready and one marked comment, or clear them",
+    )
     args = parser.parse_args()
 
     if args.self_test:
         return self_test()
+    if args.contract_body is not None:
+        try:
+            with open(args.contract_body, encoding="utf-8") as handle:
+                gaps = contract_gaps(handle.read())
+        except OSError as error:
+            print(f"board: {error}", file=sys.stderr)
+            return 2
+        if gaps:
+            print(f"not ready — missing {', '.join(gaps)}")
+            return 1
+        print("the issue content contract is complete")
+        return 0
     if not args.repo:
-        parser.error("--repo is required unless --self-test")
+        parser.error("--repo is required unless --self-test or --contract-body")
+    if args.contract is not None:
+        return check_contract(args.repo, args.contract, args.apply)
     if args.dor is not None:
         return check_dor(args.repo, args.dor)
 
