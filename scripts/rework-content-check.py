@@ -347,6 +347,12 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
                        f"{label} carries fields the action drops: {', '.join(unknown)}")
                 expect(isinstance(row.get("title"), str) and bool(row["title"].strip()),
                        f"{label} needs a title")
+                # The standard's project-registers document resolves a heading from these rows
+                # and refuses a row whose code is empty (`EMPTY_REGISTER_CODE`). A pack without
+                # codes therefore passed this check and died inside the factory, after the
+                # artefacts were already written (measured on S02, 2026-11-26).
+                expect(isinstance(row.get("code"), str) and bool(row["code"].strip()),
+                       f"{label} needs a code: the registers document refuses an empty code")
                 if kind != "risk":
                     continue
                 expect(isinstance(row.get("probability"), str)
@@ -507,6 +513,7 @@ def self_test() -> None:
         "registers": {
             "risk": [{
                 "title": "Vendor delay on the shared platform",
+                "code": "R-1",
                 "body": "Authored risk statement. " * 4,
                 "probability": "medium",
                 "impact": 4,
@@ -515,10 +522,14 @@ def self_test() -> None:
                           "decisions": []},
                 "meta": {"owner": "the programme architect (conveyor-e2e)"},
             }],
-            "issue": [{"title": "The gate is open", "body": "Authored issue. " * 4}],
-            "assumption": [{"title": "The estate stays reachable", "body": "Authored. " * 4}],
-            "dependency": [{"title": "T2 closes first", "body": "Authored. " * 4}],
-            "benefit": [{"title": "Fewer manual gates", "body": "Authored. " * 4}],
+            "issue": [{"title": "The gate is open", "code": "I-1",
+                       "body": "Authored issue. " * 4}],
+            "assumption": [{"title": "The estate stays reachable", "code": "A-1",
+                            "body": "Authored. " * 4}],
+            "dependency": [{"title": "T2 closes first", "code": "D-1",
+                            "body": "Authored. " * 4}],
+            "benefit": [{"title": "Fewer manual gates", "code": "B-1",
+                         "body": "Authored. " * 4}],
         },
         "delivery_contract": {"title": "Contract", "body": {
             "compliance": "Authored compliance method. " * 4,

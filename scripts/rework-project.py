@@ -1190,14 +1190,33 @@ class Runner:
         existing = self._read(
             "registers.list", {"project_id": self.project_id}
         ).get("items", [])
-        have = {(row.get("kind"), row.get("title")) for row in existing}
+        by_key = {
+            (row.get("kind"), row.get("title")): row for row in existing
+        }
         for kind, items in rows.items():
             for item in items:
                 title = str(item.get("title") or "").strip()
                 if not title:
                     fail(f"registers: a {kind} row has no title")
-                if (kind, title) in have:
-                    print(f"  register {kind}: {title} already present")
+                present = by_key.get((kind, title))
+                if present is not None:
+                    # A row written by an earlier run can carry an empty code; the
+                    # standard's project-registers document refuses it (`EMPTY_REGISTER_CODE`)
+                    # and the close gate then refuses the project. The pack is the authority
+                    # for its authored code, so an empty live code is filled from it
+                    # (measured on S02/S03/T1/T11, 2026-11-26).
+                    code = str(item.get("code") or "").strip()
+                    if code and not str(present.get("code") or "").strip():
+                        self.invoke(
+                            "registers.update",
+                            {"id": present["id"], "code": code},
+                            read_action="registers.get",
+                            read_input={"id": present["id"]},
+                            if_match=present.get("version", 1),
+                        )
+                        print(f"  register {kind}: {title} code set to {code}")
+                    else:
+                        print(f"  register {kind}: {title} already present")
                     continue
                 self.invoke(
                     "registers.create",

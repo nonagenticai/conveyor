@@ -1,0 +1,976 @@
+{
+  "charter": "# Charter — S02 Skeleton (retrospective, 2026-11-26)\n\n- **Project:** S02 'Skeleton — workspace, tenancy, auth, jobs, SSE', track v1, ADM phase G, tranche 1, project `01a1d039-0d27-7b45-abb5-bf851a4c3d4a`, plan `docs/plans/slices/S02-skeleton.md`. The row records `status: active`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: []` and issue 2. It was reopened for the #526 retrospective rework under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** build the one skeleton every later slice inherits — a ten-member workspace, eleven platform tables with forced row-level security, OIDC and dev principals, a fail-closed licence gate, a fenced job lease, a replayable SSE stream and an append-only audit — and prove it through the plan's §7 gate. The retrospective reconstitutes the MSP/TOGAF/SAFe lifecycle record for that delivery: charter, Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review, the project-brief and evidence outputs and the closure review.\n- **Scope:** the workspace, the eleven tables and their RLS policies, the auth boundary, the licence gate, the job runner with claim/renew/finish and reclaim, the SSE stream, the audit and the served contract. Out of scope: domain aggregates (S03), the action registry (S04), board and approval endpoints (S03–S06), the Keycloak realm and deploy (S14), pgvector (S07), the UI (S12) and the git repository itself.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle of a skeleton delivered before the rework, and it does not authorise new work.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework S02 by the reconstituted TOGAF/MSP/SAFe lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the project-brief and evidence outputs. The architecture work is the skeleton itself — one workspace, eleven platform tables, forced RLS, a fenced job lease and a replayable event stream — recorded retrospectively and dated 2026-11-26.",
+      "scope": "In scope: the ten-member workspace (eight crates plus two apps), the eleven platform tables with forced row-level security, OIDC and dev principals, the fail-closed licence gate, the job runner with claim/renew/finish and lease reclaim, the SSE stream with Last-Event-ID resume, the append-only audit, the OpenAPI lock and health/ready. Out of scope: domain aggregates (S03), the action registry (S04), board and approval endpoints (S03–S06), the Keycloak realm (S14), the licences service (D12), cluster deploy and pgbouncer configuration (S14), pgvector/search (S07), the UI (S12) and the git repository itself (CONTRACT §13).",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the seven A–D artefacts and approves them. The programme owner signs the skeleton boundary at the Phase-G review. The S02 executor runs the two-worker lease proof and posts its result on issue #2 before the project is closed. The delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d.",
+      "acceptance_criteria": "The plan's §7 gate is executable and must pass: two tenants isolated under forced RLS including the owner role; login works with a dev principal and production refuses it; a killed worker's job is reclaimed and a stale token writes nothing; the two-worker long-handler proof runs the handler exactly once; SSE replay by Last-Event-ID yields the missing events once each; the audit is append-only for the runtime role; and the licence gate fails closed. acceptance/programme/S02.toml is green against the published snapshot at the recorded SHA, and the rework note records the receipt with zero failures.",
+      "contract": "This statement 01a1ff84-4425-75d9-8772-08e09cf71069 sits under its approval 01a1ff84-57c3-7f67-9229-94bf0188732d, approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee is approved under 01a1ff85-d11f-7c2a-8716-73985ceb94e7, and the Phase-G review 01a1ff87-19a4-783f-85c5-033d5f38cedf is compliant against it. The scope baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 was taken on 2026-11-21 and approved by the same approver. The retrospective record does not re-approve any of these rows; it cites them.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — S02 Skeleton",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the skeleton serves and the engagement each needs while the platform boundary is fixed.",
+      "scope": "The stakeholders of S02 and its signed delivery contract.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme owner",
+          "axis_b": "authorises tranche 1 and accepts the skeleton boundary",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "authors the retrospective record under the #526 delegation",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "reviews and approves the seven A–D artefacts and the contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the S02 executor",
+          "axis_b": "builds the workspace and proves the kill and tenant gates",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "later slices",
+          "axis_b": "S03, S04 and S06 consume the store, auth and API skeleton unchanged",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "tenant administrators",
+          "axis_b": "rely on tenant isolation and on the login path being fail-closed",
+          "value": {
+            "influence": "medium",
+            "interest": "medium",
+            "engagement": "consult"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — S02 Skeleton",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder map — S02 Skeleton\n\n## Metadata\n\nRetrospective matrix for S02, authored 2026-11-26 from the slice plan docs/plans/slices/S02-skeleton.md and the recorded acts in docs/evidence/rework/S02/transcript.jsonl. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nThe matrix places six actors on the influence, interest and engagement axes. The programme owner decides the tranche-1 authorisation and accepts the skeleton boundary; the programme architect is responsible for the retrospective record; the Architecture Board approves the artefact set and the delivery contract. The S02 executor builds the workspace and proves the tenant-isolation and kill gates; later slices consume the store, auth and API surfaces unchanged; tenant administrators depend on isolation and fail-closed login being real rather than declared.\n\n## Links\n\nThe matrix carries one typed edge to the requirements catalog as a dependency, because what the stakeholders need from the skeleton is fixed by the ten requirements that follow. No artefact is an orphan: every other document in this pack names at least one sibling, and the solution concept realizes the requirements catalog that this edge points at.\n\n## Document\n\nThe document is the stakeholder page the artefact standard reads. It is retrospective and dated 2026-11-26: it records the actors of a skeleton delivered before the rework, not a new engagement. The engagement values are the ones the plan's §3 scope and §7 gate imply, and the named consumers are the slices the plan says inherit the skeleton without a fork.\n"
+    },
+    {
+      "title": "Driver/goal/objective — S02 Skeleton",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Record the drivers, goals and objectives that justify the skeleton and make its scope testable.",
+      "scope": "The drivers and goals behind S02's tenancy, auth, job and event boundary.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D2 — one product serves many tenants",
+          "axis_b": "a per-tenant fork is not affordable or auditable",
+          "value": {
+            "goal": "isolation by construction",
+            "objective": "forced RLS on every tenant table"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D4 — long agent work must survive a worker death",
+          "axis_b": "a lost job is invisible work and a lost lease is duplicate work",
+          "value": {
+            "goal": "exactly-once long jobs",
+            "objective": "lease renewal and reclaim"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D6 — the UI must replay what happened",
+          "axis_b": "a reconnect must not lose or duplicate an event",
+          "value": {
+            "goal": "replayable realtime",
+            "objective": "SSE with Last-Event-ID"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R6 — a licence must fail closed",
+          "axis_b": "an unlicensed tenant must not reach a billable call",
+          "value": {
+            "goal": "fail-closed entitlement",
+            "objective": "403 problem+json when the row is absent"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R8 — the audit is append-only",
+          "axis_b": "a mutable audit cannot support a decision record",
+          "value": {
+            "goal": "append-only evidence",
+            "objective": "no UPDATE or DELETE for the runtime role"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the platform boundary must be stable for later slices",
+          "axis_b": "S03, S04 and S06 must not re-litigate the skeleton",
+          "value": {
+            "goal": "one skeleton, reused",
+            "objective": "eleven platform tables and five crates"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — S02 Skeleton",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/goal/objective — S02 Skeleton\n\n## Metadata\n\nRetrospective catalog for S02, authored 2026-11-26 from the slice plan and the delivered workspace. Phase a, plateau psa, kind catalog; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nSix drivers anchor the skeleton. Two tenants must share one product without a fork, so isolation is forced in the database rather than remembered in the application. Long agent work must survive a worker death, so the job lease is renewed and reclaimed rather than trusted. The UI must replay what happened, so the event stream is ordered and resumable. A licence must fail closed, and the audit must stay append-only, because both are decision evidence. The sixth driver is the programme's: the boundary must be stable enough that S03, S04 and S06 build on it instead of reopening it.\n\n## Links\n\nThe catalog derives from the stakeholder map, because each driver exists to serve a named actor. The requirements catalog derives from this catalog in turn, so the chain stakeholder → driver → requirement → solution is unbroken. The objectives are phrased as testable outcomes, which is why the requirements that follow can each name a gate rather than an intention.\n\n## Document\n\nThe document records the drivers as the plan's §1 objective and §3 scope state them, dated to the retrospective. It does not invent a new driver: the six are the plan's own reasons for the eleven tables, the five crates and the two apps. The objectives are the ones the §7 gate can fail, which is the property that makes this catalog useful rather than decorative.\n"
+    },
+    {
+      "title": "Requirements catalog — S02 Skeleton",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Fix the ten requirements the skeleton must satisfy and the gate each one is accepted by.",
+      "scope": "The functional and quality requirements of the S02 workspace, tenancy, auth, jobs and SSE boundary.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "REQ-S02-01 — eleven platform tables",
+          "axis_b": "tenant, app_user, membership, department, event, job, schedule, audit_event, action_invocation, idempotency_key and app_licence exist with forced RLS",
+          "value": {
+            "gate": "plan §7 tenant isolation"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "REQ-S02-02 — forced row-level security",
+          "axis_b": "the owner role also sees zero rows across tenants",
+          "value": {
+            "gate": "FORCE ROW LEVEL SECURITY"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "REQ-S02-03 — OIDC and dev principals",
+          "axis_b": "a bearer dev principal works in dev; production refuses the dev path",
+          "value": {
+            "gate": "login works"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "REQ-S02-04 — fail-closed licence",
+          "axis_b": "an absent or unknown licence row returns 403 problem+json",
+          "value": {
+            "gate": "licence fail-closed"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "REQ-S02-05 — job claim with a lease",
+          "axis_b": "claim, renew and finish are fenced by the claim token",
+          "value": {
+            "gate": "stale token writes nothing"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "REQ-S02-06 — kill and reclaim",
+          "axis_b": "a SIGKILL mid-handler is reclaimed after lease expiry with attempts incremented",
+          "value": {
+            "gate": "job survives a kill"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "REQ-S02-07 — two-worker long handler",
+          "axis_b": "a handler outliving the lease runs exactly once while two workers poll",
+          "value": {
+            "gate": "import → invoke → restart proof, issue #2 P2"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "REQ-S02-08 — SSE replay",
+          "axis_b": "reconnect with Last-Event-ID yields the missing events once each in sequence order",
+          "value": {
+            "gate": "SSE replay"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "REQ-S02-09 — append-only audit",
+          "axis_b": "the runtime role cannot UPDATE or DELETE audit_event",
+          "value": {
+            "gate": "audit append-only"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "REQ-S02-10 — contract and health surface",
+          "axis_b": "the OpenAPI lock matches the served contract and health/ready reports readiness",
+          "value": {
+            "gate": "openapi lock and health"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — S02 Skeleton",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements catalog — S02 Skeleton\n\n## Metadata\n\nRetrospective catalog for S02, authored 2026-11-26. Phase a, plateau psa, kind catalog; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a. Each requirement names the gate that can fail it.\n\n## Entries\n\nTen requirements cover the skeleton. The first two make tenancy structural: eleven tables and forced row-level security, including the owner role. The next two make identity and entitlement fail closed: OIDC with a dev path that production refuses, and a licence row whose absence is a typed refusal. The job requirements are the core of issue #2: claim with a fenced lease, kill and reclaim, and the two-worker proof that a long handler runs exactly once. The last three make the surface observable and honest: SSE replay by Last-Event-ID, an append-only audit, and a served contract that matches its committed lock.\n\n## Links\n\nThe catalog derives from the driver/goal/objective catalog: every requirement is traceable to one of the six drivers. The solution concept realizes this catalog, and the data entity catalog names the tables the first requirement fixes. The acceptance manifest acceptance/programme/S02.toml is the executable form of these ten gates, so the requirement set and the verifier cannot drift silently.\n\n## Document\n\nThe document records the requirements as the plan's §5 deliverables and §7 gate state them, dated to the retrospective. It adds no requirement the plan does not already carry, and it removes none: the two-worker proof is issue #2's P2 and is listed explicitly rather than folded into the generic kill gate. That separation matters, because the kill proof and the long-handler proof fail for different reasons.\n"
+    },
+    {
+      "title": "Solution concept — S02 Skeleton",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components and edges of the skeleton and how each requirement is realized by them.",
+      "scope": "The component and deployment picture of the conveyor skeleton.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "conveyor binary (serve | migrate | worker | admin)",
+          "axis_b": "serves, migrates, runs jobs and administers",
+          "value": {
+            "kind": "process",
+            "realizes": "REQ-S02-03, REQ-S02-10"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "crates/store",
+          "axis_b": "pool, scope, migrator, outbox, jobs, audit, idempotency",
+          "value": {
+            "kind": "crate",
+            "realizes": "REQ-S02-01, REQ-S02-02, REQ-S02-05"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "crates/auth",
+          "axis_b": "JWKS, dev principal, licence extractor",
+          "value": {
+            "kind": "crate",
+            "realizes": "REQ-S02-03, REQ-S02-04"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "crates/api",
+          "axis_b": "health, request id, problem+json, /api/events, /metrics",
+          "value": {
+            "kind": "crate",
+            "realizes": "REQ-S02-08, REQ-S02-10"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "apps/server",
+          "axis_b": "subcommands and --print-openapi",
+          "value": {
+            "kind": "app",
+            "realizes": "REQ-S02-10"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Postgres 18",
+          "axis_b": "the record of every aggregate, with forced RLS",
+          "value": {
+            "kind": "store",
+            "realizes": "REQ-S02-01, REQ-S02-02"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Redis Streams",
+          "axis_b": "the bus that nudges the worker; Postgres remains the record",
+          "value": {
+            "kind": "bus",
+            "realizes": "REQ-S02-08"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Keycloak",
+          "axis_b": "the OIDC issuer S02 consumes, never configures",
+          "value": {
+            "kind": "external",
+            "realizes": "REQ-S02-03"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "licences service",
+          "axis_b": "the licence row the gate reads",
+          "value": {
+            "kind": "external",
+            "realizes": "REQ-S02-04"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "job runner",
+          "axis_b": "claims, renews and finishes with a fenced token",
+          "value": {
+            "kind": "component",
+            "realizes": "REQ-S02-05, REQ-S02-06, REQ-S02-07"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "SSE stream",
+          "axis_b": "ordered event delivery with Last-Event-ID resume",
+          "value": {
+            "kind": "component",
+            "realizes": "REQ-S02-08"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "audit writer",
+          "axis_b": "append-only rows owned by the runtime role",
+          "value": {
+            "kind": "component",
+            "realizes": "REQ-S02-09"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — S02 Skeleton",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution concept — S02 Skeleton\n\n## Metadata\n\nRetrospective diagram for S02, authored 2026-11-26. Phase a, plateau psa, kind diagram; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nTwelve components and edges describe the skeleton. One binary exposes four subcommands and serves the API; five crates divide the store, auth, API, domain and error surfaces; two apps reserve the web and server edges. Postgres 18 is the record and the only place tenancy is enforced; Redis Streams is a nudge, not a second record; Keycloak and the licences service are consumed, never configured here. The job runner and the SSE stream are the two stateful components the gates exercise, and the audit writer is the append-only edge every decision depends on.\n\n## Links\n\nThe diagram realizes the requirements catalog: each component names the requirements it carries, and each requirement has at least one component. It derives from the business capability map in the next phase, because the capabilities are what the components exist to provide. The data entity catalog names the rows these components read and write, so the component picture and the data picture cannot tell different stories.\n\n## Document\n\nThe document records the solution as the plan's §5 deliverables describe it. The retrospective makes one boundary explicit: the worker is a process over the same binary and the same database, not a separate service, so a restart is a process restart and the lease is the only coordination primitive. That is the design the kill and two-worker proofs exercise, and it is why the proofs can run as real child processes against a real Postgres.\n"
+    },
+    {
+      "title": "Business capability map — S02 Skeleton",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the business capabilities the skeleton provides and the outcome each enables.",
+      "scope": "The capability view of the S02 boundary.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Tenancy isolation",
+          "axis_b": "one product serves many tenants without a fork",
+          "value": {
+            "level": 1,
+            "outcome": "no cross-tenant read or write"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Identity and access",
+          "axis_b": "a principal is authenticated and attributed",
+          "value": {
+            "level": 1,
+            "outcome": "login works and a stranger is refused"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Job execution",
+          "axis_b": "long work runs exactly once and survives a death",
+          "value": {
+            "level": 1,
+            "outcome": "lease, renew, reclaim"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Realtime events",
+          "axis_b": "a client can resume without loss or duplication",
+          "value": {
+            "level": 1,
+            "outcome": "ordered replay by Last-Event-ID"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Audit and evidence",
+          "axis_b": "every decision leaves an append-only row",
+          "value": {
+            "level": 1,
+            "outcome": "no mutation of the audit"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Entitlement enforcement",
+          "axis_b": "a licence gates the billable path",
+          "value": {
+            "level": 1,
+            "outcome": "fail closed when the row is absent"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Operability",
+          "axis_b": "the service reports health and a served contract",
+          "value": {
+            "level": 2,
+            "outcome": "health/ready and the OpenAPI lock"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — S02 Skeleton",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — S02 Skeleton",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Business capability map — S02 Skeleton\n\n## Metadata\n\nRetrospective diagram for S02, authored 2026-11-26. Phase b, plateau hld, kind diagram; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nSeven capabilities make the skeleton a platform rather than a crate pile. Tenancy isolation and identity are the entry capabilities; job execution and realtime events are the runtime capabilities the gates exercise; audit, entitlement and operability are the trust capabilities that make the rest safe to expose. Each capability names the outcome it enables, so a later slice can ask which capability it consumes instead of which function it calls.\n\n## Links\n\nThe map derives from the solution concept and from the requirements catalog: every capability is carried by named components and every requirement falls under a capability. The data entity catalog derives from this map, because the rows exist to serve the capabilities. This is the chain the Architecture Board reviews: stakeholder → driver → requirement → component → capability → data.\n\n## Document\n\nThe document records the capability view as the plan's §3 scope and §5 deliverables imply it. The retrospective states one limit: operability is level 2, not level 1, because S02 ships health and metrics but not the dashboards or alerts that S14 and T11 own. That distinction keeps the map from claiming a monitoring capability the skeleton does not deliver.\n"
+    },
+    {
+      "title": "Data entity catalog — S02 Skeleton",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the eleven platform entities and the tenancy rule each carries.",
+      "scope": "The data entities and components of the S02 record.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "tenant",
+          "axis_b": "the root aggregate; no RLS above it",
+          "value": {
+            "tenancy": "root",
+            "key": "id uuid PK, slug unique"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "app_user",
+          "axis_b": "a principal, human or machine",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id uuid PK, kind"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "membership",
+          "axis_b": "a user's role in a tenant or department",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "user_id, role"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "department",
+          "axis_b": "an optional grouping inside a tenant",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id uuid PK"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "event",
+          "axis_b": "the outbox and the SSE source",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "seq, topic, payload"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "job",
+          "axis_b": "the unit of leased work",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id, kind, status, lease_expires_at"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "schedule",
+          "axis_b": "a future job",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id, run_at"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "audit_event",
+          "axis_b": "the append-only decision record",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id, action, actor"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "action_invocation",
+          "axis_b": "one call and its outcome",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "id, action, status"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "idempotency_key",
+          "axis_b": "the replay guard",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "key, response"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "app_licence",
+          "axis_b": "the entitlement row the gate reads",
+          "value": {
+            "tenancy": "tenant_id",
+            "key": "tenant_id, status"
+          },
+          "position": 11
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — S02 Skeleton",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — S02 Skeleton",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Data entity catalog — S02 Skeleton\n\n## Metadata\n\nRetrospective catalog for S02, authored 2026-11-26. Phase c, plateau hld, kind catalog; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nEleven tables carry the skeleton. Tenant is the root and carries no row-level security because it is the aggregate the rest hang from; every other table carries tenant_id and a forced policy. Event is both the outbox and the SSE source, so its sequence is the resume key. Job is the leased unit, with status, attempts and lease_expires_at as the columns the proofs read. Audit and action_invocation are the evidence tables; idempotency_key is the replay guard; app_licence is the entitlement row the gate reads.\n\n## Links\n\nThe catalog derives from the capability map and from the solution concept: every table serves a named capability and is read or written by a named component. The technology standards record the engine, the role model and the policy shape these tables require. The tenancy column is the join between this catalog and the RLS requirement, which is why the two are reviewed together.\n\n## Document\n\nThe document records the data entities as the plan's §5 deliverables fix them: exactly eleven platform tables, not a table per feature. The retrospective adds the tenancy rule each row carries, because that rule is what makes the catalog auditable: a table without tenant_id would be a hole in the isolation gate, and naming it here makes the hole visible before it is built.\n"
+    },
+    {
+      "title": "Technology standards — S02 Skeleton",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Fix the technology standards the skeleton is built to, so later slices inherit one stack.",
+      "scope": "The language, database, transport and contract standards of S02.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later slices S03, S04 and S06",
+          "tenant administrators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Rust 2024, unsafe forbidden",
+          "axis_b": "memory safety is a build property, not a review habit",
+          "value": {
+            "source": "workspace lint table"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "sqlx with Postgres 18",
+          "axis_b": "typed queries and one supported engine; no ORM",
+          "value": {
+            "source": "crates/store"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "forced row-level security",
+          "axis_b": "the owner role is subject to the policy too",
+          "value": {
+            "source": "migrations/0001_platform.sql"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Redis Streams as a nudge",
+          "axis_b": "Postgres is the record; the bus may be lost and replayed",
+          "value": {
+            "source": "event outbox relay"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "axum and RFC 9457 problem+json",
+          "axis_b": "one error shape across HTTP",
+          "value": {
+            "source": "crates/api"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "committed OpenAPI lock",
+          "axis_b": "a served contract that drifts from the lock must not publish",
+          "value": {
+            "source": "served-spec.lock.json"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "tracing and metrics",
+          "axis_b": "one request id, one metric surface",
+          "value": {
+            "source": "crates/api"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "docker compose for the developer loop",
+          "axis_b": "one command starts the dev stack",
+          "value": {
+            "source": "compose.yaml"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — S02 Skeleton",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Technology standards — S02 Skeleton\n\n## Metadata\n\nRetrospective catalog for S02, authored 2026-11-26. Phase d, plateau hld, kind catalog; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nEight standards make the skeleton reproducible. Rust 2024 with unsafe forbidden and sqlx over Postgres 18 are the language and engine choices; forced row-level security is the policy standard the data catalog depends on. Redis Streams is deliberately a nudge rather than a record, and the OpenAPI lock is deliberately a gate rather than a document. Axum with RFC 9457, tracing and metrics, and a one-command compose loop complete the developer and operator surfaces.\n\n## Links\n\nThe standards derive from the data entity catalog: the engine, the role model and the policy shape exist because the eleven tables require them. The solution concept realizes these standards in its components. This is the last artefact of the set, so it closes the chain that began at the stakeholder map; every earlier artefact is reachable from here through the links.\n\n## Document\n\nThe document records the standards as the plan's §4 source material and §5 deliverables state them. The retrospective marks one standard as load-bearing for the proofs: the lease is a database row with an expiry, not an in-memory timer, which is why a killed worker's work can be reclaimed by another process. That is a technology choice with a testable consequence, not a preference.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S02 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — S02 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for S02 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder map, the Driver/goal/objective catalog, the Requirements catalog and the Solution concept at phase a, plateau psa, and the Business capability map, the Data entity catalog and the Technology standards at phases b, c and d, plateau hld. Each is an approved row with a body dated 2026-11-26; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: the Stakeholder map (matrix), the Driver/goal/objective catalog (catalog), the Requirements catalog (catalog), the Solution concept (diagram), the Business capability map (diagram), the Data entity catalog (catalog) and the Technology standards (catalog). Each carries its own entries: six stakeholders, six drivers, ten requirements, twelve components and edges, seven capabilities, eleven entities and eight standards.\n\n## Links\n\nThe typed edges are: the driver catalog derives from the stakeholder map; the requirements catalog derives from the driver catalog; the solution concept realizes the requirements catalog; the capability map derives from the solution concept and the requirements catalog; the data entity catalog derives from the capability map and the solution concept; and the technology standards derive from the data entity catalog. Every edge names another artefact of this pack, so no artefact is an orphan.\n\n## Document\n\nThe index is the architecture-artifact page the artefact standard reads. The seven artefact documents were first recorded in the 2026-11-21 retrospective and are re-authored here as the 2026-11-26 set, because the replay record did not retain the artefact rows from the earlier attempt while it did retain the contracts, the review and the baseline. This index therefore describes the current pack, not the earlier one, and it is the page a reader should treat as the artefact inventory for S02.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The replay record lost the artefact rows, so a re-creation could duplicate a surviving row",
+        "body": "The snapshot carries the S02 contracts, review, baseline and published documents but zero artefact rows. This pack re-creates the seven A–D artefacts, and the check before the run is that no row with the same title and phase survives; if one does, the factory must link it rather than create a duplicate. The risk is recorded because the earlier 2026-11-21 attempt is visible in the transcript while its artefact rows are not visible in the record.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/S02/transcript.jsonl",
+            "acceptance/programme/S02.toml"
+          ],
+          "decisions": []
+        },
+        "code": "R-S02-01"
+      },
+      {
+        "title": "The two-worker lease proof is timing-sensitive and could flake under load",
+        "body": "The proof holds one handler past a two-second lease while a second worker polls. It is a real child-process test against a real Postgres, so it is honest, but it depends on the handler outliving the lease reliably. The risk is a false red under heavy machine load, not a false green; the response is to re-run in isolation rather than to loosen the assertion.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the S02 executor"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "apps/server/tests/jobs_lease_two_workers.rs",
+            "issue #2 P2"
+          ],
+          "decisions": []
+        },
+        "code": "R-S02-02"
+      },
+      {
+        "title": "The rework could close S02 while issue #2 still reads open",
+        "body": "The acceptance manifest pins S02 to closed, so the batch would close it without consulting the open issue. That is why the order is proof first, then the issue comment and close, then the project run: a closure that contradicts its own linked issue is the exact fake green this rework exists to prevent.",
+        "status": "open",
+        "severity": "high",
+        "probability": "low",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "issue #2",
+            "acceptance/programme/S02.toml"
+          ],
+          "decisions": []
+        },
+        "code": "R-S02-03"
+      }
+    ],
+    "issue": [
+      {
+        "title": "Issue #2 was open at the start of the rework although its P2 test was already written",
+        "body": "The issue's current-state table, measured 2026-11-11, still says P2 is absent, but the lane carries apps/server/tests/jobs_lease_two_workers.rs in commit d367a4a9. The issue is stale, not the code. The rework runs the test, records the result on the issue and closes it; it does not close it on the strength of the file existing.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the S02 executor"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "issue #2",
+            "commit d367a4a9"
+          ],
+          "decisions": []
+        },
+        "code": "I-S02-01"
+      },
+      {
+        "title": "The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row",
+        "body": "Act 3 of the earlier transcript sets closure_outputs to closure-review, yet the current project meta carries an empty list. The pack declares the closure review again through the factory rather than by editing the row, so the record and the evidence agree after the run.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/S02/transcript.jsonl"
+          ],
+          "decisions": []
+        },
+        "code": "I-S02-02"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The scope baseline taken on 2026-11-21 still describes S02's boundary",
+        "body": "The baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 is approved and the rework adds no scope: the artefacts, registers and closure describe the same eleven tables, five crates and two apps. If the plan's scope had changed, the baseline would need a change request before this pack could cite it.",
+        "status": "open",
+        "severity": "low",
+        "probability": "low",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S02-skeleton.md"
+          ],
+          "decisions": []
+        },
+        "code": "A-S02-01"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "S00's signed parity inventory fixes the surfaces S02 must expose",
+        "body": "S02 consumes S00's parity ids as the authoritative list of surfaces; a function not on that list is not built here. The dependency is a needs edge in the project meta and is the reason S02 follows S00 in tranche 1 rather than running beside it.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "low",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "parity/parity.yaml",
+            "docs/plans/slices/S02-skeleton.md"
+          ],
+          "decisions": []
+        },
+        "code": "D-S02-01"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "The skeleton makes every later slice inherit isolation instead of re-implementing it",
+        "body": "Eleven tables with forced RLS and one auth boundary mean S03, S04 and S06 add aggregates and actions, not tenancy. The benefit is measured by the absence of a per-slice tenancy implementation and by the tenant-isolation gate continuing to pass on every later snapshot.",
+        "status": "open",
+        "severity": "low",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme owner"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "acceptance/programme/S02.toml"
+          ],
+          "decisions": []
+        },
+        "code": "B-S02-01"
+      },
+      {
+        "title": "The two-worker proof turns the lease policy from a declaration into evidence",
+        "body": "The lease is the only coordination primitive between workers, and the proof shows a long handler runs exactly once while a second worker polls. That is the evidence the kill gate alone cannot give: a reclaimed job proves liveness, not exactly-once.",
+        "status": "open",
+        "severity": "low",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme owner"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "apps/server/tests/jobs_lease_two_workers.rs",
+            "issue #2"
+          ],
+          "decisions": []
+        },
+        "code": "B-S02-02"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — S02 Skeleton (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Deliver one skeleton: a ten-member workspace, eleven platform tables with forced row-level security, OIDC and dev principals, a fail-closed licence gate, a fenced job lease with reclaim, a replayable SSE stream, an append-only audit and a served contract pinned by the OpenAPI lock. Every later slice consumes these surfaces unchanged; no slice forks tenancy or auth.",
+      "compliance": "The Phase-G review 01a1ff87-19a4-783f-85c5-033d5f38cedf records the level compliant against this contract, and the rework note records the receipt green with zero failures on a fresh snapshot. No waiver is recorded. The contract does not claim the P4 live upstreams, which the programme tracks separately.",
+      "approval": "The delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 under approval 01a1ff85-d11f-7c2a-8716-73985ceb94e7; the approver is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The Phase-G review 01a1ff87-19a4-783f-85c5-033d5f38cedf cites this contract, and the scope baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 (kind scope, taken 2026-11-21) was approved by the same approver. The Statement of Architecture Work 01a1ff84-4425-75d9-8772-08e09cf71069 sits under its own approval 01a1ff84-57c3-7f67-9229-94bf0188732d.",
+      "capacity": "The unit is one WBS deliverable, accepted with WSJF inputs business value 8, time criticality 8, risk reduction 8 and job size 13. The work runs as the plan's build order over the workspace, the eleven tables, the auth boundary, the job runner, the event stream and the audit; each step is testable on its own before the next.",
+      "acceptance": "Acceptance is executable: acceptance/programme/S02.toml runs the project, baseline, charter, closure-outputs, contract, review, waivers, PI cadence, PI plan, PI objectives, WSJF, demo credits, lessons, product, artefact-standard and rework checks on a published snapshot. The kill and two-worker proofs are the load-bearing evidence; the tenant-isolation and SSE gates are the boundary. A receipt is the only thing that calls the project green.",
+      "evidence": "The evidence route is the acceptance manifest, the receipt docs/evidence/rework/S02.json, the transcript docs/evidence/rework/S02/transcript.jsonl, the two-worker test apps/server/tests/jobs_lease_two_workers.rs, and the published project-brief and evidence outputs. The artefact documents are the seven A–D pages and their index.",
+      "manifest": "acceptance/programme/S02.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The skeleton and its tenant, job and event proof",
+    "business_value": 8,
+    "time_criticality": 8,
+    "risk_reduction": 8,
+    "job_size": 13
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff87-19a4-783f-85c5-033d5f38cedf is compliant against the delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee, the contract is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 rather than the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, and the scope baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 is approved. The skeleton's own gate is the plan's §7: two tenants isolated under forced RLS, login, the kill and two-worker lease proofs, SSE replay, the append-only audit and the fail-closed licence. The rework adds the seven A–D artefacts, the registers and the closure review that the earlier attempt left unretained; it does not re-open the boundary. scripts/verify-project.py --project S02 --snapshot <fresh> is the receipt that must be green with zero failures.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff87-19a4-783f-85c5-033d5f38cedf",
+      "delivery_contract": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+      "scope_baseline": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+      "acceptance_manifest": "acceptance/programme/S02.toml",
+      "rework_note": "docs/evidence/rework/S02/transcript.jsonl"
+    }
+  },
+  "project_brief_output": "# Project brief — S02 Skeleton (retrospective, 2026-11-26)\n\n## Outcome\n\nOne skeleton that every later slice inherits: a ten-member Rust workspace, eleven platform tables with forced row-level security, OIDC and dev principals, a fail-closed licence gate, a fenced job lease that survives a worker death, a replayable SSE stream and an append-only audit. The outcome is proven by the plan's §7 gate, not asserted: the tenant-isolation, kill, two-worker, replay, audit and licence proofs each have a command.\n\n## Boundary\n\nIn: the workspace and its two apps, the eleven platform tables, the auth and licence boundary, the job runner and the SSE stream, the audit, health and the served contract. Out: domain aggregates (S03), the action registry (S04), board and approval screens (S03–S06), the Keycloak realm and deploy (S14), pgvector (S07), the UI (S12) and the git repository itself.\n\n## Reuse sources\n\nThe plan names three local sources: template-rust-service at 0c7396a, agent at 83b8de7 and strata_rag at b9426c3. The skeleton reuses their workspace, pool and migrator patterns and their test-harness shape; it does not vendor them. SQLx, axum and the problem+json error shape are the shared stack.\n\n## Inception units\n\nS00's signed parity inventory is the surface list; S01's UI ADR reserves apps/web without building it. The eleven tables and five crates are the inception units S03, S04 and S06 consume unchanged.\n\n## Dependencies\n\nS00 (needs) fixes the surfaces; Postgres 18 is the record; Redis Streams is the nudge; Keycloak is the OIDC issuer S02 consumes; the licences service supplies the entitlement row. None of these is configured here.\n\n## Acceptance\n\nacceptance/programme/S02.toml is the executable acceptance: project closed, approved baseline, charter asset and approved charter gate, declared closure outputs, board-approved delivery contract, compliant Phase-G review distinct from the requester, no expired waiver, PI cadence/plan/objectives, WSJF on the WBS deliverable, a demo credit, a lesson, no open P0 package, the artefact standard and the rework package. The receipt is docs/evidence/rework/S02.json.\n\n## Capabilities\n\nTenancy isolation, identity and access, job execution, realtime events, audit and evidence, entitlement enforcement and operability. Each is carried by named components and named tables, and each has a gate.\n\n## Plan\n\ndocs/plans/slices/S02-skeleton.md: steps 0–14 from the workspace through the tables, auth, jobs, SSE, audit and the served contract. The retrospective re-reads them as delivered; the two-worker proof is the one step the earlier issue left open and this rework closes.\n",
+  "evidence_output": "# Evidence — S02 Skeleton (retrospective, 2026-11-26)\n\n## Claim\n\nS02 is closed on the plan's §7 gate: two tenants are isolated under forced RLS including the owner role; login works with a dev principal and production refuses it; a killed worker's job is reclaimed and a stale token writes nothing; a long handler runs exactly once while two workers poll; SSE replay by Last-Event-ID is ordered and complete; the audit is append-only; and the licence gate fails closed. The seven A–D artefacts, the registers, the delivery contract and the closure review are published in the record.\n\n## Evidence\n\nThe acceptance manifest acceptance/programme/S02.toml; the receipt docs/evidence/rework/S02.json; the transcript docs/evidence/rework/S02/transcript.jsonl; the two-worker test apps/server/tests/jobs_lease_two_workers.rs at commit d367a4a9; the kill test apps/server/tests/jobs_kill.rs; the store job tests crates/store/tests/jobs.rs; and the seven artefact documents plus their index.\n\n## Verification\n\nRun scripts/verify-project.py --project S02 --snapshot <fresh> --kind all. It must exit 0 with zero failures on a published snapshot at the recorded SHA. The two-worker proof runs through the cargo build guard because it compiles and starts its own Postgres 18; the result is posted on issue #2 before the project closes.\n\n## Links\n\nProject 01a1d039-0d27-7b45-abb5-bf851a4c3d4a; delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee; review 01a1ff87-19a4-783f-85c5-033d5f38cedf; scope baseline 01a1ff85-faae-7c2e-b897-fe957985ca78; delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; acceptance/programme/S02.toml.\n\n## Gap\n\nThe replay record did not retain the artefact rows from the 2026-11-21 attempt, so this pack re-creates them; the contracts, review, baseline and published documents survived. The two-worker proof is timing-sensitive and is re-run in isolation if the machine is loaded. No other gap is claimed: the P4 live upstreams belong to a later slice and are not part of S02's gate.\n",
+  "closure": "# Closure — S02 Skeleton (retrospective, 2026-11-26)\n\nS02 re-closes through the one gate on the record the snapshot carries: the board-approved delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee, the approved scope baseline 01a1ff85-faae-7c2e-b897-fe957985ca78, the compliant Phase-G review 01a1ff87-19a4-783f-85c5-033d5f38cedf and the seven A–D artefacts approved by the board. The closure records the skeleton the plan's §7 gate describes: eleven platform tables with forced RLS, OIDC and dev principals, the fail-closed licence gate, the fenced job lease with reclaim, the two-worker long-handler proof, the SSE replay, the append-only audit and the served contract pinned by the OpenAPI lock. It records that issue #2's P2 proof was run and closed before this closure, and that the acceptance manifest is green with zero failures on a fresh snapshot. The boundary is unchanged from the scope baseline; the retrospective adds the record, it does not add scope.\n",
+  "closure_review": "# Closure review — S02 Skeleton (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe charter's outcome is one skeleton every later slice inherits, and the acceptance the record carries matches it. The plan's §7 gate is covered: two tenants isolated under forced RLS including the owner role; login with a dev principal and production refusal; a killed worker reclaimed with a stale token writing nothing; the two-worker long-handler proof; SSE replay by Last-Event-ID; the append-only audit; and the fail-closed licence. The delivery contract 01a1ff85-bda3-7671-a5b1-42eae3b0e6ee is approved, the baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 is approved, and the review 01a1ff87-19a4-783f-85c5-033d5f38cedf is compliant against the contract.\n\n## Evidence\n\nThe receipt docs/evidence/rework/S02.json is green with zero failures on a published snapshot; the acceptance manifest acceptance/programme/S02.toml is the executable form of the gate; the transcript docs/evidence/rework/S02/transcript.jsonl records the acts; the two-worker test apps/server/tests/jobs_lease_two_workers.rs at d367a4a9 is the proof issue #2 demanded; and the seven artefact documents plus their index are the published architecture record.\n\n## Open items\n\nIssue #2 closes when the two-worker proof's result is posted on it, before this closure; if the proof is red, this closure does not run. The replay record did not retain the artefact rows from the earlier attempt, so this pack re-creates them; the risk is recorded in the register. The P4 live upstreams are not part of S02's gate and remain with the later slice that owns them. No waiver is recorded.\n\n## Decision\n\nClose S02. The boundary is delivered and proven, the artefacts and contract are published, the Phase-G review is compliant, and the remaining items are named rather than waived. The closure is retrospective and dated 2026-11-26; it records a deliverable completed before the rework and does not authorise new work.\n"
+}
