@@ -1,8 +1,176 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T11:25:19.603151696+00:00",
+  "generated_at": "2026-11-26T13:34:11Z",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 756,
+        "state": "OPEN",
+        "title": "design: provenance on every output page and a declared-vs-evidenced register",
+        "updatedAt": "2026-11-26T13:33:10Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/756"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 755,
+        "state": "OPEN",
+        "title": "programme: the retrospective tranche reviews — close tranches 3–12 and authorise tranches 4–13",
+        "updatedAt": "2026-11-26T13:24:31Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/755"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 754,
+        "state": "OPEN",
+        "title": "ops: strict-green live publish — reconcile the ledger to the live P0/P1 set",
+        "updatedAt": "2026-11-26T13:25:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/754"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 753,
+        "state": "OPEN",
+        "title": "skills: six programme delivery-role playbooks and role routing",
+        "updatedAt": "2026-11-26T13:22:27Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/753"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 746,
+        "state": "OPEN",
+        "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
+        "updatedAt": "2026-11-26T13:18:26Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/746"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 745,
+        "state": "CLOSED",
+        "title": "add: SPEC §10.4 — the four missing analyse.* actions (app, brand, content, report)",
+        "updatedAt": "2026-11-26T12:22:37Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/745"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 744,
+        "state": "OPEN",
+        "title": "add: the proof store, proofs actions and the lean_proof gate evidence",
+        "updatedAt": "2026-11-26T13:09:31Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/744"
+      },
+      {
+        "labels": [
+          {
+            "color": "d73a4a",
+            "name": "bug"
+          },
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          }
+        ],
+        "number": 738,
+        "state": "CLOSED",
+        "title": "fix: the Procedures loader must not settle empty while the capability manifest is still loading",
+        "updatedAt": "2026-11-25T13:54:08Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/738"
+      },
       {
         "labels": [
           {
@@ -23,9 +191,9 @@
           }
         ],
         "number": 734,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "docs: S21's records state step 11 merged, and its migration as 0074",
-        "updatedAt": "2026-11-25T11:12:27Z",
+        "updatedAt": "2026-11-25T11:55:49Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/734"
       },
       {
@@ -78,9 +246,9 @@
           }
         ],
         "number": 726,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
-        "updatedAt": "2026-11-25T11:15:03Z",
+        "updatedAt": "2026-11-25T12:09:03Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/726"
       },
       {
@@ -450,7 +618,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-25T11:22:11Z",
+        "updatedAt": "2026-11-26T12:52:59Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -636,9 +804,9 @@
           }
         ],
         "number": 630,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-25T10:52:41Z",
+        "updatedAt": "2026-11-25T12:27:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {
@@ -1519,7 +1687,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-25T09:46:08Z",
+        "updatedAt": "2026-11-26T13:15:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -5778,12 +5946,16 @@
           {
             "color": "1D76DB",
             "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 24,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "docs: land SPEC V2 — the organisational operating model",
-        "updatedAt": "2026-11-24T22:24:33Z",
+        "updatedAt": "2026-11-26T11:04:25Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/24"
       },
       {
@@ -6192,7 +6364,7 @@
         "number": 3,
         "state": "OPEN",
         "title": "S04 — the external action execution contract (import → invoke → restart)",
-        "updatedAt": "2026-11-13T06:31:41Z",
+        "updatedAt": "2026-11-26T13:15:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/3"
       },
       {
@@ -6211,9 +6383,9 @@
           }
         ],
         "number": 2,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "S02 — prove long-job lease/recovery under two workers",
-        "updatedAt": "2026-11-13T06:31:40Z",
+        "updatedAt": "2026-11-26T12:49:40Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/2"
       },
       {

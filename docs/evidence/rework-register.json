@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25T11:25:08.159569651+00:00",
-  "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
+  "generated_at": "2026-11-26T13:34:11Z",
+  "git_sha": "79b681c822e8ea26e3dd07fae4860cd3fb8a3459",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -8369,7 +8369,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 5,
         "owners": [
           "programme owner"
         ]
@@ -8393,7 +8393,10 @@
           "source": "snapshot",
           "subjects": [
             "S21",
-            "T14"
+            "SPEC-V2",
+            "T13",
+            "T14",
+            "T1"
           ]
         }
       ],
@@ -8405,7 +8408,7 @@
       "spec": "\u00a75.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 5,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -8423,9 +8426,39 @@
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
+          "reason": "the seed derives `closed` from SPEC-V2's closed unit issues, while the live row stays `active`: the live record still carries ten open TOGAF/MSP artefact packages (phase E/G/H, registers, compliance review), so a closure now would claim artefacts the live record does not carry; the synchronisation waits on the retrospective rework's SPEC-V2 slice (#526 chain) or a seed install",
+          "severity": "P1",
+          "subject": "SPEC-V2"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from T13's closed unit issues, while the live row stays `active`: the live closure is refused on two open P0 rework packages (v1-w4a-1 spend budget gate, v1-w4a-2 write-verify), and the synchronisation waits on the rework lane's T13 slice (#526 chain) and the tranche-3 review",
+          "severity": "P1",
+          "subject": "T13"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
           "reason": "the seed derives `closed` from T14's closed unit issues, while the live row stays `active`: closing a project in planned tranche 13 manufactures a tranche P0, and the synchronisation waits on the tranche-13 authorisation (#526 chain) or a seed install",
           "severity": "P1",
           "subject": "T14"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
         }
       ],
       "title": "Reconcile the seed with the live rows"
@@ -27072,93 +27105,6 @@
       "title": "The kata.* family is not an action family; kata exists only as an unregistered process key"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3b-6:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a710.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "analyse.app, analyse.brand, analyse.content and analyse.report are registered with schemas and handlers (or explicitly scoped out in SPEC \u00a710.4 by owner decision), and a registry test asserts the final six-verb set.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1210,
-              "path": "docs/SPEC_V2.md",
-              "quote": "| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |",
-              "source": "code"
-            },
-            {
-              "line": 16,
-              "path": "crates/actions/src/analysis/actions.rs",
-              "quote": "const ACTION: &str = \"analyse.site\";",
-              "source": "code"
-            },
-            {
-              "line": 16,
-              "path": "crates/actions/src/analysis/video.rs",
-              "quote": "    name = \"analyse.video\",",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w3b-6",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w3b-6:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-w3b-6",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "\u00a710.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "SPEC \u00a710.4 and \u00a710.4.1 declare analyse.site, analyse.app, analyse.video, analyse.brand, analyse.content and analyse.report as the evidence producers for gates. Only analyse.site (analysis/actions.rs:16) and analyse.video (analysis/video.rs:16) are registered; there is no analyse.app, analyse.brand, analyse.content or analyse.report in the registry, so four of the six measured subjects named by \u00a710.4.1 cannot be analysed through the action surface.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1210,
-                  "path": "docs/SPEC_V2.md",
-                  "quote": "| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |",
-                  "source": "code"
-                },
-                {
-                  "line": 16,
-                  "path": "crates/actions/src/analysis/actions.rs",
-                  "quote": "const ACTION: &str = \"analyse.site\";",
-                  "source": "code"
-                },
-                {
-                  "line": 16,
-                  "path": "crates/actions/src/analysis/video.rs",
-                  "quote": "    name = \"analyse.video\",",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w3b-6",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "Four of the six declared analyse.* actions are missing"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3c-6:T3",
       "apply_to": "PLATFORM",
       "artefact": "\u00a712",
@@ -41490,12 +41436,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 80,
-      "gaps": 16,
+      "findings": 79,
+      "gaps": 19,
       "p0": 0,
-      "p1": 2,
-      "p2": 14,
-      "packages": 92,
+      "p1": 4,
+      "p2": 15,
+      "packages": 91,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -41514,29 +41460,29 @@
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.hSK3748U1X/data",
   "summary": {
     "by_severity": {
       "P0": 27,
       "P1": 185,
-      "P2": 217
+      "P2": 216
     },
     "by_standard": {
       "MSP": 72,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 92,
+      "SPEC": 91,
       "TOGAF": 218
     },
     "by_status": {
-      "open": 427,
+      "open": 426,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 427,
-    "packages": 429,
-    "resolved": 20,
-    "subjects": 538,
+    "open": 426,
+    "packages": 428,
+    "resolved": 21,
+    "subjects": 540,
     "suppressed": 2
   }
 }

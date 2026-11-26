@@ -2,95 +2,95 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 1822698,
+      "bytes": 1822683,
       "path": "architecture.json",
       "records": 542,
-      "sha256": "4bb1138af87ff1f20d904ec3eb9b92bd95c750c561ee31c8fc576513ef8c30aa"
+      "sha256": "aa5f7d131e7a5d6def56246a4afd459bb9cfeb19af34a9fa41199bef1c208d2f"
     },
     {
-      "bytes": 140714,
+      "bytes": 140699,
       "path": "artefacts.json",
       "records": 298,
-      "sha256": "92f04414e61dafe21206462634363587f440c7e231723a5551431aa45c74d64d"
+      "sha256": "8c44b72de558d309fee8e6e0c17fa7e2e03a7a6a9bcafbae59a24555bdbe42a5"
     },
     {
-      "bytes": 1832917,
+      "bytes": 1832900,
       "path": "config.json",
       "records": 2256,
-      "sha256": "a98ca90d57126192fb783558b63f494049e2e4352a7e2c8c5ea65a777192cfa2"
+      "sha256": "5ead83ec7759e7b089a31e31b2782f3305556437b89bdb9c2a9347b768578a1f"
     },
     {
-      "bytes": 109,
+      "bytes": 94,
       "path": "evidence.json",
       "records": 0,
-      "sha256": "9a2a18915e0ad9009b7f4d60b427b963e54615b614d1228289cc03b3c9f66ab0"
+      "sha256": "08ddd8e7678515dda8881b4a1761b3200d84553a23b238b94ee3f42e7f8d14ff"
     },
     {
-      "bytes": 110,
+      "bytes": 95,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "b70a9a58ece8980e51f4761651a965eef941df284566618285adef57441542c4"
+      "sha256": "74b963dfc88b853d52a557efb3dda5e4b53f8f0e64d598e0f86d0b6e586d99db"
     },
     {
-      "bytes": 4552,
+      "bytes": 4537,
       "path": "measure.json",
       "records": 0,
-      "sha256": "e10e1acbbecc63c698a764c07f0951bb7c39289037a67edf8b8c0edcf089b17d"
+      "sha256": "6c18e24b2e87741d7319fcf80c6cbced2c8ec7baffd0ab16e8cc57f4fb0d6c6a"
     },
     {
-      "bytes": 455648,
+      "bytes": 455633,
       "path": "msp.json",
       "records": 175,
-      "sha256": "e83674b3aebee9cd85d5f740d77b6ff4b2a367cc9ead5a5679eb02be511232f0"
+      "sha256": "8d232710ad2ab61a89950ab82948da8ffceb8e61925b4db7b233a353925e6f65"
     },
     {
-      "bytes": 1031,
+      "bytes": 1016,
       "path": "ops.json",
       "records": 1,
-      "sha256": "c33c500c397bf5e8ed7e2e30fa1aeb57cbf92f06e71b29d8e6c0c4e120cb95c6"
+      "sha256": "ca6ffb993a2e0afee17dfcf436afe847f0b7c56e8a12de13f366cb134f2046cc"
     },
     {
-      "bytes": 16712,
+      "bytes": 16697,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "4b6319445595b7c9ddfabec237dea69ab1c5c5b1635fc065d3f8b19765b2502f"
+      "sha256": "13c2982c5a8352c8aa7d0a319c7f9ddd34aaa98cd584952ff3118484e49c512b"
     },
     {
-      "bytes": 248720,
+      "bytes": 253367,
       "path": "programme.json",
       "records": 54,
-      "sha256": "305d9ad14c9d6539684bc6f89a9ec9438afade7d2f0c446f8c68a7d89e4fdb0b"
+      "sha256": "6d2321114431b8382c4b1d8203451b910d40057dbafd4d11522255bf573164d6"
     },
     {
-      "bytes": 1402413,
+      "bytes": 1400544,
       "path": "rework.json",
-      "records": 429,
-      "sha256": "120fd741b73310da5413e679093916024a0526f076066af7e905e076d1efe428"
+      "records": 428,
+      "sha256": "d071cbaef48b9b211dbcc88dad41061a68cb01b615a77a26b2e2176c0ce8f96a"
     },
     {
-      "bytes": 226,
+      "bytes": 211,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "7a34c601b733802d9e4e0d4d77a314828b2402fa1157322a16b6ccf350bb85a8"
+      "sha256": "2936b486bc6dcb73f1f81970350024d417d1818ba9bd45536b949c4b6bc1ecce"
     },
     {
-      "bytes": 5441081,
+      "bytes": 5442678,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "2af1ad73df8bf1464d248109c64bc9a7db6f88054289cfe768863c64b52bb3bd"
+      "sha256": "222a43e51972945a14dc7b8b6d4f2b2655a273b831108e53fa9827d77918fdf4"
     },
     {
-      "bytes": 1601226,
+      "bytes": 1601211,
       "path": "work.json",
       "records": 2634,
-      "sha256": "5e0da36bc2adddd519aeffc7b5b040895e232d3b171318ad9e1952f92b333f2c"
+      "sha256": "fac602407ac7af26a507104429016b49b38333627d81b34bed6675a6babba013"
     }
   ],
-  "generated_at": "2026-11-25T11:25:19.603151696+00:00",
-  "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
+  "generated_at": "2026-11-26T13:34:11Z",
+  "git_sha": "79b681c822e8ea26e3dd07fae4860cd3fb8a3459",
   "migration": {
-    "description": "organisation layers",
-    "version": 74
+    "description": "run executor kind",
+    "version": 75
   },
   "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
   "schema": "design-snapshot/v1",

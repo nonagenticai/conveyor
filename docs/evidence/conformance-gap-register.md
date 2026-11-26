@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25:19.603151696+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data`.
+Snapshot: `79b681c822e8ea26e3dd07fae4860cd3fb8a3459` generated `2026-11-26T13:34:11Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.hSK3748U1X/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 29 |
-| P1 | 133 |
-| P2 | 37 |
+| P1 | 135 |
+| P2 | 38 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -148,6 +148,8 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | `project_in_unauthorised_tranche` | `T18` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
 | `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `SPEC-V2` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T13` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T14` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
@@ -211,13 +213,13 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
 | S21 | active | 9 | 0 | 4 | 1 | 0 |
-| SPEC-V2 | active | 0 | 0 | 0 | 0 | 0 |
+| SPEC-V2 | active | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
-| T1 | closed | 1 | 0 | 2 | 2 | 0 |
+| T1 | closed | 1 | 0 | 2 | 3 | 0 |
 | T10 | closed | 4 | 1 | 1 | 2 | 0 |
 | T11 | closed | 1 | 0 | 2 | 2 | 0 |
 | T12 | active | 13 | 0 | 3 | 1 | 0 |
-| T13 | active | 3 | 0 | 0 | 2 | 0 |
+| T13 | active | 3 | 0 | 1 | 2 | 0 |
 | T14 | active | 4 | 0 | 5 | 1 | 0 |
 | T15 | closed | 12 | 1 | 2 | 0 | 0 |
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
