@@ -409,7 +409,13 @@ pub struct PolicyUpdateIn {
     pub action: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
-    /// `Some(None)` clears the expression; `None` keeps it.
+    /// `Some(None)` clears the expression; `None` keeps it. JSON `null` must read as the
+    /// explicit clear, not as an absent member, so the patch field uses the shared
+    /// double-option deserializer.
+    #[serde(
+        default,
+        deserialize_with = "crate::capability::views::deserialize_present"
+    )]
     pub fire_when: Option<Option<Value>>,
 }
 
