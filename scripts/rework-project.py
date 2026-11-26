@@ -71,6 +71,25 @@ def fail(message: str) -> "NoReturn":  # noqa: F821 - a deliberate abort
     raise SystemExit(1)
 
 
+def declared_categories() -> set[str]:
+    """The document categories `seed/output-standard.json` declares.
+
+    A standard artefact key is underscored (`benefits_diagram`) and its authored deliverable's
+    document category is hyphenated (`benefits-diagram`). A key with no declared category has no
+    authored deliverable beyond its instance document.
+    """
+    global _DECLARED_CATEGORIES
+    if _DECLARED_CATEGORIES is None:
+        standard = json.loads(
+            (ROOT / "seed" / "output-standard.json").read_text(encoding="utf-8")
+        )
+        _DECLARED_CATEGORIES = {str(name) for name in standard.get("categories") or []}
+    return _DECLARED_CATEGORIES
+
+
+_DECLARED_CATEGORIES: set[str] | None = None
+
+
 def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -436,6 +455,7 @@ class Runner:
                 if not needs_key and document_id and not needs_entries:
                     artefact_ids[artefact["title"]] = str(row["id"])
                     print(f"  artefact: {artefact['title']} already present")
+                    self.ensure_category_document(artefact, key)
                     continue
                 # An approved artefact is immutable; the repair is a new version that carries
                 # the standard key and the published document it sits under. The document is
@@ -476,6 +496,7 @@ class Runner:
                 )
                 artefact_ids[artefact["title"]] = str(draft["id"])
                 print(f"  artefact: {artefact['title']} re-versioned, bound and documented")
+                self.ensure_category_document(artefact, key)
                 continue
             document_id = self.publish_artefact_document(artefact)
             created = self.invoke(
@@ -501,6 +522,7 @@ class Runner:
                 if_match=1,
             )
             artefact_ids[artefact["title"]] = str(created["id"])
+            self.ensure_category_document(artefact, key)
         self.ensure_artefact_links(artefact_ids)
 
         # 6. the delivery contract
@@ -986,6 +1008,51 @@ class Runner:
                 read_id_from_output="baseline_id",
             )
             self.decide(taken["approval_id"], f"approve the {kind} baseline")
+
+    def ensure_category_document(self, artefact: dict, key: str) -> None:
+        """Publish the artefact body as its standard category's authored document.
+
+        Every category resolves its required headings from documents of that same category
+        (`seed/output-standard.json#categories.<name>.sources`), so an artefact published only as
+        `architecture-artifact-instance` leaves e.g. `benefits-diagram` with zero rows: the
+        publisher refuses the category with `EMPTY_POINTER`, the close gate names it missing, and
+        the template package stays open. The pack's body is the authored deliverable; this
+        publishes it under the category the standard declares.
+
+        One document per (project, category): a second body in the same category makes the
+        publisher's own lookup ambiguous, so an existing category document is never duplicated.
+        """
+        category = key.replace("_", "-")
+        if category not in declared_categories():
+            return
+        body = str(artefact.get("body") or "")
+        if not body.strip():
+            fail(f"artefact {artefact['title']}: no body for its {category} deliverable")
+        existing = self._read(
+            "documents.list", {"project_id": self.project_id, "category": category}
+        ).get("items") or []
+        if any(str(row.get("category") or "") == category for row in existing):
+            print(f"  document {category}: already present")
+            return
+        doc = self.invoke(
+            "documents.compose",
+            {
+                "title": str(artefact["title"]),
+                "project_id": self.project_id,
+                "body": body,
+                "category": category,
+                "publishable": True,
+            },
+            read_action="documents.get",
+            read_id_from_output="id",
+        )
+        self.invoke(
+            "documents.publish",
+            {"id": doc["id"], "publish": True},
+            read_input={"id": doc["id"]},
+            if_match=doc.get("version", 1),
+        )
+        print(f"  document {category}: published as the authored deliverable")
 
     def publish_artefact_document(self, artefact: dict) -> str:
         """Compose and publish the artefact's own document, once.
