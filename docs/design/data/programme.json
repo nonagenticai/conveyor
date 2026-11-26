@@ -1,8 +1,92 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-26T13:38:38Z",
+  "generated_at": "2026-11-26T21:15:00Z",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 773,
+        "state": "OPEN",
+        "title": "publish: republish the standards record and register after the delivery-contract filter",
+        "updatedAt": "2026-11-26T21:10:48Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/773"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 763,
+        "state": "CLOSED",
+        "title": "audit: review the delivery contract, not the SoAW, for compliance",
+        "updatedAt": "2026-11-26T16:24:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/763"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "5319E7",
+            "name": "status:needs-human"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 762,
+        "state": "OPEN",
+        "title": "proof: the live delivery drills on the released engine, and the mint path that blocks them",
+        "updatedAt": "2026-11-26T15:57:47Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/762"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 760,
+        "state": "OPEN",
+        "title": "auth: the session channel — a machine principal and a licence-bearer mint",
+        "updatedAt": "2026-11-26T16:33:36Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/760"
+      },
       {
         "labels": [
           {
@@ -57,9 +141,9 @@
           }
         ],
         "number": 754,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "ops: strict-green live publish — reconcile the ledger to the live P0/P1 set",
-        "updatedAt": "2026-11-26T13:38:11Z",
+        "updatedAt": "2026-11-26T15:50:11Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/754"
       },
       {
@@ -78,9 +162,9 @@
           }
         ],
         "number": 753,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "skills: six programme delivery-role playbooks and role routing",
-        "updatedAt": "2026-11-26T13:22:27Z",
+        "updatedAt": "2026-11-26T15:50:09Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/753"
       },
       {
@@ -103,9 +187,9 @@
           }
         ],
         "number": 746,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
-        "updatedAt": "2026-11-26T13:18:26Z",
+        "updatedAt": "2026-11-26T14:41:02Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/746"
       },
       {
@@ -618,7 +702,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-26T13:37:27Z",
+        "updatedAt": "2026-11-26T15:05:23Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -1687,7 +1771,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-26T13:15:06Z",
+        "updatedAt": "2026-11-26T16:23:53Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -6353,8 +6437,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -6362,9 +6446,9 @@
           }
         ],
         "number": 3,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "S04 — the external action execution contract (import → invoke → restart)",
-        "updatedAt": "2026-11-26T13:15:08Z",
+        "updatedAt": "2026-11-26T17:09:30Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/3"
       },
       {

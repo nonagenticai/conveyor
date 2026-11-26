@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `a5a6a46040fada4f1f59dc9dc63abf446433c468` generated `2026-11-26T13:38:38Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.gifwbAingT/data`.
+Snapshot: `34753fa35fc2ea65ece4893e6893cf0a16ffb1ab` generated `2026-11-26T21:15:00Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.ka3gjiEZAi/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 29 |
-| P1 | 136 |
-| P2 | 38 |
+| P1 | 130 |
+| P2 | 37 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -81,12 +81,6 @@ Snapshot: `a5a6a46040fada4f1f59dc9dc63abf446433c468` generated `2026-11-26T13:38
 | `closure_outputs_undeclared` | `S16` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S17` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S20` | P1 | project is closed but declares no closure_outputs |
-| `compliance_review_missing` | `T1` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T10` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T11` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T2` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T4` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T9` | P1 | closed delivery project has no Phase-G compliance review |
 | `contract_missing` | `T12` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T14` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T15` | P1 | delivery project has no live architecture contract |
@@ -216,9 +210,9 @@ Snapshot: `a5a6a46040fada4f1f59dc9dc63abf446433c468` generated `2026-11-26T13:38
 | S21 | active | 9 | 0 | 4 | 1 | 0 |
 | SPEC-V2 | active | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
-| T1 | closed | 1 | 0 | 2 | 3 | 0 |
-| T10 | closed | 4 | 1 | 1 | 2 | 0 |
-| T11 | closed | 1 | 0 | 2 | 2 | 0 |
+| T1 | closed | 1 | 0 | 1 | 2 | 0 |
+| T10 | closed | 4 | 1 | 0 | 2 | 0 |
+| T11 | closed | 1 | 0 | 1 | 2 | 0 |
 | T12 | active | 13 | 0 | 3 | 1 | 0 |
 | T13 | active | 3 | 0 | 1 | 2 | 0 |
 | T14 | active | 4 | 0 | 5 | 1 | 0 |
@@ -228,11 +222,11 @@ Snapshot: `a5a6a46040fada4f1f59dc9dc63abf446433c468` generated `2026-11-26T13:38
 | T18 | active | 4 | 0 | 4 | 1 | 0 |
 | T19 | closed | 4 | 1 | 0 | 2 | 0 |
 | T19F | active | 6 | 0 | 1 | 3 | 0 |
-| T2 | closed | 2 | 0 | 2 | 2 | 0 |
+| T2 | closed | 2 | 0 | 1 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
-| T4 | closed | 4 | 2 | 1 | 2 | 0 |
+| T4 | closed | 4 | 2 | 0 | 2 | 0 |
 | T5 | closed | 10 | 1 | 2 | 0 | 0 |
 | T6 | closed | 11 | 1 | 2 | 0 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | closed | 11 | 1 | 2 | 0 | 0 |
-| T9 | closed | 4 | 1 | 1 | 2 | 0 |
+| T9 | closed | 4 | 1 | 0 | 2 | 0 |

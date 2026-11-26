@@ -633,60 +633,6 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     },
     {
-      "rule": "compliance_review_missing",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T10",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T2",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T4",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T9",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
       "rule": "contract_missing",
       "subject": "T12",
       "severity": "P1",
@@ -1252,6 +1198,15 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "the seed derives `closed` from T14's closed unit issues, while the live row stays `active`: closing a project in planned tranche 13 manufactures a tranche P0, and the synchronisation waits on the tranche-13 authorisation (#526 chain) or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
+      "subject": "S04",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from S04's closed unit issues (#3), while the live row stays `active`: the live record has not recorded S04's closure, so closing it now would claim evidence the live record does not carry; the synchronisation waits on the #526 chain or a seed install"
     },
     {
       "rule": "unpublished_declared_output",
