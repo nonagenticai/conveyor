@@ -2475,6 +2475,15 @@
       "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163",
       "bytes": 62935,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
+    },
+    {
+      "title": "Lean delivery certificates",
+      "path": "docs/spec/lean/README.html",
+      "source": "docs/spec/lean/README.md",
+      "section": "Spec",
+      "sha256": "ce870a3d2ca1951c572b086750adccbe634e2845f65232205483d4218c28bc6f",
+      "bytes": 4325,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/spec/lean/README.md"
     }
   ]
 }
