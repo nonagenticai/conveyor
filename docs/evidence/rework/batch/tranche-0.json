@@ -1,18 +1,18 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T11:47:50+00:00",
+  "generated_at": "2026-11-26T13:14:12+00:00",
   "green": 1,
   "members": [
     {
       "factory_exit": 0,
       "gaps": [],
-      "key": "SPEC-V2",
-      "log": "docs/evidence/rework/batch/tranche-0/SPEC-V2.log",
+      "key": "PLATFORM",
+      "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log",
       "publish_exit": 1,
       "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,
-  "snapshot_sha": "3aee5d7e8d954aa2940ad15c5bf95381fa8aa136",
+  "snapshot_sha": "81e9ec6d653cd8d337d4c82aee693afb7a78405e",
   "tranche": 0
 }

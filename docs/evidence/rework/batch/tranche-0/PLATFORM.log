@@ -47,42 +47,48 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   26 architecture.artifacts_link ok
   27 architecture.artifacts_link ok
   28 architecture.artifacts_link ok
-  document project-brief: already present
-  document evidence: already present
-  document gap-analysis: already present
-  document candidate-solutions: already present
-  document project-context-diagram: already present
-  document benefits-diagram: already present
-  document architecture-artifact: already present
-  document safe-art: already present
-  document inspect-adapt: already present
+  document project-brief: already present and published
+  document evidence: already present and published
+  document gap-analysis: already present and published
+  document candidate-solutions: already present and published
+  document project-context-diagram: already present and published
+  document benefits-diagram: already present and published
+  document architecture-artifact: already present and published
+  document safe-art: already present and published
+  document inspect-adapt: already present and published
   delivery contract: already live
-  register risk: The platform's dependency on a single CI node is a single point of failure for every tranche already present
-  register risk: The standby has not been promoted in a drill, so the recovery path is documented but unproven already present
-  register issue: The live public window lags the committed pack until the next publish already present
-  register assumption: The replay record is the programme's working record until the rework is promoted already present
-  register dependency: Every delivery tranche depends on the platform's CI, registry and Postgres paths already present
-  register benefit: B1 Auditable decisions: every choice has a decision row already present
+  29 registers.update ok
+  register risk: The platform's dependency on a single CI node is a single point of failure for every tranche code set to R-PLATFORM-01
+  30 registers.update ok
+  register risk: The standby has not been promoted in a drill, so the recovery path is documented but unproven code set to R-PLATFORM-02
+  31 registers.update ok
+  register issue: The live public window lags the committed pack until the next publish code set to I-PLATFORM-01
+  32 registers.update ok
+  register assumption: The replay record is the programme's working record until the rework is promoted code set to A-PLATFORM-01
+  33 registers.update ok
+  register dependency: Every delivery tranche depends on the platform's CI, registry and Postgres paths code set to D-PLATFORM-01
+  34 registers.update ok
+  register benefit: B1 Auditable decisions: every choice has a decision row code set to B-PLATFORM-01
   governed asset Licensing frame: already present
   governed asset Blueprint states: already present
   governed asset Options appraisal: already present
   governed asset Programme appraisal: already present
   governed asset Solution intent: already present
-  programme shared_config: already set
+  35 programmes.update ok
   benefit transition B1: already present
-  29 benefits.transition_upsert ok
+  36 benefits.transition_upsert ok
   benefit transition B2: already present
-  30 benefits.transition_upsert ok
+  37 benefits.transition_upsert ok
   benefit transition B3: already present
-  31 benefits.transition_upsert ok
+  38 benefits.transition_upsert ok
   benefit transition B4: already present
-  32 benefits.transition_upsert ok
+  39 benefits.transition_upsert ok
   benefit transition B5: already present
-  33 benefits.transition_upsert ok
+  40 benefits.transition_upsert ok
   benefit transition B6: already present
-  34 benefits.transition_upsert ok
+  41 benefits.transition_upsert ok
   benefit transition B7: already present
-  35 benefits.transition_upsert ok
+  42 benefits.transition_upsert ok
   baseline: already taken
   schedule baseline: already taken
   cost baseline: already taken
@@ -90,28 +96,29 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  36 cadences.credit_demo ok
+  43 cadences.credit_demo ok
   baseline approval: none pending
   change control: 3 change row(s) present
-  37 registers.update ok
-  38 registers.update ok
-  39 registers.update ok
-  40 registers.update ok
-  41 wbs.update ok
-  42 wbs.update ok
-  43 wbs.update ok
-  44 wbs.update ok
-  45 wbs.update ok
-  46 tranches.update ok
+  44 registers.update ok
+  45 registers.update ok
+  46 registers.update ok
+  47 registers.update ok
+  48 wbs.update ok
+  49 wbs.update ok
+  50 wbs.update ok
+  51 wbs.update ok
+  52 wbs.update ok
+  53 tranches.update ok
   lesson L-PLATFORM-1: already present
-  card discharge: 0 card(s) cleared of 491 open package(s)
+  54 tranches.update ok
+  card discharge: 0 card(s) cleared of 446 open package(s)
   closure: not applicable (the project stays active)
-PLATFORM: 46 acts recorded
+PLATFORM: 54 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-1k4ngxvg/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-1k4ngxvg/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-oyshb8hi/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-oyshb8hi/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /tmp/conv526-bin-5dcfc953
 
 {
   "schema": "artefact-publication/v1",
