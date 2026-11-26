@@ -1,6 +1,6 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S09 --content docs/evidence/rework/tranche-4/rework-content-S09.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
@@ -11,7 +11,6 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Business Capability Map — S09 Documents and integrations (Phase B) already present
   artefact: Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C) already present
   artefact: Technology Standards Catalog — S09 Documents and integrations (Phase D) already present
-  01 architecture.artifacts_link ok
   02 architecture.artifacts_link ok
   03 architecture.artifacts_link ok
   04 architecture.artifacts_link ok
@@ -19,6 +18,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
   08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   delivery contract: already live
   register risk: The seven gate properties a to g have no recorded run, so the built claim is unproven already present
@@ -43,222 +43,23 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  09 cadences.credit_demo ok
-  baseline approval: none pending
-  change control: 1 change row(s) present
-  10 registers.update ok
-  record fixes: none in the content
-  card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-
-rework: projects.close refused at act 11: error: projects.close refused (409): project S09 cannot close until its mandatory artefacts exist (missing: project-registers)
-FAILED: projects.close: transport exited 1
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S09 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-no_yhcir/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-no_yhcir/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S09-bodies --local-bin /tmp/conv526-bin-8111c984
-
-{
-  "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "change-control",
-      "document_id": "01a219e2-5b79-73d2-a75d-94f97d7bac8d",
-      "natural_key": "artefact:S09:change-control:5b46e050bdac29cf",
-      "body_sha256": "5b46e050bdac29cf8b7598c6247788df457011e04776d4dcf61a3aaf633f2296"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-registers",
-      "document_id": "01a219e2-5d16-772b-a975-754d12d5e8b6",
-      "natural_key": "artefact:S09:project-registers:adfee5ee20f9f7e0",
-      "body_sha256": "adfee5ee20f9f7e00064cad388211db628c8f999ec5d3318dec534e3655b2cc0"
-    }
-  ],
-  "skipped": [
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "compliance-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "delivery-contract",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-baseline",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-wbs",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "statement-of-architecture-work",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "statement-of-intent",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
-      }
-    }
-  ],
-  "counts": {
-    "due": 6,
-    "present": 5,
-    "missing-edge": 0,
-    "stale": 2,
-    "ambiguous": 0
-  }
-}
-
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S09 --content docs/evidence/rework/tranche-4/rework-content-S09.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
-
-  reopen: not needed
-  charter: already approved
-  closure outputs: already ['closure-review']
-  SoAW: already live
-  artefact: Stakeholder Map — S09 Documents and integrations (Phase A) already present
-  artefact: Driver/Goal/Objective Catalog — S09 Documents and integrations (Phase A) already present
-  artefact: Requirements Catalog — S09 Documents and integrations (Phase A) already present
-  artefact: Solution Concept Diagram — S09 Documents and integrations (Phase A) already present
-  artefact: Business Capability Map — S09 Documents and integrations (Phase B) already present
-  artefact: Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C) already present
-  artefact: Technology Standards Catalog — S09 Documents and integrations (Phase D) already present
-  01 architecture.artifacts_link ok
-  02 architecture.artifacts_link ok
-  03 architecture.artifacts_link ok
-  04 architecture.artifacts_link ok
-  05 architecture.artifacts_link ok
-  06 architecture.artifacts_link ok
-  07 architecture.artifacts_link ok
-  08 architecture.artifacts_link ok
-  document architecture-artifact: already present and published
-  delivery contract: already live
-  register risk: The seven gate properties a to g have no recorded run, so the built claim is unproven already present
-  register risk: The deployed MinIO leg and the live strata_ingest path behind documents.ingest are unproven already present
-  register risk: The strata_rag path contract is unresolved: /query versus /api/query already present
-  register issue: documents.ingest is the one declared action of 27 not registered already present
-  register issue: The plan frontmatter reads planned while the project meta says measured_status built already present
-  register issue: The nine linked issues are recorded closed but their acceptance is not re-verified already present
-  register assumption: The 2026-11-24 rework snapshot is the authoritative record for S09 already present
-  register assumption: S03 supplies tenant, trace_link and revision exactly as the project brief records already present
-  register dependency: S09 is blocked by S03, S04 and S02 already present
-  register dependency: The deployed leg depends on the operators' MinIO endpoint, credentials and bucket policy already present
-  register dependency: documents.ingest depends on a live strata_ingest target and a sealed per-tenant token already present
-  register benefit: Document bytes leave Postgres: content lives in MinIO behind one authorized stream already present
-  register benefit: Secrets are write-only: no response returns a plaintext, value key or ciphertext already present
-  register benefit: Adjacent services stay external: a call absent from action_registry does not exist already present
-  benefit transitions: none in the content
-  baseline: already taken
-  schedule baseline: already taken
-  cost baseline: already taken
-  closure-review output: already published
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  09 cadences.credit_demo ok
+  10 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-  10 projects.close ok
+  11 projects.close_request ok
+  12 approvals.decide ok
+  13 approvals.request ok
+  14 approvals.decide ok
+  15 projects.close ok
   closed S09: 01a1d039-0d2d-71f1-a403-c9abe52c1888
-S09: 10 acts recorded
+S09: 15 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S09 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-8ozhvn9d/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-8ozhvn9d/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S09-bodies --local-bin /tmp/conv526-bin-8111c984
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S09 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-hldamm9c/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-hldamm9c/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S09-bodies --local-bin /tmp/conv526-t14-bin-20261126
 
 {
   "schema": "artefact-publication/v1",

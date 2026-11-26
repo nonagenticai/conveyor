@@ -1,328 +1,73 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
-  01 projects.programme_meta ok
+  closure outputs: already ['closure-review']
   SoAW: already live
-  02 documents.compose ok
-  03 documents.publish ok
-  04 architecture.artifacts_supersede ok
-  05 architecture.artifacts_update ok
-  06 architecture.artifacts_approve ok
-  artefact: Stakeholder Map — T9 TOGAF ADM capability (Phase A) re-versioned, bound and documented
-  07 documents.compose ok
-  08 documents.publish ok
-  09 architecture.artifacts_supersede ok
-  10 architecture.artifacts_update ok
-  11 architecture.artifacts_approve ok
-  artefact: Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A) re-versioned, bound and documented
-  12 documents.compose ok
-  13 documents.publish ok
-  14 architecture.artifacts_supersede ok
-  15 architecture.artifacts_update ok
-  16 architecture.artifacts_approve ok
-  artefact: Requirements Catalog — T9 TOGAF ADM capability (Phase A) re-versioned, bound and documented
-  17 documents.compose ok
-  18 documents.publish ok
-  19 architecture.artifacts_supersede ok
-  20 architecture.artifacts_update ok
-  21 architecture.artifacts_approve ok
-  artefact: Solution Concept Diagram — T9 TOGAF ADM capability (Phase A) re-versioned, bound and documented
-  22 documents.compose ok
-  23 documents.publish ok
-  24 architecture.artifacts_supersede ok
-  25 architecture.artifacts_update ok
-  26 architecture.artifacts_approve ok
-  artefact: Business Capability Map — T9 TOGAF ADM capability (Phase B) re-versioned, bound and documented
-  27 documents.compose ok
-  28 documents.publish ok
-  29 architecture.artifacts_supersede ok
-  30 architecture.artifacts_update ok
-  31 architecture.artifacts_approve ok
-  artefact: Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C) re-versioned, bound and documented
-  32 documents.compose ok
-  33 documents.publish ok
-  34 architecture.artifacts_supersede ok
-  35 architecture.artifacts_update ok
-  36 architecture.artifacts_approve ok
-  artefact: Technology Standards Catalog — T9 TOGAF ADM capability (Phase D) re-versioned, bound and documented
-  37 architecture.artifacts_link ok
-  38 architecture.artifacts_link ok
-  39 architecture.artifacts_link ok
-  40 architecture.artifacts_link ok
-  41 architecture.artifacts_link ok
-  42 architecture.artifacts_link ok
-  43 architecture.artifacts_link ok
-  44 architecture.artifacts_link ok
+  artefact: Stakeholder Map — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Requirements Catalog — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Solution Concept Diagram — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Business Capability Map — T9 TOGAF ADM capability (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C) already present
+  artefact: Technology Standards Catalog — T9 TOGAF ADM capability (Phase D) already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
   document architecture-artifact: already present and published
-  45 architecture.contracts_request ok
-  46 architecture.board_decide ok
-  47 architecture.contracts_approve ok
-  delivery contract: revised to carry the authored body
-  48 registers.create ok
-  49 registers.create ok
-  50 registers.create ok
-  51 registers.create ok
-  52 registers.create ok
-  53 registers.create ok
-  54 registers.create ok
-  55 registers.create ok
-  56 registers.create ok
-  57 registers.create ok
-  58 registers.create ok
-  59 registers.create ok
+  delivery contract: already live
+  register risk: The plan fragment and the measured status are never reconciled already present
+  register risk: The phase gate's refusal is declared but has no measured runtime run already present
+  register issue: The plan path docs/SPEC_V2.md#12 is a draft fragment, not a standalone plan file already present
+  register issue: No tranche-level review of T9 is recorded already present
+  register issue: No Architecture Board minutes are in the facts already present
+  register assumption: The three compliant reviews remain valid and are not superseded by this rework already present
+  register assumption: The 2026-11-24 facts snapshot is the authoritative record for T9 already present
+  register dependency: T9 is blocked by T1, T3 and P0 already present
+  register dependency: The tranche-4 exit criteria gate the tranche review on every project's published evidence already present
+  register benefit: A phase missing a mandatory artefact is refused, not discovered late already present
+  register benefit: A delivery project without a live contract is refused at design already present
+  register benefit: One recorded compliance level and a dated waiver make governance auditable already present
   benefit transitions: none in the content
   baseline: already taken
-  60 projects.baseline ok
-  61 approvals.decide ok
-  62 projects.baseline ok
-  63 approvals.decide ok
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: already published
-  64 documents.publish ok
-  65 documents.update ok
-  66 documents.publish ok
-  project-brief output: body corrected and republished
-  67 documents.publish ok
-  68 documents.update ok
-  69 documents.publish ok
-  inception-analysis output: body corrected and republished
-  70 documents.publish ok
-  71 documents.update ok
-  72 documents.publish ok
-  architecture-design output: body corrected and republished
-  73 documents.publish ok
-  74 documents.update ok
-  75 documents.publish ok
-  architecture-principles output: body corrected and republished
-  76 documents.publish ok
-  77 documents.update ok
-  78 documents.publish ok
-  adm-profile output: body corrected and republished
-  79 documents.publish ok
-  80 documents.update ok
-  81 documents.publish ok
-  artifact-standard output: body corrected and republished
-  82 documents.publish ok
-  83 documents.update ok
-  84 documents.publish ok
-  architecture-artifact output: body corrected and republished
-  85 documents.publish ok
-  86 documents.update ok
-  87 documents.publish ok
-  statement-of-architecture-work output: body corrected and republished
-  88 documents.publish ok
-  89 documents.update ok
-  90 documents.publish ok
-  compliance-review output: body corrected and republished
-  91 documents.publish ok
-  92 documents.update ok
-  93 documents.publish ok
-  waiver output: body corrected and republished
-  94 documents.publish ok
-  95 documents.update ok
-  96 documents.publish ok
-  maturity-assessment output: body corrected and republished
-  97 documents.publish ok
-  98 documents.update ok
-  99 documents.publish ok
-  skills-assessment output: body corrected and republished
-  100 architecture.reviews_record ok
-  101 cadences.credit_demo ok
+  project-brief output: current
+  inception-analysis output: current
+  architecture-design output: current
+  architecture-principles output: current
+  adm-profile output: current
+  artifact-standard output: current
+  architecture-artifact output: current
+  statement-of-architecture-work output: current
+  compliance-review output: current
+  waiver output: current
+  maturity-assessment output: current
+  skills-assessment output: current
+  Phase-G review: already recorded
+  10 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
-  102 registers.update ok
   record fixes: none in the content
-  103 approvals.request ok
-  104 approvals.decide ok
-  105 cards.comment ok
-  106 cards.move ok
-  107 cards.move ok
-  card cleared: mandatory_artefacts:tranche-1
-  108 approvals.request ok
-  109 approvals.decide ok
-  110 cards.comment ok
-  111 cards.move ok
-  112 cards.move ok
-  card cleared: mandatory_artefacts:tranche-3
-  113 approvals.request ok
-  114 approvals.decide ok
-  115 cards.comment ok
-  116 cards.move ok
-  117 cards.move ok
-  card cleared: mandatory_artefacts:tranche-5
-  118 approvals.request ok
-  119 approvals.decide ok
-  120 cards.comment ok
-  121 cards.move ok
-  122 cards.move ok
-  card cleared: mandatory_artefacts:tranche-11
-  123 approvals.request ok
-  124 approvals.decide ok
-  125 cards.comment ok
-  126 cards.move ok
-  127 cards.move ok
-  card cleared: mandatory_artefacts:tranche-7
-  128 approvals.request ok
-  129 approvals.decide ok
-  130 cards.comment ok
-  131 cards.move ok
-  132 cards.move ok
-  card cleared: mandatory_artefacts:tranche-8
-  133 approvals.request ok
-  134 approvals.decide ok
-  135 cards.comment ok
-  136 cards.move ok
-  137 cards.move ok
-  card cleared: mandatory_artefacts:tranche-10
-  138 approvals.request ok
-  139 approvals.decide ok
-  140 cards.comment ok
-  141 cards.move ok
-  142 cards.move ok
-  card cleared: mandatory_artefacts:tranche-13
-  143 approvals.request ok
-  144 approvals.decide ok
-  145 cards.comment ok
-  146 cards.move ok
-  147 cards.move ok
-  card cleared: mandatory_artefacts:tranche-4
-  148 approvals.request ok
-  149 approvals.decide ok
-  150 cards.comment ok
-  151 cards.move ok
-  152 cards.move ok
-  card cleared: mandatory_artefacts:tranche-12
-  153 approvals.request ok
-  154 approvals.decide ok
-  155 cards.comment ok
-  156 cards.move ok
-  157 cards.move ok
-  card cleared: compliance_review_missing:T9
-  158 approvals.request ok
-  159 approvals.decide ok
-  160 cards.comment ok
-  161 cards.move ok
-  162 cards.move ok
-  card cleared: mandatory_artefacts:tranche-0
-  163 approvals.request ok
-  164 approvals.decide ok
-  165 cards.comment ok
-  166 cards.move ok
-  167 cards.move ok
-  card cleared: mandatory_artefacts:tranche-2
-  168 approvals.request ok
-  169 approvals.decide ok
-  170 cards.comment ok
-  171 cards.move ok
-  172 cards.move ok
-  card cleared: mandatory_artefacts:tranche-6
-  173 approvals.request ok
-  174 approvals.decide ok
-  175 cards.comment ok
-  176 cards.move ok
-  177 cards.move ok
-  card cleared: mandatory_artefacts:tranche-9
-  178 approvals.request ok
-  179 approvals.decide ok
-  180 cards.comment ok
-  181 cards.move ok
-  182 cards.move ok
-  card cleared: std-togaf-phase-e-t9-e:T9
-  183 approvals.request ok
-  184 approvals.decide ok
-  185 cards.comment ok
-  186 cards.move ok
-  187 cards.move ok
-  card cleared: std-togaf-phase-g-t9-g:T9
-  188 approvals.request ok
-  189 approvals.decide ok
-  190 cards.comment ok
-  191 cards.move ok
-  192 cards.move ok
-  card cleared: std-togaf-phase-h-t9-h:T9
-  193 approvals.request ok
-  194 approvals.decide ok
-  195 cards.comment ok
-  196 cards.move ok
-  197 cards.move ok
-  card cleared: v1-p81-4:T9
-  198 approvals.request ok
-  199 approvals.decide ok
-  200 cards.comment ok
-  201 cards.move ok
-  202 cards.move ok
-  card cleared: v1-p81-5:T9
-  203 approvals.request ok
-  204 approvals.decide ok
-  205 cards.comment ok
-  206 cards.move ok
-  207 cards.move ok
-  card cleared: v1-w2a-2:T9
-  208 approvals.request ok
-  209 approvals.decide ok
-  210 cards.comment ok
-  211 cards.move ok
-  212 cards.move ok
-  card cleared: v1-w2a-3:T9
-  213 approvals.request ok
-  214 approvals.decide ok
-  215 cards.comment ok
-  216 cards.move ok
-  217 cards.move ok
-  card cleared: v1-w2a-4:T9
-  218 approvals.request ok
-  219 approvals.decide ok
-  220 cards.comment ok
-  221 cards.move ok
-  222 cards.move ok
-  card cleared: std-pmp-project-registers-t9:T9
-  223 approvals.request ok
-  224 approvals.decide ok
-  225 cards.comment ok
-  226 cards.move ok
-  227 cards.move ok
-  card cleared: std-togaf-phase-b-t9-b:T9
-  228 approvals.request ok
-  229 approvals.decide ok
-  230 cards.comment ok
-  231 cards.move ok
-  232 cards.move ok
-  card cleared: std-togaf-phase-c-t9-c:T9
-  233 approvals.request ok
-  234 approvals.decide ok
-  235 cards.comment ok
-  236 cards.move ok
-  237 cards.move ok
-  card cleared: std-togaf-phase-d-t9-d:T9
-  238 approvals.request ok
-  239 approvals.decide ok
-  240 cards.comment ok
-  241 cards.move ok
-  242 cards.move ok
-  card cleared: std-togaf-phase-f-t9-f:T9
-  243 approvals.request ok
-  244 approvals.decide ok
-  245 cards.comment ok
-  246 cards.move ok
-  247 cards.move ok
-  card cleared: v1-p81-6:T9
-  248 approvals.request ok
-  249 approvals.decide ok
-  250 cards.comment ok
-  251 cards.move ok
-  252 cards.move ok
-  card cleared: v1-w2a-6:T9
-  card discharge: 30 card(s) cleared of 315 open package(s)
-  closure gate: already approved
-  destructive gate: already approved
-  253 projects.close ok
+  card discharge: no open rework card owned by the project
+  11 projects.close_request ok
+  12 approvals.decide ok
+  13 approvals.request ok
+  14 approvals.decide ok
+  15 projects.close ok
   closed T9: 01a1d039-0d35-7bd1-945d-cea12c5dfd6d
-T9: 253 acts recorded
+T9: 15 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T9 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T9-snap-dc6mr1uw/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T9-snap-dc6mr1uw/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T9-bodies --local-bin /tmp/conv526-bin-8111c984
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T9 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T9-snap-e2q7rh54/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T9-snap-e2q7rh54/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T9-bodies --local-bin /tmp/conv526-t14-bin-20261126
 
 {
   "schema": "artefact-publication/v1",

@@ -1,8 +1,45 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T22:06:49+00:00",
-  "green": 2,
+  "blocked": 1,
+  "generated_at": "2026-11-26T22:51:38+00:00",
+  "green": 9,
   "members": [
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S05",
+      "log": "docs/evidence/rework/batch/tranche-4/S05.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S07",
+      "log": "docs/evidence/rework/batch/tranche-4/S07.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S09",
+      "log": "docs/evidence/rework/batch/tranche-4/S09.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T10",
+      "log": "docs/evidence/rework/batch/tranche-4/T10.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "gaps": [],
+      "key": "T14",
+      "state": "BLOCKED"
+    },
     {
       "factory_exit": 0,
       "gaps": [],
@@ -14,13 +51,37 @@
     {
       "factory_exit": 0,
       "gaps": [],
+      "key": "T18",
+      "log": "docs/evidence/rework/batch/tranche-4/T18.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T19",
+      "log": "docs/evidence/rework/batch/tranche-4/T19.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
       "key": "T4",
       "log": "docs/evidence/rework/batch/tranche-4/T4.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T9",
+      "log": "docs/evidence/rework/batch/tranche-4/T9.log",
       "publish_exit": 1,
       "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,
-  "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+  "snapshot_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
   "tranche": 4
 }

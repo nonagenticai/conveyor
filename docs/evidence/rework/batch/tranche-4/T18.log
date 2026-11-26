@@ -44,81 +44,19 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   10 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
-  11 registers.update ok
   record fixes: none in the content
-  12 cards.comment ok
-  13 cards.move ok
-  14 cards.move ok
-  card cleared: std-togaf-architecture-artifact-t18:T18
-  card discharge: 1 card(s) cleared of 310 open package(s)
+  card discharge: no open rework card owned by the project
   closure: not applicable (the project stays active)
-T18: 14 acts recorded
+T18: 10 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T18 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-xn7s2bjx/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-xn7s2bjx/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T18-bodies --local-bin /tmp/conv526-bin-8111c984
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T18 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-qu0htg7g/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T18-snap-qu0htg7g/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T18-bodies --local-bin /tmp/conv526-t14-bin-20261126
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "change-control",
-      "document_id": "01a219e4-770e-766e-8253-9782c418d9ca",
-      "natural_key": "artefact:T18:change-control:9ab1ca6ce5baf985",
-      "body_sha256": "9ab1ca6ce5baf9850d7d9184c73c5b62394bd5b9b5a5d5621a94c60c878a0013"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "compliance-review",
-      "document_id": "01a219e4-78cc-7583-8a29-2a5ace7242c6",
-      "natural_key": "artefact:T18:compliance-review:b666b479f9b5b4e7",
-      "body_sha256": "b666b479f9b5b4e72ff8a0842b532bf180703d97c61a1ae2344709f3bcfea4ac"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "delivery-contract",
-      "document_id": "01a219e4-7a8e-7134-8e7f-df925995362a",
-      "natural_key": "artefact:T18:delivery-contract:dd22cf972c6a8d69",
-      "body_sha256": "dd22cf972c6a8d69d1fd3de3f2187d109fca786f8ab5f60402cdfaa94e76126f"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "project-baseline",
-      "document_id": "01a219e4-7c34-7069-88ff-3fb255bf814c",
-      "natural_key": "artefact:T18:project-baseline:46f89492e6176064",
-      "body_sha256": "46f89492e617606498e4bad3a0c58529f0b759d0d2ae8ee1f94dccaa66e92c28"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "project-registers",
-      "document_id": "01a219e4-7dde-753d-b3fc-52995093d4ed",
-      "natural_key": "artefact:T18:project-registers:c2d2889c9516a497",
-      "body_sha256": "c2d2889c9516a497f893490f0ceb5bad0e79e74d56c9850229a6c437ac02e871"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "project-wbs",
-      "document_id": "01a219e4-7fa1-7689-93c2-c185a93bc76c",
-      "natural_key": "artefact:T18:project-wbs:0c139a1717f75634",
-      "body_sha256": "0c139a1717f75634c619132ebe6805c70c3693a9c777877147fcbf894d38da9b"
-    },
-    {
-      "project_key": "T18",
-      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a219e4-8162-775d-91a1-079ab493ef31",
-      "natural_key": "artefact:T18:statement-of-architecture-work:486770c89af1d777",
-      "body_sha256": "486770c89af1d777fd54bab22b65229af4c71f34e1da785fcb4d27a66c487c87"
-    }
-  ],
+  "applied": [],
   "skipped": [
     {
       "project_key": "T18",
@@ -139,6 +77,30 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "T18",
       "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
       "category": "inception-analysis",
       "mandatory": false,
       "trigger": null,
@@ -147,10 +109,42 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "T18",
       "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
       "category": "project-brief",
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     }
   ],
   "refused": [
@@ -192,8 +186,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     }
   ],
   "counts": {
-    "due": 10,
-    "present": 0,
+    "due": 3,
+    "present": 7,
     "missing-edge": 0,
     "stale": 4,
     "ambiguous": 0

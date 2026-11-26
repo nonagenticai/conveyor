@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a219d9-a0f7-7754-9c93-01dc072301ae decided by a distinct approver",
+      "detail": "latest closure gate 01a21a0c-5768-71a1-9f92-2eaf820fcba7 decided by a distinct approver",
       "id": "S07-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -169,16 +169,16 @@
   ],
   "failures": [],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-26T22:02:59.488222+00:00",
+  "generated_at": "2026-11-26T22:49:14.903552+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",
   "project": "S07",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T22:02:39.861425+00:00",
-    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
-    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
+    "generated_at": "2026-11-26T22:48:49.950980+00:00",
+    "git_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
+    "path": "retained-snapshot/18276de5e8ad4d19fa4c783109dbada1aa107be9"
   },
   "verdict": "green",
   "warnings": []
