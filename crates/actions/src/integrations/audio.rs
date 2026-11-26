@@ -337,7 +337,7 @@ mod tests {
                 assert_eq!(method, "POST");
                 assert_eq!(path, "/api/tts/synthesize");
                 assert_eq!(
-                    auth,
+                    auth.as_deref(),
                     Some(LICENCE_TOKEN_SECRET),
                     "the host's licence gate is armed (#410)"
                 );
@@ -378,7 +378,7 @@ mod tests {
                 assert_eq!(service, "asr");
                 assert_eq!(path, "/v1/audio/transcriptions");
                 assert_eq!(
-                    auth,
+                    auth.as_deref(),
                     Some(LICENCE_TOKEN_SECRET),
                     "the host rejects a request with no licence token (#410)"
                 );

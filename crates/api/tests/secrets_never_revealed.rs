@@ -146,7 +146,7 @@ async fn a_secret_is_written_read_rotated_and_never_returned() {
     // ── no action could reveal one ──────────────────────────────────────────────────────
     let registry = conveyor_actions::registry::registry();
     for spec in registry.iter() {
-        let name = spec.name;
+        let name = spec.name.as_ref();
         assert!(
             !(name.starts_with("secrets.") && (name.contains("reveal") || name.contains("read"))),
             "the registry has a reveal-shaped action: {name}"

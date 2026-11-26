@@ -244,7 +244,7 @@ fn every_external_action_declares_its_services_path_prefix() {
         };
         let (_, prefix) = PREFIXES
             .iter()
-            .find(|(key, _)| key == service)
+            .find(|(key, _)| *key == service.as_ref())
             .unwrap_or_else(|| {
                 panic!(
                     "{service} has no declared path prefix: read the service's own router, add a \
@@ -252,7 +252,7 @@ fn every_external_action_declares_its_services_path_prefix() {
                 )
             });
         let prefix = *prefix;
-        seen.insert(*service);
+        seen.insert(service.as_ref());
         assert!(
             prefix.is_empty() || path.starts_with(&format!("{prefix}/")),
             "{} declares {path}, but {service} serves under {prefix:?}: the base URL names the \

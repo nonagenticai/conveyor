@@ -320,6 +320,6 @@ mod tests {
     }
 
     fn spec_schema() -> Value {
-        serde_json::to_value((completions_create().input)()).expect("a schema serializes")
+        serde_json::to_value(completions_create().input_schema()).expect("a schema serializes")
     }
 }

@@ -351,7 +351,7 @@ mod tests {
         let registry = Registry::new(vec![spec("me.get"), spec("me.get")]);
         let mut seen = BTreeMap::new();
         for spec in registry.iter() {
-            *seen.entry(spec.name).or_insert(0) += 1;
+            *seen.entry(spec.name.as_ref()).or_insert(0) += 1;
         }
         assert!(seen.values().any(|count| *count > 1));
     }
@@ -369,9 +369,9 @@ mod tests {
             .iter()
             .find(|spec| {
                 spec.kind == ActionKind::Internal
-                    && !matches!(spec.handler, HandlerRef::Internal(_))
+                    && !matches!(&spec.handler, HandlerRef::Internal(_))
             })
-            .map(|spec| spec.name)
+            .map(|spec| spec.static_name())
     }
 
     #[test]
