@@ -30,3 +30,6 @@ playwright-report/
 # (!.claude/hooks/**) would otherwise re-include it — gitignore's last match wins.
 __pycache__/
 *.pyc
+
+# The rework batch holds a transient flock on its journal; never commit it.
+docs/evidence/rework/batch/*.jsonl.lock
