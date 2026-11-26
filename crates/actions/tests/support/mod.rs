@@ -14,6 +14,7 @@
 
 pub mod kata;
 pub mod lesson;
+pub mod proof;
 pub mod redis;
 
 use std::net::SocketAddr;

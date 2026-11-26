@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Proof of delivery — Lean-checked certificates for the conveyor · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="proof-of-delivery--lean-checked-certificates-for-the-conveyor">Proof of delivery — Lean-checked certificates for the conveyor</h1>
+<p>Status: building · Issue: <a href="https://github.com/nonagenticai/conveyor/issues/744">#744</a> (capability) · <a href="https://github.com/nonagenticai/conveyor/issues/746">#746</a> (corpus, programme certificates, live gate)</p>
+<h2 id="why">Why</h2>
+<p><code>docs/SPEC_V2.md</code> §5.3 already says a deliverable is accepted when an artefact or run meets its criteria, and §5.4 makes evidence a closed set that a gate resolves before it opens. Neither says what "the evidence is sufficient" means in a form a third party can re-check without trusting the conveyor's own code.</p>
+<p>The Lean prover (<code>apps/lean4-prover</code>) is a workspace crate with a synchronous API: <code>POST /api/check</code> takes Lean source and answers <code>valid</code> with diagnostics. This plan turns that into a <strong>certificate</strong>: a canonical statement of what was claimed, the facts it was checked against, the complete Lean source that proves it, and the prover identity — stored so anyone can replay the check.</p>
+<h2 id="what-is-proven-and-what-is-not">What is proven, and what is not</h2>
+<p>Three grades, in increasing cost:</p>
+<ol type="1">
+<li><strong>Instance</strong> — one delivery record's facts, serialised as a Lean literal, closed by <code>by decide</code>. Cheap, and it fails when a required item is missing.</li>
+<li><strong>Universal</strong> — theorems over a hand-written model of §5's rules, quantified over every state (<code>closed</code> is terminal, no self-transition, an accepting path carries evidence). This is the part a test cannot express.</li>
+<li><strong>Bundle</strong> — one theorem over the set of leaf certificate hashes, so a release is proven without re-proving every record in one source document.</li>
+</ol>
+<p><strong>Not proven:</strong> that the Rust implementation refines the model. Lean checks the model and the record, not the binary. Every certificate therefore carries the assumption, the spec hash and the prover identity, and the identity is <strong>asserted by the conveyor from configuration</strong>, not attested by the prover. A certificate is <em>re-checkable</em>, not <em>signed</em>. Closing that gap needs prover-side changes and is deliberately a later unit.</p>
+<h2 id="the-certificate">The certificate</h2>
+<p>One row per certificate (<code>proof</code>), append-only:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>subject_type</code>, <code>subject_id</code></td>
+<td>the card, run, WBS node, release, programme or package it is about</td>
+</tr>
+<tr>
+<td><code>spec_name</code>, <code>spec_sha256</code></td>
+<td>which specification the statement answers, and its digest</td>
+</tr>
+<tr>
+<td><code>facts_canonical</code>, <code>facts_sha256</code></td>
+<td>the canonical JSON of the facts, and its digest</td>
+</tr>
+<tr>
+<td><code>lean_source</code>, <code>theorem</code>, <code>trust</code></td>
+<td>the exact source checked, the theorem name, and whether reduction was kernel (<code>decide</code>) or native (<code>native_decide</code>)</td>
+</tr>
+<tr>
+<td><code>verdict</code>, <code>computation_time_ms</code></td>
+<td>what the prover answered and how long it took</td>
+</tr>
+<tr>
+<td><code>prover_identity</code></td>
+<td>toolchain, Mathlib revision and the prover build the check ran on</td>
+</tr>
+<tr>
+<td><code>idempotency_key</code>, <code>invocation_id</code></td>
+<td>the engine invocation whose persisted response this certificate records</td>
+</tr>
+<tr>
+<td><code>certificate_sha256</code></td>
+<td>the digest of the tuple above</td>
+</tr>
+</tbody>
+</table>
+<p>The binding between Rust and Lean is checkable without hashing inside Lean:</p>
+<ul>
+<li><code>lean_source == render(facts_canonical)</code>, and</li>
+<li><code>sha256(facts_canonical) == facts_sha256</code>.</li>
+</ul>
+<p>A verifier re-renders from the stored facts and compares bytes; a mismatch is a tampered row, not a different proof.</p>
+<h2 id="how-a-certificate-is-produced">How a certificate is produced</h2>
+<p>An action handler runs inside one transaction and may not speak HTTP (<code>crates/api/tests/externals_declared.rs</code>), so the work is two steps, not one action:</p>
+<ol type="1">
+<li>a job step invokes the declared <code>lean4.check</code> external action — the engine owns the timeout, breaker, idempotency claim and audit row;</li>
+<li><code>proofs.record</code> names that call's idempotency key, reads the engine's persisted response, and writes the certificate in its own transaction.</li>
+</ol>
+<p>A caller cannot supply a verdict; it can only name an invocation the engine already made.</p>
+<h2 id="the-actions">The actions</h2>
+<p>Four internal actions, all tenant-scoped; the prover calls stay the declared <code>lean4.*</code> externals from T14.</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Scope</th>
+<th>What it refuses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>proofs.record</code></td>
+<td><code>approvals:write</code></td>
+<td>an unknown, in-flight, expired or non-200 invocation; a body whose request hash differs from the stored one (the source is taken from that body, so a caller cannot substitute it); a theorem the source does not declare; <code>trust: kernel</code> on a source that reduces with <code>native_decide</code>; facts that are not JSON; a second certificate for one invocation</td>
+</tr>
+<tr>
+<td><code>proofs.reverify</code></td>
+<td><code>approvals:read</code></td>
+<td>a row whose digest or facts no longer describe its columns; naming the certificate's own invocation (a replay is not a re-check); a fresh check whose source, verdict or recomputed digest differs from the stored ones</td>
+</tr>
+<tr>
+<td><code>proofs.get</code></td>
+<td><code>approvals:read</code></td>
+<td>a missing id in this tenant</td>
+</tr>
+<tr>
+<td><code>proofs.list</code></td>
+<td><code>approvals:read</code></td>
+<td>an unknown subject kind</td>
+</tr>
+</tbody>
+</table>
+<p><code>proofs.reverify</code> cannot call the prover — an action handler runs in one transaction and may not speak HTTP — so re-verification is two steps like record: the caller runs a <strong>fresh</strong> <code>lean4.check</code> on the stored source under a new key, then names both the certificate and that invocation. The action is the judgement, and it writes nothing: the table is append-only, so a certificate that re-verifies is the same certificate.</p>
+<h2 id="gate-evidence">Gate evidence</h2>
+<p><code>lean_proof</code> joins <code>governed_asset</code> and <code>baseline</code> in <code>resolve_evidence</code> (<code>crates/actions/src/pm/mod.rs</code>). A gate opened with <code>pinned_spec_sha256</code> accepts a proof only when it is <code>proven</code>, on that spec hash, with a <code>certificate_sha256</code> that recomputes. Every refusal is a typed <code>422</code>, so the gate can fail — which §5.4 requires, and a gate that never refuses is a defect.</p>
+<h2 id="units">Units</h2>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>Scope</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#744</td>
+<td>the store, <code>proofs.*</code> actions, the <code>lean_proof</code> evidence kind, the credential</td>
+<td>provable against a stub prover</td>
+</tr>
+<tr>
+<td>#746</td>
+<td>the model, the facts renderer, programme certificates, package manifests, the live gate</td>
+<td>needs the deployed engine and a reachable prover</td>
+</tr>
+</tbody>
+</table>
+<h2 id="out-of-scope">Out of scope</h2>
+<p>Rust-level verification (Verus/Kani); refinement of the model to the implementation; prover-side attestation; and widening the requirement from the programme release gate to every card's Definition of Done before one real cycle of refusals exists.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/proof-of-delivery.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

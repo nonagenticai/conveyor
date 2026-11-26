@@ -2243,6 +2243,24 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/02-architecture-design.md"
     },
     {
+      "title": "Proof of delivery — Lean-checked certificates for the conveyor",
+      "path": "docs/plans/proof-of-delivery.html",
+      "source": "docs/plans/proof-of-delivery.md",
+      "section": "Plans",
+      "sha256": "b4f713a4995489db44271d2fa282a40f573dd0bde53e609c0695eb546ac3a5f8",
+      "bytes": 6140,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery.md"
+    },
+    {
+      "title": "Project brief — proof of delivery",
+      "path": "docs/plans/proof-of-delivery/project-brief.html",
+      "source": "docs/plans/proof-of-delivery/project-brief.md",
+      "section": "Plans",
+      "sha256": "17d182c6adb7609ad198a356a590787ee7a7737fd5d69f14dbb0202c61b4cfd8",
+      "bytes": 2188,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery/project-brief.md"
+    },
+    {
       "title": "S00 — Usage inventory → parity/parity.yaml",
       "path": "docs/plans/slices/S00-usage-inventory.html",
       "source": "docs/plans/slices/S00-usage-inventory.md",
