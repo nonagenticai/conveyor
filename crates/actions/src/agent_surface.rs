@@ -163,7 +163,7 @@ mod tests {
         assert!(!member.is_empty());
         assert!(member.len() <= admin.len());
         for spec in &member {
-            assert!(admin.iter().any(|other| other.name == spec.name));
+            assert!(admin.iter().any(|other| other.name == spec.name.as_ref()));
         }
         // The kind filter excludes nothing today (no workflow action is registered), which is
         // exactly why it is asserted rather than assumed: the first S13 action must change this.

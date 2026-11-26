@@ -7,6 +7,8 @@
 //! `CONVEYOR_TEST_DUPLICATE=members.set_role cargo run -p conveyor-server -- serve` exits 1
 //! before `bind`.
 
+use std::borrow::Cow;
+
 use conveyor_actions::registry::{Registry, validate};
 use conveyor_actions::spec::{
     ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, SchemaRef, Scope,
