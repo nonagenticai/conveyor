@@ -33,9 +33,9 @@
     {
       "number": 745,
       "title": "add: SPEC \u00a710.4 \u2014 the four missing analyse.* actions (app, brand, content, report)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/745",
-      "updatedAt": "2026-11-26T11:25:05Z",
+      "updatedAt": "2026-11-26T12:22:37Z",
       "labels": [
         {
           "name": "unit",
@@ -52,7 +52,7 @@
       "title": "add: the proof store, proofs actions and the lean_proof gate evidence",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/744",
-      "updatedAt": "2026-11-26T11:35:24Z",
+      "updatedAt": "2026-11-26T11:48:06Z",
       "labels": [
         {
           "name": "unit",
@@ -535,7 +535,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T11:23:50Z",
+      "updatedAt": "2026-11-26T12:22:47Z",
       "labels": [
         {
           "name": "programme",
@@ -1596,7 +1596,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T10:46:22Z",
+      "updatedAt": "2026-11-26T11:48:35Z",
       "labels": [
         {
           "name": "unit",
@@ -6292,9 +6292,9 @@
     {
       "number": 2,
       "title": "S02 \u2014 prove long-job lease/recovery under two workers",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/2",
-      "updatedAt": "2026-11-13T06:31:40Z",
+      "updatedAt": "2026-11-26T12:49:40Z",
       "labels": [
         {
           "name": "unit",
