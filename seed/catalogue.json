@@ -431,6 +431,32 @@
       }
     },
     {
+      "code": "tool_request",
+      "label": "Tool request",
+      "definition": {
+        "rules": [
+          "one_live_card_per_operation_and_procedure",
+          "the_sop_grants_nothing",
+          "a_published_toolkit_version_rebinds_the_step",
+          "the_card_names_the_operation_the_process_and_its_steps"
+        ],
+        "inputs": [],
+        "outputs": [
+          "tool",
+          "process_id",
+          "steps",
+          "pin"
+        ],
+        "acceptance": [
+          "READY: the_missing_operation_is_named_with_its_process_and_steps",
+          "DOING: a_development_job_implements_the_tool",
+          "QA: the_publication_is_gated_and_the_toolkit_version_immutable",
+          "DONE: the_step_resolves_to_the_published_pin"
+        ],
+        "human_task": false
+      }
+    },
+    {
       "code": "code_quality_analysis",
       "label": "Code quality analysis",
       "definition": {

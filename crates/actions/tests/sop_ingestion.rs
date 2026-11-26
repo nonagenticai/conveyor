@@ -1243,10 +1243,55 @@ async fn an_unreviewed_source_cannot_bind() {
     assert_eq!(process_row(&pg, &process_id).await.0, "draft");
 }
 
+/// SPEC_V2 §11.6 item 3: a procedure step that needs an operation with no tool opens a
+/// tool-request card; a published toolkit version rebinds the step, and the procedure is
+/// retryable. The SOP still grants nothing — the derived agent's ceiling stays empty.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn an_sop_cannot_grant_a_tool() {
+async fn a_missing_operation_opens_a_tool_request_and_binds_once_published() {
     let _env = ENV_LOCK.lock().await;
-    let (pg, _seeded, running) = fixture().await;
+    let (pg, seeded, running) = fixture().await;
+    let tenant = seeded.tenant;
+
+    // A project with one board lane: where a system-opened record is born.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("a scoped write");
+    let project_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, 'sop-tool-requests', 'SOP tool requests') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the project");
+    let board_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO board (tenant_id, project_id, name, position)
+         VALUES ($1, $2, 'Requests', 0) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the board");
+    let _list_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO list (tenant_id, board_id, name, position, kind)
+         VALUES ($1, $2, 'Active', 0, 'active') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the lane");
+    // The dev seed carries only the three types a project start needs; the tenant catalogue's
+    // `tool_request` type (seed/catalogue.json) is installed by the provisioning import.
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label) VALUES ($1, 'tool_request', 'Tool request')",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("the tool_request card type");
+    tx.commit().await.expect("commit the lane");
+
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     draft_content.lock().await.clone_from(&draft(
@@ -1259,15 +1304,10 @@ async fn an_sop_cannot_grant_a_tool() {
         )],
         &["shell.exec"],
     ));
+    let mut input = sop_input("receiving-tool", "receiving-sop-tool");
+    input["project_id"] = json!(project_id.to_string());
     let (status, body) = running
-        .invoke(
-            "procedures.ingest_sop",
-            TOKEN,
-            sop_input("receiving-tool", "receiving-sop-tool"),
-            None,
-            None,
-            None,
-        )
+        .invoke("procedures.ingest_sop", TOKEN, input, None, None, None)
         .await;
     assert_eq!(status, 201, "{body}");
     let process_id = field(&body, "process_id").to_owned();
@@ -1278,7 +1318,31 @@ async fn an_sop_cannot_grant_a_tool() {
         "the tool request is never echoed as a grant"
     );
 
-    // The agent holds nothing, and validation refuses the draft by name.
+    // The request is a card: it names the operation, the process and the steps that wait.
+    let (card_id, card_type, card_meta): (uuid::Uuid, String, Value) = sqlx::query_as(
+        "SELECT c.id, t.code, c.meta
+           FROM card c JOIN card_type t ON t.tenant_id = c.tenant_id AND t.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND c.board_id = $2 AND c.archived_at IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the tool-request card");
+    assert_eq!(card_type, "tool_request", "{card_type}");
+    assert_eq!(card_meta["tool"], "shell.exec", "{card_meta}");
+    assert_eq!(card_meta["process_id"], process_id, "{card_meta}");
+    assert_eq!(card_meta["process_key"], "receiving-tool", "{card_meta}");
+    assert!(
+        !card_meta["steps"]
+            .as_array()
+            .expect("the card names its steps")
+            .is_empty(),
+        "{card_meta}"
+    );
+    assert_eq!(card_meta["state"], "open", "{card_meta}");
+
+    // The agent holds nothing — a request is not a grant.
     let allowed: Vec<String> =
         sqlx::query_scalar("SELECT allowed_actions FROM capability_agent WHERE id = $1")
             .bind(uuid::Uuid::parse_str(&agent_id).expect("agent id"))
@@ -1286,6 +1350,8 @@ async fn an_sop_cannot_grant_a_tool() {
             .await
             .expect("the agent row");
     assert!(allowed.is_empty(), "{allowed:?}");
+
+    // Validation passes and names the open request: the procedure is not dead-ended.
     let (status, body) = running
         .invoke(
             "procedures.validate",
@@ -1296,19 +1362,74 @@ async fn an_sop_cannot_grant_a_tool() {
             None,
         )
         .await;
-    assert_eq!(status, 422, "{body}");
-    assert_eq!(
-        body["type"].as_str().unwrap_or_default(),
-        "sop.cannot_grant_tool",
-        "{body}"
+    assert_eq!(status, 200, "{body}");
+    let checks = output(&body)["checks"]
+        .as_array()
+        .expect("the checks")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        checks.contains("1 tool request(s) open") && checks.contains(&card_id.to_string()),
+        "{checks}"
+    );
+
+    // A development job publishes the toolkit version that provides the operation.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("a scoped write");
+    let toolkit_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, auth_adapter,
+                              owner, status)
+         VALUES ($1, 'shell', 1, 'Shell tools', 'shell', 'none', 'platform', 'published')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the published toolkit");
+    sqlx::query(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, 'exec', '{}'::jsonb, 'read', 30, 'tools.dispatch', 'published')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .execute(&mut *tx)
+    .await
+    .expect("the published tool");
+    tx.commit().await.expect("commit the publication");
+
+    // Retry: the step now resolves to the immutable pin, and no request is open.
+    let (status, body) = running
+        .invoke(
+            "procedures.validate",
+            TOKEN,
+            json!({"process_id": process_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let checks = output(&body)["checks"]
+        .as_array()
+        .expect("the checks")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        checks.contains("shell.exec -> shell.exec v1"),
+        "the step does not name its published pin: {checks}"
     );
     assert!(
-        body["detail"]
-            .as_str()
-            .unwrap_or_default()
-            .contains("shell.exec"),
-        "{body}"
+        !checks.contains("tool request(s) open"),
+        "the request is still open after the publication: {checks}"
     );
+
+    // The ceiling is unchanged: the publication is not a grant to the derived agent.
     let allowed_after: Vec<String> =
         sqlx::query_scalar("SELECT allowed_actions FROM capability_agent WHERE id = $1")
             .bind(uuid::Uuid::parse_str(&agent_id).expect("agent id"))

@@ -742,6 +742,37 @@ pub async fn update_card_tx(
     }
 }
 
+/// The newest live card on a board whose `meta[key] = value`.
+///
+/// A system-opened record (a tool request) is idempotent by its own key: the action that opens
+/// it asks whether one is already there before creating a second. `archived_at` excludes the
+/// spent records, so a fulfilled request does not block a new one.
+pub async fn find_live_card_by_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    board_id: Uuid,
+    key: &str,
+    value: &str,
+) -> Result<Option<CardRecord>, sqlx::Error> {
+    let id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM card
+          WHERE tenant_id = $1 AND board_id = $2 AND archived_at IS NULL
+            AND meta ->> $3 = $4
+          ORDER BY created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .bind(key)
+    .bind(value)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match id {
+        Some(id) => get_card_record_tx(conn, tenant, id).await,
+        None => Ok(None),
+    }
+}
+
 /// Replace a card's `meta` document, guarded by its version. `None` means absent or stale.
 ///
 /// The caller computes the merged document: `meta` is a free-form object whose keys belong to
