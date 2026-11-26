@@ -1,18 +1,24 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T09:34:59+00:00",
-  "green": 1,
+  "blocked": 1,
+  "generated_at": "2026-11-26T09:41:42+00:00",
+  "green": 0,
   "members": [
     {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "P0",
-      "log": "docs/evidence/rework/batch/tranche-0/P0.log",
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: projects.close refused at act 92: error: projects.close refused (409): project S00 cannot close until its mandatory artefacts exist (missing: business_capability_map, data_entity_catalog, driver_goal_objective, project-registers, project-wbs, requirements_catalog, solution_concept, stakehold",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
+      "key": "S00",
+      "log": "docs/evidence/rework/batch/tranche-0/S00.log",
       "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
+      "state": "BLOCKED"
     }
   ],
   "red": 0,
-  "snapshot_sha": "26cc8c94",
+  "snapshot_sha": "77425673",
   "tranche": 0
 }
