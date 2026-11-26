@@ -2074,7 +2074,12 @@
             ],
             "failure_scenario": "A delivery lead with portfolio:write creates a change row with status 'approved', baseline_ref pointing at the current approved baseline and meta.impact = {}. They then call baselines.take with that change_id. The new baseline is created and cited as advanced by an 'approved' change that no approver ever saw, bypassing §8.4 change control and §8.3's re-baseline rule entirely.",
             "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
-            "owner_project": "T3"
+            "owner_project": "T3",
+            "resolved_by": {
+                "commit": "c85c4310d213b490f5d547be9d3703bb8203f13b",
+                "test": "crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline",
+                "evidence": "spine_gates 3/3: a_register_cannot_be_born_approved, a_self_declared_approved_change_cannot_advance_a_baseline, an_approved_change_gate_advances_the_baseline"
+            }
         },
         {
             "id": "v1-w2c-5",
@@ -2374,7 +2379,12 @@
             ],
             "failure_scenario": "A `write` tool (for example `coding.jobs.create`) is published with no checks declaration. The destination answers 200 after a partial write — the branch was created but the commit was not. The broker ledgers `ok`, the run proceeds on the belief that the write verified itself, and the unverified write is indistinguishable in the ledger from a verified one.",
             "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
-            "owner_project": "T13"
+            "owner_project": "T13",
+            "resolved_by": {
+                "commit": "b7cc3f51a3b04e3638a91b99c02f48683ee2529a",
+                "test": "crates/actions/tests/tool_platform.rs::a_two_hundred_with_a_failing_verdict_is_check_failed",
+                "evidence": "tool_platform 11/11; a 200 whose own verdict/checks fail is ledgered check_failed with error_class write_not_verified. The publish half was already on main (0072_tool_meta), proved by estate_toolkits::a_write_tool_without_its_contract_is_refused"
+            }
         },
         {
             "id": "v1-w4a-3",
