@@ -193,7 +193,7 @@
 <tr>
 <td><strong>P5</strong></td>
 <td>Slice-dependent surfaces</td>
-<td>Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror <code>apps/web</code>'s state; a gate flips to live only when the owning slice does</td>
+<td>Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror <code>apps/web</code>'s state; S4 audits every gate, and a gate flips to live only when the owning slice does — as a follow-on issue on the sibling that owns the destination, never as an S4 edit</td>
 </tr>
 <tr>
 <td><strong>P6</strong></td>
@@ -220,7 +220,7 @@
 <tr>
 <td><strong>Parent G0</strong></td>
 <td>W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue</td>
-<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-*</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/api/src/web.rs</code>, <code>Dockerfile</code>, the walk workflow</td>
+<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code>, the initial <code>docs/evidence/walk-coverage.json</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/api/src/web.rs</code>, <code>Dockerfile</code>, the walk workflow</td>
 <td>P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs</td>
 </tr>
 <tr>
@@ -243,14 +243,15 @@
 </tr>
 <tr>
 <td><strong>S4</strong></td>
-<td>W5 retained V1, W6 slice-dependent, W7 P6 gate + primacy, W8 hardening</td>
-<td><code>src/destinations/v1/**</code>, <code>src/router/routes/v1.js</code>, <code>e2e/v1/**</code>, <code>docs/evidence/walk-coverage.json</code>, the P6 runbook and redirect map</td>
-<td>All 52 routes; P6 gate; a11y/perf; owner sign-off</td>
+<td>W5 retained V1, W6 slice-gate audit, W7 P6 gate + primacy, W8 hardening</td>
+<td><code>src/destinations/v1/**</code>, <code>src/router/routes/v1.js</code>, <code>e2e/v1/**</code>, the regenerated <code>docs/evidence/walk-coverage.json</code>, the P6 runbook and redirect map</td>
+<td>All 52 routes; every slice gate matches <code>apps/web</code>; P6 gate; a11y/perf; owner sign-off</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Dependencies.</strong> The parent <code>blocks</code> S1–S4. S1–S3 are parallel and file-disjoint. S4 is <code>blocked-by</code> S1–S3. The parent creates all five route files as empty row lists, so a sibling fills only its own file and the duplicate-PR guard (<code>block-duplicate-pr.py</code>) never sees overlapping edits.</p>
-<p><strong>Work-package map.</strong> W0–W2 are parts of the parent; W3–W4 are the destination work distributed across S1–S3 by wing; W5–W8 are S4. The stage table in §7 stays the content order; the split is by file ownership, not by read/write phase, because a destination module owns both its reads and its writes — splitting reads from writes would make the two issues touch the same files. Where a retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its <code>src/destinations/v1/**</code> holds only V1 surfaces with no owning destination module.</p>
+<p><strong>Work-package map.</strong> W0–W2 are parts of the parent; W3–W4 are the destination work distributed across S1–S3 by wing; W5–W8 are S4. The stage table in §7 stays the content order; the split is by file ownership, not by read/write phase, because a destination module owns both its reads and its writes — splitting reads from writes would make the two issues touch the same files. Where a retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its <code>src/destinations/v1/**</code> holds only V1 surfaces with no owning destination module. W6 is an audit: a slice landing is a follow-on issue on the sibling that owns the destination, not an S4 edit, so the four wings stay file-disjoint.</p>
+<p><strong>Generated record.</strong> <code>docs/evidence/walk-coverage.json</code> is emitted by the instrument, never hand-edited; each issue that changes coverage regenerates and commits it. It is the only shared generated artifact in the split, and a generated-file overlap alone does not merge two siblings' work; every hand-edited file stays disjoint.</p>
 <p><strong>Shared seams.</strong> <code>src/api/manifest.js</code>, <code>src/shell/sheet-host.js</code>, <code>src/world/port.js</code>, <code>src/forms/**</code> and <code>src/a11y/**</code> are parent-owned; siblings consume them and do not edit them. A sibling that needs a seam change stops and asks the parent's owner rather than forking the contract.</p>
 <p><strong>If the owner declines the split.</strong> The whole plan is one issue (<code>GEMBA-WALK</code>), the stages are commits on one <code>issue/&lt;n&gt;-gemba-walk</code> branch, and the P6 gate closes the same PR. The plan states both paths so no session has to improvise.</p>
 <h3 id="81-w0-runbook--the-first-session">8.1 W0 runbook — the first session</h3>

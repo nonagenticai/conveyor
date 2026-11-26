@@ -166,7 +166,7 @@ successor) once the walk app is on `main`; it needs no server, database or netwo
 | **P2** | Read parity across §10.5 | Every destination renders its reads with loading/empty/partial/error/denied and the honest gate; each has its spec |
 | **P3** | Write parity + gates | Every destination's writes go through the action sheet with `If-Match`/`Idempotency-Key`/approval, refusals shown verbatim, no optimistic mutation |
 | **P4** | Retained V1 surfaces | All 52 route patterns have a walk route; the V1 families have reads and their writes; specs |
-| **P5** | Slice-dependent surfaces | Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror `apps/web`'s state; a gate flips to live only when the owning slice does |
+| **P5** | Slice-dependent surfaces | Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror `apps/web`'s state; S4 audits every gate, and a gate flips to live only when the owning slice does — as a follow-on issue on the sibling that owns the destination, never as an S4 edit |
 | **P6** | Parity gate + primacy runbook | Instrument green; a11y/perf met; owner sign-off; if yes, old-route redirect map, `apps/web` freeze, stabilisation period, retirement; if no, the walk stays an alternative client |
 
 **External prerequisites.** The `/walk/` OIDC redirect-URI registration is an external change: the
@@ -192,11 +192,11 @@ own disjoint destination wings:
 
 | Issue | Contains | Files it owns | Acceptance |
 |---|---|---|---|
-| **Parent G0** | W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue | `scripts/build-walk-coverage.py`, `docs/evidence/walk-*`, `spike/walk/**` (deleted), `apps/walk/index.html`, `src/main.js`, `src/auth/**`, `src/api/**`, `src/forms/**`, `src/router/registry.js`, `src/router/routes/core.js`, `src/shell/**`, `src/world/**`, `src/state/**`, `src/a11y/**`, `src/destinations/portfolio.js`, `e2e/shell/**`, `e2e/portfolio/**`, `dev-server.mjs`, `playwright.config.ts`, `crates/api/src/web.rs`, `Dockerfile`, the walk workflow | P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs |
+| **Parent G0** | W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue | `scripts/build-walk-coverage.py`, `docs/evidence/walk-census.json`, `docs/evidence/walk-exemptions.json`, the initial `docs/evidence/walk-coverage.json`, `spike/walk/**` (deleted), `apps/walk/index.html`, `src/main.js`, `src/auth/**`, `src/api/**`, `src/forms/**`, `src/router/registry.js`, `src/router/routes/core.js`, `src/shell/**`, `src/world/**`, `src/state/**`, `src/a11y/**`, `src/destinations/portfolio.js`, `e2e/shell/**`, `e2e/portfolio/**`, `dev-server.mjs`, `playwright.config.ts`, `crates/api/src/web.rs`, `Dockerfile`, the walk workflow | P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs |
 | **S1** | W3/W4 for Portfolio & plan (except `portfolio.*`) + Organisation | `src/destinations/{programme,plan,validation,execution,decisions,runs,meetings,organisation,jobs,agents,tools,project-types}.js`, `src/router/routes/portfolio-organisation.js`, `e2e/portfolio-organisation/**` | Every owned destination `read` and `write`; specs assert empty/error/happy/refusal/write; instrument green for its rows |
 | **S2** | W3/W4 for Procedures & authoring + Govern & design | `src/destinations/{procedures,processes,process-map,authoring,adm,architecture,requirements,models,copilot}.js`, `src/router/routes/procedures-governance.js`, `e2e/procedures-governance/**` | Same |
 | **S3** | W3/W4 for Knowledge + Measure & improve + Operations + Utilities | `src/destinations/{knowledge,improve,evals,benchmarks,usage,prompt-audit,metering,operations,search,platform,settings,approvals}.js`, `src/router/routes/measure-operations-utilities.js`, `e2e/measure-operations-utilities/**` | Same |
-| **S4** | W5 retained V1, W6 slice-dependent, W7 P6 gate + primacy, W8 hardening | `src/destinations/v1/**`, `src/router/routes/v1.js`, `e2e/v1/**`, `docs/evidence/walk-coverage.json`, the P6 runbook and redirect map | All 52 routes; P6 gate; a11y/perf; owner sign-off |
+| **S4** | W5 retained V1, W6 slice-gate audit, W7 P6 gate + primacy, W8 hardening | `src/destinations/v1/**`, `src/router/routes/v1.js`, `e2e/v1/**`, the regenerated `docs/evidence/walk-coverage.json`, the P6 runbook and redirect map | All 52 routes; every slice gate matches `apps/web`; P6 gate; a11y/perf; owner sign-off |
 
 **Dependencies.** The parent `blocks` S1–S4. S1–S3 are parallel and file-disjoint. S4 is
 `blocked-by` S1–S3. The parent creates all five route files as empty row lists, so a sibling fills
@@ -209,7 +209,14 @@ file ownership, not by read/write phase, because a destination module owns both 
 writes — splitting reads from writes would make the two issues touch the same files. Where a
 retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its
 route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its
-`src/destinations/v1/**` holds only V1 surfaces with no owning destination module.
+`src/destinations/v1/**` holds only V1 surfaces with no owning destination module. W6 is an audit:
+a slice landing is a follow-on issue on the sibling that owns the destination, not an S4 edit, so
+the four wings stay file-disjoint.
+
+**Generated record.** `docs/evidence/walk-coverage.json` is emitted by the instrument, never
+hand-edited; each issue that changes coverage regenerates and commits it. It is the only shared
+generated artifact in the split, and a generated-file overlap alone does not merge two siblings'
+work; every hand-edited file stays disjoint.
 
 **Shared seams.** `src/api/manifest.js`, `src/shell/sheet-host.js`, `src/world/port.js`,
 `src/forms/**` and `src/a11y/**` are parent-owned; siblings consume them and do not edit them. A
