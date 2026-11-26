@@ -109,7 +109,8 @@
   &quot;baseline&quot;: {&quot;date&quot;: &quot;YYYY-MM-DD&quot;, &quot;git_sha&quot;: &quot;&lt;40 hex&gt;&quot;},
   &quot;routes&quot;: [{&quot;pattern&quot;: &quot;/boards&quot;, &quot;view&quot;: &quot;BoardIndex&quot;, &quot;spec&quot;: &quot;v1/board.spec.ts&quot;}],
   &quot;actions&quot;: [{&quot;name&quot;: &quot;cards.move&quot;, &quot;kind&quot;: &quot;internal&quot;, &quot;scopes&quot;: [&quot;cards:write&quot;],
-               &quot;effect&quot;: &quot;write&quot;, &quot;confirm&quot;: &quot;none&quot;, &quot;tenancy&quot;: &quot;tenant&quot;}],
+               &quot;effect&quot;: &quot;write&quot;, &quot;confirm&quot;: &quot;none&quot;, &quot;tenancy&quot;: &quot;tenant&quot;,
+               &quot;idempotent&quot;: true}],
   &quot;counts&quot;: {&quot;routes&quot;: 52, &quot;actions&quot;: 597}
 }</code></pre>
 <p>The census is built from:</p>

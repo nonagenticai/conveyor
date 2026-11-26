@@ -109,7 +109,8 @@ a signed commit:
   "baseline": {"date": "YYYY-MM-DD", "git_sha": "<40 hex>"},
   "routes": [{"pattern": "/boards", "view": "BoardIndex", "spec": "v1/board.spec.ts"}],
   "actions": [{"name": "cards.move", "kind": "internal", "scopes": ["cards:write"],
-               "effect": "write", "confirm": "none", "tenancy": "tenant"}],
+               "effect": "write", "confirm": "none", "tenancy": "tenant",
+               "idempotent": true}],
   "counts": {"routes": 52, "actions": 597}
 }
 ```
