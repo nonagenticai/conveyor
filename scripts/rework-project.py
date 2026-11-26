@@ -1014,6 +1014,7 @@ class Runner:
                     },
                     read_action="registers.get",
                     read_input={"id": str(row["id"])},
+                    if_match=int(row.get("version") or 1),
                 )
         else:
             baseline = None
@@ -1877,6 +1878,8 @@ class Runner:
         # before the gate decides. Measured on S07/S09, tr4 batch 2026-11-26: `project-registers`
         # and `change-control` were refused on the empty code and the close then refused the two
         # missing mandatory documents.
+        change_row = self._read("registers.get", {"id": str(change["change_id"])})
+        row_output = change_row.get("output") if isinstance(change_row.get("output"), dict) else change_row
         self.invoke(
             "registers.update",
             {
@@ -1885,6 +1888,7 @@ class Runner:
             },
             read_action="registers.get",
             read_input={"id": str(change["change_id"])},
+            if_match=int(row_output.get("version") or 1),
         )
         self.decide(change["approval_id"], "approve the change that authorises the acceptance")
         return str(change["change_id"])
