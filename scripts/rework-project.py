@@ -1418,6 +1418,13 @@ class Runner:
                 payload = {"id": row["id"], "change_id": change_id, **{
                     key: fix[key] for key in ("acceptance", "evidence", "status") if key in fix
                 }}
+                if str(row.get("kind") or "") == "work_package" and not row.get("card_id"):
+                    # Migration 0097: a work_package node owes its card. The row predates the
+                    # rule, and an UPDATE re-validates it, so the plan half grows the card it
+                    # should have carried from birth.
+                    payload["card_id"] = self.ensure_work_package_card(
+                        str(row.get("title") or f"{self.project} work package")
+                    )
                 self.invoke(
                     "wbs.update",
                     payload,
@@ -1503,6 +1510,40 @@ class Runner:
         )
         self.decide(created["approval_id"], "approve the record-fix change")
         return str(created["change_id"])
+
+    def ensure_work_package_card(self, title: str) -> str:
+        """Create the card a work_package node owes, on the project board's intake lane.
+
+        Migration 0097's `wbs_node_work_package_card_required` refuses a work_package without a
+        card; the plan's older nodes predate it. The card is the executors' handle on the work,
+        so the fix is to create it, not to exempt the row.
+        """
+        lanes = [
+            lane
+            for lane in self.snapshot_json("work.json").get("lists") or []
+            if str(lane.get("board_id")) == self.board
+            and str(lane.get("kind")) == "intake"
+        ]
+        if not lanes:
+            fail(f"{self.project}: the board has no intake lane for the work-package card")
+        card = self.invoke(
+            "cards.create",
+            {
+                "board_id": self.board,
+                "list_id": lanes[0]["id"],
+                "name": title[:190],
+                "description": (
+                    f"The work package '{title}' of the standing platform's plan. The card is the "
+                    "executor's handle on the work; the WBS node carries the acceptance and the "
+                    "evidence."
+                ),
+                "card_type_code": "development_chore",
+                "meta": {"work_package": title},
+            },
+            read_action="cards.get",
+            read_id_from_output="id",
+        )
+        return str(card["id"])
 
     def ensure_extra_baselines(self) -> None:
         """Take the schedule and cost baselines the PMP baseline rule reads.

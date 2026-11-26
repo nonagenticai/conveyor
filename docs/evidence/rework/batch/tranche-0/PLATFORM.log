@@ -95,8 +95,11 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   38 registers.update ok
   39 registers.update ok
   40 registers.update ok
+  41 changes.request ok
+  42 approvals.decide ok
 
-rework: wbs.update refused at act 41: error: wbs.update refused (409): `change_id` 01a20200-562e-7a53-9fcd-e136048a00fb is not an approved change request whose `baseline_ref` is the approved scope baseline 01a1fdd8-cff3-7cd9-9535-26fed3d5836b
+rework: wbs.update refused at act 43: error: wbs.update refused (500): the invocation could not be completed
+{"timestamp":"2026-11-26T10:30:37.218881Z","level":"ERROR","fields":{"message":"store failure","error":"error returned from database: new row for relation \"wbs_node\" violates check constraint \"wbs_node_work_package_card_required\" at line 2092","action":"wbs.update"},"target":"conveyor_actions::control"}
 FAILED: wbs.update: transport exited 1
 
 [exit 1]
