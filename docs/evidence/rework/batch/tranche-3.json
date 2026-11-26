@@ -1,0 +1,18 @@
+{
+  "blocked": 0,
+  "generated_at": "2026-11-26T13:12:10+00:00",
+  "green": 1,
+  "members": [
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T3",
+      "log": "docs/evidence/rework/batch/tranche-3/T3.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    }
+  ],
+  "red": 0,
+  "snapshot_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79",
+  "tranche": 3
+}

@@ -1,0 +1,3 @@
+{"blocked": null, "content": "docs/evidence/rework/tranche-3/rework-content-T3.json", "key": "T3", "snapshot_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79", "state": "PREFLIGHTED", "tranche": 3, "ts": "2026-11-26T13:11:34+00:00"}
+{"key": "T3", "snapshot_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79", "state": "RUNNING", "tranche": 3, "ts": "2026-11-26T13:11:34+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T3", "log": "docs/evidence/rework/batch/tranche-3/T3.log", "snapshot_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79", "state": "RECEIPT_GREEN", "tranche": 3, "ts": "2026-11-26T13:12:10+00:00"}

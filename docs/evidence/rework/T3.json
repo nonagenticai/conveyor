@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T3 is closed",
-      "detail": "project T3 is active",
+      "detail": "project T3 is closed",
       "id": "T3-project",
       "kind": "snapshot",
       "result": "pass",
@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a211c8-f8b1-7625-9997-d354adb874a4 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen",
+      "detail": "baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen",
       "id": "T3-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -43,25 +43,25 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a217fb-a475-7824-b01c-bfcfcb4680d3 approved by board decision 01a217fb-a503-7db9-b47b-55a111c1c8de about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T3-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a217fb-d7aa-7e7e-afea-b1ad8dfef42f (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T3-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a211c9-348c-7475-a21e-b48f4c2de610 decided by a distinct approver",
+      "detail": "latest closure gate 01a216d1-3447-7994-9a41-5386c02e2bd0 decided by a distinct approver",
       "id": "T3-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-0d8b-7021-bb29-43baa7ee8c4b carries a statement and evidence from the tranche-3 retro",
+      "detail": "lesson 01a216d0-d273-76e3-981f-989be9f580f1 carries a statement and evidence from the tranche-3 retro",
       "id": "T3-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -142,50 +142,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "5 mandatory artefact package(s) open: contract_missing:T3, mandatory_artefacts:T3, std-pmp-project-baseline-t3:T3, std-pmp-project-registers-t3:T3, std-togaf-compliance-review-t3:T3",
+      "detail": "no open standard artefact package for this project",
       "id": "T3-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "3 unresolved P0/P1 package(s): seed_live_drift:T3 (P1), contract_missing:T3 (P1), mandatory_artefacts:T3 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T3-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass",
+      "detail": "gate discharged by executable checks: T3-project, T3-baseline, T3-charter, T3-closure-outputs, T3-contract, T3-review, T3-closure-gate, T3-waivers, T3-pi-cadence, T3-pi-plan, T3-pi-objectives, T3-wsjf, T3-demo-credits, T3-lessons, T3-product, T3-artefact-standard, T3-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T3-contract (P0): no live board-approved delivery contract",
-    "T3-review (P0): no Phase-G compliance review for the project's live contract",
-    "T3-artefact-standard (P1): 5 mandatory artefact package(s) open: contract_missing:T3, mandatory_artefacts:T3, std-pmp-project-baseline-t3:T3, std-pmp-project-registers-t3:T3, std-togaf-compliance-review-t3:T3",
-    "T3-rework (P0): 3 unresolved P0/P1 package(s): seed_live_drift:T3 (P1), contract_missing:T3 (P1), mandatory_artefacts:T3 (P1)",
-    "gate (P0): the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-25T10:37:54.289730+00:00",
+  "generated_at": "2026-11-26T13:12:10.680953+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
   "project": "T3",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-26T13:11:47.607618+00:00",
+    "git_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79",
+    "path": "retained-snapshot/c1a1a0eadefe8e261dce88855c1c28b9b76f9c79"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
