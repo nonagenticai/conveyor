@@ -77,3 +77,5 @@
 {"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json", "key": "PLATFORM", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T10:44:29+00:00"}
 {"key": "PLATFORM", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T10:44:29+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "PLATFORM", "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T10:44:53+00:00"}
+{"blocked": "content rejected by rework-content-check", "content": "docs/evidence/rework/tranche-0/rework-content-SPEC-V2.json", "key": "SPEC-V2", "snapshot_sha": "3aee5d7e8d954aa2940ad15c5bf95381fa8aa136", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T11:38:43+00:00"}
+{"key": "SPEC-V2", "reason": "content rejected by rework-content-check", "snapshot_sha": "3aee5d7e8d954aa2940ad15c5bf95381fa8aa136", "state": "BLOCKED", "tranche": 0, "ts": "2026-11-26T11:38:43+00:00"}
