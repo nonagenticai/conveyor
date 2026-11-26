@@ -1260,6 +1260,7 @@ pub async fn insert_candidate_tx(
 /// signature (the same live-signature rule `open_tx` enforces), and one `kata_candidate` in
 /// `proposed` — the review state — is recorded under it. A re-close of the same retro finds both
 /// rows and writes nothing, so the pair is idempotent.
+#[allow(clippy::too_many_arguments)]
 pub async fn open_retro_candidate_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
