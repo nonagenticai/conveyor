@@ -28,9 +28,9 @@
     {
       "number": 745,
       "title": "add: SPEC \u00a710.4 \u2014 the four missing analyse.* actions (app, brand, content, report)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/745",
-      "updatedAt": "2026-11-26T11:25:05Z",
+      "updatedAt": "2026-11-26T12:22:37Z",
       "labels": [
         {
           "name": "unit",
