@@ -2317,7 +2317,12 @@
    ],
    "failure_scenario": "An auditor asks the governance screen which requirement a given run proves and where its evidence is. trace_links.list can only return requirement→card or requirement→project edges; the run, its steps and its artefacts are unreachable from the requirement, and evidence arrays naming a run are silently skipped by the gate effect. The one question §8.5 says the screen answers cannot be answered.",
    "acceptance": "Trace ends include run, step, artefact and evidence (tenant-resolved), and a bounded governance view action returns requirement → cards → runs → steps/artefacts/evidence for a requirement or run; tests build the chain and read it back.",
-   "owner_project": "S07"
+   "owner_project": "S07",
+   "resolved_by": {
+    "commit": "5968c53d4b08774cc504bd5075c9b2bd3eb86bd8",
+    "test": "crates/store/tests/s07_store.rs::the_trace_view_walks_requirement_to_run_step_artefact_and_evidence",
+    "evidence": "cargo test -p conveyor-store --test s07_store: 6 passed (the view walks requirement -> cards -> run -> step -> artefact -> evidence and refuses an unknown root); conveyor-actions parity_http_mcp: 7 passed over 620 actions; conveyor-api s07_requests: 16 passed"
+   }
   },
   {
    "id": "v1-w2c-6",
