@@ -227,3 +227,134 @@ fn a_malformed_base_url_is_refused_at_construction() {
     ));
     assert!(LicenceSyncClient::new("http://licences.example.com:8080/").is_ok());
 }
+
+/// A stub for the mint: answers `/licenses/{id}/tokens` and records the `X-Tenant-Id` it saw.
+async fn mint_stub(seen: Arc<Mutex<Option<String>>>) -> String {
+    let app = Router::new().route(
+        "/licenses/{license_id}/tokens",
+        post(move |headers: axum::http::HeaderMap| {
+            let seen = seen.clone();
+            async move {
+                *seen.lock().expect("stub lock") = headers
+                    .get("x-tenant-id")
+                    .and_then(|value| value.to_str().ok())
+                    .map(str::to_owned);
+                (
+                    StatusCode::CREATED,
+                    r#"{"token":"opaque-abc","expires_at":"2099-01-01T00:00:00Z","license_id":"lic-1"}"#,
+                )
+            }
+        }),
+    );
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the mint stub");
+    let addr = listener.local_addr().expect("stub addr");
+    tokio::spawn(async move {
+        axum::serve(listener, app).await.expect("mint stub server");
+    });
+    format!("http://{addr}")
+}
+
+#[tokio::test]
+async fn active_license_id_reads_the_id_and_an_inactive_body_answers_none() {
+    let base = stub(
+        StatusCode::OK,
+        r#"{"active":true,"license_id":"lic-1","tenant_id":"x"}"#,
+    )
+    .await;
+    let client = LicenceSyncClient::new(&base).expect("client");
+    assert_eq!(
+        client
+            .active_license_id(tenant(), "conveyor")
+            .await
+            .expect("active")
+            .as_deref(),
+        Some("lic-1")
+    );
+
+    let base = stub(StatusCode::OK, r#"{"active":false,"license_id":"lic-1"}"#).await;
+    let client = LicenceSyncClient::new(&base).expect("client");
+    assert_eq!(
+        client
+            .active_license_id(tenant(), "conveyor")
+            .await
+            .expect("inactive"),
+        None
+    );
+
+    let base = stub(StatusCode::NOT_FOUND, r#"{"detail":"no_active_license"}"#).await;
+    let client = LicenceSyncClient::new(&base).expect("client");
+    assert_eq!(
+        client
+            .active_license_id(tenant(), "conveyor")
+            .await
+            .expect("404"),
+        None
+    );
+}
+
+#[tokio::test]
+async fn active_license_id_sends_the_tenant_header() {
+    let seen = Arc::new(Mutex::new(None));
+    let app = Router::new().route(
+        "/licenses/active",
+        get({
+            let seen = seen.clone();
+            move |headers: axum::http::HeaderMap| {
+                let seen = seen.clone();
+                async move {
+                    *seen.lock().expect("stub lock") = headers
+                        .get("x-tenant-id")
+                        .and_then(|value| value.to_str().ok())
+                        .map(str::to_owned);
+                    (StatusCode::OK, r#"{"active":true,"license_id":"lic-1"}"#)
+                }
+            }
+        }),
+    );
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the active stub");
+    let addr = listener.local_addr().expect("stub addr");
+    tokio::spawn(async move {
+        axum::serve(listener, app)
+            .await
+            .expect("active stub server");
+    });
+    let client = LicenceSyncClient::new(&format!("http://{addr}")).expect("client");
+    let t = tenant();
+    assert_eq!(
+        client
+            .active_license_id(t, "conveyor")
+            .await
+            .expect("active")
+            .as_deref(),
+        Some("lic-1")
+    );
+    let expected = t.to_string();
+    assert_eq!(
+        seen.lock().expect("lock").as_deref(),
+        Some(expected.as_str())
+    );
+}
+
+#[tokio::test]
+async fn create_license_token_sends_the_tenant_and_parses_the_mint() {
+    let seen = Arc::new(Mutex::new(None));
+    let base = mint_stub(seen.clone()).await;
+    let client = LicenceSyncClient::new(&base).expect("client");
+    let t = tenant();
+    let minted = client
+        .create_license_token(t, "lic-1", 1)
+        .await
+        .expect("mint");
+    assert_eq!(minted.token, "opaque-abc");
+    assert_eq!(minted.expires_at, "2099-01-01T00:00:00Z");
+    assert_eq!(minted.license_id.as_deref(), Some("lic-1"));
+    let expected = t.to_string();
+    assert_eq!(
+        seen.lock().expect("lock").as_deref(),
+        Some(expected.as_str())
+    );
+}
