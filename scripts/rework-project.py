@@ -1634,13 +1634,23 @@ class Runner:
                 if present.get("published_at"):
                     print(f"  document {category}: already present and published")
                     continue
-                self.invoke(
-                    "documents.publish",
-                    {"id": present["id"], "publish": True},
+                # An unpublished row is a draft. The pack is the authority for its body — the
+                # publisher refuses a draft that is missing a required section, and the draft an
+                # earlier pass left may be stale (SPEC-V2's project-brief had no `Plan`).
+                updated = self.invoke(
+                    "documents.update",
+                    {"id": present["id"], "title": title, "body": body},
+                    read_action="documents.get",
                     read_input={"id": present["id"]},
                     if_match=present.get("version", 1),
                 )
-                print(f"  document {category}: published (row existed, unpublished)")
+                self.invoke(
+                    "documents.publish",
+                    {"id": updated["id"], "publish": True},
+                    read_input={"id": updated["id"]},
+                    if_match=updated.get("version", 1),
+                )
+                print(f"  document {category}: published (draft replaced by the pack's body)")
                 continue
             doc = self.invoke(
                 "documents.compose",
@@ -2018,6 +2028,52 @@ def self_test() -> None:
             raise SystemExit("self-test: a dry run wrote a card")
     finally:
         globals()["build_rework_register"] = original_build
+
+    # A row that exists is not a row that is published: an unpublished draft takes the pack's
+    # body and is published, and a published row is left alone.
+    class DocsRunner(Runner):
+        def __init__(self, rows: list[dict]) -> None:
+            super().__init__(
+                "S00", {}, ROOT / "docs" / "evidence" / "rework" / "S00" / "acts.md", False
+            )
+            self.project_id = "p1"
+            self.rows = rows
+            self.invoked: list[tuple[str, dict]] = []
+            self.content = {
+                "documents": [
+                    {"category": cat, "title": f"{cat} title", "body": f"# {cat}\n\nbody"}
+                    for cat in ("project-brief", "gap-analysis")
+                ]
+            }
+
+        def _read(self, action: str, payload: dict) -> dict:
+            if action == "documents.list":
+                return {
+                    "items": [row for row in self.rows if row["category"] == payload["category"]]
+                }
+            raise SystemExit(f"self-test: unexpected read {action}")
+
+        def invoke(self, action: str, payload: dict, **kwargs) -> dict:
+            self.invoked.append((action, payload))
+            if action == "documents.update":
+                return {"id": payload["id"], "version": 5}
+            return {"id": payload.get("id")}
+
+    docs = DocsRunner(
+        [
+            {"id": "d1", "category": "project-brief", "version": 4, "published_at": None},
+            {"id": "d2", "category": "gap-analysis", "version": 1,
+             "published_at": "2026-11-26T00:00:00Z"},
+        ]
+    )
+    docs.ensure_documents()
+    acts = [(action, payload.get("id")) for action, payload in docs.invoked]
+    if acts != [("documents.update", "d1"), ("documents.publish", "d1")]:
+        raise SystemExit(f"self-test: an unpublished draft was not replaced and published: {acts}")
+    if docs.invoked[0][1].get("body") != "# project-brief\n\nbody":
+        raise SystemExit("self-test: the pack's body was not applied to the draft")
+    if any(payload.get("id") == "d2" for _, payload in docs.invoked):
+        raise SystemExit("self-test: an already-published row was written again")
     print("rework-project: self-test ok")
 
 
