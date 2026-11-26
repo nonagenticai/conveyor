@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-26T13:34:11Z",
-  "git_sha": "79b681c822e8ea26e3dd07fae4860cd3fb8a3459",
+  "generated_at": "2026-11-26T13:37:01Z",
+  "git_sha": "88cf8af85194b41310be1fe49f57ad73d8b59113",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -8369,7 +8369,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 5,
+        "entries": 6,
         "owners": [
           "programme owner"
         ]
@@ -8392,6 +8392,7 @@
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
+            "S02",
             "S21",
             "SPEC-V2",
             "T13",
@@ -8408,8 +8409,18 @@
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 5,
+      "subject_count": 6,
       "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from S02's closed unit issues, while the live row stays `active`: the retrospective rework's S02 slice is green on the replay record but not promoted, so a closure now would claim evidence the live record does not carry; the synchronisation waits on the #526 chain or a seed install",
+          "severity": "P1",
+          "subject": "S02"
+        },
         {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
@@ -41437,9 +41448,9 @@
     },
     "SPEC": {
       "findings": 79,
-      "gaps": 19,
+      "gaps": 20,
       "p0": 0,
-      "p1": 4,
+      "p1": 5,
       "p2": 15,
       "packages": 91,
       "rules": 8,
@@ -41460,7 +41471,7 @@
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.hSK3748U1X/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.ydf3vodrqt/data",
   "summary": {
     "by_severity": {
       "P0": 27,
@@ -41482,7 +41493,7 @@
     "open": 426,
     "packages": 428,
     "resolved": 21,
-    "subjects": 540,
+    "subjects": 541,
     "suppressed": 2
   }
 }

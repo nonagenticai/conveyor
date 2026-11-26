@@ -1,6 +1,6 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-26T13:34:11Z",
+  "generated_at": "2026-11-26T13:37:01Z",
   "issue_registry": {
     "issues": [
       {
@@ -59,7 +59,7 @@
         "number": 754,
         "state": "OPEN",
         "title": "ops: strict-green live publish — reconcile the ledger to the live P0/P1 set",
-        "updatedAt": "2026-11-26T13:25:20Z",
+        "updatedAt": "2026-11-26T13:35:45Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/754"
       },
       {

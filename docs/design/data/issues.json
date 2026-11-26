@@ -1,19 +1,99 @@
 {
   "issues": [
     {
-      "number": 746,
-      "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
+      "number": 756,
+      "title": "design: provenance on every output page and a declared-vs-evidenced register",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/746",
-      "updatedAt": "2026-11-26T10:57:09Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/756",
+      "updatedAt": "2026-11-26T13:33:10Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 755,
+      "title": "programme: the retrospective tranche reviews \u2014 close tranches 3\u201312 and authorise tranches 4\u201313",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/755",
+      "updatedAt": "2026-11-26T13:24:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 754,
+      "title": "ops: strict-green live publish \u2014 reconcile the ledger to the live P0/P1 set",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/754",
+      "updatedAt": "2026-11-26T13:35:45Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 753,
+      "title": "skills: six programme delivery-role playbooks and role routing",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/753",
+      "updatedAt": "2026-11-26T13:22:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 746,
+      "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/746",
+      "updatedAt": "2026-11-26T13:18:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T1",
@@ -47,7 +127,7 @@
       "title": "add: the proof store, proofs actions and the lean_proof gate evidence",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/744",
-      "updatedAt": "2026-11-26T11:48:06Z",
+      "updatedAt": "2026-11-26T13:09:31Z",
       "labels": [
         {
           "name": "unit",
@@ -530,7 +610,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T12:22:47Z",
+      "updatedAt": "2026-11-26T12:52:59Z",
       "labels": [
         {
           "name": "programme",
@@ -1591,7 +1671,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T11:48:35Z",
+      "updatedAt": "2026-11-26T13:15:06Z",
       "labels": [
         {
           "name": "unit",
@@ -6268,7 +6348,7 @@
       "title": "S04 \u2014 the external action execution contract (import \u2192 invoke \u2192 restart)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/3",
-      "updatedAt": "2026-11-13T06:31:41Z",
+      "updatedAt": "2026-11-26T13:15:08Z",
       "labels": [
         {
           "name": "unit",

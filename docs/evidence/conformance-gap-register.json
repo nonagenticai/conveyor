@@ -1,7 +1,7 @@
 {
   "counts": {
     "P0": 29,
-    "P1": 135,
+    "P1": 136,
     "P2": 38,
     "P3": 0
   },
@@ -1084,6 +1084,14 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
+      "subject": "S02"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
       "subject": "S21"
     },
     {
@@ -1624,8 +1632,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-26T13:34:11Z",
-    "git_sha": "79b681c822e8ea26e3dd07fae4860cd3fb8a3459",
+    "generated_at": "2026-11-26T13:37:01Z",
+    "git_sha": "88cf8af85194b41310be1fe49f57ad73d8b59113",
     "path": "data",
     "tenant": "nonagentic"
   },

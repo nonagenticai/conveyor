@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `79b681c822e8ea26e3dd07fae4860cd3fb8a3459` generated `2026-11-26T13:34:11Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.hSK3748U1X/data`.
+Snapshot: `88cf8af85194b41310be1fe49f57ad73d8b59113` generated `2026-11-26T13:37:01Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.ydf3vodrqt/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 29 |
-| P1 | 135 |
+| P1 | 136 |
 | P2 | 38 |
 | P3 | 0 |
 
@@ -147,6 +147,7 @@ Snapshot: `79b681c822e8ea26e3dd07fae4860cd3fb8a3459` generated `2026-11-26T13:34
 | `project_in_unauthorised_tranche` | `T14` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T18` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
+| `seed_live_drift` | `S02` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `SPEC-V2` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T13` | P1 | seed status 'closed' != live status 'active' |
@@ -189,7 +190,7 @@ Snapshot: `79b681c822e8ea26e3dd07fae4860cd3fb8a3459` generated `2026-11-26T13:34
 | PLATFORM | active | 0 | 0 | 0 | 0 | 0 |
 | S00 | closed | 0 | 0 | 2 | 0 | 0 |
 | S01 | closed | 0 | 0 | 2 | 0 | 0 |
-| S02 | active | 1 | 0 | 1 | 0 | 0 |
+| S02 | active | 1 | 0 | 2 | 0 | 0 |
 | S03 | closed | 2 | 0 | 1 | 0 | 0 |
 | S04 | active | 3 | 0 | 2 | 0 | 0 |
 | S05 | closed | 4 | 1 | 4 | 0 | 0 |
