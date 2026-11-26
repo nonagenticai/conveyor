@@ -296,6 +296,121 @@ impl LicenceSyncClient {
         })
     }
 
+    /// The id of the tenant's effectively active licence for `app_key`.
+    ///
+    /// `GET /licenses/active` answers the same schema as introspection; only `license_id` is read
+    /// here. A 404 (no active licence), an inactive body and a body with no id all answer `None` —
+    /// the caller refuses, never mints on a guessed licence.
+    pub async fn active_license_id(
+        &self,
+        tenant: TenantId,
+        app_key: &str,
+    ) -> Result<Option<String>, SyncError> {
+        let url = format!(
+            "{}/licenses/active?tenant_id={}&app_key={}",
+            self.base_url,
+            urlencode(&tenant.to_string()),
+            urlencode(app_key)
+        );
+        // `GET /licenses/active` refuses a bare `license-reader` with "Missing tenant context":
+        // the route's tenant-scope gate resolves the caller's tenant from the `tenant_id` claim
+        // or this header. A service account carries no claim, so it names the tenant it is acting
+        // for; the route still refuses a tenant the caller's owner cannot reach.
+        let mut builder = self
+            .http
+            .get(&url)
+            .header("x-tenant-id", tenant.to_string());
+        if let Some(creds) = &self.creds {
+            let header = creds
+                .authorization()
+                .await
+                .map_err(|error| SyncError::Transport {
+                    url: url.clone(),
+                    error: error.to_string(),
+                })?;
+            builder = builder.header(reqwest::header::AUTHORIZATION, header);
+        }
+        let response = builder.send().await.map_err(|error| SyncError::Transport {
+            url: url.clone(),
+            error: error.to_string(),
+        })?;
+        let status = response.status();
+        if status.as_u16() == 404 {
+            return Ok(None);
+        }
+        if !status.is_success() {
+            let detail = response.text().await.unwrap_or_default();
+            return Err(SyncError::Refused {
+                url,
+                status: status.as_u16(),
+                detail,
+            });
+        }
+        let body: Value = response.json().await.map_err(|error| SyncError::Body {
+            url,
+            error: error.to_string(),
+        })?;
+        let active = body.get("active").and_then(Value::as_bool).unwrap_or(false);
+        let id = body
+            .get("license_id")
+            .and_then(Value::as_str)
+            .filter(|id| !id.trim().is_empty())
+            .map(str::to_owned);
+        Ok(active.then_some(id).flatten())
+    }
+
+    /// `POST /licenses/{license_id}/tokens?expires_days=N` — a short-lived opaque bearer on one
+    /// licence.
+    ///
+    /// The caller's credential must hold the licences `license-manager` (or `license-admin`) realm
+    /// role and its `api_client` owner must be an issuer of the licence's app. `X-Tenant-Id` names
+    /// the tenant the call acts in; the service refuses a tenant the owner cannot reach. The raw
+    /// token is returned exactly once and is never logged here.
+    pub async fn create_license_token(
+        &self,
+        tenant: TenantId,
+        license_id: &str,
+        expires_days: u32,
+    ) -> Result<MintedToken, SyncError> {
+        let url = format!(
+            "{}/licenses/{}/tokens?expires_days={expires_days}",
+            self.base_url,
+            urlencode(license_id)
+        );
+        let mut builder = self
+            .http
+            .post(&url)
+            .header("x-tenant-id", tenant.to_string())
+            .json(&json!({}));
+        if let Some(creds) = &self.creds {
+            let header = creds
+                .authorization()
+                .await
+                .map_err(|error| SyncError::Transport {
+                    url: url.clone(),
+                    error: error.to_string(),
+                })?;
+            builder = builder.header(reqwest::header::AUTHORIZATION, header);
+        }
+        let response = builder.send().await.map_err(|error| SyncError::Transport {
+            url: url.clone(),
+            error: error.to_string(),
+        })?;
+        let status = response.status();
+        if !status.is_success() {
+            let detail = response.text().await.unwrap_or_default();
+            return Err(SyncError::Refused {
+                url,
+                status: status.as_u16(),
+                detail,
+            });
+        }
+        response.json().await.map_err(|error| SyncError::Body {
+            url,
+            error: error.to_string(),
+        })
+    }
+
     /// `GET /licenses/active?tenant_id=&app_key=`.
     pub async fn fetch(&self, tenant: TenantId, app_key: &str) -> Result<SyncOutcome, SyncError> {
         let url = format!(

@@ -371,12 +371,11 @@
           784,
           787,
           788,
-          789,
           791,
           792
         ],
-        "open": 26,
-        "ready": 9,
+        "open": 25,
+        "ready": 8,
         "unknown": 0
       }
     },
@@ -1891,7 +1890,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           83,
           558,
@@ -1900,7 +1899,7 @@
           688,
           776
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2268,10 +2267,11 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          74
+          74,
+          797
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },

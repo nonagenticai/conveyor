@@ -346,7 +346,9 @@ mod tests {
                 (75, "run executor kind".to_owned()),
                 // Delivery proofs (#744): the re-checkable gate evidence
                 // (0076_lean_proof.sql, SPEC_V2 §5.3/§5.4).
-                (76, "lean proof".to_owned())
+                (76, "lean proof".to_owned()),
+                // #779: the issue that carries a delivery unit (0077_development_issue_ref.sql).
+                (77, "development issue ref".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
