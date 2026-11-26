@@ -5195,6 +5195,48 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("lean4.check", json!({}), None),
         plain("lean4.elaborate", json!({}), None),
         plain("lean4.prove", json!({}), None),
+        // Delivery proofs (#744). Each refusal in `crates/actions/src/proof/mod.rs` is a typed 422,
+        // so the nil id is a row that cannot exist and the uninvoked key cannot resolve. `list` is
+        // the one read that answers: an empty, tenant-scoped set.
+        expecting(plain("proofs.get", json!({"id": Uuid::nil()}), None), 422),
+        expecting(
+            plain(
+                "proofs.list",
+                json!({"subject_type": "card", "subject_id": Uuid::nil()}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "proofs.record",
+                json!({
+                    "idempotency_key": "parity-record-never-invoked",
+                    "invocation_input": {"source": "theorem parity : True := by trivial"},
+                    "subject_type": "card",
+                    "subject_id": Uuid::nil(),
+                    "spec_name": "parity",
+                    "spec_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "facts_canonical": "{}",
+                    "theorem": "parity",
+                    "trust": "kernel",
+                }),
+                None,
+            ),
+            422,
+        ),
+        expecting(
+            plain(
+                "proofs.reverify",
+                json!({
+                    "proof_id": Uuid::nil(),
+                    "idempotency_key": "parity-reverify-never-invoked",
+                    "invocation_input": {},
+                }),
+                None,
+            ),
+            422,
+        ),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
