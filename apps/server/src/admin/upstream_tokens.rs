@@ -79,12 +79,25 @@ pub struct Filled {
     pub expires_at: Option<String>,
 }
 
+/// The refusal a mint gets when the deployment carries no minter credential.
+///
+/// It names the variable, because the operator's fix is a setting, not a code change, and a
+/// silent fall back to the backend's credential would seal a token the licences service
+/// refuses at the next introspection.
+pub const MINTER_NOT_CONFIGURED: &str =
+    "bundle minter credential not configured: BUNDLE_MINTER_CLIENT_SECRET";
+
 /// Seal the tenant's token for `service`.
+///
+/// `minter` is the client the mint authenticates with — `conveyor-bundle-minter`, never the
+/// backend's credential. A [`TokenSource::Byo`] fill needs no client and passes `None`; a mint
+/// without one is [`MINTER_NOT_CONFIGURED`], refused before any HTTP call and before any row is
+/// written.
 ///
 /// A row that already exists is rotated — the old value does not survive, by design.
 pub async fn fill(
     pool: &PgPool,
-    licences: Option<&LicenceSyncClient>,
+    minter: Option<&LicenceSyncClient>,
     tenant_slug: &str,
     service: UpstreamService,
     source: TokenSource,
@@ -96,9 +109,7 @@ pub async fn fill(
 
     let (value, source_name, expires_at) = match source {
         TokenSource::Mint => {
-            let client = licences.ok_or_else(|| {
-                "LICENCES_BASE_URL is not set; the mint needs the licences API".to_owned()
-            })?;
+            let client = minter.ok_or_else(|| MINTER_NOT_CONFIGURED.to_owned())?;
             let minted = client
                 .mint_bundle_token(tenant_id, service.licences_app(), 60)
                 .await
