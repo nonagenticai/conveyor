@@ -160,16 +160,16 @@
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-26T13:04:27.208018+00:00",
+  "generated_at": "2026-11-26T13:06:33.143143+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
   "project": "S02",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T13:04:10.787307+00:00",
-    "git_sha": "de5e98bf157b2f3e2bedcce59dc022f1c9270578",
-    "path": "retained-snapshot/de5e98bf157b2f3e2bedcce59dc022f1c9270578"
+    "generated_at": "2026-11-26T13:05:12.847496+00:00",
+    "git_sha": "7796da7f0b839f31fe1c331ee3f2c21d089fc8f0",
+    "path": "retained-snapshot/7796da7f0b839f31fe1c331ee3f2c21d089fc8f0"
   },
   "verdict": "green",
   "warnings": []

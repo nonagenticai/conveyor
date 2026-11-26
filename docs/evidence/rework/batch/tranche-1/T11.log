@@ -1,6 +1,6 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T11 --content docs/evidence/rework/tranche-1/rework-content-T11.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
@@ -11,7 +11,6 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Business capability map — metrics, metering and maturity already present
   artefact: Data entity catalog — metrics, metering and maturity already present
   artefact: Technology standards — metrics, metering and maturity already present
-  01 architecture.artifacts_link ok
   02 architecture.artifacts_link ok
   03 architecture.artifacts_link ok
   04 architecture.artifacts_link ok
@@ -20,215 +19,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   07 architecture.artifacts_link ok
   08 architecture.artifacts_link ok
   09 architecture.artifacts_link ok
-  document architecture-artifact: already present and published
-  delivery contract: already live
-  10 registers.update ok
-  register risk: A metrics read that starts writing a roll-up row would turn derived figures into a second store code set to R-T11-01
-  11 registers.update ok
-  register risk: A stale billing total could match the derived cost by accident code set to R-T11-02
-  12 registers.update ok
-  register risk: A tenant with few approvals can reach C1 on a very small sample code set to R-T11-03
-  13 registers.update ok
-  register issue: The original T11 governance record was never authored code set to I-T11-01
-  14 registers.update ok
-  register issue: Eval- and benchmark-backed quality metrics sit outside T11 code set to I-T11-02
-  15 registers.update ok
-  register assumption: billing.summary's attested total is the charging system's authoritative figure for the period code set to A-T11-01
-  16 registers.update ok
-  register assumption: The published snapshot's measure.inference window is representative enough to display code set to A-T11-02
-  17 registers.update ok
-  register dependency: Every T11 figure depends on the ledgers it reads code set to D-T11-01
-  18 registers.update ok
-  register dependency: The console depends on the published snapshot, not on a live metrics call code set to D-T11-02
-  19 registers.update ok
-  register benefit: Every metric is computed from rows, so a figure cannot drift from the ledger it summarises code set to B-T11-01
-  20 registers.update ok
-  register benefit: Billing divergence surfaces as an incident rather than a silent adjustment code set to B-T11-02
-  benefit transitions: none in the content
-  baseline: already taken
-  schedule baseline: already taken
-  cost baseline: already taken
-  closure-review output: already published
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  21 cadences.credit_demo ok
-  baseline approval: none pending
-  change control: 1 change row(s) present
-  record fixes: none in the content
-  card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-
-rework: projects.close refused at act 22: error: projects.close refused (409): project T11 cannot close until its mandatory artefacts exist (missing: project-registers)
-FAILED: projects.close: transport exited 1
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T11 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-1uvhi2c1/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-1uvhi2c1/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T11-bodies --local-bin /tmp/conv526-bin-5dcfc953
-
-{
-  "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "project-registers",
-      "document_id": "01a217f5-c5fc-7511-b4d6-ff549d521db7",
-      "natural_key": "artefact:T11:project-registers:4d9232efd2d37e2c",
-      "body_sha256": "4d9232efd2d37e2c6953f55a3bf708ee134906a3a9249e3a2430bccfb71e9180"
-    }
-  ],
-  "skipped": [
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "change-control",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "compliance-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "delivery-contract",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "project-baseline",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "project-wbs",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "statement-of-architecture-work",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "statement-of-intent",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "T11",
-      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
-      }
-    }
-  ],
-  "counts": {
-    "due": 5,
-    "present": 5,
-    "missing-edge": 0,
-    "stale": 3,
-    "ambiguous": 0
-  }
-}
-
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T11 --content docs/evidence/rework/tranche-1/rework-content-T11.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
-
-  reopen: not needed
-  charter: already approved
-  closure outputs: already ['closure-review']
-  SoAW: already live
-  artefact: Stakeholder map — metrics, metering and maturity already present
-  artefact: Driver/goal/objective — metrics, metering and maturity already present
-  artefact: Requirements catalog — metrics, metering and maturity already present
-  artefact: Solution concept — metrics, metering and maturity already present
-  artefact: Business capability map — metrics, metering and maturity already present
-  artefact: Data entity catalog — metrics, metering and maturity already present
-  artefact: Technology standards — metrics, metering and maturity already present
-  01 architecture.artifacts_link ok
-  02 architecture.artifacts_link ok
-  03 architecture.artifacts_link ok
-  04 architecture.artifacts_link ok
-  05 architecture.artifacts_link ok
-  06 architecture.artifacts_link ok
-  07 architecture.artifacts_link ok
-  08 architecture.artifacts_link ok
-  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   delivery contract: already live
   register risk: A metrics read that starts writing a roll-up row would turn derived figures into a second store already present
@@ -250,21 +41,23 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  10 cadences.credit_demo ok
+  11 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-  11 projects.close ok
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
   closed T11: 01a1d039-0d36-782b-8b18-ff07a64dedbe
-T11: 11 acts recorded
+T11: 16 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T11 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-v4zin2l9/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-v4zin2l9/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T11-bodies --local-bin /tmp/conv526-bin-5dcfc953
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T11 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-_djlkqhn/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T11-snap-_djlkqhn/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T11-bodies --local-bin /tmp/conv526-bin-5dcfc953
 
 {
   "schema": "artefact-publication/v1",

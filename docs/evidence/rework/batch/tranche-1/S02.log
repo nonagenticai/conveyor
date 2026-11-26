@@ -1,6 +1,6 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S02 --content docs/evidence/rework/tranche-1/rework-content-S02.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
@@ -11,7 +11,6 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Business capability map — S02 Skeleton already present
   artefact: Data entity catalog — S02 Skeleton already present
   artefact: Technology standards — S02 Skeleton already present
-  01 architecture.artifacts_link ok
   02 architecture.artifacts_link ok
   03 architecture.artifacts_link ok
   04 architecture.artifacts_link ok
@@ -20,211 +19,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   07 architecture.artifacts_link ok
   08 architecture.artifacts_link ok
   09 architecture.artifacts_link ok
-  document architecture-artifact: already present and published
-  delivery contract: already live
-  10 registers.update ok
-  register risk: The replay record lost the artefact rows, so a re-creation could duplicate a surviving row code set to R-S02-01
-  11 registers.update ok
-  register risk: The two-worker lease proof is timing-sensitive and could flake under load code set to R-S02-02
-  12 registers.update ok
-  register risk: The rework could close S02 while issue #2 still reads open code set to R-S02-03
-  13 registers.update ok
-  register issue: Issue #2 was open at the start of the rework although its P2 test was already written code set to I-S02-01
-  14 registers.update ok
-  register issue: The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row code set to I-S02-02
-  15 registers.update ok
-  register assumption: The scope baseline taken on 2026-11-21 still describes S02's boundary code set to A-S02-01
-  16 registers.update ok
-  register dependency: S00's signed parity inventory fixes the surfaces S02 must expose code set to D-S02-01
-  17 registers.update ok
-  register benefit: The skeleton makes every later slice inherit isolation instead of re-implementing it code set to B-S02-01
-  18 registers.update ok
-  register benefit: The two-worker proof turns the lease policy from a declaration into evidence code set to B-S02-02
-  benefit transitions: none in the content
-  baseline: already taken
-  schedule baseline: already taken
-  cost baseline: already taken
-  closure-review output: already published
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  19 cadences.credit_demo ok
-  baseline approval: none pending
-  change control: 1 change row(s) present
-  record fixes: none in the content
-  card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-
-rework: projects.close refused at act 20: error: projects.close refused (409): project S02 cannot close until its mandatory artefacts exist (missing: project-registers)
-FAILED: projects.close: transport exited 1
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S02 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-u18p1w4u/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-u18p1w4u/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/S02-bodies --local-bin /tmp/conv526-bin-5dcfc953
-
-{
-  "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "project-registers",
-      "document_id": "01a217f4-d39b-75dc-9267-d33a20204908",
-      "natural_key": "artefact:S02:project-registers:71223645725286b6",
-      "body_sha256": "71223645725286b6915e59709f0a8e19918323c41d48d581e18133528772d9e2"
-    }
-  ],
-  "skipped": [
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "change-control",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "compliance-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "delivery-contract",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "project-baseline",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "project-wbs",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "statement-of-architecture-work",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "statement-of-intent",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S02",
-      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
-      }
-    }
-  ],
-  "counts": {
-    "due": 5,
-    "present": 5,
-    "missing-edge": 0,
-    "stale": 3,
-    "ambiguous": 0
-  }
-}
-
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S02 --content docs/evidence/rework/tranche-1/rework-content-S02.json --tranche-label tranche 1 --demo-cadence 01a1ff74-9819-72dc-a1f2-e102c73e9672
-
-  reopen: not needed
-  charter: already approved
-  closure outputs: already ['closure-review']
-  SoAW: already live
-  artefact: Stakeholder map — S02 Skeleton already present
-  artefact: Driver/goal/objective — S02 Skeleton already present
-  artefact: Requirements catalog — S02 Skeleton already present
-  artefact: Solution concept — S02 Skeleton already present
-  artefact: Business capability map — S02 Skeleton already present
-  artefact: Data entity catalog — S02 Skeleton already present
-  artefact: Technology standards — S02 Skeleton already present
-  01 architecture.artifacts_link ok
-  02 architecture.artifacts_link ok
-  03 architecture.artifacts_link ok
-  04 architecture.artifacts_link ok
-  05 architecture.artifacts_link ok
-  06 architecture.artifacts_link ok
-  07 architecture.artifacts_link ok
-  08 architecture.artifacts_link ok
-  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   delivery contract: already live
   register risk: The replay record lost the artefact rows, so a re-creation could duplicate a surviving row already present
@@ -244,21 +39,23 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  10 cadences.credit_demo ok
+  11 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-  11 projects.close ok
+  12 projects.close_request ok
+  13 approvals.decide ok
+  14 approvals.request ok
+  15 approvals.decide ok
+  16 projects.close ok
   closed S02: 01a1d039-0d27-7b45-abb5-bf851a4c3d4a
-S02: 11 acts recorded
+S02: 16 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S02 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-90u_6utg/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-90u_6utg/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/S02-bodies --local-bin /tmp/conv526-bin-5dcfc953
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S02 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-8qpk954l/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S02-snap-8qpk954l/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/S02-bodies --local-bin /tmp/conv526-bin-5dcfc953
 
 {
   "schema": "artefact-publication/v1",

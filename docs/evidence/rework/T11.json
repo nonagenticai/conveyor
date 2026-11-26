@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a217ea-4462-7ae4-a0ac-567ae4c32db5 decided by a distinct approver",
+      "detail": "latest closure gate 01a217f7-691d-7cce-9892-ad46586bd980 decided by a distinct approver",
       "id": "T11-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,48 +142,34 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "1 mandatory artefact package(s) open: compliance_review_missing:T11",
+      "detail": "no open standard artefact package for this project",
       "id": "T11-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T11-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T11-artefact-standard' did not pass; the gate check 'T11-rework' did not pass",
+      "detail": "gate discharged by executable checks: T11-project, T11-baseline, T11-charter, T11-closure-outputs, T11-contract, T11-review, T11-closure-gate, T11-waivers, T11-pi-cadence, T11-pi-plan, T11-pi-objectives, T11-wsjf, T11-demo-credits, T11-lessons, T11-product, T11-artefact-standard, T11-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T11-artefact-standard (P1): 1 mandatory artefact package(s) open: compliance_review_missing:T11",
-    "T11-rework (P0): 1 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1)",
-    "gate (P0): the gate check 'T11-artefact-standard' did not pass; the gate check 'T11-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-26T13:05:29.362277+00:00",
+  "generated_at": "2026-11-26T13:07:07.042134+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T11.toml",
   "name": "Metrics, metering and maturity",
@@ -191,9 +177,9 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-26T13:05:12.847496+00:00",
-    "git_sha": "de5e98bf157b2f3e2bedcce59dc022f1c9270578",
-    "path": "retained-snapshot/de5e98bf157b2f3e2bedcce59dc022f1c9270578"
+    "git_sha": "7796da7f0b839f31fe1c331ee3f2c21d089fc8f0",
+    "path": "retained-snapshot/7796da7f0b839f31fe1c331ee3f2c21d089fc8f0"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
