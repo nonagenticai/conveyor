@@ -1,40 +1,18 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T21:50:06+00:00",
-  "green": 0,
+  "generated_at": "2026-11-26T21:51:04+00:00",
+  "green": 1,
   "members": [
     {
       "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "7 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifac",
-          "gap": "record",
-          "id": "T13-artefact-standard",
-          "kind": "snapshot",
-          "severity": "P1"
-        },
-        {
-          "detail": "the gate check 'T13-artefact-standard' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        },
-        {
-          "detail": "the project is closed while its manifest is red",
-          "gap": "record",
-          "id": "closed-on-red",
-          "kind": "snapshot",
-          "severity": "P0"
-        }
-      ],
+      "gaps": [],
       "key": "T13",
       "log": "docs/evidence/rework/batch/tranche-3/T13.log",
       "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "state": "RECEIPT_GREEN"
     }
   ],
-  "red": 1,
+  "red": 0,
   "snapshot_sha": "8111c984",
   "tranche": 3
 }

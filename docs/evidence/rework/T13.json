@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a216d0-a52f-721a-a074-a3c8b5a3c40f decided by a distinct approver",
+      "detail": "latest closure gate 01a219d7-1b51-79e3-8ff8-3547ba11de89 decided by a distinct approver",
       "id": "T13-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,10 +142,10 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, std-togaf-architecture-artifact-instance-01a20276-82e4-7594-b73b-60590e969803:T13, std-togaf-architecture-artifact-instance-01a20276-c56b-75f2-b9bd-9ddaba1dd95f:T13",
+      "detail": "no open standard artefact package for this project",
       "id": "T13-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -160,39 +160,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T13-artefact-standard' did not pass",
+      "detail": "gate discharged by executable checks: T13-project, T13-baseline, T13-charter, T13-closure-outputs, T13-contract, T13-review, T13-closure-gate, T13-waivers, T13-pi-cadence, T13-pi-plan, T13-pi-objectives, T13-wsjf, T13-demo-credits, T13-lessons, T13-product, T13-artefact-standard, T13-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T13-artefact-standard (P1): 7 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, std-togaf-architecture-artifact-instance-01a20276-82e4-7594-b73b-60590e969803:T13, std-togaf-architecture-artifact-instance-01a20276-c56b-75f2-b9bd-9ddaba1dd95f:T13",
-    "gate (P0): the gate check 'T13-artefact-standard' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-26T21:50:06.854895+00:00",
+  "generated_at": "2026-11-26T21:51:04.988322+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T21:50:03.036325+00:00",
+    "generated_at": "2026-11-26T21:50:48.738134+00:00",
     "git_sha": "8111c984",
     "path": "retained-snapshot/8111c984"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
