@@ -6,7 +6,13 @@
 //! the deterministic half — name/domain/logo/colour extraction and the field/colour/font
 //! comparison. No clock, no network, no storage.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
+
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+use crate::model::{Category, Document, Finding, Report, Scorecard, Severity};
+use crate::rubric::{Rubric, grade};
 
 /// One font the page declared.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -53,8 +59,6 @@ pub struct FieldComparison {
     pub value_b: String,
     pub matched: bool,
 }
-
-use serde::Serialize;
 
 /// Two brands compared. `overall_similarity` is the source's weighted blend (field matches 60%,
 /// colour 20%, font Jaccard 20%); `color_distance` is the Euclidean RGB distance.
@@ -358,6 +362,253 @@ fn darken_hex(hex_color: &str) -> String {
         (f64::from(green) * 0.8) as u8,
         (f64::from(blue) * 0.8) as u8
     )
+}
+
+/// A brand's declared voice: the terms the copy must use and the terms it must not.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct BrandVoice {
+    #[serde(default)]
+    pub required_terms: Vec<String>,
+    #[serde(default)]
+    pub forbidden_terms: Vec<String>,
+}
+
+/// The brand facts a caller asserts, checked against one page.
+///
+/// An empty list means "this dimension is not declared", so nothing in it is checked.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct BrandFacts {
+    /// Hexadecimal colours the brand owns.
+    #[serde(default)]
+    pub palette: Vec<String>,
+    /// Font families the brand owns.
+    #[serde(default)]
+    pub typography: Vec<String>,
+    /// The vocabulary the brand's copy must use or avoid.
+    #[serde(default)]
+    pub voice: BrandVoice,
+}
+
+/// Measure one page against the supplied brand facts.
+///
+/// The page's colours are every hex literal in its markup and styles, its families are the
+/// `font-family` declarations, and its voice is the visible text. Each declared fact the page does
+/// not express is a finding; observed facts the brand does not declare are named once in
+/// aggregate. A dimension the caller leaves empty is not checked.
+pub fn analyse(document: &Document, brand: &BrandFacts) -> Report {
+    let mut findings = Vec::new();
+
+    let observed_colours = observed_colours(&document.html);
+    let mut declared_colours = BTreeSet::new();
+    for colour in &brand.palette {
+        match normalise_colour(colour) {
+            Some(colour) => {
+                declared_colours.insert(colour.clone());
+                if !observed_colours.contains(&colour) {
+                    findings.push(brand_finding(
+                        "brand-palette-missing",
+                        Severity::Medium,
+                        format!("the declared colour {colour} is not on the page"),
+                        "A colour the brand declares does not occur in the page's markup or styles.",
+                        colour,
+                    ));
+                }
+            }
+            None => findings.push(brand_finding(
+                "brand-palette-missing",
+                Severity::Medium,
+                format!("the declared colour {colour:?} is not a hexadecimal colour"),
+                "A palette entry is not a hexadecimal colour and cannot be observed on a page.",
+                colour.clone(),
+            )),
+        }
+    }
+    if !brand.palette.is_empty() {
+        let undeclared: Vec<String> = observed_colours
+            .difference(&declared_colours)
+            .cloned()
+            .collect();
+        if !undeclared.is_empty() {
+            findings.push(brand_finding(
+                "brand-palette-undeclared",
+                Severity::Info,
+                "colours outside the declared palette",
+                "The page uses colours the brand palette does not declare.",
+                undeclared.join(", "),
+            ));
+        }
+    }
+
+    let observed_fonts = observed_fonts(&document.html);
+    let mut declared_fonts = BTreeSet::new();
+    for family in &brand.typography {
+        let family = family.trim().to_ascii_lowercase();
+        if family.is_empty() {
+            continue;
+        }
+        declared_fonts.insert(family.clone());
+        if !observed_fonts.contains(&family) {
+            findings.push(brand_finding(
+                "brand-typography-missing",
+                Severity::Medium,
+                format!("the declared typeface {family} is not used"),
+                "A font family the brand declares is not used by any font-family declaration on the page.",
+                family,
+            ));
+        }
+    }
+    if !brand.typography.is_empty() {
+        let undeclared: Vec<String> = observed_fonts
+            .difference(&declared_fonts)
+            .cloned()
+            .collect();
+        if !undeclared.is_empty() {
+            findings.push(brand_finding(
+                "brand-typography-undeclared",
+                Severity::Info,
+                "typefaces outside the declared set",
+                "The page declares families the brand typography does not.",
+                undeclared.join(", "),
+            ));
+        }
+    }
+
+    let text = visible_text(&document.html);
+    for term in &brand.voice.required_terms {
+        let term = term.trim();
+        if term.is_empty() {
+            continue;
+        }
+        if !text.contains(&term.to_ascii_lowercase()) {
+            findings.push(brand_finding(
+                "brand-voice-term-missing",
+                Severity::Medium,
+                format!("the required voice term {term:?} is missing"),
+                "A term the brand voice requires does not occur in the page's visible text.",
+                term.to_owned(),
+            ));
+        }
+    }
+    for term in &brand.voice.forbidden_terms {
+        let term = term.trim();
+        if term.is_empty() {
+            continue;
+        }
+        if text.contains(&term.to_ascii_lowercase()) {
+            findings.push(brand_finding(
+                "brand-voice-term-forbidden",
+                Severity::High,
+                format!("the forbidden voice term {term:?} occurs"),
+                "A term the brand voice forbids occurs in the page's visible text.",
+                term.to_owned(),
+            ));
+        }
+    }
+
+    // No dedupe: each missing palette entry, unused family or voice term is a distinct item, and
+    // the rubric's dedupe keys on `check_id`, so it would erase all but one of each.
+    let scorecard = brand_scorecard(&findings);
+    Report {
+        url: document.url.clone(),
+        findings,
+        scorecard,
+    }
+}
+
+fn brand_finding(
+    check_id: &str,
+    severity: Severity,
+    title: impl Into<String>,
+    description: impl Into<String>,
+    evidence: impl Into<String>,
+) -> Finding {
+    Finding {
+        check_id: Some(check_id.to_owned()),
+        category: Category::Brand,
+        severity,
+        title: title.into(),
+        description: description.into(),
+        evidence: Some(evidence.into()),
+        source_tool: Some("brand_scan".to_owned()),
+        scanner_count: 1,
+        ..Finding::default()
+    }
+}
+
+fn normalise_colour(value: &str) -> Option<String> {
+    let value = value.trim().to_ascii_lowercase();
+    let hex = value.strip_prefix('#')?;
+    if !hex.chars().all(|character| character.is_ascii_hexdigit()) {
+        return None;
+    }
+    match hex.len() {
+        3 => {
+            let expanded: String = hex
+                .chars()
+                .flat_map(|character| [character, character])
+                .collect();
+            Some(format!("#{expanded}"))
+        }
+        6 => Some(format!("#{hex}")),
+        _ => None,
+    }
+}
+
+fn observed_colours(html: &str) -> BTreeSet<String> {
+    let pattern = regex::Regex::new("#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b")
+        .expect("the colour pattern is valid");
+    pattern
+        .find_iter(html)
+        .filter_map(|found| normalise_colour(found.as_str()))
+        .collect()
+}
+
+fn observed_fonts(html: &str) -> BTreeSet<String> {
+    let pattern = regex::Regex::new("font-family\\s*:\\s*([^;}\"]+)")
+        .expect("the font-family pattern is valid");
+    let mut families = BTreeSet::new();
+    for captures in pattern.captures_iter(html) {
+        let Some(value) = captures.get(1) else {
+            continue;
+        };
+        for family in value.as_str().split(',') {
+            let family = family
+                .trim()
+                .trim_matches(|character| character == '"' || character == '\'')
+                .trim()
+                .to_ascii_lowercase();
+            if !family.is_empty() {
+                families.insert(family);
+            }
+        }
+    }
+    families
+}
+
+fn visible_text(html: &str) -> String {
+    let document = scraper::Html::parse_document(html);
+    let text = document.root_element().text().collect::<Vec<_>>().join(" ");
+    text.split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_ascii_lowercase()
+}
+
+fn brand_scorecard(findings: &[Finding]) -> Scorecard {
+    let rubric = Rubric::default();
+    let mut buckets = BTreeMap::new();
+    let overall_score = if findings.is_empty() {
+        100.0
+    } else {
+        let score = rubric.category_score(findings, Category::Brand);
+        buckets.insert(Category::Brand.as_str().to_owned(), score);
+        score
+    };
+    Scorecard {
+        overall_score,
+        grade: grade(overall_score),
+        buckets,
+    }
 }
 
 #[cfg(test)]

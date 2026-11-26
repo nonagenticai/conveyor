@@ -141,9 +141,13 @@ use serde_json::{Value, json};
 /// `architecture.board_sit_open|board_sit_decide`, `cadences.materialise` — 582 → **587**.
 /// **S21 step 11 (#697) adds 2 internal**: `organisation_layers.list|set` — 587 → **589**,
 /// internal 563 → 565, external stays 24.
-const EXPECTED: [&str; 589] = [
+const EXPECTED: [&str; 593] = [
     "actions.describe",
     "actions.list",
+    "analyse.app",
+    "analyse.brand",
+    "analyse.content",
+    "analyse.report",
     "analyse.site",
     "analyse.video",
     "agent.run",
@@ -861,12 +865,38 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 558 -> 563; external stays 24.
     // S21 step 11 (#697) adds two internal actions (`organisation_layers.list|set`):
     // internal 563 -> 565; external stays 24 — both read and write this tenant's own layer rows.
-    assert_eq!((internal, external), (565, 24));
+    // #745 adds four internal read actions (`analyse.app|brand|content|report`):
+    // internal 565 -> 569; external stays 24 — each is a pure function of stored documents and
+    // caller-supplied evidence.
+    assert_eq!((internal, external), (569, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
         internal,
         external
+    );
+}
+
+#[test]
+fn the_analysis_family_is_the_six_declared_verbs() {
+    let registry = assert_registry_consistent().expect("the compiled registry is consistent");
+    let mut names: Vec<&str> = registry
+        .names()
+        .into_iter()
+        .filter(|name| name.starts_with("analyse."))
+        .collect();
+    names.sort_unstable();
+    assert_eq!(
+        names,
+        [
+            "analyse.app",
+            "analyse.brand",
+            "analyse.content",
+            "analyse.report",
+            "analyse.site",
+            "analyse.video",
+        ],
+        "SPEC_V2 §10.4 declares exactly six analysis verbs"
     );
 }
 
