@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="proof-of-delivery--the-lean-certificate-corpus">Proof of delivery — the Lean certificate corpus</h1>
-<p>Part of #746. This document records what was actually measured, on which artefact, and what was <strong>not</strong> run. It is a delivery record, not a claim of completeness: § Not proven lists the gap.</p>
+<p>Part of #746, extended by #762. This document records what was actually measured, on which artefact, and what was <strong>not</strong> run. It is a delivery record, not a claim of completeness: § Live on the released engine holds the drills against the deployed engine, and the assumption no certificate removes.</p>
 <h2 id="artefacts">Artefacts</h2>
 <table>
 <thead>
@@ -57,6 +57,7 @@
 <ul>
 <li><strong>The corpus and the renderer's exact output</strong> were checked by running <code>lake env lean &lt;file&gt;</code> inside the prover's own pod, against its own lake project, with the file streamed in and removed afterwards. That is the same command the prover's runner issues, so "valid" here means the same thing the API would answer — without going through the HTTP layer.</li>
 <li><strong>The engine path</strong> (the declared <code>lean4.check</code> external, the sealed credential, the persisted invocation, <code>proofs.record</code> and <code>proofs.reverify</code>) is proven by integration tests against a real PostgreSQL 18 and a stub prover: <code>crates/actions/tests/proofs_record.rs</code>, <code>proofs_reverify.rs</code>, <code>pm_gate_proof.rs</code>.</li>
+<li><strong>The live drills</strong> (§ Live on the released engine) run that same engine path against the deployed engine and the real prover, through the public API, with a real tenant bearer.</li>
 </ul>
 <h2 id="measurement--kernel-checks-on-the-exact-artefacts">Measurement — kernel checks on the exact artefacts</h2>
 <table>
@@ -161,14 +162,71 @@
 </tr>
 </tbody>
 </table>
-<h2 id="not-proven--the-deployment-gap">Not proven — the deployment gap</h2>
-<p>Scenarios P6.1 and P6.2 of #746 are live and cannot be run yet, so this unit stops short of closing them:</p>
-<ol type="1">
-<li>The deployed engine does not yet carry migration <code>0076</code> — it lands with the store unit's merge.</li>
-<li>The deployed engine has no <code>CONVEYOR_EXTERNAL_LEAN4_URL</code>, so the <code>lean4.*</code> externals answer <code>503 action-service-unconfigured</code>; the deployment correction is a private infrastructure change.</li>
-<li>No sealed <code>lean4.token</code> exists for the live tenant. Minting one is <code>conveyor admin upstream-token --service lean4 --mint</code>, which requires the deployment above.</li>
-</ol>
-<p>Network reachability from the conveyor namespace to the prover is already in place, and the release gate's required-evidence mechanism is proven by test. What remains is a deployment, not code.</p>
+<h2 id="live-on-the-released-engine">Live on the released engine</h2>
+<p>Measured 2026-11-26 against the deployed engine — the image carrying <code>0076</code>, #746 and <code>CONVEYOR_EXTERNAL_LEAN4_URL</code> from the private infrastructure repository — with a real tenant bearer from the application's own OIDC login. Every body below is the deployed engine's answer; none of it is a test double.</p>
+<h3 id="the-credential">The credential</h3>
+<p>The tenant's prover bearer is a licence token minted on the tenant's <strong>own <code>conveyor</code> licence</strong> and sealed with <code>conveyor admin upstream-token --tenant … --service lean4 --token-stdin</code>. The engine reads it as the <code>lean4.token</code> secret and sends <code>Authorization: Bearer …</code>; the prover introspects it and takes the tenant from the licence, never from a header. A dedicated <code>lean4-prover</code> licence app does not exist, so the self-service mint (<code>--mint</code>) is tracked as #776.</p>
+<h3 id="the-measurements">The measurements</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Request</th>
+<th>Deployed engine's answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prover reachability</td>
+<td><code>lean4.check</code>, <code>{"source": "theorem smoke_ok : 2 + 2 = 4 := by decide"}</code></td>
+<td><code>200</code>; <code>{"valid": true, "computation_time_ms": 835.01, "diagnostics": [], "stderr": "", "stdout": ""}</code></td>
+</tr>
+<tr>
+<td>The renderer's own output</td>
+<td><code>lean4.check</code>, the slice certificate <code>render</code> emits from the facts below (3 537 characters)</td>
+<td><code>200</code>; <code>{"valid": true, "computation_time_ms": 1509.88}</code></td>
+</tr>
+<tr>
+<td>Negative control</td>
+<td><code>lean4.check</code>, <code>theorem nope : 1 = 2 := by decide</code></td>
+<td><code>200</code>; <code>{"valid": false, "computation_time_ms": 836.15}</code>, the tactic's message in <code>stdout</code></td>
+</tr>
+<tr>
+<td>The certificate</td>
+<td><code>proofs.record</code> naming that invocation, the facts and <code>theorem delivery_ok</code>, <code>trust: kernel</code></td>
+<td><code>201</code>; <code>{"verdict": "proven", "certificate_sha256": "31feb1ba…33e4648", "facts_sha256": "7c7daf3a…ddc4f0f", "computation_time_ms": 1509.88}</code></td>
+</tr>
+<tr>
+<td>The gate, without the certificate</td>
+<td><code>approvals.request</code>, <code>required_kinds: ["lean_proof"]</code>, <code>require_evidence: true</code>, <code>pinned_spec_sha256</code>, <code>evidence: []</code></td>
+<td><code>422</code>; <code>"type": "gate_evidence_missing"</code>, <code>"detail": "this gate requires a \"lean_proof\" evidence item to open; the request names none"</code></td>
+</tr>
+<tr>
+<td>The gate, with it</td>
+<td>the same request plus <code>evidence: [{"kind": "lean_proof", "id": "&lt;certificate&gt;"}]</code></td>
+<td><code>200</code>; the approval's <code>evidence[0]</code> is <code>{"kind": "lean_proof", "id": "01a219b7…cfea658", "certificate_sha256": "31feb1ba…33e4648", "spec_sha256": "fc0fe31a…a99b99e2"}</code></td>
+</tr>
+<tr>
+<td>The tamper drill</td>
+<td>the stored <code>facts_canonical</code> edited (one evidence item renamed) <strong>with</strong> <code>facts_sha256</code> and <code>certificate_sha256</code> recomputed, so the row is internally consistent; a fresh <code>lean4.check</code> of the unchanged source answers <code>valid: true</code>, then <code>proofs.reverify</code> on the rewritten row</td>
+<td><code>422</code>; <code>"type": "proof_source_not_rendered"</code>, <code>"detail": "proof_id: the stored source is not this rendering of the stored facts"</code></td>
+</tr>
+<tr>
+<td>The refusal is recorded</td>
+<td>the engine's own record of the call above</td>
+<td><code>action_invocation</code> row `proofs.reverify</td>
+</tr>
+</tbody>
+</table>
+<p>The facts the certificate carries name the model digest <code>d19f8ad3…baca504</code> and the specification pin <code>fc0fe31a…a99b99e2</code>; <code>proofs.record</code> re-rendered the facts and refused nothing, which is what makes the row's <code>lean_source</code> the renderer's output rather than a caller's claim.</p>
+<p>An approval must belong to a project, card or run, so the two live gate calls name a project; the earlier attempts on the same morning that omit it are input validation, not the gate.</p>
+<h3 id="a-prover-defect-this-exposed">A prover defect this exposed</h3>
+<p>A check that fails returns <code>valid: false</code> with <code>diagnostics: []</code> and Lean's message in <strong><code>stdout</code></strong>: <code>apps/lean4-prover/src/runner.rs</code> parses only <code>stderr</code> (three call sites). Certificates are unaffected — <code>valid</code> comes from the exit code — but the diagnostic channel is empty for every failure. Worth its own fix; it is not #746's.</p>
+<h3 id="what-this-still-does-not-prove">What this still does not prove</h3>
+<ul>
+<li>That the facts in a certificate describe what actually happened in the database. That refinement is the assumption every certificate names (see <code>docs/spec/lean/README.md</code>); proving it is Verus/Kani work, not part of the corpus.</li>
+<li>The self-service mint path: the credential above was minted and sealed by an operator, and <code>--mint</code> still needs the dedicated client and the licence-app decision (#776).</li>
+</ul>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/proof-of-delivery.md</code> at build time.</span>

@@ -420,11 +420,10 @@
           784,
           787,
           788,
-          789,
           791
         ],
-        "open": 25,
-        "ready": 9,
+        "open": 24,
+        "ready": 8,
         "unknown": 0
       }
     },
@@ -1715,14 +1714,14 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           72,
           744,
           746,
           762
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1943,7 +1942,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           83,
           558,
@@ -1952,7 +1951,7 @@
           688,
           776
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2318,11 +2317,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          74
+          74,
+          797
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2858,8 +2858,8 @@
       },
       "total": 52,
       "uncovered": [],
-      "with_open_units": 11,
-      "without_open_units": 41
+      "with_open_units": 10,
+      "without_open_units": 42
     },
     "screens": {
       "actions_invoked": 39,
