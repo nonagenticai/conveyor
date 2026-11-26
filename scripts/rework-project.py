@@ -401,18 +401,23 @@ class Runner:
             read_action="cards.get",
             read_input={"id": card_id},
         )
+        version = int(card.get("version") or 1)
+        moved = card
         if str(card.get("list_id") or "") != str(active["id"]):
-            self.invoke(
+            moved = self.invoke(
                 "cards.move",
                 {"id": card_id, "list_id": str(active["id"])},
                 read_action="cards.get",
                 read_input={"id": card_id},
+                if_match=version,
             )
+            version = int(moved.get("version") or version + 1)
         self.invoke(
             "cards.move",
             {"id": card_id, "list_id": str(done["id"])},
             read_action="cards.get",
             read_input={"id": card_id},
+            if_match=version,
         )
 
     def discharge_rework_cards(self) -> int:
@@ -1482,6 +1487,7 @@ def self_test() -> None:
             self.project_id = "p1"
             self.snapshot = "/tmp/self-test-snap/data"
             self.invoked: list[tuple[str, dict]] = []
+            self.move_if_matches: list[int | None] = []
 
         def snapshot_json(self, name: str) -> dict:
             if name != "work.json":
@@ -1518,8 +1524,12 @@ def self_test() -> None:
 
         def invoke(self, action: str, payload: dict, **kwargs) -> dict:
             self.invoked.append((action, payload))
+            if action == "cards.move":
+                self.move_if_matches.append(kwargs.get("if_match"))
             if action == "approvals.request":
                 return {"id": "gate-1"}
+            if action == "cards.move":
+                return {"id": payload.get("id"), "version": 2}
             return {"id": payload.get("id")}
 
         def decide(self, approval_id: str, note: str, close_gate: bool = False) -> dict:
@@ -1547,6 +1557,10 @@ def self_test() -> None:
         moves = [payload["list_id"] for action, payload in fake.invoked if action == "cards.move"]
         if moves != ["l-active", "l-done"]:
             raise SystemExit(f"self-test: the discharge moved to {moves}")
+        if fake.move_if_matches != [1, 2]:
+            raise SystemExit(
+                f"self-test: the moves did not carry the card version: {fake.move_if_matches}"
+            )
         if any(payload.get("id") == "c-open" for _, payload in fake.invoked):
             raise SystemExit("self-test: an open package's card was discharged")
 
