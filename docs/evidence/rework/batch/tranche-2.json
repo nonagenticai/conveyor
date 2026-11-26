@@ -1,27 +1,43 @@
 {
-  "blocked": 2,
-  "generated_at": "2026-11-26T13:07:43+00:00",
+  "blocked": 1,
+  "generated_at": "2026-11-26T13:09:36+00:00",
   "green": 0,
   "members": [
     {
-      "factory_exit": 1,
+      "factory_exit": 0,
       "gaps": [
         {
-          "detail": "rework: registers.create refused at act 45: error: registers.create refused (422): the input does not match the action schema [links: links must be an object with `cards`, `requirements` and `decisions` arrays (links_invalid)]",
-          "gap": "instrument",
-          "id": null
+          "detail": "1 mandatory artefact package(s) open: std-togaf-delivery-contract-s03:S03",
+          "gap": "record",
+          "id": "S03-artefact-standard",
+          "kind": "snapshot",
+          "severity": "P1"
+        },
+        {
+          "detail": "the gate check 'S03-artefact-standard' did not pass",
+          "gap": "code",
+          "id": "gate",
+          "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
         }
       ],
       "key": "S03",
       "log": "docs/evidence/rework/batch/tranche-2/S03.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
+      "publish_exit": 1,
+      "state": "RECEIPT_RED"
     },
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: registers.create refused at act 50: error: registers.create refused (422): the input does not match the action schema [links: links must be an object with `cards`, `requirements` and `decisions` arrays (links_invalid)]",
+          "detail": "rework: projects.close refused at act 102: error: projects.close refused (409): the Phase-G review is non_conformant; an active waiver is required",
           "gap": "instrument",
           "id": null
         }
@@ -32,7 +48,7 @@
       "state": "BLOCKED"
     }
   ],
-  "red": 0,
-  "snapshot_sha": "307493c39a1193bc0c71edcdc0df12d4d8f2bbce",
+  "red": 1,
+  "snapshot_sha": "92cc110b022336f0bf00d44815ba6dd3f48e17b1",
   "tranche": 2
 }

@@ -1035,7 +1035,8 @@
       "acceptance_at": "the live record at the rework snapshot 2026-11-21T19:24:46Z and the delivery commit 96a3d47b (2026-11-12)",
       "manifest": "acceptance/programme/S03.toml",
       "retrospective": true,
-      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "commitments": "S03 commits to one domain and schema foundation every later slice builds on: the aggregate tables and their forced row-level security, the migration chain that owns them, and the typed store surface that reads and writes them. The delivery is the schema delta and its policies, not a parallel store; a later slice extends the catalogue rather than re-declaring tenancy. The contract closes on the acceptance manifest acceptance/programme/S03.toml and on the published evidence, and it does not claim the action registry (S04) or the board endpoints (S03-S06) that consume it."
     }
   },
   "wbs_deliverable": {
