@@ -9859,8 +9859,16 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     tx.commit().await.expect("commit the earned waivers");
 
     let mut checked = 0usize;
+    // An action may be sampled more than once with different inputs (`tool_bindings.list`
+    // samples the run-filtered and the unfiltered read), so coverage is the set of names
+    // exercised, while `checked` counts the samples the loop ran.
+    let mut checked_names: BTreeSet<&str> = BTreeSet::new();
     let total = registry_names.len();
-    for sample in samples {
+    // The index is part of every idempotency key below. Two samples may name the same action
+    // with different inputs (`tool_bindings.list` samples both the run-filtered and the
+    // unfiltered read); a key built from the action name alone makes the second execution a
+    // `409 idempotency-conflict` against the first instead of a sample.
+    for (index, sample) in samples.into_iter().enumerate() {
         let spec = conveyor_actions::registry::registry()
             .get(sample.name)
             .unwrap_or_else(|| panic!("{} is not registered", sample.name));
@@ -9876,7 +9884,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
             }
             let input = (sample.input)(&ctx);
             let precondition = sample.precondition(&ctx);
-            let key = format!("task-a-{}", sample.name);
+            let key = format!("task-a-{index}-{}", sample.name);
             let (status_h, http_body) = running
                 .invoke(
                     sample.name,
@@ -9884,7 +9892,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                     input.clone(),
                     precondition.as_deref(),
                     Some(&key),
-                    Some(&format!("rid-a-{}", sample.name)),
+                    Some(&format!("rid-a-{index}-{}", sample.name)),
                 )
                 .await;
             let result = tasks_mcp
@@ -9913,6 +9921,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 sample.name
             );
             checked += 1;
+            checked_names.insert(sample.name);
             continue;
         }
 
@@ -9925,15 +9934,15 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                     "dev:alice",
                     input.clone(),
                     precondition.as_deref(),
-                    Some(&format!("det-http-{}", sample.name)),
-                    Some(&format!("rid-h-{}", sample.name)),
+                    Some(&format!("det-http-{index}-{}", sample.name)),
+                    Some(&format!("rid-h-{index}-{}", sample.name)),
                 )
                 .await;
             let result = mcp
                 .call(
                     &tool,
                     mcp_input(&input, precondition.as_deref()),
-                    Some(&format!("det-mcp-{}", sample.name)),
+                    Some(&format!("det-mcp-{index}-{}", sample.name)),
                 )
                 .await;
             let structured = structured_content(&result);
@@ -9945,6 +9954,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 sample.name
             );
             checked += 1;
+            checked_names.insert(sample.name);
             continue;
         }
 
@@ -9954,7 +9964,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         }
         let input = (sample.input)(&ctx);
         let precondition = sample.precondition(&ctx);
-        let key_a = format!("parity-a-{}", sample.name);
+        let key_a = format!("parity-a-{index}-{}", sample.name);
         let (status_a, http_a) = running
             .invoke(
                 sample.name,
@@ -9962,7 +9972,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 input.clone(),
                 precondition.as_deref(),
                 Some(&key_a),
-                Some(&format!("rid-a-{}", sample.name)),
+                Some(&format!("rid-a-{index}-{}", sample.name)),
             )
             .await;
         let result_a = mcp
@@ -9987,7 +9997,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         }
         let input = (sample.input)(&ctx);
         let precondition = sample.precondition(&ctx);
-        let key_b = format!("parity-b-{}", sample.name);
+        let key_b = format!("parity-b-{index}-{}", sample.name);
         let result_b = mcp
             .call(
                 &tool,
@@ -10003,7 +10013,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
                 input,
                 precondition.as_deref(),
                 Some(&key_b),
-                Some(&format!("rid-b-{}", sample.name)),
+                Some(&format!("rid-b-{index}-{}", sample.name)),
             )
             .await;
         assert_outcome(&sample, status_b, &result_b, &http_b);
@@ -10014,15 +10024,22 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
             sample.name
         );
         checked += 1;
+        checked_names.insert(sample.name);
     }
     assert_eq!(
-        checked, total,
-        "every registered action must be checked, not {} of {total}",
-        checked
+        checked_names.len(),
+        total,
+        "every registered action must be checked: {} distinct of {total}",
+        checked_names.len()
+    );
+    assert!(
+        checked >= total,
+        "the loop must run every sample: {checked} of at least {total}"
     );
     println!(
-        "parity: {checked} actions ({total} registered), both directions, bodies equal after \
-         stripping request_id/duration_ms"
+        "parity: {checked} samples over {} actions ({total} registered), both directions, \
+         bodies equal after stripping request_id/duration_ms",
+        checked_names.len()
     );
     running.shutdown().await;
     });

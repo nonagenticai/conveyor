@@ -545,7 +545,7 @@ pub async fn view_trace_tx(
     let mut truncated = false;
 
     // The root row, the cards, and (for a run root) the run itself.
-    let (view_root, mut cards, root_run) = match root {
+    let (view_root, cards, root_run) = match root {
         TraceRoot::Requirement(id) => {
             let row: Option<(String, String)> = sqlx::query_as(
                 "SELECT title, kind FROM governed_asset WHERE tenant_id = $1 AND id = $2",
