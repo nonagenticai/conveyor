@@ -1,6 +1,6 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T10 --content docs/evidence/rework/tranche-4/rework-content-T10.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
-  01 projects.reopen ok
+  reopen: not needed
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
@@ -11,13 +11,13 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B) already present
   artefact: Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C) already present
   artefact: Technology Standards Catalog — T10 SAFe cadence and MSP tranches (Phase D) already present
+  01 architecture.artifacts_link ok
   02 architecture.artifacts_link ok
   03 architecture.artifacts_link ok
   04 architecture.artifacts_link ok
   05 architecture.artifacts_link ok
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
-  08 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   delivery contract: already live
   register risk: The tranche-4 exit review is absent, so the tranche is reconciled unauthorised already present
@@ -40,12 +40,169 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  09 cadences.credit_demo ok
+  08 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
+  09 registers.update ok
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  10 projects.close_request ok
+  11 approvals.decide ok
+  12 approvals.request ok
+  13 approvals.decide ok
+  14 projects.close ok
+  closed T10: 01a1d039-0d36-70c1-a5e8-f50956c5e3f9
+T10: 14 acts recorded
 
-rework: registers.update refused at act 10: error: registers.update refused (412): registers.update replaces an existing row: If-Match (or `_version`) is required
-FAILED: registers.update: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T10 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-uhchx8nk/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-uhchx8nk/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T10-bodies --local-bin /tmp/conv526-bin-8111c984
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 

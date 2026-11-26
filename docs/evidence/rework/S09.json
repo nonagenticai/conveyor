@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a21213-d312-7391-935c-8558cd6b06b3 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a219da-1919-75c5-97c0-6c9e766306df approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "S09-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21213-c27d-796a-9e5f-e1abbb872d75 approved by board decision 01a21213-c2c7-7d60-89a9-a2ae3e18cd49 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a219d9-f671-708a-b28f-063e7e79e6ec approved by board decision 01a219d9-f717-73ba-9c86-18adeeecd4ef about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S09-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-96c2-741d-8580-f80905d42919 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219da-2fcd-78b3-9d0b-4159efee9baa (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S09-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a21242-99f0-7463-ae4e-b98443f0bf70 decided by a distinct approver",
+      "detail": "latest closure gate 01a219da-63b9-7709-a1f5-f200a0a9c0ab decided by a distinct approver",
       "id": "S09-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -106,7 +106,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "S09-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -169,16 +169,16 @@
   ],
   "failures": [],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-25T11:48:38.121479+00:00",
+  "generated_at": "2026-11-26T22:03:34.966510+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
   "project": "S09",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T22:03:15.234639+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
   "verdict": "green",
   "warnings": []

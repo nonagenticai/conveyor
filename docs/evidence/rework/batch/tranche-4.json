@@ -1,165 +1,42 @@
 {
-  "blocked": 5,
-  "generated_at": "2026-11-26T22:02:15+00:00",
-  "green": 2,
+  "blocked": 0,
+  "generated_at": "2026-11-26T22:04:30+00:00",
+  "green": 4,
   "members": [
     {
       "factory_exit": 0,
       "gaps": [],
-      "key": "S05",
-      "log": "docs/evidence/rework/batch/tranche-4/S05.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 12: error: projects.close refused (409): project S07 cannot close until its mandatory artefacts exist (missing: project-registers)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
       "key": "S07",
       "log": "docs/evidence/rework/batch/tranche-4/S07.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 12: error: projects.close refused (409): project S09 cannot close until its mandatory artefacts exist (missing: project-registers)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
-      "key": "S09",
-      "log": "docs/evidence/rework/batch/tranche-4/S09.log",
-      "publish_exit": 1,
-      "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: registers.update refused at act 10: error: registers.update refused (412): registers.update replaces an existing row: If-Match (or `_version`) is required",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
-      "key": "T10",
-      "log": "docs/evidence/rework/batch/tranche-4/T10.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "1 unresolved P0/P1 package(s): v1-w3c-2:T14 (P1)",
-          "gap": "record",
-          "id": "T14-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'T14-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        }
-      ],
-      "key": "T14",
-      "log": "docs/evidence/rework/batch/tranche-4/T14.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_RED"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T16 (P1)",
-          "gap": "record",
-          "id": "T16-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'T16-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        }
-      ],
-      "key": "T16",
-      "log": "docs/evidence/rework/batch/tranche-4/T16.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_RED"
-    },
-    {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: cards.move refused at act 78: error: cards.move refused (409): the project declares no project_type, so no move is legal",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
-      "key": "T18",
-      "log": "docs/evidence/rework/batch/tranche-4/T18.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 127: error: projects.close refused (409): project T19 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
-      "key": "T19",
-      "log": "docs/evidence/rework/batch/tranche-4/T19.log",
-      "publish_exit": 1,
-      "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
-          "gap": "record",
-          "id": "T4-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'T4-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        }
-      ],
-      "key": "T4",
-      "log": "docs/evidence/rework/batch/tranche-4/T4.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "state": "RECEIPT_GREEN"
     },
     {
       "factory_exit": 0,
       "gaps": [],
-      "key": "T9",
-      "log": "docs/evidence/rework/batch/tranche-4/T9.log",
+      "key": "S09",
+      "log": "docs/evidence/rework/batch/tranche-4/S09.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T10",
+      "log": "docs/evidence/rework/batch/tranche-4/T10.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T19",
+      "log": "docs/evidence/rework/batch/tranche-4/T19.log",
       "publish_exit": 1,
       "state": "RECEIPT_GREEN"
     }
   ],
-  "red": 3,
+  "red": 0,
   "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
   "tranche": 4
 }

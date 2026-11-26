@@ -1,0 +1,59 @@
+{
+  "body_sha256": "5b46e050bdac29cf8b7598c6247788df457011e04776d4dcf61a3aaf633f2296",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+    "key": "S09",
+    "kind": "project",
+    "title": "Documents, repositories, secrets, workers UI, reports/metrics, billing display"
+  },
+  "title": "Change Control \u2014 Documents, repositories, secrets, workers UI, reports/metrics, billing display"
+}

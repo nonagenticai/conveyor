@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a21213-b54e-7999-8a91-cae16d92ab8a approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a219d9-5241-7d98-8c54-550959dc4138 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "S07-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21213-a583-734a-a5b9-95221e14d0c4 approved by board decision 01a21213-a5c7-75aa-b779-7f54caf5d825 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a219d9-2fa8-703a-99f2-fb7e7572e467 approved by board decision 01a219d9-303c-7fdc-b217-ec349e82329b about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S07-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-890a-7983-8a14-4225589c68a1 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219d9-6600-7a4f-bd43-a6d8d4a8fd7b (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S07-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a21242-8c17-7f3f-9543-456671d2a0aa decided by a distinct approver",
+      "detail": "latest closure gate 01a219d9-a0f7-7754-9c93-01dc072301ae decided by a distinct approver",
       "id": "S07-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -106,7 +106,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "S07-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -142,58 +142,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "1 mandatory artefact package(s) open: v1-w2c-5:S07",
+      "detail": "no open standard artefact package for this project",
       "id": "S07-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-w2c-5:S07 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "S07-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S07-artefact-standard' did not pass; the gate check 'S07-rework' did not pass",
+      "detail": "gate discharged by executable checks: S07-project, S07-baseline, S07-charter, S07-closure-outputs, S07-contract, S07-review, S07-closure-gate, S07-waivers, S07-pi-cadence, S07-pi-plan, S07-pi-objectives, S07-lessons, S07-wsjf, S07-demo-credits, S07-product, S07-artefact-standard, S07-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S07-artefact-standard (P1): 1 mandatory artefact package(s) open: v1-w2c-5:S07",
-    "S07-rework (P0): 1 unresolved P0/P1 package(s): v1-w2c-5:S07 (P1)",
-    "gate (P0): the gate check 'S07-artefact-standard' did not pass; the gate check 'S07-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-25T11:48:37.501446+00:00",
+  "generated_at": "2026-11-26T22:02:59.488222+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",
   "project": "S07",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T22:02:39.861425+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a216d0-a896-776c-b9ed-b7f6c658be55 decided by a distinct approver",
+      "detail": "latest closure gate 01a219e2-d723-7982-adf4-7035cffc1f1b decided by a distinct approver",
       "id": "T10-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -169,14 +169,14 @@
   ],
   "failures": [],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-26T21:55:51.921634+00:00",
+  "generated_at": "2026-11-26T22:03:54.511181+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",
   "project": "T10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T21:55:05.173842+00:00",
+    "generated_at": "2026-11-26T22:03:15.234639+00:00",
     "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
     "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
