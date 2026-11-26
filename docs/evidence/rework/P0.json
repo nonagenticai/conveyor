@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a21732-e958-7ae1-885d-a28ae2cdad9a decided by a distinct approver",
+      "detail": "latest closure gate 01a21735-3ab2-7170-ab65-8de4aa6d0051 decided by a distinct approver",
       "id": "P0-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -151,10 +151,10 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "1 mandatory artefact package(s) open: dr-w4-proj-change-control-placeholder:P0",
+      "detail": "no open standard artefact package for this project",
       "id": "P0-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -169,29 +169,16 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'P0-artefact-standard' did not pass",
+      "detail": "gate discharged by executable checks: P0-project, P0-baseline, P0-charter, P0-closure-outputs, P0-contract, P0-review, P0-closure-gate, P0-waivers, P0-benefit-baseline, P0-pi-cadence, P0-wsjf, P0-demo-credits, P0-lessons, P0-pi-plan, P0-pi-objectives, P0-product, P0-artefact-standard, P0-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "P0-artefact-standard (P1): 1 mandatory artefact package(s) open: dr-w4-proj-change-control-placeholder:P0",
-    "gate (P0): the gate check 'P0-artefact-standard' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-26T09:32:46.572090+00:00",
+  "generated_at": "2026-11-26T09:34:59.864858+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
@@ -199,9 +186,9 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-26T09:32:27.025161+00:00",
-    "git_sha": "afe96408",
-    "path": "retained-snapshot/afe96408"
+    "git_sha": "26cc8c94",
+    "path": "retained-snapshot/26cc8c94"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
