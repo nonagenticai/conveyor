@@ -1,17 +1,8 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T10:44:53+00:00",
-  "green": 1,
-  "members": [
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "PLATFORM",
-      "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    }
-  ],
+  "generated_at": "2026-11-26T10:45:34+00:00",
+  "green": 0,
+  "members": [],
   "red": 0,
   "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6",
   "tranche": 0
