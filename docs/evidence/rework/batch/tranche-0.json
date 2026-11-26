@@ -1,13 +1,13 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T08:07:45+00:00",
+  "generated_at": "2026-11-26T08:14:18+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 111: error: projects.close refused (409): the project's tranche is not authorised; the programme's review authorises it",
+          "detail": "rework: projects.close refused at act 26: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, benefits-diagram, candidate-solutions, gap-analysis, project-context-diagram, project-registers)",
           "gap": "instrument",
           "id": null
         }
