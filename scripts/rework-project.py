@@ -1409,12 +1409,17 @@ class Runner:
                 if row is None:
                     fail(f"record fix: no WBS node matches {match}")
                 if change_id is None:
+                    # The change must be approved AND reference the approved scope baseline;
+                    # an open change with a blocked approval reads like a change but the WBS
+                    # gate refuses it (measured 2026-11-26 on PLATFORM's two change rows).
                     changes = [
                         r
                         for r in self._read(
                             "registers.list", {"project_id": self.project_id}
                         ).get("items") or []
                         if r.get("kind") == "change"
+                        and str(r.get("status") or "") in ("accepted", "approved")
+                        and r.get("baseline_ref")
                     ]
                     if not changes:
                         fail("record fix: a WBS edit needs the approved change row")
