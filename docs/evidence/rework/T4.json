@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T4 is closed",
-      "detail": "project T4 is active",
+      "detail": "project T4 is closed",
       "id": "T4-project",
       "kind": "snapshot",
       "result": "pass",
@@ -151,10 +151,10 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T4-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -173,29 +173,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T4-rework' did not pass",
+      "detail": "gate discharged by executable checks: T4-project, T4-baseline, T4-charter, T4-closure-outputs, T4-contract, T4-review, T4-closure-gate, T4-waivers, T4-pi-cadence, T4-pi-plan, T4-pi-objectives, T4-wsjf, T4-demo-credits, T4-lessons, T4-product, T4-artefact-standard, T4-rework, T4-coach-gate",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T4-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
-    "gate (P0): the gate check 'T4-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-26T22:01:11.024450+00:00",
+  "generated_at": "2026-11-26T22:06:49.550609+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",
   "project": "T4",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T22:01:06.683468+00:00",
+    "generated_at": "2026-11-26T22:06:11.756901+00:00",
     "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
     "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

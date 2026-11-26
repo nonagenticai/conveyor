@@ -1,135 +1,68 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T16 --content docs/evidence/rework/tranche-4/rework-content-T16.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T16 --content docs/evidence/rework/tranche-4/rework-content-T16.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
   reopen: not needed
   charter: already approved
-  closure outputs: not applicable (the project stays active)
-  01 architecture.contracts_request ok
-  02 architecture.board_decide ok
-  03 architecture.contracts_approve ok
-  04 documents.compose ok
-  05 documents.publish ok
-  06 architecture.artifacts_supersede ok
-  07 architecture.artifacts_update ok
-  08 architecture.artifacts_approve ok
-  artefact: Stakeholder map — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  09 documents.compose ok
-  10 documents.publish ok
-  11 architecture.artifacts_supersede ok
-  12 architecture.artifacts_update ok
-  13 architecture.artifacts_approve ok
-  artefact: Driver, goal and objective catalogue — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  14 documents.compose ok
-  15 documents.publish ok
-  16 architecture.artifacts_supersede ok
-  17 architecture.artifacts_update ok
-  18 architecture.artifacts_approve ok
-  artefact: Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  19 documents.compose ok
-  20 documents.publish ok
-  21 architecture.artifacts_supersede ok
-  22 architecture.artifacts_update ok
-  23 architecture.artifacts_approve ok
-  artefact: Solution concept — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  24 documents.compose ok
-  25 documents.publish ok
-  26 architecture.artifacts_supersede ok
-  27 architecture.artifacts_update ok
-  28 architecture.artifacts_approve ok
-  artefact: Business capability map — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  29 documents.compose ok
-  30 documents.publish ok
-  31 architecture.artifacts_supersede ok
-  32 architecture.artifacts_update ok
-  33 architecture.artifacts_approve ok
-  artefact: Data entity catalogue — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  34 documents.compose ok
-  35 documents.publish ok
-  36 architecture.artifacts_supersede ok
-  37 architecture.artifacts_update ok
-  38 architecture.artifacts_approve ok
-  artefact: Technology standards — T16 procedure ingestion (retrospective, 2026-11-23) re-versioned, bound and documented
-  39 architecture.artifacts_link ok
-  40 architecture.artifacts_link ok
-  41 architecture.artifacts_link ok
-  42 architecture.artifacts_link ok
-  43 architecture.artifacts_link ok
-  44 architecture.artifacts_link ok
-  45 architecture.artifacts_link ok
-  46 architecture.artifacts_link ok
-  47 architecture.artifacts_link ok
-  48 architecture.artifacts_link ok
-  49 architecture.artifacts_link ok
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder map — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Driver, goal and objective catalogue — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Solution concept — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Business capability map — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Data entity catalogue — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  artefact: Technology standards — T16 procedure ingestion (retrospective, 2026-11-23) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  11 architecture.artifacts_link ok
   document architecture-artifact: already present and published
-  50 architecture.contracts_request ok
-  51 architecture.board_decide ok
-  52 architecture.contracts_approve ok
-  53 registers.create ok
-  54 registers.create ok
-  55 registers.create ok
-  56 registers.create ok
-  57 registers.create ok
-  58 registers.create ok
-  59 registers.create ok
-  60 registers.create ok
-  61 registers.create ok
-  62 registers.create ok
-  63 registers.create ok
+  delivery contract: already live
+  register risk: The live T16 gate is not re-executed, so acceptance rests on the built flag and the approved artefacts rather than a fresh run already present
+  register risk: The earlier close predates the tranche-4 authorisation, so the tranche-4 review may not accept the reconstructed record already present
+  register issue: The project closed without a charter, scope baseline, delivery contract, Phase-G review or published closure review already present
+  register issue: The statement of architecture work and delivery contract were missing at the snapshot and are supplied retrospectively already present
+  register assumption: RDF/OWL/Turtle stays a strata knowledge-pack import bound by knowledge_pack_ref; T16 owns no RDF store, graph store or reasoner already present
+  register assumption: The tranche-4 review decides continue, so this retrospective needs no close, no waiver and no new scope already present
+  register dependency: T16 depends on T2, T13 and P0, and builds on the tool spine those projects carry already present
+  register dependency: T17's tenant-wide generalisation is sequenced after T16, so T16's pack binding and publication gate constrain it already present
+  register benefit: A drafting job can no longer publish its own procedure; a human decision owns publication already present
+  register benefit: A re-ingest versions the draft while the published row keeps its source and its knowledge pack already present
+  register benefit: An unreviewed source never binds a job, so bound execution only runs reviewed PDDL procedures already present
   benefit transitions: none in the content
   baseline: already taken
-  64 projects.baseline ok
-  65 approvals.decide ok
-  66 projects.baseline ok
-  67 approvals.decide ok
-  closure-review output: not applicable (the project stays active)
-  68 documents.publish ok
-  69 documents.update ok
-  70 documents.publish ok
-  project-brief output: body corrected and republished
-  71 documents.publish ok
-  72 documents.update ok
-  73 documents.publish ok
-  evidence output: body corrected and republished
-  74 architecture.reviews_record ok
-  75 cadences.credit_demo ok
+  schedule baseline: already taken
+  cost baseline: already taken
+  12 documents.compose ok
+  13 documents.publish ok
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  14 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
-  76 registers.update ok
   record fixes: none in the content
-  77 approvals.request ok
-  78 approvals.decide ok
-  79 cards.comment ok
-  80 cards.move ok
-  81 cards.move ok
-  card cleared: std-togaf-architecture-artifact-t16:T16
-  card discharge: 1 card(s) cleared of 358 open package(s)
-  closure: not applicable (the project stays active)
-T16: 81 acts recorded
+  card discharge: 0 card(s) cleared of 310 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  15 projects.close ok
+  closed T16: 01a1d039-0d38-76fb-9394-b75934d16fcd
+T16: 15 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T16 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T16-snap-yqr2fcj7/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T16-snap-yqr2fcj7/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T16-bodies --local-bin /tmp/conv526-bin-8111c984
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T16 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T16-snap-na0rwfzh/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T16-snap-na0rwfzh/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T16-bodies --local-bin /tmp/conv526-bin-8111c984
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "T16",
-      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
-      "category": "compliance-review",
-      "document_id": "01a219de-5b4a-7256-b375-5d1788245bc7",
-      "natural_key": "artefact:T16:compliance-review:a5af98fd2a89e638",
-      "body_sha256": "a5af98fd2a89e6389481b63b97271a224eaf744c4d4cd6ebadcf20a1bbe21bc9"
-    },
-    {
-      "project_key": "T16",
-      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
-      "category": "delivery-contract",
-      "document_id": "01a219de-5d0d-709f-a179-943e3fed1acd",
-      "natural_key": "artefact:T16:delivery-contract:a775c87d0130a53c",
-      "body_sha256": "a775c87d0130a53c30bcaa04b990fcffcb6410323ebe465caaa2f4324ffbffaf"
-    }
-  ],
+  "applied": [],
   "skipped": [
     {
       "project_key": "T16",
@@ -146,6 +79,30 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "T16",
+      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T16",
+      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T16",
+      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     },
     {
       "project_key": "T16",
@@ -239,10 +196,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     }
   ],
   "counts": {
-    "due": 6,
-    "present": 0,
+    "due": 4,
+    "present": 2,
     "missing-edge": 0,
-    "stale": 7,
+    "stale": 8,
     "ambiguous": 0
   }
 }

@@ -1,13 +1,21 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T22:05:39+00:00",
-  "green": 1,
+  "generated_at": "2026-11-26T22:06:49+00:00",
+  "green": 2,
   "members": [
     {
       "factory_exit": 0,
       "gaps": [],
-      "key": "T18",
-      "log": "docs/evidence/rework/batch/tranche-4/T18.log",
+      "key": "T16",
+      "log": "docs/evidence/rework/batch/tranche-4/T16.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T4",
+      "log": "docs/evidence/rework/batch/tranche-4/T4.log",
       "publish_exit": 1,
       "state": "RECEIPT_GREEN"
     }

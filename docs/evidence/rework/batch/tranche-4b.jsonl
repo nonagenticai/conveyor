@@ -73,3 +73,9 @@
 {"blocked": null, "content": "docs/evidence/rework/tranche-4/rework-content-T18.json", "key": "T18", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-26T22:05:13+00:00"}
 {"key": "T18", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:05:13+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "T18", "log": "docs/evidence/rework/batch/tranche-4/T18.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:05:39+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-4/rework-content-T16.json", "key": "T16", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-26T22:06:05+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-4/rework-content-T4.json", "key": "T4", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-26T22:06:05+00:00"}
+{"key": "T16", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:06:05+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T16", "log": "docs/evidence/rework/batch/tranche-4/T16.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:06:30+00:00"}
+{"key": "T4", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RUNNING", "tranche": 4, "ts": "2026-11-26T22:06:30+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T4", "log": "docs/evidence/rework/batch/tranche-4/T4.log", "snapshot_sha": "60b290a3c661b22572603c4f007906561ee7f44b", "state": "RECEIPT_GREEN", "tranche": 4, "ts": "2026-11-26T22:06:49+00:00"}
