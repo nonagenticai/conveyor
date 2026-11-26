@@ -32,27 +32,42 @@ static SERIAL: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 struct Stub {
     base: String,
     hits: Arc<AtomicUsize>,
+    answer: Arc<std::sync::Mutex<Value>>,
 }
 
 #[derive(Clone)]
 struct StubState {
     hits: Arc<AtomicUsize>,
+    answer: Arc<std::sync::Mutex<Value>>,
 }
 
-async fn answer(
+async fn answer_fn(
     axum::extract::State(state): axum::extract::State<StubState>,
     uri: axum::http::Uri,
 ) -> axum::Json<Value> {
     state.hits.fetch_add(1, Ordering::SeqCst);
-    axum::Json(json!({"stub": true, "path": uri.path()}))
+    let mut body = state.answer.lock().expect("the stub answer").clone();
+    if let Some(map) = body.as_object_mut() {
+        // The path is how a test tells the services apart.
+        map.insert("path".to_owned(), json!(uri.path()));
+    }
+    axum::Json(body)
 }
 
 impl Stub {
     async fn start() -> Stub {
+        Stub::start_with(json!({"stub": true})).await
+    }
+
+    async fn start_with(answer: Value) -> Stub {
         let hits = Arc::new(AtomicUsize::new(0));
+        let shared = Arc::new(std::sync::Mutex::new(answer));
         let app = axum::Router::new()
-            .fallback(axum::routing::any(answer))
-            .with_state(StubState { hits: hits.clone() });
+            .fallback(axum::routing::any(answer_fn))
+            .with_state(StubState {
+                hits: hits.clone(),
+                answer: shared.clone(),
+            });
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
             .await
             .expect("bind the destination stub");
@@ -63,7 +78,13 @@ impl Stub {
         Stub {
             base: format!("http://{addr}"),
             hits,
+            answer: shared,
         }
+    }
+
+    /// Answer every later call with `body` (the path is still filled in).
+    fn answer_with(&self, body: Value) {
+        *self.answer.lock().expect("the stub answer") = body;
     }
 
     fn hits(&self) -> usize {
@@ -282,6 +303,60 @@ async fn a_bound_job_calls_coding_through_the_broker() {
     assert_eq!(
         body["output"]["path"], "/api/jobs",
         "the call reached the registered coding destination alias: {body}"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+// ── #797 P3 (v1-w4a-2): a 2xx is judged by the call's own read-back ─────────────────────
+
+/// A `200` whose own verification says the write did not happen is not `ok` (SPEC_V2 §11.3).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_two_hundred_with_a_failing_verdict_is_check_failed() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture.stub.answer_with(json!({
+        "verdict": "fail",
+        "checks": [{"ok": false, "detail": "the write is not visible on read-back"}]
+    }));
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+    assert_eq!(status, 422, "a failed read-back is not ok: {body}");
+    assert_eq!(
+        body["type"], "write_not_verified",
+        "the refusal names the verification: {body}"
+    );
+
+    let rows = fixture.ledger().await;
+    assert_eq!(rows.len(), 1, "one call is one ledger row: {rows:?}");
+    assert_eq!(
+        rows[0].status, "check_failed",
+        "the ledger records the failed check, not ok: {rows:?}"
+    );
+    assert_eq!(
+        rows[0].error_class.as_deref(),
+        Some("write_not_verified"),
+        "the ledger names why: {rows:?}"
+    );
+    assert!(
+        rows[0]
+            .error_message
+            .as_deref()
+            .is_some_and(|message| message.contains("verdict")),
+        "the ledger carries the destination's own verdict: {rows:?}"
     );
 
     fixture.running.shutdown().await;

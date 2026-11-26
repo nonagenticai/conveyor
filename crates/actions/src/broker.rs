@@ -79,6 +79,51 @@ fn field(field: &str, detail: impl Into<String>) -> FieldError {
     }
 }
 
+/// The verification a `2xx` write reports against itself (SPEC_V2 §11.3).
+///
+/// The envelope is `{status, data, checks[], next[]}`; a write adds a `verdict`. A wrapped
+/// destination document sits under `output`, so the members are read there first. A body that
+/// carries neither member proves nothing here: a `read_back`-only tool verifies through its
+/// read tool later.
+fn write_verification_failure(effect: &str, body: &Value) -> Option<String> {
+    if effect != "write" && effect != "destructive" {
+        return None;
+    }
+    let document = body.get("output").unwrap_or(body);
+    if let Some(verdict) = document.get("verdict") {
+        let passed = verdict.as_bool() == Some(true)
+            || verdict.as_str().is_some_and(|word| {
+                word.eq_ignore_ascii_case("ok")
+                    || word.eq_ignore_ascii_case("pass")
+                    || word.eq_ignore_ascii_case("passed")
+            });
+        if !passed {
+            return Some(format!("the destination's verdict is {verdict}"));
+        }
+    }
+    if let Some(checks) = document.get("checks") {
+        let Some(entries) = checks.as_array() else {
+            return Some("the destination's checks are not a list".to_owned());
+        };
+        for entry in entries {
+            // A check declares its outcome in whichever member its service uses; any of the
+            // three is a failure, so a service cannot drift to a spelling read as a pass.
+            let ok = entry.get("ok").and_then(Value::as_bool);
+            let pass = entry.get("pass").and_then(Value::as_bool);
+            let status = entry.get("status").and_then(Value::as_str);
+            let failed = ok == Some(false)
+                || pass == Some(false)
+                || status.is_some_and(|status| {
+                    status.eq_ignore_ascii_case("fail") || status.eq_ignore_ascii_case("failed")
+                });
+            if failed {
+                return Some(format!("a read-back check failed: {entry}"));
+            }
+        }
+    }
+    None
+}
+
 /// Resolve, check, validate, gate, call and ledger one tool call.
 pub(crate) async fn invoke_broker(
     pool: &PgPool,
@@ -330,6 +375,22 @@ pub(crate) async fn invoke_broker(
             }
         }
         Err(error) => Err(error),
+    };
+
+    // SPEC_V2 §11.3: a 2xx is not `ok` when the write's own envelope reports the effect did not
+    // happen. Refusing here lands in the `422` arm below, so the ledger says `check_failed`.
+    let outcome = match outcome {
+        Ok(outcome) if (200..=299).contains(&outcome.status) => {
+            match write_verification_failure(&tool.effect, &outcome.body) {
+                Some(detail) => Err(ActionError::new(
+                    422,
+                    "write_not_verified",
+                    format!("{}: {detail}", call.tool),
+                )),
+                None => Ok(outcome),
+            }
+        }
+        other => other,
     };
 
     // The response size of a refusal that came from the broker itself is the problem document's.
