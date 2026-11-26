@@ -1256,18 +1256,27 @@ def resolve_documents(
     programme_projects: dict[str, set[str]],
     category: str | None = None,
     scope: str | None = None,
+    require_heading: bool = True,
 ) -> tuple[dict[str, Any], bool]:
-    """Resolve one heading against the published documents. Returns (source, heading_found)."""
+    """Resolve one heading against the published documents. Returns (source, heading_found).
+
+    `require_heading=False` is for a source that names its document category explicitly: the
+    document itself is the section, and the category's own standard already guarantees its
+    headings. The page must still exist — a document with no rendered body is not evidence.
+    """
     wanted = category or str(template.get("document_category") or "")
     scope = scope or ("subject" if subject["kind"] in {"project", "card", "phase"} else "programme")
     docs = documents_for(snapshot, subject, wanted, scope, programme_projects)
     headings = {str(doc.get("id")): document_headings(outputs_dir, str(doc.get("id"))) for doc in docs}
-    heading_key = normalise(heading)
-    matched = [
-        doc for doc in docs
-        if headings[str(doc.get("id"))] is not None
-        and heading_key in headings[str(doc.get("id"))]
-    ]
+    if require_heading:
+        heading_key = normalise(heading)
+        matched = [
+            doc for doc in docs
+            if headings[str(doc.get("id"))] is not None
+            and heading_key in headings[str(doc.get("id"))]
+        ]
+    else:
+        matched = [doc for doc in docs if headings[str(doc.get("id"))] is not None]
     source = {
         "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
         "category": wanted, "scope": scope,
@@ -1406,6 +1415,7 @@ def resolve_section(
                 document_source, heading_found = resolve_documents(
                     heading, template, subject, snapshot, outputs_dir, programme_projects,
                     wanted_category, wanted_scope,
+                    require_heading=bool(source.get("require_heading", True)),
                 )
                 if not heading_found:
                     missing_headings.add(heading)
@@ -3077,11 +3087,69 @@ def self_test_computed_sources(fixture: dict[str, Any]) -> None:
     print("generate-standards: self-test case computed-sources OK")
 
 
+def self_test_require_heading() -> None:
+    """A category document evidences its section only when the source says so."""
+    with tempfile.TemporaryDirectory() as tmp:
+        outputs = Path(tmp)
+        snapshot = {
+            "programme": {"projects": [{"id": "p1", "programme_id": "pg"}]},
+            "artefacts": {
+                "documents": [
+                    {
+                        "id": "doc-1",
+                        "category": "gap-analysis",
+                        "project_id": "p1",
+                        "publishable": True,
+                        "created_at": "2026-11-20T00:00:00Z",
+                        "title": "Gap Analysis",
+                    }
+                ]
+            },
+        }
+        (outputs / "output-doc-1.html").write_text(
+            "<h1>Gaps</h1><h2>Baseline</h2><h2>Target</h2>", encoding="utf-8"
+        )
+        subject = {
+            "kind": "phase", "id": "p1:e", "key": "P1/e", "project_id": "p1",
+            "project_key": "P1", "phase": "e", "programme_id": "pg", "meta": {},
+        }
+        source = {
+            "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
+            "match": {"category": "gap-analysis", "scope": "subject"},
+        }
+        strict = {"document_category": "phase-e", "sources": {"Gap analysis": [source]}}
+        section = resolve_section(
+            "Gap analysis", strict, "phase-e", subject, snapshot, outputs, {"pg": {"p1"}}
+        )
+        assert section["status"] != "evidenced", (
+            "a document without the section heading must not evidence the section"
+        )
+        whole = {
+            "document_category": "phase-e",
+            "sources": {"Gap analysis": [dict(source, require_heading=False)]},
+        }
+        section = resolve_section(
+            "Gap analysis", whole, "phase-e", subject, snapshot, outputs, {"pg": {"p1"}}
+        )
+        assert section["status"] == "evidenced", (
+            "an explicit category document is the section when require_heading is false"
+        )
+        missing = Path(tmp) / "no-page"
+        missing.mkdir()
+        section = resolve_section(
+            "Gap analysis", whole, "phase-e", subject, snapshot, missing, {"pg": {"p1"}}
+        )
+        assert section["status"] != "evidenced", (
+            "a document with no rendered page is not evidence"
+        )
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
     self_test_sources_declared(std)
     self_test_computed_sources(fixture)
+    self_test_require_heading()
     with tempfile.TemporaryDirectory() as tmp:
         outputs = Path(tmp)
         self_test_outputs(outputs)

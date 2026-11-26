@@ -4339,6 +4339,7 @@
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "gap-analysis",
               "scope": "subject"
@@ -4350,6 +4351,7 @@
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "candidate-solutions",
               "scope": "subject"
@@ -4361,6 +4363,7 @@
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "project-context-diagram",
               "scope": "subject"
@@ -4372,6 +4375,7 @@
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "benefits-diagram",
               "scope": "subject"
@@ -4542,7 +4546,8 @@
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "h"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
