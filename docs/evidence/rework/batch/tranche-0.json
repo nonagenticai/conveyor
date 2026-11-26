@@ -1,47 +1,24 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T07:53:20+00:00",
+  "blocked": 1,
+  "generated_at": "2026-11-26T08:07:45+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "11 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-arc",
-          "gap": "record",
-          "id": "DESIGN-PUBLISH-artefact-standard",
-          "kind": "snapshot",
-          "severity": "P1"
-        },
-        {
-          "detail": "4 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
-          "gap": "record",
-          "id": "DESIGN-PUBLISH-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        },
-        {
-          "detail": "the project is closed while its manifest is red",
-          "gap": "record",
-          "id": "closed-on-red",
-          "kind": "snapshot",
-          "severity": "P0"
+          "detail": "rework: projects.close refused at act 111: error: projects.close refused (409): the project's tranche is not authorised; the programme's review authorises it",
+          "gap": "instrument",
+          "id": null
         }
       ],
       "key": "DESIGN-PUBLISH",
       "log": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "publish_exit": null,
+      "state": "BLOCKED"
     }
   ],
-  "red": 1,
-  "snapshot_sha": "a9fe740e99ff7394f8ed7dec5f86a39821b1cad8",
+  "red": 0,
+  "snapshot_sha": "3e10fc52830ac80ac33071a32b8d25eb4430d337",
   "tranche": 0
 }

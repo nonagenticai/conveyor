@@ -1,225 +1,128 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project DESIGN-PUBLISH --content docs/evidence/rework/tranche-0/rework-content-DESIGN-PUBLISH.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
 
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  02 documents.compose ok
+  03 documents.publish ok
+  04 architecture.artifacts_create ok
+  05 architecture.artifacts_approve ok
+  06 documents.compose ok
+  07 documents.publish ok
+  08 architecture.artifacts_create ok
+  09 architecture.artifacts_approve ok
+  10 documents.compose ok
+  11 documents.publish ok
+  12 architecture.artifacts_create ok
+  13 architecture.artifacts_approve ok
+  14 documents.compose ok
+  15 documents.publish ok
+  16 architecture.artifacts_create ok
+  17 architecture.artifacts_approve ok
+  18 documents.compose ok
+  19 documents.publish ok
+  20 architecture.artifacts_create ok
+  21 architecture.artifacts_approve ok
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_create ok
+  25 architecture.artifacts_approve ok
+  26 documents.compose ok
+  27 documents.publish ok
+  28 architecture.artifacts_create ok
+  29 architecture.artifacts_approve ok
+  30 documents.compose ok
+  31 documents.publish ok
+  32 architecture.artifacts_create ok
+  33 architecture.artifacts_approve ok
+  34 documents.compose ok
+  35 documents.publish ok
+  36 architecture.artifacts_create ok
+  37 architecture.artifacts_approve ok
+  38 documents.compose ok
+  39 documents.publish ok
+  40 architecture.artifacts_create ok
+  41 architecture.artifacts_approve ok
+  42 documents.compose ok
+  43 documents.publish ok
+  44 architecture.artifacts_create ok
+  45 architecture.artifacts_approve ok
+  46 documents.compose ok
+  47 documents.publish ok
+  48 architecture.artifacts_create ok
+  49 architecture.artifacts_approve ok
+  50 documents.compose ok
+  51 documents.publish ok
+  52 architecture.artifacts_create ok
+  53 architecture.artifacts_approve ok
+  54 documents.compose ok
+  55 documents.publish ok
+  56 architecture.artifacts_create ok
+  57 architecture.artifacts_approve ok
+  58 documents.compose ok
+  59 documents.publish ok
+  60 architecture.artifacts_create ok
+  61 architecture.artifacts_approve ok
+  62 architecture.artifacts_link ok
+  63 architecture.artifacts_link ok
+  64 architecture.artifacts_link ok
+  65 architecture.artifacts_link ok
+  66 architecture.artifacts_link ok
+  67 architecture.artifacts_link ok
+  68 architecture.artifacts_link ok
+  69 architecture.artifacts_link ok
+  70 architecture.artifacts_link ok
+  71 architecture.artifacts_link ok
+  72 architecture.artifacts_link ok
+  73 architecture.artifacts_link ok
+  74 architecture.artifacts_link ok
+  75 architecture.artifacts_link ok
+  76 architecture.artifacts_link ok
+  77 architecture.artifacts_link ok
+  78 architecture.artifacts_link ok
+  79 architecture.artifacts_link ok
+  80 architecture.artifacts_link ok
+  81 architecture.artifacts_link ok
+  82 architecture.artifacts_link ok
+  83 architecture.artifacts_link ok
+  84 architecture.artifacts_link ok
+  85 architecture.artifacts_link ok
+  86 architecture.contracts_request ok
+  87 architecture.board_decide ok
+  88 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  89 registers.create ok
+  90 registers.create ok
+  91 registers.create ok
+  92 registers.create ok
+  93 registers.create ok
+  94 registers.create ok
+  baseline: already taken
+  95 projects.baseline ok
+  96 approvals.decide ok
+  97 projects.baseline ok
+  98 approvals.decide ok
+  closure-review output: already published
+  99 documents.publish ok
+  100 documents.update ok
+  101 documents.publish ok
+  project-brief output: body corrected and republished
+  102 documents.publish ok
+  103 documents.update ok
+  104 documents.publish ok
+  evidence output: body corrected and republished
+  105 architecture.reviews_record ok
+  106 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  107 projects.close_request ok
+  108 approvals.decide ok
+  109 approvals.request ok
+  110 approvals.decide ok
 
-rework: SNAPSHOT_DATABASE_URL is required to build the review read-back snapshot
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project DESIGN-PUBLISH --snapshot /tmp/conv526-snap-1126b/data --outputs-dir /tmp/conv526-snap-1126b/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
-
-{
-  "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "change-control",
-      "document_id": "01a216d8-3496-7074-a7c1-33f9c9fd016e",
-      "natural_key": "artefact:DESIGN-PUBLISH:change-control:464a770d31d8610b",
-      "body_sha256": "464a770d31d8610bf23ff26a8d15c91ca026365978a27efff243ba7743554d20"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "compliance-review",
-      "document_id": "01a216d8-365c-76fb-bfbe-b6d840eae41b",
-      "natural_key": "artefact:DESIGN-PUBLISH:compliance-review:294f6e86096ea477",
-      "body_sha256": "294f6e86096ea477426b18802d39c5ea9a25dcdd8a4e0a058bf7b61613222ea1"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "delivery-contract",
-      "document_id": "01a216d8-380e-75b3-b1fe-13c369727be8",
-      "natural_key": "artefact:DESIGN-PUBLISH:delivery-contract:88707a97f42e4fde",
-      "body_sha256": "88707a97f42e4fde1f5c21715c02eeb1f71496f9473d751ecad6608ffc6ef212"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "project-baseline",
-      "document_id": "01a216d8-39c1-72b6-b948-53791e6ac44b",
-      "natural_key": "artefact:DESIGN-PUBLISH:project-baseline:f6576daff78d9346",
-      "body_sha256": "f6576daff78d9346f6a6d868da7c39b06b2c8c9964719b4d900fe4a6effaacb7"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "project-wbs",
-      "document_id": "01a216d8-3b69-72a3-a04f-fd968547ccdc",
-      "natural_key": "artefact:DESIGN-PUBLISH:project-wbs:6252e97c228893a9",
-      "body_sha256": "6252e97c228893a920f9f1474927a0227c20a5fd9ef20d263659513b60a813a5"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a216d8-3d0a-7579-9b45-fab608445ae9",
-      "natural_key": "artefact:DESIGN-PUBLISH:statement-of-architecture-work:26242559cdfa8060",
-      "body_sha256": "26242559cdfa8060b92d85a92f5c94286edd81ba55f91f66b9c59ec2a151b450"
-    }
-  ],
-  "skipped": [
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "closure-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Document' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "benefits-diagram",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Goals and outcomes' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "candidate-solutions",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Candidates' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "gap-analysis",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Baseline' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "project-context-diagram",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "project-registers",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Risks' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "request-for-architecture-work",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Purpose' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "statement-of-intent",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "DESIGN-PUBLISH",
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
-      }
-    }
-  ],
-  "counts": {
-    "due": 17,
-    "present": 0,
-    "missing-edge": 0,
-    "stale": 2,
-    "ambiguous": 0
-  }
-}
-
+rework: projects.close refused at act 111: error: projects.close refused (409): the project's tranche is not authorised; the programme's review authorises it
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 
