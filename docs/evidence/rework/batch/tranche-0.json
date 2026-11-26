@@ -1,13 +1,13 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T08:14:18+00:00",
+  "generated_at": "2026-11-26T08:17:02+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 26: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, benefits-diagram, candidate-solutions, gap-analysis, project-context-diagram, project-registers)",
+          "detail": "rework: documents.compose refused at act 1: error: documents.compose refused (409): the output is missing required sections: Requirements, Types, Trace links [body: missing required section: Requirements (output_incomplete); body: missing required section: Types (output_incomplete); body: missing re",
           "gap": "instrument",
           "id": null
         }
