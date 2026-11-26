@@ -1,6 +1,6 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S03 --content docs/evidence/rework/tranche-2/rework-content-S03.json --tranche-label tranche 2 --demo-cadence 01a2004a-87d8-77e9-b06a-171361548e38
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
@@ -11,276 +11,17 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Business Capability Map — S03 Domain and schema (Phase B) already present
   artefact: Data Entity/Data Component Catalog — S03 Domain and schema (Phase C) already present
   artefact: Technology Standards Catalog — S03 Domain and schema (Phase D) already present
-  01 architecture.artifacts_link ok
   02 architecture.artifacts_link ok
   03 architecture.artifacts_link ok
   04 architecture.artifacts_link ok
   05 architecture.artifacts_link ok
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
-  delivery contract: already live
-  08 registers.create ok
-  09 registers.create ok
-  10 registers.create ok
-  11 registers.create ok
-  12 registers.create ok
-  13 registers.create ok
-  14 registers.create ok
-  15 registers.create ok
-  16 registers.create ok
-  17 registers.create ok
-  benefit transitions: none in the content
-  baseline: already taken
-  18 projects.baseline ok
-  19 approvals.decide ok
-  20 projects.baseline ok
-  21 approvals.decide ok
-  closure-review output: already published
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  22 cadences.credit_demo ok
-  baseline approval: none pending
-  change control: 1 change row(s) present
-  record fixes: none in the content
-  23 approvals.request ok
-  24 approvals.decide ok
-  25 cards.comment ok
-  26 cards.move ok
-  27 cards.move ok
-  card cleared: std-togaf-phase-e-s03-e:S03
-  28 approvals.request ok
-  29 approvals.decide ok
-  30 cards.comment ok
-  31 cards.move ok
-  32 cards.move ok
-  card cleared: std-togaf-phase-g-s03-g:S03
-  33 approvals.request ok
-  34 approvals.decide ok
-  35 cards.comment ok
-  36 cards.move ok
-  37 cards.move ok
-  card cleared: std-togaf-phase-h-s03-h:S03
-  38 approvals.request ok
-  39 approvals.decide ok
-  40 cards.comment ok
-  41 cards.move ok
-  42 cards.move ok
-  card cleared: std-pmp-project-registers-s03:S03
-  43 approvals.request ok
-  44 approvals.decide ok
-  45 cards.comment ok
-  46 cards.move ok
-  47 cards.move ok
-  card cleared: std-togaf-architecture-artifact-s03:S03
-  48 approvals.request ok
-  49 approvals.decide ok
-  50 cards.comment ok
-  51 cards.move ok
-  52 cards.move ok
-  card cleared: std-togaf-compliance-review-s03:S03
-  53 approvals.request ok
-  54 approvals.decide ok
-  55 cards.comment ok
-  56 cards.move ok
-  57 cards.move ok
-  card cleared: std-togaf-phase-b-s03-b:S03
-  58 approvals.request ok
-  59 approvals.decide ok
-  60 cards.comment ok
-  61 cards.move ok
-  62 cards.move ok
-  card cleared: std-togaf-phase-c-s03-c:S03
-  63 approvals.request ok
-  64 approvals.decide ok
-  65 cards.comment ok
-  66 cards.move ok
-  67 cards.move ok
-  card cleared: std-togaf-phase-d-s03-d:S03
-  68 approvals.request ok
-  69 approvals.decide ok
-  70 cards.comment ok
-  71 cards.move ok
-  72 cards.move ok
-  card cleared: std-togaf-phase-f-s03-f:S03
-  card discharge: 10 card(s) cleared of 458 open package(s)
-  73 projects.close_request ok
-  74 approvals.decide ok
-  75 approvals.request ok
-  76 approvals.decide ok
-
-rework: projects.close refused at act 77: error: projects.close refused (409): project S03 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
-FAILED: projects.close: transport exited 1
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S03 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-xvcusrdm/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-xvcusrdm/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-2/S03-bodies --local-bin /tmp/conv526-bin-5dcfc953
-
-{
-  "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "change-control",
-      "document_id": "01a217f9-06cc-7128-8347-4b040e8517f9",
-      "natural_key": "artefact:S03:change-control:232cc1e349648f7b",
-      "body_sha256": "232cc1e349648f7bb8a7294bf8e77fe2f7c428290dae87aac52d875b9ea7a2a6"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "compliance-review",
-      "document_id": "01a217f9-087e-7563-a987-1bf2e17a497f",
-      "natural_key": "artefact:S03:compliance-review:5657cd81cbb2362e",
-      "body_sha256": "5657cd81cbb2362eded9ef80a603a01f46e8ef64cc44ac6a46f6e93c97764833"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "delivery-contract",
-      "document_id": "01a217f9-0a1d-7654-afe0-5f5b2ae9de2d",
-      "natural_key": "artefact:S03:delivery-contract:b23eeacfe1e94038",
-      "body_sha256": "b23eeacfe1e940384806109a23f3bb227b312683ca6fffeaa8dc2cafdc948986"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "project-baseline",
-      "document_id": "01a217f9-0bae-72aa-b845-fb233cd2fd03",
-      "natural_key": "artefact:S03:project-baseline:10693b6ee0aa9c99",
-      "body_sha256": "10693b6ee0aa9c990b0e2ded47248ee20fafcb71e452fd0d2172cfca2acbdcd1"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "project-registers",
-      "document_id": "01a217f9-0d4c-77f5-af41-107e4f6d483b",
-      "natural_key": "artefact:S03:project-registers:de28d26b43e42806",
-      "body_sha256": "de28d26b43e42806855bf884bec165abf25f5b01a158612ef79b786a59ddb434"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "project-wbs",
-      "document_id": "01a217f9-0efc-779b-b1fe-05fcbeaf8fa5",
-      "natural_key": "artefact:S03:project-wbs:5301916195fc3599",
-      "body_sha256": "5301916195fc3599448e9d290521eee084dfc21f785029152f1ebdace628ea69"
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a217f9-10b2-71b7-af77-58b22c1a3c7a",
-      "natural_key": "artefact:S03:statement-of-architecture-work:06e5d3feec954e22",
-      "body_sha256": "06e5d3feec954e229077623635472f269ddecbf36691054f0050013cc5e0bc77"
-    }
-  ],
-  "skipped": [
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "stale"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Document' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "statement-of-intent",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S03",
-      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
-      }
-    }
-  ],
-  "counts": {
-    "due": 12,
-    "present": 0,
-    "missing-edge": 0,
-    "stale": 1,
-    "ambiguous": 0
-  }
-}
-
-
-[exit 1]
-
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S03 --content docs/evidence/rework/tranche-2/rework-content-S03.json --tranche-label tranche 2 --demo-cadence 01a2004a-87d8-77e9-b06a-171361548e38
-
-  reopen: not needed
-  charter: already approved
-  closure outputs: already ['closure-review']
-  SoAW: already live
-  artefact: Stakeholder Map — S03 Domain and schema (Phase A) already present
-  artefact: Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A) already present
-  artefact: Requirements Catalog — S03 Domain and schema (Phase A) already present
-  artefact: Solution Concept Diagram — S03 Domain and schema (Phase A) already present
-  artefact: Business Capability Map — S03 Domain and schema (Phase B) already present
-  artefact: Data Entity/Data Component Catalog — S03 Domain and schema (Phase C) already present
-  artefact: Technology Standards Catalog — S03 Domain and schema (Phase D) already present
-  01 architecture.artifacts_link ok
-  02 architecture.artifacts_link ok
-  03 architecture.artifacts_link ok
-  04 architecture.artifacts_link ok
-  05 architecture.artifacts_link ok
-  06 architecture.artifacts_link ok
-  07 architecture.artifacts_link ok
-  delivery contract: already live
+  08 architecture.artifacts_link ok
+  09 architecture.contracts_request ok
+  10 architecture.board_decide ok
+  11 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
   register risk: The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1) already present
   register risk: The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2) already present
   register issue: S03 closed out of sequence before the tranche-2 review (U3-EXC-S03) already present
@@ -298,22 +39,24 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   closure-review output: already published
   project-brief output: current
   evidence output: current
-  Phase-G review: already recorded
-  08 cadences.credit_demo ok
+  12 architecture.reviews_record ok
+  13 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
-  closure gate: already approved
-  destructive gate: already approved
-  09 projects.close ok
+  14 projects.close_request ok
+  15 approvals.decide ok
+  16 approvals.request ok
+  17 approvals.decide ok
+  18 projects.close ok
   closed S03: 01a1d039-0d28-743b-86c7-0d0698ed69c1
-S03: 9 acts recorded
+S03: 18 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S03 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-1plmdgj9/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-1plmdgj9/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-2/S03-bodies --local-bin /tmp/conv526-bin-5dcfc953
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S03 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-6k81ip1h/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S03-snap-6k81ip1h/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-2/S03-bodies --local-bin /tmp/conv526-bin-5dcfc953
 
 {
   "schema": "artefact-publication/v1",
@@ -341,7 +84,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "compliance-review",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "stale"
     },
     {
       "project_key": "S03",
@@ -349,7 +92,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "delivery-contract",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "stale"
     },
     {
       "project_key": "S03",
@@ -456,9 +199,9 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   ],
   "counts": {
     "due": 5,
-    "present": 7,
+    "present": 5,
     "missing-edge": 0,
-    "stale": 2,
+    "stale": 4,
     "ambiguous": 0
   }
 }
