@@ -1009,18 +1009,6 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
             mint,
             token_stdin: _,
         } => {
-            let licences = match config.licences_base_url.as_deref() {
-                Some(base) => Some(match config.service_credentials() {
-                    Ok(creds) => conveyor_auth::LicenceSyncClient::with_credentials(base, creds)
-                        .map_err(|error| RunError::Refused(format!("licences client: {error}")))?,
-                    Err(error) => {
-                        return Err(RunError::Refused(format!(
-                            "licences S2S credential: {error}"
-                        )));
-                    }
-                }),
-                None => None,
-            };
             let source = if mint {
                 admin::upstream_tokens::TokenSource::Mint
             } else {
@@ -1030,8 +1018,30 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 })?;
                 admin::upstream_tokens::TokenSource::Byo(line.trim().as_bytes().to_vec())
             };
+            // The mint authenticates as `conveyor-bundle-minter`, its own platform-owned client.
+            // The backend's credential is not a fallback: the licences mint route is owner-scoped
+            // and `conveyor-backend` belongs to a different owner, so it would be refused anyway.
+            let minter = match &source {
+                admin::upstream_tokens::TokenSource::Mint => {
+                    let base = config.licences_base_url.as_deref().ok_or_else(|| {
+                        RunError::Refused(
+                            "LICENCES_BASE_URL is not set; the mint needs the licences API"
+                                .to_owned(),
+                        )
+                    })?;
+                    let creds = config
+                        .bundle_minter_credentials()
+                        .map_err(RunError::Refused)?;
+                    Some(
+                        conveyor_auth::LicenceSyncClient::with_credentials(base, creds).map_err(
+                            |error| RunError::Refused(format!("licences client: {error}")),
+                        )?,
+                    )
+                }
+                admin::upstream_tokens::TokenSource::Byo(_) => None,
+            };
             let filled =
-                admin::upstream_tokens::fill(&pool, licences.as_ref(), &tenant, service, source)
+                admin::upstream_tokens::fill(&pool, minter.as_ref(), &tenant, service, source)
                     .await
                     .map_err(RunError::Refused)?;
             println!(

@@ -850,7 +850,7 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1232,7 +1232,7 @@
       "key": "T12",
       "name": "One organisation loop",
       "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1280,7 +1280,7 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1289,7 +1289,8 @@
           76,
           556,
           557,
-          630
+          630,
+          778
         ],
         "depends_on": [
           "T2",
@@ -1315,7 +1316,7 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1325,7 +1326,8 @@
           558,
           560,
           561,
-          688
+          688,
+          776
         ],
         "depends_on": [
           "T13",
@@ -1685,7 +1687,17 @@
           755,
           756,
           760,
-          773
+          779,
+          780,
+          781,
+          782,
+          783,
+          784,
+          787,
+          788,
+          789,
+          791,
+          792
         ],
         "depends_on": [],
         "plan_status": "active",
