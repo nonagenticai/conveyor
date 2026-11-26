@@ -343,7 +343,10 @@ mod tests {
                 (74, "organisation layers".to_owned()),
                 // T18-3c (#630): the run pins the executor kind it was created with
                 // (0075_run_executor_kind.sql, SPEC_V2 §10.5.2).
-                (75, "run executor kind".to_owned())
+                (75, "run executor kind".to_owned()),
+                // Delivery proofs (#744): the re-checkable gate evidence
+                // (0076_lean_proof.sql, SPEC_V2 §5.3/§5.4).
+                (76, "lean proof".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
