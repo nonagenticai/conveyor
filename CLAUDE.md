@@ -21,6 +21,24 @@ Read, in order: `docs/SPEC.md` → `docs/plans/00-INDEX.md` → `docs/plans/03-D
 - Stopping before merge? Write the `<!-- handoff -->` comment from `03-DELIVERY.md`. Never end
   on a verbal status.
 
+## Roles — load the skill for the work
+
+| Work | Skill |
+|---|---|
+| Tranche review, programme register, baselines, #302/#303 | `programme-manager` |
+| Architecture contracts, ADM phase/plateau, compliance, waiver, #395 | `programme-architect` |
+| Benefit profiles, baselines, transitions, realization | `benefits-manager` |
+| Project brief and analysis/architecture inception | `business-analyst` |
+| Standards fixpoint, closure evidence, independent acceptance | `quality-manager` |
+| Release receipt, deployed identity, cutover, live probe | `release-manager` |
+| Queue truth, claim, issue body, PR mechanics | `issue-pickup`, `issue-sweep`, `issue-create`, `issue-deliver` |
+
+**Separation of duties.** The role that builds a gate's subject never certifies it: the builder
+hands a live or end-to-end part to a fresh verifier; the architect's own contract is approved by
+the Board; the BCM's realization is accepted by the SRO. No session writes `owner`, `approved_by`,
+`SRO` or an approval row on the owner's behalf — it prepares the evidence and the recommendation,
+and the human signs. A question is an approval, and its decision records who decided.
+
 Current queue: `gh issue list --label unit --state open`. `status:blocked` issues are not
 claimable. This file overrides the global `LANES` line for this repo: the lane's one-PR rule is
 kept, but the unit is the issue and the branch carries its number.
