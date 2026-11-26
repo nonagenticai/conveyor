@@ -1,9 +1,14 @@
-//! #744 — `proofs.reverify`: a stored certificate against a fresh prover check.
+//! #744 + #746 — `proofs.reverify`: a stored certificate against a fresh prover check.
 //!
 //! Re-verification is two steps, because a handler cannot speak HTTP: the caller runs a **new**
 //! `lean4.check` on the stored source and then names both the certificate and that invocation.
 //! This action is the judgement — the fresh verdict, source and recomputed digest must equal the
 //! stored ones, and a tampered row is refused before it is even compared.
+//!
+//! #746 adds the second half: a row whose facts name the current model must also carry the source
+//! this binary renders from those facts. That is what catches a row rewritten *consistently* —
+//! columns, facts digest and certificate digest all recomputed — which the digest checks alone
+//! cannot see.
 //!
 //! `rbuild -- test -p conveyor-actions --test proofs_reverify`.
 
@@ -16,14 +21,6 @@ use support::proof;
 
 fn output(body: &Value) -> &Value {
     body.get("output").unwrap_or(body)
-}
-
-/// A source unique to one test, so the shared stub's per-source plan cannot leak between tests.
-fn source(marker: &str) -> String {
-    format!(
-        "theorem delivery_ok : 2 + 2 = 4 := by decide\n-- {marker} {}\n",
-        Uuid::now_v7()
-    )
 }
 
 async fn fixture() -> (support::Pg, support::Seeded) {
@@ -48,8 +45,8 @@ fn reverify(proof_id: &str, key: &str, invocation_input: &Value) -> Value {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn an_unchanged_certificate_reverifies() {
     let (pg, seeded) = fixture().await;
-    let source = source("unchanged");
-    let (proof_id, certificate) = proof::record(&pg, &seeded, &source).await;
+    let source = proof::source(&proof::facts("unchanged"));
+    let (proof_id, certificate) = proof::record(&pg, &seeded, "unchanged").await;
 
     let (key, input) = proof::check(&pg, &seeded, &source).await;
     let outcome = conveyor_actions::invoke(
@@ -84,8 +81,8 @@ async fn an_unchanged_certificate_reverifies() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_tampered_source_fails() {
     let (pg, seeded) = fixture().await;
-    let source = source("tampered");
-    let (proof_id, _) = proof::record(&pg, &seeded, &source).await;
+    let source = proof::source(&proof::facts("tampered"));
+    let (proof_id, _) = proof::record(&pg, &seeded, "tampered").await;
 
     // The table is append-only for the runtime role; a superuser is the adversary here.
     sqlx::query("UPDATE proof SET lean_source = $1 WHERE id = $2")
@@ -114,12 +111,77 @@ async fn a_tampered_source_fails() {
     assert_eq!(error.code, "proof_digest_mismatch", "{error:?}");
 }
 
+/// #746 — a row rewritten *consistently*: the source replaced and the certificate digest
+/// recomputed so every stored digest agrees with its columns. The re-render is the only check
+/// that can see it, because it needs the model rather than the row.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_consistently_rewritten_row_fails_the_render_check() {
+    let (pg, seeded) = fixture().await;
+    let source = proof::source(&proof::facts("rewritten"));
+    let (proof_id, _) = proof::record(&pg, &seeded, "rewritten").await;
+    let id = Uuid::parse_str(&proof_id).expect("the proof id");
+
+    let row = sqlx::query(
+        "SELECT subject_type, subject_id, spec_name, spec_sha256, facts_canonical, facts_sha256, \
+         theorem, trust, verdict, prover_identity, idempotency_key FROM proof WHERE id = $1",
+    )
+    .bind(id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the certificate");
+    use sqlx::Row as _;
+    let forged = "theorem delivery_ok : True := by trivial\n";
+    let rewritten = conveyor_store::proof::NewProof {
+        subject_type: row.get("subject_type"),
+        subject_id: row.get("subject_id"),
+        spec_name: row.get("spec_name"),
+        spec_sha256: row.get("spec_sha256"),
+        facts_canonical: row.get("facts_canonical"),
+        facts_sha256: row.get("facts_sha256"),
+        lean_source: forged.to_owned(),
+        theorem: row.get("theorem"),
+        trust: conveyor_store::proof::ProofTrust::parse(row.get::<String, _>("trust").as_str())
+            .expect("the stored trust"),
+        proven: row.get::<String, _>("verdict") == "proven",
+        computation_time_ms: None,
+        prover_identity: row.get("prover_identity"),
+        invocation_id: None,
+        idempotency_key: row.get("idempotency_key"),
+    };
+    let digest = conveyor_store::proof::certificate_digest(&rewritten);
+    sqlx::query("UPDATE proof SET lean_source = $1, certificate_sha256 = $2 WHERE id = $3")
+        .bind(forged)
+        .bind(&digest)
+        .bind(id)
+        .execute(&pg.super_pool)
+        .await
+        .expect("rewrite the row consistently");
+
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
+    let error = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.reverify",
+            seeded.user_id,
+            reverify(&proof_id, &key, &input),
+            None,
+        ),
+    )
+    .await
+    .expect_err("a consistently rewritten row still does not describe the model");
+
+    assert_eq!(error.status, 422);
+    assert_eq!(error.code, "proof_source_not_rendered", "{error:?}");
+}
+
 /// P3.2 — when the prover answers differently for the same source, the certificate is refused.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_changed_verdict_fails() {
     let (pg, seeded) = fixture().await;
-    let source = source("changed");
-    let (proof_id, _) = proof::record(&pg, &seeded, &source).await;
+    let source = proof::source(&proof::facts("changed"));
+    let (proof_id, _) = proof::record(&pg, &seeded, "changed").await;
 
     proof::prover().await.refute(&source);
     let (key, input) = proof::check(&pg, &seeded, &source).await;
@@ -145,7 +207,8 @@ async fn a_changed_verdict_fails() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_same_invocation_is_not_a_reverification() {
     let (pg, seeded) = fixture().await;
-    let source = source("same-invocation");
+    let facts = proof::facts("same-invocation");
+    let source = proof::source(&facts);
     let (key, input) = proof::check(&pg, &seeded, &source).await;
 
     let recorded = conveyor_actions::invoke(
@@ -159,7 +222,7 @@ async fn the_same_invocation_is_not_a_reverification() {
                 &key,
                 &input,
                 Uuid::now_v7(),
-                &proof::facts("same-invocation"),
+                &facts,
                 proof::THEOREM,
                 "kernel",
             ),

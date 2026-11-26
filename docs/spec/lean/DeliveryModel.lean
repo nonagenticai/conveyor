@@ -3,8 +3,8 @@
 
 This file is embedded verbatim at the head of every rendered certificate
 (`crates/actions/src/proof/render.rs`), so it must stay small and elaborate fast.
-It is core Lean only: no Mathlib import, no `native_decide`. Every theorem is closed
-by the kernel (`by decide` / `simp` + `decide`).
+It is core Lean only: no Mathlib import and no compiler-native reduction. Every
+theorem is closed by the kernel (`decide` and `simp`).
 
 It models **§5.3–§5.4 of `docs/SPEC_V2.md`**: plan ≠ evidence, a gate carries evidence,
 and a closed item is terminal. It does *not* model the Rust engine that produces the facts —
@@ -52,21 +52,27 @@ def covered (required present : List String) : Bool :=
 def checkSlice (f : SliceFacts) : Bool :=
   (f.state == .closed) && covered f.required f.present
 
-structure ProgrammeFacts where
-  specSha256 : String
-  modelSha256 : String
-  expected : List String
-  leaves : List String
-  deriving DecidableEq, BEq, Repr
-
 def noDuplicates (xs : List String) : Bool :=
   xs.eraseDups.length == xs.length
 
 def sameSet (a b : List String) : Bool :=
   noDuplicates a && noDuplicates b && a.all (fun x => b.contains x) && b.all (fun x => a.contains x)
 
+structure ProgrammeFacts where
+  specSha256 : String
+  modelSha256 : String
+  expected : List String
+  leaves : List (String × String)
+  deriving DecidableEq, BEq, Repr
+
+def leafNames (leaves : List (String × String)) : List String :=
+  leaves.map (fun leaf => leaf.1)
+
+def leafDigests (leaves : List (String × String)) : List String :=
+  leaves.map (fun leaf => leaf.2)
+
 def checkProgramme (f : ProgrammeFacts) : Bool :=
-  sameSet f.expected f.leaves
+  sameSet f.expected (leafNames f.leaves) && noDuplicates (leafDigests f.leaves)
 
 structure PackageFacts where
   specSha256 : String

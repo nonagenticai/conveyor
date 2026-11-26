@@ -84,16 +84,69 @@ async fn request(
     .await
 }
 
+/// #746 — a gate that *names* `lean_proof` as required refuses to open without one, and opens
+/// with it. `require_evidence` alone is advisory: it only refuses an empty list.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_required_kind_is_refused_without_it_and_accepted_with_it() {
+    let (pg, seeded) = fixture().await;
+    let project_id = project(&pg, &seeded).await;
+    let (proof_id, certificate) = proof::record(&pg, &seeded, "required").await;
+
+    let mut without = gate(&project_id, &proof_id, Some(&proof::spec_sha256()));
+    without["evidence"] = json!([]);
+    without["required_kinds"] = json!(["lean_proof"]);
+    let error = request(&pg, &seeded, without)
+        .await
+        .expect_err("a gate that requires a proof cannot open without one");
+    assert_eq!(error.status, 422);
+    assert_eq!(error.code, "gate_evidence_missing", "{error:?}");
+    assert!(
+        error.detail.contains("lean_proof"),
+        "the refusal names the missing kind: {error:?}"
+    );
+
+    // With the certificate named, the same gate opens and its meta cites the certificate.
+    let mut with = gate(&project_id, &proof_id, Some(&proof::spec_sha256()));
+    with["required_kinds"] = json!(["lean_proof"]);
+    let outcome = request(&pg, &seeded, with)
+        .await
+        .expect("a gate that requires a proof opens when one is named");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    let approval_id = output(&outcome.body)["id"]
+        .as_str()
+        .expect("the approval id")
+        .to_owned();
+    let meta: Value = sqlx::query_scalar("SELECT meta FROM approval WHERE id = $1")
+        .bind(Uuid::parse_str(&approval_id).expect("the approval id"))
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the approval row");
+    assert_eq!(meta["evidence"][0]["certificate_sha256"], certificate);
+}
+
+/// A required kind that no evidence item can satisfy is refused with its own code, not silently
+/// ignored.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unknown_required_kind_is_refused() {
+    let (pg, seeded) = fixture().await;
+    let project_id = project(&pg, &seeded).await;
+    let (proof_id, _) = proof::record(&pg, &seeded, "unknown-kind").await;
+
+    let mut input = gate(&project_id, &proof_id, Some(&proof::spec_sha256()));
+    input["required_kinds"] = json!(["vibes"]);
+    let error = request(&pg, &seeded, input)
+        .await
+        .expect_err("a kind that is not typed cannot be required");
+    assert_eq!(error.status, 422);
+    assert_eq!(error.code, "gate_evidence_unknown_kind", "{error:?}");
+}
+
 /// P4.1 — a valid proof on the pinned specification opens the gate, and the meta cites it.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_valid_proof_opens_the_gate() {
     let (pg, seeded) = fixture().await;
     let project_id = project(&pg, &seeded).await;
-    let source = format!(
-        "theorem delivery_ok : 2 + 2 = 4 := by decide\n-- valid {}\n",
-        Uuid::now_v7()
-    );
-    let (proof_id, certificate) = proof::record(&pg, &seeded, &source).await;
+    let (proof_id, certificate) = proof::record(&pg, &seeded, "valid").await;
 
     let outcome = request(
         &pg,
@@ -128,11 +181,7 @@ async fn a_valid_proof_opens_the_gate() {
 async fn every_bad_proof_is_refused() {
     let (pg, seeded) = fixture().await;
     let project_id = project(&pg, &seeded).await;
-    let source = format!(
-        "theorem delivery_ok : 2 + 2 = 4 := by decide\n-- refused {}\n",
-        Uuid::now_v7()
-    );
-    let (proof_id, _) = proof::record(&pg, &seeded, &source).await;
+    let (proof_id, _) = proof::record(&pg, &seeded, "refused").await;
 
     // A stale pin: the certificate answers a different specification.
     let stale = "b".repeat(64);
@@ -167,12 +216,9 @@ async fn every_bad_proof_is_refused() {
     assert_eq!(error.code, "gate_evidence_proof_digest", "{error:?}");
 
     // An honest row, but the prover said it was not proven.
-    let refuted = format!(
-        "theorem delivery_ok : 2 + 2 = 5 := by decide\n-- unproven {}\n",
-        Uuid::now_v7()
-    );
-    proof::prover().await.refute(&refuted);
-    let (unproven_id, _) = proof::record(&pg, &seeded, &refuted).await;
+    let refuted_source = proof::source(&proof::facts("unproven"));
+    proof::prover().await.refute(&refuted_source);
+    let (unproven_id, _) = proof::record(&pg, &seeded, "unproven").await;
     let error = request(
         &pg,
         &seeded,

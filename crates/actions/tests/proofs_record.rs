@@ -37,14 +37,15 @@ async fn a_supplied_verdict_is_ignored() {
     let prover = proof::prover().await;
 
     // The prover answers `valid: false`, while the caller claims the opposite.
-    let source = "theorem delivery_ok : 2 + 2 = 5 := by decide -- refuted\n";
-    prover.refute(source);
-    let (key, input) = proof::check(&pg, &seeded, source).await;
+    let facts = proof::facts("verdict");
+    let source = proof::source(&facts);
+    prover.refute(&source);
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
     let mut record = proof::record_input(
         &key,
         &input,
         Uuid::now_v7(),
-        &proof::facts("verdict"),
+        &facts,
         proof::THEOREM,
         "kernel",
     );
@@ -87,16 +88,11 @@ async fn a_supplied_verdict_is_ignored() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_replay_returns_the_first_certificate() {
     let (pg, seeded) = fixture().await;
-    let (key, input) = proof::check(&pg, &seeded, proof::SOURCE).await;
+    let facts = proof::facts("replay");
+    let source = proof::source(&facts);
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
     let subject = Uuid::now_v7();
-    let record = proof::record_input(
-        &key,
-        &input,
-        subject,
-        &proof::facts("replay"),
-        proof::THEOREM,
-        "kernel",
-    );
+    let record = proof::record_input(&key, &input, subject, &facts, proof::THEOREM, "kernel");
 
     let first = conveyor_actions::invoke(
         &pg.runtime,
@@ -134,12 +130,14 @@ async fn a_replay_returns_the_first_certificate() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn an_unknown_invocation_is_refused() {
     let (pg, seeded) = fixture().await;
+    let facts = proof::facts("unknown");
+    let body = json!({ "source": proof::source(&facts), "timeout": 60 });
 
     let record = proof::record_input(
         "never-called",
-        &json!({ "source": proof::SOURCE, "timeout": 60 }),
+        &body,
         Uuid::now_v7(),
-        &proof::facts("unknown"),
+        &facts,
         proof::THEOREM,
         "kernel",
     );
@@ -161,13 +159,15 @@ async fn an_unknown_invocation_is_refused() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_different_body_under_the_same_key_is_refused() {
     let (pg, seeded) = fixture().await;
-    let (key, _) = proof::check(&pg, &seeded, proof::SOURCE).await;
+    let facts = proof::facts("mismatch");
+    let source = proof::source(&facts);
+    let (key, _) = proof::check(&pg, &seeded, &source).await;
 
     let record = proof::record_input(
         &key,
-        &json!({ "source": "theorem delivery_ok : 1 + 1 = 3 := by decide\n", "timeout": 60 }),
+        &json!({ "source": format!("{source}-- a different body\n"), "timeout": 60 }),
         Uuid::now_v7(),
-        &proof::facts("mismatch"),
+        &facts,
         proof::THEOREM,
         "kernel",
     );
@@ -184,18 +184,20 @@ async fn a_different_body_under_the_same_key_is_refused() {
     assert_eq!(error.code, "proof_invocation_mismatch", "{error:?}");
 }
 
-/// A certificate names a theorem; the checked source has to declare it.
+/// A source the caller wrote is refused, even when the prover accepts it: a certificate records
+/// what its facts state, and the facts are rendered by the engine, never supplied.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn the_theorem_must_be_declared_by_the_source() {
+async fn a_hand_written_source_is_refused() {
     let (pg, seeded) = fixture().await;
-    let (key, input) = proof::check(&pg, &seeded, proof::SOURCE).await;
+    let hand_written = "theorem delivery_ok : 2 + 2 = 4 := by decide\n";
+    let (key, input) = proof::check(&pg, &seeded, hand_written).await;
 
     let record = proof::record_input(
         &key,
         &input,
         Uuid::now_v7(),
-        &proof::facts("theorem"),
-        "some_other_theorem",
+        &proof::facts("hand-written"),
+        proof::THEOREM,
         "kernel",
     );
     let error = conveyor_actions::invoke(
@@ -205,24 +207,26 @@ async fn the_theorem_must_be_declared_by_the_source() {
         proof::request("proofs.record", seeded.user_id, record, None),
     )
     .await
-    .expect_err("a theorem the source does not declare is refused");
+    .expect_err("a source that is not the rendering of the facts is refused");
 
     assert_eq!(error.status, 422);
-    assert_eq!(error.code, "proof_theorem_absent", "{error:?}");
+    assert_eq!(error.code, "proof_source_not_rendered", "{error:?}");
 }
 
-/// `native_decide` trusts the compiler. Recording it as `kernel` would overstate the claim.
+/// The certificate's spec pin and the facts' spec must be the same specification.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn native_decide_cannot_be_called_kernel() {
+async fn the_facts_and_the_certificate_must_pin_the_same_spec() {
     let (pg, seeded) = fixture().await;
-    let source = "theorem delivery_ok : 2 + 2 = 4 := by native_decide\n";
-    let (key, input) = proof::check(&pg, &seeded, source).await;
+    let mut facts = proof::facts("spec");
+    facts["spec_sha256"] = json!("0".repeat(64));
+    let source = proof::source(&facts);
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
 
     let record = proof::record_input(
         &key,
         &input,
         Uuid::now_v7(),
-        &proof::facts("native"),
+        &facts,
         proof::THEOREM,
         "kernel",
     );
@@ -233,28 +237,77 @@ async fn native_decide_cannot_be_called_kernel() {
         proof::request("proofs.record", seeded.user_id, record, None),
     )
     .await
-    .expect_err("a native reduction is not a kernel reduction");
+    .expect_err("facts taken against another spec cannot back this certificate");
 
     assert_eq!(error.status, 422);
-    assert_eq!(error.code, "proof_trust_mismatch", "{error:?}");
+    assert_eq!(error.code, "proof_spec_mismatch", "{error:?}");
+}
 
-    // And the honest certificate is accepted: the claim is recorded, not flattened.
+/// Facts that name a model this binary does not embed are refused: a certificate that mixed two
+/// models would mean nothing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn facts_naming_another_model_are_refused() {
+    let (pg, seeded) = fixture().await;
+    let mut facts = proof::facts("model");
+    facts["model_sha256"] = json!("0".repeat(64));
+    let source = format!(
+        "{}\ndef facts : SliceFacts := {{}}\n\ntheorem delivery_ok : checkSlice facts = true := by decide\n",
+        conveyor_actions::proof::render::MODEL_SOURCE
+    );
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
+
     let record = proof::record_input(
         &key,
         &input,
         Uuid::now_v7(),
-        &proof::facts("native"),
+        &facts,
         proof::THEOREM,
-        "native",
+        "kernel",
     );
-    let outcome = conveyor_actions::invoke(
+    let error = conveyor_actions::invoke(
         &pg.runtime,
         conveyor_actions::registry(),
         seeded.tenant,
         proof::request("proofs.record", seeded.user_id, record, None),
     )
     .await
-    .expect("the native certificate");
-    assert_eq!(outcome.status, 201, "{}", outcome.body);
-    assert_eq!(output(&outcome.body)["trust"], "native");
+    .expect_err("a certificate cannot name a model the binary does not embed");
+
+    assert_eq!(error.status, 422);
+    assert_eq!(error.code, "proof_model_mismatch", "{error:?}");
+}
+
+/// Facts that do not satisfy the model are refused before the prover, and the refusal names the
+/// item — the prover-answered-invalid path is what a *rendered* source cannot reach.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_incomplete_snapshot_is_refused() {
+    let (pg, seeded) = fixture().await;
+    let mut facts = proof::facts("incomplete");
+    facts["present"] = json!(["gate"]);
+    let source = proof::source(&proof::facts("incomplete"));
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
+
+    let record = proof::record_input(
+        &key,
+        &input,
+        Uuid::now_v7(),
+        &facts,
+        proof::THEOREM,
+        "kernel",
+    );
+    let error = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request("proofs.record", seeded.user_id, record, None),
+    )
+    .await
+    .expect_err("a slice that has lost an evidence item is not certifiable");
+
+    assert_eq!(error.status, 422);
+    assert_eq!(error.code, "proof_facts_incomplete", "{error:?}");
+    assert!(
+        error.detail.contains("incomplete"),
+        "the refusal names the missing item: {error:?}"
+    );
 }
