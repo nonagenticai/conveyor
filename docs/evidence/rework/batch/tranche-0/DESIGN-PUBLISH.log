@@ -7,9 +7,76 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   artefact: Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
   artefact: Driver / Goal / Objective Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
   artefact: Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Data Entity / Data Component Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Matrix — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Benefits Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Implementation and Migration Plan Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Request Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Register — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  11 architecture.artifacts_link ok
+  12 architecture.artifacts_link ok
+  13 architecture.artifacts_link ok
+  14 architecture.artifacts_link ok
+  15 architecture.artifacts_link ok
+  16 architecture.artifacts_link ok
+  17 architecture.artifacts_link ok
+  18 architecture.artifacts_link ok
+  19 architecture.artifacts_link ok
+  20 architecture.artifacts_link ok
+  21 architecture.artifacts_link ok
+  22 architecture.artifacts_link ok
+  23 architecture.artifacts_link ok
+  24 architecture.artifacts_link ok
+  25 documents.compose ok
+  26 documents.publish ok
+  document benefits-diagram: published
+  27 documents.compose ok
+  28 documents.publish ok
+  document candidate-solutions: published
+  29 documents.compose ok
+  30 documents.publish ok
+  document project-context-diagram: published
+  31 documents.compose ok
+  32 documents.publish ok
+  document gap-analysis: published
+  delivery contract: already live
+  register risk: The live public window is narrower than the committed pack already present
+  register risk: The 2026-11-25 acceptance record is red on the mandatory artefact standard already present
+  register issue: Four mandatory packages remain unresolved P0/P1 at the 2026-11-25 record already present
+  register assumption: The republish from live rows restores the public window already present
+  register dependency: The live window depends on U7's republish already present
+  register benefit: Public collaboration: the studio design is publicly readable already present
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  33 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  closure gate: already approved
+  destructive gate: already approved
 
-rework: documents.compose refused at act 1: error: documents.compose refused (409): the output is missing required sections: Requirements, Types, Trace links [body: missing required section: Requirements (output_incomplete); body: missing required section: Types (output_incomplete); body: missing required section: Trace links (output_incomplete)]
-FAILED: documents.compose: transport exited 1
+rework: projects.close refused at act 34: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, project-registers)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 

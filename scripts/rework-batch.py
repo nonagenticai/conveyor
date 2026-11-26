@@ -525,7 +525,12 @@ def run_one(
         # PUBLISHED documents (`project-registers`, `architecture-artifact`) that only the
         # publisher composes from the rows the factory has just written. Publishing once and
         # resuming the factory is the only order in which a standard-bound project can close.
-        if not (publish and not dry_run and "closure_mandatory_artefacts_missing" in detail):
+        # The refusal's wire text carries the message, not the code, so both are matched.
+        resumable = publish and not dry_run and (
+            "closure_mandatory_artefacts_missing" in detail
+            or "cannot close until its mandatory artefacts exist" in detail
+        )
+        if not resumable:
             return {
                 "key": key,
                 "state": "BLOCKED",
