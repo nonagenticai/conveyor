@@ -25,6 +25,11 @@ use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
 
+/// The sealed secret the speech toolkit's binding names when it overrides the shared licence.
+pub const SPEECH_TOKEN_SECRET: &str = "speech.token";
+/// The sealed secret the retrieval toolkit's binding names.
+pub const STRATA_TOKEN_SECRET: &str = "strata.token";
+
 /// The upstream services whose tenant credential the conveyor sends as the bearer.
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
 pub enum UpstreamService {
@@ -32,14 +37,20 @@ pub enum UpstreamService {
     Laya,
     /// The inference router (`inference.chat`, `completions.create`).
     Inference,
+    /// The speech host (`produce.speech`); its licence gate accepts only the `speech` app.
+    Speech,
+    /// The strata retriever (`retrieval.query`); its licence gate accepts only `strata-rag`.
+    Strata,
 }
 
 impl UpstreamService {
-    /// The sealed secret's name — the key the engine's `auth` names.
+    /// The sealed secret's name — the key the engine's `auth` (or a binding alias) names.
     pub fn secret(self) -> &'static str {
         match self {
             Self::Laya => conveyor_actions::process::judge::LAYA_TOKEN_SECRET,
             Self::Inference => conveyor_actions::integrations::inference::INFERENCE_TOKEN_SECRET,
+            Self::Speech => SPEECH_TOKEN_SECRET,
+            Self::Strata => STRATA_TOKEN_SECRET,
         }
     }
 
@@ -48,6 +59,8 @@ impl UpstreamService {
         match self {
             Self::Laya => "laya",
             Self::Inference => "inference-router",
+            Self::Speech => "speech",
+            Self::Strata => "strata-rag",
         }
     }
 }
@@ -149,4 +162,29 @@ pub async fn fill(
         source: source_name,
         expires_at,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Each upstream names the sealed row its binding will read and the licences app the mint
+    /// presents. The two licence-gated estates (speech, strata_rag) are here because the shared
+    /// `licence.token` is the wrong app for them.
+    #[test]
+    fn each_upstream_names_its_secret_and_app() {
+        for (service, secret, app) in [
+            (UpstreamService::Laya, "laya.token", "laya"),
+            (
+                UpstreamService::Inference,
+                "inference.token",
+                "inference-router",
+            ),
+            (UpstreamService::Speech, "speech.token", "speech"),
+            (UpstreamService::Strata, "strata.token", "strata-rag"),
+        ] {
+            assert_eq!(service.secret(), secret);
+            assert_eq!(service.licences_app(), app);
+        }
+    }
 }

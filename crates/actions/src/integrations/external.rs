@@ -226,9 +226,29 @@ fn coding_jobs_get() -> ActionSpec {
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_get) }
 
+/// The body `retrieval.query` sends to `strata_rag`.
+///
+/// The engine passes an external action's input through verbatim, so this is the retriever's own
+/// `QueryRequest` reduced to the two fields a conveyor caller sets. `query` has no default in the
+/// service, so a body without it is refused — the tool was published with an empty schema and
+/// could not carry a query at all until this pair existed (v1-w3c-2 / T14's live gate).
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct RetrievalQueryIn {
+    /// The text to retrieve for.
+    query: String,
+    /// How many hits to return; absent means the retriever's own default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    top_k: Option<u32>,
+}
+
+fn retrieval_query_input() -> Schema {
+    schemars::schema_for!(RetrievalQueryIn)
+}
+
 /// `retrieval.query` — a ranked retrieval over `strata_rag` (never a local index).
 fn retrieval_query() -> ActionSpec {
-    spec(Target {
+    let mut action = spec(Target {
         name: "retrieval.query",
         service: "strata_rag",
         method: "POST",
@@ -241,7 +261,9 @@ fn retrieval_query() -> ActionSpec {
         timeout_ms: 5_000,
         effect: Effect::Read,
         idempotent: true,
-    })
+    });
+    action.input = SchemaRef::Compiled(retrieval_query_input);
+    action
 }
 inventory::submit! { ActionRegistration::new(retrieval_query) }
 
@@ -264,3 +286,33 @@ fn billing_rollup() -> ActionSpec {
     action
 }
 inventory::submit! { ActionRegistration::new(billing_rollup) }
+
+#[cfg(test)]
+mod tests {
+    use crate::registry::registry;
+
+    /// The live retrieval call cannot carry a query unless the published tool's schema requires
+    /// one: `strata_rag`'s `QueryRequest.query` has no default, so an empty body is a 422.
+    #[test]
+    fn retrieval_query_requires_the_query_string() {
+        let spec = registry()
+            .get("retrieval.query")
+            .expect("retrieval.query is registered");
+        let schema = spec.input_schema();
+        let required = schema
+            .get("required")
+            .and_then(serde_json::Value::as_array)
+            .cloned()
+            .unwrap_or_default();
+        assert!(
+            required.iter().any(|field| field == "query"),
+            "retrieval.query must require `query`; strata_rag refuses a body without it: {schema}"
+        );
+        let properties = schema
+            .get("properties")
+            .and_then(serde_json::Value::as_object)
+            .unwrap_or_else(|| panic!("retrieval.query has no properties: {schema}"));
+        assert!(properties.contains_key("query"), "{schema}");
+        assert!(properties.contains_key("top_k"), "{schema}");
+    }
+}

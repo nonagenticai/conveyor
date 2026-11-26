@@ -216,7 +216,7 @@ enum AdminCommand {
         #[arg(long, conflicts_with = "expect")]
         write: Option<PathBuf>,
     },
-    /// Seal a tenant's BYO token for an upstream service (`laya`, `inference`). Never prints it.
+    /// Seal a tenant's BYO token for an upstream service (`laya`, `inference`, `speech`, `strata`). Never prints it.
     UpstreamToken {
         /// The tenant slug.
         #[arg(long)]

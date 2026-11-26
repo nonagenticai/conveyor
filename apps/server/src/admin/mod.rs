@@ -13,5 +13,6 @@ pub mod intake;
 /// `conveyor admin retire-plan-seed` — archive the retired plan-seed cards.
 pub mod retire_plan_seed;
 pub mod trace_diff;
-/// `conveyor admin upstream-token` — seal a tenant's BYO bearer for `laya` / `inference`.
+/// `conveyor admin upstream-token` — seal a tenant's BYO bearer for `laya` / `inference` /
+/// `speech` / `strata`.
 pub mod upstream_tokens;
