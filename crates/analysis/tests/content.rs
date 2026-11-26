@@ -1,7 +1,7 @@
 //! P6.1 — `analyse.content` over a supplied document: the CRO and marketing scanner families
 //! produce the findings and the scorecard is their weighted mean.
 
-use conveyor_analysis::content::analyse;
+use conveyor_analysis::content::{analyse, analyse_quality};
 use conveyor_analysis::model::{Category, Document};
 
 fn sparse_page() -> Document {
@@ -63,4 +63,42 @@ fn the_scorecard_holds_one_bucket_per_present_category() {
         );
     }
     assert!(report.scorecard.overall_score > 0.0 && report.scorecard.overall_score <= 100.0);
+}
+
+#[test]
+fn the_content_quality_checks_join_the_cro_scan() {
+    let page = Document::new(
+        "",
+        r#"<html><body><h2>One</h2><h2>Two</h2>
+        <p>In today's fast-paced world, click here.</p></body></html>"#,
+    );
+    let report = analyse_quality(&page);
+    let ids: Vec<&str> = report
+        .findings
+        .iter()
+        .map(|finding| finding.check_id())
+        .collect();
+
+    assert!(ids.contains(&"content-heading-missing"));
+    assert!(ids.contains(&"content-no-sources"));
+    assert!(ids.contains(&"content-filler"));
+    assert!(
+        ids.iter()
+            .any(|id| id.starts_with("cro-") || id.starts_with("mkt-")),
+        "the CRO/marketing findings are still present: {ids:?}"
+    );
+    assert!(
+        report.scorecard.buckets.contains_key("content"),
+        "the content bucket is scored"
+    );
+}
+
+#[test]
+fn the_quality_report_is_a_pure_function_of_the_document() {
+    let first = analyse_quality(&sparse_page());
+    let second = analyse_quality(&sparse_page());
+    assert_eq!(
+        serde_json::to_string(&first).expect("serialisable"),
+        serde_json::to_string(&second).expect("serialisable")
+    );
 }

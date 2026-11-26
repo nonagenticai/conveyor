@@ -1,7 +1,11 @@
 //! P5.2 — two brand snapshots compared: the changed attributes are named with both values, and the
 //! comparison's own numbers (similarity, colour distance) move in the direction the values moved.
 
-use conveyor_analysis::brand::{BrandSnapshot, FontInfo, PageFacts, SiteFacts, compare, extract};
+use conveyor_analysis::brand::{
+    BrandFacts, BrandSnapshot, BrandVoice, FontInfo, PageFacts, SiteFacts, analyse, compare,
+    extract,
+};
+use conveyor_analysis::model::{Document, Report};
 
 fn font(family: &str) -> FontInfo {
     FontInfo {
@@ -94,4 +98,85 @@ fn extraction_is_a_pure_function_of_the_supplied_facts() {
     assert_eq!(first.logo_url, "https://www.acme.example/logo.svg");
     assert_eq!(first.primary_color, "#112233");
     assert_eq!(first.secondary_color, "#0d1b28");
+}
+
+fn brand_page(html: &str) -> Document {
+    Document::new("https://example.test/", html)
+}
+
+fn brand_has(report: &Report, check_id: &str, evidence: &str) -> bool {
+    report.findings.iter().any(|finding| {
+        finding.check_id() == check_id
+            && finding
+                .evidence
+                .as_deref()
+                .is_some_and(|value| value == evidence)
+    })
+}
+
+#[test]
+fn the_page_is_measured_against_the_supplied_brand() {
+    let brand = BrandFacts {
+        palette: vec!["#ff0000".to_owned(), "#00ff00".to_owned()],
+        typography: vec!["Inter".to_owned(), "Roboto".to_owned()],
+        ..BrandFacts::default()
+    };
+    let page =
+        brand_page(r#"<div style="color:#ff0000;font-family:'Inter',sans-serif">brand</div>"#);
+    let report = analyse(&page, &brand);
+
+    assert!(brand_has(&report, "brand-palette-missing", "#00ff00"));
+    assert!(
+        !brand_has(&report, "brand-palette-missing", "#ff0000"),
+        "the declared colour the page uses is not a finding"
+    );
+    assert!(brand_has(&report, "brand-typography-missing", "roboto"));
+    assert!(
+        !brand_has(&report, "brand-typography-missing", "inter"),
+        "the declared family the page uses is not a finding"
+    );
+    assert!(brand_has(
+        &report,
+        "brand-typography-undeclared",
+        "sans-serif"
+    ));
+}
+
+#[test]
+fn a_missing_voice_term_is_named() {
+    let brand = BrandFacts {
+        voice: BrandVoice {
+            required_terms: vec!["plumber".to_owned()],
+            forbidden_terms: vec!["cheap".to_owned()],
+        },
+        ..BrandFacts::default()
+    };
+    let report = analyse(&brand_page("<p>Our service is cheap.</p>"), &brand);
+
+    assert!(brand_has(&report, "brand-voice-term-missing", "plumber"));
+    assert!(brand_has(&report, "brand-voice-term-forbidden", "cheap"));
+    assert_eq!(
+        report.scorecard.overall_score,
+        report.scorecard.buckets["brand"]
+    );
+}
+
+#[test]
+fn the_same_page_and_facts_twice_is_the_same_report() {
+    let brand = BrandFacts {
+        palette: vec!["#112233".to_owned()],
+        typography: vec!["Inter".to_owned()],
+        voice: BrandVoice {
+            required_terms: vec!["acme".to_owned()],
+            forbidden_terms: Vec::new(),
+        },
+    };
+    let page = brand_page(r#"<div style="font-family:Inter;color:#112233">Acme</div>"#);
+    let first = analyse(&page, &brand);
+    let second = analyse(&page, &brand);
+    assert_eq!(
+        serde_json::to_string(&first).expect("serialisable"),
+        serde_json::to_string(&second).expect("serialisable")
+    );
+    assert!(first.findings.is_empty(), "{:?}", first.findings);
 }
