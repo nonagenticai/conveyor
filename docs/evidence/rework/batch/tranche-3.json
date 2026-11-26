@@ -1,18 +1,24 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T13:12:10+00:00",
-  "green": 1,
+  "blocked": 1,
+  "generated_at": "2026-11-26T21:31:47+00:00",
+  "green": 0,
   "members": [
     {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "T3",
-      "log": "docs/evidence/rework/batch/tranche-3/T3.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: registers.create refused at act 55: error: registers.create refused (422): the input does not match the action schema [links: links must be an object with `cards`, `requirements` and `decisions` arrays (links_invalid)]",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
+      "key": "S04",
+      "log": "docs/evidence/rework/batch/tranche-3/S04.log",
+      "publish_exit": null,
+      "state": "BLOCKED"
     }
   ],
   "red": 0,
-  "snapshot_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79",
+  "snapshot_sha": "8111c984",
   "tranche": 3
 }
