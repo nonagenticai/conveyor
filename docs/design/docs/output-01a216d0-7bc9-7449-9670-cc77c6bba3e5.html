@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 — Project Brief · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief</h1>
+<h2>Outcome</h2>
+<p>The conveyor ingests SOPs, RDF/OWL ontologies and BPMN/Visio/draw.io documents into governed procedure drafts
+that a person publishes, and a bound job executes the PDDL steps.</p>
+<h2>Boundary</h2>
+<p>Not in scope: the procedure catalogue UI (T18) and the process engine (S13).</p>
+<h2>Reuse sources</h2>
+<p>The action spine's governed assets and documents, the capability/job families, the process executor (S13), and
+the D53 decision (knowledge pack, no RDF store at runtime).</p>
+<h2>Inception units</h2>
+<p>The ingestion actions (<code>procedures.ingest_*</code>), the review/publish gates, and the re-ingest versioning path.</p>
+<h2>Dependencies</h2>
+<p>T2 (plan spine), T13 (governed assets), P0 (programme definition); S13 for execution.</p>
+<h2>Acceptance</h2>
+<p>SPEC_V2 §12 T16, proven by 25/25 named tests at lane head <code>46fc49e2</code>; manifest <code>acceptance/programme/T16.toml</code>.</p>
+<h2>Capabilities</h2>
+<p>A team can turn its written procedures into executable, versioned procedures without hand-authoring the
+action space.</p>
+<h2>Plan</h2>
+<p>Delivered in tranche 4; the PI plan for tranche 4 carries the objectives and capacity.</p>
+<h2>Risks</h2>
+<p>The systemic-improvement loop (T5) and the operations path (T7) are the coupled slices; the human gate and the
+knowledge-pack decision are the mitigations.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

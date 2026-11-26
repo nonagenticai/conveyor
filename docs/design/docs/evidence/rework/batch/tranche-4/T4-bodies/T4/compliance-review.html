@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Kanban coach · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--kanban-coach">Compliance Review — Kanban coach</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a2028d-942b-759a-ad59-ab9c38629977&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T4.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T4.toml&quot;,
+        &quot;sha&quot;: &quot;fc4ed551b7ad1a1c062781d6b820d0d700633c86&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level non_conformant for T4 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. It names the four findings this batch admitted, each by id and by what is missing. v1-p6-2 (P1) \u2014 the systemic path terminates at a process-run id: `coach.rs:994-999` starts `KATA_PROCESS` with `{interruption_id}` and stores the run id as `kata_candidate_id`; there is no kata record naming an instrument and success threshold, no tenant-kata scoping, no measurement and no adoption gate, so a systemic finding never changes production. v1-p6-4 (P1) \u2014 interruptions are silently dropped: the cap counts every interruption on a card regardless of signature (`count_interruptions_for_card_tx`, line 603), refuses the fourth failed run at `COACH_INTERRUPTION_MAX` (line 608) with no coach card and no escalation, and `board/pull.rs:359` suppresses coaching whenever any live root run exists on the card. v1-p6-5 (P1) \u2014 the coach is wired only to failed runs: `coach.interrupt` has one caller, `err.card` (`board/pull.rs:424`); WIP breaches, stale leases, gate timeouts and board events, all section 6.2 inputs, have no producer. v1-p6-6 (P2) \u2014 orphan coach cards can be created by the public create path: `board/cards.rs:104` accepts any catalogue card type, including coach, and validates neither an interruption row nor `meta.interrupted_card_id`. Clause dispositions. Clause 2 is proved by `coach.rs::a_repeat_signature_escalates_instead_of_a_second_card` (line 683) and clause 3 by `::a_failed_coach_run_never_opens_a_coach_card` (line 745) with `::a_nested_coach_run_is_refused` (line 1343). Clause 1 has a named passing test for a first interruption (`::an_interruption_yields_one_coach_card_one_triage_and_one_remedy`, line 577) but is refuted as a universal by v1-p6-4, so it is not proved at HEAD. Clause 4 has a named passing test (`::a_systemic_class_opens_one_kata`, line 816, with `::a_transient_class_opens_no_kata`, line 864) but proves only a process start; v1-p6-2 shows the kata record, instrument and threshold that the clause intends are absent, so the clause is proved only in the weaker sense. The close also carried a mandatory_artefacts gap: at the 2026-11-22 rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The register&#39;s `closed` status is retained because no open finding is P0 and the manifest&#39;s product gate is P0-only; v1-p6-2, v1-p6-4 and v1-p6-5 are carried as P1 packages and v1-p6-6 as P2, none waived.&quot;,
+      &quot;id&quot;: &quot;01a2028e-a1be-779d-a762-8d118fc2ec0b&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a2028d-942b-759a-ad59-ab9c38629977&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T4.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T4.toml&quot;,
+        &quot;sha&quot;: &quot;fc4ed551b7ad1a1c062781d6b820d0d700633c86&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level non_conformant for T4 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. It names the four findings this batch admitted, each by id and by what is missing. v1-p6-2 (P1) \u2014 the systemic path terminates at a process-run id: `coach.rs:994-999` starts `KATA_PROCESS` with `{interruption_id}` and stores the run id as `kata_candidate_id`; there is no kata record naming an instrument and success threshold, no tenant-kata scoping, no measurement and no adoption gate, so a systemic finding never changes production. v1-p6-4 (P1) \u2014 interruptions are silently dropped: the cap counts every interruption on a card regardless of signature (`count_interruptions_for_card_tx`, line 603), refuses the fourth failed run at `COACH_INTERRUPTION_MAX` (line 608) with no coach card and no escalation, and `board/pull.rs:359` suppresses coaching whenever any live root run exists on the card. v1-p6-5 (P1) \u2014 the coach is wired only to failed runs: `coach.interrupt` has one caller, `err.card` (`board/pull.rs:424`); WIP breaches, stale leases, gate timeouts and board events, all section 6.2 inputs, have no producer. v1-p6-6 (P2) \u2014 orphan coach cards can be created by the public create path: `board/cards.rs:104` accepts any catalogue card type, including coach, and validates neither an interruption row nor `meta.interrupted_card_id`. Clause dispositions. Clause 2 is proved by `coach.rs::a_repeat_signature_escalates_instead_of_a_second_card` (line 683) and clause 3 by `::a_failed_coach_run_never_opens_a_coach_card` (line 745) with `::a_nested_coach_run_is_refused` (line 1343). Clause 1 has a named passing test for a first interruption (`::an_interruption_yields_one_coach_card_one_triage_and_one_remedy`, line 577) but is refuted as a universal by v1-p6-4, so it is not proved at HEAD. Clause 4 has a named passing test (`::a_systemic_class_opens_one_kata`, line 816, with `::a_transient_class_opens_no_kata`, line 864) but proves only a process start; v1-p6-2 shows the kata record, instrument and threshold that the clause intends are absent, so the clause is proved only in the weaker sense. The close also carried a mandatory_artefacts gap: at the 2026-11-22 rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The register&#39;s `closed` status is retained because no open finding is P0 and the manifest&#39;s product gate is P0-only; v1-p6-2, v1-p6-4 and v1-p6-5 are carried as P1 packages and v1-p6-6 as P2, none waived.&quot;,
+      &quot;id&quot;: &quot;01a2028e-a1be-779d-a762-8d118fc2ec0b&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: null,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level non_conformant for T4 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. It names the four findings this batch admitted, each by id and by what is missing. v1-p6-2 (P1) \u2014 the systemic path terminates at a process-run id: `coach.rs:994-999` starts `KATA_PROCESS` with `{interruption_id}` and stores the run id as `kata_candidate_id`; there is no kata record naming an instrument and success threshold, no tenant-kata scoping, no measurement and no adoption gate, so a systemic finding never changes production. v1-p6-4 (P1) \u2014 interruptions are silently dropped: the cap counts every interruption on a card regardless of signature (`count_interruptions_for_card_tx`, line 603), refuses the fourth failed run at `COACH_INTERRUPTION_MAX` (line 608) with no coach card and no escalation, and `board/pull.rs:359` suppresses coaching whenever any live root run exists on the card. v1-p6-5 (P1) \u2014 the coach is wired only to failed runs: `coach.interrupt` has one caller, `err.card` (`board/pull.rs:424`); WIP breaches, stale leases, gate timeouts and board events, all section 6.2 inputs, have no producer. v1-p6-6 (P2) \u2014 orphan coach cards can be created by the public create path: `board/cards.rs:104` accepts any catalogue card type, including coach, and validates neither an interruption row nor `meta.interrupted_card_id`. Clause dispositions. Clause 2 is proved by `coach.rs::a_repeat_signature_escalates_instead_of_a_second_card` (line 683) and clause 3 by `::a_failed_coach_run_never_opens_a_coach_card` (line 745) with `::a_nested_coach_run_is_refused` (line 1343). Clause 1 has a named passing test for a first interruption (`::an_interruption_yields_one_coach_card_one_triage_and_one_remedy`, line 577) but is refuted as a universal by v1-p6-4, so it is not proved at HEAD. Clause 4 has a named passing test (`::a_systemic_class_opens_one_kata`, line 816, with `::a_transient_class_opens_no_kata`, line 864) but proves only a process start; v1-p6-2 shows the kata record, instrument and threshold that the clause intends are absent, so the clause is proved only in the weaker sense. The close also carried a mandatory_artefacts gap: at the 2026-11-22 rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The register&#39;s `closed` status is retained because no open finding is P0 and the manifest&#39;s product gate is P0-only; v1-p6-2, v1-p6-4 and v1-p6-5 are carried as P1 packages and v1-p6-6 as P2, none waived.&quot;,
+      &quot;id&quot;: &quot;01a2028e-a1be-779d-a762-8d118fc2ec0b&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-22T09:20:30.699998+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a2028e-a1be-779d-a762-8d118fc2ec0b: non_conformant / no outcome&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/T4-bodies/T4/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T3 — PM job: gate evidence · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T3-PM.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t3--pm-job-gate-evidence">T3 — PM job: gate evidence</h1>
+<p>Slice T3 of <code>docs/SPEC_V2.md</code> §12 (row at <code>docs/SPEC_V2.md:1724</code>). The gate text is:</p>
+<blockquote>
+<p>PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request.</p>
+</blockquote>
+<p>Each clause is proved by an integration test in the <code>conveyor-api</code> package. Every test calls the served HTTP API with a real <code>job_binding</code> principal; the harness (<code>crates/actions/tests/support/mod.rs</code>, <code>Running</code>) boots the real Axum app against an ephemeral Postgres 18 with the real migrations and tenant RLS. These are not unit tests with mocked stores.</p>
+<h2 id="clause--test">Clause → test</h2>
+<table>
+<thead>
+<tr>
+<th>§12 gate clause</th>
+<th>Test</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PM runs a request end to end</td>
+<td><code>the_pm_charters_plans_and_baselines_a_request</code></td>
+<td><code>cargo test -p conveyor-api --test pm_lifecycle the_pm_charters_plans_and_baselines_a_request</code></td>
+</tr>
+<tr>
+<td>the PM cannot approve its own gate</td>
+<td><code>the_pm_cannot_decide_its_own_gate</code></td>
+<td><code>cargo test -p conveyor-api --test pm_self_approval the_pm_cannot_decide_its_own_gate</code></td>
+</tr>
+<tr>
+<td>a baseline change requires a change request</td>
+<td><code>a_new_baseline_without_a_change_request_is_refused</code></td>
+<td><code>cargo test -p conveyor-api --test pm_baseline_change a_new_baseline_without_a_change_request_is_refused</code></td>
+</tr>
+<tr>
+<td>a baseline change requires a change request (the <code>pm.plan</code> path)</td>
+<td><code>plan_without_a_change_request_is_refused</code></td>
+<td><code>cargo test -p conveyor-api --test pm_baseline_change plan_without_a_change_request_is_refused</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-pm-runs-a-request-end-to-end--pm_lifecyclers">1. PM runs a request end to end — <code>pm_lifecycle.rs</code></h3>
+<p><code>the_pm_charters_plans_and_baselines_a_request</code> drives the whole spine through the API: <code>pm.charter</code> creates the project, the charter asset and the charter gate in one transaction; a distinct principal approves the gate; <code>pm.plan</code> writes the WBS (parents before children) and the scope baseline plus its baseline gate; that gate is approved; <code>pm.get</code> then returns the project, the charter asset, the three WBS nodes in order, one baseline whose <code>approved_by</code> is the approving principal, and both gates <code>approved</code>. It also reads <code>governed_asset</code> directly to confirm the charter gate's effect approved the asset.</p>
+<p>Supporting: <code>only_pm_creates_and_closes</code> (same file) shows a non-PM <code>job_binding</code> in the same tenant is refused when it tries to charter or close, and writes nothing.</p>
+<h3 id="2-the-pm-cannot-approve-its-own-gate--pm_self_approvalrs">2. The PM cannot approve its own gate — <code>pm_self_approval.rs</code></h3>
+<p><code>the_pm_cannot_decide_its_own_gate</code> first proves the gate's <code>requested_by</code> is the PM principal, then has that same principal decide it: <code>409 conflict</code> with detail <code>the requester cannot decide their own gate</code>; zero <code>approval_decision</code> rows written; the gate stays <code>pending</code>; the charter asset stays <code>draft</code>. <code>a_distinct_approver_is_recorded</code> is the positive control: a distinct principal's approval is recorded exactly once against that principal and the gate and asset resolve.</p>
+<h3 id="3-a-baseline-change-requires-a-change-request--pm_baseline_changers">3. A baseline change requires a change request — <code>pm_baseline_change.rs</code></h3>
+<ul>
+<li><code>a_new_baseline_without_a_change_request_is_refused</code>: <code>baselines.take</code> on a project with an approved baseline, no <code>change_id</code> → <code>409 change_request_required</code>, detail naming the protected baseline; the approved row is byte-identical afterwards and no second baseline is written.</li>
+<li><code>approved_change_request_advances_the_baseline</code>: <code>changes.request</code> writes an open change whose <code>baseline_ref</code> names the baseline it would replace and whose impact block round-trips through <code>meta</code>; a second principal approves its gate; the new baseline cites the change.</li>
+<li><code>plan_without_a_change_request_is_refused</code>: the same rule on <code>pm.plan</code> — no <code>change_id</code> → <code>409 change_request_required</code>, refused before any write (WBS count unchanged, still one baseline).</li>
+<li><code>plan_with_an_approved_change_advances</code>: a named, approved <code>change_id</code> lets <code>pm.plan</code> advance; the new baseline row cites the approved change.</li>
+</ul>
+<h2 id="additional-t3-action-coverage--pm_statusrs-61">Additional T3 action coverage — <code>pm_status.rs</code> (§6.1)</h2>
+<p>The §12 gate text names three clauses; the T3 action set also includes <code>pm.status</code>, proved here and cited in <code>scripts/v2-slice-artefacts.json</code> with the files above:</p>
+<ul>
+<li><code>status_report_cites_live_baseline_and_gates</code> — <code>cargo test -p conveyor-api --test pm_status status_report_cites_live_baseline_and_gates</code>: <code>pm.status</code> writes exactly one <code>draft</code> governed asset of kind <code>status_report</code> whose body cites the live project, baseline, charter and baseline gates, pending change and its gate by id, the WBS, and the caller's narrative; the action never publishes it.</li>
+<li><code>empty_narrative_refused</code> — <code>cargo test -p conveyor-api --test pm_status empty_narrative_refused</code>: empty and whitespace-only narratives are refused <code>422</code> with field <code>narrative</code> and code <code>status_narrative_required</code>, and no report is written.</li>
+</ul>
+<h2 id="verification-status--what-is-and-is-not-claimed">Verification status — what is and is not claimed</h2>
+<ul>
+<li><strong>Verified while writing this page (commit <code>93c91ef8</code>):</strong> all four test files exist and every test name above is present in its file as a <code>#[tokio::test]</code> integration test.</li>
+<li><strong>Test-verified:</strong> the behaviour above is what these tests assert end to end against a real Postgres 18 and a real HTTP server.</li>
+<li><strong>Not live-verified:</strong> no run against a deployed environment is cited here. This page claims no live deployment record for T3.</li>
+<li><strong>Not re-executed here:</strong> Rust compilation and test runs are off-box on this estate; the pass record is the repository's CI/preflight for the branch, not a local run made while writing this page.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/T3-PM.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

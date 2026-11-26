@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T14 live gate — measured 2026-11-25 · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t14/live-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t14-live-gate--measured-2026-11-25">T14 live gate — measured 2026-11-25</h1>
+<p>Executed on the #526 branch binary against the programme record (staging copy, tenant <code>nonagentic</code>). Destinations were reached from m4 through ssh port-forwards to the cluster (kubectl port-forward on strato) and to the model-host boxes (mini1/mini2) — the engine process ran locally, so every HTTP call below is a real call to the estate service, not a stub. Steps are journaled in <code>docs/evidence/t14/live/</code> (request and full response per act).</p>
+<h2 id="what-the-gate-requires-and-what-was-measured">What the gate requires, and what was measured</h2>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Result</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>each published toolkit has a <strong>probe</strong></td>
+<td><strong>PASS</strong> — coding, image_gen, speech, transcription, scientific all <code>live</code> (http 200)</td>
+<td><code>36-probe-restored-final.json</code></td>
+</tr>
+<tr>
+<td>each published toolkit has <strong>one live call</strong></td>
+<td><strong>PARTIAL</strong> — coding: <strong>PASS</strong> (two jobs queued through <code>tools.call</code>, ids <code>ef545018…</code>, <code>95ffcdac…</code>); speech/transcription: <strong>blocked</strong> 503, the tenant has no sealed <code>licence.token</code> and the audio services refuse an unauthenticated call; scientific: <strong>blocked</strong> 401, the service demands <code>X-Tenant-Id: Bearer &lt;licence&gt;</code> or an <code>Authorization</code> licence and the action sends neither; image_gen: <strong>blocked</strong> 503 in this process, the model host answered but the document store has no object storage configured locally (the deployed pod reaches MinIO)</td>
+<td><code>41-call-coding.json</code>, <code>40-call-speech.json</code>, <code>40-call-transcription.json</code>, <code>40-call-image_gen.json</code>, <code>15-call-scientific.json</code>, <code>37-call-after-restore.json</code></td>
+</tr>
+<tr>
+<td>scientific_processor <strong>scaled up</strong> for its probe and one live call, <strong>then scaled back</strong></td>
+<td><strong>scale acts PASS</strong> — observed baseline 1 replica; <code>1→0</code> (park), <code>0→1</code> (scale-up), probe live; <code>1→0</code> (outage), probe unreachable; <code>0→1</code> (restore). Its live call is blocked by the service licence above</td>
+<td><code>23-scale-zero.log</code>, <code>24-scale-up.log</code>, <code>26-scale-outage.log</code>, <code>29-scale-restore.log</code>, <code>31-scale-outage-2.log</code>, <code>34-scale-restore-2.log</code></td>
+</tr>
+<tr>
+<td>a <strong>zero-use report</strong> exists</td>
+<td><strong>PASS</strong> — <code>tools.usage</code> returns one row per published tool version with its window count and <code>zero_use</code> flag</td>
+<td><code>38-zero-use-report.json</code></td>
+</tr>
+<tr>
+<td>a backend <strong>outage unbinds</strong> new runs and in-flight runs finish</td>
+<td><strong>unbind PASS</strong> — with scientific's pods gone (confirmed 0 pods), the probe reported <code>unreachable</code>, disabled 2 bindings, and <code>tools.call</code> was refused <code>409</code> <strong>before any network call</strong>; after restore the probe reported <code>live</code>, <code>bindings_restored: 2</code>, and the call reached the service again (its 401). The in-flight half is proved by <code>crates/actions/tests/estate_toolkits.rs::an_in_flight_run_finishes_after_the_unbind</code>; the live licence blocker prevented staging a long real call</td>
+<td><code>32-probe-outage-2.json</code>, <code>33-call-outage-2.json</code>, <code>36-probe-restored-final.json</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="publication-wave">Publication wave</h2>
+<p><code>toolkits.publish</code> published the embedded catalogue: coding/speech/transcription/image_gen to version 2 (<code>version_bumped</code>), scientific created at version 1 as <code>published</code> (its manifest status was changed from <code>draft</code> because the gate names it), retrieval/webscraper/lean4 created as <code>draft</code>. <code>39-publish-idempotent.json</code> is the second run, showing <code>unchanged</code> for every toolkit.</p>
+<h2 id="product-defects-the-live-gate-found-fixed-on-this-branch">Product defects the live gate found (fixed on this branch)</h2>
+<ol type="1">
+<li><strong>The outbound Idempotency-Key was never forwarded.</strong> The coding service refuses a create without the header; the engine claimed the key for its own dedupe and sent nothing. The external dispatcher now forwards the caller's key (crates/actions/src/invoke.rs) and the admin CLI can carry one (<code>--idempotency-key</code>). The coding call above is the proof.</li>
+<li><strong><code>scientific</code> was not publishable</strong> (manifest <code>status: draft</code>) although the gate names its probe. Status changed to <code>published</code>.</li>
+</ol>
+<h2 id="blockers-that-are-not-code">Blockers that are not code</h2>
+<ul>
+<li><strong>Tenant licences — a production licensing act, by the programme's own rule.</strong> <code>speech</code>/ <code>transcription</code> need a sealed <code>licence.token</code> for the audio services; <code>scientific</code> needs a licence its service accepts. The staging record holds only the <code>conveyor</code> app licence, and the production tenant's sealed <code>licence.token</code> was created after the record copy was taken. The programme already ruled on this class in <code>docs/evidence/S21-RUN.md:100</code>: minting a licence for a non-production tenant is <strong>a production licensing act</strong>, so these calls are deploy-bound proofs taken with the production credential on the deployed engine — not something the pre-merge record can or should mint for itself.</li>
+<li><strong>Object storage in the local engine.</strong> <code>image_gen</code> renders but cannot store its document without MinIO; the deployed pod has it. This receipt is likewise deploy-bound.</li>
+</ul>
+<p>Both are named, measured refusals — not silent gaps. Until the deployed proofs exist, T14's live-call clause cannot be claimed, and the project stays open.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t14/live-gate.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

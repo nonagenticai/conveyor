@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 — Statement of Architecture Work · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Statement of Architecture Work — T16 ingestion</h1>
+<h2>Assignment</h2>
+<p>The T16 slice (SPEC_V2 §12; issues #85, #448) under the programme's architecture governance: ingest the
+organisation's procedure sources as governed, human-reviewed procedures and let a bound job execute them.</p>
+<h2>Scope</h2>
+<p><code>procedures.ingest_sop</code>, <code>procedures.ingest_rdf</code>, <code>procedures.ingest_process</code>, <code>procedures.review_source</code>,
+<code>procedures.publish</code>, re-ingest versioning and a bound job's PDDL steps. Not in scope: the procedure catalogue
+UI (T18) and the process engine (S13).</p>
+<h2>Responsibilities</h2>
+<p>The author job requests and drafts; the approver job decides every gate and is never its requester; the
+programme architect owns the contract and the Phase-G review; the BCM owns the benefit.</p>
+<h2>Acceptance criteria</h2>
+<p>SPEC_V2 §12 T16: a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the draft is
+published behind a human gate; a re-ingest creates the next draft version while the published row keeps its
+source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds. Proven by
+25/25 tests at lane head <code>46fc49e2</code> (transcript <code>/tmp/u5a-v14/evidence/T16-acceptance.md</code>).</p>
+<h2>Contract</h2>
+<p>The live delivery contract <code>01a20a8b-b32c-7185-808f-8ea0b4c5ec46</code>, requested by the author job and approved by the Architecture
+Board under the standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; its Phase-G review is compliant and cites that delegation.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

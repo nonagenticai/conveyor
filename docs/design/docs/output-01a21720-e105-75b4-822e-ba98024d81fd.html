@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline — re-acceptance correction (2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline — re-acceptance correction (2026-11-26)</h1>
+<h2>Context</h2>
+<p>The re-acceptance decision <code>01a2171f-201e-72fb-a8ac-c1e6fd4f633c</code> accepted the conformance baseline
+from the 2026-11-26 snapshot and deleted the 37 entries whose gap had gone. Between that acceptance
+and the publish, <code>docs/design/scripts/publish-data.sh</code> regenerated <code>seed/programme.json</code> from the
+freshly fetched issue registry (step 3e, the same fixpoint the registry refresh runs). The
+regenerated seed carries T13 as <code>closed</code> while the live record carries it <code>active</code>: a real
+<code>seed_live_drift</code> the previous seed did not express.</p>
+<p>The strict gate therefore refused the publish with exactly one new live gap, <code>seed_live_drift T13</code>
+(P1). The gap is honest — T13 is reopened for the retrospective rework while its issue is closed —
+and it belongs in the accepted ledger rather than being fixed in the seed by hand.</p>
+<h2>Decision</h2>
+<p>Amend the re-acceptance to the final gap set measured on the 2026-11-26 snapshot with the installed
+seed: 155 entries, 16 P0 and 139 P1, accepted by <code>conveyor-e2e</code> under delegation
+<code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, approved by <code>conveyor-approver</code>. One entry is added to the
+ledger of decision <code>01a2171f-201e-72fb-a8ac-c1e6fd4f633c</code>: <code>seed_live_drift T13</code> at P1. No other
+entry changes; the 37 deletions of that decision stand.</p>
+<h2>Consequences</h2>
+<p>The publish gate can run against the amended ledger. T13's drift clears when the tranche-3 batch
+re-closes the project and the seed is regenerated from the closed issue, at which point the entry is
+deleted, not re-dated. No gap is waived. The seed is not hand-edited; it is the fixpoint
+<code>build-programme-seed.py</code> produces from the issue registry at this publish.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>docs/evidence/conformance-baseline.json</code> — the amended accepted ledger (155 entries).</li>
+<li><code>docs/design/data/conformance.json</code> — the publish's final gap register, which names
+<code>seed_live_drift T13</code>.</li>
+<li><code>seed/programme.json</code> — the regenerated seed installed by the publish (step 3e).</li>
+<li>The strict publish run at <code>/tmp/conv526-publish-1126g.log</code>, which refused with exactly this entry.</li>
+<li>Decision <code>01a2171f-201e-72fb-a8ac-c1e6fd4f633c</code> — the re-acceptance this decision amends.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

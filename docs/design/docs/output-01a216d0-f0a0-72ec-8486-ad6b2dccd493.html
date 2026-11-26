@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>SAFe Portfolio — conveyor buildout (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>SAFe Portfolio — conveyor buildout</h1>
+<p>The portfolio view of conveyor buildout (<code>01a1d039-0d24-7d16-ae52-4841e96ccfac</code>): what the record holds, the strategic themes the programme measures itself on, and the benefit links that connect each theme to an outcome, an output and a capability.</p>
+<h2>Portfolio canvas</h2>
+<p>The record summarises the programme as 48 projects, of which 26 are closed and 21 are active, across 14 tranches. It also counts 7 benefits, 20 cadences, 3 baselines and 56 register items.</p>
+<table><thead><tr><th>Measure</th><th>Count</th></tr></thead><tbody>
+<tr><td>projects</td><td>48</td></tr>
+<tr><td>closed</td><td>26</td></tr>
+<tr><td>active</td><td>21</td></tr>
+<tr><td>tranches</td><td>14</td></tr>
+<tr><td>benefits</td><td>7</td></tr>
+<tr><td>cadences</td><td>20</td></tr>
+<tr><td>baselines</td><td>3</td></tr>
+<tr><td>register_items</td><td>56</td></tr>
+</tbody></table>
+<p>This canvas is a derived summary; it names no source table for the counts it reports.</p>
+<p><em>Source: computed safe-portfolio summary</em></p>
+<h2>Strategic themes</h2>
+<p>Seven benefit profiles are recorded, references <code>B1</code> to <code>B7</code>. B1, B6 and B7 are <code>active</code> with a measured or instrumented baseline; B2 to B5 are <code>draft</code> with the baseline "not measured - no instrument exists (recorded as a kata on the kata project)". Every profile names the same benefit owner job, <code>01a1db6b-4f17-7e76-838d-590d71578ad1</code>.</p>
+<table><thead><tr><th>Ref</th><th>Description</th><th>Category</th><th>Status</th><th>Baseline</th><th>Target</th><th>Project id</th></tr></thead><tbody>
+<tr><td>B1</td><td>Auditable decisions</td><td>governance</td><td>active</td><td>105 approval_decision / 662 run at 2026-11-22 (decisions per run, 0.15861)</td><td>every choice has a decision row</td><td>none recorded</td></tr>
+<tr><td>B2</td><td>Less bespoke tooling</td><td>programme benefit</td><td>draft</td><td>not measured - no instrument exists</td><td>every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified</td><td>01a1d039-0d37-730f-8f8a-2f50e5a0933d</td></tr>
+<tr><td>B3</td><td>Self-development</td><td>programme benefit</td><td>draft</td><td>not measured - no instrument exists</td><td>one self-development run reaches live verification on evidence; a second is repeatable</td><td>01a1d039-0d34-7973-8989-0b83246fc888</td></tr>
+<tr><td>B4</td><td>Public collaboration</td><td>programme benefit</td><td>draft</td><td>not measured - no instrument exists</td><td>at least one outside contribution changes a published output; every output is reachable</td><td>01a1d039-0d39-7414-b43c-450de170ffe1</td></tr>
+<tr><td>B5</td><td>One model</td><td>programme benefit</td><td>draft</td><td>not measured - no instrument exists</td><td>the T0 gate exists and refuses a second store; the registry has one home</td><td>01a1d039-0d32-7734-98da-fb7f1e2386c7</td></tr>
+<tr><td>B6</td><td>Predictable delivery</td><td>delivery</td><td>active</td><td>check-registers at /tmp/conveyor-526-reg-snap (open register findings, 28.0)</td><td>the seed, coverage and published checklist agree at every tranche review</td><td>01a1dcb8-d24b-76de-b901-56fd56e001bc</td></tr>
+<tr><td>B7</td><td>Tokens per accepted deliverable</td><td>efficiency</td><td>active</td><td>9,458,468 inference tokens / 15 demo-credited deliverables at 2026-11-22 (630565 per deliverable)</td><td>20% reduction on the primary denominator (tokens per demo-credited deliverable, 504452)</td><td>none recorded</td></tr>
+</tbody></table>
+<p>B1's KPI is <code>decisions per run</code> at 0.15861, measured by counting decision rows per run from the action ledger; its risk reference is R7. B6's KPI is <code>open register findings</code> at 28.0, measured from coverage.json and seed/programme.json regenerated and checked in CI; its risk reference is R2. B7's KPIs are <code>tokens per demo-credited deliverable</code> (baseline 630565, target 504452, measured as inference ledger total tokens / demo-credited deliverables) and <code>run failure rate</code> with ceiling "baseline + 0.5pp"; its risk reference is R10. B2 records the risk that "the unowned fleet keeps growing while toolkits wait", B3 that "the CI queue or a flaky gate makes the loop unusable", B4 that "unreviewed public input or spam", and B5 that "a parallel store appears as a convenience". Record ids: B1 <code>01a1e9de-4e4f-757e-a8c8-bf3522e5adcf</code>, B2 <code>01a1e9df-0308-7fdc-8492-32db1e582a2d</code>, B3 <code>01a1e9df-0c4b-7807-b35c-5810ec418d45</code>, B4 <code>01a1e9df-1592-79a5-839e-037d8fe4251b</code>, B5 <code>01a1e9df-1e42-7199-87e1-23c577c62f8e</code>, B6 <code>01a1e9df-27b8-7827-ae4e-6d48ca5904e8</code>, B7 <code>01a204d2-dbf6-750a-a031-9f00f5fe7754</code>.</p>
+<p><em>Source: msp.json#/benefit_profiles</em></p>
+<h2>Value streams</h2>
+<p>Six benefit links are recorded, each tying a benefit profile to an operational outcome, a delivered output, a strategic objective and the capability the outcome requires. All six are kind <code>benefit</code> at version 1, recorded on 2026-11-17.</p>
+<table><thead><tr><th>Operational outcome</th><th>Output</th><th>Strategic objective</th><th>Capability</th><th>Benefit id</th><th>Link id</th></tr></thead><tbody>
+<tr><td>O3 Every decision is auditable</td><td>T2 decision ladder</td><td>decision ladder (rule -&gt; laya -&gt; generation -&gt; human)</td><td>every choice is traceable to a policy and a person</td><td>01a1e9de-4e4f-757e-a8c8-bf3522e5adcf</td><td>01a1e9df-6063-783c-a130-075067d33a17</td></tr>
+<tr><td>O4 Every tool is governed</td><td>T13 tool platform</td><td>versioned toolkit with a probe, binding and ledger</td><td>services with no calls are retired</td><td>01a1e9df-0308-7fdc-8492-32db1e582a2d</td><td>01a1e9df-6a8a-7e0c-bf4b-022848d53774</td></tr>
+<tr><td>O5 The conveyor develops and operates itself</td><td>T6 development project</td><td>development projects under gates</td><td>the conveyor changes itself with rollback</td><td>01a1e9df-0c4b-7807-b35c-5810ec418d45</td><td>01a1e9df-732b-78a5-9b34-779be11092c5</td></tr>
+<tr><td>O6 The public can see and challenge the design</td><td>DESIGN-PUBLISH public site</td><td>public repository and published outputs</td><td>an outside review changes a published output</td><td>01a1e9df-1592-79a5-839e-037d8fe4251b</td><td>01a1e9df-7f1f-769c-bd17-8f71322cc505</td></tr>
+<tr><td>O1 One model, one store</td><td>T0 model and contracts</td><td>one store and one action registry</td><td>a concept has one table</td><td>01a1e9df-1e42-7199-87e1-23c577c62f8e</td><td>01a1e9df-87b8-7761-ae0d-f5bb03c66628</td></tr>
+<tr><td>O2 Jobs, not code paths</td><td>P0 + T1 plan spine</td><td>programme plan and coverage instrument</td><td>the plan and the measurement agree</td><td>01a1e9df-27b8-7827-ae4e-6d48ca5904e8</td><td>01a1e9df-9066-70a9-8050-e86503fb1b7e</td></tr>
+</tbody></table>
+<p>Four of the six links point at <code>draft</code> profiles (B2 to B5); the B1 and B6 links point at <code>active</code> profiles. No value-stream link exists for B7 in this record.</p>
+<p><em>Source: msp.json#/benefit_links</em></p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

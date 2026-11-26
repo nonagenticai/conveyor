@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T10 (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — T10 SAFe cadence and MSP tranches (retrospective, 2026-11-22)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>T10's section 12 gate asks that PI planning materialise cards from the backlog by WSJF within WIP; that a deliverable without evidence cannot demo; that a retro produce lessons; that an end-of-tranche review with no baselines, benefit status or risk evidence be refused; and that a transition which never measured its baseline cannot report the benefit realized. Materialisation, the demo gate, retro lessons and the benefit baseline gate hold and were re-read for this review. The tranche-review clause is refused without evidence as written, but the evidence bar is presence-only (v1-p83-1) and the baseline requirement is not gated (v1-p83-4); both are carried as named deviations. The level is compliant with named deviations.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>acceptance/programme/T10.toml</code> — the project's manifest.</li>
+<li><code>crates/store/tests/programme_cadence.rs</code> (lines 179, 215, 249, 302, 386); <code>crates/store/tests/refinement.rs</code> (lines 114, 152); <code>crates/store/tests/demo_gate.rs</code> (line 94); <code>crates/store/tests/retro.rs</code> (lines 156, 190); <code>crates/store/tests/tranche_review.rs</code> (line 208); <code>crates/store/tests/benefit_transition.rs</code> (lines 161, 194); <code>crates/actions/tests/pi_plan_approval.rs</code> (lines 249, 274, 297, 338, 363); <code>apps/server/tests/cadence_jobs.rs</code> (line 153).</li>
+<li><code>migrations/0056_cadence_tranche.sql</code> and <code>migrations/0044_plan_spine.sql</code>.</li>
+<li>the 2026-11-22 project row in <code>/tmp/u7-snapshot/data/programme.json</code> — <code>closed</code>, version 11, tranche 4.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><code>v1-p83-1</code> (P1) — tranche authorisation and review evidence are presence-only. Owned by T10.</li>
+<li><code>v1-p83-2</code> (P1) — benefit measurement has no typed baseline/post values. Owned by T10.</li>
+<li><code>v1-p83-3</code> (P1) — BCM and benefit ownership are free text. Owned by T10.</li>
+<li><code>v1-p83-4</code> (P1) — tranche baselines are nullable and unapproved. Owned by T10.</li>
+<li><code>v1-p83-5</code> (P1) — <code>programmes.update</code> closes without a review or plan. Owned by T10.</li>
+<li><code>v1-p83-6</code> (P2) — PMP closure reads only the scope baseline.</li>
+<li><code>v1-p82-5</code> (P2) — the PI backlog is one project's WBS.</li>
+<li><code>v1-p82-6</code> (P2) — lessons need no evidence and emit no kata candidates.</li>
+</ul>
+<p>None is waived.</p>
+<h2>Decision</h2>
+<p>Retain the register's <code>closed</code> status on the P0-only product gate. Requested by the programme's service actor <code>conveyor-e2e</code> and decided by the distinct approver <code>conveyor-approver</code> under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the requester is not the approver. The eight open items are carried into the next tranche and must be disposed by a dated decision at the programme's viability review if still open.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T17 Tenant asset authoring · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T17/closure-review
+version: 1
+status: published
+project: T17
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>T17 — Tenant asset authoring: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>A short brief plus documents drafts a catalogue of departments and jobs</td><td><code>crates/actions/tests/authoring.rs::a_chat_brief_drafts_the_org_and_job_catalogue</code></td><td>pass</td></tr>
+<tr><td>Documents yield linked procedure and policy drafts</td><td><code>authoring.rs::documents_yield_linked_procedure_and_policy_drafts</code>; <code>authoring.rs::a_draft_that_references_an_unpublished_asset_is_refused</code></td><td>pass</td></tr>
+<tr><td>A reviewed catalogue publishes with its decisions</td><td><code>authoring.rs::a_reviewed_catalogue_publishes_with_its_decisions</code>; <code>crates/actions/tests/authoring_standard.rs</code>; <code>apps/web/e2e/authoring.spec.ts</code></td><td>pass</td></tr>
+<tr><td>No asset publishes itself</td><td><code>crates/actions/tests/asset_review.rs::the_authoring_job_cannot_publish_its_own_asset</code>, <code>::a_non_human_decision_cannot_complete_an_asset_gate</code></td><td>pass</td></tr>
+<tr><td>No asset widens a tool grant</td><td><code>asset_review.rs::an_asset_never_widens_a_tool_grant</code></td><td>pass</td></tr>
+<tr><td>The delivery is on main and gated</td><td>issues #87 (PR #632, <code>c29c7f52</code>), #629 (PR #659, <code>38334552</code>), #655 (PR #687, <code>ca392a97</code>); <code>actions:authoring</code> = <code>exists</code> (<code>v2-coverage.md</code>)</td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>Delivery merges: <code>c29c7f52d939</code> (PR #632), <code>38334552e9b8</code> (PR #659), <code>ca392a97d7d8</code> (PR #687).</li>
+<li>Behaviour: the <code>authoring.rs</code>, <code>authoring_standard.rs</code> and <code>asset_review.rs</code> scenarios; the
+real-app authoring E2E.</li>
+<li>Dependencies: T3 (#74) and T16 (#85) are closed; the live procedure/policy ingestion is T16's
+capability, and this project's tests prove the linked drafts and the refused dependency order.</li>
+<li>The inception set: <code>docs/plans/inception/T17/</code>.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>The dependency order is refused at the draft attempt (<code>v2-coverage.md</code>), not at publish — this
+review does not claim a publish-time check.</li>
+<li>The intake brief's readability before #655 is corrected by #655/PR #687; this review cites the
+corrected record.</li>
+<li>The tranche-5 authorisation is <strong>not</strong> claimed here; it is the #526 programme chain's act.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. Acceptance is met on the evidence above; the listed items are recorded as scoped refusals or
+another unit's capability, and no tranche authorisation is manufactured.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tenant asset authoring · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

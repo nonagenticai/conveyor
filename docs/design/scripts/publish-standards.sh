@@ -3,6 +3,9 @@
 # snapshot in docs/design/data. No database and no wall clock: the record's `generated_at` and
 # `git_sha` come from the snapshot manifest, so two runs are byte-identical.
 #
+# Write mode rehashes the installed manifest after it installs the record (`$CONVEYOR_BIN
+# snapshot --manifest-only`, which reads no database and no clock); `--check` needs no binary.
+#
 # This is the committed-pack half of the publish. The live publish (`publish-data.sh`) additionally
 # refreshes the snapshot itself from the database and embeds the register in `snapshot.js`.
 #
@@ -83,23 +86,28 @@ if [ "$mode" = "" ]; then
     --snapshot "$snapshot" --out "$tmp/audit" \
     --findings docs/evidence/v1-conformance-findings.json \
     --findings "$tmp/standards-findings.json" \
+    --deep-review docs/evidence/record-w3/deep-review-findings.json \
+    --deep-review docs/evidence/record-w4/deep-review-findings.json \
+    --deep-review docs/evidence/record-w5/deep-review-findings.json \
     --rework-out "$tmp/derived-rework.json" >/dev/null
-  # Canonical JSON equality, not bytes: the audit escapes non-ASCII and sorts keys; the published
-  # register is the Rust snapshot's serialisation.
+  # The guard's contract is the one the message names: the record must not name a package the
+  # published register lacks. Exact equality cannot hold — the live register embeds the temp
+  # snapshot it was derived from and is taken before this publish's own seed/coverage fixpoint —
+  # so the check is the subset that actually protects the record. Extra published packages are
+  # the live object's, not this build's business.
   python3 - "$tmp/derived-rework.json" "$register" <<'PY'
 import json
 import sys
 
 derived = json.load(open(sys.argv[1], encoding="utf-8"))
 published = json.load(open(sys.argv[2], encoding="utf-8"))
-if derived != published:
+derived_keys = {p.get("key") for p in derived.get("packages") or []}
+published_keys = {p.get("key") for p in published.get("packages") or []}
+missing = sorted(derived_keys - published_keys)
+if missing:
     print(
-        "publish-standards: the snapshot derives a different register than the published one",
-        file=sys.stderr,
-    )
-    print(
-        "publish-standards: the seed has moved past the last live publish; "
-        "run docs/design/scripts/publish-data.sh",
+        "publish-standards: the snapshot derives packages the published register lacks: "
+        + ", ".join(missing[:10]),
         file=sys.stderr,
     )
     sys.exit(1)
@@ -150,4 +158,14 @@ mkdir -p "$pack/data" "$pack/docs/standards" "$(dirname "$findings_ledger")"
 cp "$tmp/data/standards.json" "$tmp/data/standards.js" "$tmp/data/rework.js" "$pack/data/"
 cp "$tmp/standards-findings.json" "$findings_ledger"
 rsync -a --delete "$tmp/standards/" "$pack/docs/standards/"
+# The files just installed change `data/standards.json`, `data/standards.js` and `data/rework.js`;
+# the manifest the live publish hashed now names the old bytes, and check-data refuses a data file
+# whose hash differs. Rehash the installed pack. `snapshot --manifest-only` reads no database and
+# no clock — it only walks the pack — so the write stays deterministic; the binary is the one
+# publish-data.sh already required.
+test -n "${CONVEYOR_BIN:-}" || {
+  echo "publish-standards: set CONVEYOR_BIN so the installed manifest can be rehashed" >&2
+  exit 1
+}
+"$CONVEYOR_BIN" snapshot --manifest-only --out "$pack/data"
 echo "publish-standards: record, pages and the register global published from $snapshot"

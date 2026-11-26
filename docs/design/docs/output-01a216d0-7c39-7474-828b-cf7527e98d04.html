@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T7 — Project Brief · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief</h1>
+<h2>Outcome</h2>
+<p>The conveyor operates the estate: an incident is opened, triaged, mitigated by an approved write,
+resolved with a postmortem; a destructive call without the tenant's approvals is refused.</p>
+<h2>Boundary</h2>
+<p>Not in scope: the process engine (S13) and the procedure catalogue (T18); the k8s API is reached
+only through a registered host and read-only actions for reads.</p>
+<h2>Reuse sources</h2>
+<p>The action spine's approvals and governed assets, the cards/board surfaces, T4's contracts, and
+T5's systemic-improvement loop.</p>
+<h2>Inception units</h2>
+<p>The ops actions (<code>ops.incident</code>, triage, the write verbs), the approval policy, and the host
+registry.</p>
+<h2>Dependencies</h2>
+<p>T2 and T4; T5 for the systemic loop; the cluster live proof is deploy-bound.</p>
+<h2>Acceptance</h2>
+<p>SPEC_V2 §12 T7, proven by the executed suite and <code>acceptance/programme/T7.toml</code>.</p>
+<h2>Capabilities</h2>
+<p>An operator can run an incident through the product's own actions, with the tenant's policy as
+the only path to a destructive write.</p>
+<h2>Plan</h2>
+<p>Delivered in tranche 5; the tranche-5 PI plan carries the objectives and capacity.</p>
+<h2>Risks</h2>
+<p>The live proof needs the deployed operator CLI; a host must be registered before a live read; the
+systemic loop's kata is T5's.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -57,6 +57,15 @@ if [ -n "${GENERATED_AT:-}" ]; then
 fi
 "$conveyor" "${snapshot_args[@]}"
 
+# 2a. The audit evaluates the coverage the pack ships. A temp snapshot carries no `coverage.json`,
+#     so `status_source_drift` would never fire on the live record even though the committed pack,
+#     which ships `data/coverage.json`, reports the same drift — the live register and the
+#     committed-pack derivation then disagree and `publish-standards.sh` cannot write the record
+#     (measured 2026-11-26: status_source_drift:T18, P2). Copy the installed coverage in so both
+#     derivations read the same bytes; the install replaces it and `build-coverage.py` regenerates
+#     it to the same fixpoint below.
+cp "$data/coverage.json" "$tmp/data/coverage.json"
+
 # 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
 #    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
 #    same defect never becomes a second card.
@@ -159,10 +168,17 @@ test -f "$tmp/docs/standards/index.html" || {
 #     `$tmp/data`; rehash the pack as it now stands so the installed manifest covers every file.
 #     Nothing is regenerated, and no database is read.
 "$conveyor" snapshot --manifest-only --out "$tmp/data"
-rsync -a --delete "$tmp/data/" "$data/"
+# `actions.json` is the installed action-registry dump (build-coverage's input), not a snapshot
+# output: the snapshot never produces it, so `--delete` would destroy the registry the coverage
+# check below reads. It is refreshed by `conveyor admin actions dump`, a separate step, exactly
+# as `issues.json` is the raw GitHub export and is not a snapshot output either.
+rsync -a --delete --exclude 'actions.json' "$tmp/data/" "$data/"
 # The canonical register is an evidence ledger as well as a published row: the committed-pack
-# publish (`publish-standards.sh`) compares its build against this copy.
-cp "$tmp/conformance/rework.json" "$root/docs/evidence/rework-register.json"
+# publish (`publish-standards.sh`) compares its build against this copy. Copy the register the
+# SNAPSHOT embedded (`$tmp/data/rework.json`), not the pre-snapshot file: the snapshot masks
+# absolute home paths (`[redacted-path]`), and the committed ledger must be byte-identical to the
+# document the pack publishes or check-data refuses the pack.
+cp "$tmp/data/rework.json" "$root/docs/evidence/rework-register.json"
 for _ in 1 2 3; do
   python3 "$root/scripts/build-programme-seed.py"
   python3 "$root/scripts/build-coverage.py"
@@ -176,6 +192,13 @@ python3 "$root/scripts/build-v2-coverage.py" --check
 python3 "$pack/scripts/build-docs.py"
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/docs/" "$pack/docs/"
+# 3g. The manifest must name every file the installed pack carries. The files written after 3f
+#     (actions.json, coverage.*, output-standard.js, the rendered pages) are not snapshot outputs,
+#     so the hash taken at 3f predates them; rehash the installed pack once the tree is final.
+#     Nothing is regenerated, and no database is read. check-data refuses a data/ file the
+#     manifest does not name, so this rehash is what makes the published pack pass its own gate.
+"$conveyor" snapshot --manifest-only --out "$data"
+
 
 # 4. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
 # `issues.json` is an INPUT to the snapshot (the redacted registry is inside programme.json).

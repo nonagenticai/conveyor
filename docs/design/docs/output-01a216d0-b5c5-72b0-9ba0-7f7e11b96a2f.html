@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T10 — Candidate solutions (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Candidate Solutions — T10 SAFe cadence and MSP tranches</h1>
+<h2>Candidates</h2>
+<table><thead><tr><th>Candidate</th><th>Shape</th><th>Outcome</th></tr></thead><tbody>
+<tr><td>Cadence state machine with an approved PI plan</td><td>explicit <code>planned → approved → running → closed</code> states; materialisation gated on the approved plan</td><td>adopted</td></tr>
+<tr><td>Cron-only backlog drain</td><td>a schedule that moves cards by stored priority</td><td>rejected: no approval gate, no idempotent tick</td></tr>
+<tr><td>Stored WSJF score</td><td>persist the computed score on the WBS row</td><td>rejected: the score is a function of four integers and is recomputed (§8.2)</td></tr>
+<tr><td>Free-text demo evidence</td><td>any non-empty note satisfies the demo credit</td><td>rejected: replaced by typed evidence (<code>demo_gate.rs</code>)</td></tr>
+<tr><td>Tranche review by prose</td><td>the review records its own claim</td><td>rejected: the review must cite baselines, benefit status and the risk register (<code>tranche_review.rs</code>)</td></tr>
+</tbody></table>
+<h2>Criteria</h2>
+<p>The five §12 clauses: plan approval before materialisation; WIP-bounded WSJF order; typed demo
+evidence; a retro lesson requirement; a tranche review and benefit transition that cannot pass
+without measured evidence. Secondary: an idempotent tick, refinement of unscored/aged rows, and
+a record that reads back through the product's own actions.</p>
+<h2>Options rejected</h2>
+<p>The stored-score and free-text shapes are the ones the V1 audit found still live
+(<code>v1-p83-1</code>, <code>v1-p83-4</code>); they are named as gaps, not as accepted design. The cron-only drain
+never existed in code and was rejected at design time because it cannot carry an approval gate.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

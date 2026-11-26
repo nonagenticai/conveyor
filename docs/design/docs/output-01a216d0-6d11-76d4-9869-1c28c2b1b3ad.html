@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 — Project Brief (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project Brief — S04 Action registry</h1>
+<h2>Outcome</h2>
+<p>One action declaration serves HTTP, MCP, OpenAPI, the admin CLI and external ingest: 549 actions
+from a single registry, 580 served operations locked by hash.</p>
+<h2>Boundary</h2>
+<p>Out of scope: the screens (S12), the board (S05) and the tool platform (T13). The registry must not
+fork per transport; a second declaration path is a defect.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>crates/actions/src/lib.rs</code> and <code>crates/actions-derive</code> — the ActionSpec declaration and macro.</li>
+<li><code>crates/actions/src/invoke.rs</code> — the one invocation path with idempotency and audit.</li>
+<li><code>crates/api/src/actions.rs</code> — the HTTP route over the same registry.</li>
+<li><code>crates/actions/src/lock.rs</code> — the served-spec lock.</li>
+</ul>
+<h2>Inception units</h2>
+<p>The gate analysis (derive, manifest, OpenAPI, MCP, invocation, ingest), the transport-parity
+choice, and the lock's hash discipline are the inception units.</p>
+<h2>Dependencies</h2>
+<p>S02 (the skeleton) and S03 (the domain schema); tranche 3; issue #3.</p>
+<h2>Acceptance</h2>
+<p><code>acceptance/programme/S04.toml</code> is the gate: the derive crate, the registry and the vocabularies,
+the parity test, the lock check and the ingest round-trip.</p>
+<h2>Capabilities</h2>
+<p>One declaration per action; one invocation path; one served spec; one external-ingest fold.</p>
+<h2>Plan</h2>
+<p>Two deliverables — the ActionSpec derive crate and the registry and spec vocabularies — accepted
+under change <code>01a2054b-3f86-7959-b2ad-f1edc5b0bb55</code>, credited at the tranche-3 demo, and closed
+against the frozen baseline <code>01a20256-44d0-731d-b345-fffc5f3ac9e8</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

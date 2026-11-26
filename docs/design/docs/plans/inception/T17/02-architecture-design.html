@@ -40,7 +40,7 @@
 <li><strong>Links:</strong> issue #87; SPEC_V2 §12; the sibling inception document; <code>seed/programme.json</code>.</li>
 </ul>
 <h2 id="context-and-boundary">Context and boundary</h2>
-<p>T17 turns a tenant's chat brief and documents into reviewed, published tenant assets. Downstream of T0, T2, T3, T13 and T16, it owns intake, drafts, the publication orchestrator, a template store and an inert tool request. It does not own published assets' tables (§10.1), SOP/RDF/BPMN conversion and PKO (T16, #85, OPEN <code>status:blocked</code>, absent), the tool model (T13, #76, OPEN <code>status:claimed</code>, absent), or policy evaluation (T2). Publication calls the owning aggregate's action in one transaction; a missing action refuses, never degrades.</p>
+<p>T17 turns a tenant's chat brief and documents into reviewed, published tenant assets. Downstream of T0, T2, T3, T13 and T16, it owns intake, drafts, the publication orchestrator, a template store and an inert tool request. It does not own published assets' tables (§10.1), SOP/RDF/BPMN conversion and the procedure draft/PDDL surface (T16, #85, OPEN <code>status:blocked</code>, absent), the tool model (T13, #76, OPEN <code>status:claimed</code>, absent), or policy evaluation (T2). Publication calls the owning aggregate's action in one transaction; a missing action refuses, never degrades.</p>
 <h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
 <table>
 <thead>
@@ -90,7 +90,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>intake</code> means <code>authoring.intake</code>. Every existing action name resolves in <code>docs/design/data/actions.json</code>. The T16 names <code>procedures.draft</code>, <code>pko.import_rdf</code>, <code>pko.edit</code> and <code>pko.publish</code>, and T13's <code>tool_authoring.draft</code>, are absent today and are marked <code>(to create)</code>.</p>
+<p><code>intake</code> means <code>authoring.intake</code>. Every existing action name resolves in <code>docs/design/data/actions.json</code>. T16's <code>procedures.draft</code> (the re-scoped surface; D53 retired the PKO actions) and T13's <code>tool_authoring.draft</code> are absent today and are marked <code>(to create)</code>.</p>
 <table>
 <thead>
 <tr>
@@ -125,16 +125,16 @@
 </tr>
 <tr>
 <td>procedure</td>
-<td><code>procedure</code> / <code>procedures.publish</code> (existing; T16 adds PDDL text and the PKO pin)</td>
+<td><code>procedure</code> / <code>procedures.publish</code> (existing; T16 adds PDDL text and the <code>knowledge_pack_ref</code> pin)</td>
 <td><code>procedures.draft</code> (to create, T16)</td>
 <td><code>procedures.publish</code></td>
 <td>human</td>
 </tr>
 <tr>
-<td>PKO rows</td>
-<td><code>pko_release</code>/<code>pko_entity</code> (to create, T16)</td>
-<td><code>pko.import_rdf</code>/<code>pko.edit</code> (to create, T16)</td>
-<td><code>pko.publish</code> (to create, T16)</td>
+<td>Knowledge pack</td>
+<td><code>strata</code> pack import (<code>procedures.ingest_rdf</code>, existing); the procedure pins it by <code>knowledge_pack_ref</code> (0060:22,38)</td>
+<td><code>procedures.ingest_rdf</code> (existing)</td>
+<td>none — the procedure's publish carries the pin</td>
 <td>human</td>
 </tr>
 <tr>

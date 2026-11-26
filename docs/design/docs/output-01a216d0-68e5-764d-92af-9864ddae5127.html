@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 — Project Brief (record completed, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project Brief — T3 PM job</h1>
+<h2>Outcome</h2>
+<p>A project manager job runs a request end to end: a charter, a planned WBS, a frozen scope
+baseline, a change-requested acceptance, and a closure — and it cannot approve its own gate.</p>
+<h2>Boundary</h2>
+<p>Out of scope: project creation and board surfaces (S05), the tool platform (T13), and the
+architecture capability itself (T9). The PM path must not fork the action registry, the approval
+primitives or the snapshot projection; it composes them.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>crates/actions/src/pm/mod.rs</code> — <code>plan_project</code>, <code>changes.request</code>.</li>
+<li><code>crates/store/src/spine.rs</code> — the baseline, gate and change primitives.</li>
+<li><code>crates/actions/src/board/</code> — the charter asset and gate.</li>
+<li><code>crates/actions/src/architecture.rs</code> — contracts and compliance reviews.</li>
+</ul>
+<h2>Inception units</h2>
+<p>The T3 gate analysis, the candidate approaches to dual control, and the acceptance record are the
+inception units; each was assessed against the live primitives rather than a new mechanism.</p>
+<h2>Dependencies</h2>
+<p>T2 (the domain model) and P0 (the programme definition). Issue #74. The tranche-3 cadence
+supplies the PI plan, objectives and the demo.</p>
+<h2>Acceptance</h2>
+<p>SPEC_V2 §12 T3: PM runs a request end to end; cannot approve its own gate; a baseline change
+requires a change request. <code>acceptance/programme/T3.toml</code> is the gate.</p>
+<h2>Capabilities</h2>
+<p>Dual-controlled gates, the frozen scope baseline, the change-request path with its impact block,
+and closure against the baseline — the capabilities the five accepted deliverables demonstrate.</p>
+<h2>Plan</h2>
+<p>Charter → <code>projects.baseline</code> (WBS with WSJF inputs, frozen scope baseline, distinct approval) →
+accepted deliverables under an approved change → delivery contract 01a2052f-29da-76c4-9bda-e45e0f408fe8 and Phase-G review →
+closure review, closure gate and <code>projects.close</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

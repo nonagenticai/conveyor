@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 — Gap analysis (retrospective, 2026-11-23) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T16 — Gap analysis (retrospective, 2026-11-23)</h1>
+<h2>Baseline</h2>
+<p>Before T16: procedure knowledge lived in documents; there was no typed, versioned ingestion, no
+human publication gate on the drafting job, and no bound PDDL execution from an ingested source.</p>
+<h2>Target</h2>
+<p>A SOP, an OWL/Turtle file or a BPMN/Visio/draw.io diagram becomes a typed draft through the product's
+own actions; a human gate publishes it; a re-ingest versions it while the published row stays stable;
+a bound job runs its PDDL steps; an unreviewed source never binds.</p>
+<h2>Gaps and work packages</h2>
+<table><thead><tr><th>Gap</th><th>Work package (accepted)</th></tr></thead><tbody>
+<tr><td>SOP sources not ingested</td><td>1 — SOP intake as a governed asset</td></tr>
+<tr><td>RDF/OWL not bound to procedures</td><td>2 — knowledge pack bound by <code>knowledge_pack_ref</code></td></tr>
+<tr><td>Process documents not converted</td><td>3 — BPMN, Visio and draw.io to PDDL drafts</td></tr>
+<tr><td>Drafting could publish</td><td>4 — source review and human publication gates</td></tr>
+<tr><td>Re-ingest forked the row</td><td>5 — re-ingest versioning</td></tr>
+<tr><td>Unreviewed sources could bind</td><td>6 — bound job runs the PDDL steps</td></tr>
+</tbody></table>
+<p>Residual gap: live-cluster fault injection is T7's live proof, recorded separately; T16's gate is
+the executed test set, not a probe.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

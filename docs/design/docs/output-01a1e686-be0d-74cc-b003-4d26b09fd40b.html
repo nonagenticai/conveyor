@@ -42,7 +42,7 @@
 <h2>Verification</h2>
 <p>From the repository root at the S02 acceptance snapshot:</p>
 <pre><code class="language-bash">set -euo pipefail
-source ~/.cargo/env
+source [redacted-path]
 cargo fmt --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
@@ -64,7 +64,7 @@ docker compose up -d --build &amp;&amp; curl -sf localhost:8930/health/ready
 <p>Closed in this batch. The long-job lease/recovery proof under two concurrent workers now exists: <code>apps/server/tests/jobs_lease_two_workers.rs</code> (P2.1–P2.3) runs two real <code>conveyor worker</code> children with <code>JOB_LEASE_SECS=2</code> against a handler held for four leases; the row keeps <code>attempts = 1</code>, the stub is called once, the finish is <code>succeeded</code>, and the lease is cleared and never resurrected. Local run: <code>nextest run -p conveyor-server --test jobs_lease_two_workers</code> -&gt; PASS (11.878 s) at d367a4a9; preflight 44938697512 (success). Pending: the PR's CI shards and the deploy are the delivery gates — the test has not yet run in CI and the deployed image is not this branch; issue #2 remains open only as that gate and closes with the lane PR.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-25T03:46:32.319854100+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

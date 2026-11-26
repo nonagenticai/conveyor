@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Evidence — T12 One organisation loop · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T12/evidence
+version: 1
+status: published
+project: T12
+category: evidence
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: evidence
+phase: G
+plateau: capability</h2>
+<h1>T12 — One organisation loop: evidence</h1>
+<h2>Claim</h2>
+<p>T12's loop is constructed and proven in the server harness: request → PM → delivery jobs → coach
+interruption → kata → development project → deploy/live verify → operations incident → lesson, with
+every transition audited and the loop within budget, and one benefit baselined before its
+transition and read by the acceptance harness. The project's <strong>acceptance is open</strong>: the live half
+of P7 was not exercised (owner ruling 2026-11-24).</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>apps/server/tests/organisation_loop.rs</code> (12 scenarios), including <code>request_to_pm</code>,
+<code>development_project_deploy_and_live_verify</code>, <code>deploy_failure_to_incident</code>,
+<code>incident_to_promoted_lesson</code>, <code>every_loop_transition_audited</code>, <code>loop_within_budget</code> and
+<code>architecture_and_benefits_acceptance</code>.</li>
+<li>PR #670, merge <code>64f3d6ec370da089cefa46b4d8b6b80092ac98ad</code> (head <code>e65552f0</code>).</li>
+<li>The deployed P6 service answered <code>GET /health</code> 200 at digest <code>sha256:84c75723…</code>, tag
+<code>sha-64f3d6e</code>, 2026-11-24T21:00:07Z.</li>
+</ul>
+<h2>Verification</h2>
+<p><code>cargo test -p conveyor-server --test organisation_loop</code> on a checked-out main; the deployment
+probe is <code>curl -fsS https://&lt;deployed-host&gt;/health</code> at the tag above (recorded in the unit's
+evidence, not repeated here).</p>
+<h2>Links</h2>
+<ul>
+<li><code>docs/plans/inception/T12/00-project-brief.md</code>, <code>01-inception-analysis.md</code>,
+<code>02-architecture-design.md</code></li>
+<li>Issue #88 (open); PR #670; <code>docs/evidence/v2-coverage.md</code>.</li>
+</ul>
+<h2>Gap</h2>
+<p>The acceptance is open and this document does not claim it:</p>
+<ul>
+<li>P7's live half is <strong>not exercised</strong> (owner ruling 2026-11-24).</li>
+<li>The rollback exercise was not run.</li>
+<li>The budget binding is an open question (tenant, programme or job binding; default tenant with
+per-binding defaults); the observed refusal is the inference router's <code>429 budget_exceeded</code>, not
+a conveyor-side spend gate.</li>
+<li>No live benefit delta is claimed; <code>architecture_and_benefits_acceptance</code> is a harness test.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>One organisation loop · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

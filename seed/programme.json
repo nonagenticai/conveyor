@@ -778,7 +778,7 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
@@ -792,7 +792,8 @@
           624,
           649,
           656,
-          697
+          697,
+          734
         ],
         "depends_on": [
           "S09",
@@ -1278,7 +1279,7 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1313,7 +1314,7 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1537,7 +1538,8 @@
         "issues": [
           682,
           683,
-          684
+          684,
+          722
         ],
         "depends_on": [
           "T19",
@@ -1668,21 +1670,16 @@
           95,
           102,
           193,
-          222,
           223,
-          224,
           225,
           395,
           435,
           476,
           526,
           569,
-          572,
           660,
           669,
-          681,
-          693,
-          716
+          733
         ],
         "depends_on": [],
         "plan_status": "active",

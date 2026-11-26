@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T8 Organisational memory · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T8/closure-review
+version: 1
+status: published
+project: T8
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>T8 — Organisational memory: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>A lesson with one evidence reference is refused</td><td><code>crates/actions/tests/lessons.rs::one_evidence_ref_is_refused</code>; <code>crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref</code>; migration <code>0069_lesson_lifecycle.sql</code></td><td>pass</td></tr>
+<tr><td>Two independent references and a human review promote a source draft</td><td><code>crates/actions/tests/lessons.rs::two_independent_refs_and_a_human_review_promote_a_source_draft</code></td><td>pass</td></tr>
+<tr><td>A bad run records a lesson that is not doctrine</td><td><code>crates/actions/tests/lessons.rs::a_failed_run_records_a_lesson_that_is_not_doctrine</code></td><td>pass</td></tr>
+<tr><td>The delivery is on main and gated</td><td>issue #79 closed by PR #664, merge <code>57d8ef8fe07de413e6a73430584ddd2cf2d59d7f</code> (head <code>9e2b7f57</code>); preflight run 45393424722 success</td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>Delivery merge <code>57d8ef8fe07de413e6a73430584ddd2cf2d59d7f</code>; migration
+<code>migrations/0069_lesson_lifecycle.sql</code>.</li>
+<li>Behaviour: the named <code>lessons.rs</code> and <code>store/tests/lesson.rs</code> scenarios.</li>
+<li>The brief: <code>docs/plans/T8/project-brief.md</code> (authored at closure from SPEC §12 T8 and D36).</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>This closure review is the project's first; no earlier closure record existed.</li>
+<li>Incident-reference lessons are a typed <code>422</code> until T7's table — T7's scope, not a T8 gap.</li>
+<li><code>strata_rag</code> publishing/embeddings were never in T8's scope; #84's promotion rate and #82's
+retro authoring are separate units; the live loop is #88/T12.</li>
+<li>The tranche-11 authorisation is <strong>not</strong> claimed here; it is the #526 programme chain's act.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. Acceptance is met on the evidence above; the listed items are other projects' scope, and
+this review does not manufacture a tranche authorisation.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Organisational memory · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

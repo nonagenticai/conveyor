@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T10 — Project WBS (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project WBS — T10 SAFe cadence and MSP tranches</h1>
+<h2>Work packages</h2>
+<table><thead><tr><th>Deliverable</th><th>Business value</th><th>Time criticality</th><th>Risk reduction</th><th>Job size</th><th>Status</th></tr></thead><tbody>
+<tr><td>SAFe cadence and MSP tranches — WSJF materialisation, demo evidence, retro lessons, tranche review and benefit realisation</td><td>8</td><td>7</td><td>8</td><td>8</td><td>accepted</td></tr>
+</tbody></table>
+<p>WSJF = (8+7+8)/8 = 2.875, computed from the four integers and never stored (§8.2).</p>
+<h2>Acceptance</h2>
+<p>The project's §12 gate is the acceptance: PI planning materialises cards from the backlog by
+computed WSJF within the WIP slots only after the plan is approved; a deliverable without typed
+evidence cannot demo; a retro cannot close without a lesson; an end-of-tranche review without
+baselines, benefit status or risk evidence is refused; a transition that never measured its
+baseline cannot report the benefit realised. Each clause is proved by a named test
+(<code>crates/store/tests/programme_cadence.rs</code>, <code>demo_gate.rs</code>, <code>retro.rs</code>, <code>tranche_review.rs</code>,
+<code>benefit_transition.rs</code>) and the retrospective review records the deviations it admits.</p>
+<h2>Status</h2>
+<p>Accepted as the retrospective WBS deliverable; the project's acceptance instrument is
+<code>acceptance/programme/T10.toml</code>. Eight V1 findings remain open against T10 and are not waived.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

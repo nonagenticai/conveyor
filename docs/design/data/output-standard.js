@@ -2114,7 +2114,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -3890,7 +3890,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -3928,7 +3928,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "b"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
@@ -3946,7 +3947,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -3984,7 +3985,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "c"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
@@ -4002,7 +4004,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4040,7 +4042,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "d"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
@@ -4058,7 +4061,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4307,7 +4310,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "e"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
@@ -4325,7 +4329,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4335,6 +4339,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "gap-analysis",
               "scope": "subject"
@@ -4346,6 +4351,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "candidate-solutions",
               "scope": "subject"
@@ -4357,6 +4363,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "project-context-diagram",
               "scope": "subject"
@@ -4368,6 +4375,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
+            "require_heading": false,
             "match": {
               "category": "benefits-diagram",
               "scope": "subject"
@@ -4435,7 +4443,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4445,11 +4453,11 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     },
     "phase-g": {
       "required": [
-        "Mandatory artefacts",
         "Contract and gate",
         "Evidence"
       ],
       "optional": [
+        "Mandatory artefacts",
         "Findings"
       ],
       "skeleton": "# Phase G\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
@@ -4473,11 +4481,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "g"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
         "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$project_id"
+            }
+          },
           {
             "kind": "rows",
             "file": "architecture.json",
@@ -4491,7 +4508,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4529,7 +4546,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "h"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
@@ -4547,7 +4565,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }

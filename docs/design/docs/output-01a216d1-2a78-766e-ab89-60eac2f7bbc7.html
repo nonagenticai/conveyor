@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T7 — Closure review (record completed, 2026-11-24) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T7 — Closure review (record completed, 2026-11-24)</h1>
+<p>Project: T7 — Operations · Tranche 5 · Plan: SPEC_V2 §12 · Issues #78, #8</p>
+<h2>Outcome vs acceptance</h2>
+<p>SPEC_V2 §12 T7's gate is met by executed tests at lane head <code>a9ffecb8</code>, not by prose: an incident
+is triaged with no write (<code>an_incident_is_triaged_with_no_write</code>); an approved mitigation sets
+<code>mitigated_at</code> with a read-back (<code>an_approved_mitigation_sets_mitigated_at_with_a_read_back</code>); an
+incident resolves with a linked postmortem (<code>an_incident_resolves_with_a_linked_postmortem</code>); a
+destructive call without the tenant's approvals is refused (<code>a_destructive_call_without_approval_is_refused</code>),
+and an approval for another target is refused; restart, scale, rollback and flag-flip are callable
+and read back (<code>the_four_write_verbs_are_callable_and_read_back</code>). 31 tests, 31 passed, 1 skipped.</p>
+<h2>Evidence</h2>
+<p>The published acceptance evidence <code>01a20ae2-55d5-75f3-b7ed-49e043ac52b8</code> carries the command and the clause-to-test map
+(<code>/tmp/u5a-r9/evidence/T7-acceptance.md</code>); the delivery contract <code>01a20ae2-30eb-7f69-812e-e98009182041</code> is live with its Board decision; the Phase-G
+review <code>01a20ae2-325e-7e6d-a8fb-e8664452bc5e</code> is compliant and cites the published standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; the
+closure asset is <code>the approved closure asset</code>. The manifest <code>acceptance/programme/T7.toml</code> is the gate.</p>
+<h2>Open items</h2>
+<p>The cluster live proof is deploy-bound: <code>scripts/ops-live-proof.sh</code> needs the operator CLI
+(<code>$HOME/.claude/skills/conveyor-api/scripts/conveyor-ctl</code>), which is absent on this box, and the
+deployed conveyor is digest <code>sha256:60898434…</code> (rollout 2026-11-21T04:38Z). <code>the_live_read_returns_the_pod_list</code>
+is skipped by its own harness env gate. Neither is claimed as executed.</p>
+<h2>Decision</h2>
+<p>Close.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
