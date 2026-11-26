@@ -1,0 +1,101 @@
+{
+  "body_sha256": "71223645725286b6915e59709f0a8e19918323c41d48d581e18133528772d9e2",
+  "category": "project-registers",
+  "headings": [
+    {
+      "heading": "Risks",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Issues",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Assumptions",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Dependencies",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Benefits",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Changes",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "30e438c3340c062dd1d9f892bc2bd0f5e842ba820cbc12b7696079fdb98e5be6",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+    "key": "S02",
+    "kind": "project",
+    "title": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE"
+  },
+  "title": "Project Registers \u2014 Skeleton \u2014 workspace, tenancy, auth, jobs, SSE"
+}

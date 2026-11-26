@@ -1275,7 +1275,15 @@ class Audit:
             contracts = [
                 row
                 for row in self.data.contracts
-                if row.get("project_id") == project.get("id") and row.get("status") == "live"
+                if row.get("project_id") == project.get("id")
+                and row.get("status") == "live"
+                # A Phase-G compliance review is of the DELIVERY contract. The SoAW is a live
+                # contract too, and demanding a review of it red every v2 project whose SoAW
+                # has none (measured on T1/T11, 2026-11-26).
+                and (
+                    str(row.get("kind") or "") == "delivery_contract"
+                    or str(row.get("phase_code") or "").lower() == "f"
+                )
             ]
             for contract in contracts:
                 reviews = [
@@ -2553,10 +2561,15 @@ def self_test() -> None:
             "contracts": [
                 {"id": "c1", "project_id": "t1", "kind": "statement_of_architecture_work",
                  "status": "live", "approved_at": "2026-11-20T01:00:00+00:00",
-                 "approved_by": "u1", "requested_by": "u2"}
+                 "approved_by": "u1", "requested_by": "u2"},
+                # A v2 project carries both; the compliance review names the delivery contract.
+                {"id": "c2", "project_id": "t1", "kind": "delivery_contract",
+                 "phase_code": "f", "status": "live",
+                 "approved_at": "2026-11-20T01:30:00+00:00",
+                 "approved_by": "u1", "requested_by": "u2"},
             ],
             "compliance_reviews": [
-                {"id": "r1", "project_id": "t1", "contract_id": "c1", "level": "compliant",
+                {"id": "r1", "project_id": "t1", "contract_id": "c2", "level": "compliant",
                  "reviewed_at": "2026-11-20T02:00:00+00:00"}
             ],
             "waivers": [],
@@ -2863,6 +2876,10 @@ def self_test() -> None:
         data.waivers.append(row)
 
     expect(programme_waiver, "waiver_not_permitted")
+
+    # A Phase-G review of the delivery contract satisfies the rule; the live SoAW is not a
+    # compliance subject, so its having no review is not a gap.
+    expect_absent(lambda data: None, "compliance_review_missing")
 
     def review_waiver(kind: str):
         def mutate(data: Dataset) -> None:

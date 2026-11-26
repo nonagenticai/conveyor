@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a1ff90-4e19-7bcf-acbf-3f29d980572e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a217e9-df2d-7df3-ac63-82ea8bdbf7a1 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T11-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20231-bd2b-744e-b9f0-0daf9b21e25a decided by a distinct approver",
+      "detail": "latest closure gate 01a217ea-4462-7ae4-a0ac-567ae4c32db5 decided by a distinct approver",
       "id": "T11-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "6 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-t11:T11, std-togaf-phase-g-t11-g:T11",
+      "detail": "1 mandatory artefact package(s) open: compliance_review_missing:T11",
       "id": "T11-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1), mandatory_artefacts:T11 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1)",
       "id": "T11-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -177,22 +177,22 @@
     }
   ],
   "failures": [
-    "T11-artefact-standard (P1): 6 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-t11:T11, std-togaf-phase-g-t11-g:T11",
-    "T11-rework (P0): 2 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1), mandatory_artefacts:T11 (P1)",
+    "T11-artefact-standard (P1): 1 mandatory artefact package(s) open: compliance_review_missing:T11",
+    "T11-rework (P0): 1 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1)",
     "gate (P0): the gate check 'T11-artefact-standard' did not pass; the gate check 'T11-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T10:37:53.445773+00:00",
+  "generated_at": "2026-11-26T13:05:29.362277+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T11.toml",
   "name": "Metrics, metering and maturity",
   "project": "T11",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-26T13:05:12.847496+00:00",
+    "git_sha": "de5e98bf157b2f3e2bedcce59dc022f1c9270578",
+    "path": "retained-snapshot/de5e98bf157b2f3e2bedcce59dc022f1c9270578"
   },
   "verdict": "red",
   "warnings": []

@@ -1,52 +1,92 @@
 {
-  "blocked": 3,
-  "generated_at": "2026-11-26T12:54:49+00:00",
-  "green": 0,
+  "blocked": 0,
+  "generated_at": "2026-11-26T13:05:29+00:00",
+  "green": 1,
   "members": [
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 20: error: projects.close refused (409): project S02 cannot close until its mandatory artefacts exist (missing: project-registers)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "S02",
       "log": "docs/evidence/rework/batch/tranche-1/S02.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
+      "state": "RECEIPT_GREEN"
     },
     {
-      "factory_exit": 1,
+      "factory_exit": 0,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 23: error: projects.close refused (409): project T1 cannot close until its mandatory artefacts exist (missing: project-registers)",
-          "gap": "instrument",
-          "id": null
+          "detail": "1 mandatory artefact package(s) open: compliance_review_missing:T1",
+          "gap": "record",
+          "id": "T1-artefact-standard",
+          "kind": "snapshot",
+          "severity": "P1"
+        },
+        {
+          "detail": "1 unresolved P0/P1 package(s): compliance_review_missing:T1 (P1)",
+          "gap": "record",
+          "id": "T1-rework",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "the gate check 'T1-artefact-standard' did not pass; the gate check 'T1-rework' did not pass",
+          "gap": "code",
+          "id": "gate",
+          "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
         }
       ],
       "key": "T1",
       "log": "docs/evidence/rework/batch/tranche-1/T1.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
+      "state": "RECEIPT_RED"
     },
     {
-      "factory_exit": 1,
+      "factory_exit": 0,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 22: error: projects.close refused (409): project T11 cannot close until its mandatory artefacts exist (missing: project-registers)",
-          "gap": "instrument",
-          "id": null
+          "detail": "1 mandatory artefact package(s) open: compliance_review_missing:T11",
+          "gap": "record",
+          "id": "T11-artefact-standard",
+          "kind": "snapshot",
+          "severity": "P1"
+        },
+        {
+          "detail": "1 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1)",
+          "gap": "record",
+          "id": "T11-rework",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "the gate check 'T11-artefact-standard' did not pass; the gate check 'T11-rework' did not pass",
+          "gap": "code",
+          "id": "gate",
+          "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
         }
       ],
       "key": "T11",
       "log": "docs/evidence/rework/batch/tranche-1/T11.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
+      "state": "RECEIPT_RED"
     }
   ],
-  "red": 0,
-  "snapshot_sha": "61412ed8bd133dc5830cac54f76d8c7dba331f4b",
+  "red": 2,
+  "snapshot_sha": "de5e98bf157b2f3e2bedcce59dc022f1c9270578",
   "tranche": 1
 }

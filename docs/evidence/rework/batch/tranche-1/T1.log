@@ -68,11 +68,20 @@ FAILED: projects.close: transport exited 1
 
 [exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T1 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-zzvearo5/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-zzvearo5/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T1-bodies --local-bin /tmp/conv526-bin-5dcfc953
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T1 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-lt_65d6n/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-lt_65d6n/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T1-bodies --local-bin /tmp/conv526-bin-5dcfc953
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [],
+  "applied": [
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-registers",
+      "document_id": "01a217f5-4ca5-71cb-be50-516c8912fcd9",
+      "natural_key": "artefact:T1:project-registers:019e199aa05d53ba",
+      "body_sha256": "019e199aa05d53ba62aa2811c6af78f45d4a5632ebe3e646164d8b5f1d352797"
+    }
+  ],
   "skipped": [
     {
       "project_key": "T1",
@@ -104,7 +113,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "compliance-review",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "stale"
     },
     {
       "project_key": "T1",
@@ -171,18 +180,6 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "T1",
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
-      "category": "project-registers",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_REGISTER_CODE",
-        "message": "required heading 'Risks' resolves a register row with an empty code"
-      }
-    },
-    {
-      "project_key": "T1",
-      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "category": "statement-of-intent",
       "mandatory": false,
       "trigger": null,
@@ -207,9 +204,9 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   ],
   "counts": {
     "due": 4,
-    "present": 6,
+    "present": 5,
     "missing-edge": 0,
-    "stale": 4,
+    "stale": 5,
     "ambiguous": 0
   }
 }
@@ -241,30 +238,18 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   09 architecture.artifacts_link ok
   document architecture-artifact: already present and published
   delivery contract: already live
-  10 registers.update ok
-  register risk: A later consumer reads a cadence row as a working PI rhythm code set to R-T1-01
-  11 registers.update ok
-  register risk: An edit after a baseline is expected to appear in the frozen scope code set to R-T1-02
-  12 registers.update ok
-  register risk: The in-flight set is tenant configuration, so a misconfiguration hides live work code set to R-T1-03
-  13 registers.update ok
-  register issue: No contemporaneous governance record existed at the 2026-11-17 close code set to I-T1-01
-  14 registers.update ok
-  register issue: The Plan tab's WBS, baseline and register screens are not a console delivery code set to I-T1-02
-  15 registers.update ok
-  register assumption: Every gate passes through approvals.decide, so the requester exclusion covers the whole programme code set to A-T1-01
-  16 registers.update ok
-  register assumption: The four WSJF inputs are valid integers for every WBS row that reaches the read code set to A-T1-02
-  17 registers.update ok
-  register dependency: T2, T3, T9 and T10 build on the plan-spine rows code set to D-T1-01
-  18 registers.update ok
-  register dependency: The frozen baseline depends on the take and the snapshot sharing one transaction code set to D-T1-02
-  19 registers.update ok
-  register benefit: Priority is arithmetic and never a stale stored score code set to B-T1-01
-  20 registers.update ok
-  register benefit: A tranche review cannot decide without baselines, benefit status and the risk register code set to B-T1-02
-  21 registers.update ok
-  register benefit: Self-approval is refused on every gate, not only where a test looks code set to B-T1-03
+  register risk: A later consumer reads a cadence row as a working PI rhythm already present
+  register risk: An edit after a baseline is expected to appear in the frozen scope already present
+  register risk: The in-flight set is tenant configuration, so a misconfiguration hides live work already present
+  register issue: No contemporaneous governance record existed at the 2026-11-17 close already present
+  register issue: The Plan tab's WBS, baseline and register screens are not a console delivery already present
+  register assumption: Every gate passes through approvals.decide, so the requester exclusion covers the whole programme already present
+  register assumption: The four WSJF inputs are valid integers for every WBS row that reaches the read already present
+  register dependency: T2, T3, T9 and T10 build on the plan-spine rows already present
+  register dependency: The frozen baseline depends on the take and the snapshot sharing one transaction already present
+  register benefit: Priority is arithmetic and never a stale stored score already present
+  register benefit: A tranche review cannot decide without baselines, benefit status and the risk register already present
+  register benefit: Self-approval is refused on every gate, not only where a test looks already present
   programme shared_config: already set
   benefit transitions: none in the content
   baseline: already taken
@@ -274,16 +259,170 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  22 cadences.credit_demo ok
+  10 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
   closure gate: already approved
   destructive gate: already approved
+  11 projects.close ok
+  closed T1: 01a1d039-0d32-7c81-8365-371217d16ef7
+T1: 11 acts recorded
 
-rework: projects.close refused at act 23: error: projects.close refused (409): project T1 cannot close until its mandatory artefacts exist (missing: project-registers)
-FAILED: projects.close: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T1 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-061staep/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T1-snap-061staep/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-1/T1-bodies --local-bin /tmp/conv526-bin-5dcfc953
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T1",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 6,
+    "missing-edge": 0,
+    "stale": 6,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 
