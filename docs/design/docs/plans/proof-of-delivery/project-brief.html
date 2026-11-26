@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project brief — proof of delivery · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery/project-brief.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-brief--proof-of-delivery">Project brief — proof of delivery</h1>
+<ul>
+<li><strong>Programme</strong>: conveyor buildout · tranche 1 (authorised)</li>
+<li><strong>Plan</strong>: <code>docs/plans/proof-of-delivery.md</code></li>
+<li><strong>Units</strong>: #744 (capability), #746 (corpus, certificates, live gate)</li>
+<li><strong>ADM</strong>: phase G, capability plateau</li>
+</ul>
+<h2 id="outcome">Outcome</h2>
+<p>A delivered slice or work package can be handed to a third party with a certificate that says what was claimed, which facts it was checked against, and the exact Lean source that closed the claim — and that party can re-run the check without trusting the conveyor.</p>
+<h2 id="why-now">Why now</h2>
+<p>The Lean prover is already a workspace crate and a declared set of external actions (<code>crates/actions/src/integrations/lean4.rs</code>). Gate evidence is already a closed, typed set (<code>resolve_evidence</code>). The only missing pieces are the durable certificate and one evidence kind, so the marginal cost is small and the evidence model stops being prose.</p>
+<h2 id="scope">Scope</h2>
+<p>In: the <code>proof</code> store, <code>proofs.*</code> actions, the <code>lean_proof</code> evidence kind, the Lean model and facts renderer, programme certificates, package-manifest proofs, and the live gate on the programme release.</p>
+<p>Out: Rust-level verification, model-to-implementation refinement, prover-side attestation, and widening the requirement to every card's Definition of Done before one real cycle of refusals.</p>
+<h2 id="benefits">Benefits</h2>
+<p>Enabling for <strong>B1 — Auditable decisions</strong> (the certificate is the evidence a decision row cites) and for <strong>B6 — Predictable delivery</strong> (the release gate reads a bundle rather than a checklist). No new benefit instrument is introduced.</p>
+<h2 id="gates">Gates</h2>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capability (#744)</td>
+<td>every scenario green on a stub prover at the PR head</td>
+</tr>
+<tr>
+<td>Live (#746)</td>
+<td>the deployed engine carries migration <code>0076</code>, the <code>conveyor</code> namespace reaches <code>lean4-prover:8812</code>, and the tamper drill refuses</td>
+</tr>
+</tbody>
+</table>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>The prover allows two active lanes shared with other tenants; proof work is capped at one concurrent call and honours <code>Retry-After</code>.</li>
+<li>Kernel reduction over large literals can exceed the 120-second cap; the measurement step records the real numbers before anything depends on them, and <code>native_decide</code> is recorded as a different trust claim when used.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/proof-of-delivery/project-brief.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
