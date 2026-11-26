@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 760,
+      "title": "auth: the session channel \u2014 a machine principal and a licence-bearer mint",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/760",
+      "updatedAt": "2026-11-26T13:58:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 756,
       "title": "design: provenance on every output page and a declared-vs-evidenced register",
       "state": "OPEN",
@@ -41,9 +58,9 @@
     {
       "number": 754,
       "title": "ops: strict-green live publish \u2014 reconcile the ledger to the live P0/P1 set",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/754",
-      "updatedAt": "2026-11-26T13:38:11Z",
+      "updatedAt": "2026-11-26T14:06:37Z",
       "labels": [
         {
           "name": "unit",
@@ -62,9 +79,9 @@
     {
       "number": 753,
       "title": "skills: six programme delivery-role playbooks and role routing",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/753",
-      "updatedAt": "2026-11-26T13:22:27Z",
+      "updatedAt": "2026-11-26T14:33:27Z",
       "labels": [
         {
           "name": "unit",
@@ -83,9 +100,9 @@
     {
       "number": 746,
       "title": "proof: the Lean delivery corpus, programme certificates and the live gate",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/746",
-      "updatedAt": "2026-11-26T13:18:26Z",
+      "updatedAt": "2026-11-26T14:41:02Z",
       "labels": [
         {
           "name": "unit",
@@ -610,7 +627,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T13:37:27Z",
+      "updatedAt": "2026-11-26T14:06:52Z",
       "labels": [
         {
           "name": "programme",
@@ -1671,7 +1688,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T13:15:06Z",
+      "updatedAt": "2026-11-26T13:56:50Z",
       "labels": [
         {
           "name": "unit",
