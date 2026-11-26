@@ -4672,16 +4672,24 @@ pub async fn close_retro_tx(
 /// pre-tranche programmes) also keeps the legacy allowance — the rule binds the first tranche to
 /// a plan that exists, it does not invent one. An authorised-looking state is only an
 /// authorisation when the row names the review that set it and that review is a review of this
-/// tranche.
+/// tranche — except for `closed`, which is terminal: the engine reaches it only through a
+/// `continue` review of the tranche itself, and the seeded genesis tranche is closed from birth.
 pub async fn assert_project_tranche_authorised_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<(), PlanStoreError> {
     match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
-        Some((number, state))
-            if matches!(state.as_str(), "authorised" | "in_review" | "closed") =>
-        {
+        // A closed tranche is past authorisation by construction: the only engine path to
+        // `closed` is a review of that tranche whose decision is `continue`
+        // (`record_tranche_review_tx`), and the programme's genesis tranche is seeded closed.
+        // Its `authorisation_review_id` names the review that authorised *it*, which for the
+        // genesis row is never written — so requiring the link here refused every close in the
+        // programme's first tranche (measured 2026-11-26: DESIGN-PUBLISH's rework halted at act
+        // 111, `projects.close` 409 `closure_tranche_not_authorised`, while the seed itself
+        // declares tranche 0 closed).
+        Some((_number, state)) if state == "closed" => Ok(()),
+        Some((number, state)) if matches!(state.as_str(), "authorised" | "in_review") => {
             let row: Option<(Uuid, Option<Uuid>)> = sqlx::query_as(
                 "SELECT t.id, t.authorisation_review_id
                    FROM programme_tranche t

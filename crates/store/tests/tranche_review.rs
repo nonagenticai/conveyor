@@ -584,6 +584,29 @@ async fn a_review_refuses_an_unapproved_or_wrong_kind_baseline() {
     );
 }
 
+/// A closed tranche is terminal: the engine reaches it only through a `continue` review of the
+/// tranche itself, and the programme's genesis tranche is seeded closed with no review at all.
+/// A project in it must therefore close and start — the retrospective rework re-closes tranche
+/// 0's projects, and requiring a link refused every one of those closes (2026-11-26).
+#[tokio::test]
+async fn a_closed_tranche_admits_its_projects_without_an_authorisation_review() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("UPDATE programme_tranche SET state = 'closed' WHERE id = $1")
+        .bind(f.tranche1)
+        .execute(&db.super_pool)
+        .await
+        .expect("close the tranche with no review");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let allowed = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, f.project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "a closed tranche admits its projects: {allowed:?}"
+    );
+}
+
 /// The state alone is not an authorisation: an `authorised` row with no review, or a review of
 /// the previous tranche that did not continue, cannot start a project. The previous tranche's
 /// `continue` review is the authorisation the engine writes.
