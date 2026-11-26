@@ -465,6 +465,29 @@ def fresh_snapshot(sha: str, label: str) -> tuple[Path | None, str | None]:
     return directory / "data", None
 
 
+def publish_member(key: str, number: int, snapshot: Path, log: Path) -> int:
+    """Compose and publish the standard's project documents from the record's own rows."""
+    return run_command(
+        [
+            sys.executable,
+            str(PUBLISHER),
+            "--apply",
+            "--project",
+            key,
+            "--snapshot",
+            str(snapshot),
+            "--outputs-dir",
+            str(snapshot.parent / "docs"),
+            "--bodies-out",
+            str(EVIDENCE / "batch" / f"tranche-{number}" / f"{key}-bodies"),
+            "--local-bin",
+            os.environ.get("PROGRAMME_RECORD_BIN", ""),
+        ],
+        log=log,
+        dry_run=False,
+    )
+
+
 def run_one(
     member: dict,
     msp: dict,
@@ -497,14 +520,41 @@ def run_one(
         # Measured 2026-11-26: a three-second environment abort was published as "the factory ran
         # and closed one package", because the publisher and the receipt ran anyway. A crash is
         # BLOCKED with the factory's own line; nothing downstream may read the untouched rows.
-        return {
-            "key": key,
-            "state": "BLOCKED",
-            "factory_exit": code,
-            "publish_exit": None,
-            "gaps": [{"id": None, "gap": "instrument", "detail": crash_detail(log, code)}],
-            "log": str(log.relative_to(ROOT)),
-        }
+        detail = crash_detail(log, code)
+        # One exception, and it is a dependency rather than a retry: the close gate reads
+        # PUBLISHED documents (`project-registers`, `architecture-artifact`) that only the
+        # publisher composes from the rows the factory has just written. Publishing once and
+        # resuming the factory is the only order in which a standard-bound project can close.
+        if not (publish and not dry_run and "closure_mandatory_artefacts_missing" in detail):
+            return {
+                "key": key,
+                "state": "BLOCKED",
+                "factory_exit": code,
+                "publish_exit": None,
+                "gaps": [{"id": None, "gap": "instrument", "detail": detail}],
+                "log": str(log.relative_to(ROOT)),
+            }
+        mid, error = fresh_snapshot(sha, key)
+        if error:
+            return {
+                "key": key,
+                "state": "BLOCKED",
+                "factory_exit": code,
+                "publish_exit": None,
+                "gaps": [{"id": None, "gap": "instrument", "detail": error}],
+                "log": str(log.relative_to(ROOT)),
+            }
+        member["publish_exit"] = publish_member(key, number, mid, log)
+        code = run_command(factory, log=log, dry_run=dry_run)
+        if code != 0:
+            return {
+                "key": key,
+                "state": "BLOCKED",
+                "factory_exit": code,
+                "publish_exit": member["publish_exit"],
+                "gaps": [{"id": None, "gap": "instrument", "detail": crash_detail(log, code)}],
+                "log": str(log.relative_to(ROOT)),
+            }
     receipt_snapshot = snapshot
     if not dry_run:
         fresh, error = fresh_snapshot(sha, key)
@@ -522,25 +572,7 @@ def run_one(
         # The publisher refuses without its snapshot, its outputs directory and the record
         # binary. A publish that cannot run is a recorded failure, never a silently skipped
         # step: measured, the batch ran ten members with the publisher erroring out each time.
-        code = run_command(
-            [
-                sys.executable,
-                str(PUBLISHER),
-                "--apply",
-                "--project",
-                key,
-                "--snapshot",
-                str(receipt_snapshot),
-                "--outputs-dir",
-                str(receipt_snapshot.parent / "docs"),
-                "--bodies-out",
-                str(EVIDENCE / "batch" / f"tranche-{number}" / f"{key}-bodies"),
-                "--local-bin",
-                os.environ.get("PROGRAMME_RECORD_BIN", ""),
-            ],
-            log=log,
-            dry_run=False,
-        )
+        code = publish_member(key, number, receipt_snapshot, log)
         if code != 0:
             member["publish_exit"] = code
         # The publisher writes documents too; the receipt must see them.
