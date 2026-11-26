@@ -3222,6 +3222,98 @@ pub async fn insert_benefit_measurement_tx(
     Ok(row)
 }
 
+/// True when a baseline carries the five measurement fields SPEC_V2 §8.3 requires: value, unit,
+/// when it was taken, how, and the evidence behind it. A baseline missing any of them is a
+/// declaration, not a measurement.
+fn benefit_baseline_complete(baseline: Option<&Value>) -> bool {
+    let Some(Value::Object(fields)) = baseline else {
+        return false;
+    };
+    ["value", "unit", "measured_at", "method", "evidence"]
+        .iter()
+        .all(|key| match fields.get(*key) {
+            None | Some(Value::Null) => false,
+            Some(Value::String(text)) => !text.trim().is_empty(),
+            Some(Value::Object(map)) => !map.is_empty(),
+            Some(Value::Array(items)) => !items.is_empty(),
+            Some(_) => true,
+        })
+}
+
+/// The reading re-records the recorded baseline: same value and unit. A different value or unit
+/// is a re-baseline, which an approved profile changes only through an approved change request.
+fn benefit_reading_agrees(baseline: Option<&Value>, record: &BenefitMeasurementRecord) -> bool {
+    let Some(Value::Object(fields)) = baseline else {
+        return false;
+    };
+    let value = fields.get("value").and_then(Value::as_f64);
+    let unit = fields.get("unit").and_then(Value::as_str).map(str::trim);
+    value == record.actual_value && unit == Some(record.unit.trim())
+}
+
+/// The measured reading, merged over the declared fields a profile carries beside it (a
+/// definition, a KPI list), so the measurement record keeps both.
+fn benefit_baseline_merged(baseline: Option<&Value>, record: &BenefitMeasurementRecord) -> Value {
+    let mut fields = match baseline {
+        Some(Value::Object(existing)) => existing.clone(),
+        _ => serde_json::Map::new(),
+    };
+    fields.insert("value".to_owned(), serde_json::json!(record.actual_value));
+    fields.insert("unit".to_owned(), Value::String(record.unit.clone()));
+    fields.insert(
+        "measured_at".to_owned(),
+        Value::String(record.measured_at.to_rfc3339()),
+    );
+    fields.insert("method".to_owned(), Value::String(record.method.clone()));
+    fields.insert("evidence".to_owned(), record.evidence.clone());
+    Value::Object(fields)
+}
+
+/// Apply a baseline reading to the profile it belongs to (SPEC_V2 §8.3: the benefit profile is
+/// the measurement record).
+///
+/// The reading row and the profile are written in one transaction, so `benefits.get` and the
+/// published snapshot carry the measurement rather than a declaration beside it. Completeness is
+/// the change-control boundary: an incomplete baseline is completed by the measurement; a
+/// complete one on an approved profile changes only through an approved change request.
+pub async fn record_measured_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    record: &BenefitMeasurementRecord,
+) -> Result<(), PlanStoreError> {
+    let current = get_benefit_tx(&mut *conn, tenant, benefit_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "benefit profile",
+        })?;
+    let approved =
+        current.status != "draft" || benefit_is_approved_tx(&mut *conn, tenant, benefit_id).await?;
+    if approved
+        && benefit_baseline_complete(current.baseline.as_ref())
+        && !benefit_reading_agrees(current.baseline.as_ref(), record)
+    {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitChangeRequired));
+    }
+    let baseline = benefit_baseline_merged(current.baseline.as_ref(), record);
+    let updated = sqlx::query(
+        "UPDATE benefit_profile
+            SET baseline = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .bind(baseline)
+    .execute(&mut *conn)
+    .await?;
+    if updated.rows_affected() == 0 {
+        return Err(PlanStoreError::NotFound {
+            what: "benefit profile",
+        });
+    }
+    Ok(())
+}
+
 /// List a benefit's measurements, newest reading first.
 pub async fn list_benefit_measurements_tx(
     conn: &mut PgConnection,

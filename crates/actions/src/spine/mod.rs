@@ -2947,6 +2947,7 @@ async fn benefits_measure(
             "kind must be baseline, interim or post",
         ));
     }
+    let benefit_id = input.benefit_id;
     let record = store::spine::insert_benefit_measurement_tx(
         &mut *tx,
         ctx.tenant,
@@ -2964,6 +2965,21 @@ async fn benefits_measure(
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
+    // §8.3: the profile is the measurement record, so a baseline reading writes both the reading
+    // and the profile, in this transaction. A baseline with no evidence is a slot, not a
+    // measurement; an approved profile's complete baseline changes only through a change request.
+    if record.kind == "baseline" {
+        if !conveyor_domain::spine::evidence_present(&record.evidence) {
+            return Err(invalid(
+                "evidence",
+                "benefit_measurement_evidence_missing",
+                "a baseline reading must carry the evidence behind it",
+            ));
+        }
+        store::spine::record_measured_baseline_tx(&mut *tx, ctx.tenant, benefit_id, &record)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    }
     emit_spine_event(&mut *tx, &ctx, "benefit_measurement", record.id, "created").await?;
     Ok(HandlerOutput::created(benefit_measurement_out(&record)))
 }

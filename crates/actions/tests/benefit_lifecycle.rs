@@ -137,6 +137,13 @@ async fn get_benefit(running: &support::Running, id: &str) -> Value {
     output(&body).clone()
 }
 
+/// The profile's current `If-Match` value. A baseline measurement writes the profile's
+/// measurement record, so a test that measures before an update must re-read the row it is
+/// about to change — the version it saw at creation is stale by then.
+async fn current_etag(running: &support::Running, id: &str) -> String {
+    format!("\"{}\"", get_benefit(running, id).await["version"])
+}
+
 /// `benefits.measure` — one reading of the benefit: the baseline or the post-transition value.
 async fn measure(
     running: &support::Running,
@@ -281,7 +288,7 @@ async fn a_draft_profile_is_editable() {
                 "measurement_method": "monthly",
                 "benefit_owner_job_id": owner,
             }),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -315,7 +322,7 @@ async fn an_approved_profile_needs_a_change_request() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "baseline": {"value": 12}}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -354,7 +361,7 @@ async fn a_benefit_profile_gate_approval_also_protects_the_measurement() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "baseline": {"value": 12}}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -392,7 +399,7 @@ async fn a_change_request_advances_the_profile() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "baseline": {"value": 12}, "change_id": change}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -428,7 +435,7 @@ async fn a_retired_profile_leaves_the_map() {
             "benefits.retire",
             TOKEN,
             json!({"id": benefit, "reason": "superseded by BEN-02"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -477,7 +484,7 @@ async fn a_profile_in_transition_cannot_retire() {
             "benefits.retire",
             TOKEN,
             json!({"id": benefit, "reason": "superseded"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -496,7 +503,7 @@ async fn a_profile_in_transition_cannot_retire() {
             "benefits.retire",
             TOKEN,
             json!({"id": benefit, "reason": "superseded"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -522,7 +529,7 @@ async fn a_realized_status_needs_a_complete_transition() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -554,7 +561,7 @@ async fn a_realized_status_needs_a_complete_transition() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -575,7 +582,7 @@ async fn a_realized_status_needs_a_complete_transition() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -593,12 +600,16 @@ async fn a_realized_status_needs_a_complete_transition() {
     let (status, body) = measure(&running, &benefit, "post", "2026-11-19T00:00:00Z", None).await;
     assert_eq!(status, 201, "{body}");
 
+    let before_refusal = get_benefit(&running, &benefit).await["version"]
+        .as_i64()
+        .expect("a version");
+    let etag = format!("\"{before_refusal}\"");
     let (status, body) = running
         .invoke(
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(etag.as_str()),
             None,
             None,
         )
@@ -613,7 +624,11 @@ async fn a_realized_status_needs_a_complete_transition() {
     );
     let unchanged = get_benefit(&running, &benefit).await;
     assert_eq!(unchanged["status"], "active", "{unchanged}");
-    assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
+    assert_eq!(
+        unchanged["version"].as_i64(),
+        Some(before_refusal),
+        "the refusal wrote a row: {unchanged}"
+    );
 
     // A post reading taken after the enactment realises the benefit.
     let (status, body) = measure(&running, &benefit, "post", "2026-11-21T00:00:00Z", None).await;
@@ -623,7 +638,7 @@ async fn a_realized_status_needs_a_complete_transition() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -660,7 +675,7 @@ async fn a_realized_status_is_refused_on_timestamps_alone() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -753,38 +768,35 @@ async fn a_realized_status_needs_evidence_behind_the_readings() {
         .await;
     assert_eq!(status, 200, "{body}");
 
-    // Both readings are measured values but carry no evidence.
-    for (kind, measured_at) in [
-        ("baseline", "2026-11-01T00:00:00Z"),
-        ("post", "2026-11-21T00:00:00Z"),
-    ] {
-        let (status, body) = running
-            .invoke(
-                "benefits.measure",
-                TOKEN,
-                json!({
-                    "benefit_id": benefit,
-                    "kind": kind,
-                    "target_value": 8.0,
-                    "actual_value": if kind == "baseline" { 14.0 } else { 9.0 },
-                    "unit": "hours",
-                    "method": "median of the weekly run timestamps",
-                    "measured_at": measured_at,
-                }),
-                None,
-                None,
-                None,
-            )
-            .await;
-        assert_eq!(status, 201, "{body}");
-    }
+    // The baseline is the profile's measurement record, so it carries its evidence from the
+    // start; the post reading is taken without evidence to prove the realization claim refuses it.
+    measure(&running, &benefit, "baseline", "2026-11-01T00:00:00Z", None).await;
+    let (status, body) = running
+        .invoke(
+            "benefits.measure",
+            TOKEN,
+            json!({
+                "benefit_id": benefit,
+                "kind": "post",
+                "target_value": 8.0,
+                "actual_value": 9.0,
+                "unit": "hours",
+                "method": "median of the weekly run timestamps",
+                "measured_at": "2026-11-21T00:00:00Z",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
 
     let (status, body) = running
         .invoke(
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -804,7 +816,7 @@ async fn a_realized_status_needs_evidence_behind_the_readings() {
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(current_etag(&running, &benefit).await.as_str()),
             None,
             None,
         )
@@ -1027,4 +1039,133 @@ async fn a_placeholder_baseline_is_refused() {
     );
     let detail = text(&body["errors"][0], "detail");
     assert!(detail.contains("baseline"), "{body}");
+}
+
+/// SPEC_V2 §8.3 — the profile is the measurement record. A baseline reading writes the profile's
+/// baseline with its value, unit, date, method and evidence, completing an incomplete record.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_baseline_reading_completes_the_profile_record() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Baseline record programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+
+    let (status, body) =
+        measure(&running, &benefit, "baseline", "2026-11-02T00:00:00Z", None).await;
+    assert_eq!(status, 201, "{body}");
+
+    let profile = get_benefit(&running, &benefit).await;
+    let baseline = &profile["baseline"];
+    assert_eq!(baseline["value"], 14.0, "{profile}");
+    assert_eq!(baseline["unit"], "hours", "{profile}");
+    assert_eq!(
+        baseline["measured_at"], "2026-11-02T00:00:00+00:00",
+        "{profile}"
+    );
+    assert_eq!(
+        baseline["method"], "median of the weekly run timestamps",
+        "{profile}"
+    );
+    assert_eq!(baseline["evidence"]["ref"], "baseline-reading", "{profile}");
+}
+
+/// SPEC_V2 §8.3 — a baseline with no evidence is a slot, not a measurement: the reading is
+/// refused and the transaction stores nothing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_baseline_reading_without_evidence_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Evidence-free baseline programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+
+    let (status, body) = running
+        .invoke(
+            "benefits.measure",
+            TOKEN,
+            json!({
+                "benefit_id": benefit,
+                "kind": "baseline",
+                "target_value": 8.0,
+                "actual_value": 14.0,
+                "unit": "hours",
+                "method": "median of the weekly run timestamps",
+                "measured_at": "2026-11-02T00:00:00Z",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_measurement_evidence_missing",
+        "{body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({"benefit_id": benefit}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        output(&body)["items"].as_array().is_some_and(Vec::is_empty),
+        "a refused baseline reading must not be stored: {body}"
+    );
+}
+
+/// SPEC_V2 §8.3 — a complete baseline on an approved profile is protected: re-recording the same
+/// reading is allowed, a different value is a re-baseline and needs an approved change request.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_complete_baseline_changes_only_through_a_change() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Protected baseline programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+
+    let (status, body) =
+        measure(&running, &benefit, "baseline", "2026-11-02T00:00:00Z", None).await;
+    assert_eq!(
+        status, 201,
+        "completing an incomplete baseline is allowed: {body}"
+    );
+    let (status, body) =
+        measure(&running, &benefit, "baseline", "2026-11-03T00:00:00Z", None).await;
+    assert_eq!(
+        status, 201,
+        "re-recording the same reading is allowed: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "benefits.measure",
+            TOKEN,
+            json!({
+                "benefit_id": benefit,
+                "kind": "baseline",
+                "target_value": 8.0,
+                "actual_value": 12.0,
+                "unit": "hours",
+                "method": "median of the weekly run timestamps",
+                "measured_at": "2026-11-04T00:00:00Z",
+                "evidence": {"ref": "re-baseline"},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "benefit_change_required", "{body}");
+
+    let profile = get_benefit(&running, &benefit).await;
+    assert_eq!(
+        profile["baseline"]["value"], 14.0,
+        "the protected baseline is unchanged: {profile}"
+    );
 }
