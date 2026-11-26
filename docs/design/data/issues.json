@@ -1,11 +1,264 @@
 {
   "issues": [
     {
+      "number": 792,
+      "title": "GEMBA-WALK inception \u2014 register the programme project and publish the MSP/TOGAF/SAFe set",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/792",
+      "updatedAt": "2026-11-26T21:57:40Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 791,
+      "title": "skills: add the authoring, build, architecture, procedural and analysis role playbooks; harden the six",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/791",
+      "updatedAt": "2026-11-26T22:01:03Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 789,
+      "title": "ci: run design-pack on merge_group so it can be a required check",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/789",
+      "updatedAt": "2026-11-26T22:01:01Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 788,
+      "title": "estate: the conveyor-bundle-minter client and the lean4-prover licence app (#776 P3)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/788",
+      "updatedAt": "2026-11-26T21:42:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 787,
+      "title": "prover: a failing lean4.check returns no diagnostics because only stderr is parsed",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/787",
+      "updatedAt": "2026-11-26T21:42:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 784,
+      "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/784",
+      "updatedAt": "2026-11-26T21:40:57Z",
+      "labels": [
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 783,
+      "title": "design: conformance and standards as row-derived sections",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/783",
+      "updatedAt": "2026-11-26T21:38:39Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 782,
+      "title": "design: the unit record on the public site, and the retirement of the superseded Python",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/782",
+      "updatedAt": "2026-11-26T21:38:25Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 781,
+      "title": "skills: the delivery actor \u2014 delivery-unit, programme-sync, and the six roles on the action route",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/781",
+      "updatedAt": "2026-11-26T21:59:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 780,
+      "title": "github: the intent channel \u2014 issue form, DoR on events, sub-issues and tranche milestones",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/780",
+      "updatedAt": "2026-11-26T21:39:07Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 779,
+      "title": "programme: the unit record \u2014 charter, list and close a delivery unit as a row",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/779",
+      "updatedAt": "2026-11-26T21:59:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 778,
+      "title": "T13 \u2014 a missing operation opens a tool request; publish rebinds the step",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/778",
+      "updatedAt": "2026-11-26T21:59:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T13",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 776,
+      "title": "add: the mint path uses a dedicated minter credential, and refuses without one",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/776",
+      "updatedAt": "2026-11-26T21:41:56Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 773,
       "title": "publish: republish the standards record and register after the delivery-contract filter",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/773",
-      "updatedAt": "2026-11-26T21:10:48Z",
+      "updatedAt": "2026-11-26T21:40:50Z",
       "labels": [
         {
           "name": "unit",
@@ -44,18 +297,18 @@
     },
     {
       "number": 762,
-      "title": "proof: the live delivery drills on the released engine, and the mint path that blocks them",
+      "title": "proof: the live delivery drills on the released engine",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/762",
-      "updatedAt": "2026-11-26T15:57:47Z",
+      "updatedAt": "2026-11-26T21:25:36Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:needs-human",
-          "color": "5319E7"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T1",
@@ -106,7 +359,7 @@
       "title": "programme: the retrospective tranche reviews \u2014 close tranches 3\u201312 and authorise tranches 4\u201313",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/755",
-      "updatedAt": "2026-11-26T13:24:31Z",
+      "updatedAt": "2026-11-26T21:38:57Z",
       "labels": [
         {
           "name": "unit",
@@ -1755,7 +2008,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T16:23:53Z",
+      "updatedAt": "2026-11-26T21:38:44Z",
       "labels": [
         {
           "name": "unit",
@@ -5164,9 +5417,9 @@
     {
       "number": 88,
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-25T07:20:21Z",
+      "updatedAt": "2026-11-26T21:37:08Z",
       "labels": [
         {
           "name": "unit",
