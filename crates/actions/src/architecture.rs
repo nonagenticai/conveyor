@@ -388,6 +388,10 @@ async fn architecture_artifacts_create(
 pub struct ArtifactUpdateIn {
     /// The artefact.
     pub id: Uuid,
+    /// The standard type that binds the row to its catalogue key. A v1 row may carry none;
+    /// a rework binds it here so the phase and close gates can resolve the row.
+    #[serde(default)]
+    pub artifact_type_id: Option<Uuid>,
     /// Title.
     #[serde(default)]
     pub title: Option<String>,
@@ -452,6 +456,7 @@ async fn architecture_artifacts_update(
     });
     let patch = store::architecture::ArtifactPatch {
         title: input.title,
+        artifact_type_id: input.artifact_type_id,
         change_initiative: input.change_initiative,
         purpose: input.purpose,
         stakeholders: input.stakeholders,

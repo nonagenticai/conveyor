@@ -498,6 +498,9 @@ pub struct NewArtifact {
 pub struct ArtifactPatch {
     /// Title.
     pub title: Option<String>,
+    /// The standard type that binds the row to its catalogue key. A v1 row may carry none;
+    /// a rework binds it here, and the phase and close gates resolve the row by this binding.
+    pub artifact_type_id: Option<Uuid>,
     /// The related change initiative.
     pub change_initiative: Option<String>,
     /// Why it exists.
@@ -895,6 +898,7 @@ pub async fn update_artifact_tx(
     let sql = format!(
         "UPDATE architecture_artifact SET
             title = coalesce($4, title),
+            artifact_type_id = coalesce($12, artifact_type_id),
             change_initiative = coalesce($5, change_initiative),
             purpose = coalesce($6, purpose),
             stakeholders = coalesce($7, stakeholders),
@@ -918,6 +922,7 @@ pub async fn update_artifact_tx(
         .bind(patch.document_id)
         .bind(patch.contract_id)
         .bind(&patch.meta)
+        .bind(patch.artifact_type_id)
         .fetch_optional(&mut *conn)
         .await?;
     let record = record.ok_or(ArchitectureStoreError::Stale("architecture artefact"))?;

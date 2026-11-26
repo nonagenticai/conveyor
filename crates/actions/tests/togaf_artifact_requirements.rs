@@ -103,3 +103,42 @@ async fn an_artefact_without_its_type_is_refused() {
         "a refused create wrote an artefact row"
     );
 }
+
+/// The repair path: a draft artefact's standard type can be set by update. A v1 row carries no
+/// type binding, so the rework supersedes it and binds the type here — the phase and close gates
+/// resolve the row by it, and without it an existing row reads as missing (measured on S00,
+/// 2026-11-26: the close gate named every re-versioned artefact missing).
+#[tokio::test]
+async fn an_artefact_can_be_bound_to_its_type_by_update() {
+    let f = arch::fixture().await;
+    arch::tailor(&f, json!({}), json!({})).await;
+    let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Type binding").await;
+    let first = arch::type_id(&f.running, "principles_catalog").await;
+    let second = arch::type_id(&f.running, "stakeholder_map").await;
+
+    let created = arch::artifact(
+        &f.running,
+        "preliminary",
+        "psa",
+        "principles_catalog",
+        "Unbound principles",
+        json!({
+            "project_id": project,
+            "artifact_type_id": first,
+        }),
+    )
+    .await;
+    let id = arch::id_of(&created);
+    let version = created["version"].as_i64().expect("a version");
+    let etag = format!("\"{version}\"");
+
+    let (status, updated) = arch::call(
+        &f.running,
+        "architecture.artifacts_update",
+        json!({ "id": id, "artifact_type_id": second }),
+        Some(etag.as_str()),
+    )
+    .await;
+    assert_eq!(status, 200, "{updated}");
+    assert_eq!(updated["artifact_type_id"], second, "{updated}");
+}

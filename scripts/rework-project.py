@@ -601,7 +601,16 @@ class Runner:
                 row = titles[artefact["title"]]
                 meta = dict(row.get("meta") or {})
                 document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
-                needs_key = meta.get("artifact_key") != key
+                # The close and phase gates resolve an approved artefact by its standard type,
+                # not by `meta.artifact_key` (measured on S00, 2026-11-26: a re-versioned row
+                # carried the meta key but no type, so `projects.close` named every artefact
+                # missing while the row existed). Both bindings must hold before a row counts as
+                # present; otherwise the repair re-versions it and sets the type below.
+                expected_type = standard.get(key)
+                needs_key = (
+                    meta.get("artifact_key") != key
+                    or str(row.get("artifact_type_id") or "") != str(expected_type or "")
+                )
                 # A supersede copies the row but not its entries: a re-versioned artefact whose
                 # pack carries entries and whose row has none is repaired in place (measured on
                 # T9's seven artefacts, 2026-11-25: every Entries section resolved to zero).
@@ -636,6 +645,7 @@ class Runner:
                     "architecture.artifacts_update",
                     {
                         "id": draft["id"],
+                        "artifact_type_id": expected_type,
                         "meta": meta,
                         "document_id": document_id,
                         "entries": artefact.get("entries") or [],
