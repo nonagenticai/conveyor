@@ -43,18 +43,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   22 architecture.artifacts_link ok
   23 architecture.artifacts_link ok
   24 architecture.artifacts_link ok
-  25 documents.compose ok
-  26 documents.publish ok
-  document benefits-diagram: published
-  27 documents.compose ok
-  28 documents.publish ok
-  document candidate-solutions: published
-  29 documents.compose ok
-  30 documents.publish ok
-  document project-context-diagram: published
-  31 documents.compose ok
-  32 documents.publish ok
-  document gap-analysis: published
+  document benefits-diagram: already present
+  document candidate-solutions: already present
+  document project-context-diagram: already present
+  document gap-analysis: already present
   delivery contract: already live
   register risk: The live public window is narrower than the committed pack already present
   register risk: The 2026-11-25 acceptance record is red on the mandatory artefact standard already present
@@ -69,13 +61,277 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  33 cadences.credit_demo ok
+  25 cadences.credit_demo ok
   baseline approval: none pending
   change control: 2 change row(s) present
   closure gate: already approved
   destructive gate: already approved
 
-rework: projects.close refused at act 34: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, project-registers)
+rework: projects.close refused at act 26: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, project-registers)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project DESIGN-PUBLISH --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-DESIGN-PUBLISH-snap-r9nnthcv/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-DESIGN-PUBLISH-snap-r9nnthcv/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-registers",
+      "document_id": "01a216f0-a067-778b-b3d1-e0a769d1cb7b",
+      "natural_key": "artefact:DESIGN-PUBLISH:project-registers:85067ff7e2c655e6",
+      "body_sha256": "85067ff7e2c655e646a2272a57b37739f57391bcd61b568e1a1ea217534cfbc2"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Document' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 7,
+    "present": 3,
+    "missing-edge": 0,
+    "stale": 8,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project DESIGN-PUBLISH --content docs/evidence/rework/tranche-0/rework-content-DESIGN-PUBLISH.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Driver / Goal / Objective Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Data Entity / Data Component Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Matrix — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Benefits Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Implementation and Migration Plan Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Request Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Register — DESIGN-PUBLISH (retrospective, 2026-11-26) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  11 architecture.artifacts_link ok
+  12 architecture.artifacts_link ok
+  13 architecture.artifacts_link ok
+  14 architecture.artifacts_link ok
+  15 architecture.artifacts_link ok
+  16 architecture.artifacts_link ok
+  17 architecture.artifacts_link ok
+  18 architecture.artifacts_link ok
+  19 architecture.artifacts_link ok
+  20 architecture.artifacts_link ok
+  21 architecture.artifacts_link ok
+  22 architecture.artifacts_link ok
+  23 architecture.artifacts_link ok
+  24 architecture.artifacts_link ok
+  document benefits-diagram: already present
+  document candidate-solutions: already present
+  document project-context-diagram: already present
+  document gap-analysis: already present
+  delivery contract: already live
+  register risk: The live public window is narrower than the committed pack already present
+  register risk: The 2026-11-25 acceptance record is red on the mandatory artefact standard already present
+  register issue: Four mandatory packages remain unresolved P0/P1 at the 2026-11-25 record already present
+  register assumption: The republish from live rows restores the public window already present
+  register dependency: The live window depends on U7's republish already present
+  register benefit: Public collaboration: the studio design is publicly readable already present
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  25 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 26: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact)
 FAILED: projects.close: transport exited 1
 
 [exit 1]

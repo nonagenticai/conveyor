@@ -1,20 +1,20 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T08:19:18+00:00",
+  "generated_at": "2026-11-26T08:20:07+00:00",
   "green": 0,
   "members": [
     {
       "factory_exit": 1,
       "gaps": [
         {
-          "detail": "rework: projects.close refused at act 34: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, project-registers)",
+          "detail": "rework: projects.close refused at act 26: error: projects.close refused (409): project DESIGN-PUBLISH cannot close until its mandatory artefacts exist (missing: architecture-artifact, project-registers)",
           "gap": "instrument",
           "id": null
         }
       ],
       "key": "DESIGN-PUBLISH",
       "log": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH.log",
-      "publish_exit": null,
+      "publish_exit": 1,
       "state": "BLOCKED"
     }
   ],
