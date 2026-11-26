@@ -54,12 +54,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   document project-context-diagram: already present
   document benefits-diagram: already present
   document architecture-artifact: already present
-  29 documents.compose ok
-  30 documents.publish ok
-  document safe-art: published
-  31 documents.compose ok
-  32 documents.publish ok
-  document inspect-adapt: published
+  document safe-art: already present
+  document inspect-adapt: already present
   delivery contract: already live
   register risk: The platform's dependency on a single CI node is a single point of failure for every tranche already present
   register risk: The standby has not been promoted in a drill, so the recovery path is documented but unproven already present
@@ -74,19 +70,19 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   governed asset Solution intent: already present
   programme shared_config: already set
   benefit transition B1: already present
-  33 benefits.transition_upsert ok
+  29 benefits.transition_upsert ok
   benefit transition B2: already present
-  34 benefits.transition_upsert ok
+  30 benefits.transition_upsert ok
   benefit transition B3: already present
-  35 benefits.transition_upsert ok
+  31 benefits.transition_upsert ok
   benefit transition B4: already present
-  36 benefits.transition_upsert ok
+  32 benefits.transition_upsert ok
   benefit transition B5: already present
-  37 benefits.transition_upsert ok
+  33 benefits.transition_upsert ok
   benefit transition B6: already present
-  38 benefits.transition_upsert ok
+  34 benefits.transition_upsert ok
   benefit transition B7: already present
-  39 benefits.transition_upsert ok
+  35 benefits.transition_upsert ok
   baseline: already taken
   schedule baseline: already taken
   cost baseline: already taken
@@ -94,28 +90,40 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  40 cadences.credit_demo ok
+  36 cadences.credit_demo ok
   baseline approval: none pending
   change control: 3 change row(s) present
-  41 registers.update ok
-  42 registers.update ok
-  43 registers.update ok
-  44 registers.update ok
+  37 registers.update ok
+  38 registers.update ok
+  39 registers.update ok
+  40 registers.update ok
+  41 wbs.update ok
+  42 wbs.update ok
+  43 wbs.update ok
+  44 wbs.update ok
   45 wbs.update ok
-  46 wbs.update ok
-  47 wbs.update ok
-  48 wbs.update ok
-  49 wbs.update ok
-  50 tranches.update ok
-  51 programme_lessons.propose ok
-  card discharge: 0 card(s) cleared of 513 open package(s)
+  46 tranches.update ok
+  lesson L-PLATFORM-1: already present
+  47 approvals.request ok
+  48 approvals.decide ok
+  49 cards.comment ok
+  50 cards.move ok
+  51 cards.move ok
+  card cleared: v1-p112-1:PLATFORM
+  52 approvals.request ok
+  53 approvals.decide ok
+  54 cards.comment ok
+  55 cards.move ok
+  56 cards.move ok
+  card cleared: v1-w3b-2:PLATFORM
+  card discharge: 2 card(s) cleared of 496 open package(s)
   closure: not applicable (the project stays active)
-PLATFORM: 51 acts recorded
+PLATFORM: 56 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-4a6iiur3/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-4a6iiur3/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-ux865wem/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-ux865wem/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",

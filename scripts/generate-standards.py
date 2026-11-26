@@ -1705,7 +1705,13 @@ def build_instances(
                         heading, template, category, subject, snapshot, outputs_dir,
                         programme_projects, register=register,
                     )
-                    section["required"] = True
+                    # A heading whose only sources are declared optional is optional, whatever
+                    # the template's `required` list says: a waiver log with no waiver, or a
+                    # governance log with no review, is the honest absence the source names.
+                    sources = (template.get("sources") or {}).get(heading) or []
+                    section["required"] = not (
+                        sources and all(source.get("optional") for source in sources)
+                    )
                     sections.append(section)
                 for heading in template.get("optional") or []:
                     if heading in (template.get("sources") or {}) and not section_not_applicable(

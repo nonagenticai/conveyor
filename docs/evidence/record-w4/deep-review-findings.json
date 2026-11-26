@@ -116,7 +116,12 @@
       "title": "The portfolio canvas states 48 projects while its own status counts sum to 47",
       "evidence": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
       "acceptance": "Every count on the canvas is derived from the same rows and sums exactly (archived included in the total and in its own status bucket), and the section names its source; a unit test asserts the sum equals the total for a fixture with an archived project.",
-      "artifact": "seed/output-standard.json#safe-portfolio"
+      "artifact": "seed/output-standard.json#safe-portfolio",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-safe-portfolio.json",
+        "evidence": "the canvas now names 48 projects as 26 closed + 21 active + 1 archived, sums that equal the total, and names programme.json#/projects as the source; the count table carries the archived bucket."
+      }
     },
     {
       "key": "w4-prog-refined-vision-count",
@@ -126,7 +131,12 @@
       "title": "The refined vision claims fifteen distinct baseline references from fourteen distinct ids",
       "evidence": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
       "acceptance": "The section's distinct-reference count is computed over distinct ids and equals the distinct set it lists; a unit test asserts the count for a fixture with repeated ids.",
-      "artifact": "seed/output-standard.json#refined-vision"
+      "artifact": "seed/output-standard.json#refined-vision",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-refined-vision.json",
+        "evidence": "the refined vision now states fourteen distinct baseline references, the distinct-id count of its 17 rows (the rows repeat 01a20279, 01a1fdd8 and 01a1fbb1); the re-read body's count equals its distinct ids."
+      }
     },
     {
       "key": "w4-prog-safe-cadence-pi",
@@ -136,7 +146,12 @@
       "title": "The safe cadence's PI plan covers five tranches of fourteen",
       "evidence": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
       "acceptance": "The cadence record carries one PI interval per authorised/planned tranche, or the section states the intervals it actually has and why the rest are absent; the body's count equals its rows.",
-      "artifact": "seed/output-standard.json#safe-cadence"
+      "artifact": "seed/output-standard.json#safe-cadence",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "docs/evidence/record/inputs/programme/compose-safe-cadence.json",
+        "evidence": "the cadence body now states the five intervals it has (tranches 0–4, one per materialised tranche) and why tranches 5–13 have none yet (no cadence row until the tranche is authorised); each section's stated count equals its rows."
+      }
     },
     {
       "key": "w4-prog-safe-art-intent",
@@ -161,7 +176,12 @@
       "title": "A retired test row 'schema probe — delete me' is published across baselines and change-control sections",
       "evidence": "A frozen baseline publishes a register row titled 'schema probe — delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
       "acceptance": "The probe row is retired from the live record (or replaced by a real row with a code); no published baseline or change-control body contains the probe title; a read-time query refuses a published register row whose code is empty.",
-      "artifact": "seed/output-standard.json#project-baseline"
+      "artifact": "seed/output-standard.json#project-baseline",
+      "resolved_by": {
+        "commit": "99f45bdae8ce0766d475099e67d911b1f9fb9b74",
+        "test": "scripts/compose-artefact-bodies.py",
+        "evidence": "the schema-probe row 01a1fbb0-8d6a-73c8-9d78-7024e80222b5 was cancelled through registers.update (act 37, 2026-11-26); the mandate and programme-strategies bodies were re-authored without the probe row; and the body composer now refuses a register row with an empty code (EMPTY_REGISTER_CODE, self-test PASS), so no composed body can admit one."
+      }
     },
     {
       "key": "w4-proj-baseline-scope-repeats",

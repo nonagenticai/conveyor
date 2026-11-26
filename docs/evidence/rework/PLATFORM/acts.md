@@ -11,3 +11,5 @@ credit and published its declared outputs (project-brief, evidence).
 PLATFORM: 601 acts in `transcript.jsonl`; the last run recorded 305.
 
 PLATFORM: 652 acts in `transcript.jsonl`; the last run recorded 51.
+
+PLATFORM: 708 acts in `transcript.jsonl`; the last run recorded 56.

@@ -350,6 +350,25 @@ def compose(
             if type(exc).__name__ == "GenerationError":
                 abort("GENERATION_ERROR", str(exc), heading=heading)
             raise
+        # A register row with an empty code is test data, not a published record. The schema
+        # probe reached a published body because nothing refused it; this is that refusal.
+        for entry in section.get("sources") or []:
+            pointer = str(entry.get("pointer") or "")
+            if str(entry.get("file") or "") != "msp.json" or "register" not in pointer:
+                continue
+            for row in entry.get("rows") or []:
+                if (
+                    isinstance(row, dict)
+                    and "code" in row
+                    and not str(row.get("code") or "").strip()
+                ):
+                    refuse(
+                        "EMPTY_REGISTER_CODE",
+                        f"required heading {heading!r} resolves a register row with an empty code",
+                        heading=heading,
+                        row_id=str(row.get("id") or ""),
+                        title=str(row.get("title") or ""),
+                    )
         for source in declared:
             if source.get("optional") or source.get("kind") == "absence":
                 continue
@@ -509,6 +528,23 @@ def self_test_compose(gen) -> None:
             assert exc.code == "NO_EVIDENCE", exc.code
         else:
             raise AssertionError("an all-absence body must refuse NO_EVIDENCE")
+        # A register row with an empty code is test data: the source that admitted the schema
+        # probe must refuse it. The mutant that deletes the guard dies here.
+        standard["templates"]["probe"]["sources"] = {
+            "Alpha": [{"kind": "rows", "file": "msp.json", "pointer": "/register_items",
+                       "match": {"kind": "issue"}}],
+            "Beta": [{"kind": "absence", "record": "beta", "fallback": True}],
+        }
+        snapshot["msp"]["register_items"][0]["code"] = ""
+        try:
+            compose(gen, standard, snapshot, root, "probe", "programme", "pg1")
+        except Refusal as exc:
+            assert exc.code == "EMPTY_REGISTER_CODE", exc.code
+        else:
+            raise AssertionError("a register row with an empty code must refuse")
+        snapshot["msp"]["register_items"][0]["code"] = "I-1"
+        summary = compose(gen, standard, snapshot, root, "probe", "programme", "pg1")
+        assert "One issue" in summary["body"], summary["body"]
         # A self-document heading is refused unless the template declares itself authored. The
         # fixture's d1 vision page carries `Purpose`, so the flagged template composes and the
         # unflagged one must refuse: the mutant that deletes the guard dies here.
