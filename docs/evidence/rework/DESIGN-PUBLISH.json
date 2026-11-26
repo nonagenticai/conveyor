@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "DESIGN-PUBLISH is closed",
-      "detail": "project DESIGN-PUBLISH is active",
+      "detail": "project DESIGN-PUBLISH is closed",
       "id": "DESIGN-PUBLISH-project",
       "kind": "snapshot",
       "result": "pass",
@@ -115,38 +115,34 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "2 mandatory artefact package(s) open: std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
+      "detail": "no open standard artefact package for this project",
       "id": "DESIGN-PUBLISH-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:DESIGN-PUBLISH (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "DESIGN-PUBLISH-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
+      "detail": "gate discharged by executable checks: DESIGN-PUBLISH-project, DESIGN-PUBLISH-baseline, DESIGN-PUBLISH-charter, DESIGN-PUBLISH-closure-outputs, DESIGN-PUBLISH-contract, DESIGN-PUBLISH-review, DESIGN-PUBLISH-closure-gate, DESIGN-PUBLISH-waivers, DESIGN-PUBLISH-pi-cadence, DESIGN-PUBLISH-wsjf, DESIGN-PUBLISH-demo-credits, DESIGN-PUBLISH-product, DESIGN-PUBLISH-artefact-standard, DESIGN-PUBLISH-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "DESIGN-PUBLISH-artefact-standard (P1): 2 mandatory artefact package(s) open: std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
-    "DESIGN-PUBLISH-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:DESIGN-PUBLISH (P1)",
-    "gate (P0): the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-26T08:22:33.285114+00:00",
+  "generated_at": "2026-11-26T08:44:57.048644+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
   "name": "Publish the SPEC_V2 studio design pack, live",
@@ -157,6 +153,6 @@
     "git_sha": "03d6c357863ea3455d188fb0f98c8acc5d308ac9",
     "path": "retained-snapshot/03d6c357863ea3455d188fb0f98c8acc5d308ac9"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

@@ -1,21 +1,15 @@
 {
-  "blocked": 1,
-  "generated_at": "2026-11-26T08:43:44+00:00",
-  "green": 0,
+  "blocked": 0,
+  "generated_at": "2026-11-26T08:44:57+00:00",
+  "green": 1,
   "members": [
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: cards.move refused at act 29: error: cards.move refused (412): cards.move replaces an existing row: If-Match (or `_version`) is required",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "DESIGN-PUBLISH",
       "log": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH.log",
-      "publish_exit": null,
-      "state": "BLOCKED"
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,

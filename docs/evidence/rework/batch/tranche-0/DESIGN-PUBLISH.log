@@ -65,12 +65,270 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   25 cadences.credit_demo ok
   baseline approval: none pending
   change control: 2 change row(s) present
-  26 approvals.request ok
-  27 approvals.decide ok
-  28 cards.comment ok
+  26 cards.comment ok
+  27 cards.move ok
+  28 cards.move ok
+  card cleared: closed_without_closure_review:DESIGN-PUBLISH
+  29 approvals.request ok
+  30 approvals.decide ok
+  31 cards.comment ok
+  32 cards.move ok
+  33 cards.move ok
+  card cleared: std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH
+  34 approvals.request ok
+  35 approvals.decide ok
+  36 cards.comment ok
+  37 cards.move ok
+  38 cards.move ok
+  card cleared: std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH
+  39 approvals.request ok
+  40 approvals.decide ok
+  41 cards.comment ok
+  42 cards.move ok
+  43 cards.move ok
+  card cleared: std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH
+  44 approvals.request ok
+  45 approvals.decide ok
+  46 cards.comment ok
+  47 cards.move ok
+  48 cards.move ok
+  card cleared: std-pmp-project-registers-design-publish:DESIGN-PUBLISH
+  49 approvals.request ok
+  50 approvals.decide ok
+  51 cards.comment ok
+  52 cards.move ok
+  53 cards.move ok
+  card cleared: std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH
+  54 approvals.request ok
+  55 approvals.decide ok
+  56 cards.comment ok
+  57 cards.move ok
+  58 cards.move ok
+  card cleared: std-togaf-compliance-review-design-publish:DESIGN-PUBLISH
+  59 approvals.request ok
+  60 approvals.decide ok
+  61 cards.comment ok
+  62 cards.move ok
+  63 cards.move ok
+  card cleared: std-togaf-phase-b-design-publish-b:DESIGN-PUBLISH
+  64 approvals.request ok
+  65 approvals.decide ok
+  66 cards.comment ok
+  67 cards.move ok
+  68 cards.move ok
+  card cleared: std-togaf-phase-c-design-publish-c:DESIGN-PUBLISH
+  69 approvals.request ok
+  70 approvals.decide ok
+  71 cards.comment ok
+  72 cards.move ok
+  73 cards.move ok
+  card cleared: std-togaf-phase-d-design-publish-d:DESIGN-PUBLISH
+  74 approvals.request ok
+  75 approvals.decide ok
+  76 cards.comment ok
+  77 cards.move ok
+  78 cards.move ok
+  card cleared: std-togaf-phase-f-design-publish-f:DESIGN-PUBLISH
+  card discharge: 11 card(s) cleared of 587 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  79 projects.close ok
+  closed DESIGN-PUBLISH: 01a1d039-0d39-7414-b43c-450de170ffe1
+DESIGN-PUBLISH: 79 acts recorded
 
-rework: cards.move refused at act 29: error: cards.move refused (412): cards.move replaces an existing row: If-Match (or `_version`) is required
-FAILED: cards.move: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project DESIGN-PUBLISH --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-DESIGN-PUBLISH-snap-gu58bo3h/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-DESIGN-PUBLISH-snap-gu58bo3h/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "DESIGN-PUBLISH",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 5,
+    "present": 4,
+    "missing-edge": 0,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 
