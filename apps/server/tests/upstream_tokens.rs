@@ -8,7 +8,9 @@ mod common;
 
 use conveyor_auth::LicenceSyncClient;
 use conveyor_domain::TenantId;
-use conveyor_server::admin::upstream_tokens::{TokenSource, UpstreamService, fill};
+use conveyor_server::admin::upstream_tokens::{
+    MINTER_NOT_CONFIGURED, TokenSource, UpstreamService, fill,
+};
 use conveyor_store as store;
 use serde_json::{Value, json};
 use uuid::Uuid;
@@ -237,6 +239,36 @@ async fn a_mint_for_an_unknown_app_fails() {
         .await
         .expect("count the secret rows");
     assert_eq!(rows, 0, "a failed mint writes nothing");
+}
+
+/// #776: a mint with no minter credential is refused, names the variable, and writes nothing.
+///
+/// The refusal has to happen before the HTTP call and before the row: falling back to the
+/// backend's credential would seal a token the licences service refuses at introspection, and
+/// the operator would believe the prover's credential works.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_mint_without_the_minter_credential_is_refused() {
+    init_env();
+    let db = common::TestDb::fresh().await;
+    let tenant = tenant(&db, "tok-no-minter").await;
+
+    let error = fill(
+        &db.super_pool,
+        None,
+        "tok-no-minter",
+        UpstreamService::Lean4,
+        TokenSource::Mint,
+    )
+    .await
+    .expect_err("a mint with no minter credential is refused");
+
+    assert_eq!(error, MINTER_NOT_CONFIGURED);
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM secret WHERE tenant_id = $1")
+        .bind(tenant)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count the secret rows");
+    assert_eq!(rows, 0, "a refused mint writes no secret row");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
