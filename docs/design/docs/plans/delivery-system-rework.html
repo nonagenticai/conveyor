@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The delivery system that uses the conveyor · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/delivery-system-rework.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-delivery-system-that-uses-the-conveyor">The delivery system that uses the conveyor</h1>
+<p><strong>Status:</strong> U1 of the delivery-system rework (#756); U2 is #753; U3 (the GitHub channel) is created when U1 merges.</p>
+<h2 id="why">Why</h2>
+<p>Three weeks of buildout produced most of the V2 slices, but the programme that builds the conveyor is not run on the conveyor. Progress lives in repo files and is reconstructed by Python; the roles that perform the gated acts have no executable form; the public record carries no provenance.</p>
+<p>Measured 2026-11-26 on <code>main@ba56759a</code>:</p>
+<ul>
+<li><code>scripts/</code> — 21 files, 9,794 lines. Twelve are pure file transforms or validators; nine are state machines that reach GitHub, the cluster or the network.</li>
+<li>The engine already exposes every action twice — <code>POST /api/actions/&lt;name&gt;/invocations</code> and <code>/mcp</code> — both licence- and scope-gated. Sessions bypass both, because there is no non-interactive bearer (measured: the pinned client is public with direct grants off; the service client is service-account-only).</li>
+<li>The design site is row-driven: <code>msp.json</code> shows 6 benefit profiles with <strong>0 transitions, 0 baselines and 0 register items</strong>; <code>architecture.json</code> shows 3 artefacts and 1 contract. Those zeros are the programme's real health.</li>
+<li>Output pages carry a generator meta tag only — no kind, hash, status, owner, gate or commit.</li>
+</ul>
+<h2 id="the-finding">The finding</h2>
+<p>The buildout authors progress as files and projects it <strong>into</strong> rows; SPEC_V2 §10.1 says the conveyor owns those rows. That inversion is what the Python estate pays for, and every recurring red is the same shape — two representations of one fact (seed vs rows, standards vs output pages, registry PR vs live issue list).</p>
+<h2 id="the-target-model--one-direction-per-channel">The target model — one direction per channel</h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Carries</th>
+<th>Never carries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conveyor rows</td>
+<td>every progress fact: artefact, register item, baseline, tranche review, benefit, gate</td>
+<td>derived copies</td>
+</tr>
+<tr>
+<td>Role skills</td>
+<td>the act: read the role's card → one decision → one action → read-back → close</td>
+<td>free-form work, verbal status</td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>intent: issue = claim, PR = code + CI evidence</td>
+<td>programme state</td>
+</tr>
+<tr>
+<td>Design site</td>
+<td>proof: rendered rows with provenance and drill-down</td>
+<td>hand-authored pages</td>
+</tr>
+</tbody>
+</table>
+<h2 id="units">Units</h2>
+<ul>
+<li><strong>U1 (#756)</strong> — render the record that already exists: a provenance block on every output page, and a per-project declared-vs-evidenced register. Deletes the dead half of <code>scripts/check-output-standard.py</code>.</li>
+<li><strong>U2 (#753, claimed elsewhere)</strong> — six programme delivery-role playbooks and role routing.</li>
+<li><strong>U3 (created when U1 merges)</strong> — the GitHub channel: issue form, contract check, sub-issues, tranche milestones, required checks, and one sync action replacing the registry commit-PR loop.</li>
+</ul>
+<h2 id="out-of-scope">Out of scope</h2>
+<p>The <code>apps/web</code> UI (T18 owns it; the site is the public record, the app is the working UI); Projects V2 (a second board); any change to the Rust action layer beyond the two named additions; the V1 S-slices.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li><strong>Register's "declared" side</strong> — the standard's categories are keyed by project class. If class → project type → tranche does not resolve from rows, the register ships per project type and the class rollup waits.</li>
+<li><strong>#526 overlap</strong> — shared files in the programme actions; U3 sequences after it.</li>
+<li><strong>Committed-pack removal (U3)</strong> — output pages stop being in git; the site's index becomes the provenance record. The homepage mirror must build from rows first.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/delivery-system-rework.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

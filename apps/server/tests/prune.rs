@@ -803,6 +803,17 @@ async fn the_worker_seeds_and_materialises_schedules_once() {
         .expect("seed defaults");
     assert_eq!(inserted, 2 * DEFAULT_SCHEDULES.len());
 
+    // The seed seats every row on its cron's next occurrence — a clock boundary. A run that
+    // straddles one makes the whole every-minute set due (the #637/#639 class, measured here at
+    // 00:35:00.36 on a merge queue) and swamps the single job this test is about. Park the set,
+    // then make exactly one row due; the subject stays the concurrent claim, not the cron
+    // arithmetic.
+    sqlx::query("UPDATE schedule SET next_run_at = now() + interval '1 day' WHERE tenant_id = $1")
+        .bind(a.as_uuid())
+        .execute(&db.super_pool)
+        .await
+        .expect("park every seeded schedule");
+
     sqlx::query(
         "UPDATE schedule SET next_run_at = now() - interval '1 second'
           WHERE tenant_id = $1 AND kind = 'event.prune'",
@@ -1190,6 +1201,13 @@ async fn s16_prunes_are_scheduled_and_delete_only_the_callers_tenant() {
     schedule::seed_defaults(&db.runtime)
         .await
         .expect("seed the default schedules");
+    // Same boundary hazard as `the_worker_seeds_and_materialises_schedules_once`: seat the set in
+    // the future so only the two kinds this test makes due can materialise.
+    sqlx::query("UPDATE schedule SET next_run_at = now() + interval '1 day' WHERE tenant_id = $1")
+        .bind(a.as_uuid())
+        .execute(&db.super_pool)
+        .await
+        .expect("park every seeded schedule");
 
     let seed_inference = |tenant: TenantId, age: i64| {
         let pool = db.super_pool.clone();

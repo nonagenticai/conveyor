@@ -103,11 +103,24 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         object.insert("issue_registry".to_owned(), args.issues.clone());
         object.insert("feedback".to_owned(), Value::Array(feedback));
     }
+    // The declared-vs-evidenced register, built from the same rows this view renders. The
+    // committed gap register is a checkout artefact; a pod without one reports the posture as
+    // absent rather than inventing zero gaps.
+    let register = crate::snapshot::with_header(
+        crate::register::build(
+            &data.programme,
+            &crate::register::from_records(&records),
+            crate::register::read_gaps(&std::env::current_dir()?).as_ref(),
+        ),
+        crate::snapshot::SCHEMA,
+        &generated_at,
+    );
     // The rework register is a commit-time artefact like the issue registry: it is carried into
     // the wrapper from `args`, and omitted from it when the image has no register.
     let snapshot_js = snapshot_js(
         &data,
         args.rework.as_ref(),
+        Some(&register),
         args.tenant_slug,
         args.feedback_url,
         &generated_at,
@@ -138,6 +151,7 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         &redacted_attachments,
         &names,
         &generated_at,
+        crate::outputs::rendered_commit().as_deref(),
     )?;
 
     Ok(SiteView {
