@@ -407,6 +407,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-start-agent-ready.md"
     },
     {
+      "title": "Live rollback across a migration boundary (2026-11-27, #669)",
+      "path": "docs/evidence/2026-11-27-rollback-migration-boundary.html",
+      "source": "docs/evidence/2026-11-27-rollback-migration-boundary.md",
+      "section": "Evidence",
+      "sha256": "88709897872fbc6b3908007cc50be15a82868a771624565a88a3e5129b188f23",
+      "bytes": 3770,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-27-rollback-migration-boundary.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",

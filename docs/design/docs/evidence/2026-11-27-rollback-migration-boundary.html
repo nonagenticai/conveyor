@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Live rollback across a migration boundary (2026-11-27, #669) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-27-rollback-migration-boundary.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="live-rollback-across-a-migration-boundary-2026-11-27-669">Live rollback across a migration boundary (2026-11-27, #669)</h1>
+<p>Issue #669. The rollback fix (#672, <code>a8c22f8e</code>) is proven live: a binary that embeds migrations through 0080 ran against a database that carries 0081, became Ready, and served — both digests and <code>/health</code> 200 at each step.</p>
+<h2 id="the-revisions">The revisions</h2>
+<table>
+<thead>
+<tr>
+<th>step</th>
+<th>image digest</th>
+<th><code>CONVEYOR_GIT_SHA</code></th>
+<th>migrations embedded</th>
+<th>schema applied</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>before</td>
+<td><code>sha256:f13dea55…0171c</code></td>
+<td><code>0096cc0da…</code></td>
+<td>0081</td>
+<td>81</td>
+</tr>
+<tr>
+<td>rolled back</td>
+<td><code>sha256:cbee6af8…4654</code></td>
+<td><code>949e95c8c…</code></td>
+<td>0080</td>
+<td>81</td>
+</tr>
+<tr>
+<td>after</td>
+<td><code>sha256:f13dea55…0171c</code></td>
+<td><code>0096cc0da…</code></td>
+<td>0081</td>
+<td>81</td>
+</tr>
+</tbody>
+</table>
+<p>The rolled-back image is a post-fix build (<code>949e95c8c</code> descends from <code>a8c22f8e</code>); a pre-fix image still fails closed by design — the tolerance is what the test exercises.</p>
+<h2 id="the-steps-utc-2026-11-27">The steps (UTC, 2026-11-27)</h2>
+<table>
+<thead>
+<tr>
+<th>time</th>
+<th>step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>22:29:59</td>
+<td>image-update automation suspended; <code>spec.suspend</code> read back <code>true</code></td>
+</tr>
+<tr>
+<td>22:30:31</td>
+<td>pin pushed (<code>5b39d1580b</code>): the five image lines — both Deployments — rewritten to the bare digest, the <code>$imagepolicy</code> setter removed so the automation cannot rewrite them</td>
+</tr>
+<tr>
+<td>22:30:44</td>
+<td>source and <code>services</code> kustomization reconciled to that revision</td>
+</tr>
+<tr>
+<td>22:31:24</td>
+<td>converged: two API pods and the worker Running and Ready on <code>cbee6af8…</code></td>
+</tr>
+<tr>
+<td>22:31:27</td>
+<td>deployments recorded; both binaries report <code>949e95c8c…</code>; <code>/health</code> 200, <code>/health/ready</code> 200</td>
+</tr>
+<tr>
+<td>22:32:0x</td>
+<td>a database-backed action (<code>benchmark_suites.list</code>) invoked through the deployed CLI on the old binary returned its rows; <code>select max(version) from _sqlx_migrations</code> = 81</td>
+</tr>
+<tr>
+<td>22:32:15</td>
+<td>revert pushed (<code>4733e66e39</code>); the image-update automation resumed (<code>spec.suspend</code> unset)</td>
+</tr>
+<tr>
+<td>22:32:44</td>
+<td>restored: all three pods on <code>f13dea55…</code>; both binaries report <code>0096cc0da…</code>; <code>/health</code> 200</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-run-proves">What the run proves</h2>
+<ul>
+<li><strong>The runtime migrator tolerates a newer applied schema.</strong> A 0080-max binary's <code>migrate</code> init container ran against schema 81, the pods became Ready, <code>/health</code> and <code>/health/ready</code> answered 200, and a database-backed action served. Before #672 the same state failed in the init container (<code>VersionMissing</code>), so the prior digest never served at all.</li>
+<li><strong>The rollback is durable against the image automation</strong> when the setter comment is removed, and the restore is a plain revert once the setter is back (the automation then owns the line again).</li>
+<li><strong>The service stayed available throughout</strong>: replicas 2 with <code>maxUnavailable: 0</code>, worker 1, a PDB; the window from suspend to restored-and-ready was 2 m 45 s, and no step served fewer API pods than the rolling update allows.</li>
+</ul>
+<h2 id="two-defects-in-the-sanctioned-rollback-script-found-en-route">Two defects in the sanctioned rollback script (found en route)</h2>
+<p><code>scripts/rollback-image.sh</code> (the deployment repository) could not be used as written:</p>
+<ul>
+<li>it matches the setter as <code>"$imagepolicy": "flux-system:&lt;name&gt;"</code> — with a space after the colon — while the conveyor manifest carries <code>{"$imagepolicy":"flux-system:conveyor"}</code> without one, so the script finds no target. The spaced form is the tree's majority (60 lines); conveyor's five lines are the unspaced form written by the image automation.</li>
+<li>its registry probe uses HTTP Basic auth; GHCR answers 401 (it requires the Bearer token exchange), so the script refuses any <code>ghcr.io</code> image before it reaches the rewrite.</li>
+</ul>
+<p>This run followed the script's procedure by hand — suspend, bare-digest pin with the setter removed, reconcile, verify, re-enrol — and the same pin and revert are the record above. The two defects are reported here, not fixed in this unit.</p>
+<h2 id="scope">Scope</h2>
+<p>No application code changed. The only shared-state changes were the temporary pin and its revert in the deployment repository (both named above), plus the suspension and resumption of the image-update automation.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-27-rollback-migration-boundary.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
