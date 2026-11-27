@@ -12,6 +12,8 @@ use support::{Pg, Running};
 
 fn game_config(pg: &Pg) -> conveyor_api::config::Config {
     let mut config = support::config(pg);
+    // The production operator client, so the per-host assertion is meaningful.
+    config.auth.oidc_client_id = "conveyor-web".to_owned();
     config.game_hosts = vec!["game.nonagentic.ai".to_owned()];
     config.auth.oidc_game_client_id = Some("conveyor-game".to_owned());
     config.game_public_url = Some("https://game.nonagentic.ai".to_owned());
@@ -54,35 +56,43 @@ async fn the_game_host_refuses_operator_surfaces_and_answers_its_own_client() {
         .await;
     assert_ne!(status, 404, "the operator host still routes /mcp");
 
-    // The legacy prefix is a 308 to configuration, with the query preserved.
-    let (status, headers, _) = running
-        .http_full(
-            reqwest::Method::GET,
-            "/walk/portfolio?x=1",
-            None,
-            &operator,
-            None,
-        )
-        .await;
+    // The legacy prefix is a 308 to configuration, with the query preserved. A client that
+    // follows redirects would land on the live game host and hide the response under test.
+    let (status, location) =
+        redirect(&running, "/walk/portfolio?x=1", "conveyor.nonagentic.ai").await;
     assert_eq!(status, 308);
     assert_eq!(
-        headers.get("location").expect("a Location"),
-        "https://game.nonagentic.ai/portfolio?x=1"
+        location.as_deref(),
+        Some("https://game.nonagentic.ai/portfolio?x=1")
     );
 
     // A hostile Host cannot move the redirect: it is configuration, not the request.
-    let (status, headers, _) = running
-        .http_full(
-            reqwest::Method::GET,
-            "/walk/portfolio",
-            None,
-            &[("host", "attacker.example")],
-            None,
-        )
-        .await;
+    let (status, location) = redirect(&running, "/walk/portfolio", "attacker.example").await;
     assert_eq!(status, 308);
     assert_eq!(
-        headers.get("location").expect("a Location"),
-        "https://game.nonagentic.ai/portfolio"
+        location.as_deref(),
+        Some("https://game.nonagentic.ai/portfolio")
     );
+}
+
+/// The status and `Location` of a request whose redirects are NOT followed.
+async fn redirect(running: &Running, path: &str, host: &str) -> (u16, Option<String>) {
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .expect("a no-redirect client");
+    let response = client
+        .get(format!("{}{}", running.base(), path))
+        .header("host", host)
+        .send()
+        .await
+        .expect("the request");
+    (
+        response.status().as_u16(),
+        response
+            .headers()
+            .get("location")
+            .and_then(|value| value.to_str().ok())
+            .map(str::to_owned),
+    )
 }

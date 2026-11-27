@@ -192,6 +192,24 @@ mod tests {
     }
 
     #[test]
+    fn the_game_client_is_explicit_and_never_defaulted() {
+        // No default: an unset game client leaves the azp allowlist at the operator client.
+        assert!(cfg(&[]).unwrap().oidc_game_client_id.is_none());
+        let c = cfg(&[("CONVEYOR_GAME_OIDC_CLIENT_ID", "conveyor-game")]).unwrap();
+        assert_eq!(c.oidc_game_client_id.as_deref(), Some("conveyor-game"));
+        // The operator client and the audience are untouched.
+        assert_eq!(c.oidc_client_id, "conveyor");
+        assert_eq!(c.oidc_audience, "conveyor");
+        // Empty counts as unset.
+        assert!(
+            cfg(&[("CONVEYOR_GAME_OIDC_CLIENT_ID", "  ")])
+                .unwrap()
+                .oidc_game_client_id
+                .is_none()
+        );
+    }
+
+    #[test]
     fn dev_auth_parses_and_empty_means_unset() {
         for v in ["1", "true", "YES", "on"] {
             assert!(cfg(&[("CONVEYOR_DEV_AUTH", v)]).unwrap().dev_auth, "{v}");
