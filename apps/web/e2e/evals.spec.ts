@@ -180,6 +180,24 @@ test("the report is the server's; the label and round controls hit their actions
   // `cost_ceiling_cents`. One eval carries one open climb, so the seeded climb stops first.
   const seededRow = page.locator("table.wtbl tbody tr", { hasText: "correct" });
   await seededRow.getByRole("button", { name: "Stop" }).click();
+  // Every climb write refreshes the instrument and rebuilds the tab; a screen read that lands
+  // mid-rebuild sees an empty or stale table (measured on a fresh database, #733). Prove the
+  // write on the climb list first, then the reload is the screen read.
+  await expect
+    .poll(
+      async () => {
+        const list = await invoke<{ items: { target: string; status: string }[] }>(
+          request,
+          "eval_climbs.list",
+          { eval_id: evalId },
+        );
+        return list.items.find((row) => row.target === "correct")?.status;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe("stopped");
+  await page.reload();
+  const costRow = page.locator("table.wtbl tbody tr", { hasText: "cost_usd" });
   await expect(seededRow.locator(".pill")).toHaveText("stopped");
 
   await page.getByLabel("Goal kind").selectOption("cost");
@@ -190,7 +208,21 @@ test("the report is the server's; the label and round controls hit their actions
   await page.getByLabel("Noise band").fill("0.75");
   await page.getByRole("button", { name: "Start climb" }).click();
 
-  const costRow = page.locator("table.wtbl tbody tr", { hasText: "cost_usd" });
+  // Same as the stop: prove the start on the climb list, then reload as the screen read.
+  await expect
+    .poll(
+      async () => {
+        const list = await invoke<{ items: { target: string }[] }>(
+          request,
+          "eval_climbs.list",
+          { eval_id: evalId },
+        );
+        return list.items.filter((row) => row.target === "cost_usd").length;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(1);
+  await page.reload();
   await expect(costRow).toHaveCount(1);
   await expect(costRow.locator(".pill")).toHaveText("planned");
   await expect(costRow).toContainText("correct ≥ 0.50");
@@ -256,8 +288,23 @@ test("the report is the server's; the label and round controls hit their actions
   await page.getByRole("button", { name: "Record round" }).click();
   await expect(page.locator('.callout[role="status"]')).toContainText("Round 1 recorded");
 
-  // Recording refreshes the instrument's data, which rebuilds the tab; the read gesture is the
-  // climb's own "Rounds" button, and it now carries the round the form just recorded.
+  // The recording is the write; prove it on the climb's own read first. Recording also refreshes
+  // the instrument, and the tab's rebuild can empty the rounds table right after it filled —
+  // measured on a fresh database (#733): the count read 1 and the very next read found no rows.
+  // The reload sequences the screen read after the rebuild; the read gesture is the climb's own
+  // "Rounds" button, which then carries the round the form just recorded.
+  await expect
+    .poll(
+      async () => {
+        const climb = await invoke<{ rounds: { round: number }[] }>(request, "eval_climbs.get", {
+          id: costClimb.id,
+        });
+        return climb.rounds.length;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(1);
+  await page.reload();
   await costRow.getByRole("button", { name: "Rounds" }).click();
   const roundRows = page.locator("table.wtbl", { hasText: "Variant" }).locator("tbody tr");
   await expect(roundRows).toHaveCount(1);
