@@ -365,6 +365,18 @@ pub(crate) async fn insert_start_card_and_run(
                 );
                 return Ok(());
             }
+            // A programme project is born `draft` and its tranche review authorises the work;
+            // the run must not start ungoverned (v1-w2b-2). The project, board and start card
+            // are valid — the card starts once the tranche is authorised — so this is the same
+            // non-fatal state as an unready capability, never a failed create.
+            (409, "tranche_not_authorised") => {
+                tracing::info!(
+                    process_key = START_PROCESS_KEY,
+                    "projects.create: the project's tranche is not authorised; the project and \
+                     its start card were created without a run"
+                );
+                return Ok(());
+            }
             _ => return Err(error),
         }
     }
