@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S18-loop-0096cc0da — the improvement loop after #638, measured on the deployed revision · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-0096cc0da.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s18-loop-0096cc0da--the-improvement-loop-after-638-measured-on-the-deployed-revision">S18-loop-0096cc0da — the improvement loop after #638, measured on the deployed revision</h1>
+<p>Issue #12. A fresh live run at the deployed revision carrying #638 (<code>7c72c12c6</code>):</p>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONVEYOR_GIT_SHA</code></td>
+<td><code>0096cc0da…</code> (both <code>deploy/conveyor</code> and <code>deploy/conveyor-worker</code>, read with <code>printenv</code>)</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>sha256:f13dea55…0171c</code></td>
+</tr>
+<tr>
+<td>suite</td>
+<td><code>verified50-v1</code> · <code>01a1d039-0d04-7568-98ab-457e1d84fab0</code></td>
+</tr>
+<tr>
+<td>subset</td>
+<td>the same 12 django instances as the 2026-11-23 run, <code>concurrency=6</code>, <code>with_failing_test=true</code></td>
+</tr>
+<tr>
+<td>model</td>
+<td><code>local-llm</code> (the subject's pinned model)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-two-runs">The two runs</h2>
+<table>
+<thead>
+<tr>
+<th>run</th>
+<th>arm</th>
+<th>label</th>
+<th>id</th>
+<th>window (UTC)</th>
+<th>n</th>
+<th>graded</th>
+<th>no_attempt</th>
+<th>resolved</th>
+<th>apply_failed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline (direct model)</td>
+<td><code>baseline</code></td>
+<td><code>baseline-oracle-files+failing-test</code></td>
+<td><code>01a21f36-4d4c-7def-8dcd-ed91664e8356</code></td>
+<td>22:52–23:00</td>
+<td>12</td>
+<td>2</td>
+<td>6</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>pipeline</td>
+<td><code>conveyor</code></td>
+<td><code>conveyor-oracle-files+failing-test</code></td>
+<td><code>01a21f25-a0bd-78c0-896d-d2afdd50f194</code></td>
+<td>22:34–22:50</td>
+<td>12</td>
+<td>2</td>
+<td>7</td>
+<td>1</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>The arms are comparable under the contract's rule (oracle <code>files+test</code> and prompt <code>bug_fix</code> on both; the pipeline is what is compared). The comparison below is the action the improvement job invokes, called directly:</p>
+<pre class="json"><code>{&quot;comparable&quot;: true, &quot;both&quot;: 0, &quot;neither&quot;: 0, &quot;a_only&quot;: 0, &quot;b_only&quot;: 1,
+ &quot;discordant&quot;: 1, &quot;missing_in_one&quot;: 2, &quot;p_value&quot;: 1.0}</code></pre>
+<p><code>a</code> = the pipeline run, <code>b</code> = the direct run. <strong>p = 1.0</strong>: under the loop's rule (<code>p &lt; 0.05</code> and at least six same-direction discordant pairs) the verdict is <code>inconclusive</code> by construction. One instance is graded in both runs, one in the direct run only, two in the pipeline run only.</p>
+<h2 id="per-case">Per case</h2>
+<table>
+<thead>
+<tr>
+<th>instance</th>
+<th>direct arm</th>
+<th>pipeline arm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>django__django-10880</code></td>
+<td><code>apply_failed</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-11149</code></td>
+<td><code>no_attempt</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-11163</code></td>
+<td><code>apply_failed</code></td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-11451</code></td>
+<td><code>apply_failed</code></td>
+<td><code>resolved</code></td>
+</tr>
+<tr>
+<td><code>django__django-11490</code></td>
+<td><code>no_attempt</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-11848</code></td>
+<td><code>unresolved</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-11880</code></td>
+<td><code>resolved</code></td>
+<td><code>unresolved</code></td>
+</tr>
+<tr>
+<td><code>django__django-13112</code></td>
+<td><code>no_attempt</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-13158</code></td>
+<td><code>no_attempt</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+<tr>
+<td><code>django__django-13401</code></td>
+<td><code>no_attempt</code></td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-13512</code></td>
+<td><code>apply_failed</code></td>
+<td><code>apply_failed</code></td>
+</tr>
+<tr>
+<td><code>django__django-14500</code></td>
+<td><code>no_attempt</code></td>
+<td><code>no_attempt</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-the-denominator-is-two">Why the denominator is two</h2>
+<ul>
+<li><strong>No patch produced.</strong> 6 direct cases and 7 pipeline cases are <code>no_attempt</code>. In the pipeline arm the worker recorded <code>the agent produced no patch</code> for one and, for three, <code>idempotency-conflict: a request with this Idempotency-Key is still running</code> — a retry of <code>agent.run</code> colliding with the previous attempt's in-flight call and being recorded as a terminal refusal. The direct arm's six are one-call refusals (<code>attempts=1</code>).</li>
+<li><strong>Patch not applying.</strong> Of the six patches the direct arm produced, four failed to apply in the sandbox (<code>apply_failed</code>); of the pipeline's five, three did. <code>apply_failed</code> is withheld from the graded denominator, like <code>no_attempt</code>.</li>
+<li>The significance rule needs six same-direction discordant pairs. At a paired intersection of 1 in 12, a 50-instance run projects to roughly four pairs — still below the bar.</li>
+</ul>
+<h2 id="what-638-did-verified-live">What #638 did, verified live</h2>
+<p>The baseline arm no longer fails: it ran, produced patches on six cases and had them graded (4 <code>apply_failed</code>, 1 <code>unresolved</code>, 1 <code>resolved</code>). The grading fix is live. The remaining cap is the producer yield — production and patch applicability — not the grading path.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>#12's acceptance — "a fresh live improvement run at a deployed revision carrying #638, with a decisive verdict (not <code>inconclusive</code>)" — is not met by this run, and cannot be met on the deployed revision: the verdict machinery needs six paired cases and the instrument yields one. No candidate configuration changes this, because the paired denominator is capped by the smaller arm's graded set. The producer's yield is the prerequisite, filed as #900.</p>
+<h2 id="artefacts">Artefacts</h2>
+<ul>
+<li><code>snapshot</code>/<code>facts</code> are not applicable here: this is a live benchmark run, not a unit-ledger render. The run ids above are the durable handles; <code>benchmark_runs.get</code>, <code>benchmark_cases.list</code> and <code>benchmark_runs.compare</code> re-read them.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S18-loop-0096cc0da.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

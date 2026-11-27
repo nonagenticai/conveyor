@@ -506,6 +506,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-B.md"
     },
     {
+      "title": "S18-loop-0096cc0da — the improvement loop after #638, measured on the deployed revision",
+      "path": "docs/evidence/S18-loop-0096cc0da.html",
+      "source": "docs/evidence/S18-loop-0096cc0da.md",
+      "section": "Evidence",
+      "sha256": "90051f742b7f6505e6f49d1fe96fc632286cfa678108aebaac4eb372ffc8dd07",
+      "bytes": 4367,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-0096cc0da.md"
+    },
+    {
       "title": "S18-loop-29cc3820 — the real improvement loop at one deployed revision",
       "path": "docs/evidence/S18-loop-29cc3820.html",
       "source": "docs/evidence/S18-loop-29cc3820.md",
