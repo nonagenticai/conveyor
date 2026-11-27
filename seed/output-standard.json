@@ -74,7 +74,8 @@
     "pi-plan",
     "pi-objectives",
     "system-demo",
-    "inspect-adapt"
+    "inspect-adapt",
+    "epic"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -856,7 +857,8 @@
         "Capabilities the benefits depend on"
       ],
       "optional": [
-        "Decision"
+        "Decision",
+        "Options"
       ],
       "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options, including doing nothing\n\nThe options considered including doing nothing.\n\n## Investment appraisal and cash flow\n\nThe appraisal, the cash flow and the basis of both.\n\n## Capabilities the benefits depend on\n\nThe capabilities and business changes the benefits require, and who delivers them.\n\n## Decision\n\nThe investment decision and its authority.\n",
       "standard": "MSP",
@@ -2112,6 +2114,11 @@
           {
             "kind": "computed",
             "name": "project_artifact_links"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/links"
           }
         ],
         "Document": [
@@ -2121,6 +2128,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -2199,6 +2215,15 @@
               "phase_code": "a",
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
           }
         ],
         "Scope": [
@@ -2210,6 +2235,15 @@
               "kind": "statement_of_architecture_work",
               "phase_code": "a",
               "project_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
             }
           }
         ],
@@ -2223,6 +2257,15 @@
               "phase_code": "a",
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
           }
         ],
         "Acceptance criteria": [
@@ -2235,6 +2278,15 @@
               "phase_code": "a",
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
           }
         ],
         "Contract": [
@@ -2246,6 +2298,15 @@
               "kind": "statement_of_architecture_work",
               "phase_code": "a",
               "project_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
             }
           }
         ]
@@ -2277,6 +2338,14 @@
             "match": {
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Findings": [
@@ -2288,18 +2357,42 @@
             "match": {
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Waivers": [
           {
             "kind": "computed",
             "name": "waiver_status"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Decision": [
           {
             "kind": "computed",
             "name": "governing_review"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ]
       },
@@ -2329,6 +2422,14 @@
             "match": {
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Accepting owner": [
@@ -2337,6 +2438,14 @@
             "file": "architecture.json",
             "pointer": "/waivers",
             "optional": true,
+            "match": {
+              "project_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
             "match": {
               "project_id": "$subject_id"
             }
@@ -2351,6 +2460,14 @@
             "match": {
               "project_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Reassessment": [
@@ -2359,6 +2476,14 @@
             "file": "architecture.json",
             "pointer": "/waivers",
             "optional": true,
+            "match": {
+              "project_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
             "match": {
               "project_id": "$subject_id"
             }
@@ -2932,6 +3057,14 @@
             "match": {
               "benefit_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
           }
         ],
         "Readiness": [
@@ -2941,6 +3074,14 @@
             "pointer": "/benefit_transitions",
             "match": {
               "benefit_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
             }
           }
         ],
@@ -2952,6 +3093,14 @@
             "match": {
               "benefit_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
           }
         ],
         "Post-transition measurement": [
@@ -2962,6 +3111,14 @@
             "match": {
               "benefit_id": "$subject_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
           }
         ],
         "Legacy retirement": [
@@ -2971,6 +3128,14 @@
             "pointer": "/benefit_transitions",
             "match": {
               "benefit_id": "$subject_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
             }
           }
         ]
@@ -3063,6 +3228,11 @@
                 "realization"
               ]
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/links"
           }
         ]
       },
@@ -3092,36 +3262,60 @@
           {
             "kind": "computed",
             "name": "architecture_principles"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Tailored ADM": [
           {
             "kind": "computed",
             "name": "architecture_profile"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Artefact standard": [
           {
             "kind": "computed",
             "name": "artifact_standard"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Architecture Board": [
           {
             "kind": "computed",
             "name": "architecture_board"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Governance and contracts": [
           {
             "kind": "computed",
             "name": "architecture_governance"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Maturity and skills": [
           {
             "kind": "computed",
             "name": "architecture_maturity_skills"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ]
       },
@@ -3157,6 +3351,11 @@
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
             "optional": true
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews"
           }
         ],
         "Waivers": [
@@ -3165,6 +3364,11 @@
             "file": "architecture.json",
             "pointer": "/waivers",
             "optional": true
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers"
           }
         ]
       },
@@ -3247,6 +3451,15 @@
             "kind": "absence",
             "fallback": true,
             "record": "the contract's commitment list: a commitments field on the delivery contract body"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Compliance method": [
@@ -3259,12 +3472,30 @@
             "kind": "absence",
             "fallback": true,
             "record": "the contract's compliance method: a compliance field on the delivery contract body"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Approval": [
           {
             "kind": "computed",
             "name": "contract_approval"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
           }
         ]
       },
@@ -3436,6 +3667,11 @@
           {
             "kind": "computed",
             "name": "programme_charter"
+          },
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
           }
         ],
         "Solution intent": [
@@ -3447,6 +3683,10 @@
               "kind": "adr",
               "key": "solution_intent"
             }
+          },
+          {
+            "kind": "computed",
+            "name": "programme_summary"
           }
         ],
         "Backlog with WSJF": [
@@ -3457,6 +3697,11 @@
             "match": {
               "status": "accepted"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
           }
         ],
         "Shared configuration": [
@@ -3538,6 +3783,11 @@
             "match": {
               "gate": "tranche_review"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals"
           }
         ]
       },
@@ -3620,6 +3870,14 @@
               "project_id": "$subject_id",
               "kind": "scope"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Schedule": [
@@ -3636,6 +3894,14 @@
             "kind": "absence",
             "fallback": true,
             "record": "the project schedule baseline: a project_baseline row of kind schedule"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Cost": [
@@ -3652,6 +3918,14 @@
             "kind": "absence",
             "fallback": true,
             "record": "the project cost baseline: a project_baseline row of kind cost"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
           }
         ],
         "Approval": [
@@ -3662,6 +3936,14 @@
             "match": {
               "project_id": "$subject_id",
               "gate": "baseline"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
             }
           }
         ]
@@ -3793,6 +4075,15 @@
               "project_id": "$subject_id",
               "kind": "change"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "change"
+            }
           }
         ],
         "Decisions": [
@@ -3831,6 +4122,10 @@
             "kind": "computed",
             "name": "phase_artefacts",
             "phase": "preliminary"
+          },
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
           }
         ],
         "Contract and gate": [
@@ -3909,6 +4204,15 @@
               "category": "architecture-artifact-instance",
               "scope": "subject"
             }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
           }
         ]
       },
@@ -3947,6 +4251,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "b"
+            }
           }
         ],
         "Evidence": [
@@ -3964,6 +4276,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4004,6 +4325,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "c"
+            }
           }
         ],
         "Evidence": [
@@ -4021,6 +4350,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4061,6 +4399,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "d"
+            }
           }
         ],
         "Evidence": [
@@ -4078,6 +4424,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4329,6 +4684,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "e"
+            }
           }
         ],
         "Evidence": [
@@ -4346,6 +4709,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4462,6 +4834,15 @@
               "category": "architecture-artifact-instance",
               "scope": "subject"
             }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
           }
         ]
       },
@@ -4470,10 +4851,10 @@
     "phase-g": {
       "required": [
         "Contract and gate",
-        "Evidence"
+        "Evidence",
+        "Mandatory artefacts"
       ],
       "optional": [
-        "Mandatory artefacts",
         "Findings"
       ],
       "skeleton": "# Phase G\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
@@ -4500,6 +4881,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "g"
+            }
           }
         ],
         "Evidence": [
@@ -4525,6 +4914,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4565,6 +4963,14 @@
               "kind": "delivery_contract",
               "project_id": "$project_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "h"
+            }
           }
         ],
         "Evidence": [
@@ -4582,6 +4988,15 @@
             "pointer": "/documents",
             "match": {
               "category": "architecture-artifact-instance",
+              "scope": "subject"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
               "scope": "subject"
             }
           }
@@ -4880,6 +5295,76 @@
       },
       "verifier": "generate-standards.py --check-category inspect-adapt",
       "document_authored": true
+    },
+    "epic": {
+      "required": [
+        "Epic",
+        "Features",
+        "Enablers",
+        "WSJF"
+      ],
+      "optional": [
+        "Dependencies",
+        "PI objectives",
+        "Demo evidence",
+        "Inspect & adapt",
+        "Links"
+      ],
+      "skeleton": "# Epic\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Epic\n\nThe outcome this epic delivers, stated so its completion is observable.\n\n## Features\n\nThe features it delivers, each with its acceptance.\n\n## Enablers\n\nThe enablers the features depend on.\n\n## WSJF\n\nThe weighted shortest job first inputs and the resulting order.\n\n## Dependencies\n\nWhat this epic depends on and what depends on it.\n\n## PI objectives\n\nThe PI objectives this epic contributes to.\n\n## Demo evidence\n\nThe demo that shows the epic working.\n\n## Inspect & adapt\n\nThe retrospective outcome and any change it produced.\n\n## Links\n\nThe published record, the plan and the issues.\n",
+      "standard": "SAFe",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "epic",
+      "document_authored": true,
+      "verifier": "generate-standards.py --check-category epic",
+      "sources": {
+        "Epic": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "epic",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Features": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "epic",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Enablers": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "epic",
+              "scope": "subject"
+            }
+          }
+        ],
+        "WSJF": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "epic",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     }
   },
   "on_demand": [
@@ -4925,6 +5410,7 @@
     "candidate-solutions",
     "project-context-diagram",
     "benefits-diagram",
-    "gap-analysis"
+    "gap-analysis",
+    "epic"
   ]
 }

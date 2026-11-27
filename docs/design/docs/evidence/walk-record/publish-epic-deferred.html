@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — the epic publish (deployment-gated) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-record/publish-epic-deferred.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--the-epic-publish-deployment-gated">GEMBA-WALK — the epic publish (deployment-gated)</h1>
+<p><code>documents.compose</code> of <code>docs/plans/inception/GEMBA-WALK/05-safe-epic.md</code> as category <code>epic</code>. <code>epic</code> is added to <code>seed/output-standard.json</code> on this branch; the standard is <code>include_str!</code> into conveyor-domain, so the deployed engine refuses the category until the image built from the merged main is rolled out. The refusal below is the gate, not a transport failure.</p>
+<h2 id="the-refusal-live-2026-11-27">The refusal (live, 2026-11-27)</h2>
+<pre><code>error: documents.compose refused (422): the input does not match the action schema
+command terminated with exit code 1</code></pre>
+<p>The deployed engine's embedded standard predates this branch's <code>epic</code> category. The composer publishes when the merged image is rolled out; the read-back id is recorded on the issue then.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/walk-record/publish-epic-deferred.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

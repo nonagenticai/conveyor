@@ -3512,6 +3512,33 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
+      "title": "GEMBA-WALK — the epic publish (deployment-gated)",
+      "path": "docs/evidence/walk-record/publish-epic-deferred.html",
+      "source": "docs/evidence/walk-record/publish-epic-deferred.md",
+      "section": "Evidence",
+      "sha256": "d61ee8b3cec3e3a0aa155d71dec6745f542b8a49f3f44defadb7a6357c650712",
+      "bytes": 774,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-record/publish-epic-deferred.md"
+    },
+    {
+      "title": "GEMBA-WALK — publish the plan",
+      "path": "docs/evidence/walk-record/publish-plan.html",
+      "source": "docs/evidence/walk-record/publish-plan.md",
+      "section": "Evidence",
+      "sha256": "638489df5c53f3ef32669740773ae4a31dbfbdc31c57368e498ab522bbd4bbd7",
+      "bytes": 506,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-record/publish-plan.md"
+    },
+    {
+      "title": "GEMBA-WALK — publish the project WBS (GW-A6)",
+      "path": "docs/evidence/walk-record/publish-wbs.html",
+      "source": "docs/evidence/walk-record/publish-wbs.md",
+      "section": "Evidence",
+      "sha256": "df537ea118f099937bd1673fcef0eb3b4b83b9c98d448100c16b8da40f66208f",
+      "bytes": 608,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-record/publish-wbs.md"
+    },
+    {
       "title": "W1 — the Gemba Walk client and renderer spike",
       "path": "docs/evidence/walk-spike.html",
       "source": "docs/evidence/walk-spike.md",
@@ -3633,8 +3660,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/GEMBA-WALK.html",
       "source": "docs/plans/GEMBA-WALK.md",
       "section": "Plans",
-      "sha256": "b7ff16ddfbd87e24a902ccb52fc0ffde7b87fd66b93b2055bb98da9f3503ddc3",
-      "bytes": 30524,
+      "sha256": "fdc1bab6077df74c9df088ed049cc049177435c1418cccfcc124e84e98e24f10",
+      "bytes": 30770,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
@@ -4038,8 +4065,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/05-safe-epic.html",
       "source": "docs/plans/inception/GEMBA-WALK/05-safe-epic.md",
       "section": "Plans",
-      "sha256": "417c25dbb8977246a95ec71010fc17ef1e842a69b64fbe19240480cb6586f195",
-      "bytes": 7679,
+      "sha256": "304a9c9774edbe3a5f758a688135a8fcb183bc50e287bd55ad9f318f22cd9693",
+      "bytes": 7882,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/05-safe-epic.md"
     },
     {
@@ -4056,8 +4083,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.html",
       "source": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md",
       "section": "Plans",
-      "sha256": "f892d4268e9217bee83f8df01238cba9c6aec3cc39c9f37826235d09e3cad2e3",
-      "bytes": 13050,
+      "sha256": "d396a46870747f01609dac7d307b526e45b9491ce82596c12f182a135fc4b0a8",
+      "bytes": 15000,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md"
     },
     {

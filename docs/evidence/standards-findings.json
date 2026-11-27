@@ -28,6 +28,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -95,6 +100,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -164,6 +174,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -232,6 +247,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -288,6 +308,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -304,6 +329,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -322,6 +352,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -333,6 +368,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -379,6 +419,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -395,6 +440,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -413,6 +463,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -424,6 +479,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -470,6 +530,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -486,6 +551,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -504,6 +574,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -515,6 +590,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -561,6 +641,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -577,6 +662,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -595,6 +685,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -606,6 +701,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -950,7 +1050,7 @@
       "title": "PMP artefact absent: project-wbs"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s06b: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06b-agent-direct-interface.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s06b: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06b-agent-direct-interface.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -967,6 +1067,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -985,6 +1090,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -996,6 +1106,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -1028,7 +1143,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s10: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S10-copilot-ag-ui.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s10: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S10-copilot-ag-ui.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -1045,6 +1160,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -1063,6 +1183,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -1074,6 +1199,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -1106,7 +1236,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s11: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S11-procedures.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s11: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S11-procedures.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -1123,6 +1253,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -1141,6 +1276,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -1152,6 +1292,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -1208,6 +1353,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1277,6 +1427,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -1344,6 +1499,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1413,6 +1573,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -1480,6 +1645,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1549,6 +1719,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -1616,6 +1791,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1685,6 +1865,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -1752,6 +1937,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1821,6 +2011,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -1888,6 +2083,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -1957,6 +2157,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -2024,6 +2229,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -2093,6 +2303,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -2160,6 +2375,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/register_items",
               0
             ]
           ],
@@ -2229,6 +2449,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/register_items",
+              0
             ]
           ],
           "source": "artefact"
@@ -2285,6 +2510,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2301,6 +2531,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2319,6 +2554,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2330,6 +2570,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2376,6 +2621,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2392,6 +2642,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2410,6 +2665,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2421,6 +2681,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2467,6 +2732,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2483,6 +2753,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2501,6 +2776,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2512,6 +2792,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2558,6 +2843,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2574,6 +2864,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2592,6 +2887,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2603,6 +2903,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2649,6 +2954,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2665,6 +2975,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2683,6 +2998,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2694,6 +3014,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2740,6 +3065,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2756,6 +3086,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2774,6 +3109,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2785,6 +3125,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2831,6 +3176,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2847,6 +3197,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2865,6 +3220,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2876,6 +3236,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2922,6 +3287,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2938,6 +3308,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -2956,6 +3331,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -2967,6 +3347,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3013,6 +3398,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3029,6 +3419,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3047,6 +3442,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3058,6 +3458,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3104,6 +3509,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3120,6 +3530,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3138,6 +3553,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3149,6 +3569,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3195,6 +3620,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3211,6 +3641,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3229,6 +3664,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3240,6 +3680,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3286,6 +3731,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3302,6 +3752,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3320,6 +3775,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3331,6 +3791,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3377,6 +3842,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3393,6 +3863,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3411,6 +3886,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3422,6 +3902,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3468,6 +3953,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3484,6 +3974,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3502,6 +3997,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3513,6 +4013,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3559,6 +4064,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3575,6 +4085,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3593,6 +4108,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3604,6 +4124,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3650,6 +4175,11 @@
               "msp.json",
               "/project_baselines",
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3666,6 +4196,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -3684,6 +4219,11 @@
               null,
               null,
               0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
+              0
             ]
           ],
           "source": "artefact"
@@ -3695,6 +4235,11 @@
             [
               "work.json",
               "/approvals",
+              0
+            ],
+            [
+              "msp.json",
+              "/project_baselines",
               0
             ]
           ],
@@ -6644,15 +7189,44 @@
       "title": "TOGAF artefact partial: architecture-artifact-instance"
     },
     {
-      "acceptance": "std-togaf-architecture-artifact-t19f: evidence the missing section(s) Document of Architecture Artifact — Follow-on: docs/plans/T19F-meeting-bindings.md from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-architecture-artifact-s06b: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S06b-agent-direct-interface.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "architecture-artifact",
       "evidence": [
         {
-          "artefact": "std-togaf-architecture-artifact-t19f",
+          "artefact": "std-togaf-architecture-artifact-s06b",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06b",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06b",
           "section": "Document",
           "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
             [
               "artefacts.json",
               "/documents",
@@ -6663,30 +7237,1393 @@
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
-      "id": "std-togaf-architecture-artifact-t19f",
+      "id": "std-togaf-architecture-artifact-s06b",
       "kind": "RECORD",
       "missing": [
+        "Metadata",
+        "Entries",
         "Document"
       ],
-      "owner_project": "T19F",
-      "package_key": "std-togaf-architecture-artifact-t19f:T19F",
-      "problem": "The architecture-artifact artefact for Follow-on: docs/plans/T19F-meeting-bindings.md is partial; missing required sections: Document.",
+      "owner_project": "S06b",
+      "package_key": "std-togaf-architecture-artifact-s06b:S06b",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Metadata, Entries, Document.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
       "standard": "TOGAF",
       "subject": {
-        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
-        "key": "T19F",
+        "id": "01a1d039-0d2a-7ea9-b809-929452f221fd",
+        "key": "S06b",
         "kind": "project",
         "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "project_key": "T19F",
-        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+        "project_key": "S06b",
+        "title": "Plan: docs/plans/slices/S06b-agent-direct-interface.md"
       },
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s06b: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06b-agent-direct-interface.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-architecture-artifact-s06c: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S06c-mcp-tasks.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s06c",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06c",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06c",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s06c",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S06c",
+      "package_key": "std-togaf-architecture-artifact-s06c:S06c",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 7 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+        "key": "S06c",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06c",
+        "title": "Plan: docs/plans/slices/S06c-mcp-tasks.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s06d: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S06d-connector-standard.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s06d",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06d",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s06d",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s06d",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S06d",
+      "package_key": "std-togaf-architecture-artifact-s06d:S06d",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 8 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2b-7b80-93fe-c1daf60c5c1f",
+        "key": "S06d",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06d",
+        "title": "Plan: docs/plans/slices/S06d-connector-standard.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s10: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S10-copilot-ag-ui.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s10",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s10",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s10",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s10",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S10",
+      "package_key": "std-togaf-architecture-artifact-s10:S10",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2d-787e-853e-fef542ec8815",
+        "key": "S10",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S10",
+        "title": "Plan: docs/plans/slices/S10-copilot-ag-ui.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s11: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S11-procedures.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s11",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s11",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s11",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s11",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S11",
+      "package_key": "std-togaf-architecture-artifact-s11:S11",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2d-7ec6-aef0-4096ea66e7a4",
+        "key": "S11",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S11",
+        "title": "Plan: docs/plans/slices/S11-procedures.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s12: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S12-ui-buildout.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s12",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s12",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s12",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s12",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S12",
+      "package_key": "std-togaf-architecture-artifact-s12:S12",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S12-ui-buildout.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 10 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2e-7585-8cb4-ab197d2e6dab",
+        "key": "S12",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S12",
+        "title": "Plan: docs/plans/slices/S12-ui-buildout.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s13: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S13-n8n-engine.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s13",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s13",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s13",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s13",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S13",
+      "package_key": "std-togaf-architecture-artifact-s13:S13",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S13-n8n-engine.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 8 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e",
+        "key": "S13",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S13",
+        "title": "Plan: docs/plans/slices/S13-n8n-engine.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s14: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S14-cutover.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s14",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s14",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s14",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s14",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S14",
+      "package_key": "std-togaf-architecture-artifact-s14:S14",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 11 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2f-75f2-a1fb-aa95893aa206",
+        "key": "S14",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S14",
+        "title": "Plan: docs/plans/slices/S14-cutover.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s15: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s15",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s15",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s15",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s15",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S15",
+      "package_key": "std-togaf-architecture-artifact-s15:S15",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S15-capability-knowledge-memory.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 7 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d2f-7ca0-9d3d-534ca7d673fb",
+        "key": "S15",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S15",
+        "title": "Plan: docs/plans/slices/S15-capability-knowledge-memory.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s16: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S16-inference-audit.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s16",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s16",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s16",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s16",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S16",
+      "package_key": "std-togaf-architecture-artifact-s16:S16",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 7 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+        "key": "S16",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S16",
+        "title": "Plan: docs/plans/slices/S16-inference-audit.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s18: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S18-kata-improvement.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s18",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s18",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s18",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s18",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S18",
+      "package_key": "std-togaf-architecture-artifact-s18:S18",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S18-kata-improvement.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 9 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d30-7f95-9d93-30eaabfec6da",
+        "key": "S18",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S18",
+        "title": "Plan: docs/plans/slices/S18-kata-improvement.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s19: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S19-eval-builder.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s19",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s19",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s19",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s19",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S19",
+      "package_key": "std-togaf-architecture-artifact-s19:S19",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S19-eval-builder.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 8 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d31-77b6-80e2-1c7205d63f99",
+        "key": "S19",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S19",
+        "title": "Plan: docs/plans/slices/S19-eval-builder.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s20: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S20-eval-hillclimb.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s20",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s20",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s20",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s20",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S20",
+      "package_key": "std-togaf-architecture-artifact-s20:S20",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S20-eval-hillclimb.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 9 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d31-7d0f-ab1f-16240952e223",
+        "key": "S20",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S20",
+        "title": "Plan: docs/plans/slices/S20-eval-hillclimb.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-s21: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — Plan: docs/plans/slices/S21-message-construction.md from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-s21",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s21",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-s21",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-s21",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "S21",
+      "package_key": "std-togaf-architecture-artifact-s21:S21",
+      "problem": "The architecture-artifact artefact for Plan: docs/plans/slices/S21-message-construction.md is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 9 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d32-71f6-bad4-81493c102060",
+        "key": "S21",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S21",
+        "title": "Plan: docs/plans/slices/S21-message-construction.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t12: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t12",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t12",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t12",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t12",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "T12",
+      "package_key": "std-togaf-architecture-artifact-t12:T12",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T12 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 13 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d36-7de8-891c-4d3dcf110cf5",
+        "key": "T12",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T12",
+        "title": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t15: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t15",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t15",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t15",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t15",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "T15",
+      "package_key": "std-togaf-architecture-artifact-t15:T15",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T15 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 12 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d37-7f20-9959-979c31daeb5e",
+        "key": "T15",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T15",
+        "title": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t5: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t5",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t5",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t5",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t5",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "T5",
+      "package_key": "std-togaf-architecture-artifact-t5:T5",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T5 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 10 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d34-73db-975e-5d178d729cef",
+        "key": "T5",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T5",
+        "title": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t6: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t6",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t6",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t6",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t6",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "T6",
+      "package_key": "std-togaf-architecture-artifact-t6:T6",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T6 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 11 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d34-7973-8989-0b83246fc888",
+        "key": "T6",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T6",
+        "title": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t8: evidence the missing section(s) Metadata, Entries, Document of Architecture Artifact — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t8",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t8",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t8",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t8",
+      "kind": "RECORD",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "T8",
+      "package_key": "std-togaf-architecture-artifact-t8:T8",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T8 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document. Not yet due: tranche 11 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d35-76bb-a22e-be49e3e95d16",
+        "key": "T8",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T8",
+        "title": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Waivers of Architecture Governance Log — Architecture capability — conveyor buildout from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-governance-log",
+      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
+      "category": "architecture-governance-log",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Waivers",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/waivers",
+              0
+            ],
+            [
+              "architecture.json",
+              "/waivers",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "kind": "RECORD",
+      "missing": [
+        "Waivers"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The architecture-governance-log artefact for Architecture capability — conveyor buildout is partial; missing required sections: Waivers.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "capability",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Architecture capability — conveyor buildout"
+      },
+      "title": "TOGAF artefact partial: architecture-governance-log"
+    },
+    {
+      "acceptance": "std-togaf-compliance-review-s06b: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S06b-agent-direct-interface.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -6695,6 +8632,11 @@
           "artefact": "std-togaf-compliance-review-s06b",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -6711,6 +8653,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6723,6 +8670,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6732,11 +8684,13 @@
       "id": "std-togaf-compliance-review-s06b",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S06b",
       "package_key": "std-togaf-compliance-review-s06b:S06b",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Decision.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Relationship, Findings, Decision.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -6752,7 +8706,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s06c: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06c-mcp-tasks.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s06c: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S06c-mcp-tasks.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -6761,6 +8715,11 @@
           "artefact": "std-togaf-compliance-review-s06c",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -6777,6 +8736,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6789,6 +8753,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6798,11 +8767,13 @@
       "id": "std-togaf-compliance-review-s06c",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S06c",
       "package_key": "std-togaf-compliance-review-s06c:S06c",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Decision. Not yet due: tranche 7 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 7 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -6818,7 +8789,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s06d: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06d-connector-standard.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s06d: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S06d-connector-standard.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -6827,6 +8798,11 @@
           "artefact": "std-togaf-compliance-review-s06d",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -6843,6 +8819,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6855,6 +8836,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6864,11 +8850,13 @@
       "id": "std-togaf-compliance-review-s06d",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S06d",
       "package_key": "std-togaf-compliance-review-s06d:S06d",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Decision. Not yet due: tranche 8 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 8 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -6884,7 +8872,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s10: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S10-copilot-ag-ui.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s10: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S10-copilot-ag-ui.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -6893,6 +8881,11 @@
           "artefact": "std-togaf-compliance-review-s10",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -6909,6 +8902,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6921,6 +8919,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6930,11 +8933,13 @@
       "id": "std-togaf-compliance-review-s10",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S10",
       "package_key": "std-togaf-compliance-review-s10:S10",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Decision.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Relationship, Findings, Decision.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -6950,7 +8955,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s11: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S11-procedures.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s11: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S11-procedures.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -6959,6 +8964,11 @@
           "artefact": "std-togaf-compliance-review-s11",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -6975,6 +8985,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6987,6 +9002,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -6996,11 +9016,13 @@
       "id": "std-togaf-compliance-review-s11",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S11",
       "package_key": "std-togaf-compliance-review-s11:S11",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Decision.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Relationship, Findings, Decision.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7016,7 +9038,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s12: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S12-ui-buildout.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s12: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S12-ui-buildout.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7025,6 +9047,11 @@
           "artefact": "std-togaf-compliance-review-s12",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7041,6 +9068,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7053,6 +9085,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7062,11 +9099,13 @@
       "id": "std-togaf-compliance-review-s12",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S12",
       "package_key": "std-togaf-compliance-review-s12:S12",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S12-ui-buildout.md is partial; missing required sections: Decision. Not yet due: tranche 10 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S12-ui-buildout.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 10 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7082,7 +9121,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s13: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S13-n8n-engine.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s13: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S13-n8n-engine.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7091,6 +9130,11 @@
           "artefact": "std-togaf-compliance-review-s13",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7107,6 +9151,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7119,6 +9168,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7128,11 +9182,13 @@
       "id": "std-togaf-compliance-review-s13",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S13",
       "package_key": "std-togaf-compliance-review-s13:S13",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S13-n8n-engine.md is partial; missing required sections: Decision. Not yet due: tranche 8 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S13-n8n-engine.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 8 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7148,7 +9204,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s14: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S14-cutover.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s14: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S14-cutover.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7157,6 +9213,11 @@
           "artefact": "std-togaf-compliance-review-s14",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7173,6 +9234,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7185,6 +9251,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7194,11 +9265,13 @@
       "id": "std-togaf-compliance-review-s14",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S14",
       "package_key": "std-togaf-compliance-review-s14:S14",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Decision. Not yet due: tranche 11 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 11 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7214,7 +9287,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s15: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s15: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7223,6 +9296,11 @@
           "artefact": "std-togaf-compliance-review-s15",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7239,6 +9317,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7251,6 +9334,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7260,11 +9348,13 @@
       "id": "std-togaf-compliance-review-s15",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S15",
       "package_key": "std-togaf-compliance-review-s15:S15",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S15-capability-knowledge-memory.md is partial; missing required sections: Decision. Not yet due: tranche 7 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S15-capability-knowledge-memory.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 7 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7280,7 +9370,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s16: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S16-inference-audit.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s16: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S16-inference-audit.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7289,6 +9379,11 @@
           "artefact": "std-togaf-compliance-review-s16",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7305,6 +9400,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7317,6 +9417,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7326,11 +9431,13 @@
       "id": "std-togaf-compliance-review-s16",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S16",
       "package_key": "std-togaf-compliance-review-s16:S16",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Decision. Not yet due: tranche 7 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 7 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7346,7 +9453,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s18: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S18-kata-improvement.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s18: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S18-kata-improvement.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7355,6 +9462,11 @@
           "artefact": "std-togaf-compliance-review-s18",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7371,6 +9483,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7383,6 +9500,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7392,11 +9514,13 @@
       "id": "std-togaf-compliance-review-s18",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S18",
       "package_key": "std-togaf-compliance-review-s18:S18",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S18-kata-improvement.md is partial; missing required sections: Decision. Not yet due: tranche 9 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S18-kata-improvement.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 9 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7412,7 +9536,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s19: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S19-eval-builder.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s19: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S19-eval-builder.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7421,6 +9545,11 @@
           "artefact": "std-togaf-compliance-review-s19",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7437,6 +9566,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7449,6 +9583,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7458,11 +9597,13 @@
       "id": "std-togaf-compliance-review-s19",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S19",
       "package_key": "std-togaf-compliance-review-s19:S19",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S19-eval-builder.md is partial; missing required sections: Decision. Not yet due: tranche 8 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S19-eval-builder.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 8 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7478,7 +9619,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s20: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S20-eval-hillclimb.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s20: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S20-eval-hillclimb.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7487,6 +9628,11 @@
           "artefact": "std-togaf-compliance-review-s20",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7503,6 +9649,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7515,6 +9666,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7524,11 +9680,13 @@
       "id": "std-togaf-compliance-review-s20",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S20",
       "package_key": "std-togaf-compliance-review-s20:S20",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S20-eval-hillclimb.md is partial; missing required sections: Decision. Not yet due: tranche 9 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S20-eval-hillclimb.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 9 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7544,7 +9702,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-s21: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S21-message-construction.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-s21: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — Plan: docs/plans/slices/S21-message-construction.md from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7553,6 +9711,11 @@
           "artefact": "std-togaf-compliance-review-s21",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7569,6 +9732,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7581,6 +9749,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7590,11 +9763,13 @@
       "id": "std-togaf-compliance-review-s21",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "S21",
       "package_key": "std-togaf-compliance-review-s21:S21",
-      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S21-message-construction.md is partial; missing required sections: Decision. Not yet due: tranche 9 is planned.",
+      "problem": "The compliance-review artefact for Plan: docs/plans/slices/S21-message-construction.md is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 9 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7610,7 +9785,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-t12: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-t12: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7619,6 +9794,11 @@
           "artefact": "std-togaf-compliance-review-t12",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7635,6 +9815,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7647,6 +9832,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7656,11 +9846,13 @@
       "id": "std-togaf-compliance-review-t12",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "T12",
       "package_key": "std-togaf-compliance-review-t12:T12",
-      "problem": "The compliance-review artefact for SPEC_V2 slice T12 (docs/SPEC_V2.md §12) is partial; missing required sections: Decision. Not yet due: tranche 13 is planned.",
+      "problem": "The compliance-review artefact for SPEC_V2 slice T12 (docs/SPEC_V2.md §12) is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 13 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7676,7 +9868,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-t15: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-t15: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7685,6 +9877,11 @@
           "artefact": "std-togaf-compliance-review-t15",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7701,6 +9898,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7713,6 +9915,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7722,11 +9929,13 @@
       "id": "std-togaf-compliance-review-t15",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "T15",
       "package_key": "std-togaf-compliance-review-t15:T15",
-      "problem": "The compliance-review artefact for SPEC_V2 slice T15 (docs/SPEC_V2.md §12) is partial; missing required sections: Decision. Not yet due: tranche 12 is planned.",
+      "problem": "The compliance-review artefact for SPEC_V2 slice T15 (docs/SPEC_V2.md §12) is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 12 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7742,7 +9951,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-t5: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-t5: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7751,6 +9960,11 @@
           "artefact": "std-togaf-compliance-review-t5",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7767,6 +9981,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7779,6 +9998,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7788,11 +10012,13 @@
       "id": "std-togaf-compliance-review-t5",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "T5",
       "package_key": "std-togaf-compliance-review-t5:T5",
-      "problem": "The compliance-review artefact for SPEC_V2 slice T5 (docs/SPEC_V2.md §12) is partial; missing required sections: Decision. Not yet due: tranche 10 is planned.",
+      "problem": "The compliance-review artefact for SPEC_V2 slice T5 (docs/SPEC_V2.md §12) is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 10 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7808,7 +10034,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-t6: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-t6: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7817,6 +10043,11 @@
           "artefact": "std-togaf-compliance-review-t6",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7833,6 +10064,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7845,6 +10081,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7854,11 +10095,13 @@
       "id": "std-togaf-compliance-review-t6",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "T6",
       "package_key": "std-togaf-compliance-review-t6:T6",
-      "problem": "The compliance-review artefact for SPEC_V2 slice T6 (docs/SPEC_V2.md §12) is partial; missing required sections: Decision. Not yet due: tranche 11 is planned.",
+      "problem": "The compliance-review artefact for SPEC_V2 slice T6 (docs/SPEC_V2.md §12) is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 11 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7874,7 +10117,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-compliance-review-t8: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-compliance-review-t8: evidence the missing section(s) Relationship, Findings, Decision of Compliance Review — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from architecture.json#/compliance_reviews, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "compliance-review",
@@ -7883,6 +10126,11 @@
           "artefact": "std-togaf-compliance-review-t8",
           "section": "Relationship",
           "snapshot": [
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
+            ],
             [
               "architecture.json",
               "/compliance_reviews",
@@ -7899,6 +10147,11 @@
               "architecture.json",
               "/compliance_reviews",
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7911,6 +10164,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/compliance_reviews",
+              0
             ]
           ],
           "source": "artefact"
@@ -7920,11 +10178,13 @@
       "id": "std-togaf-compliance-review-t8",
       "kind": "RECORD",
       "missing": [
+        "Relationship",
+        "Findings",
         "Decision"
       ],
       "owner_project": "T8",
       "package_key": "std-togaf-compliance-review-t8:T8",
-      "problem": "The compliance-review artefact for SPEC_V2 slice T8 (docs/SPEC_V2.md §12) is partial; missing required sections: Decision. Not yet due: tranche 11 is planned.",
+      "problem": "The compliance-review artefact for SPEC_V2 slice T8 (docs/SPEC_V2.md §12) is partial; missing required sections: Relationship, Findings, Decision. Not yet due: tranche 11 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -7940,7 +10200,7 @@
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s06c: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06c-mcp-tasks.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s06c: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06c-mcp-tasks.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -7957,6 +10217,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -7975,6 +10240,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -7986,6 +10256,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8018,7 +10293,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s06d: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06d-connector-standard.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s06d: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06d-connector-standard.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8035,6 +10310,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8053,6 +10333,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8064,6 +10349,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8096,7 +10386,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s12: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S12-ui-buildout.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s12: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S12-ui-buildout.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8113,6 +10403,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8131,6 +10426,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8142,6 +10442,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8174,7 +10479,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s13: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S13-n8n-engine.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s13: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S13-n8n-engine.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8191,6 +10496,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8209,6 +10519,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8220,6 +10535,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8252,7 +10572,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s14: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S14-cutover.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s14: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S14-cutover.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8269,6 +10589,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8287,6 +10612,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8298,6 +10628,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8330,7 +10665,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s15: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s15: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8347,6 +10682,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8365,6 +10705,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8376,6 +10721,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8408,7 +10758,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s16: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S16-inference-audit.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s16: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S16-inference-audit.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8425,6 +10775,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8443,6 +10798,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8454,6 +10814,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8486,7 +10851,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s18: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S18-kata-improvement.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s18: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S18-kata-improvement.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8503,6 +10868,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8521,6 +10891,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8532,6 +10907,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8564,7 +10944,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s19: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S19-eval-builder.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s19: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S19-eval-builder.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8581,6 +10961,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8599,6 +10984,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8610,6 +11000,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8642,7 +11037,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s20: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S20-eval-hillclimb.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s20: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S20-eval-hillclimb.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8659,6 +11054,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8677,6 +11077,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8688,6 +11093,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8720,7 +11130,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-s21: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S21-message-construction.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-delivery-contract-s21: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S21-message-construction.md from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
       "category": "delivery-contract",
@@ -8737,6 +11147,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8755,6 +11170,11 @@
               null,
               null,
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8766,6 +11186,11 @@
             [
               null,
               null,
+              0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
               0
             ]
           ],
@@ -8798,53 +11223,6 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-delivery-contract-t19f: evidence the missing section(s) Compliance method of Delivery Contract — Follow-on: docs/plans/T19F-meeting-bindings.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-      "area": "delivery-contract",
-      "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
-      "category": "delivery-contract",
-      "evidence": [
-        {
-          "artefact": "std-togaf-delivery-contract-t19f",
-          "section": "Compliance method",
-          "snapshot": [
-            [
-              null,
-              null,
-              0
-            ],
-            [
-              null,
-              null,
-              0
-            ]
-          ],
-          "source": "artefact"
-        }
-      ],
-      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
-      "id": "std-togaf-delivery-contract-t19f",
-      "kind": "RECORD",
-      "missing": [
-        "Compliance method"
-      ],
-      "owner_project": "T19F",
-      "package_key": "std-togaf-delivery-contract-t19f:T19F",
-      "problem": "The delivery-contract artefact for Follow-on: docs/plans/T19F-meeting-bindings.md is partial; missing required sections: Compliance method.",
-      "severity": "P2",
-      "source": "artefact",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "subject": {
-        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
-        "key": "T19F",
-        "kind": "project",
-        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "project_key": "T19F",
-        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
-      },
-      "title": "TOGAF artefact partial: delivery-contract"
-    },
-    {
       "acceptance": "std-togaf-phase-g-s06b-g: evidence the missing section(s) Contract and gate of Phase G — S06b — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
       "audited_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
@@ -8854,6 +11232,11 @@
           "artefact": "std-togaf-phase-g-s06b-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -8900,6 +11283,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -8938,6 +11326,11 @@
           "artefact": "std-togaf-phase-g-s06d-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -8984,6 +11377,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9022,6 +11420,11 @@
           "artefact": "std-togaf-phase-g-s11-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9068,6 +11471,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9106,6 +11514,11 @@
           "artefact": "std-togaf-phase-g-s13-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9152,6 +11565,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9190,6 +11608,11 @@
           "artefact": "std-togaf-phase-g-s15-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9236,6 +11659,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9274,6 +11702,11 @@
           "artefact": "std-togaf-phase-g-s18-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9320,6 +11753,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9358,6 +11796,11 @@
           "artefact": "std-togaf-phase-g-s20-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9404,6 +11847,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9442,6 +11890,11 @@
           "artefact": "std-togaf-phase-g-t12-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9488,6 +11941,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9526,6 +11984,11 @@
           "artefact": "std-togaf-phase-g-t5-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
@@ -9572,6 +12035,11 @@
               "architecture.json",
               "/contracts",
               0
+            ],
+            [
+              "architecture.json",
+              "/contracts",
+              0
             ]
           ],
           "source": "artefact"
@@ -9610,6 +12078,11 @@
           "artefact": "std-togaf-phase-g-t8-g",
           "section": "Contract and gate",
           "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ],
             [
               "architecture.json",
               "/contracts",
