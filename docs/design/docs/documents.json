@@ -987,8 +987,8 @@
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "131de4d4384486941b1ad6100c50ac0103a3e705baba4369d976e1e6e81e7134",
-      "bytes": 16577,
+      "sha256": "f19c6dba62c25e8946ca48523d014b0845961d47999cc2e9c9d811409784b328",
+      "bytes": 20176,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -2445,8 +2445,8 @@
       "path": "docs/plans/proof-of-delivery.html",
       "source": "docs/plans/proof-of-delivery.md",
       "section": "Plans",
-      "sha256": "1cbf9cc27bff96c04c76b638b54d482b0499a1d415bae8732f6efe3da732d1eb",
-      "bytes": 7272,
+      "sha256": "dcb67aecdca52430a973b5f2acd7be2d5d0e65fe097cb5f9354ee9636d53fe75",
+      "bytes": 7575,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery.md"
     },
     {

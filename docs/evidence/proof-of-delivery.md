@@ -248,8 +248,58 @@ The `Verify:` cross-check against `scripts/ci/board.py`: 9 units pass the checke
 model (the checker accepts one `Verify:` in the exact section; the model requires one per part),
 6 the reverse, 293 agree. Both answers are in `units.json`; neither is silently adopted.
 
-**What is not run yet.** The kernel verdict over these chunks is deployment-gated: the collector
-records through `proofs.render`, which is added by #836 and deploys with this PR. The live step
-(two chunk certificates — one proven, one unproven if the findings persist — a `proofs.reverify`,
-and the programme bundle) is run after the rollout and recorded here with its response bodies.
-Until then these are the collector's facts and mirror, not a certificate.
+### The live certification (2026-11-27)
+
+The deployment gate opened when #836 merged: the rolled image (`f3c8a4e8…`) carries `proofs.render`.
+Three facts about the live path had to be measured first, and they are now part of the method:
+
+- **The edge signature.** `conveyor.nonagentic.ai` answers `403` `error code: 1010` to the default
+  `Python-urllib/…` signature. With the same token and body in the same minute, `curl` answered 403
+  for `-A Python-urllib/3.15` and 200 for `-A conveyor-collector/1.0`. The collector now sends the
+  named signature (`scripts/proof/collect_units.py:Engine.call`, asserted by its `--self-test`).
+- **The prover bearer's lifetime.** The engine's sealed `lean4.token` is a
+  `mint_bundle_token(tenant, app, 60)` — a **60-minute** mint (`apps/server/src/admin/upstream_tokens.rs:114`).
+  The token sealed on 2026-11-26 had expired, and the first live `lean4.check` answered the
+  prover's `401` through the engine. Re-minting with
+  `conveyor admin upstream-token --tenant … --service lean4 --mint` restored it immediately. Nothing
+  refreshes it (the residual is #776's), so a live run mints immediately before it certifies.
+- **The grant.** The licence bearer authenticates as the tenant's `mcp` machine channel, whose
+  authority is the channel policy, not a user role. `channels.policy_set` takes the *complete*
+  override set, so the run read `channels.policy_get` and merged — **108 → 114** stored overrides,
+  adding exactly `lean4.check`, `proofs.render`, `proofs.record`, `proofs.reverify`, `proofs.get`
+  and `proofs.list`. The 108 live overrides (another lane's in-flight work) were preserved.
+  `channels.policy_set` itself is `denial: administration`, so the write went through
+  `conveyor admin action invoke`.
+
+The collector's `certify` over the committed corpus `66544ac7…` recorded two chunk certificates and
+the programme bundle:
+
+| Certificate | Units | Verdict | `certificate_sha256` | `facts_sha256` | Kernel |
+|---|---|---|---|---|---|
+| `01a21d8a-d07f-7994-b63b-17380345c9f4` | 200 | `unproven` | `82a7f781…8f22a61` | `6dcf1e47…e04251c` | 2 517 ms, `valid: false` |
+| `01a21d8a-df06-7f12-9d46-ea68816af74c` | 120 | `unproven` | `f152cff6…b83f343` | `d6b6c47e…734c5bf` | 2 353 ms, `valid: false` |
+| `01a21d8a-ec89-77f0-9987-ebf1092a0cbf` | bundle | `proven` | `a32c262a…cd7da1f` | — | `valid: true` |
+
+The bundle is `proven` because `checkProgramme` certifies the bundle's structure — the expected leaf
+set and distinct digests — not its leaves' verdicts. The ledger's two refusals are the deliverable.
+
+The passing-subset control (`scripts/proof/control_units.py control`) certifies the 264 units that
+pass every rule, under a derived corpus `4939254241302bf2…`, so the live record path is exercised on
+a real proven set as well:
+
+| Certificate | Units | Verdict | `certificate_sha256` | Kernel |
+|---|---|---|---|---|
+| `01a21d8b-1448-7428-8413-8831e3c75ac5` | 200 | `proven` | `70f8254b…b8aa3ce` | 2 592 ms, `valid: true` |
+| `01a21d8b-2695-7a11-a17c-2710f4b17b1c` | 64 | `proven` | `7df8d678…14e20cc` | 2 233 ms, `valid: true` |
+| `01a21d8b-3def-7420-8573-fcf53dcc2afb` | bundle | `proven` | `305e321f…fdf8ee7` | `valid: true` |
+
+`proofs.reverify` on chunk-000 (`scripts/proof/control_units.py reverify`): the fresh `lean4.check`
+answered `valid: false` in 2 529 ms, the fresh source equalled the stored one, and the stored verdict
+matched (`unproven`; the full response is `reverify.json` beside the certificates). A second
+`certify` over the same snapshot replayed the same invocation keys and returned the **same three
+certificate ids** — the collector is deterministic end to end.
+
+**What this proves, and what it does not.** The kernel certifies that the committed facts do not
+satisfy `checkUnit` for the 56 units named above, and the control certifies the path accepts a real
+passing set. The facts' provenance and the committed snapshot remain the reviewer's lever; the
+assumption line in § What the certificate says, and what it does not is unchanged.
