@@ -1,0 +1,179 @@
+# The Gemba Walk's browser verdict: the instrument, the wasm crate, and the Playwright suite
+# against the real server through the walk's dev origin. Path-filtered like web.yml, so a
+# docs-only or non-walk PR starts no browser job.
+name: walk
+
+on:
+  pull_request:
+    paths:
+      - "apps/walk/**"
+      - "crates/walk-world/**"
+      - "crates/auth/**"
+      - "crates/api/src/web.rs"
+      - "crates/api/src/config.rs"
+      - "crates/api/src/lib.rs"
+      - "crates/api/tests/web_hosts.rs"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Dockerfile"
+      - "scripts/build-walk-coverage.py"
+      - "scripts/ci/tests/walk_coverage.sh"
+      - "docs/evidence/walk-*"
+      - ".github/workflows/walk.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/walk/**"
+      - "crates/walk-world/**"
+      - ".github/workflows/walk.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: walk-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    # The same public-repository gate as ci-public.yml: skipped, never red, while private.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: The parity instrument and its failure modes
+        run: |
+          set -euo pipefail
+          python3 scripts/build-walk-coverage.py --check
+          python3 scripts/build-walk-coverage.py --self-test
+          bash scripts/ci/tests/walk_coverage.sh
+
+  walk:
+    if: ${{ !github.event.repository.private }}
+    needs: census
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      APP_ENV: development
+      CONVEYOR_DEV_AUTH: "1"
+      BIND_ADDR: 127.0.0.1:8930
+      # The game host and its client are a fail-closed pair in the server config.
+      CONVEYOR_GAME_HOSTS: game.nonagentic.ai
+      CONVEYOR_GAME_OIDC_CLIENT_ID: conveyor-game
+      CONVEYOR_GAME_PUBLIC_URL: https://game.nonagentic.ai
+      CONVEYOR_S3_BACKEND: memory
+      CONVEYOR_EXTERNAL_INFERENCE_URL: http://127.0.0.1:8940
+      PG_IMAGE: postgres:18
+      REDIS_IMAGE: library/redis:8.10.1-alpine
+      DATABASE_URL: postgres://conveyor_runtime:conveyor_runtime_dev@127.0.0.1:55432/conveyor_e2e
+      DATABASE_MIGRATE_URL: postgres://conveyor_migrate:conveyor_migrate_dev@127.0.0.1:55432/conveyor_e2e
+      DATABASE_LISTEN_URL: postgres://conveyor_runtime:conveyor_runtime_dev@127.0.0.1:55432/conveyor_e2e
+      REDIS_URL: redis://127.0.0.1:56379/
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Rust toolchain follows rust-toolchain.toml
+        run: |
+          set -euo pipefail
+          rustup show
+          rustc --version
+
+      - name: the walk unit tests and type check
+        # Before the wasm build: tsc type-checks the hand-written modules only.
+        run: |
+          set -euo pipefail
+          cd apps/walk
+          npm ci
+          find src -name '*.test.js' -exec node --test {} +
+          npx tsc -p . --noEmit
+
+      - name: the walk-world headless tests
+        run: cargo test -p walk-world --locked
+
+      - name: build the wasm engine
+        run: |
+          set -euo pipefail
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-bindgen-cli --version 0.2.130 --locked
+          cargo build --release --locked -p walk-world --features wasm \
+            --target wasm32-unknown-unknown
+          wasm-bindgen --target web --no-typescript \
+            --out-dir apps/walk/pkg --out-name walk_world \
+            target/wasm32-unknown-unknown/release/walk_world.wasm
+
+      - name: start Postgres 18 and Redis
+        run: |
+          set -euo pipefail
+          docker run -d --rm --name walk-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            --shm-size=1g \
+            -p 127.0.0.1:55432:5432 \
+            "$PG_IMAGE" -c fsync=off -c max_connections=300
+          docker run -d --rm --name walk-redis \
+            --tmpfs /data -p 127.0.0.1:56379:6379 \
+            "$REDIS_IMAGE"
+          for _ in $(seq 1 60); do
+            docker exec walk-pg pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec walk-pg pg_isready -h 127.0.0.1 -U postgres
+          for _ in $(seq 1 60); do
+            docker exec walk-redis redis-cli ping >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec walk-redis redis-cli ping
+
+      - name: create the e2e database and its two roles
+        run: |
+          set -euo pipefail
+          docker exec walk-pg psql -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE conveyor_e2e"
+          docker exec -i walk-pg psql -U postgres -d conveyor_e2e -v ON_ERROR_STOP=1 < scripts/db-roles.sql
+
+      - name: build the server binary
+        run: cargo build --locked -p conveyor-server
+
+      - name: migrate and seed the dev tenants
+        run: ./target/debug/conveyor migrate --dev-seed
+
+      - name: start serve
+        run: |
+          set -euo pipefail
+          nohup ./target/debug/conveyor serve > /tmp/walk-serve.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/health/ready >/dev/null && break
+            sleep 1
+          done
+          curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/health/ready
+          # The game host's own client id, through the same host the walk dev server forces.
+          curl -sf -H 'host: game.nonagentic.ai' http://127.0.0.1:8930/config.json \
+            | grep -q '"client_id":"conveyor-game"'
+          # The boundary: /mcp is a real route and must be refused by the outer gate.
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H 'host: game.nonagentic.ai' http://127.0.0.1:8930/mcp)
+          test "$code" = "404"
+
+      - name: install a browser
+        run: |
+          set -euo pipefail
+          cd apps/walk
+          npx playwright install --with-deps chromium
+
+      - name: the walk Playwright suite
+        run: |
+          set -euo pipefail
+          cd apps/walk
+          PLAYWRIGHT_CHANNEL=chromium \
+            DEV_AUTH_TOKEN=dev:alice \
+            npx playwright test --reporter=list
+
+      - name: server and dev-server logs on failure
+        if: failure()
+        run: |
+          echo "=== conveyor serve"
+          tail -n 200 /tmp/walk-serve.log || true

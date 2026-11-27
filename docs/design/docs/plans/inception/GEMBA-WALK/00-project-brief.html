@@ -24,10 +24,13 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--project-brief">GEMBA-WALK — Project brief</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The client is served at <code>https://game.nonagentic.ai/</code> at the root, with its own public client <code>conveyor-game</code> in the <code>conveyor</code> realm; the operator origin's <code>/walk/*</code> 308s to it, and <code>/walk/</code> remains only the no-host dev/CI shape. The action count is 598 (572 attributes + 26 manual registrations). Read "<code>/walk/X</code>" in the analysis sections below as the app path <code>/X</code> on the game host.</p>
+</blockquote>
 <h2 id="outcome">Outcome</h2>
-<p>A signed-in tenant member can complete every operator task in a separate, game-style client at <code>/walk/</code> — the same reads, writes, gates and refusals as <code>apps/web</code> — and the parity is measured by an instrument, so the owner can decide whether the walk becomes the primary UI on evidence rather than on a mock.</p>
+<p>A signed-in tenant member can complete every operator task in a separate, game-style client at <code>https://game.nonagentic.ai/</code> — the same reads, writes, gates and refusals as <code>apps/web</code> — and the parity is measured by an instrument, so the owner can decide whether the walk becomes the primary UI on evidence rather than on a mock.</p>
 <h2 id="boundary">Boundary</h2>
-<p><strong>In:</strong> the static sub-site at <code>/walk/</code> (same image and origin, no new port); route parity with the 52 <code>apps/web</code> route patterns; reachability and schema-rendering of the 597 registered actions; the seven wings and their rooms; seats as view presets; DOM sheets as the only work surface; the <code>WorldView</code> port and the canvas-2D baseline; the parity instrument and its frozen census; Playwright specs per destination; the scoped <code>/walk/*</code> serving fallback; accessibility and performance budgets; deployment; the P6 primacy runbook.</p>
+<p><strong>In:</strong> a static client at <code>https://game.nonagentic.ai/</code> (same image and service, a second host; the operator origin's <code>/walk/*</code> redirects to it); route parity with the 52 <code>apps/web</code> route patterns at the host root; reachability and schema-rendering of the 598 registered actions; the seven wings and their rooms; seats as view presets; DOM sheets as the only work surface; the <code>WorldView</code> port and the canvas-2D baseline; the parity instrument and its frozen census; Playwright specs per destination; the host dispatch, the <code>/walk</code> 308 and the game-host boundary; its own public Keycloak client <code>conveyor-game</code> and the live sign-in proof; accessibility and performance budgets; deployment; the P6 primacy runbook.</p>
 <p><strong>Out:</strong> no table, action, event, port or decision store; no second backend or read model; no SSR; no native mobile, chat, audio or video; no calendar/AV dependency; no fixture or embedded snapshot; the mock is not committed and never the client's source; the design pack at <code>/design/</code> is unchanged; <code>apps/web</code> is not retired before the P6 gate; primacy is not claimed from prose.</p>
 <p><strong>It must not fork:</strong> the action registry, the decision store, the read models, the auth flow's identity provider, or the Playwright contract. A capability the server does not expose is an honest gate, exactly as in <code>apps/web</code>.</p>
 <h2 id="reuse-sources">Reuse sources</h2>
@@ -68,7 +71,7 @@
 <tr>
 <td>Action registry</td>
 <td><code>crates/actions/src/**</code>, <code>docs/design/data/actions.json</code></td>
-<td>are all 597 actions schema-described, and which are destructive or approval-gated?</td>
+<td>are all 598 actions schema-described, and which are destructive or approval-gated?</td>
 </tr>
 <tr>
 <td>Specs</td>
@@ -120,16 +123,16 @@
 <td>the build unit is not claimed until the three inception documents are published</td>
 </tr>
 <tr>
-<td>acceptance-blocked-by</td>
-<td>external (owner/ops)</td>
-<td>the <code>/walk/</code> OIDC redirect-URI registration: the production sign-in scenario waits; the dev cookie unblocks construction</td>
+<td>blocks</td>
+<td>the gitops-production change</td>
+<td>the <code>conveyor-game</code> client, the tunnel ingress, the VirtualService host and the deployment env; delivered in the same unit (CR-WALK-001)</td>
 </tr>
 </tbody>
 </table>
 <h2 id="acceptance">Acceptance</h2>
 <p>Each part carries a BDD scenario with its <code>Verify:</code> command; the plan's stage gates are the build's acceptance.</p>
 <ul>
-<li><strong>Foundation (P1).</strong> Given the merged seed and the dev server, when a signed-in member opens <code>/walk/</code>, then the entrance renders the Portfolio reads and one real write round-trips. Verify: <code>npx playwright test -c apps/walk/playwright.config.ts --grep foundation</code> (to create).</li>
+<li><strong>Foundation (P1).</strong> Given the merged seed and the dev server, when a signed-in member opens <code>https://game.nonagentic.ai/</code>, then the entrance renders the Portfolio reads and one real write round-trips. Verify: <code>npx playwright test -c apps/walk/playwright.config.ts --grep foundation</code> (to create).</li>
 <li><strong>Read parity (P2).</strong> Given every §10.5 destination, when it loads, then loading, empty, partial, error and denied states render with the honest gate. Verify: <code>npx playwright test -c apps/walk/playwright.config.ts --grep reads</code> (to create).</li>
 <li><strong>Write parity (P3).</strong> Given a write action, when it is submitted, then the envelope, <code>If-Match</code>, <code>Idempotency-Key</code> and approval are sent, and a refusal is shown verbatim with no optimistic mutation. Verify: the contract test per action family (to create).</li>
 <li><strong>Retained V1 (P4).</strong> Given the frozen census, when the instrument runs, then every route has a walk route and a spec, and every action is reachable and schema-rendered. Verify: <code>python3 scripts/build-walk-coverage.py --check</code> (to create at P0).</li>
@@ -149,7 +152,7 @@
 </thead>
 <tbody>
 <tr>
-<td>597 actions and 52 routes is multi-session</td>
+<td>598 actions and 52 routes is multi-session</td>
 <td>the schema-driven action sheet gives early reachability; the frozen census and per-destination specs make gaps visible</td>
 </tr>
 <tr>
@@ -169,8 +172,8 @@
 <td>the scoped <code>web.rs</code> fallback and its Rust test land in P1, before any link is published</td>
 </tr>
 <tr>
-<td>OIDC redirect is an external change</td>
-<td>the dev cookie unblocks the spike; the production scenario is <code>acceptance-blocked-by</code>, never a construction blocker</td>
+<td>The game host leaks an operator surface</td>
+<td>a router-level host gate, a host-aware static dispatch and <code>app()</code> matrix tests; <code>/mcp</code> and <code>/design</code> are refused on the game host</td>
 </tr>
 <tr>
 <td>The mock's fixtures leak into the client</td>
@@ -183,7 +186,7 @@
 </tbody>
 </table>
 <h2 id="gaps">Gaps</h2>
-<p>At this brief's date the live register has no GEMBA-WALK row (<code>seed/programme.json</code> has 50 projects, none of them GEMBA-WALK); there is no <code>/walk</code> route, app or spec in the tree. The three inception documents are authored here and published by this unit (#792); the build units G0 and S1–S4 do not exist until then. The OIDC redirect URI is the one external gap.</p>
+<p>At this brief's date the live register has no GEMBA-WALK row (<code>seed/programme.json</code> has 50 projects, none of them GEMBA-WALK); there is no <code>/walk</code> route, app or spec in the tree. The three inception documents are authored here and published by this unit (#792); the build units G0 and S1–S4 do not exist until then. The game host and its client are delivered by CR-WALK-001; there is no external identity gap.</p>
 <h2 id="links">Links</h2>
 <ul>
 <li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>

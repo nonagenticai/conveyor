@@ -63,21 +63,22 @@ inside the canvas or a game engine.
 
 ## 4. Information architecture and routing
 
-**Route parity by construction.** Every `apps/web` path has a walk path formed by the `/walk`
-prefix: `/portfolio` → `/walk/portfolio`, `/board/:board_id` → `/walk/board/:board_id`,
-`/design/adm` → `/walk/design/adm`. `/walk/` is the entrance (the app's `/`). This makes the parity
-instrument a set comparison and the old-route redirect map mechanical.
+**Route parity by construction.** Every `apps/web` path is the walk's path on the game host:
+`/portfolio` → `/portfolio`, `/board/:board_id` → `/board/:board_id`, `/design/adm` →
+`/design/adm`. `/` is the entrance (the app's `/`). The parity instrument is therefore a set
+equality. `conveyor.nonagentic.ai/walk/*` returns a 308 to the game host with the `/walk` prefix
+stripped; the `/walk/` sub-site remains only as the no-host dev/CI shape (ADR 0024).
 
-| Wing | Rooms (destination routes, walk-prefixed) | Read path (families) | Write path (families) | Spec |
+| Wing | Rooms (destination routes on the game host) | Read path (families) | Write path (families) | Spec |
 |---|---|---|---|---|
-| Portfolio & plan | `/walk/portfolio`, `/walk/portfolio/:programme_id`, `/walk/programme`, `/walk/plan`, `/walk/validation`, `/walk/execution`, `/walk/decisions`, `/walk/runs`, `/walk/runs/:run_id`, `/walk/meetings`, `/walk/meetings/:id`, `/walk/` (Today) | portfolio read models, `programmes.*`, `benefits.*`, `tranches.*`, `wbs.*`, `baselines.*`, `registers.*`, `meetings.*`, `approvals.*`, `runs.*`, `metrics.programme` | `programmes.*`, `benefits.*`, `tranches.*`, `wbs.*`, `baselines.take`, `registers.*`, `meetings.*`, `approvals.decide`, `runs.cancel` | `portfolio`, `programme`, `plan`, `validation`, `execution`, `meetings`, `run-queue`, `run-detail` |
-| Organisation | `/walk/organisation`, `/walk/jobs`, `/walk/agents`, `/walk/tools`, `/walk/project-types` | `industries.list`, `departments.list`, `jobs.*`, `job_releases.*`, `job_bindings.*`, `approval_policies.*`, `decision_policies.*`, `refinements.*`, `laya_configs.*`, `ladder.list`, `tools.*`, `toolkits.*`, `tool_bindings.*`, `tool_calls.*` | the create/update/release/retire verbs those families expose; `tools.probe|call|publish|retire`, `toolkits.*`, `tool_bindings.*`, `tool_authoring.*` | `organisation`, `jobs`, `agents`, `tools`, `project-types` |
-| Procedures & authoring | `/walk/procedures`, `/walk/build/processes`, `/walk/build/processes/:process_id`, `/walk/build/process-map`, `/walk/build/process-map/:map_id`, `/walk/authoring` | `procedures.*`, `capabilities.*`, `processes.*`, `approvals.list`, `authoring.assets` | `procedures.*`, `procedures.ingest_*`, `authoring.*` | `procedures`, `processes`, `process-map`, `authoring` |
-| Govern & design | `/walk/design/adm`, `/walk/architecture`, `/walk/design/requirements`, `/walk/design/requirements/:id`, `/walk/design/models`, `/walk/design/models/:model_id`, `/walk/copilot` | `architecture.*`, `repository_search`, `contracts_list`, `profile_get`, requirements/models reads | `artifacts_*`, `contracts_*`, `phases_advance`, `reviews_*`, `board_*` | `adm`, `trace-architecture`, `requirements`, `editor`, `copilot` |
-| Knowledge & memory | `/walk/knowledge` | the knowledge/memory reads of the owning slice; the route renders **not yet live** until they exist | the owning slice's writes | `knowledge` |
-| Measure & improve | `/walk/improve`, `/walk/evals`, `/walk/evals/:eval_id`, `/walk/evals/benchmarks`, `/walk/evals/benchmarks/run/:run_id`, `/walk/measure/usage`, `/walk/measure/prompt-audit`, `/walk/metering` | coach queue, `kata.*`, lessons, evals/benchmarks reads, metering reads | `coach.*`, `kata.*`, `lessons.*` | `improve`, `evals`, `benchmarks`, `inference-usage`, `prompt-audit`, `metering` |
-| Operations | `/walk/operations` | incidents, runbooks, on-call reads | `ops.*` (gated) | `operations` |
-| Utilities | `/walk/search`, `/walk/platform`, `/walk/settings/members`, `/walk/settings/roles`, `/walk/settings/inference`, `/walk/settings/admin`, `/walk/approvals` | the corresponding reads | the corresponding writes | `search`, `platform`, `members`, `roles`, `inference`, `admin`, `shell` |
+| Portfolio & plan | `/portfolio`, `/portfolio/:programme_id`, `/programme`, `/plan`, `/validation`, `/execution`, `/decisions`, `/runs`, `/runs/:run_id`, `/meetings`, `/meetings/:id`, `/` (Today) | portfolio read models, `programmes.*`, `benefits.*`, `tranches.*`, `wbs.*`, `baselines.*`, `registers.*`, `meetings.*`, `approvals.*`, `runs.*`, `metrics.programme` | `programmes.*`, `benefits.*`, `tranches.*`, `wbs.*`, `baselines.take`, `registers.*`, `meetings.*`, `approvals.decide`, `runs.cancel` | `portfolio`, `programme`, `plan`, `validation`, `execution`, `meetings`, `run-queue`, `run-detail` |
+| Organisation | `/organisation`, `/jobs`, `/agents`, `/tools`, `/project-types` | `industries.list`, `departments.list`, `jobs.*`, `job_releases.*`, `job_bindings.*`, `approval_policies.*`, `decision_policies.*`, `refinements.*`, `laya_configs.*`, `ladder.list`, `tools.*`, `toolkits.*`, `tool_bindings.*`, `tool_calls.*` | the create/update/release/retire verbs those families expose; `tools.probe|call|publish|retire`, `toolkits.*`, `tool_bindings.*`, `tool_authoring.*` | `organisation`, `jobs`, `agents`, `tools`, `project-types` |
+| Procedures & authoring | `/procedures`, `/build/processes`, `/build/processes/:process_id`, `/build/process-map`, `/build/process-map/:map_id`, `/authoring` | `procedures.*`, `capabilities.*`, `processes.*`, `approvals.list`, `authoring.assets` | `procedures.*`, `procedures.ingest_*`, `authoring.*` | `procedures`, `processes`, `process-map`, `authoring` |
+| Govern & design | `/design/adm`, `/architecture`, `/design/requirements`, `/design/requirements/:id`, `/design/models`, `/design/models/:model_id`, `/copilot` | `architecture.*`, `repository_search`, `contracts_list`, `profile_get`, requirements/models reads | `artifacts_*`, `contracts_*`, `phases_advance`, `reviews_*`, `board_*` | `adm`, `trace-architecture`, `requirements`, `editor`, `copilot` |
+| Knowledge & memory | `/knowledge` | the knowledge/memory reads of the owning slice; the route renders **not yet live** until they exist | the owning slice's writes | `knowledge` |
+| Measure & improve | `/improve`, `/evals`, `/evals/:eval_id`, `/evals/benchmarks`, `/evals/benchmarks/run/:run_id`, `/measure/usage`, `/measure/prompt-audit`, `/metering` | coach queue, `kata.*`, lessons, evals/benchmarks reads, metering reads | `coach.*`, `kata.*`, `lessons.*` | `improve`, `evals`, `benchmarks`, `inference-usage`, `prompt-audit`, `metering` |
+| Operations | `/operations` | incidents, runbooks, on-call reads | `ops.*` (gated) | `operations` |
+| Utilities | `/search`, `/platform`, `/settings/members`, `/settings/roles`, `/settings/inference`, `/settings/admin`, `/approvals` | the corresponding reads | the corresponding writes | `search`, `platform`, `members`, `roles`, `inference`, `admin`, `shell` |
 
 The table is the map, not a substitute for §10.5's contracts: the read/write families, states and
 refusals are §10.5.2's and the owning slice's. A destination whose slice is not built renders the
@@ -85,9 +86,9 @@ same **not yet live** gate as `apps/web`, naming the missing action or slice, an
 
 **Routing rules**
 
-- Clean URLs (`/walk/<app path>`), HTML5 history. The server must serve `/walk/index.html` for a
-  non-asset path under `/walk/` (see §10); without that change a walk deep link falls through to the
-  operator app's `index.html`.
+- Clean URLs (the app path, e.g. `/portfolio`), HTML5 history. On the game host the server serves
+  `walk/index.html` for a non-asset path (see §10); on a no-host dev origin it serves the same tree
+  under `/walk/`. Without the host rule a walk deep link would fall through to the operator app.
 - Query strings are preserved and are part of the deep link. A sheet that represents a record uses a
   path or query the server can be linked to; a purely visual camera state is never a URL requirement.
 - Back/forward restores the room and the sheet. Closing a sheet returns focus to its opener.
@@ -105,8 +106,10 @@ The walk is a contract-faithful client of the existing server; it invents nothin
   (`read | write | destructive`), `confirm` (`none | card | card-typed`), `tenancy`, `spec_hash` and
   the scope list. This is what makes a generic action sheet possible: the form is generated from the
   schema, and the effect/confirm/tenancy drive the confirmation and approval UX.
-- **Reads.** Literal `GET` routes only (the §10.5.2 read paths), with `next_cursor` pagination.
-  No GraphQL, no ad-hoc read endpoint, no published snapshot as the app's source.
+- **Reads.** The same read contract as `apps/web`: a literal `GET` where one exists (§10.5.2), and
+  otherwise the owning read action invoked with the standard envelope — `programmes.list` is one
+  (`apps/web/src/screens/v2.rs:161-175`). `next_cursor` pagination. No GraphQL, no ad-hoc read
+  endpoint, no published snapshot as the app's source.
 - **Writes.** `POST /api/actions/{name}/invocations` with `{"input": …}` and, for a destructive
   call, `{"input": …, "approval_id": "…"}`. Headers: `Authorization: Bearer`, `X-Active-Tenant`,
   `If-Match: <version>` on an update, `Idempotency-Key` on a create. No optimistic mutation: after a
@@ -203,15 +206,17 @@ map/list view exposes the same rooms and records; no network access; no authorit
 ### 6.3 Renderer candidates
 
 The **simulation is decided**: `bevy_ecs 0.20.1` in `crates/walk-world` (ADR 0022), compiled to
-`wasm32-unknown-unknown` and loaded behind the port. The **renderer is not**: both adapters consume
-the same `FrameView`.
+`wasm32-unknown-unknown` and loaded behind the port. The **renderer is decided**: canvas-2D
+(ADR 0023, accepted 2026-11-27). Both adapters consume the same `FrameView`; the port keeps the
+choice reversible.
 
-- **Baseline — canvas 2D pseudo-3D.** The mock's approach: a hand-written projection, painter's
+- **Selected — canvas 2D pseudo-3D.** The mock's approach: a hand-written projection, painter's
   depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a
-  small payload. It ships first.
-- **Candidate — WebGL2.** The same `FrameView` drawn through a thin WebGL2 layer when the scene's
-  figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR
-  0023 records the winner and the budgets.
+  small payload. It ships first and is the W2 renderer.
+- **Candidate — WebGL2.** The same `FrameView` drawn through a thin WebGL2 layer. Measured
+  head-to-head with the baseline in the P0 spike: it tied at the 60 fps cap with a larger heap and a
+  GPU requirement, so it remains a measured candidate behind the port, not a dependency. ADR 0023
+  records the numbers and the budgets.
 
 No `bevy_render`, `bevy_winit` or `bevy_asset` dependency is admitted: the engine is a simulation
 crate, not a rendering stack.
@@ -304,6 +309,9 @@ The walk carries the mock's validated warm palette, embedded as tokens (no exter
   No `innerHTML` of server data; no `eval`; no third-party script, font or image origins.
 - The client is same-origin with the API; it sends no request to `/api` when signed out and holds no
   embedded credentials.
+- The game has its own public client `conveyor-game` in the `conveyor` realm. The API accepts
+  exactly the two first-party `azp` values (`conveyor-web`, `conveyor-game`) against the `conveyor`
+  audience; an unknown or missing `azp` is rejected (ADR 0024).
 - A refusal is displayed with its action code and the server's message; a toast never claims a
   success the server did not return.
 - The walk adds no CSP weakening. If a strict policy is introduced, it must work under it (no inline
@@ -311,30 +319,41 @@ The walk carries the mock's validated warm palette, embedded as tokens (no exter
 
 ## 10. Deployment and operational contract
 
-- **Static sub-site.** `apps/walk`'s build output is copied to `/out/site/walk` in the image. The
-  server already serves a directory with its own `index.html` as a sub-site (the `/design/` model).
-- **Deep links.** `crates/api/src/web.rs` currently falls back to the site-root `index.html` for a
-  non-asset path that is not a directory index, so `/walk/portfolio` would render the operator app.
-  Add a scoped rule: for `GET`/`HEAD`, a path under `/walk/` with no file extension serves
-  `/walk/index.html`. It never applies to `/api`, `/mcp`, health or metrics. A Rust test asserts the
-  fallback and the 404 for a missing asset.
-- **Local development.** `apps/walk/dev-server.mjs` serves the walk under `/walk/` on port 8932 and
-  proxies `/api`, `/health`, `/config.json` and `/__dev/login` to `127.0.0.1:8930`, preserving the
-  production path shape. Playwright uses `http://127.0.0.1:8932` as its base URL.
-- **Identity.** The same issuer and public client; add the walk's redirect URI
-  (`https://<host>/walk/`, and the dev origin's `/walk/`) to the client's valid redirect URIs. If the
-  identity operator prefers isolation, register a dedicated public client and serve its id to the
-  walk rather than widening the app's client. This is an external configuration prerequisite, not a
-  repository change.
-- **Configuration.** `/config.json` is served at the origin root; the walk fetches it absolutely and
-  uses the same `issuer`, `client_id` and `dev_auth` fields.
+- **Host.** The game is served at `https://game.nonagentic.ai/`, at the root; the same image and
+  service as the API. `conveyor.nonagentic.ai/walk` and `/walk/*` return a 308 to the game host with
+  the prefix stripped. The `/walk/` sub-site remains only as the no-host dev/CI shape.
+- **Static tree.** `apps/walk`'s files (the entry, `src/`, `data/`, the wasm `pkg/`) are copied to
+  `/out/site/walk` in the image. On the game host the static handler maps a request path into that
+  tree at the root; a missing asset is a 404, never the SPA entry. The same tree is base-relative,
+  so it also works under `/walk/` on a no-host dev origin.
+- **Host boundary.** The server normalises the `Host` (lowercase, port stripped) and dispatches
+  before any operator surface. On a game host it serves only the walk tree, `/config.json` and the
+  API; a router-level middleware refuses `/mcp` and `/design` (404) before those routes run, and the
+  static handler never serves the operator index. `/api`, `/health` and `/metrics` are unaffected.
+- **Deep links.** On the game host a non-asset path serves `walk/index.html`; on the operator host
+  `/walk` and `/walk/*` 308 to `CONVEYOR_GAME_PUBLIC_URL` (configuration, never the request `Host`)
+  preserving the remainder and query. The redirect is evaluated before the directory-index branch.
+  Rust tests assert the host matrix, the 404 for a missing asset, the operator surfaces' 404 on the
+  game host, and the operator origin's unchanged behaviour.
+- **Local development.** `apps/walk/dev-server.mjs` serves the walk at the root on port 8932 and
+  proxies `/api`, `/health`, `/config.json` and `/__dev/login` to `127.0.0.1:8930` with
+  `Host: game.nonagentic.ai` so the server answers with the game client id. Playwright uses
+  `http://127.0.0.1:8932` as its base URL.
+- **Identity.** A dedicated **public client `conveyor-game`** in the existing realm `conveyor`:
+  standard flow, PKCE S256, redirect `https://game.nonagentic.ai/*`, web origin
+  `https://game.nonagentic.ai`, the `conveyor` audience mapper, and the same default/optional
+  scopes as `conveyor-web`. The API accepts the two-client `azp` allowlist and keeps the `conveyor`
+  audience. The client is managed by the git-driven realm-patch ConfigMap and its manual Job; the
+  live proof is a real sign-in as `conveyor-e2e`, never a redirect-only claim.
+- **Configuration.** `/config.json` is served per host: the game client id on the game host, the
+  operator client id elsewhere; the same `issuer`, `client_id` and `dev_auth` fields.
 - **Caching.** The entry document is not cached as a stale build (`no-store` or the site's existing
   behaviour); assets may be cached with a content hash or a version query. No new CDN or cache layer.
-- **No new port in production.** The production entry is the existing origin at `/walk/`; port 8932
-  is local development only. Port 8000 is never used.
-- **If Bevy is selected.** The wasm build (`wasm32-unknown-unknown` + wasm-bindgen) runs in
-  GitHub-hosted CI, never on a local machine; the output lands in the same static tree. The static
-  contract above does not change.
+- **No new port in production.** The production entry is the game host on the existing service;
+  port 8932 is local development only. Port 8000 is never used.
+- **The wasm build.** `crates/walk-world` is built for `wasm32-unknown-unknown` with the pinned
+  wasm-bindgen in the image stage and in CI, never on a local machine; the output lands in the same
+  static tree and is a lazy asset, not part of the sign-in critical path.
 
 ## 11. Verification
 
@@ -345,8 +364,12 @@ The walk carries the mock's validated warm palette, embedded as tokens (no exter
   refusal (or one write where the destination owns a write), plus manifest gating (a control
   absent when its action is absent) and the headers on a write (`If-Match`, `Idempotency-Key`,
   `approval_id` where applicable).
-- **Auth** — dev login, deep-link gate, sign-out, and a 401 path; the OIDC redirect is exercised in
-  the P0 spike and in a deployed smoke where configured.
+- **Auth** — dev login, deep-link gate, sign-out, and a 401 path; the deployed OIDC project performs
+  one real PKCE sign-in as `conveyor-e2e`, captures the memory-only token from the first `/api`
+  request and asserts the Portfolio read. A redirect that only reaches Keycloak is not acceptance.
+- **Host matrix (Rust)** — game entry, deep link, asset, missing asset 404, per-host `/config.json`,
+  no operator index, `/mcp` and `/design` 404 on the game host, the operator origin unchanged, the
+  `/walk` 308 with the query preserved, and a hostile `Host` cannot change the redirect target.
 - **Parity instrument** — `scripts/build-walk-coverage.py` compares the frozen census, the composed
   route registry (`src/router/registry.js` fed by `src/router/routes/*.js`) and the walk specs; it
   emits `docs/evidence/walk-coverage.json` and exits non-zero on a missing destination, an expired
@@ -373,8 +396,9 @@ Slow 4G for load metrics. It records:
 | CI build time and reproducibility | the no-local-Rust rule makes CI the only build |
 | DOM-overlay input/focus and screen-reader path | the engine must not own the work surface |
 
-ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2
-wins; it remains the fallback behind the port.
+ADR 0023 records the measured budgets and selects canvas-2D; WebGL2 tied on the reference scene
+but carries a larger heap and a GPU requirement, so it remains a candidate behind the port. The
+baseline is never deleted.
 
 ## 13. Parity gate (before any primacy claim)
 
@@ -392,8 +416,9 @@ The walk reaches parity only when all of these are true and recorded:
 
 ## 14. Do-Not list
 
-- Do not invent a REST endpoint, a read model or an action. Reads are literal `GET`s; writes are
-  actions.
+- Do not invent a REST endpoint, a read model or an action. Reads use the app's read contract — a
+  literal `GET` where one exists, otherwise the owning read action (e.g. `programmes.list`); writes
+  are actions.
 - Do not hardcode which actions exist. The manifest is the contract.
 - Do not use the published snapshot, a seed, a fixture or `localStorage` as the app's programme
   state.

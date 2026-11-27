@@ -26,7 +26,7 @@
     <main class="doc-body"><h1 id="gemba-walk--inception-record">GEMBA-WALK — inception record</h1>
 <p>The durable MSP/TOGAF/SAFe set for the Gemba Walk, the separate client authorised by ADR 0021 as a candidate primary UI. It is modelled on the T19 precedent (<code>docs/plans/T19/</code>) and the standard in <code>docs/plans/inception/README.md</code>.</p>
 <h2 id="status">Status</h2>
-<p>Drafted 2026-11-26 under the owner's direction. ADR 0021 is <strong>Accepted</strong> as a delegated rule decision (the build's approver under the published delegation, 2026-11-22, expiry 2027-02-18); <code>apps/web</code> remains normative until the P6 gate. The documents are drafts until the Architecture Board reviews them (target 2026-12-03, after the P0 spike) and this unit publishes them on the project. The live publication ids are recorded on issue #792.</p>
+<p>Drafted 2026-11-26 under the owner's direction; amended 2026-11-27 by CR-WALK-001 and ADR 0024 (the game host and its own public client). ADR 0021 and ADR 0024 are <strong>Accepted</strong> as delegated rule decisions (the build's approver under the published delegation, 2026-11-22, expiry 2027-02-18); <code>apps/web</code> remains normative until the P6 gate. The documents are drafts until the Architecture Board reviews them (target 2026-12-03, after the P0 spike) and this unit publishes them on the project. The live publication ids are recorded on issue #792.</p>
 <h2 id="reading-order">Reading order</h2>
 <ol type="1">
 <li><code>00-project-brief.md</code> — outcome, boundary, reuse, acceptance.</li>
@@ -37,6 +37,7 @@
 <li><code>05-safe-epic.md</code> — epic, features, enablers, WSJF, PI objectives.</li>
 <li><code>06-statement-of-architecture-work.md</code> — the Phase-A contract.</li>
 <li><code>07-governance-and-evidence.md</code> — WBS, baseline, registers, change control, evidence, closure.</li>
+<li><code>08-change-request-001-host-and-identity.md</code> — CR-WALK-001: the host and identity change, its options, impact, decision and rollback.</li>
 </ol>
 <p>Then the plan (<code>docs/plans/GEMBA-WALK.md</code>) for stages and the issue split, and <code>docs/design/GEMBA-WALK-SPEC.md</code> for the client architecture.</p>
 <h2 id="category-map">Category map</h2>
@@ -80,6 +81,10 @@
 <td><code>07-governance-and-evidence.md</code></td>
 <td><code>project-wbs</code>, <code>project-baseline</code>, <code>project-registers</code>, <code>change-control</code>, <code>evidence</code>, <code>closure-review</code></td>
 </tr>
+<tr>
+<td><code>08-change-request-001-host-and-identity.md</code></td>
+<td><code>change-control</code> (the MSP change request)</td>
+</tr>
 </tbody>
 </table>
 <p><code>candidate-solutions</code>, <code>gap-analysis</code> and the migration plan are sections of the phase-E/F views inside <code>02-architecture-design.md</code>; they are not separate outputs. <code>statement-of-intent</code> and <code>request-for-architecture-work</code> are Phase-G/H outputs, named in the register and authored at completion.</p>
@@ -92,7 +97,7 @@
 </ul>
 <h2 id="links">Links</h2>
 <ul>
-<li>Direction: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+<li>Direction: <code>docs/decisions/0021-gemba-walk-client.md</code>; <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code></li>
 <li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code></li>
 <li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
 <li>Standard: <code>docs/plans/P0-programme-definition.md</code> §4–§6; <code>.claude/skills/{business-analyst,programme-architect,benefits-manager,quality-manager}</code></li>

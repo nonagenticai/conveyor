@@ -1,6 +1,6 @@
 ---
 document: GEMBA-WALK/safe-epic
-version: 1
+version: 2
 status: draft
 project: GEMBA-WALK
 category: epic
@@ -11,9 +11,13 @@ review_date: 2026-12-03
 
 # GEMBA-WALK — SAFe epic
 
+> **Amendment 2026-11-27 (CR-WALK-001, ADR 0024).** The client is served at
+> `https://game.nonagentic.ai/` with its own public client `conveyor-game`; F1, the enablers and
+> PI-4 are updated, and the identity is owned delivery work rather than an external redirect.
+
 ## Epic
 
-**Hypothesis.** If the conveyor serves a second, contract-faithful client at `/walk/` whose every
+**Hypothesis.** If the conveyor serves a second, contract-faithful client at `https://game.nonagentic.ai/` whose every
 read and write goes through the existing registry, then the programme can measure whether the
 action contract is UI-independent, and the owner can decide primacy on a frozen census and
 per-destination evidence instead of a mock.
@@ -32,7 +36,7 @@ with the mock; retiring `apps/web` before the gate; any new table, action, event
 
 | ID | Feature | Parts | Acceptance (the plan's `Verify:`) |
 |---|---|---|---|
-| F1 | The served static sub-site and its fallback | W2 | `apps/walk` static build + the `web.rs` fallback test |
+| F1 | The served game host and its boundary | W2a | `apps/walk` static build + the host matrix in `web.rs`/`web_hosts.rs` |
 | F2 | Read parity across the §10.5 destinations | W3 | per-destination specs: loading, empty, partial, error, denied |
 | F3 | Write parity and the server's gates | W4 | contract test per write: envelope, `If-Match`, `Idempotency-Key`, approval, refusal |
 | F4 | Retained V1 surfaces | W5 | every retained route and its spec |
@@ -46,14 +50,16 @@ with the mock; retiring `apps/web` before the gate; any new table, action, event
 | ID | Enabler | Serves |
 |---|---|---|
 | E1 | `docs/evidence/walk-census.json` + `scripts/build-walk-coverage.py` + exemptions | F6, F8 |
-| E2 | The PKCE identity flow, the dev cookie and the external `/walk/` redirect URI | F1 |
+| E2 | The PKCE identity flow, the dev cookie and the game client `conveyor-game` (git-managed, Job, read-back) | F1 |
 | E3 | The schema-driven action sheet over `actions.describe` | F2, F3 |
 | E4 | The `WorldView` port and the canvas-2D adapter | F7 |
 | E8 | `crates/walk-world` — the `bevy_ecs` simulation core (entities, components, schedules) and its headless tests | F7 |
 | E9 | The transport bridge: the manifest, intents, receipts and SSE deltas at the wasm boundary | F2, F7 |
 | E10 | The replay and determinism harness, including the schedule-ambiguity test | F7, F8 |
 | E11 | The `FrameView` adapter contract shared by canvas-2D and WebGL2 | F7 |
-| E5 | The scoped `/walk/*` fallback in `crates/api/src/web.rs` and its Rust test | F1 |
+| E5 | The host dispatch, the router-level game-host gate and the `/walk` 308 — with their Rust tests | F1 |
+| E12 | The gitops host route: the cloudflared ingress, the `conveyor-public-vs` host and the deployment env | F1 |
+| E13 | The dedicated Keycloak client `conveyor-game` and the API `azp` allowlist | F1, F8 |
 | E6 | The Playwright harness and the scripted decision-task traces | F2–F4, F8 |
 | E7 | The walk CI workflow, the Dockerfile copy and the static build | F1, F8 |
 
@@ -74,9 +80,9 @@ are created; S1–S3 are parallel and equal-sized by construction, S4 carries th
 | ID | Objective | Committed | Business value | Demo evidence |
 |---|---|---|---:|---|
 | PI-1 | The inception set is published and the project is in the live register | committed | 8 | document ids, contract id, register row |
-| PI-2 | The census and instrument reproduce 52 routes and 597 actions without a server | committed | 8 | `build-walk-coverage.py --check` |
+| PI-2 | The census and instrument reproduce 52 routes and 598 actions without a server | committed | 8 | `build-walk-coverage.py --check` |
 | PI-3 | The spike proves PKCE, SSE, schema forms and a deep link on the dev origin | committed | 13 | the spike record; ADR 0022 |
-| PI-4 | The foundation serves `/walk/` and completes a Portfolio read + one write | committed | 13 | Playwright foundation spec |
+| PI-4 | The foundation serves `https://game.nonagentic.ai/`, signs in through `conveyor-game`, and completes a Portfolio read + one write | committed | 13 | the host matrix, the deployed OIDC spec, the foundation spec |
 | PI-5 | Read parity across the seven wings | uncommitted | 8 | per-destination specs |
 | PI-6 | Write parity with headers, approval and refusals | uncommitted | 13 | contract tests |
 | PI-7 | Retained V1 and the slice-dependent gates | uncommitted | 5 | the V1 specs and the gate audit |
@@ -94,13 +100,14 @@ order; no objective is dropped from the P6 gate.
 | blocks | S1–S4 (to create), file-disjoint | the wings and the P6 gate |
 | related | #395 | the delivery contract the design gate reads |
 | related | #526 | the programme publish transport this project's artefacts use |
-| acceptance-blocked-by | external (owner/ops) | the `/walk/` OIDC redirect registration |
+| blocks | the gitops-production change | the client, host, tunnel ingress and deployment env (CR-WALK-001) |
 
 ## Demo evidence
 
 The system demo exhibits: the census reproducing the baseline; the instrument failing on an
 unreachable action and passing after the fix; the spike's PKCE redirect, SSE update, a read form, a
-write with `If-Match`, a destructive action refused without approval, and a deep link; the
+write with `If-Match`, a destructive action refused without approval, and a deep link; the game
+host's entry and boundary, the real `conveyor-game` sign-in, and the `/walk` 308; the
 foundation's Portfolio read and one real write; one read and one write per wing; the retained V1
 routes; the a11y and performance measurements; the P6 decision. No demo, no credit.
 
@@ -118,3 +125,5 @@ surface is a stop-and-escalate, never a backend addition.
 - MSP: `04-msp-profile.md`
 - Architecture: `02-architecture-design.md`
 - Spec: `docs/design/GEMBA-WALK-SPEC.md` §11–§13
+- ADR 0024: `docs/decisions/0024-gemba-walk-host-and-identity.md`
+- Change request: `08-change-request-001-host-and-identity.md`
