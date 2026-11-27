@@ -639,10 +639,6 @@ async fn invoke_call(
     // ── 7: the ledger and the event, after the call ──────────────────────────────────────
     // The cost is the handler's own priced ledger rows, read at the same derived-cost formula
     // every report uses (D52). A replay has no new invocation and therefore no new charge.
-    let invocation_id = outcome
-        .as_ref()
-        .ok()
-        .and_then(|outcome| outcome.invocation_id);
     let input_hash = crate::spec::sha256_hex(&serde_json::to_vec(&call.input).unwrap_or_default());
     let call_id = store::tool::NewToolCall {
         run_id: Some(run.run_id),

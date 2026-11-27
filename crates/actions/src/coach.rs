@@ -1449,7 +1449,6 @@ async fn coach_remedy(
     }
 
     // P4: a systemic class opens exactly one kata; every other class opens none.
-    let mut kata_run_id = None;
     if policy.systemic.iter().any(|class| class == &triage_class) {
         let started = crate::process::runs::process_runs_start(
             &mut *tx,
@@ -1468,7 +1467,7 @@ async fn coach_remedy(
         )
         .await?;
         let started = started.value;
-        kata_run_id = Some(started.id.clone());
+        kata_id = Some(started.id.clone());
         if let Ok(run_id) = Uuid::parse_str(&started.id) {
             store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)
                 .await

@@ -417,7 +417,7 @@ pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> 
 /// govern therefore takes this path; `tailor` alone leaves a draft that never governs.
 pub async fn tailor_adopted(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
     const PHASES: [&str; 9] = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"];
-    let draft = tailor(&f.running, requirements.clone(), contract_kinds.clone()).await;
+    let draft = tailor(f, requirements.clone(), contract_kinds.clone()).await;
     let profile_id = id_of(&draft);
     // The decision about the profile, on a board of its own so the fixture does not disturb
     // board-list assertions.
