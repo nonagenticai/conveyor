@@ -208,3 +208,62 @@ theorem merge_complete_implies (o : UnitObs) (h : mergeComplete o = true)
           cases b with
           | false => simp [mergeComplete] at h
           | true => simp
+
+/-! ## The engine's recorded unit — `checkRecord`
+
+`UnitObs` above is the GitHub-observed contract, collected outside the engine. The engine's own
+unit record is a different subject: a `development_project` charter plus its recorded steps and
+gate decisions. `proofs.attest` derives these facts from rows only, and `checkRecord` is what the
+unit's certificate theorem closes. Every field is `Option`, so an unobserved fact is `none` and
+fails closed — the engine never defaults to a pass. -/
+
+structure UnitRecordFacts where
+  specSha256 : String
+  modelSha256 : String
+  issueRef : Option String
+  repo : Option String
+  lane : Option String
+  pullNumber : Option Nat
+  pullUrl : Option String
+  pullHead : Option String
+  ciRunId : Option String
+  ciSha : Option String
+  ciVerdict : Option String
+  mergeSha : Option String
+  deployDigest : Option String
+  servingDigest : Option String
+  liveHealth : Option Nat
+  liveAcceptanceExit : Option Int
+  gateReview : Option Bool
+  gateMerge : Option Bool
+  gateDeploy : Option Bool
+  deriving DecidableEq, BEq, Repr
+
+def nonEmpty (value : Option String) : Bool :=
+  match value with
+  | some text => !text.isEmpty
+  | none => false
+
+def positive (value : Option Nat) : Bool :=
+  match value with
+  | some number => decide (0 < number)
+  | none => false
+
+/-- The recorded unit is complete: a charter with its issue, a pull request, a green CI run on
+that head, a merge, a deploy, a live check at the deployed digest, and three approved gates. The
+live digest must equal the deployed digest — a live check that ran elsewhere evidences nothing. -/
+def checkRecord (f : UnitRecordFacts) : Bool :=
+  nonEmpty f.issueRef && nonEmpty f.repo && nonEmpty f.lane &&
+    positive f.pullNumber && nonEmpty f.pullUrl && nonEmpty f.pullHead &&
+    nonEmpty f.ciRunId && nonEmpty f.ciSha && f.ciVerdict == some "green" &&
+    nonEmpty f.mergeSha && nonEmpty f.deployDigest && nonEmpty f.servingDigest &&
+    f.liveHealth == some 200 && f.liveAcceptanceExit == some 0 &&
+    f.gateReview == some true && f.gateMerge == some true && f.gateDeploy == some true &&
+    f.servingDigest == f.deployDigest
+
+/-- A record with no merge cannot be proven. This is the fail-closed property in the kernel, not
+in the renderer: an absent fact can never be rendered into a passing certificate. -/
+theorem record_without_merge_is_unproven (f : UnitRecordFacts) (h : f.mergeSha = none) :
+    checkRecord f = false := by
+  simp [checkRecord, nonEmpty, h]
+

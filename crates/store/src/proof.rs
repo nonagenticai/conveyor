@@ -25,7 +25,11 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 /// The subject kinds a certificate can be about (`proof.subject_type`).
-pub const SUBJECT_TYPES: [&str; 7] = [
+///
+/// `unit` is the engine's own recorded delivery unit (#837): its facts are derived from the
+/// development rows, unlike `unit_ledger`, whose facts are GitHub observations collected outside
+/// the engine (#836).
+pub const SUBJECT_TYPES: [&str; 8] = [
     "card",
     "run",
     "wbs_node",
@@ -33,6 +37,7 @@ pub const SUBJECT_TYPES: [&str; 7] = [
     "programme",
     "package",
     "unit_ledger",
+    "unit",
 ];
 
 /// The reduction a proof closed under. `kernel` is `by decide`; `native` is `native_decide`,

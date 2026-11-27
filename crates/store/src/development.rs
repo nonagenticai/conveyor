@@ -130,6 +130,10 @@ pub enum DevelopmentStoreError {
     ClosureExists(Uuid),
     /// The closure's gate references disagree with the approvals the project actually has.
     ClosureGateMissing(&'static str),
+    /// The development project already carries a proof policy.
+    ProofPolicyExists(Uuid),
+    /// The proof policy does not exist in this tenant.
+    ProofPolicyMissing(Uuid),
 }
 
 impl From<sqlx::Error> for DevelopmentStoreError {
@@ -583,4 +587,105 @@ pub async fn auto_approve_tx(
     .execute(&mut *conn)
     .await?;
     Ok(())
+}
+
+// ── proof_policy — the engine-derived unit certificate's policy (#837) ───────────────────
+
+const POLICY_COLUMNS: &str = "id, tenant_id, development_project_id, spec_name, spec_sha256, \
+                              required, version, created_at, updated_at";
+
+/// One `proof_policy` row: the specification a unit's certificate answers and whether the DoD
+/// gate is required. The specification pin is written at charter and never updated.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ProofPolicyRow {
+    pub id: Uuid,
+    pub tenant_id: Uuid,
+    pub development_project_id: Uuid,
+    pub spec_name: String,
+    pub spec_sha256: String,
+    pub required: bool,
+    pub version: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+/// The policy fields `development_projects.charter` writes.
+pub struct NewProofPolicy {
+    pub development_project_id: Uuid,
+    pub spec_name: String,
+    pub spec_sha256: String,
+    pub required: bool,
+}
+
+/// Write the policy at charter. One policy per development project; a replay returns the same
+/// charter through the action's key path, so a second insert is a defect and is refused.
+pub async fn insert_proof_policy_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    input: &NewProofPolicy,
+) -> Result<ProofPolicyRow, DevelopmentStoreError> {
+    let sql = format!(
+        "INSERT INTO proof_policy (tenant_id, development_project_id, spec_name, spec_sha256, \
+                                   required)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING {POLICY_COLUMNS}"
+    );
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(input.development_project_id)
+        .bind(&input.spec_name)
+        .bind(&input.spec_sha256)
+        .bind(input.required)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(|error| {
+            if let Some(database) = error.as_database_error()
+                && database.is_unique_violation()
+            {
+                return DevelopmentStoreError::ProofPolicyExists(input.development_project_id);
+            }
+            DevelopmentStoreError::Database(error)
+        })
+}
+
+/// Read the project's policy, when it has one.
+pub async fn proof_policy_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    development_project_id: Uuid,
+) -> Result<Option<ProofPolicyRow>, DevelopmentStoreError> {
+    let sql = format!(
+        "SELECT {POLICY_COLUMNS} FROM proof_policy
+          WHERE tenant_id = $1 AND development_project_id = $2"
+    );
+    Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(development_project_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Toggle whether the DoD gate is required. This is the only mutation the policy admits: the
+/// specification pin is never rewritten, and the action refuses an implementer's loosening.
+pub async fn set_proof_required_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    development_project_id: Uuid,
+    required: bool,
+) -> Result<ProofPolicyRow, DevelopmentStoreError> {
+    let sql = format!(
+        "UPDATE proof_policy
+            SET required = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND development_project_id = $2
+          RETURNING {POLICY_COLUMNS}"
+    );
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(development_project_id)
+        .bind(required)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(DevelopmentStoreError::ProofPolicyMissing(
+            development_project_id,
+        ))
 }
