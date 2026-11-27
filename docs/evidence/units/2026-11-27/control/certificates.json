@@ -1,0 +1,43 @@
+{
+  "chunks": [
+    {
+      "certificate_id": "01a21d8b-1448-7428-8413-8831e3c75ac5",
+      "certificate_sha256": "70f8254bfca871a1dd4b90205f8de0de4f7c32cf399bf8bfe3bec09a6b8aa3ce",
+      "computation_time_ms": 2592.16,
+      "facts_sha256": "0d3e63fed48c5de41aa921e6978f948fe0bd830319b7168c70e782bd41e0dfec",
+      "model_sha256": "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
+      "name": "chunk-000",
+      "units": 200,
+      "valid": true,
+      "verdict": "proven"
+    },
+    {
+      "certificate_id": "01a21d8b-2695-7a11-a17c-2710f4b17b1c",
+      "certificate_sha256": "7df8d67898de54e8d874173fd4ccbbf4573223ba4dfc9d38b7daf129e14e20cc",
+      "computation_time_ms": 2232.51,
+      "facts_sha256": "949cae703d3786961a2dbcb1892b029a4cdfccee821903c6fb6b32b540dbc4dd",
+      "model_sha256": "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
+      "name": "chunk-001",
+      "units": 64,
+      "valid": true,
+      "verdict": "proven"
+    }
+  ],
+  "corpus_sha256": "4939254241302bf25a06db27a00270090245b35bffdb74f47bc84364567ace78",
+  "programme": {
+    "certificate_id": "01a21d8b-3def-7420-8573-fcf53dcc2afb",
+    "certificate_sha256": "305e321f0524143bbbe668391ca8c538c4d74e8729d2f296f18ab1719fdf8ee7",
+    "leaves": [
+      [
+        "chunk-000",
+        "70f8254bfca871a1dd4b90205f8de0de4f7c32cf399bf8bfe3bec09a6b8aa3ce"
+      ],
+      [
+        "chunk-001",
+        "7df8d67898de54e8d874173fd4ccbbf4573223ba4dfc9d38b7daf129e14e20cc"
+      ]
+    ],
+    "valid": true,
+    "verdict": "proven"
+  }
+}

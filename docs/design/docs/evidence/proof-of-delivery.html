@@ -386,7 +386,90 @@
 </tbody>
 </table>
 <p>The <code>Verify:</code> cross-check against <code>scripts/ci/board.py</code>: 9 units pass the checker and fail the model (the checker accepts one <code>Verify:</code> in the exact section; the model requires one per part), 6 the reverse, 293 agree. Both answers are in <code>units.json</code>; neither is silently adopted.</p>
-<p><strong>What is not run yet.</strong> The kernel verdict over these chunks is deployment-gated: the collector records through <code>proofs.render</code>, which is added by #836 and deploys with this PR. The live step (two chunk certificates — one proven, one unproven if the findings persist — a <code>proofs.reverify</code>, and the programme bundle) is run after the rollout and recorded here with its response bodies. Until then these are the collector's facts and mirror, not a certificate.</p>
+<h3 id="the-live-certification-2026-11-27">The live certification (2026-11-27)</h3>
+<p>The deployment gate opened when #836 merged: the rolled image (<code>f3c8a4e8…</code>) carries <code>proofs.render</code>. Three facts about the live path had to be measured first, and they are now part of the method:</p>
+<ul>
+<li><strong>The edge signature.</strong> <code>conveyor.nonagentic.ai</code> answers <code>403</code> <code>error code: 1010</code> to the default <code>Python-urllib/…</code> signature. With the same token and body in the same minute, <code>curl</code> answered 403 for <code>-A Python-urllib/3.15</code> and 200 for <code>-A conveyor-collector/1.0</code>. The collector now sends the named signature (<code>scripts/proof/collect_units.py:Engine.call</code>, asserted by its <code>--self-test</code>).</li>
+<li><strong>The prover bearer's lifetime.</strong> The engine's sealed <code>lean4.token</code> is a <code>mint_bundle_token(tenant, app, 60)</code> — a <strong>60-minute</strong> mint (<code>apps/server/src/admin/upstream_tokens.rs:114</code>). The token sealed on 2026-11-26 had expired, and the first live <code>lean4.check</code> answered the prover's <code>401</code> through the engine. Re-minting with <code>conveyor admin upstream-token --tenant … --service lean4 --mint</code> restored it immediately. Nothing refreshes it (the residual is #776's), so a live run mints immediately before it certifies.</li>
+<li><strong>The grant.</strong> The licence bearer authenticates as the tenant's <code>mcp</code> machine channel, whose authority is the channel policy, not a user role. <code>channels.policy_set</code> takes the <em>complete</em> override set, so the run read <code>channels.policy_get</code> and merged — <strong>108 → 114</strong> stored overrides, adding exactly <code>lean4.check</code>, <code>proofs.render</code>, <code>proofs.record</code>, <code>proofs.reverify</code>, <code>proofs.get</code> and <code>proofs.list</code>. The 108 live overrides (another lane's in-flight work) were preserved. <code>channels.policy_set</code> itself is <code>denial: administration</code>, so the write went through <code>conveyor admin action invoke</code>.</li>
+</ul>
+<p>The collector's <code>certify</code> over the committed corpus <code>66544ac7…</code> recorded two chunk certificates and the programme bundle:</p>
+<table>
+<thead>
+<tr>
+<th>Certificate</th>
+<th>Units</th>
+<th>Verdict</th>
+<th><code>certificate_sha256</code></th>
+<th><code>facts_sha256</code></th>
+<th>Kernel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01a21d8a-d07f-7994-b63b-17380345c9f4</code></td>
+<td>200</td>
+<td><code>unproven</code></td>
+<td><code>82a7f781…8f22a61</code></td>
+<td><code>6dcf1e47…e04251c</code></td>
+<td>2 517 ms, <code>valid: false</code></td>
+</tr>
+<tr>
+<td><code>01a21d8a-df06-7f12-9d46-ea68816af74c</code></td>
+<td>120</td>
+<td><code>unproven</code></td>
+<td><code>f152cff6…b83f343</code></td>
+<td><code>d6b6c47e…734c5bf</code></td>
+<td>2 353 ms, <code>valid: false</code></td>
+</tr>
+<tr>
+<td><code>01a21d8a-ec89-77f0-9987-ebf1092a0cbf</code></td>
+<td>bundle</td>
+<td><code>proven</code></td>
+<td><code>a32c262a…cd7da1f</code></td>
+<td>—</td>
+<td><code>valid: true</code></td>
+</tr>
+</tbody>
+</table>
+<p>The bundle is <code>proven</code> because <code>checkProgramme</code> certifies the bundle's structure — the expected leaf set and distinct digests — not its leaves' verdicts. The ledger's two refusals are the deliverable.</p>
+<p>The passing-subset control (<code>scripts/proof/control_units.py control</code>) certifies the 264 units that pass every rule, under a derived corpus <code>4939254241302bf2…</code>, so the live record path is exercised on a real proven set as well:</p>
+<table>
+<thead>
+<tr>
+<th>Certificate</th>
+<th>Units</th>
+<th>Verdict</th>
+<th><code>certificate_sha256</code></th>
+<th>Kernel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01a21d8b-1448-7428-8413-8831e3c75ac5</code></td>
+<td>200</td>
+<td><code>proven</code></td>
+<td><code>70f8254b…b8aa3ce</code></td>
+<td>2 592 ms, <code>valid: true</code></td>
+</tr>
+<tr>
+<td><code>01a21d8b-2695-7a11-a17c-2710f4b17b1c</code></td>
+<td>64</td>
+<td><code>proven</code></td>
+<td><code>7df8d678…14e20cc</code></td>
+<td>2 233 ms, <code>valid: true</code></td>
+</tr>
+<tr>
+<td><code>01a21d8b-3def-7420-8573-fcf53dcc2afb</code></td>
+<td>bundle</td>
+<td><code>proven</code></td>
+<td><code>305e321f…fdf8ee7</code></td>
+<td><code>valid: true</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>proofs.reverify</code> on chunk-000 (<code>scripts/proof/control_units.py reverify</code>): the fresh <code>lean4.check</code> answered <code>valid: false</code> in 2 529 ms, the fresh source equalled the stored one, and the stored verdict matched (<code>unproven</code>; the full response is <code>reverify.json</code> beside the certificates). A second <code>certify</code> over the same snapshot replayed the same invocation keys and returned the <strong>same three certificate ids</strong> — the collector is deterministic end to end.</p>
+<p><strong>What this proves, and what it does not.</strong> The kernel certifies that the committed facts do not satisfy <code>checkUnit</code> for the 56 units named above, and the control certifies the path accepts a real passing set. The facts' provenance and the committed snapshot remain the reviewer's lever; the assumption line in § What the certificate says, and what it does not is unchanged.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/proof-of-delivery.md</code> at build time.</span>

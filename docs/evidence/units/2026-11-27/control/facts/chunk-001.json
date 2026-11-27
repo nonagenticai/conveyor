@@ -1,0 +1,1548 @@
+{
+  "kind": "unit_ledger",
+  "model_sha256": "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
+  "provenance": {
+    "collector_sha256": "de57caa7c8b906875731ca9955eae9c120800e616698e0f24e8e450ea108c86c",
+    "units": {
+      "nonagenticai/conveyor#66": {
+        "artifact": "8eda18bab9c9262316215fc92688f57ce91801bccfcb36209233f7040e176b13",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#661": {
+        "artifact": "afcf63cfb15828bda94ae0a78b3e713d105bcd38e21540404873caa185e2433b",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#671": {
+        "artifact": "f3311174318630601458dce8daaed141e6e4f9c93a10e0142199f5768ee63f85",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#68": {
+        "artifact": "c8a3010395e86d14d3fe562e3b2d83f5140f1951c211e72b0e8b81658e269f90",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#680": {
+        "artifact": "1465a65f01c2a04ab1a1a8fd1c55970156fbc345db4671fbf9856c3a133a3157",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#681": {
+        "artifact": "5200b49ddf578e25b1b2007e6dcaab1c7369269a1f2f115b8783526af99ee7c5",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#682": {
+        "artifact": "8ff086ee8cf360e0de41b7df283829828d5ce5be69bec1924e8a7acf2802ce2a",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#683": {
+        "artifact": "3c1936cc0dd715022bf5e1424b0bf80eeedae724bb8038c6d07ad4c2281b1f22",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#684": {
+        "artifact": "cb3d9d1e7ee89fb421e7b0362512faf34d02397b4af1ce4585e23f08a7cdaa1c",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#688": {
+        "artifact": "24225ac59362aaa7133fbda85fad485193f8158f8cba8bb17777f32d8208bd0e",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#693": {
+        "artifact": "b72c0df085710296fcd1d83424c1b5928dec02c9163a4dad3ff3b31559bd8393",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#696": {
+        "artifact": "ac383d06975fff2a027d865e7ab524727b1921490d6b0f39e060df40b391b5e9",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#697": {
+        "artifact": "c413a75ae4963746584247db8c1e56a929154cb8d05144da68001d1954b78f65",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#7": {
+        "artifact": "cab2865eea02190800b38c60aabd0e9cabb4a5e10846da8c0158f1a4ed0dd0ae",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#70": {
+        "artifact": "11c41a4a4b690ee2c0522a34d9ef679b64acefe7f77d1709c50569e57bf291ea",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#714": {
+        "artifact": "9ee9c4001380fe88f5783412af1ee92b70f308eab6afd2b73ebbb62943fddca5",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#716": {
+        "artifact": "1aaf56295ccfd17463148bc7213f6e56bcc2a4734e4ce3778380e6324dcc490a",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#72": {
+        "artifact": "db890a2353d0641aad7244c578a3ff305f731e7ef3114cf384f201f60f5643e5",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#722": {
+        "artifact": "10e10ba2a9509170f252b1e963481587634909537f327740ec66078d913a491f",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#726": {
+        "artifact": "7613fc55ed7b60bdde3b3d12a712e8a9fed403a5391b700fc368bbf2ed97ba14",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#729": {
+        "artifact": "b98635d87704075585a5e88b97a81866fe276de42006aa30dd19149238f6e0ad",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#734": {
+        "artifact": "7eb35cdb3ecd0cd80718fb7d0e65bc582c17c531d5840e046dffb9b0bbcb0e0b",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#738": {
+        "artifact": "14f680d7360d7801000253815f821bcfbb7ac25f7787f4f24f83d28d7f7fcedf",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#74": {
+        "artifact": "1fa29b0cb59e2ce24363cf2dbfe81bf7ff339f615f1bba00d8396a11004f6bf4",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#744": {
+        "artifact": "f98901af8020ba92cea09c28da1827fafdd431de7cdc9d5566320cd36f737bc4",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#745": {
+        "artifact": "380f54e6cfebc19bf2fae36395ebe66141549583b97fdcbf986e10dd8e354e91",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#746": {
+        "artifact": "d1a53ea57c30716887581c06981bc8a6c2ef2d7cf6ed5ff4575a4742ecec0111",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#75": {
+        "artifact": "ef9d1aab5b7b01114e37082dbb3fde72220defd107e58cd1e9181e2326b15feb",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#754": {
+        "artifact": "72b41d3e9ccb410aef5fec52828959352c355b6640569eaca0de634725aebbfa",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#756": {
+        "artifact": "45264192ae893201af8c374fe2d273b3350260acf1fa5252adfafbd525de8e9c",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#76": {
+        "artifact": "d261533dd76ffa3b3163121784ef6a242fc30b841a4f825a76bc1a37cf305dda",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#760": {
+        "artifact": "90fbf764915756ed52e52e9e1c30234e7a74feb129630d4d675345cf9461c77d",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#762": {
+        "artifact": "c46f7e4f89d66ad571747b8bc60f7a326cfe3673d856006a8c6e1acabf19460d",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#763": {
+        "artifact": "e07fd7e7efbabfc1d6a23ba17712c2650374a3d7668da147678a110540c4fe20",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#77": {
+        "artifact": "4dab08268e008cb2508ab46ecc16302e65892211a19415518f62bdb13220c34c",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#773": {
+        "artifact": "eda519eaa2653cf5aecfb55935b0440dc838851ec1611162cad278de65311a10",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#776": {
+        "artifact": "c9580007700d1ae4520f3b6f9b5852ab22f4a0b4fb0ac18a354ef65a6945373c",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#778": {
+        "artifact": "c95d1481b7ebe90555868574690d823362611753ff62f4f07de9784c376ccbf4",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#779": {
+        "artifact": "448d9e08b1adf333d97b024a7cdf3ee7049f1515b3f9ea0f61045a1945788a37",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#78": {
+        "artifact": "ca46e09fed41df10b6954089e4d82b1b36fe7c6ecba6c866f96c31b211886151",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#780": {
+        "artifact": "296a06c0f0401b04d7418377006d5b7726d7b9309215fd34ba10b2649bc70ae4",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#787": {
+        "artifact": "3eac8cd42c65d711b52155d8465ac6f8a409e60398aa4d1ba01262ea415a8538",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#789": {
+        "artifact": "380755a50b234b591f421736517a16c84673ee7e7d288f4f65032dc9b806ea1a",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#79": {
+        "artifact": "32bbaf7838cdde67a9125d2f708d0f318f6c1868194ae93dd9574511b3e8248d",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#791": {
+        "artifact": "0497b47a090d38baeaf624a3fa07157b99e53b3c93ff4c219481ed4357ce852b",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#8": {
+        "artifact": "1465ec36d599d7d8f8d61c062114aed30bfbe17e430964eb8ef60753cdba5227",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#80": {
+        "artifact": "7b2ee16dda3746ba8d9e4ac667ad4916c58493fa8d4d1f93f8fcc42b2bbf6839",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#806": {
+        "artifact": "8792aa542df69ef8688858b93d98674892c8bbe542e02ffef2f1d9dc9384757a",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#812": {
+        "artifact": "daa49fb7f63b715eab0bd60a914d818a3d20cf06fb5a5487aca242a58583fcf0",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#813": {
+        "artifact": "fdd0e3b781f49c420fa6aa2e4eb93b58f758adcf6c0fbf0b70e8668ad69259fb",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#82": {
+        "artifact": "8d9da2b20f0222cc6fbd478d015481bd87a6581272e80f108b0cd0baf3f680f0",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#821": {
+        "artifact": "c903d36c673f522f1181933e00249ad1e06798979df6363ec7e90e5f132ef5e3",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#822": {
+        "artifact": "28be158361a694aa8b4db6039f902acca84d296c7d4a380eb87192d035b0de41",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#83": {
+        "artifact": "16b7fc626e5c1f02464bd805a8dd447897a5aa92ec3099873fcb9dbdaf63c315",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#84": {
+        "artifact": "c87d848c4fc5b8af2ffc1a0feff7480d367f5056a5827a21634ff89188ecd691",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#85": {
+        "artifact": "567971b8f0a9780d36ebedd3f3f328ca697b42394d7113a57da12782ba14b9da",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#86": {
+        "artifact": "c591eee66936bfa007e4d13fa2afbe5f197beb9f17c0da55be5641a2b36566dc",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#87": {
+        "artifact": "9630e8e805f1171ad7b8aed6deb4af0ee1b06a1617b2c429fc514adfe39b7e90",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#88": {
+        "artifact": "18989e732f0b91a74545de6fa3d2532edfa0ab9a3ab700b8658b748c92eab7b3",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#89": {
+        "artifact": "98d52c5ea34f9aa5e141dd7472c168f649a46320d59bc43ecb723c93397e972e",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#93": {
+        "artifact": "347ed508fc0a48534d34c82b6d95a137e5d26e6d1267c9492ae2e5c15d04ac9d",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#95": {
+        "artifact": "468d409b6aca7c3b8772a2d40c9982dd74e38df0b20114c6ebcc994eb7e1d24d",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#97": {
+        "artifact": "f4dcc09583ccc6e9931b45dfad139468fb0645844cb285dfe7a555f1d97c9538",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      },
+      "nonagenticai/conveyor#98": {
+        "artifact": "2c067e55cb8154976e841e76ee104162d3d31655a57226dc002ce88a676d5310",
+        "rules": {
+          "branchDeleted": "branch.head_liveness/v1",
+          "branches": "branch.claim_names/v1",
+          "ciRuns": "ci.pull_request_runs/v1",
+          "closesKeyword": "pull.closing_keyword/v1",
+          "issue": "issue.state/v1",
+          "pull": "pull.state/v1",
+          "pulls": "pull.closing_references/v1",
+          "verifyParts": "issue.contract_verify/v2"
+        }
+      }
+    }
+  },
+  "spec_sha256": "12514c99588f9b8c02f46592384bd62878cb350d8948fbfa9f9df9987ca26fc0",
+  "units": [
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#66",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#661",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#671",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#68",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#680",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#681",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#682",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#683",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#684",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#688",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#693",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#696",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#697",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#7",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#70",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#714",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#716",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#72",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#722",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#726",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#729",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#734",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#738",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#74",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#744",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#745",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#746",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#75",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#754",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#756",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#76",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#760",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#762",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#763",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#77",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#773",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#776",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#778",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#779",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#78",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#780",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#787",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#789",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#79",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#791",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#8",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#80",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#806",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#812",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#813",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#82",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#821",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#822",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#83",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#84",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#85",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#86",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#87",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#88",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#89",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#93",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#95",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#97",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    },
+    {
+      "branchDeleted": true,
+      "branches": 1,
+      "ciRuns": 1,
+      "closesKeyword": true,
+      "issue": "closed",
+      "key": "nonagenticai/conveyor#98",
+      "pull": "merged",
+      "pulls": 1,
+      "verifyParts": true
+    }
+  ]
+}

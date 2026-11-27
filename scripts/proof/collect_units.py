@@ -736,6 +736,10 @@ class Engine:
                 "Authorization": f"Bearer {self.token}",
                 "Content-Type": "application/json",
                 "Idempotency-Key": key,
+                # Cloudflare answers 403 `error code: 1010` to the default
+                # `Python-urllib/…` signature on the public host; a named client
+                # signature passes. Measured 2026-11-27.
+                "User-Agent": "conveyor-collector/1.0",
             },
             method="POST",
         )
@@ -1076,6 +1080,33 @@ def self_test() -> int:
 
     assert [unit["key"] for unit in corpus["units"]] == sorted(units)
     assert len(chunks(corpus["units"], 2)) == 2, "chunking is by size"
+
+    # The public host answers 403 `error code: 1010` to the default Python-urllib
+    # signature; the client must send a named one (measured 2026-11-27).
+    seen: dict[str, str] = {}
+
+    class _Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_exc):
+            return False
+
+        def read(self) -> bytes:
+            return b"{}"
+
+    def _capture(request, timeout=None):  # noqa: ANN001, ARG001
+        seen.update({key.lower(): value for key, value in request.header_items()})
+        return _Response()
+
+    original = urllib.request.urlopen
+    urllib.request.urlopen = _capture
+    try:
+        Engine("https://example.invalid", "token").call("lean4.check", {}, "self-test")
+    finally:
+        urllib.request.urlopen = original
+    assert seen.get("user-agent") == "conveyor-collector/1.0", seen
+
     print("self-test: ok")
     return 0
 
