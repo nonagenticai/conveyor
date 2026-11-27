@@ -1,6 +1,17 @@
 ---
 name: kata
 description: Use when a systemic failure must be improved rather than patched — a named part of the system changed, an instrument and a pre-registered prediction, a measurement and an adoption decision. Improves the system; a person adopts the change.
+allowed-actions:
+  - kata.open
+  - kata.get
+  - kata.observe
+  - kata.analyse
+  - kata.hypothesise
+  - kata.propose
+  - kata.measure
+  - kata.standardise
+  - kata.sustain
+  - kata.stretch
 ---
 
 # kata
@@ -22,7 +33,8 @@ it. Hand adoption to a person.
 | The six Gets, the kata tenant and the never-list | `docs/SPEC_V2.md` §6.3 |
 | Kata actions | `kata.open`, `kata.get`, `kata.observe`, `kata.analyse`, `kata.hypothesise`, `kata.propose`, `kata.measure`, `kata.standardise`, `kata.sustain`, `kata.stretch`, `kata.adopt` |
 | Inputs | failed runs, eval deltas, benchmark regressions, coach escalations, ops postmortems |
-| Record tool | `scripts/programme-record.py` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -58,7 +70,7 @@ it. Hand adoption to a person.
 | Measurement | `kata.measure` at the instrument's revision |
 | Adoption | `kata.adopt` by a person |
 | Propagation | `kata.stretch` per target |
-| Live act | `python3 scripts/programme-record.py --action kata.observe ...` with `--read-action kata.get` |
+| Live act | `kata.observe` over `/api/actions` with the session bearer; read back with `kata.get` |
 
 ## Refusals
 
@@ -81,5 +93,13 @@ it. Hand adoption to a person.
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action kata.get --input '{"id":"<kata-id>"}'
+test -f .claude/skills/kata/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/kata.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<kata-id>"}}'
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.

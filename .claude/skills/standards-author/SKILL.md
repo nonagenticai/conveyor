@@ -1,6 +1,10 @@
 ---
 name: standards-author
 description: Use when a programme output, standard or evidence document must be authored or revised to the adopted artefact standard; when a document-backed output must be published; or when an output's category, headings or links are challenged. Authors to the standard; the owner or Board approves.
+allowed-actions:
+  - documents.compose
+  - documents.publish
+  - documents.get
 ---
 
 # standards-author
@@ -26,7 +30,9 @@ resolvable links, and a rendered page. Never approve your own output.
 | Committed pack | `docs/design/scripts/publish-standards.sh` |
 | Design-docs index | `docs/design/scripts/check-docs.cjs` |
 | Published standards | `docs/standards/` |
-| Record tool | `scripts/programme-record.py`; `documents.compose`, `documents.publish`, `documents.get` |
+| Actions | `documents.compose`, `documents.publish`, `documents.get` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -61,7 +67,7 @@ resolvable links, and a rendered page. Never approve your own output.
 | Document | `documents.publish` → `documents.get`; repo copy under `docs/` |
 | Rendered page | `docs/design/docs/output-<id>.html` |
 | Standard | `docs/standards/` |
-| Live act | `python3 scripts/programme-record.py --action documents.compose ...` with `--read-action documents.get` |
+| Live act | `documents.compose` over `/api/actions` with the session bearer; read back with `documents.get` |
 
 ## Refusals
 
@@ -84,7 +90,16 @@ resolvable links, and a rendered page. Never approve your own output.
 ## Verify
 
 ```bash
+test -f .claude/skills/standards-author/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/documents.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<document-id>"}}'
 python3 scripts/check-output-standard.py
 python3 scripts/generate-standards.py --check --snapshot docs/design/data
 docs/design/scripts/publish-standards.sh --check
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.

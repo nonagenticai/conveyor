@@ -1,6 +1,14 @@
 ---
 name: project-manager
 description: Use when a request must become a governed project — charter, WBS, baseline, dependencies, risks, gates and closure — or when a project's baseline or scope must change. Charters and closes; a distinct approver decides every gate.
+allowed-actions:
+  - projects.charter
+  - projects.get
+  - pm.plan
+  - pm.get
+  - pm.route_gate
+  - pm.close
+  - changes.request
 ---
 
 # project-manager
@@ -24,8 +32,9 @@ never change an approved baseline without a change request, never do the deliver
 | Gates, evidence and dual control | `docs/SPEC_V2.md` §5.4 |
 | Brief and inception | `docs/plans/P0-programme-definition.md` §4, §5 |
 | Worked precedent | `docs/plans/T19/project-brief.md` (implementation #606) |
-| Actions | `projects.charter`, `pm.plan`, `pm.get`, `pm.route_gate`, `pm.close`, `changes.request` |
-| Record tool | `scripts/programme-record.py` |
+| Actions | `projects.charter`, `projects.get`, `pm.plan`, `pm.get`, `pm.route_gate`, `pm.close`, `changes.request` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -60,7 +69,7 @@ never change an approved baseline without a change request, never do the deliver
 | Gate routing | `pm.route_gate` + the approval row the approver writes |
 | Change | `changes.request` |
 | Closure | `pm.close` → `pm.get` |
-| Live act | `python3 scripts/programme-record.py --action projects.charter ...` with `--read-action pm.get` |
+| Live act | `projects.charter` over `/api/actions` with the session bearer; read back with `pm.get` and `projects.get` |
 
 ## Refusals
 
@@ -77,13 +86,23 @@ never change an approved baseline without a change request, never do the deliver
 |---|---|
 | The brief or inception is missing | `business-analyst` |
 | The delivery design or contract is missing | `solution-architect` |
-| The unit's execution is ready | `delivery-unit` (#781, queued) / `issue-deliver` until it lands |
+| The unit's execution is ready | `delivery-unit` / `issue-deliver` |
 | The tranche review needs project status | `programme-manager` |
 | Closure evidence needs an independent verdict | `quality-manager` |
 
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"<project-id>"}'
-python3 scripts/programme-record.py --check --action projects.get --input '{"id":"<project-id>"}'
+test -f .claude/skills/project-manager/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/pm.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"project_id":"<project-id>"}}'
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/projects.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<project-id>"}}'
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.

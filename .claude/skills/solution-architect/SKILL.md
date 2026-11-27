@@ -1,6 +1,14 @@
 ---
 name: solution-architect
 description: Use when a delivery project needs its analysis and architecture inception, design options, typed artefacts or a delivery contract request; or when a design must be handed to the build. Designs the delivery; the Board approves and programme-architect runs Phase-G compliance.
+allowed-actions:
+  - architecture.artifacts_create
+  - architecture.artifacts_update
+  - architecture.artifacts_link
+  - architecture.artifacts_list
+  - architecture.contracts_request
+  - architecture.contracts_get
+  - architecture.phases_advance
 ---
 
 # solution-architect
@@ -25,7 +33,8 @@ existing surface.
 | Contracts, phases, compliance, waivers | `docs/plans/T9-architecture-capability.md` §4.3–§4.5 |
 | Worked precedents | `docs/plans/T19/architecture-design.md`; `docs/plans/inception/T12/01-inception-analysis.md` |
 | Actions | `architecture.artifacts_create`, `architecture.artifacts_update`, `architecture.artifacts_link`, `architecture.artifacts_list`, `architecture.contracts_request`, `architecture.contracts_get`, `architecture.phases_advance` |
-| Record tool | `scripts/programme-record.py` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -61,7 +70,7 @@ existing surface.
 | Inception analysis and design | project `document` (`meta.category='analysis'` / `'architecture'`); `docs/plans/inception/<project>/` |
 | Artefacts | `architecture.artifacts_*`; `architecture_artifact` rows and links |
 | Contract request | `architecture.contracts_request` → `architecture.contracts_get` |
-| Live act | `python3 scripts/programme-record.py --action architecture.contracts_request ...` with `--read-action architecture.contracts_get` |
+| Live act | `architecture.contracts_request` over `/api/actions` with the session bearer; read back with `architecture.contracts_get` |
 
 ## Refusals
 
@@ -85,6 +94,14 @@ existing surface.
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action architecture.contracts_get --input '{"id":"<contract-id>"}'
+test -f .claude/skills/solution-architect/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/architecture.contracts_get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<contract-id>"}}'
 test -f docs/plans/inception/T12/01-inception-analysis.md
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.
