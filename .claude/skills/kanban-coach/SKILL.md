@@ -1,6 +1,13 @@
 ---
 name: kanban-coach
 description: Use when a card is blocked, a run fails, a lease is stale, WIP is breached or a gate times out; when an interruption must become one coach card and a bounded remedy or an escalation. Organises the work; never does the blocked work.
+allowed-actions:
+  - coach.interrupt
+  - coach.triage
+  - coach.remedy
+  - coach.escalate
+  - cards.get
+  - kata.open
 ---
 
 # kanban-coach
@@ -22,7 +29,8 @@ systemic.
 | The coach role, closed sets and recursion guard | `docs/SPEC_V2.md` §6.2 |
 | Coach actions | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
 | Card and board rows | `cards.get`; the board/list |
-| Record tool | `scripts/programme-record.py` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -55,7 +63,7 @@ systemic.
 | Triage | `coach.triage` row |
 | Remedy | `coach.remedy` row |
 | Escalation | `coach.escalate`; the human decision |
-| Live act | `python3 scripts/programme-record.py --action coach.triage ...` with `--read-action cards.get` |
+| Live act | `coach.triage` over `/api/actions` with the session bearer; read back with `cards.get` |
 
 ## Refusals
 
@@ -77,5 +85,13 @@ systemic.
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action cards.get --input '{"id":"<card-id>"}'
+test -f .claude/skills/kanban-coach/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/cards.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<card-id>"}}'
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.

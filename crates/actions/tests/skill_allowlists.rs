@@ -28,15 +28,22 @@ use std::path::{Path, PathBuf};
 
 /// The playbooks that must declare their action set. The `issue-*` skills act through git and
 /// `gh`, not the action route, and are deliberately not here.
-const ROLE_PLAYBOOKS: [&str; 8] = [
+const ROLE_PLAYBOOKS: [&str; 15] = [
     "benefits-manager",
     "business-analyst",
     "delivery-unit",
+    "kanban-coach",
+    "kata",
+    "operations",
+    "pmo-lead",
     "programme-architect",
     "programme-manager",
     "programme-sync",
+    "project-manager",
     "quality-manager",
     "release-manager",
+    "solution-architect",
+    "standards-author",
 ];
 
 fn skills_root() -> PathBuf {
@@ -140,4 +147,29 @@ fn an_unknown_action_and_a_forbidden_action_are_both_caught() {
     let forbidden = violations(&["lessons.review".to_owned()]);
     assert_eq!(forbidden.len(), 1, "{forbidden:?}");
     assert!(forbidden[0].contains("machine-forbidden"), "{forbidden:?}");
+}
+
+/// #849: the Python recorder is retired from every role playbook. A playbook that names it shows
+/// the session a route the machine principal does not have (no bearer, no grant) and hides the
+/// action that actually exists, so the guard is a test rather than a sentence.
+#[test]
+fn no_role_playbook_names_the_python_record_tool() {
+    let root = skills_root();
+    let mut problems = Vec::new();
+    for name in ROLE_PLAYBOOKS {
+        let path = root.join(name).join("SKILL.md");
+        match fs::read_to_string(&path) {
+            Ok(text) if text.contains("scripts/programme-record.py") => problems.push(format!(
+                "{}: names the retired Python act; use /api/actions with the session bearer",
+                path.display()
+            )),
+            Ok(_) => {}
+            Err(error) => problems.push(format!("{}: {error}", path.display())),
+        }
+    }
+    assert!(
+        problems.is_empty(),
+        "no role playbook may name the Python recorder:\n{}",
+        problems.join("\n")
+    );
 }
