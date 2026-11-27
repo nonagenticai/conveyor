@@ -17,6 +17,8 @@
 //! docs/design/data/artefacts.json     governed assets and document metadata
 //! docs/design/data/measure.json       inference aggregates (tokens, cache classes) and the
 //!                                     per-project/per-card spend the delivery view reads
+//! docs/design/data/delivery.json      each delivery unit's charter, steps, gates and closure,
+//!                                     and the programme-health section (#782 P1)
 //! docs/design/data/secrets.json       secret METADATA only — never a value
 //! docs/design/data/evidence.json      the evidence/plan documents and their hashes
 //! docs/design/data/feedback.json      the external feedback issues
@@ -282,6 +284,12 @@ pub async fn run_with_pool(
     )?;
     write_file(
         &args.out,
+        "delivery.json",
+        with_header(data.delivery, SCHEMA, &generated_at),
+        &mut files,
+    )?;
+    write_file(
+        &args.out,
         "secrets.json",
         with_header(data.secrets, SCHEMA, &generated_at),
         &mut files,
@@ -414,6 +422,8 @@ pub(crate) fn snapshot_js(
         "architecture": data.architecture,
         "ops": data.ops,
         "measure": data.measure,
+        "delivery": data.delivery,
+        "programme_health": data.programme_health,
     });
     // The register is not a store section (`SnapshotData` is owned by `conveyor_store`), so it
     // is attached here, before redaction — present only when the caller supplied one, absent
