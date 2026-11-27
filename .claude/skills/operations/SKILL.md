@@ -1,6 +1,25 @@
 ---
 name: operations
 description: Use when an incident, alert, failed run, cluster or CI outage, or a destructive ops action is in scope; when a mitigation, a postmortem or a kata candidate must be recorded. Acts through a card; the destructive gate is human.
+allowed-actions:
+  - ops.pods
+  - ops.events
+  - ops.logs
+  - ops.ci_status
+  - ops.flux_status
+  - ops.host_status
+  - ops.incident
+  - ops.triage
+  - ops.mitigate
+  - ops.postmortem
+  - ops.resolve
+  - ops.restart
+  - ops.scale
+  - ops.rollback
+  - ops.flag_flip
+  - approvals.request
+  - cards.get
+  - kata.open
 ---
 
 # operations
@@ -25,7 +44,8 @@ candidate when the signature is systemic.
 | Write tools (each gated) | `ops.restart`, `ops.scale`, `ops.rollback`, `ops.flag_flip` |
 | The incident acts | `ops.incident`, `ops.triage`, `ops.mitigate`, `ops.postmortem`, `ops.resolve` |
 | Estate skills | `estate-cluster`, `estate-ci`, `estate-data` |
-| Record tool | `scripts/programme-record.py` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -61,7 +81,7 @@ candidate when the signature is systemic.
 | Postmortem | `ops.postmortem`; the document row |
 | Resolution | `ops.resolve` |
 | Kata candidate | `kata.open` (proposed, not adopted) |
-| Live act | `python3 scripts/programme-record.py --action ops.incident ...` with `--read-action cards.get` |
+| Live act | `ops.incident` over `/api/actions` with the session bearer; read back with `cards.get` |
 
 ## Refusals
 
@@ -85,6 +105,14 @@ candidate when the signature is systemic.
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action cards.get --input '{"id":"<card-id>"}'
+test -f .claude/skills/operations/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/cards.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{"id":"<card-id>"}}'
 ./scripts/ops-live-proof.sh assert   # needs CONVEYOR_SSH_KEY, CONVEYOR_HOST, BOARD_ID, LIST_ID, RUNBOOK_ID
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.
