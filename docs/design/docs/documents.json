@@ -1740,6 +1740,15 @@
     },
     {
       "title": "report",
+      "path": "docs/evidence/units/2026-11-27-scoped/report.html",
+      "source": "docs/evidence/units/2026-11-27-scoped/report.md",
+      "section": "Evidence",
+      "sha256": "b48667bcd036c8a9e3766964055b919345c336e69fa2e9c6f3f93f3360551593",
+      "bytes": 6148,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-scoped/report.md"
+    },
+    {
+      "title": "report",
       "path": "docs/evidence/units/2026-11-27/report.html",
       "source": "docs/evidence/units/2026-11-27/report.md",
       "section": "Evidence",
