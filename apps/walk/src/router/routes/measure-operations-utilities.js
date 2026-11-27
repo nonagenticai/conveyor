@@ -1,3 +1,140 @@
-// S3's rows (Knowledge, Measure, Operations & Utilities). Empty until S3 lands.
+// S3's rows (Knowledge & memory + Measure & improve + Operations + Utilities). Each row is the
+// census's walk/app/room/spec exactly; the destination module is loaded lazily (SPEC §6.1).
+// Literal paths precede the parameterised rows, so `/evals/benchmarks` never resolves as an
+// eval id.
 
-export default [];
+export default [
+  {
+    walk: "/approvals",
+    app: "/approvals",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/approvals.spec.ts",
+    load: () => import("../../destinations/approvals.js"),
+  },
+  {
+    walk: "/evals",
+    app: "/evals",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/evals.spec.ts",
+    load: () => import("../../destinations/evals.js"),
+  },
+  {
+    walk: "/evals/benchmarks",
+    app: "/evals/benchmarks",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/benchmarks.spec.ts",
+    load: () => import("../../destinations/benchmarks.js"),
+  },
+  {
+    walk: "/evals/benchmarks/run/:run_id",
+    app: "/evals/benchmarks/run/:run_id",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/benchmarks.spec.ts",
+    load: () => import("../../destinations/benchmarks.js"),
+  },
+  {
+    walk: "/evals/improvement",
+    app: "/evals/improvement",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/improve.spec.ts",
+    load: () => import("../../destinations/improve.js"),
+  },
+  {
+    walk: "/evals/:eval_id/:tab",
+    app: "/evals/:eval_id/:tab",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/evals.spec.ts",
+    load: () => import("../../destinations/evals.js"),
+  },
+  {
+    walk: "/evals/:eval_id",
+    app: "/evals/:eval_id",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/evals.spec.ts",
+    load: () => import("../../destinations/evals.js"),
+  },
+  {
+    walk: "/improve",
+    app: "/improve",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/improve.spec.ts",
+    load: () => import("../../destinations/improve.js"),
+  },
+  {
+    walk: "/knowledge",
+    app: "/knowledge",
+    room: "knowledge",
+    spec: "e2e/measure-operations-utilities/knowledge.spec.ts",
+    load: () => import("../../destinations/knowledge.js"),
+  },
+  {
+    walk: "/measure/prompt-audit",
+    app: "/measure/prompt-audit",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/prompt-audit.spec.ts",
+    load: () => import("../../destinations/prompt-audit.js"),
+  },
+  {
+    walk: "/measure/usage",
+    app: "/measure/usage",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/usage.spec.ts",
+    load: () => import("../../destinations/usage.js"),
+  },
+  {
+    walk: "/metering",
+    app: "/metering",
+    room: "measure",
+    spec: "e2e/measure-operations-utilities/metering.spec.ts",
+    load: () => import("../../destinations/metering.js"),
+  },
+  {
+    walk: "/operations",
+    app: "/operations",
+    room: "operations",
+    spec: "e2e/measure-operations-utilities/operations.spec.ts",
+    load: () => import("../../destinations/operations.js"),
+  },
+  {
+    walk: "/platform",
+    app: "/platform",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/platform.spec.ts",
+    load: () => import("../../destinations/platform.js"),
+  },
+  {
+    walk: "/search",
+    app: "/search",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/search.spec.ts",
+    load: () => import("../../destinations/search.js"),
+  },
+  {
+    walk: "/settings/admin",
+    app: "/settings/admin",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/settings.spec.ts",
+    load: () => import("../../destinations/settings.js"),
+  },
+  {
+    walk: "/settings/inference",
+    app: "/settings/inference",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/settings.spec.ts",
+    load: () => import("../../destinations/settings.js"),
+  },
+  {
+    walk: "/settings/members",
+    app: "/settings/members",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/settings.spec.ts",
+    load: () => import("../../destinations/settings.js"),
+  },
+  {
+    walk: "/settings/roles",
+    app: "/settings/roles",
+    room: "utilities",
+    spec: "e2e/measure-operations-utilities/settings.spec.ts",
+    load: () => import("../../destinations/settings.js"),
+  },
+];
