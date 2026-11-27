@@ -30,8 +30,8 @@ review_date: 2026-12-03
 | W2a | Serving and identity: the host dispatch, the router-level game-host gate, `/config.json` per host, the `/walk` 308, the `azp` allowlist, the Keycloak client and its read-back | P1 | delivery (G0) | the Rust host matrix; the admin-API read-back | done 2026-11-27 (#813; live matrix 14/14) |
 | W2b | The client: auth, API, forms, router, shell, world entrance, Portfolio read + create/update | P1 | delivery (G0) | `node --test`; `tsc`; the foundation Playwright spec | done 2026-11-27 (#813) |
 | W2c | Tests and CI: the walk workflow, the deployed OIDC spec, the Dockerfile/wasm build, the census re-key | P1 | delivery (G0) | the walk workflow green; the deployed sign-in | done 2026-11-27 (#813; engine fix #839) |
-| W3 | Read parity across the seven wings | P2 | S1–S3 | per-destination specs | planned |
-| W4 | Write parity and gates | P3 | S1–S3 | contract tests per write | planned |
+| W3 | Read parity across the seven wings | P2 | S1–S3 | per-destination specs | done 2026-11-27 (#814/#877, #815/#874, #816/#880) |
+| W4 | Write parity and gates | P3 | S1–S3 | contract tests per write | done 2026-11-27 (#814/#877, #815/#874, #816/#880) |
 | W5 | Retained V1 surfaces | P4 | S4 | every retained route and spec | planned |
 | W6 | Slice-dependent surfaces and gate audit | P5 | S4 | the gate audit matches `apps/web` | planned |
 | W7 | P6 parity gate and the primacy runbook | P6 | programme-manager + owner | instrument green; a11y/perf; the owner's decision | planned |
@@ -40,6 +40,21 @@ review_date: 2026-12-03
 The WBS is the build order; the issue split is by file ownership: G0 = W0–W2 (with W2a–W2c),
 S1–S3 = W3–W4 by wing, S4 = W5–W8. The five build issues are created only after the inception set is published
 (#792); the split is the written exception approved for this plan.
+
+## Acceptance
+
+A work package is accepted by its named instrument, never by prose: the WBS row's Acceptance
+column is the plan's `Verify:` and the evidence is the instrument's output at the delivery head.
+A row whose instrument fails is not accepted; a row whose evidence is a document is read back
+through the engine.
+
+## Status
+
+| Work package | State | Evidence |
+|---|---|---|
+| W0–W2 | done 2026-11-27 | #813; the G0 evidence table above |
+| W3–W4 | done 2026-11-27 | #814/#877, #815/#874, #816/#880; the W3/W4 evidence table above |
+| W5–W8 | planned | S4 (#817) |
 
 ## Baseline
 
@@ -126,7 +141,7 @@ re-opens the gate.
 |---|---|---|---|
 | #792 | inception | document ids and hash-equal bodies; `contracts_get`; the 10 artefact rows; the benefit profile; the re-audit | this issue's `Evidence at completion` |
 | G0 (`#813`) | P0–P1 | the census reproduction (52/598); the instrument's four failure modes; the spike record; ADR 0022/0023/0024; the host matrix; the client read-back; the foundation Playwright spec; the deployed OIDC sign-in | recorded 2026-11-27 — see the evidence rows below |
-| S1–S3 (to create) | P2–P3 | per-destination specs (empty/error/happy/refusal/write); the contract tests; the instrument's rows | each PR body |
+| S1–S3 (#814/#877, #815/#874, #816/#880) | P2–P3 | per-destination specs (empty/error/happy/refusal/write); the contract tests; the instrument's rows | recorded 2026-11-27 — see the wing evidence below |
 | S4 (to create) | P4–P6 | all 52 routes; the gate audit; the a11y/perf measurements; the P6 runbook; the owner's decision | the PR body + the closure review |
 
 ### G0 evidence, recorded 2026-11-27
@@ -138,6 +153,14 @@ re-opens the gate.
 | Deployed identity | real `conveyor-e2e` sign-in on `https://game.nonagentic.ai/`; `/api/me` 200; Today rendered | the deployed OIDC setup, passing on #813 |
 | Engine | `#world-canvas` `data-engine="ecs"` after #839/#840; the suite now demands `ecs` | #839 close-out, live digest `sha256:fbdfb090…` |
 | Keycloak | client `conveyor-game` created, its second Job run's preflight passed; redirects, web origins, PKCE and the audience mapper read back | #813 close-out |
+
+### W3/W4 evidence, recorded 2026-11-27
+
+| Wing | Delivery | Specs (the recorded proof) | Instrument |
+|---|---|---|---|
+| S1 — Portfolio & plan + Organisation | #814 / PR #877, head `873b016fc`, merge `30b769b28`; deployed digest `0d4815eb…` | `e2e/portfolio/portfolio.spec.ts` and `e2e/portfolio-organisation/*.spec.ts` (12): programme, plan, validation, execution, decisions, runs, meetings, organisation, jobs, agents, tools, project-types | 15/15 census rows registered; the walk workflow green at the merge head |
+| S2 — Procedures & authoring + Govern & design | #815 / PR #874, head `2db1bf76f`, merge `e6f4c3ac9` | `e2e/procedures-governance/*.spec.ts` (9): procedures, processes, process-map, authoring, adm, architecture, requirements, models, copilot | 13/13 census rows registered; the walk workflow green at the merge head |
+| S3 — Knowledge + Measure & improve + Operations + Utilities | #816 / PR #880, head `c21deb4be`, merge `a92565410` | `e2e/measure-operations-utilities/*.spec.ts` (12): knowledge, improve, evals, benchmarks, usage, prompt-audit, metering, operations, search, platform, settings, approvals | 19/19 census rows registered; the committed record reads 50/52, the 2 absent are S4's |
 
 The live-record read-backs this unit performed are in the register (`03-artifact-register.md`) and
 on #847.
