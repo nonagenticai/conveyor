@@ -133,7 +133,7 @@ use serde_json::{Value, json};
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// Every action the registry serves, in the order `registry().names()` returns it.
 /// Regenerated at the main merge; the per-lane history above is superseded.
-const EXPECTED: [&str; 630] = [
+const EXPECTED: [&str; 631] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -862,7 +862,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // total is unchanged from the 602/28 the merge note recorded; the action spec's kind is
     // what moved, for the three tool-hosted reads T14 serves through the tool platform rather
     // than a direct external call. The action dump was regenerated from this same registry.
-    assert_eq!((internal, external), (605, 25));
+    assert_eq!((internal, external), (606, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
