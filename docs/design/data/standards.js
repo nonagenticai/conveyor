@@ -11908,6 +11908,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-pmp-change-control-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12005,6 +12006,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-pmp-change-control-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12102,6 +12104,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-pmp-change-control-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12541,6 +12544,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-pmp-change-control-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12638,6 +12642,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-pmp-change-control-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12735,6 +12740,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-pmp-change-control-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12832,6 +12838,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-pmp-change-control-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -12929,6 +12936,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-pmp-change-control-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13026,6 +13034,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-pmp-change-control-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13123,6 +13132,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-pmp-change-control-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13334,6 +13344,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-pmp-change-control-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13431,6 +13442,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-pmp-change-control-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13528,6 +13540,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-pmp-change-control-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -13625,6 +13638,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-pmp-change-control-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -14312,6 +14326,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-pmp-change-control-t12:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -14657,6 +14672,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-pmp-change-control-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -15210,6 +15226,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-pmp-change-control-t19f:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -15649,6 +15666,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-pmp-change-control-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -15746,6 +15764,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-pmp-change-control-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -15957,6 +15976,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-pmp-change-control-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -17075,7 +17095,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06b.html",
-        "sha256": "41e6461905d49cc2cf917f2d9cad857848c3ae1f5ad63d832cebd001f2af7796"
+        "sha256": "f8d8c6f45320954df45dd4a72281ba52570f5b61e61686fb7cac0e97058e3086"
       },
       "gate": {
         "approval_id": "",
@@ -17086,7 +17106,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06b",
-      "package_key": "std-pmp-closure-review-s06b:S06b",
+      "package_key": "closed_without_closure_review:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -17193,7 +17214,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06c.html",
-        "sha256": "8ed22c6c077a94709d7bf1e471f049af9603cf1e778172917dfedc16b9b1ae09"
+        "sha256": "3c7a3c70443dbed4582ea355938435d41f8b6fce361dc402727397727ab9d04c"
       },
       "gate": {
         "approval_id": "",
@@ -17204,7 +17225,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06c",
-      "package_key": "std-pmp-closure-review-s06c:S06c",
+      "package_key": "closed_without_closure_review:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -17311,7 +17333,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06d.html",
-        "sha256": "7e7f53aefb4e08e04172e1d56f28d44fb0b0f214174d5e57e29e45883a1faf02"
+        "sha256": "279973f9147b7428a4e4977f7838af842bf81f4cce7401d3cb1be63920e0f158"
       },
       "gate": {
         "approval_id": "",
@@ -17322,7 +17344,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06d",
-      "package_key": "std-pmp-closure-review-s06d:S06d",
+      "package_key": "closed_without_closure_review:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -17816,7 +17839,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s10.html",
-        "sha256": "b9e14fd3b240c67462a683ab6c202247028d05ccd6b6794779b8b09b5221df46"
+        "sha256": "73b36fa25e8b46c934564a9d2ae4bc8f443c3bb7a0a83f28896c6501f03c3461"
       },
       "gate": {
         "approval_id": "",
@@ -17827,7 +17850,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S10",
-      "package_key": "std-pmp-closure-review-s10:S10",
+      "package_key": "closed_without_closure_review:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -17934,7 +17958,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s11.html",
-        "sha256": "1d18e97865833a3d472c393eeada88539d48d57b295aa162e41d244e1370f6dd"
+        "sha256": "65cd22cc045d3f530971b1806e370e3aae3c74cad94868f3e21001b5e3e05794"
       },
       "gate": {
         "approval_id": "",
@@ -17945,7 +17969,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S11",
-      "package_key": "std-pmp-closure-review-s11:S11",
+      "package_key": "closed_without_closure_review:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18052,7 +18077,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s12.html",
-        "sha256": "da022d3538979c3b5d3053e504d572e8b25f10a99e236adba13acd9fd2d71076"
+        "sha256": "f88fbcdcaf17fd88834f1c2ae643cf6116832f7227375fc9bd08e496f91ca556"
       },
       "gate": {
         "approval_id": "",
@@ -18063,7 +18088,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S12",
-      "package_key": "std-pmp-closure-review-s12:S12",
+      "package_key": "closed_without_closure_review:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18170,7 +18196,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s13.html",
-        "sha256": "4c12290afda5054e8815cee9c1a57dd234083c5d7f9e9d8188b407347e9c91b3"
+        "sha256": "91d7ebc1246b23a73847ebe9b85eb2db9efe8278bbce19631ac6cdb7d25b6923"
       },
       "gate": {
         "approval_id": "",
@@ -18181,7 +18207,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S13",
-      "package_key": "std-pmp-closure-review-s13:S13",
+      "package_key": "closed_without_closure_review:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18288,7 +18315,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s16.html",
-        "sha256": "d4c4c88ccd9020586edbf336b2104a8c11d8db809f3eb37f6eba4c5a6902d29f"
+        "sha256": "d2d34807442fc5982ffc6ff4737535beb664330560eae0d78162023afc29b6bc"
       },
       "gate": {
         "approval_id": "",
@@ -18299,7 +18326,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S16",
-      "package_key": "std-pmp-closure-review-s16:S16",
+      "package_key": "closed_without_closure_review:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18406,7 +18434,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s20.html",
-        "sha256": "c6af2e2372260d7062c1b1226cf5d7b989cfcf4fca687d1af20e1591e040151b"
+        "sha256": "591e32db1d1457b53c963c3aeaa46e5b7fb864cff5c1a7be01d94e54b30e4adb"
       },
       "gate": {
         "approval_id": "",
@@ -18417,7 +18445,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S20",
-      "package_key": "std-pmp-closure-review-s20:S20",
+      "package_key": "closed_without_closure_review:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -24553,6 +24582,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-pmp-project-baseline-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -24703,6 +24733,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-pmp-project-baseline-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -24853,6 +24884,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-pmp-project-baseline-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -25720,6 +25752,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-pmp-project-baseline-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -25870,6 +25903,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-pmp-project-baseline-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -26020,6 +26054,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-pmp-project-baseline-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -26170,6 +26205,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-pmp-project-baseline-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -26320,6 +26356,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-pmp-project-baseline-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -26470,6 +26507,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-pmp-project-baseline-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -26620,6 +26658,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-pmp-project-baseline-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -27009,6 +27048,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-pmp-project-baseline-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -27159,6 +27199,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-pmp-project-baseline-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -27309,6 +27350,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-pmp-project-baseline-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -27459,6 +27501,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-pmp-project-baseline-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -28804,6 +28847,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-pmp-project-baseline-t12:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -29462,6 +29506,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-pmp-project-baseline-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -30568,6 +30613,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-pmp-project-baseline-t19f:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -31435,6 +31481,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-pmp-project-baseline-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -31585,6 +31632,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-pmp-project-baseline-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -31974,6 +32022,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-pmp-project-baseline-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -34601,7 +34650,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06b.html",
-        "sha256": "080f82deb917f2bce790aee5b3a3481fe6c9db37949375ba177777ed174686de"
+        "sha256": "2a25089a622623942498ca41dd290e726ffdcd83d0f87065dfa6aea7124930fa"
       },
       "gate": {
         "approval_id": "",
@@ -34612,7 +34661,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06b",
-      "package_key": "std-pmp-project-brief-s06b:S06b",
+      "package_key": "unpublished_declared_output:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -34803,7 +34853,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06c.html",
-        "sha256": "f89af8b43a16dd664352e241d9c091a4114e5d9494248930b8ee3d8fa81fca6c"
+        "sha256": "82dcd041cf7f7ba0c9c05f5ecf2140b107e70e975d839a34ddf502af0bc6ba49"
       },
       "gate": {
         "approval_id": "",
@@ -34814,7 +34864,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06c",
-      "package_key": "std-pmp-project-brief-s06c:S06c",
+      "package_key": "unpublished_declared_output:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -35005,7 +35056,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06d.html",
-        "sha256": "cc9331bc9673f6e092577546f2fa0e748d768b830bd6ce7a15bdeb64353b6fc1"
+        "sha256": "f704b806bb97136b34a7610ae0914e6159391d845b49122f4f5206ae317cf9aa"
       },
       "gate": {
         "approval_id": "",
@@ -35016,7 +35067,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S06d",
-      "package_key": "std-pmp-project-brief-s06d:S06d",
+      "package_key": "unpublished_declared_output:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -35882,7 +35934,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s10.html",
-        "sha256": "c450159c9fab2cd579079126f31aabf36f8e351bfd65ad2bf1b3412450382f1d"
+        "sha256": "117c8608f907098548f07f16620866aee87995076fedbfbf28ccbd6568341a70"
       },
       "gate": {
         "approval_id": "",
@@ -35893,7 +35945,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S10",
-      "package_key": "std-pmp-project-brief-s10:S10",
+      "package_key": "unpublished_declared_output:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -36084,7 +36137,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s11.html",
-        "sha256": "2fb2af7c52739f6842514198b9da70addbd69a8ac8ee7c5fdd55ef76e8135b73"
+        "sha256": "3fff953f5909fc6c99d0fd7cc34eb567f2c414d88f86b0a23ae162ebe0be3e06"
       },
       "gate": {
         "approval_id": "",
@@ -36095,7 +36148,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S11",
-      "package_key": "std-pmp-project-brief-s11:S11",
+      "package_key": "unpublished_declared_output:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -36286,7 +36340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s12.html",
-        "sha256": "216fd9336346e6d66f00dbb9367de885acfe2914b5898f9c15d9f6b90290c61a"
+        "sha256": "5c9535cf812cd5d0b9c36afcc8657f31ce0afc66a60e2025cfef7453e110c0ec"
       },
       "gate": {
         "approval_id": "",
@@ -36297,7 +36351,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S12",
-      "package_key": "std-pmp-project-brief-s12:S12",
+      "package_key": "unpublished_declared_output:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -36488,7 +36543,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s13.html",
-        "sha256": "5f3035964310f8070fa53d5f0725f07d613ce4eb0b763abe809a5f73e5824a9c"
+        "sha256": "e043c1c0f9b19f96eb02c533de058e8ff6d9c7de93ce19768ef9440a2f581d6c"
       },
       "gate": {
         "approval_id": "",
@@ -36499,7 +36554,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S13",
-      "package_key": "std-pmp-project-brief-s13:S13",
+      "package_key": "unpublished_declared_output:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -36690,7 +36746,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s14.html",
-        "sha256": "6e951bc52b20968db6bacbd6d8a0e02a64a196fbbd3a98d0eb8b6668c0d8f973"
+        "sha256": "8cd5667a7347036abcc26844b1b23eb588ee91dc67c45661a43ac199289d4609"
       },
       "gate": {
         "approval_id": "",
@@ -36701,7 +36757,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S14",
-      "package_key": "std-pmp-project-brief-s14:S14",
+      "package_key": "unpublished_declared_output:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -36892,7 +36949,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s15.html",
-        "sha256": "42bf5d6cccd364d0d9cc4f54ce3f2091b415d5a0188d56422ba4a8ac361b0451"
+        "sha256": "2a449005b28f7ad664b3aa73b95e76eee25a234925024f094bfab6ad2079be55"
       },
       "gate": {
         "approval_id": "",
@@ -36903,7 +36960,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S15",
-      "package_key": "std-pmp-project-brief-s15:S15",
+      "package_key": "unpublished_declared_output:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -37094,7 +37152,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s16.html",
-        "sha256": "291e3ca431c1169e6d8ce3a2af6b601dfcac956276c8936213389c9c4bd37d3a"
+        "sha256": "bb9b1c5423fcc19af590098de5ca122ed21ade511157001ec5bb7ab14dead0d7"
       },
       "gate": {
         "approval_id": "",
@@ -37105,7 +37163,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S16",
-      "package_key": "std-pmp-project-brief-s16:S16",
+      "package_key": "unpublished_declared_output:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -37521,7 +37580,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s18.html",
-        "sha256": "1e90d57bcb5f783af5b60e696540a826201482bddb1cb238b4fcde79e00416bc"
+        "sha256": "1c9f61138bebb1b25b66d1f3ff7922cf4cb4cf4b2b49c459ddc1c4ef175fc57c"
       },
       "gate": {
         "approval_id": "",
@@ -37532,7 +37591,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S18",
-      "package_key": "std-pmp-project-brief-s18:S18",
+      "package_key": "unpublished_declared_output:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -37723,7 +37783,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s19.html",
-        "sha256": "63954dc3afde4433b2e2ab436e7b84c9db7ddcc85a534b75335355b6bef280f6"
+        "sha256": "aadfd7e3cc41ffcc5ec0d675acf9aed1ed6327d4bce804e4474f897d2382bd7e"
       },
       "gate": {
         "approval_id": "",
@@ -37734,7 +37794,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S19",
-      "package_key": "std-pmp-project-brief-s19:S19",
+      "package_key": "unpublished_declared_output:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -37925,7 +37986,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s20.html",
-        "sha256": "dd3375a63d4b4f2fce61131625fd4ed107c50d953101503c294de9b9da95f86c"
+        "sha256": "2510f73c79d1aae0b836f5d8651a83b1d1f6e7006217064f55abaefa96f2ff47"
       },
       "gate": {
         "approval_id": "",
@@ -37936,7 +37997,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S20",
-      "package_key": "std-pmp-project-brief-s20:S20",
+      "package_key": "unpublished_declared_output:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -38127,7 +38189,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s21.html",
-        "sha256": "c73ac17760b6861050dbf27157428b1b76af46876a16dd1c80558a52b0f4b9b7"
+        "sha256": "d48985e3efd350c1834c52114294901cc086456dd95878e44e71eba1ef804a80"
       },
       "gate": {
         "approval_id": "",
@@ -38138,7 +38200,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S21",
-      "package_key": "std-pmp-project-brief-s21:S21",
+      "package_key": "unpublished_declared_output:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -45276,6 +45339,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-pmp-project-registers-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -45428,6 +45492,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-pmp-project-registers-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -45580,6 +45645,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-pmp-project-registers-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -46350,6 +46416,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-pmp-project-registers-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -46502,6 +46569,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-pmp-project-registers-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -46654,6 +46722,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-pmp-project-registers-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -46802,6 +46871,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-pmp-project-registers-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -46950,6 +47020,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-pmp-project-registers-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -47102,6 +47173,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-pmp-project-registers-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -47250,6 +47322,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-pmp-project-registers-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -47578,6 +47651,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-pmp-project-registers-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -47726,6 +47800,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-pmp-project-registers-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -47874,6 +47949,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-pmp-project-registers-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -48022,6 +48098,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-pmp-project-registers-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -49195,6 +49272,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-pmp-project-registers-t12:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -49770,6 +49848,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-pmp-project-registers-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -50697,6 +50776,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-pmp-project-registers-t19f:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -51478,6 +51558,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-pmp-project-registers-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -51626,6 +51707,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-pmp-project-registers-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -51950,6 +52032,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-pmp-project-registers-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -53539,6 +53622,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-pmp-project-wbs-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -53630,6 +53714,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-pmp-project-wbs-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -53721,6 +53806,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-pmp-project-wbs-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54118,6 +54204,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-pmp-project-wbs-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54209,6 +54296,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-pmp-project-wbs-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54300,6 +54388,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-pmp-project-wbs-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54391,6 +54480,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-pmp-project-wbs-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54470,7 +54560,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s14.html",
-        "sha256": "3a981567cc3a156de026f4435edaf06c5062319c000c2dd32089182298415f5a"
+        "sha256": "0e8fc327cebe69db49f05a6f315e54f4e7af1586977105eda4bf8d64c8c03e26"
       },
       "gate": {
         "approval_id": "",
@@ -54481,7 +54571,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S14",
-      "package_key": "std-pmp-project-wbs-s14:S14",
+      "package_key": "wbs_absent:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54561,7 +54652,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s15.html",
-        "sha256": "8f3396fd0c63ccfdc013a44c45560e43e3f48adc70b5743da7c8a40f087f5831"
+        "sha256": "5f4228b16f7a96781f9a75bd5b8798f296d8b462fcdfd8c0f23a652473d352b0"
       },
       "gate": {
         "approval_id": "",
@@ -54572,7 +54663,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S15",
-      "package_key": "std-pmp-project-wbs-s15:S15",
+      "package_key": "wbs_absent:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54664,6 +54756,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-pmp-project-wbs-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54845,7 +54938,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s18.html",
-        "sha256": "1fd178aed2f3f261367a0ce2b96e4bf3f260d4275da1508a6df2b168245fd3d6"
+        "sha256": "c5528020806d267a9de25ffe510c15c22ac3eac52720f7b4c13caadb0c538644"
       },
       "gate": {
         "approval_id": "",
@@ -54856,7 +54949,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S18",
-      "package_key": "std-pmp-project-wbs-s18:S18",
+      "package_key": "wbs_absent:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -54936,7 +55030,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s19.html",
-        "sha256": "80f0c9106e22bdd4b0fdbc3ff5045b6b23b6cb3a233003e961f39e391f9a4780"
+        "sha256": "f5ac304cf5d4cb005ef06cfd35132040bb4c65d62020d3dd8563acca2d4d910a"
       },
       "gate": {
         "approval_id": "",
@@ -54947,7 +55041,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S19",
-      "package_key": "std-pmp-project-wbs-s19:S19",
+      "package_key": "wbs_absent:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -55039,6 +55134,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-pmp-project-wbs-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -55118,7 +55214,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s21.html",
-        "sha256": "08b29c3257853da01f6adb9ca4596cd6d15a06daee7cba97a5e8207e29c8e2f2"
+        "sha256": "d35c5b2783953a205fd1e69a22b95b0af269db8e6707b82e67dfee988c19ee75"
       },
       "gate": {
         "approval_id": "",
@@ -55129,7 +55225,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S21",
-      "package_key": "std-pmp-project-wbs-s21:S21",
+      "package_key": "wbs_absent:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -55719,7 +55816,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t12.html",
-        "sha256": "d0b54e84d0e6564a021d3edea03562a3248eafe1104c9e82c0f6a576d75ce6c8"
+        "sha256": "4cdd8845086cf931c6a54376cf7f73d8ac82587153a444e4a702076d821a0770"
       },
       "gate": {
         "approval_id": "",
@@ -55730,7 +55827,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T12",
-      "package_key": "std-pmp-project-wbs-t12:T12",
+      "package_key": "wbs_absent:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -56041,6 +56139,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-pmp-project-wbs-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -56603,7 +56702,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t19f.html",
-        "sha256": "69b33ab6cad941541b5cbab4391520841c0fd9b40ee206151734320d8af6a741"
+        "sha256": "660936dcc04eddfffa3464503328a05992b43576082009696badf2bddc5e6280"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -56614,7 +56713,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T19F",
-      "package_key": "std-pmp-project-wbs-t19f:T19F",
+      "package_key": "wbs_absent:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -57072,6 +57172,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-pmp-project-wbs-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -57163,6 +57264,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-pmp-project-wbs-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -57431,6 +57533,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-pmp-project-wbs-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -61285,6 +61388,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -63530,6 +63634,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-architecture-analysis-design-publish:DESIGN-PUBLISH",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -63776,6 +63881,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-architecture-analysis-platform:PLATFORM",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -63893,6 +63999,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S00",
       "package_key": "std-togaf-architecture-analysis-s00:S00",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64010,6 +64117,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S01",
       "package_key": "std-togaf-architecture-analysis-s01:S01",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64127,6 +64235,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S02",
       "package_key": "std-togaf-architecture-analysis-s02:S02",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64244,6 +64353,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S03",
       "package_key": "std-togaf-architecture-analysis-s03:S03",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64361,6 +64471,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S04",
       "package_key": "std-togaf-architecture-analysis-s04:S04",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64478,6 +64589,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S05",
       "package_key": "std-togaf-architecture-analysis-s05:S05",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64595,6 +64707,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S06",
       "package_key": "std-togaf-architecture-analysis-s06:S06",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64712,6 +64825,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S07",
       "package_key": "std-togaf-architecture-analysis-s07:S07",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64829,6 +64943,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S08",
       "package_key": "std-togaf-architecture-analysis-s08:S08",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -64946,6 +65061,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S09",
       "package_key": "std-togaf-architecture-analysis-s09:S09",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65063,6 +65179,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S17",
       "package_key": "std-togaf-architecture-analysis-s17:S17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65180,6 +65297,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-architecture-analysis-spec-v2:SPEC-V2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65297,6 +65415,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T0",
       "package_key": "std-togaf-architecture-analysis-t0:T0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65414,6 +65533,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T1",
       "package_key": "std-togaf-architecture-analysis-t1:T1",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65531,6 +65651,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T10",
       "package_key": "std-togaf-architecture-analysis-t10:T10",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65648,6 +65769,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T11",
       "package_key": "std-togaf-architecture-analysis-t11:T11",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65765,6 +65887,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T13",
       "package_key": "std-togaf-architecture-analysis-t13:T13",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65882,6 +66005,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T14",
       "package_key": "std-togaf-architecture-analysis-t14:T14",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -65999,6 +66123,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T16",
       "package_key": "std-togaf-architecture-analysis-t16:T16",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66116,6 +66241,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T17",
       "package_key": "std-togaf-architecture-analysis-t17:T17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66233,6 +66359,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T18",
       "package_key": "std-togaf-architecture-analysis-t18:T18",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66350,6 +66477,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19",
       "package_key": "std-togaf-architecture-analysis-t19:T19",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66467,6 +66595,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-analysis-t19f:T19F",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66584,6 +66713,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T2",
       "package_key": "std-togaf-architecture-analysis-t2:T2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66701,6 +66831,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T3",
       "package_key": "std-togaf-architecture-analysis-t3:T3",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66818,6 +66949,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T4",
       "package_key": "std-togaf-architecture-analysis-t4:T4",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -66935,6 +67067,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T7",
       "package_key": "std-togaf-architecture-analysis-t7:T7",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -67052,6 +67185,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T9",
       "package_key": "std-togaf-architecture-analysis-t9:T9",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -71045,6 +71179,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-togaf-architecture-artifact-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -71231,6 +71366,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-togaf-architecture-artifact-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -71417,6 +71553,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-togaf-architecture-artifact-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -72576,6 +72713,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-togaf-architecture-artifact-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -72762,6 +72900,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-togaf-architecture-artifact-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -72948,6 +73087,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-togaf-architecture-artifact-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -73134,6 +73274,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-togaf-architecture-artifact-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -73320,6 +73461,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-togaf-architecture-artifact-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -73506,6 +73648,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-togaf-architecture-artifact-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -73692,6 +73835,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-togaf-architecture-artifact-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -74199,6 +74343,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-togaf-architecture-artifact-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -74385,6 +74530,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-togaf-architecture-artifact-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -74571,6 +74717,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-togaf-architecture-artifact-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -74757,6 +74904,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-togaf-architecture-artifact-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -76918,6 +77066,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-togaf-architecture-artifact-t12:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -77851,6 +78000,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-togaf-architecture-artifact-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -80871,6 +81021,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-togaf-architecture-artifact-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -81057,6 +81208,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-togaf-architecture-artifact-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -81564,6 +81716,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-togaf-architecture-artifact-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -88299,6 +88452,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bb-cfc9-72ec-85f5-619bf730fff9:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -88442,6 +88596,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bb-f6ea-7d99-b23f-4dc3dace459c:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -88600,6 +88755,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bc-1f7b-7703-bb2d-a0d8695d12bd:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -88758,6 +88914,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bc-465a-7d83-b9c6-7c7b089d8b02:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -88901,6 +89058,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bc-6b09-7785-ab85-5e72fc64997a:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -89039,6 +89197,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bc-92bd-71d7-964f-8d9761e78baa:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -89187,6 +89346,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-instance-01a210bc-b7e1-7a83-b322-81d74e0a903a:T19F",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -130473,6 +130633,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-architecture-design-design-publish:DESIGN-PUBLISH",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -130611,6 +130772,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "P0",
       "package_key": "std-togaf-architecture-design-p0:P0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -130749,6 +130911,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-architecture-design-platform:PLATFORM",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -130887,6 +131050,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S00",
       "package_key": "std-togaf-architecture-design-s00:S00",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131025,6 +131189,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S01",
       "package_key": "std-togaf-architecture-design-s01:S01",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131163,6 +131328,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S02",
       "package_key": "std-togaf-architecture-design-s02:S02",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131301,6 +131467,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S03",
       "package_key": "std-togaf-architecture-design-s03:S03",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131439,6 +131606,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S04",
       "package_key": "std-togaf-architecture-design-s04:S04",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131577,6 +131745,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S05",
       "package_key": "std-togaf-architecture-design-s05:S05",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131715,6 +131884,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S06",
       "package_key": "std-togaf-architecture-design-s06:S06",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131853,6 +132023,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S07",
       "package_key": "std-togaf-architecture-design-s07:S07",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -131991,6 +132162,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S08",
       "package_key": "std-togaf-architecture-design-s08:S08",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132129,6 +132301,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S09",
       "package_key": "std-togaf-architecture-design-s09:S09",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132267,6 +132440,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S17",
       "package_key": "std-togaf-architecture-design-s17:S17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132405,6 +132579,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-architecture-design-spec-v2:SPEC-V2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132543,6 +132718,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T0",
       "package_key": "std-togaf-architecture-design-t0:T0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132681,6 +132857,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T1",
       "package_key": "std-togaf-architecture-design-t1:T1",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132831,6 +133008,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T10",
       "package_key": "std-togaf-architecture-design-t10:T10",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132969,6 +133147,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T11",
       "package_key": "std-togaf-architecture-design-t11:T11",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -133413,6 +133592,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T14",
       "package_key": "std-togaf-architecture-design-t14:T14",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -133704,6 +133884,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T16",
       "package_key": "std-togaf-architecture-design-t16:T16",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134301,6 +134482,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-design-t19f:T19F",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134439,6 +134621,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T2",
       "package_key": "std-togaf-architecture-design-t2:T2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134577,6 +134760,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T3",
       "package_key": "std-togaf-architecture-design-t3:T3",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134715,6 +134899,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T4",
       "package_key": "std-togaf-architecture-design-t4:T4",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -135159,6 +135344,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T7",
       "package_key": "std-togaf-architecture-design-t7:T7",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -138206,6 +138392,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-togaf-compliance-review-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -138346,6 +138533,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-togaf-compliance-review-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -138486,6 +138674,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-togaf-compliance-review-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139133,6 +139322,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-togaf-compliance-review-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139273,6 +139463,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-togaf-compliance-review-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139413,6 +139604,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-togaf-compliance-review-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139553,6 +139745,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-togaf-compliance-review-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139693,6 +139886,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-togaf-compliance-review-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139833,6 +140027,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-togaf-compliance-review-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -139973,6 +140168,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-togaf-compliance-review-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -140282,6 +140478,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-togaf-compliance-review-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -140422,6 +140619,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-togaf-compliance-review-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -140562,6 +140760,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-togaf-compliance-review-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -140702,6 +140901,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-togaf-compliance-review-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -141837,6 +142037,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-togaf-compliance-review-t12:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -142390,6 +142591,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-togaf-compliance-review-t15:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -144107,6 +144309,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-togaf-compliance-review-t5:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -144247,6 +144450,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-togaf-compliance-review-t6:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -144556,6 +144760,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-togaf-compliance-review-t8:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -146530,6 +146735,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-togaf-delivery-contract-s06b:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -146651,6 +146857,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-togaf-delivery-contract-s06c:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -146772,6 +146979,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-togaf-delivery-contract-s06d:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147343,6 +147551,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-togaf-delivery-contract-s10:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147464,6 +147673,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-togaf-delivery-contract-s11:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147585,6 +147795,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-togaf-delivery-contract-s12:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147706,6 +147917,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-togaf-delivery-contract-s13:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147827,6 +148039,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-togaf-delivery-contract-s14:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -147948,6 +148161,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-togaf-delivery-contract-s15:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -148069,6 +148283,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-togaf-delivery-contract-s16:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -148340,6 +148555,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-togaf-delivery-contract-s18:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -148461,6 +148677,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-togaf-delivery-contract-s19:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -148582,6 +148799,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-togaf-delivery-contract-s20:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -148703,6 +148921,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-togaf-delivery-contract-s21:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -149637,7 +149856,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t12.html",
-        "sha256": "aacd55f1011af080c13b4ed1bea3723b5880f99161402c7ee40f6595e08cd388"
+        "sha256": "b643129cba0117d5f0c4e707c8f49bae1a940e74ef194518f649332d05c95fc9"
       },
       "gate": {
         "approval_id": "",
@@ -149648,7 +149867,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T12",
-      "package_key": "std-togaf-delivery-contract-t12:T12",
+      "package_key": "contract_missing:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -150073,7 +150293,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t15.html",
-        "sha256": "44662e0db41337c9eb699b93f9f3af85e18bb3412f40c4c7d7b0f9c7af90dbc9"
+        "sha256": "b90b081cc0a84f2088627cd7ac93dc31b607a2c1028474338168c1a84fba7df0"
       },
       "gate": {
         "approval_id": "",
@@ -150084,7 +150304,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T15",
-      "package_key": "std-togaf-delivery-contract-t15:T15",
+      "package_key": "contract_missing:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -151508,7 +151729,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t5.html",
-        "sha256": "4db1e0972f9099824f5076fb0c1f2746ecd059cf103e5e8015082a13c3494049"
+        "sha256": "9d70a383d461fa1eb4f00ca718b46c08e05443dc95451c448f51935a74789543"
       },
       "gate": {
         "approval_id": "",
@@ -151519,7 +151740,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T5",
-      "package_key": "std-togaf-delivery-contract-t5:T5",
+      "package_key": "contract_missing:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -151629,7 +151851,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t6.html",
-        "sha256": "550f0ecfdb0ab6004c219438988ddf4e3e9a02d5a1dd4ec4a6fdf4ac1e1256d5"
+        "sha256": "14ac2e43229dbdefc6e1233de44dfad979d718c7e8c41945c61457fceaea7843"
       },
       "gate": {
         "approval_id": "",
@@ -151640,7 +151862,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T6",
-      "package_key": "std-togaf-delivery-contract-t6:T6",
+      "package_key": "contract_missing:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -151900,7 +152123,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t8.html",
-        "sha256": "7e544c8b7d47c1ccb84a9dbfae664fc599fadcabfebf6a136a8031634d6c28b6"
+        "sha256": "4b5e21c03b5fbba4600de695c53fc1fc77708e22fc3d069f476926867b0b97dd"
       },
       "gate": {
         "approval_id": "",
@@ -151911,7 +152134,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T8",
-      "package_key": "std-togaf-delivery-contract-t8:T8",
+      "package_key": "contract_missing:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -152501,7 +152725,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-platform.html",
-        "sha256": "f20e23f99f9a4aa531a4b8fd373798fe2518d48d0b070849005a73925ee440b8"
+        "sha256": "060bc7b88b8985ec297bb6f0acc997bf16891def5629f433b4abf7378c1d54b5"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -152570,67 +152794,67 @@ window.CONVEYOR_STANDARDS = {
           "severity": "P1",
           "sources": [
             {
-              "count": 126,
+              "count": 324,
               "items": [
                 {
-                  "id": "01a2173a-f0ca-7c32-95f4-f6d31fb7a56a",
+                  "id": "project_in_unauthorised_tranche:S06c",
                   "status": "open",
-                  "title": "Planka's database cannot evidence usage: four boards and five test cards"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a2173a-f14e-7f22-bd84-077baf35eb9f",
+                  "id": "project_in_unauthorised_tranche:S06d",
                   "status": "open",
-                  "title": "The execution census covers three days, so it cannot answer quarterly use"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a2173a-f2df-79bd-8cb2-fdcc84e4e795",
+                  "id": "project_in_unauthorised_tranche:S12",
                   "status": "open",
-                  "title": "Every later slice depends on parity_ids, and S14 gates on 100 % of used"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a2173a-f365-765f-9e04-0cf4ce88c891",
+                  "id": "project_in_unauthorised_tranche:S13",
                   "status": "open",
-                  "title": "The measurement depends on read-only access to master Postgres and Loki"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a21741-d67d-755f-96ac-c6b673e8a6d1",
+                  "id": "project_in_unauthorised_tranche:S16",
                   "status": "open",
-                  "title": "The five-run sets for metrics 5–7 never completed inside the measurement window"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a21741-d78c-78f7-bc2d-2785bbe0e479",
+                  "id": "project_in_unauthorised_tranche:S20",
                   "status": "open",
-                  "title": "S01 depends on S00 for the parity ids the UI build consumes"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a217e8-499c-7d4f-89f5-5b169a5ae506",
+                  "id": "project_in_unauthorised_tranche:T15",
                   "status": "open",
-                  "title": "Issue #2 was open at the start of the rework although its P2 test was already written"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a217e8-4a3d-753c-8eaf-224b6673bf8f",
+                  "id": "project_in_unauthorised_tranche:T5",
                   "status": "open",
-                  "title": "The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a217e8-4b86-790c-897b-e9ca5483da48",
+                  "id": "project_in_unauthorised_tranche:T6",
                   "status": "open",
-                  "title": "S00's signed parity inventory fixes the surfaces S02 must expose"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
                 },
                 {
-                  "id": "01a1fbac-8ec9-717c-be79-6d1b97980743",
-                  "status": "accepted",
-                  "title": "Out-of-sequence closure accepted as a retrospective exception (S03)"
-                },
-                {
-                  "id": "01a217f8-b0ad-7317-987c-f82f016bf405",
-                  "status": "accepted",
-                  "title": "S03 closed out of sequence before the tranche-2 review (U3-EXC-S03)"
-                },
-                {
-                  "id": "01a217f8-b2cc-7b1d-995c-0723649d6202",
+                  "id": "project_in_unauthorised_tranche:T8",
                   "status": "open",
-                  "title": "S02 platform migration and tenancy primitives land first"
+                  "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+                },
+                {
+                  "id": "std-pmp-change-control-s06b:S06b",
+                  "status": "open",
+                  "title": "PMP artefact absent: change-control"
+                },
+                {
+                  "id": "std-pmp-change-control-s10:S10",
+                  "status": "open",
+                  "title": "PMP artefact absent: change-control"
                 }
               ],
               "kind": "computed",
@@ -180752,6 +180976,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06b",
       "package_key": "std-togaf-phase-g-s06b-g:S06b",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -180875,6 +181100,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06c",
       "package_key": "std-togaf-phase-g-s06c-g:S06c",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -180998,6 +181224,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S06d",
       "package_key": "std-togaf-phase-g-s06d-g:S06d",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -181517,6 +181744,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S10",
       "package_key": "std-togaf-phase-g-s10-g:S10",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -181640,6 +181868,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S11",
       "package_key": "std-togaf-phase-g-s11-g:S11",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -181763,6 +181992,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S12",
       "package_key": "std-togaf-phase-g-s12-g:S12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -181886,6 +182116,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S13",
       "package_key": "std-togaf-phase-g-s13-g:S13",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182009,6 +182240,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S14",
       "package_key": "std-togaf-phase-g-s14-g:S14",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182132,6 +182364,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S15",
       "package_key": "std-togaf-phase-g-s15-g:S15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182255,6 +182488,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S16",
       "package_key": "std-togaf-phase-g-s16-g:S16",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182510,6 +182744,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S18",
       "package_key": "std-togaf-phase-g-s18-g:S18",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182633,6 +182868,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S19",
       "package_key": "std-togaf-phase-g-s19-g:S19",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182756,6 +182992,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S20",
       "package_key": "std-togaf-phase-g-s20-g:S20",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -182879,6 +183116,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "S21",
       "package_key": "std-togaf-phase-g-s21-g:S21",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -183717,6 +183955,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T12",
       "package_key": "std-togaf-phase-g-t12-g:T12",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -184124,6 +184363,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T15",
       "package_key": "std-togaf-phase-g-t15-g:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -185388,6 +185628,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T5",
       "package_key": "std-togaf-phase-g-t5-g:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -185511,6 +185752,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T6",
       "package_key": "std-togaf-phase-g-t6-g:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -185766,6 +186008,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T8",
       "package_key": "std-togaf-phase-g-t8-g:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -187031,6 +187274,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-request-for-architecture-work-design-publish:DESIGN-PUBLISH",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -187121,6 +187365,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "P0",
       "package_key": "std-togaf-request-for-architecture-work-p0:P0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -187211,6 +187456,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-request-for-architecture-work-platform:PLATFORM",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -187301,6 +187547,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-request-for-architecture-work-spec-v2:SPEC-V2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211271,6 +211518,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-statement-of-intent-design-publish:DESIGN-PUBLISH",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211361,6 +211609,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "P0",
       "package_key": "std-togaf-statement-of-intent-p0:P0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211451,6 +211700,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-statement-of-intent-platform:PLATFORM",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211541,6 +211791,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S00",
       "package_key": "std-togaf-statement-of-intent-s00:S00",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211631,6 +211882,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S01",
       "package_key": "std-togaf-statement-of-intent-s01:S01",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211721,6 +211973,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S02",
       "package_key": "std-togaf-statement-of-intent-s02:S02",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211811,6 +212064,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S03",
       "package_key": "std-togaf-statement-of-intent-s03:S03",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211901,6 +212155,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S04",
       "package_key": "std-togaf-statement-of-intent-s04:S04",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -211991,6 +212246,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S05",
       "package_key": "std-togaf-statement-of-intent-s05:S05",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212081,6 +212337,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S06",
       "package_key": "std-togaf-statement-of-intent-s06:S06",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212171,6 +212428,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S07",
       "package_key": "std-togaf-statement-of-intent-s07:S07",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212261,6 +212519,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S08",
       "package_key": "std-togaf-statement-of-intent-s08:S08",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212351,6 +212610,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S09",
       "package_key": "std-togaf-statement-of-intent-s09:S09",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212441,6 +212701,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S17",
       "package_key": "std-togaf-statement-of-intent-s17:S17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212531,6 +212792,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-statement-of-intent-spec-v2:SPEC-V2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212621,6 +212883,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T0",
       "package_key": "std-togaf-statement-of-intent-t0:T0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212711,6 +212974,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T1",
       "package_key": "std-togaf-statement-of-intent-t1:T1",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212801,6 +213065,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T10",
       "package_key": "std-togaf-statement-of-intent-t10:T10",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212891,6 +213156,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T11",
       "package_key": "std-togaf-statement-of-intent-t11:T11",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -212981,6 +213247,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T13",
       "package_key": "std-togaf-statement-of-intent-t13:T13",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213071,6 +213338,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T14",
       "package_key": "std-togaf-statement-of-intent-t14:T14",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213161,6 +213429,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T16",
       "package_key": "std-togaf-statement-of-intent-t16:T16",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213251,6 +213520,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T17",
       "package_key": "std-togaf-statement-of-intent-t17:T17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213341,6 +213611,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T18",
       "package_key": "std-togaf-statement-of-intent-t18:T18",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213431,6 +213702,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19",
       "package_key": "std-togaf-statement-of-intent-t19:T19",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213521,6 +213793,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19F",
       "package_key": "std-togaf-statement-of-intent-t19f:T19F",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213611,6 +213884,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T2",
       "package_key": "std-togaf-statement-of-intent-t2:T2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213701,6 +213975,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T3",
       "package_key": "std-togaf-statement-of-intent-t3:T3",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213791,6 +214066,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T4",
       "package_key": "std-togaf-statement-of-intent-t4:T4",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213881,6 +214157,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T7",
       "package_key": "std-togaf-statement-of-intent-t7:T7",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -213971,6 +214248,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T9",
       "package_key": "std-togaf-statement-of-intent-t9:T9",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214061,6 +214339,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-waiver-design-publish:DESIGN-PUBLISH",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214198,6 +214477,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "P0",
       "package_key": "std-togaf-waiver-p0:P0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214335,6 +214615,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-waiver-platform:PLATFORM",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214472,6 +214753,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S00",
       "package_key": "std-togaf-waiver-s00:S00",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214609,6 +214891,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S01",
       "package_key": "std-togaf-waiver-s01:S01",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214746,6 +215029,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S02",
       "package_key": "std-togaf-waiver-s02:S02",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -214883,6 +215167,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S03",
       "package_key": "std-togaf-waiver-s03:S03",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215020,6 +215305,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S04",
       "package_key": "std-togaf-waiver-s04:S04",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215157,6 +215443,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S05",
       "package_key": "std-togaf-waiver-s05:S05",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215294,6 +215581,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S06",
       "package_key": "std-togaf-waiver-s06:S06",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215431,6 +215719,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S07",
       "package_key": "std-togaf-waiver-s07:S07",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215568,6 +215857,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S08",
       "package_key": "std-togaf-waiver-s08:S08",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215705,6 +215995,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S09",
       "package_key": "std-togaf-waiver-s09:S09",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215842,6 +216133,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "S17",
       "package_key": "std-togaf-waiver-s17:S17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -215979,6 +216271,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-waiver-spec-v2:SPEC-V2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216116,6 +216409,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T0",
       "package_key": "std-togaf-waiver-t0:T0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216253,6 +216547,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T1",
       "package_key": "std-togaf-waiver-t1:T1",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216390,6 +216685,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T10",
       "package_key": "std-togaf-waiver-t10:T10",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216527,6 +216823,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T11",
       "package_key": "std-togaf-waiver-t11:T11",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216664,6 +216961,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T13",
       "package_key": "std-togaf-waiver-t13:T13",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216801,6 +217099,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T14",
       "package_key": "std-togaf-waiver-t14:T14",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -216938,6 +217237,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T16",
       "package_key": "std-togaf-waiver-t16:T16",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217075,6 +217375,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T17",
       "package_key": "std-togaf-waiver-t17:T17",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217212,6 +217513,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T18",
       "package_key": "std-togaf-waiver-t18:T18",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217349,6 +217651,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19",
       "package_key": "std-togaf-waiver-t19:T19",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217486,6 +217789,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T19F",
       "package_key": "std-togaf-waiver-t19f:T19F",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217623,6 +217927,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T2",
       "package_key": "std-togaf-waiver-t2:T2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217760,6 +218065,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T3",
       "package_key": "std-togaf-waiver-t3:T3",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -217897,6 +218203,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T4",
       "package_key": "std-togaf-waiver-t4:T4",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -218034,6 +218341,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T7",
       "package_key": "std-togaf-waiver-t7:T7",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -218171,6 +218479,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": false,
       "owner_project": "T9",
       "package_key": "std-togaf-waiver-t9:T9",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -218326,7 +218635,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "git_sha": "17f470d5c6213353be0051e0207d4430ba6e7a56",
-  "payload_sha256": "9cda6ff8e8846b409b5e4627c212a77496a16b4d0eb2e420d1234105473c06ea",
+  "payload_sha256": "56e8e5bbbc439177bcbbba688c68d6ce10b53bfb161993e8b208d12167e16641",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 236,
