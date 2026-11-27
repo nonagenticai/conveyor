@@ -742,3 +742,141 @@ async fn a_transient_class_opens_no_kata() {
     .expect("the kata runs");
     assert_eq!(kata_runs, 0);
 }
+
+// ── the remedy consumer (v1-p6-1) ─────────────────────────────────────────────────────────
+
+fn error_code(body: &Value) -> &str {
+    body["errors"][0]["code"]
+        .as_str()
+        .or_else(|| body["type"].as_str())
+        .unwrap_or_else(|| panic!("no error code in {body}"))
+}
+
+/// The next dispatch of one card: `process_runs.start`, without the 201 assertion.
+async fn try_start(running: &support::Running, card: &str, key: &str) -> (u16, Value) {
+    running
+        .invoke(
+            "process_runs.start",
+            TOKEN,
+            json!({"card_id": card, "process_key": key, "inputs": {}}),
+            None,
+            None,
+            None,
+        )
+        .await
+}
+
+async fn card_meta_field(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    card: &str,
+    field: &str,
+) -> Option<String> {
+    sqlx::query_scalar("SELECT meta->>$3 FROM card WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(Uuid::parse_str(card).expect("card"))
+        .bind(field)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("read the card's meta field")
+}
+
+async fn card_lane(pg: &support::Pg, seeded: &support::Seeded, card: &str) -> Uuid {
+    sqlx::query_scalar("SELECT list_id FROM card WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(Uuid::parse_str(card).expect("card"))
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("read the card's lane")
+}
+
+/// A blocked remedy stops the card's next dispatch, and the block is on the card.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_block_remedy_stops_the_next_dispatch() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "the card to block").await;
+    let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
+    let _ = err_card(&pg, &seeded, &run).await;
+    let (interruption, _, _, _, _) = interruption_row(&pg, &seeded, &card).await;
+    let (status, body) = triage(&running, interruption, "transient", 0.9).await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = remedy(&running, interruption, Some("block")).await;
+    assert_eq!(status, 201, "{body}");
+
+    let (status, body) = try_start(&running, &card, FAILING_KEY).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(error_code(&body), "coach_blocked", "{body}");
+    assert_eq!(
+        card_meta_field(&pg, &seeded, &card, "coach_blocked")
+            .await
+            .as_deref(),
+        Some("true"),
+        "the block is recorded on the card"
+    );
+}
+
+/// A retry remedy lets the next dispatch create the run.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_retry_remedy_lets_the_next_dispatch_run() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "the card to retry").await;
+    let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
+    let _ = err_card(&pg, &seeded, &run).await;
+    let (interruption, _, _, _, _) = interruption_row(&pg, &seeded, &card).await;
+    triage(&running, interruption, "transient", 0.9).await;
+    let (status, body) = remedy(&running, interruption, Some("retry")).await;
+    assert_eq!(status, 201, "{body}");
+
+    let (status, body) = try_start(&running, &card, FAILING_KEY).await;
+    assert_eq!(
+        status, 201,
+        "the retry remedy lets the dispatch run: {body}"
+    );
+    assert_eq!(
+        card_meta_field(&pg, &seeded, &card, "coach_remedy_effect")
+            .await
+            .as_deref(),
+        Some("retry"),
+        "the card records the applied remedy"
+    );
+}
+
+/// A move remedy places the card in the lane its detail names.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_move_remedy_places_the_card() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "the card to move").await;
+    let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
+    let _ = err_card(&pg, &seeded, &run).await;
+    let (interruption, _, _, _, _) = interruption_row(&pg, &seeded, &card).await;
+    triage(&running, interruption, "transient", 0.9).await;
+    let (status, body) = running
+        .invoke(
+            "coach.remedy",
+            TOKEN,
+            json!({
+                "interruption_id": interruption,
+                "remedy_class": "move",
+                "detail": { "list_id": waiting },
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+
+    let (status, body) = try_start(&running, &card, FAILING_KEY).await;
+    assert_eq!(status, 201, "the move is applied before the run: {body}");
+    assert_eq!(
+        card_lane(&pg, &seeded, &card).await.to_string(),
+        waiting,
+        "the card is in the lane the remedy named"
+    );
+}
