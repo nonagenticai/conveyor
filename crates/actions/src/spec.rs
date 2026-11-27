@@ -1117,7 +1117,9 @@ mod tests {
         assert_eq!(Scope::LessonsWrite.as_str(), "lessons:write");
         assert_eq!(Scope::LessonsReview.as_str(), "lessons:review");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 74);
+        assert_eq!(Scope::FeedbackRead.as_str(), "feedback:read");
+        assert_eq!(Scope::FeedbackWrite.as_str(), "feedback:write");
+        assert_eq!(Scope::ALL.len(), 76);
     }
 
     #[test]
