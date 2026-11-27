@@ -214,9 +214,19 @@ def contract_gaps(body: str) -> list[str]:
     missing = programme_gaps(body)
     if missing:
         gaps.append(f"`Programme` rows: {', '.join(missing)}")
-    parts = section_lines(body, "Parts and acceptance criteria") or []
-    if not any(VERIFY_RE.match(line) for line in parts):
-        gaps.append("a `Verify:` line in `Parts and acceptance criteria`")
+    parts = section_lines(body, "Parts and acceptance criteria")
+    # One `Verify:` per `###` part — 03-DELIVERY's DoR says the acceptance is per part, and it
+    # is the rule `DeliveryModel.lean`'s `partsVerified` certifies. A body with no `###` part is
+    # measured as one block, so a single-part brief still needs its line; a body with no Parts
+    # section lacks it too (the section gap above names the larger defect).
+    if parts is None:
+        gaps.append("a `Verify:` line in every part of `Parts and acceptance criteria`")
+    else:
+        blocks = re.split(r"(?m)^###\s+", "\n".join(parts))[1:] or ["\n".join(parts)]
+        if not all(
+            any(VERIFY_RE.match(line) for line in block.splitlines()) for block in blocks
+        ):
+            gaps.append("a `Verify:` line in every part of `Parts and acceptance criteria`")
     return gaps
 
 
@@ -982,6 +992,24 @@ def self_test() -> int:
     contract_cases = [
         ("conforming h2 body", contract_body("##"), []),
         ("conforming issue-form body (h3)", contract_body("###"), []),
+        (
+            "two parts, one Verify line",
+            contract_body("###").replace(
+                "  Verify: `true`",
+                "  Verify: `true`\n\n### P2 — the second part\n"
+                "- **P2.1** Given a state, when an act, then an outcome.",
+            ),
+            ["a `Verify:` line in every part"],
+        ),
+        (
+            "two parts, each with a Verify line",
+            contract_body("###").replace(
+                "  Verify: `true`",
+                "  Verify: `true`\n\n### P2 — the second part\n"
+                "- **P2.1** Given a state, when an act, then an outcome.\n  Verify: `true`",
+            ),
+            [],
+        ),
         (
             "a missing section",
             contract_body("###").replace("### Baseline", "### Base line"),
