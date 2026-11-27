@@ -49,6 +49,9 @@ async function binding(request: APIRequestContext): Promise<Binding> {
     release_id: release.id,
     executor_kind: "internal_agent",
     capability_agent_id: agent!.id,
+    // #833's spend-budget gate refuses an internal-agent run whose binding declares no
+    // ceiling; the fixture declares the smallest honest one.
+    meta: { limits: { cost_budget_usd: 1 } },
   });
   return { id: created.id, release_hash: release.release_hash };
 }
