@@ -303,14 +303,31 @@ def check_conformance(snapshot_dir: Path) -> tuple[bool, str]:
     return False, f"strict audit fails; {detail}"
 
 
-def check_findings_instrument(ledger: Path) -> tuple[bool, str]:
+def check_findings_instrument(ledger: Path, snapshot_dir: Path) -> tuple[bool, str]:
+    """The findings ledger through the conformance audit's ledger check.
+
+    `scripts/verify-findings.py` retired with #782 (the superseded programme generators); the
+    audit now reads and validates a ledger as part of the rework register's provenance. The
+    quote-freshness half of the old gate retires with it; the structural refusals (a non-object
+    finding, a repeated identifier) remain the audit's own.
+    """
+    out = Path(tempfile.mkdtemp(prefix="viability-findings-")) / "rework.json"
     code, output = run_command(
-        [sys.executable, str(ROOT / "scripts" / "verify-findings.py"), str(ledger)]
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "audit-programme-conformance.py"),
+            "--snapshot",
+            str(snapshot_dir),
+            "--findings",
+            str(ledger),
+            "--rework-out",
+            str(out),
+        ]
     )
     if code != 0:
         tail = " ".join(output.strip().splitlines()[-3:])
-        return False, f"verify-findings exits {code}: {tail[:300]}"
-    return True, "verify-findings passes"
+        return False, f"the findings ledger is refused ({code}): {tail[:300]}"
+    return True, "the findings ledger merges into the register"
 
 
 # ── the verdict ──────────────────────────────────────────────────────────────
@@ -486,7 +503,7 @@ def main(argv: list[str]) -> int:
             (
                 "findings",
                 "ledger instrument",
-                *check_findings_instrument(ledger_path),
+                *check_findings_instrument(ledger_path, snapshot),
             )
         )
     ok, detail = check_findings(ledger)

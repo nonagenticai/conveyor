@@ -179,7 +179,8 @@ rsync -a --delete --exclude 'actions.json' "$tmp/data/" "$data/"
 # document the pack publishes or check-data refuses the pack.
 cp "$tmp/data/rework.json" "$root/docs/evidence/rework-register.json"
 for _ in 1 2 3; do
-  python3 "$root/scripts/build-programme-seed.py"
+  # The programme seed is frozen (#782 P4): build-programme-seed.py is retired, so the loop
+  # re-derives only the measured coverage until it agrees with itself.
   python3 "$root/scripts/build-coverage.py"
   if python3 "$root/scripts/build-coverage.py" --check; then
     break
