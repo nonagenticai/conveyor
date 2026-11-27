@@ -7,14 +7,14 @@ Measured 2026-11-27T06:21–06:24Z against the deployed engine
 Transport: the deployed CLI. The admin host is redacted from this public receipt; the command shape
 is `ssh <admin host> 'sudo KUBECONFIG=… kubectl -n conveyor exec -i deploy/conveyor -- conveyor
 admin action invoke --tenant nonagentic --name <action> --input /dev/stdin'`. Each call's input and
-raw response sit beside this file.
+its response or error stream sit beside this file.
 
 ## Verdicts
 
 | Contract | Verdict | Command | Actor | Returned | Evidence |
 |---|---|---|---|---|---|
 | coding | **executed against the real coding service** | `tools.call` `coding.jobs_create` on run `01a21bab-93d2-7ea7-b0a8-e69af2e17a23`, bound to toolkit `01a1f353-cf2b-7ed5-b470-2290ef635b0e` (effect ceiling `write`) | the tenant's first active member (CLI default) | job `7c5b90bb-7fa0-4e5a-8840-e38d8bb5c6f5`, `queued` 06:23:36Z; read back through `coding.jobs_get` → `running`, started 06:23:37Z | `24-coding.json`, `25-coding-get.json` |
-| worker | **executed over conveyor's durable queue** (#450 retired the Python upstream) | `workers.list` | same | 47 `(kind,status)` queue rows (for example `approval.closed.emit succeeded 20905`, `benchmark.reap succeeded 4163`) and 2 registered hosts | `10-workers.json` |
+| worker | **executed over conveyor's durable queue** (#450 retired the Python upstream) | `workers.list` | same | 47 `(kind,status)` queue buckets (for example `approval.closed.emit` succeeded × 20905, `benchmark.reap` succeeded × 4163) and 2 registered hosts (`mini1`, `mini2`) | `10-workers.json` |
 | billing | **executed over conveyor's ledger** (#46) | `billing.summary` `{window_days: 30}` | same | window 2026-10-28T06:21:42Z → 2026-11-27T06:21:42Z; `total_usd` 1.417925; 649 inference calls; 25 tool calls | `11-billing.json` |
 
 ## The coding path
@@ -40,4 +40,7 @@ The run and bind sequence, all live:
   call executed through the real contract; the job's own output is the coding service's record.
 - The worker and billing rows are reads over conveyor state, not external calls. That is the
   contract after #450 and #46, and this receipt says so rather than implying an upstream answered.
+- `workers.list` returns the queue as aggregated `(kind,status,count)` buckets and the host
+  registry; it exposes no per-job row id. A row-level read is `jobs.list`, which this receipt does
+  not take. P1.2's acceptance was amended accordingly at `4c3d2df9a`.
 - Nothing here re-runs T14's six toolkit calls; this is #3's P4.1 only.
