@@ -103,6 +103,36 @@ pub struct DevelopmentCharterIn {
     /// before any branch and the project's own actions never change it (§9.3).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gate_set: Option<Vec<String>>,
+    /// The engine-derived unit certificate's policy (#837). Absent means the unit carries no
+    /// pinned specification and its Definition of done stays advisory.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_policy: Option<DevelopmentProofPolicyIn>,
+}
+
+/// The unit certificate's policy, as the charter writes it.
+///
+/// `spec_sha256` is the specification the certificate answers, frozen here: an implementer who
+/// could re-pin it would certify against an easier document. `required` selects the Definition of
+/// done gate — advisory when false, refusing when true — and only a principal other than the
+/// implementer may loosen it (`change_judging_surface`).
+#[derive(Clone, Debug, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct DevelopmentProofPolicyIn {
+    /// The specification's name (for example `docs/SPEC_V2.md`).
+    pub spec_name: String,
+    /// That specification's SHA-256. Empty is allowed only while the policy is advisory.
+    #[serde(default)]
+    pub spec_sha256: String,
+    /// Whether the unit's Definition of done requires the certificate.
+    #[serde(default)]
+    pub required: bool,
+}
+
+/// The normalized policy, before the development project row exists.
+struct ProofPolicySpec {
+    spec_name: String,
+    spec_sha256: String,
+    required: bool,
 }
 
 /// One recorded step.
@@ -267,12 +297,15 @@ pub struct DevelopmentJudgingChangeIn {
     pub change: Value,
 }
 
-/// The refusal document for `change_judging_surface`. The action never succeeds — a development
-/// project cannot change a surface that judges it — so this type is the declared output shape of
-/// an operation whose only successful outcome would be a governance project's, outside T6.
+/// The outcome of a `change_judging_surface` attempt.
+///
+/// The three original surfaces always refuse — a development project cannot change what judges
+/// it. `proof_policy` admits one safe change (`required`), recorded by the wrapper; `refused` is
+/// false only when that toggle was applied, and the refused calls remain refusals.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct DevelopmentJudgingChangeOut {
-    /// Always true when the operation were admitted; the action refuses before it returns.
+    /// Whether the attempt was refused. False only for an admitted `proof_policy.required`
+    /// toggle.
     pub refused: bool,
 }
 
@@ -339,6 +372,16 @@ fn development_error(error: DevelopmentStoreError, action: &str) -> ActionError 
             409,
             "gate_not_approved",
             format!("{action}: the {gate} gate is not approved"),
+        ),
+        DevelopmentStoreError::ProofPolicyExists(id) => ActionError::new(
+            409,
+            "proof_policy_exists",
+            format!("{action}: development project {id} already carries a proof policy"),
+        ),
+        DevelopmentStoreError::ProofPolicyMissing(id) => ActionError::new(
+            409,
+            "proof_policy_missing",
+            format!("{action}: development project {id} carries no proof policy"),
         ),
     }
 }
@@ -521,7 +564,10 @@ async fn ensure_predecessors(
 }
 
 /// The newest development gate for `(project, gate)`: a pending one first, then an approved one.
-async fn find_gate(
+///
+/// `pub(crate)` because the unit facts builder (`crate::proof::facts`) derives the same gate
+/// observations the close path resolves; there is one gate reader, not a second one.
+pub(crate) async fn find_gate(
     tx: &mut PgConnection,
     tenant: conveyor_domain::TenantId,
     project_id: Uuid,
@@ -622,7 +668,7 @@ async fn request_gate(
     Ok((record, true))
 }
 
-fn gate_approved(record: &Option<ApprovalRecord>) -> bool {
+pub(crate) fn gate_approved(record: &Option<ApprovalRecord>) -> bool {
     record
         .as_ref()
         .is_some_and(|record| record.approval.status == conveyor_domain::ApprovalStatus::Approved)
@@ -740,6 +786,48 @@ async fn development_projects_charter(
         }
     };
 
+    // The unit certificate's policy is normalized here, before any row exists: the digest shape
+    // and the required/blank-spec rule are the action's refusals, and the table's CHECKs are the
+    // backstop for a row written by any other path.
+    let proof_policy = match input.proof_policy.as_ref() {
+        None => None,
+        Some(policy) => {
+            let spec_name = policy.spec_name.trim();
+            if spec_name.is_empty() {
+                return Err(invalid(
+                    "proof_policy.spec_name",
+                    "required",
+                    "must not be empty",
+                ));
+            }
+            let spec_sha256 = policy.spec_sha256.trim();
+            let digest_ok = spec_sha256.is_empty()
+                || (spec_sha256.len() == 64
+                    && spec_sha256
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)));
+            if !digest_ok {
+                return Err(invalid(
+                    "proof_policy.spec_sha256",
+                    "invalid_value",
+                    "must be a lower-case SHA-256 (64 hex characters) or empty",
+                ));
+            }
+            if policy.required && spec_sha256.is_empty() {
+                return Err(invalid(
+                    "proof_policy.spec_sha256",
+                    "required",
+                    "a required unit gate must pin the specification digest",
+                ));
+            }
+            Some(ProofPolicySpec {
+                spec_name: spec_name.to_owned(),
+                spec_sha256: spec_sha256.to_owned(),
+                required: policy.required,
+            })
+        }
+    };
+
     let key = match input.key.as_deref() {
         Some(raw) => {
             let key = conveyor_domain::Code::parse(raw)
@@ -785,6 +873,25 @@ async fn development_projects_charter(
                 }
                 if issue_ref.is_some() && existing.issue_ref != issue_ref {
                     mismatched.push("issue_ref");
+                }
+                let existing_policy =
+                    store::development::proof_policy_tx(&mut *tx, ctx.tenant, existing.id)
+                        .await
+                        .map_err(|error| {
+                            tracing::error!(?error, "read the development proof policy");
+                            ActionError::internal()
+                        })?;
+                let policy_matches = match (&proof_policy, &existing_policy) {
+                    (None, None) => true,
+                    (Some(requested), Some(existing)) => {
+                        requested.spec_name == existing.spec_name
+                            && requested.spec_sha256 == existing.spec_sha256
+                            && requested.required == existing.required
+                    }
+                    _ => false,
+                };
+                if !policy_matches {
+                    mismatched.push("proof_policy");
                 }
                 if !mismatched.is_empty() {
                     return Err(ActionError::new(
@@ -855,6 +962,21 @@ async fn development_projects_charter(
     )
     .await
     .map_err(|error| development_error(error, "development_projects.charter"))?;
+
+    if let Some(policy) = &proof_policy {
+        store::development::insert_proof_policy_tx(
+            &mut *tx,
+            ctx.tenant,
+            &store::development::NewProofPolicy {
+                development_project_id: row.id,
+                spec_name: policy.spec_name.clone(),
+                spec_sha256: policy.spec_sha256.clone(),
+                required: policy.required,
+            },
+        )
+        .await
+        .map_err(|error| development_error(error, "development_projects.charter"))?;
+    }
 
     Ok(HandlerOutput::created(policy_from_row(&row)))
 }
@@ -1439,6 +1561,96 @@ async fn development_projects_rollback(
 
 // ── development_projects.close ──────────────────────────────────────────────────────────
 
+/// Resolve the unit's Definition of done against the engine's own rows (#837).
+///
+/// The policy the charter pinned selects the mode. With no policy the unit is advisory and the
+/// closure says so. With a policy, the engine derives the facts, finds the newest proven
+/// certificate over exactly those facts and that specification pin, and resolves it through the
+/// same `lean_proof` arm a PM gate uses. Required refuses the close when the certificate is
+/// missing or invalid; advisory records the outcome in the closure and lets the close proceed.
+async fn unit_dod(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    project: &DevelopmentProjectRow,
+) -> Result<Value, ActionError> {
+    use crate::proof::facts;
+
+    let policy = store::development::proof_policy_tx(&mut *conn, tenant, project.id)
+        .await
+        .map_err(|error| development_error(error, "development_projects.close"))?;
+    let Some(policy) = policy else {
+        return Ok(json!({
+            "required": false,
+            "lean_proof": "missing",
+            "reason": "the unit carries no proof_policy",
+        }));
+    };
+    if policy.spec_sha256.trim().is_empty() {
+        if policy.required {
+            return Err(crate::pm::missing_required_kind("lean_proof"));
+        }
+        return Ok(json!({
+            "required": false,
+            "lean_proof": "missing",
+            "reason": "the proof_policy pins no specification digest",
+        }));
+    }
+
+    let facts = match facts::derive_unit_record(&mut *conn, tenant, project.id).await {
+        Ok(facts) => facts,
+        Err(error) if policy.required => return Err(error),
+        Err(error) => {
+            return Ok(json!({
+                "required": false,
+                "lean_proof": "unproven",
+                "reason": error.code,
+                "detail": error.detail,
+            }));
+        }
+    };
+    let canonical = facts.canonical()?;
+    let facts_sha256 = conveyor_domain::compare::content_hash(&Value::String(canonical));
+    let proof = facts::proof_on_facts(
+        &mut *conn,
+        tenant,
+        project.id,
+        &facts_sha256,
+        &policy.spec_sha256,
+    )
+    .await?;
+    let Some(proof) = proof else {
+        if policy.required {
+            return Err(crate::pm::missing_required_kind("lean_proof"));
+        }
+        return Ok(json!({
+            "required": false,
+            "lean_proof": "missing",
+            "facts_sha256": facts_sha256,
+        }));
+    };
+
+    match crate::pm::resolve_lean_proof(&mut *conn, tenant, proof.id, Some(&policy.spec_sha256))
+        .await
+    {
+        Ok(evidence) => Ok(json!({
+            "required": policy.required,
+            "lean_proof": "proven",
+            "proof_id": proof.id,
+            "facts_sha256": facts_sha256,
+            "evidence": evidence,
+        })),
+        Err(error) if policy.required => Err(error),
+        Err(error) => Ok(json!({
+            "required": false,
+            "lean_proof": "unproven",
+            "proof_id": proof.id,
+            "facts_sha256": facts_sha256,
+            "reason": error.code,
+            "detail": error.detail,
+        })),
+    }
+}
+
 /// Write the closure record, after every step and gate passed (P1.1, §9.1 9).
 #[crate::action(
     name = "development_projects.close",
@@ -1522,7 +1734,12 @@ async fn development_projects_close(
             )
         })?;
 
-    // 4. The steps' typed evidence, read from the rows (never from the caller).
+    // 4. The unit's Definition of done: the engine-derived certificate, when the charter pinned
+    //    one. Required refuses the close; advisory reports the outcome in the closure. The same
+    //    `lean_proof` evidence arm a PM gate resolves is reused — one path, not two.
+    let dod = unit_dod(&mut *tx, ctx.tenant, &project).await?;
+
+    // 5. The steps' typed evidence, read from the rows (never from the caller).
     let by_step = |step: Step| steps.iter().find(|row| row.step == step.as_str());
     let pr = by_step(Step::PullRequest).expect("required pull_request step");
     let ci = by_step(Step::Ci).expect("required ci step");
@@ -1610,6 +1827,7 @@ async fn development_projects_close(
         },
         "live_check": live.evidence,
         "rollback": rollback.map(|row| row.evidence.clone()),
+        "dod": dod,
     });
 
     let row = store::development::insert_closure_tx(
@@ -1814,11 +2032,16 @@ async fn development_projects_list(
 
 // ── development_projects.change_judging_surface ────────────────────────────────────────
 
-/// The development project's attempt to change a surface that judges it: refused (§9.3).
+/// The development project's attempt to change a surface that judges it (§9.3).
 ///
-/// The refusal is the feature. The legitimate path is a separate governance project with a
-/// different approver set; the invoke layer records this refused call as an
-/// `action_invocation` + `audit_event` (outcome `refused`), and the charter is untouched.
+/// The refusal is the feature for `gate_set`, `approval_policy` and `instrument`: the legitimate
+/// path is a separate governance project with a different approver set, and the invoke layer
+/// records the refused call as an `action_invocation` + `audit_event` (outcome `refused`).
+///
+/// `proof_policy` is the one exception, and only in the safe direction: a principal other than
+/// the implementer may toggle `required`, and the implementer may tighten it. The specification
+/// pin is never rewritten — an implementer who could re-pin to an easier specification would
+/// defeat the certificate — and the implementer may never loosen the gate (#837).
 #[crate::action(
     name = "development_projects.change_judging_surface",
     version = 1,
@@ -1839,13 +2062,16 @@ async fn development_projects_change_judging_surface(
         return Err(invalid(
             "surface",
             "invalid_value",
-            "must be gate_set, approval_policy or instrument",
+            "must be gate_set, approval_policy, instrument or proof_policy",
         ));
     }
     if !input.change.is_object() {
         return Err(invalid("change", "invalid_value", "must be a JSON object"));
     }
     let project = load_project(&mut *tx, ctx.tenant, input.development_project_id).await?;
+    if input.surface == "proof_policy" {
+        return change_proof_required(&mut *tx, &ctx, &project, &input.change).await;
+    }
     Err(ActionError::new(
         403,
         "judging_surface_immutable",
@@ -1857,4 +2083,68 @@ async fn development_projects_change_judging_surface(
             project.id, input.surface
         ),
     ))
+}
+
+/// The `proof_policy` surface's one admissible change: `required`.
+///
+/// The specification pin is frozen at charter. A principal other than the implementer may toggle
+/// the requirement either way; the implementer may only tighten it — loosening the gate that
+/// judges its own work is exactly what §9.3 refuses (#837).
+async fn change_proof_required(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project: &DevelopmentProjectRow,
+    change: &Value,
+) -> Result<HandlerOutput<DevelopmentJudgingChangeOut>, ActionError> {
+    let object = change.as_object().expect("the caller checked an object");
+    if let Some(key) = object.keys().find(|key| key.as_str() != "required") {
+        return Err(ActionError::new(
+            403,
+            "judging_surface_immutable",
+            format!(
+                "the proof policy's {key:?} is frozen at charter; only `required` may be \
+                 toggled. Re-pinning the specification would let an implementer certify against \
+                 an easier document"
+            ),
+        ));
+    }
+    let required = object
+        .get("required")
+        .and_then(Value::as_bool)
+        .ok_or_else(|| invalid("change.required", "invalid_value", "must be a boolean"))?;
+    let policy = store::development::proof_policy_tx(&mut *conn, ctx.tenant, project.id)
+        .await
+        .map_err(|error| development_error(error, "development_projects.change_judging_surface"))?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "proof_policy_missing",
+                format!("development project {} carries no proof policy", project.id),
+            )
+        })?;
+    if required && policy.spec_sha256.trim().is_empty() {
+        return Err(ActionError::new(
+            422,
+            "proof_spec_unpinned",
+            "a required unit gate needs the charter's specification digest; this policy has none",
+        ));
+    }
+    if !required && ctx.actor_id == project.implementer_id {
+        return Err(ActionError::new(
+            403,
+            "judging_surface_immutable",
+            format!(
+                "the implementer of development project {} cannot loosen its proof requirement: \
+                 only a principal other than the implementer may (the same separation-of-duties \
+                 rule that keeps the implementer out of its gates)",
+                project.id
+            ),
+        ));
+    }
+    store::development::set_proof_required_tx(&mut *conn, ctx.tenant, project.id, required)
+        .await
+        .map_err(|error| development_error(error, "development_projects.change_judging_surface"))?;
+    Ok(HandlerOutput::ok(DevelopmentJudgingChangeOut {
+        refused: false,
+    }))
 }
