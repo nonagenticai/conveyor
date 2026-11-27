@@ -271,7 +271,7 @@ The two open questions the issue carries are answered in the recommendation:
 | P4.2 counts | `grep -n '5,057' docs/plans/conformance-rows.md` and `grep -n '5,450'` | both present (5,057 at §0 and §4; 5,450 at §0, §4 and the stage table) | ca5309751 |
 | Docs gate | `python3 docs/design/scripts/build-docs.py --check` | 303 sources, 0 failures; the page and index are committed | ca5309751 |
 | Programme gate | `python3 scripts/ci/board.py --repo nonagenticai/conveyor --dor 783` | exit 0 | ca5309751 |
-| P4.1 decision | the owner's comment on #783 | pending | — |
+| P4.1 decision | the owner's comment on #783 | **accept** — recorded 2026-11-27 on #783, with Stage 0 as the next unit | issue comment |
 
 ## 7. Risks and open points
 
