@@ -1,16 +1,74 @@
 {
-  "schema": "issue-registry/v1",
-  "provenance": {
-    "tenant": "nonagentic",
-    "source": "github:nonagenticai/conveyor"
-  },
   "issues": [
+    {
+      "number": 886,
+      "title": "walk: reconcile the project record to the delivered S1\u2013S3 (WBS, PI, parity matrix)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/886",
+      "updatedAt": "2026-11-27T21:48:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 884,
+      "title": "proof: commit the post-#868 live certificate and its regenerated report",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/884",
+      "updatedAt": "2026-11-27T21:48:44Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 882,
+      "title": "programme: record T18 as built \u2014 the ten V2 routes and the spec gate landed",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/882",
+      "updatedAt": "2026-11-27T21:29:09Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
     {
       "number": 878,
       "title": "fix(walk): the registry test must allow a wing's rows",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/878",
-      "updatedAt": "2026-11-27T18:39:20Z",
+      "updatedAt": "2026-11-27T19:38:43Z",
       "labels": [
         {
           "name": "unit",
@@ -71,9 +129,9 @@
     {
       "number": 868,
       "title": "proof: verifyParts must apply only to unit-labeled issues",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/868",
-      "updatedAt": "2026-11-27T19:25:22Z",
+      "updatedAt": "2026-11-27T21:00:13Z",
       "labels": [
         {
           "name": "unit",
@@ -98,7 +156,7 @@
       "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/867",
-      "updatedAt": "2026-11-27T18:58:21Z",
+      "updatedAt": "2026-11-27T19:40:06Z",
       "labels": [
         {
           "name": "unit",
@@ -331,9 +389,9 @@
     {
       "number": 848,
       "title": "test: T18 \u2014 every V2 destination's spec asserts empty, error, happy and one refusal",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/848",
-      "updatedAt": "2026-11-27T18:12:34Z",
+      "updatedAt": "2026-11-27T19:51:42Z",
       "labels": [
         {
           "name": "unit",
@@ -647,15 +705,15 @@
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/817",
-      "updatedAt": "2026-11-27T07:33:44Z",
+      "updatedAt": "2026-11-27T21:31:38Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "GEMBA-WALK",
@@ -666,9 +724,9 @@
     {
       "number": 816,
       "title": "S3 \u2014 Gemba Walk: Knowledge, Measure, Operations & Utilities read/write parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/816",
-      "updatedAt": "2026-11-27T18:52:19Z",
+      "updatedAt": "2026-11-27T21:31:25Z",
       "labels": [
         {
           "name": "unit",
@@ -687,9 +745,9 @@
     {
       "number": 815,
       "title": "S2 \u2014 Gemba Walk: Procedures & authoring + Govern & design read/write parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/815",
-      "updatedAt": "2026-11-27T18:23:27Z",
+      "updatedAt": "2026-11-27T19:31:13Z",
       "labels": [
         {
           "name": "unit",
@@ -708,9 +766,9 @@
     {
       "number": 814,
       "title": "S1 \u2014 Gemba Walk: Portfolio & plan + Organisation read/write parity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/814",
-      "updatedAt": "2026-11-27T18:27:20Z",
+      "updatedAt": "2026-11-27T21:34:30Z",
       "labels": [
         {
           "name": "unit",
@@ -935,17 +993,17 @@
     {
       "number": 783,
       "title": "design: conformance and standards as row-derived sections",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/783",
-      "updatedAt": "2026-11-27T11:24:39Z",
+      "updatedAt": "2026-11-27T20:48:59Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -7142,7 +7200,7 @@
     },
     {
       "number": 21,
-      "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale compute-1 doc",
+      "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale hp1 doc",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/21",
       "updatedAt": "2026-11-13T06:32:13Z",
