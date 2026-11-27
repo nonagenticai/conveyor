@@ -230,6 +230,12 @@ pub async fn create_tx(
     request: &ProposalRequest<'_>,
 ) -> Result<Approval, ProposalError> {
     let mut new = NewApproval::new(request.spec.name.to_string(), KIND);
+    // SPEC_V2 §6.5: an ops-controlled action carries human dual control. The invoke boundary
+    // refuses the call unless the gate has a two-decision quorum, so the proposal opens it with
+    // that quorum — a single-decision gate could be approved and still authorise nothing.
+    if conveyor_actions::control::approvals::requires_dual_control(request.spec.name.as_ref()) {
+        new.required_decisions = new.required_decisions.max(2);
+    }
     new.project_id = request.project_id;
     new.requested_by = Some(request.proposer_id);
     new.expires_at = request.expires_at;

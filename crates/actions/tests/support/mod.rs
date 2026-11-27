@@ -356,6 +356,9 @@ pub async fn tranche_review_evidence(pg: &Pg, seeded: &Seeded, tranche: Uuid) ->
 /// that one principal requested can be decided by another (SPEC_V2 §5.4's requester exclusion).
 pub const REVIEWER: &str = "dev:reviewer";
 
+/// The second distinct human: the second approver a §6.5 dual-control gate needs.
+pub const REVIEWER_TWO: &str = "dev:reviewer2";
+
 pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
     let tenant_id: Uuid = sqlx::query_scalar(
         "INSERT INTO tenant (slug, name) VALUES ($1, $2)

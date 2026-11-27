@@ -755,6 +755,15 @@ const OPS_CONTROLLED: &[&str] = &[
     "ops.mitigate",
 ];
 
+/// Whether `action` is one of the ops actions SPEC_V2 §6.5 puts under human dual control.
+///
+/// The invoke boundary refuses such a call unless its approval carries a two-decision quorum and
+/// two distinct human approvers. Every creator of that gate — the console flow, a copilot
+/// proposal — must open it with the quorum, or the approved call could never run.
+pub fn requires_dual_control(action: &str) -> bool {
+    OPS_CONTROLLED.contains(&action)
+}
+
 /// The dry-run half of §6.5: the real call must follow a recorded dry run of the same action
 /// and input.
 ///

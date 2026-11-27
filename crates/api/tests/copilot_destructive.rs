@@ -86,7 +86,26 @@ async fn recorded_target(
     target
 }
 
-/// P1.1 — the proposal records the target its gate will compare against.
+/// The quorum recorded on a gate.
+async fn recorded_quorum(
+    pg: &copilot::support::Pg,
+    tenant: conveyor_domain::TenantId,
+    id: Uuid,
+) -> i64 {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the read");
+    let quorum: i64 =
+        sqlx::query_scalar("SELECT required_decisions::bigint FROM approval WHERE id = $1")
+            .bind(id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("read the quorum");
+    tx.commit().await.expect("commit");
+    quorum
+}
+
+/// P1.1 — the proposal records the target its gate will compare against, at the §6.5 quorum.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_proposal_records_the_target_it_authorises() {
     let (_running, pg, tenant, approval_id, _turn, _model) = propose_scale(3).await;
@@ -94,6 +113,11 @@ async fn a_proposal_records_the_target_it_authorises() {
         recorded_target(&pg, tenant, approval_id).await.as_deref(),
         Some(scale_target(3).as_str()),
         "the proposal must carry the target the invoke boundary will compute"
+    );
+    assert_eq!(
+        recorded_quorum(&pg, tenant, approval_id).await,
+        2,
+        "an ops-controlled proposal opens the §6.5 dual-control quorum"
     );
 }
 
@@ -139,17 +163,21 @@ async fn a_proposal_without_a_target_is_refused() {
 async fn an_approved_proposal_executes_its_destructive_action() {
     let (running, pg, tenant, approval_id, turn_id, _model) = propose_scale(3).await;
 
-    let (status, decided) = running
-        .invoke(
-            "approvals.decide",
-            copilot::support::REVIEWER,
-            json!({"approval_id": approval_id, "decision": "approve"}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "approvals.decide: {decided}");
+    // SPEC_V2 §6.5: ops.scale carries dual control, so the proposal opened a two-decision gate
+    // and two distinct humans approve it before anything executes.
+    for bearer in [copilot::support::REVIEWER, copilot::support::REVIEWER_TWO] {
+        let (status, decided) = running
+            .invoke(
+                "approvals.decide",
+                bearer,
+                json!({"approval_id": approval_id, "decision": "approve"}),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "approvals.decide: {decided}");
+    }
 
     let outcome = execute(
         &running.state.pool,
@@ -211,17 +239,19 @@ async fn a_rejected_proposal_executes_nothing() {
 async fn an_approval_for_another_object_cannot_execute() {
     let (running, pg, tenant, approval_id, _turn, _model) = propose_scale(3).await;
 
-    let (status, decided) = running
-        .invoke(
-            "approvals.decide",
-            copilot::support::REVIEWER,
-            json!({"approval_id": approval_id, "decision": "approve"}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "approvals.decide: {decided}");
+    for bearer in [copilot::support::REVIEWER, copilot::support::REVIEWER_TWO] {
+        let (status, decided) = running
+            .invoke(
+                "approvals.decide",
+                bearer,
+                json!({"approval_id": approval_id, "decision": "approve"}),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "approvals.decide: {decided}");
+    }
 
     // The approval is now APPROVED, and it names replicas 9 while the sealed input asks for 3.
     // That is what a gate that only checked "is it approved?" would miss.
