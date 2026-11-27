@@ -1721,6 +1721,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
     },
     {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27-adopted/report.html",
+      "source": "docs/evidence/units/2026-11-27-adopted/report.md",
+      "section": "Evidence",
+      "sha256": "61ed1a4d1f9f423aca1afc6e4bbd0384e8bc9c6f33ae854226510622201f2eb6",
+      "bytes": 5153,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-adopted/report.md"
+    },
+    {
       "title": "findings",
       "path": "docs/evidence/units/2026-11-27-findings/findings.html",
       "source": "docs/evidence/units/2026-11-27-findings/findings.md",
