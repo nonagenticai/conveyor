@@ -71,6 +71,6 @@ export function problemLine(problem) {
  */
 export function problemText(problem) {
   const parts = [problemLine(problem)];
-  for (const item of problem.fields) parts.push(`${item.field}: ${item.detail}`);
+  for (const item of problem.fields ?? []) parts.push(`${item.field}: ${item.detail}`);
   return parts.filter((part) => part !== "").join(" · ");
 }

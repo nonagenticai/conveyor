@@ -42,11 +42,14 @@ test("problemText appends the field errors", () => {
     code: "action-invalid-input",
     detail: "the input does not match the action schema",
     requestId: "req-2",
-    fields: [{ field: "action", detail: "has no approval to waive" }],
+    fields: [
+      { field: "action", detail: "has no approval to waive" },
+      { field: "approval", detail: "must be `required` or `waived`" },
+    ],
   };
   assert.equal(
     problemText(problem),
-    "action-invalid-input — the input does not match the action schema — request req-2 · action: has no approval to waive",
+    "action-invalid-input — the input does not match the action schema — request req-2 · action: has no approval to waive · approval: must be `required` or `waived`",
   );
 });
 
