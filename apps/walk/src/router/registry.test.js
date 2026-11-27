@@ -5,14 +5,12 @@ import { matchPath, resolve, routes } from "./registry.js";
 import core from "./routes/core.js";
 
 test("core owns the entrance and the two Portfolio rows, host-rooted", () => {
-  // The registry composes core first, then the wings' files in a fixed order. Assert the core
-  // prefix, not the whole list: a wing's rows are composed after core and must not fail the
-  // foundation's own test.
-  const coreWalks = core.map((row) => row.walk);
-  assert.deepEqual(
-    routes.slice(0, coreWalks.length).map((row) => row.walk),
-    coreWalks,
-  );
+  // The registry composes core first, then the wings' files in a fixed order. Pin core's own
+  // rows literally (so deleting one fails) and assert they are the composed registry's prefix
+  // (so a wing's rows compose without weakening core's guarantee).
+  const coreWalks = ["/", "/portfolio", "/portfolio/:programme_id"];
+  assert.deepEqual(core.map((row) => row.walk), coreWalks);
+  assert.deepEqual(routes.slice(0, coreWalks.length).map((row) => row.walk), coreWalks);
   for (const row of routes) assert.equal(row.walk, row.app);
 });
 
