@@ -1779,8 +1779,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "36a9ea9baec8251703573a23958fb31c4dcba29afd6722e4ed66a696a3d132d6",
-      "bytes": 262754,
+      "sha256": "45387cacb5df079d9bbaa54a6143baec370343ab84d71df808b561730ac98d74",
+      "bytes": 263258,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -2205,6 +2205,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "244030e0a23f20220656fa756a439cbdafef8a78df38b8231b534b46ae1739a3",
       "bytes": 18561,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
+    },
+    {
+      "title": "Conformance and standards as row-derived sections",
+      "path": "docs/plans/conformance-rows.html",
+      "source": "docs/plans/conformance-rows.md",
+      "section": "Plans",
+      "sha256": "2763f6c16b61f3c2912a1f713e3abe4d1f0f6270fc17cf9bd18cd33f8664bebf",
+      "bytes": 29564,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/conformance-rows.md"
     },
     {
       "title": "The delivery system that uses the conveyor",

@@ -89,6 +89,12 @@ reviewed and changed by data PR; the live rows are the record after install:
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
   and the gate T1–T19 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM`, `GEMBA-WALK` — the cross-cutting units.
+- `PLATFORM` — conformance as rows: `docs/plans/conformance-rows.md` (#783) is a **design note, not
+  a slice plan**. It inventories the 5,450 lines of `scripts/audit-programme-conformance.py`,
+  `scripts/generate-standards.py` and `scripts/governance-chain.py`, names one owner per invariant
+  and stages the replacement (a `conformance`/`standards`/`rework` snapshot section plus
+  `snapshot --strict`, then the deletions). Its stages become separate units only after the
+  owner's decision on #783.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a
 one-line `Programme project:` header. Each delivery unit's issue carries the same context in four

@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Conformance and standards as row-derived sections · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/conformance-rows.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="conformance-and-standards-as-row-derived-sections">Conformance and standards as row-derived sections</h1>
+<p><strong>Status:</strong> design note for #783 — no code in this unit. Claim baseline <code>main@e6f4c3ac9</code> (2026-11-27). The owner's decision (P4) is the merge gate and is not self-issued.</p>
+<p><strong>Why this note exists.</strong> Three Python generators still build the programme's own conformance record from a mixture of live rows, committed files and published pages, and then write files back. This note inventories every invariant they enforce, names one owner for each — a live action, a snapshot section, a committed standard, a one-off instrument, or the unit that closes a gap — and stages the replacement so no invariant is dropped on the way.</p>
+<p><strong>Measured at the claim baseline</strong> (<code>docs/design/data</code>, 2026-11-27):</p>
+<table>
+<thead>
+<tr>
+<th>Generator</th>
+<th style="text-align: right;">Lines</th>
+<th>What it produces now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scripts/audit-programme-conformance.py</code></td>
+<td style="text-align: right;">2,465</td>
+<td>30 rules → 199 gaps (29 P0, 131 P1, 39 P2); a 160-entry accepted-gap ledger; the rework projection (420 packages, 533 subjects, 33 resolved, 2 suppressed)</td>
+</tr>
+<tr>
+<td><code>scripts/generate-standards.py</code></td>
+<td style="text-align: right;">1,697</td>
+<td>629 artefact instances (247 evidenced, 186 partial, 196 absent); 232 findings; 629 pages + <code>standards.json</code>/<code>standards.js</code>/<code>rework.js</code></td>
+</tr>
+<tr>
+<td><code>scripts/governance-chain.py</code></td>
+<td style="text-align: right;">1,288</td>
+<td>7 live checks and a 6-step apply over <code>/api/actions</code> for a T19/T19F project</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>5,450</strong></td>
+<td>the issue's 5,057 is the original <code>main@0d6db794</code> measurement; the delta is audit +40 and standards +353, chain unchanged</td>
+</tr>
+</tbody>
+</table>
+<p>The three are chained by <code>docs/design/scripts/publish-data.sh:59-122</code>: snapshot → audit (draft) → standards findings → audit with findings → rework register → snapshot with <code>--conformance</code> → strict audit → copy <code>conformance.json</code>/<code>.md</code> → standards (final) → <code>build-docs</code>. The site then serves <code>snapshot.js</code>, <code>outputs.js</code> and the rendered pages (<code>crates/api/src/design.rs:4-11</code>, <code>crates/pack/src/live.rs:74</code>); the baked <code>docs/design/data/*.json</code> and <code>docs/standards/*</code> are a second copy of what the same rows can answer.</p>
+<h2 id="1-what-is-already-row-derived--reuse-never-duplicate">1. What is already row-derived — reuse, never duplicate</h2>
+<p><code>crates/store/src/snapshot.rs:26-61</code> defines the snapshot; <code>:947-1025</code> assembles it. These sections are live and already answer a large part of the inventory:</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Fields the note relies on</th>
+<th>Builder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>programme</code></td>
+<td><code>programme</code>, <code>projects</code> (with <code>meta.depends_on</code>, <code>meta.tranche</code>, <code>meta.adm_phase</code>, <code>meta.closure_outputs</code>), <code>issue_registry</code>, <code>feedback</code></td>
+<td><code>snapshot.rs:947</code>; registry merged by <code>crates/pack/src/snapshot.rs:207-220</code></td>
+</tr>
+<tr>
+<td><code>msp</code></td>
+<td><code>benefit_profiles</code>, <code>benefit_links</code>, <code>benefit_transitions</code>, <code>tranches</code>, <code>tranche_reviews</code>, <code>programme_baselines</code>, <code>cadences</code>, <code>wbs_nodes</code>, <code>register_items</code>, <code>project_dependencies</code>, <code>benefit_realisation</code>, <code>dependencies</code>, <code>tranche_reconciliation</code></td>
+<td><code>snapshot.rs:976-992</code></td>
+</tr>
+<tr>
+<td><code>msp.dependencies</code></td>
+<td><code>edges</code>, <code>counts</code>, <code>untyped</code>, <code>unknown_targets</code>, <code>cycles</code> — recomputed from <code>meta.depends_on</code></td>
+<td><code>snapshot.rs:1230-1307</code>; Kosaraju at <code>:1312</code></td>
+</tr>
+<tr>
+<td><code>msp.tranche_reconciliation</code></td>
+<td>per tranche: <code>authorised</code>, <code>review</code>, <code>projects.{total,active,closed,archived}</code>, <code>flags</code> (<code>review_missing</code>, <code>projects_closed_before_authorisation</code>)</td>
+<td><code>snapshot.rs:1388-1481</code></td>
+</tr>
+<tr>
+<td><code>msp.benefit_realisation</code></td>
+<td>per profile: baseline value/measured_at/placeholder, post value, delta, state</td>
+<td><code>snapshot.rs:1061-1210</code></td>
+</tr>
+<tr>
+<td><code>artefacts</code></td>
+<td><code>governed_assets</code>, <code>documents</code> (published outputs with <code>category</code>, <code>status</code>, <code>content_hash</code>)</td>
+<td><code>snapshot.rs:993</code></td>
+</tr>
+<tr>
+<td><code>architecture</code></td>
+<td><code>profiles</code> (<code>status</code>, <code>phase_set</code>, <code>artifact_requirements</code>, hash inputs), <code>standard</code>, <code>artifacts</code> (with <code>phase_code</code>, <code>status</code>, entries, links, <code>document_id</code>), <code>links</code>, <code>contracts</code>, <code>compliance_reviews</code>, <code>waivers</code>, <code>board</code>, <code>maturity</code>, <code>skills</code>, <code>phase_progress</code></td>
+<td><code>snapshot.rs:994-1006</code></td>
+</tr>
+<tr>
+<td><code>architecture.phase_progress</code></td>
+<td>per project: each phase <code>state</code> (<code>evidenced</code>/<code>not-evidenced</code>), <code>contract</code>, <code>compliance</code>, <code>next_required</code></td>
+<td><code>snapshot.rs:1516+</code></td>
+</tr>
+<tr>
+<td><code>work</code></td>
+<td><code>cards</code>, <code>runs</code>, <code>approvals</code>, <code>approval_decisions</code></td>
+<td><code>snapshot.rs:963-975</code></td>
+</tr>
+<tr>
+<td><code>delivery</code></td>
+<td>per unit: <code>repo</code>, <code>lane</code>, <code>issue_ref</code>, <code>status</code>, <code>steps</code>, the three <code>gates</code>, <code>closure</code> (or <code>not recorded</code>)</td>
+<td><code>snapshot.rs:836-888</code></td>
+</tr>
+<tr>
+<td><code>programme_health</code></td>
+<td><code>tranches</code> (reconciliation), <code>benefits.{profiles,transitions,realised}</code>, <code>units.{total,by_status}</code>, <code>provenance.{documents,with_source_commit,unrecorded}</code></td>
+<td><code>snapshot.rs:935-944</code></td>
+</tr>
+<tr>
+<td><code>register</code> (pack)</td>
+<td>declared-vs-evidenced outputs per project, quoting the committed gap register</td>
+<td><code>crates/pack/src/register.rs:77</code>; built at <code>crates/pack/src/snapshot.rs:197-205</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>msp.project_dependencies</code> is the typed <code>project_dependency</code> table; <code>msp.dependencies</code> is the declared <code>meta.depends_on</code> graph. Both are real graphs; the typed table is the better owner once it is populated, and the declared graph is the fallback (<code>scripts/generate-standards.py:417-458</code>).</p>
+<h2 id="2-p1--the-invariant-inventory">2. P1 — the invariant inventory</h2>
+<p>One row per invariant. The source of truth is a live row, one of the sections above, a committed standard, or a one-off repository fact. Lines cite the claim baseline.</p>
+<h3 id="21-audit-programme-conformancepy--the-conformance-rules">2.1 <code>audit-programme-conformance.py</code> — the conformance rules</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Invariant</th>
+<th>Enforced at</th>
+<th>Source of truth</th>
+<th>Consumers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>A declared dependency names a project that exists</td>
+<td><code>:287-313</code></td>
+<td><code>msp.dependencies.unknown_targets</code> (<code>snapshot.rs:1279-1293</code>); typed <code>msp.project_dependencies</code></td>
+<td>rework packages, design site</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>A declared dependency carries <code>blocks|needs|supersedes|informs</code></td>
+<td><code>:314-324</code></td>
+<td><code>msp.dependencies.untyped</code> (<code>snapshot.rs:1271-1278</code>)</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>The declared dependency graph has no cycle</td>
+<td><code>:325-331</code></td>
+<td><code>msp.dependencies.cycles</code> (<code>snapshot.rs:1294-1307</code>, Kosaraju <code>:1312</code>)</td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>A published cadence section has rows</td>
+<td><code>:361-372</code></td>
+<td><code>msp.cadences</code> (<code>snapshot.rs:984</code>); the rule only fires when the section exists and is empty</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Every active project has a WBS node</td>
+<td><code>:374-391</code></td>
+<td><code>msp.wbs_nodes</code> (<code>snapshot.rs:985</code>) vs <code>programme.projects[].status</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>The snapshot header schema matches the standard</td>
+<td><code>:425-458</code></td>
+<td><code>manifest.schema</code> written by <code>crates/pack/src/snapshot.rs</code> (<code>SCHEMA</code>); expected value <code>sources.snapshot_schema</code> in <code>governance/conformance.json</code></td>
+<td>publish pipeline</td>
+</tr>
+<tr>
+<td>A7</td>
+<td>P0's declared output categories are published</td>
+<td><code>:460-479</code></td>
+<td><code>seed/output-standard.json</code> class <code>p0</code> (21 categories) vs <code>artefacts.documents</code>; the <code>register</code> section already compares these (<code>crates/pack/src/register.rs</code>)</td>
+<td>publish gate, site posture</td>
+</tr>
+<tr>
+<td>A8</td>
+<td>A tranche has entry/exit criteria; a closed tranche has a review and a review date</td>
+<td><code>:480-495</code></td>
+<td><code>msp.tranches.{entry_criteria,exit_criteria,state,review_at}</code> + <code>msp.tranche_reviews</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A9</td>
+<td>A <code>continue</code> review authorises the next tranche and names it</td>
+<td><code>:496-553</code></td>
+<td><code>msp.tranche_reconciliation.authorised</code>, <code>review</code> (<code>snapshot.rs:1421-1474</code>); <code>msp.tranches.authorisation_review_id</code></td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A10</td>
+<td>A project's status is compatible with its tranche's state</td>
+<td><code>:555-589</code></td>
+<td><code>msp.tranche_reconciliation.projects</code> + <code>flags.projects_closed_before_authorisation</code>; <code>meta.tranche</code> (<code>snapshot.rs:1429-1454</code>)</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A11</td>
+<td>A closed project declares <code>meta.closure_outputs</code></td>
+<td><code>:591-607</code></td>
+<td><code>programme.projects[].meta.closure_outputs</code> (<code>snapshot.rs:947</code>)</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A12</td>
+<td>A closed project publishes its closure review</td>
+<td><code>:608-620</code></td>
+<td><code>artefacts.documents</code> + the project's declared/closure categories</td>
+<td>rework packages (P0/P1)</td>
+</tr>
+<tr>
+<td>A13</td>
+<td>Every declared output is published</td>
+<td><code>:622-641</code></td>
+<td>the <code>register</code> section (<code>crates/pack/src/register.rs:77</code>) + <code>programme_health.provenance</code></td>
+<td>publish gate</td>
+</tr>
+<tr>
+<td>A14</td>
+<td>A benefit profile carries target, method, operational area, owner and a benefits-map edge</td>
+<td><code>:643-661</code></td>
+<td><code>msp.benefit_profiles</code> + <code>msp.benefit_links</code>; the write is <code>benefits.create/update/link</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A15</td>
+<td>A baseline is a measurement record, not a placeholder</td>
+<td><code>:662-704</code></td>
+<td><code>msp.benefit_realisation.placeholder</code> and baseline fields (<code>snapshot.rs:1088-1123</code>); the write is <code>benefits.create/update</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A16a</td>
+<td>A realised benefit has a measured baseline, post-measurement and evidence</td>
+<td><code>:705-723</code></td>
+<td><code>msp.benefit_realisation</code> (<code>snapshot.rs:1061-1210</code>); the write is <code>benefits.transition_upsert</code></td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A16b</td>
+<td>A transition's measurements are ordered: baseline before enactment before post</td>
+<td><code>:724-763</code></td>
+<td><code>msp.benefit_realisation</code>; the write is <code>benefits.transition_upsert</code></td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A17</td>
+<td>The programme has management, governance and boundary baselines</td>
+<td><code>:765-778</code></td>
+<td><code>msp.programme_baselines</code> (<code>snapshot.rs:983</code>); the write is <code>programmes.baseline</code> / <code>programmes.baseline_approve</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A18</td>
+<td>The ADM profile is adopted and matches the pinned hash</td>
+<td><code>:782-807</code></td>
+<td><code>architecture.profiles</code> (<code>snapshot.rs:995</code>); the pin is <code>sources.profile_hash</code> in <code>governance/conformance.json</code>; the write is <code>architecture.profile_tailor</code></td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A19</td>
+<td>An active architecture board is recorded</td>
+<td><code>:808-821</code></td>
+<td><code>architecture.board</code> (<code>snapshot.rs:1002</code>); the writes are <code>architecture.board_open</code> and the meeting actions</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A20</td>
+<td>A live v2 project has a live architecture contract</td>
+<td><code>:823-845</code></td>
+<td><code>architecture.contracts</code> (<code>snapshot.rs:999</code>); the write is <code>architecture.contracts_request</code>/<code>contracts_approve</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A21</td>
+<td>A live contract carries its approval</td>
+<td><code>:846-853</code></td>
+<td><code>architecture.contracts.approved_at</code>; the write is <code>architecture.contracts_approve</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A22</td>
+<td>A contract's requester is not its approver</td>
+<td><code>:854-869</code></td>
+<td>enforced live at <code>crates/actions/src/architecture.rs:1097-1105</code> (<code>requester_is_approver</code>); rows expose <code>requested_by</code>/<code>approved_by</code></td>
+<td>audit history only</td>
+</tr>
+<tr>
+<td>A23</td>
+<td>A closed delivery project has a Phase-G delivery-contract review; a non-conformant review has an active waiver</td>
+<td><code>:871-927</code></td>
+<td><code>architecture.compliance_reviews</code> + <code>architecture.waivers</code> (<code>snapshot.rs:1000-1001</code>); the writes are <code>architecture.reviews_record</code> / <code>reviews_waive</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A24</td>
+<td>A waiver carries owner, reason and reassessment date, and an active one is not expired</td>
+<td><code>:929-955</code></td>
+<td><code>architecture.waivers</code>; the write is <code>architecture.reviews_waive</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A25</td>
+<td>The Preliminary capability has each mandatory artefact type approved</td>
+<td><code>:957-984</code></td>
+<td><code>architecture.standard</code> (preliminary rows) + approved <code>architecture.artifacts</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A26</td>
+<td>Every project has the approved artefacts its profile's requirements demand up to its phase</td>
+<td><code>:986-1026</code></td>
+<td><code>architecture.profiles.artifact_requirements</code> + <code>architecture.artifacts.status</code> + <code>architecture.phase_progress</code> (<code>snapshot.rs:1516+</code> reports evidence, not the required set)</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A27</td>
+<td>The seed's project status matches the live row</td>
+<td><code>:1030-1046</code></td>
+<td><code>seed/programme.json</code> (committed mapping) vs <code>programme.projects[].status</code></td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A28</td>
+<td>The coverage instrument's status matches the live row</td>
+<td><code>:1047-1064</code></td>
+<td><code>docs/design/data/coverage.json</code> (the code-measured instrument) vs the live row</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A29</td>
+<td>The tracking issue names scripts that exist</td>
+<td><code>:1075-1102</code></td>
+<td>the GitHub issue registry (<code>programme.issue_registry</code>) vs the repository tree</td>
+<td>rework packages</td>
+</tr>
+<tr>
+<td>A30</td>
+<td>The rule matrix is a complete governance record</td>
+<td><code>:1271-1365</code></td>
+<td><code>governance/conformance.json</code> (the standard, never a projection); validated against <code>seed/output-standard.json</code> and <code>seed/programme.json</code>/<code>programme-definition.json</code></td>
+<td>the audit itself</td>
+</tr>
+<tr>
+<td>A31</td>
+<td>The accepted-gap ledger is valid, unexpired, and matches the live gaps</td>
+<td><code>:1189-1268</code></td>
+<td><code>docs/evidence/conformance-baseline.json</code> — 160 entries, all <code>rework</code>, earliest expiry 2027-02-18</td>
+<td>strict publish gate</td>
+</tr>
+<tr>
+<td>A32</td>
+<td>The gap register projects into rework packages, duplicates and suppressions, with a scorecard</td>
+<td><code>:1465-1709</code></td>
+<td>gaps + the matrix + the findings ledgers; published as <code>rework.json</code>/<code>rework.js</code> (file input at <code>crates/pack/src/snapshot.rs:209-211</code>)</td>
+<td>the card factory, the site</td>
+</tr>
+<tr>
+<td>A33</td>
+<td>The gap register has a Markdown rendering</td>
+<td><code>:1131-1182</code></td>
+<td>the gaps; a document renderer, not a record</td>
+<td><code>docs/evidence/conformance-gap-register.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>Supporting invariants of the same script (not separate rules): the self-test harness (<code>:1740-2307</code>), <code>load_dataset</code> (<code>:1105-1128</code>), and the CLI (<code>:2313-2461</code>).</p>
+<h3 id="22-generate-standardspy--the-standards-derivation">2.2 <code>generate-standards.py</code> — the standards derivation</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Invariant</th>
+<th>Enforced at</th>
+<th>Source of truth</th>
+<th>Consumers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>The subject set is programme, project, tranche, benefit, capability, phase and card rows</td>
+<td><code>:183-288</code></td>
+<td><code>programme</code>, <code>msp</code>, <code>architecture</code>, <code>work</code> sections</td>
+<td>standards instances</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Every standard template applies to every subject; the 629 artefacts carry a status (<code>evidenced</code>/<code>partial</code>/<code>absent</code>) and a gate</td>
+<td><code>:977-1056</code>, <code>:893-964</code></td>
+<td><code>seed/output-standard.json</code> (the standard, committed) + the sections + published pages</td>
+<td>findings, the design site</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Each template section resolves to a named row or published document</td>
+<td><code>:769-872</code></td>
+<td>the same sections; the 14 computed sources below</td>
+<td>artefact status</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>A published document section is evidenced only when the page carries its heading</td>
+<td><code>:293-334</code></td>
+<td><code>artefacts.documents</code> rows + <code>docs/design/docs/output-*.html</code></td>
+<td>artefact status</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>An artefact's gate reads a live contract or approval</td>
+<td><code>:933-964</code></td>
+<td><code>architecture.contracts</code> + <code>work.approvals</code></td>
+<td>the standards page</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Every mandatory artefact that is not evidenced yields a finding, deduplicated against the gap register</td>
+<td><code>:1086-1159</code>, <code>:1061-1083</code></td>
+<td>the conformance gaps + <code>COVERED_BY</code>/<code>ABSENT_ONLY_COVERED</code> (<code>:64-73</code>)</td>
+<td>rework register</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>An artefact's finding links to the published package that owns it</td>
+<td><code>:1424-1473</code></td>
+<td>the <code>rework</code> register (<code>:1380-1395</code>)</td>
+<td>the site</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>The record's payload, every page's bytes and <code>standards.js</code> match their recorded hashes</td>
+<td><code>:1478-1551</code></td>
+<td>the generated record + the pack build</td>
+<td>the pack's integrity gate</td>
+</tr>
+<tr>
+<td>S9</td>
+<td>The WSJF order is computed from four typed integer inputs; the score is never stored (§8.2)</td>
+<td><code>:357-398</code></td>
+<td><code>msp.wbs_nodes.{business_value,time_criticality,risk_reduction,job_size}</code></td>
+<td>the plan pages</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>The dependency-graph artefact rows are the typed table, else the declared graph</td>
+<td><code>:417-458</code></td>
+<td><code>msp.project_dependencies</code> (typed) / <code>msp.dependencies</code> (declared)</td>
+<td>the plan pages</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>A refinement cadence row carries a period; an unfiltered cadence read is not a row</td>
+<td><code>:460-485</code></td>
+<td><code>msp.cadences</code> (<code>kind='refinement'</code>, <code>period</code>)</td>
+<td>the cadence page</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>Kata candidates come from a lesson's typed marker or the kata register</td>
+<td><code>:487-548</code></td>
+<td><code>msp.lessons[].meta.kata_candidate</code> or a <code>kata</code> section — neither is in the snapshot today (the kata rows are empty)</td>
+<td>the I&amp;A page</td>
+</tr>
+<tr>
+<td>S13</td>
+<td>The gap-analysis rows are the conformance gaps</td>
+<td><code>:550-623</code></td>
+<td>the conformance gaps</td>
+<td>the gap page</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>Each of the 629 artefacts is a rendered page with an index and a hash</td>
+<td><code>:1190-1368</code></td>
+<td>the instances; a document renderer</td>
+<td>the design pack</td>
+</tr>
+</tbody>
+</table>
+<p>Computed sources (the 14 named derivations of S3): <code>programme_summary</code>, <code>benefit_map</code>, <code>architecture_capability</code>, <code>phase_artefacts</code>, <code>requirements_catalog</code>, <code>gap-analysis</code>, <code>dependency_graph</code>, <code>refinement_cadence</code>, <code>kata_candidates</code>, <code>wsjf_order</code>, <code>artifact_metadata</code>, <code>artifact_entries</code>, <code>artifact_links</code>, <code>artifact_document</code> (<code>:625-766</code>). Every one reads a section listed in §1; none needs a second derivation.</p>
+<h3 id="23-governance-chainpy--the-live-togaf-chain">2.3 <code>governance-chain.py</code> — the live TOGAF chain</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Invariant</th>
+<th>Enforced at</th>
+<th>Source of truth</th>
+<th>Consumers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td>The standing delegation is published and active</td>
+<td><code>:1178-1182</code></td>
+<td>the delegation document row; <code>documents.publish</code></td>
+<td><code>apply</code> gate</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>The live project row is the profile's project (<code>T19</code>/<code>T19F</code>)</td>
+<td><code>:1206-1207</code></td>
+<td><code>projects.get</code>; the <code>programme</code> section</td>
+<td><code>check</code></td>
+</tr>
+<tr>
+<td>G3</td>
+<td>The seven mandatory artefact types are approved</td>
+<td><code>:60-68</code>, <code>:1213-1216</code></td>
+<td><code>architecture.artifacts</code> rows; <code>architecture.artifacts_approve</code></td>
+<td><code>check</code></td>
+</tr>
+<tr>
+<td>G4</td>
+<td>A live, approved architecture contract and a live delivery contract exist; the requester is not the approver</td>
+<td><code>:1218-1226</code></td>
+<td><code>architecture.contracts</code>; <code>architecture.contracts_*</code> (the refusal is live: <code>crates/actions/src/architecture.rs:1097-1105</code>)</td>
+<td><code>check</code></td>
+</tr>
+<tr>
+<td>G5</td>
+<td>The benefit baseline is a measurement record and the benefit has an owner job</td>
+<td><code>:1228-1232</code></td>
+<td><code>msp.benefit_profiles</code>; <code>benefits.*</code></td>
+<td><code>check</code></td>
+</tr>
+<tr>
+<td>G6</td>
+<td>The <code>architecture-artifact</code> document is published and carries Metadata/Entries/Links/Document</td>
+<td><code>:1234-1242</code></td>
+<td><code>artefacts.documents</code> + the page body; <code>documents.compose</code>/<code>publish</code></td>
+<td><code>check</code></td>
+</tr>
+<tr>
+<td>G7</td>
+<td>The profile's Phase-G compliance reviews exist at the expected levels</td>
+<td><code>:1244-1260</code></td>
+<td><code>architecture.compliance_reviews</code>; <code>architecture.reviews_record</code></td>
+<td><code>check</code></td>
+</tr>
+</tbody>
+</table>
+<p>The apply path (<code>:1176-1193</code>) is a six-step orchestrator over the same actions: artefacts, links, Statement of Architecture Work, delivery contract, baseline, reviews, document. It writes no record of its own; <code>scripts/programme-record.py</code> is its transport.</p>
+<h2 id="3-p2--the-ownership-map">3. P2 — the ownership map</h2>
+<p>Exactly one owner per invariant. Owner kinds: <strong>action</strong> (a live handler is the gate), <strong>section</strong> (a computed snapshot section is the gate), <strong>standard</strong> (a committed document that is the rule, not a projection), <strong>keep</strong> (a one-off instrument observing an external/frozen fact or a renderer), <strong>gap</strong> (no owner yet; the unit that closes it).</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Owner kind</th>
+<th>Owner</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.dependencies.unknown_targets</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.dependencies.untyped</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.dependencies.cycles</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.cadences</code> (empty published section)</td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.wbs_nodes</code> + <code>programme.projects</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>keep</td>
+<td>the pack header contract (<code>manifest.schema</code> vs <code>sources.snapshot_schema</code> in <code>governance/conformance.json</code>)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>A7</td>
+<td>section</td>
+<td><code>register</code> (<code>crates/pack/src/register.rs:77</code>)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>A8</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.tranches</code> + <code>msp.tranche_reviews</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A9</td>
+<td>section</td>
+<td><code>msp.tranche_reconciliation.authorised</code>/<code>review</code></td>
+<td>live; the authorisation link field is a gap in the same section</td>
+</tr>
+<tr>
+<td>A10</td>
+<td>section</td>
+<td><code>msp.tranche_reconciliation.flags.projects_closed_before_authorisation</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A11</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>programme.projects[].meta.closure_outputs</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A12</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>artefacts.documents</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A13</td>
+<td>section</td>
+<td><code>register</code> + <code>programme_health.provenance</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A14</td>
+<td>action</td>
+<td><code>benefits.create</code>/<code>benefits.update</code>; <code>benefits.link</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A15</td>
+<td>action</td>
+<td><code>benefits.create</code>/<code>benefits.update</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A16a</td>
+<td>action</td>
+<td><code>benefits.transition_upsert</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A16b</td>
+<td>action</td>
+<td><code>benefits.transition_upsert</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A17</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>msp.programme_baselines</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A18</td>
+<td>gap</td>
+<td><code>architecture.profile_tailor</code> must compute and pin the profile hash (the standard pin exists; the action does not check it)</td>
+<td>gap</td>
+</tr>
+<tr>
+<td>A19</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>architecture.board</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A20</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>architecture.contracts</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A21</td>
+<td>action</td>
+<td><code>architecture.contracts_approve</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A22</td>
+<td>action</td>
+<td><code>architecture.contracts_approve</code> (<code>crates/actions/src/architecture.rs:1097-1105</code>)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>A23</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>architecture.compliance_reviews</code> + <code>waivers</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A24</td>
+<td>action</td>
+<td><code>architecture.reviews_waive</code> (verify the handler refuses an invalid waiver)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>A25</td>
+<td>section</td>
+<td><code>conformance</code> reading <code>architecture.standard</code> (preliminary) + approved <code>artifacts</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>A26</td>
+<td>section</td>
+<td><code>architecture.phase_progress</code> gains <code>missing_artefacts</code> from the profile</td>
+<td>gap — extend the section</td>
+</tr>
+<tr>
+<td>A27</td>
+<td>keep</td>
+<td>the publish pipeline's seed/live check</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>A28</td>
+<td>keep</td>
+<td>the design-pack coverage instrument</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>A29</td>
+<td>keep</td>
+<td>the issue-registry fact</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>A30</td>
+<td>standard</td>
+<td><code>governance/conformance.json</code>; shape check in the design pack</td>
+<td>live</td>
+</tr>
+<tr>
+<td>A31</td>
+<td>gap</td>
+<td>accepted-gap rows via <code>registers.*</code></td>
+<td>gap — Stage 4</td>
+</tr>
+<tr>
+<td>A32</td>
+<td>section</td>
+<td><code>rework</code> section computed by the engine</td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>A33</td>
+<td>keep</td>
+<td>the document renderer (<code>build-docs</code>)</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>S1</td>
+<td>section</td>
+<td><code>standards</code> reading the programme/msp/architecture/work subjects</td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>section</td>
+<td><code>standards</code> computing the 629 instances from <code>seed/output-standard.json</code> + the sections</td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>section</td>
+<td><code>standards</code> reading the 14 computed sources from §1</td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>gap</td>
+<td><code>documents.compose</code> must refuse a page missing a template heading (the four-heading rule)</td>
+<td>gap</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>section</td>
+<td><code>standards</code> reading <code>architecture.contracts</code> + <code>work.approvals</code></td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>section</td>
+<td><code>standards</code> (the covered-key dedupe against the conformance gaps)</td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>section</td>
+<td><code>rework</code></td>
+<td>gap — Stage 2</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>keep</td>
+<td>the pack's build-integrity check</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>S9</td>
+<td>section</td>
+<td><code>msp.wbs_nodes</code> typed integer inputs; the score is computed in the page, never stored</td>
+<td>live</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>section</td>
+<td><code>msp.project_dependencies</code> (typed), else <code>msp.dependencies</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>section</td>
+<td><code>msp.cadences</code> (<code>kind='refinement'</code>, <code>period</code>)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>gap</td>
+<td>a <code>kata</code> section and the <code>kata.*</code> rows (the actions exist; the section and rows do not)</td>
+<td>gap</td>
+</tr>
+<tr>
+<td>S13</td>
+<td>section</td>
+<td><code>conformance</code></td>
+<td>gap — Stage 0</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>keep</td>
+<td>the standards page renderer</td>
+<td>keep</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>action</td>
+<td><code>documents.publish</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>section</td>
+<td><code>programme</code> (the live project row the chain addresses)</td>
+<td>live</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>action</td>
+<td><code>architecture.artifacts_approve</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>G4</td>
+<td>action</td>
+<td><code>architecture.contracts_request</code>/<code>contracts_approve</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>action</td>
+<td><code>benefits.create</code>/<code>benefits.update</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>G6</td>
+<td>gap</td>
+<td><code>documents.compose</code> must refuse a document missing a template heading</td>
+<td>gap</td>
+</tr>
+<tr>
+<td>G7</td>
+<td>action</td>
+<td><code>architecture.reviews_record</code></td>
+<td>live</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The one-owner rule in words.</strong> A write-time constraint belongs to the action that refuses it (A14, A15, A16a, A16b, A21-A22, A24, G1, G3-G5, G7). A completeness or consistency check over rows belongs to the engine's computed section, which reads the sections in §1 and never re-derives them (A1-A5, A7-A13, A17, A19-A20, A23, A25-A26, S1-S3, S5-S11, S13, G2). An external or frozen fact, a renderer or a build-integrity check stays a one-off (A6, A27-A30, A33, S8, S14). A gap names the unit that closes it (A18, A31-A32, S4, S12, G6). No invariant is assigned to a file scheduled for deletion.</p>
+<h2 id="4-p3--the-staged-replacement">4. P3 — the staged replacement</h2>
+<p>Targets are the measured function spans of the claim baseline; a stage closes when <code>wc -l</code> on the three scripts is at or below its target and every proving test is green at the PR head.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Capability live first</th>
+<th>Files deleted</th>
+<th>Proving test</th>
+<th>Lines after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>conformance</code> snapshot section (the 30 rules as row predicates reading the sections) + <code>conveyor snapshot --strict</code></td>
+<td>none</td>
+<td>the section's findings equal the current audit's output on the same snapshot; <code>--strict</code> exits 1 on the 160 accepted P0/P1 gaps and 0 when they are fixed</td>
+<td>5,450</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Stage 0's strict gate</td>
+<td>audit methods <code>dependencies</code> (<code>:287-331</code>), <code>tranche_authorisation</code> (<code>:496-553</code>), <code>project_tranche</code> (<code>:555-589</code>), <code>benefits</code> (<code>:643-763</code>) and their self-test cases</td>
+<td><code>--strict</code> reproduces the same verdict; the four sections carry the same flags; audit <code>wc -l</code> ≤ 5,071</td>
+<td>5,071</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>standards</code> and <code>rework</code> sections (the 629 instances, 232 findings, 420 packages computed by the engine)</td>
+<td><code>generate-standards.py</code> except the page renderer (<code>:1190-1368</code>), which moves to the pack; the audit's remaining row rules, <code>build_register</code> (<code>:1465-1662</code>), <code>_scorecard</code> (<code>:1665-1709</code>)</td>
+<td>the standards summary <code>629/247/186/196/232</code> and the rework summary <code>420 packages/418 open/2 suppressed</code> reproduced from the sections; the pages byte-identical; the design pack green</td>
+<td>2,038</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the <code>programme-architect</code>/<code>solution-architect</code> playbooks over <code>/api/actions</code> (the #849 session channel), plus the G6 heading rule as a compose/handler rule</td>
+<td><code>governance-chain.py</code> (<code>:1-1288</code>)</td>
+<td>the T19/T19F chain applied by the playbook; G1-G7 read back from the sections; no script in the playbook</td>
+<td>750</td>
+</tr>
+<tr>
+<td>4</td>
+<td>accepted-gap rows via <code>registers.*</code> (a register of accepted P0/P1 gaps with owner, expiry, disposition)</td>
+<td><code>docs/evidence/conformance-baseline.json</code> and <code>check_strict</code> (<code>:1226-1268</code>)</td>
+<td>the 160 entries readable as rows; the strict verdict identical before and after</td>
+<td>630</td>
+</tr>
+</tbody>
+</table>
+<p>The 5,057 in the issue's P4.2 is the original <code>main@0d6db794</code> measurement; the claim baseline is <strong>5,450</strong> (audit 2,465, standards 1,697, chain 1,288). The targets above are from that 5,450.</p>
+<p><strong>Stage 0 is the load-bearing unit.</strong> It is the only stage that needs new engine code before any deletion; its section is the gate every later deletion leans on. It must reproduce the current audit's findings exactly (a golden test against the committed snapshot) before anything is removed. The <code>conformance</code> section reads the sections in §1; it does not re-derive them (P1.2).</p>
+<p><strong>Stages are independent after Stage 0.</strong> Stage 2 and Stage 3 touch disjoint files; Stage 4 is independent of both. Each is a separate issue, created only from this note once it is accepted.</p>
+<h2 id="5-p4--the-decision">5. P4 — the decision</h2>
+<p><strong>Recommendation: accept.</strong> Adopt Stage 0 as the next unit (a <code>conformance</code> section and <code>snapshot --strict</code> in the engine), then Stage 1's deletions, then Stage 2/3/4 as separate units.</p>
+<p>The decision options, for the record:</p>
+<ol type="1">
+<li><strong>Accept</strong> — the ownership map and the five stages as written; the next unit is Stage 0.</li>
+<li><strong>Amend</strong> — e.g., keep the standards pages file-first and move only the conformance rules; or move Stage 4 (the ledger) ahead of Stage 2. Name the change; the note is revised before merge.</li>
+<li><strong>Reject</strong> — the generators stay; the reason is recorded, and no unit is created from this note.</li>
+</ol>
+<p>The two open questions the issue carries are answered in the recommendation:</p>
+<ul>
+<li><strong>The gap register: a register, not a new table.</strong> The register itself is a projection over rows — the <code>conformance</code> section computes it. The <em>accepted-gap ledger</em> (160 entries) is the record that needs rows: a <code>registers.*</code> register of accepted gaps with owner, expiry and disposition (Stage 4). No new table is proposed.</li>
+<li><strong>The standards record: a section plus published documents.</strong> The derivation (instances, status, findings) is the <code>standards</code> section; the pages are outputs rendered from it, with provenance (#756). Neither is a second derivation.</li>
+</ul>
+<h2 id="6-evidence-at-completion">6. Evidence at completion</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Command / test</th>
+<th>Result</th>
+<th>SHA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1 file exists</td>
+<td><code>test -f docs/plans/conformance-rows.md</code></td>
+<td>exit 0</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P1.1 three generators named</td>
+<td><code>grep -c 'audit-programme-conformance|generate-standards|governance-chain' docs/plans/conformance-rows.md</code></td>
+<td>10 (≥ 3)</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P1.1 cited paths resolve</td>
+<td><code>git cat-file -e origin/main:&lt;path&gt;</code> for every path in §1-§2</td>
+<td>20 paths checked, 0 missing</td>
+<td>e6f4c3ac9</td>
+</tr>
+<tr>
+<td>P2.1 table count</td>
+<td><code>grep -c '^| ' docs/plans/conformance-rows.md</code> ≥ the invariant count</td>
+<td>149 table rows; 55 invariants in P1 and 55 owner rows in P2</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P2.2 one owner per row</td>
+<td>the P2 table, reviewed</td>
+<td>55 rows, one owner each (action, section, standard, keep or gap)</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P3.1 stages</td>
+<td>the P3 table; <code>git diff --check</code>; links resolve</td>
+<td>the five-stage table with line targets; <code>git diff --check</code> exit 0; 0 Markdown links</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P4.2 counts</td>
+<td><code>grep -n '5,057' docs/plans/conformance-rows.md</code> and <code>grep -n '5,450'</code></td>
+<td>both present (5,057 at §0 and §4; 5,450 at §0, §4 and the stage table)</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>Docs gate</td>
+<td><code>python3 docs/design/scripts/build-docs.py --check</code></td>
+<td>303 sources, 0 failures; the page and index are committed</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>Programme gate</td>
+<td><code>python3 scripts/ci/board.py --repo nonagenticai/conveyor --dor 783</code></td>
+<td>exit 0</td>
+<td>ca5309751</td>
+</tr>
+<tr>
+<td>P4.1 decision</td>
+<td>the owner's comment on #783</td>
+<td><strong>accept</strong> — recorded 2026-11-27 on #783, with Stage 0 as the next unit</td>
+<td>issue comment</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-risks-and-open-points">7. Risks and open points</h2>
+<ul>
+<li><strong>The committed pack lags the live rows.</strong> The 199 gaps / 629 instances / 420 packages above are measured on <code>docs/design/data</code> at the claim baseline; the live publish (#526's lane) can differ. Stage 0's golden test must be taken on both the committed and the live snapshot.</li>
+<li><strong>The strict audit already fails on the committed pack</strong> (<code>seed_live_drift T12</code> and a grown-ledger entry) because the committed pack is not the live publish snapshot. That is a known state, not a property of this note; the Stage 0 unit must reproduce the <em>live</em> verdict and treat the committed-pack delta as the stale-badge signal (#867), not as a new rule.</li>
+<li><strong>The standards page renderer stays.</strong> Rendering 629 HTML pages is a document renderer, not a record; it is out of scope for deletion and moves to the pack's own scripts.</li>
+<li><strong>The kata section is empty today.</strong> S12's owner (the <code>kata.*</code> actions) exists, but the snapshot has no kata section and the rows are zero. Stage 2 must not claim a kata derivation it cannot evidence; the note marks it a gap with the kata section unit.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/conformance-rows.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
