@@ -44,79 +44,108 @@ function tile(page: Page, label: string) {
     .filter({ has: page.locator(".tk", { hasText: new RegExp(`^${label}$`) }) });
 }
 
+/** The action's own row count at one level, read now. */
+async function rowsNow(
+  request: APIRequestContext,
+  level: string,
+  id?: string,
+): Promise<number> {
+  return (await usage(request, level, id)).rows.length;
+}
+
 /**
- * The screen's table against the action's own rows, sampled together.
+ * The table against the action's own rows, bracketed rather than equated.
  *
  * The ledger is live while this suite runs — `web.yml` starts a worker and the model double, and
- * both land inference calls — so a row count read before the navigation can be a row stale by
- * the time the table renders (measured 2026-11-27: 151 read, 152 rendered). Re-read both sides
- * until they agree; the assertion is still that the screen is the action's own page, never a
- * client-side approximation.
+ * both land inference calls — so a count taken at one moment and a table rendered from a read at
+ * another can differ in either direction (measured 2026-11-27: 151 read / 152 rendered, then 150
+ * rendered / 151 read). What is knowable is the bracket: the screen read the action *after*
+ * `before` was taken and *before* this call, so the table must show a count the ledger held in
+ * that window. The window also waits for the tab to render: until it does, the table carries the
+ * previous level's count, which falls outside the bracket and the poll tries again.
  */
-async function expectRowsToMatch(
+async function expectRowsWithin(
   page: Page,
   request: APIRequestContext,
   level: string,
+  before: number,
   id?: string,
 ): Promise<void> {
   await expect
     .poll(
-      async () =>
-        (await usage(request, level, id)).rows.length -
-        (await page.getByTestId("metering-table").locator("tbody tr").count()),
+      async () => {
+        const shown = await page.getByTestId("metering-table").locator("tbody tr").count();
+        const now = await rowsNow(request, level, id);
+        return shown >= before && shown <= now
+          ? "within"
+          : `${shown} rows, the ledger held ${before}..${now}`;
+      },
       { timeout: 10_000 },
     )
-    .toBe(0);
+    .toBe("within");
 }
 
 test("the roll-ups drill to the call", async ({ page, request }) => {
+  const rollup = async () => {
+    const rows = (await usage(request, "tenant")).rows;
+    return {
+      calls: rows.reduce((total, row) => total + row.calls, 0),
+      tokens: rows.reduce((total, row) => total + row.tokens, 0),
+      rows: rows.length,
+    };
+  };
+  const before = await rollup();
+
   await page.goto("/metering");
   await expect(page.getByRole("heading", { name: "Metering" })).toBeVisible();
 
-  // The roll-up's tiles are the sums of the rows the action returns — sampled in the same poll
-  // iteration, because the ledger is live while this suite runs (measured 2026-11-27: 150 read,
-  // 151 shown, a call landing between the read and the render).
+  // The roll-up's tiles are the sums of the rows the action returns. The screen reads once, so
+  // the read is bracketed: `before` is the ledger at navigation, `after` the ledger as soon as
+  // the tiles have rendered, and each tile must hold a value the ledger carried in between.
   const tileNumber = async (label: string): Promise<number> => {
     const text = await tile(page, label).locator(".tv").textContent();
     return Number((text ?? "").replace(/[^0-9]/g, ""));
   };
-  await expect
-    .poll(
-      async () => {
-        const rows = (await usage(request, "tenant")).rows;
-        const calls = rows.reduce((total, row) => total + row.calls, 0);
-        const tokens = rows.reduce((total, row) => total + row.tokens, 0);
-        const shownCalls = await tileNumber("Calls");
-        const shownTokens = await tileNumber("Tokens");
-        return `${shownCalls - calls}/${shownTokens - tokens}`;
-      },
-      { timeout: 10_000 },
-    )
-    .toBe("0/0");
+  const shownCalls = await tileNumber("Calls");
+  const shownTokens = await tileNumber("Tokens");
+  const shownRows = await page.getByTestId("metering-table").locator("tbody tr").count();
+  const after = await rollup();
 
-  // The tenant level is one named row; the table is the action's own page.
-  await expectRowsToMatch(page, request, "tenant");
+  // The window is the screen's own load, in which this suite lands at most a call or two. A
+  // ledger that moved further means the bracket is not meaningful and the test says so.
+  expect(after.calls - before.calls).toBeLessThanOrEqual(2);
+  expect(
+    shownCalls,
+    `the Calls tile shows ${shownCalls}; the ledger held ${before.calls}..${after.calls}`,
+  ).toBeGreaterThanOrEqual(before.calls);
+  expect(shownCalls).toBeLessThanOrEqual(after.calls);
+  expect(shownTokens).toBeGreaterThanOrEqual(before.tokens);
+  expect(shownTokens).toBeLessThanOrEqual(after.tokens);
+  expect(shownRows).toBeGreaterThanOrEqual(before.rows);
+  expect(shownRows).toBeLessThanOrEqual(after.rows);
 
   // The drill-down levels render from the same action; the call level is one row per call.
+  const callsBefore = await rowsNow(request, "call");
   await page.getByRole("tab", { name: "Call", exact: true }).click();
-  await expectRowsToMatch(page, request, "call");
+  await expectRowsWithin(page, request, "call", callsBefore);
   await expect(page.getByTestId("metering-table").locator("tbody tr").first()).toContainText("call");
 
   // A selected run scopes steps and calls by run_id — the one parent the action's filter names.
   const run = await usage(request, "run");
   const scoped = run.rows.find((row) => row.key.length === 36);
+  const runsBefore = await rowsNow(request, "run");
   await page.getByRole("tab", { name: "Run", exact: true }).click();
-  await expectRowsToMatch(page, request, "run");
+  await expectRowsWithin(page, request, "run", runsBefore);
   if (scoped) {
     // The full key, not eight characters: a UUIDv7's timestamp prefix repeats within a
     // millisecond, so a prefix match is ambiguous when many runs were seeded together.
+    const scopedBefore = await rowsNow(request, "call", scoped.key);
     await page
       .locator(`tr[data-run="${scoped.key}"]`)
       .getByRole("button", { name: "Drill to calls" })
       .click();
     await expect(page.getByTestId("metering-scope")).toBeVisible();
-    // Same live-ledger sampling, scoped to the one run.
-    await expectRowsToMatch(page, request, "call", scoped.key);
+    await expectRowsWithin(page, request, "call", scopedBefore, scoped.key);
   } else {
     // The dev seed's ledger is unattributed: no run key can scope, so no drill control is
     // offered for it — the screen never invents a parent the action cannot filter by.
