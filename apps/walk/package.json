@@ -1,0 +1,15 @@
+{
+  "name": "conveyor-walk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:list": "playwright test --list",
+    "test": "find src -name '*.test.js' -exec node --test {} +",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "typescript": "5.7.3"
+  }
+}

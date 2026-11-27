@@ -24,8 +24,11 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--safe-epic">GEMBA-WALK — SAFe epic</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The client is served at <code>https://game.nonagentic.ai/</code> with its own public client <code>conveyor-game</code>; F1, the enablers and PI-4 are updated, and the identity is owned delivery work rather than an external redirect.</p>
+</blockquote>
 <h2 id="epic">Epic</h2>
-<p><strong>Hypothesis.</strong> If the conveyor serves a second, contract-faithful client at <code>/walk/</code> whose every read and write goes through the existing registry, then the programme can measure whether the action contract is UI-independent, and the owner can decide primacy on a frozen census and per-destination evidence instead of a mock.</p>
+<p><strong>Hypothesis.</strong> If the conveyor serves a second, contract-faithful client at <code>https://game.nonagentic.ai/</code> whose every read and write goes through the existing registry, then the programme can measure whether the action contract is UI-independent, and the owner can decide primacy on a frozen census and per-destination evidence instead of a mock.</p>
 <p><strong>Outcome.</strong> The P6 gate: every §10.5 destination and retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip with the correct headers; the accessibility and performance budgets are met; the owner signs the primacy decision — or the walk remains an alternative client.</p>
 <p><strong>Non-goals.</strong> A second backend, decision store or read model; SSR; native mobile; chat, audio or video; customer care; a replacement for <code>/design/</code>; a public unauthenticated mode; pixel parity with the mock; retiring <code>apps/web</code> before the gate; any new table, action, event or port.</p>
 <h2 id="features">Features</h2>
@@ -41,9 +44,9 @@
 <tbody>
 <tr>
 <td>F1</td>
-<td>The served static sub-site and its fallback</td>
-<td>W2</td>
-<td><code>apps/walk</code> static build + the <code>web.rs</code> fallback test</td>
+<td>The served game host and its boundary</td>
+<td>W2a</td>
+<td><code>apps/walk</code> static build + the host matrix in <code>web.rs</code>/<code>web_hosts.rs</code></td>
 </tr>
 <tr>
 <td>F2</td>
@@ -106,7 +109,7 @@
 </tr>
 <tr>
 <td>E2</td>
-<td>The PKCE identity flow, the dev cookie and the external <code>/walk/</code> redirect URI</td>
+<td>The PKCE identity flow, the dev cookie and the game client <code>conveyor-game</code> (git-managed, Job, read-back)</td>
 <td>F1</td>
 </tr>
 <tr>
@@ -141,8 +144,18 @@
 </tr>
 <tr>
 <td>E5</td>
-<td>The scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> and its Rust test</td>
+<td>The host dispatch, the router-level game-host gate and the <code>/walk</code> 308 — with their Rust tests</td>
 <td>F1</td>
+</tr>
+<tr>
+<td>E12</td>
+<td>The gitops host route: the cloudflared ingress, the <code>conveyor-public-vs</code> host and the deployment env</td>
+<td>F1</td>
+</tr>
+<tr>
+<td>E13</td>
+<td>The dedicated Keycloak client <code>conveyor-game</code> and the API <code>azp</code> allowlist</td>
+<td>F1, F8</td>
 </tr>
 <tr>
 <td>E6</td>
@@ -202,7 +215,7 @@
 </tr>
 <tr>
 <td>PI-2</td>
-<td>The census and instrument reproduce 52 routes and 597 actions without a server</td>
+<td>The census and instrument reproduce 52 routes and 598 actions without a server</td>
 <td>committed</td>
 <td style="text-align: right;">8</td>
 <td><code>build-walk-coverage.py --check</code></td>
@@ -216,10 +229,10 @@
 </tr>
 <tr>
 <td>PI-4</td>
-<td>The foundation serves <code>/walk/</code> and completes a Portfolio read + one write</td>
+<td>The foundation serves <code>https://game.nonagentic.ai/</code>, signs in through <code>conveyor-game</code>, and completes a Portfolio read + one write</td>
 <td>committed</td>
 <td style="text-align: right;">13</td>
-<td>Playwright foundation spec</td>
+<td>the host matrix, the deployed OIDC spec, the foundation spec</td>
 </tr>
 <tr>
 <td>PI-5</td>
@@ -288,14 +301,14 @@
 <td>the programme publish transport this project's artefacts use</td>
 </tr>
 <tr>
-<td>acceptance-blocked-by</td>
-<td>external (owner/ops)</td>
-<td>the <code>/walk/</code> OIDC redirect registration</td>
+<td>blocks</td>
+<td>the gitops-production change</td>
+<td>the client, host, tunnel ingress and deployment env (CR-WALK-001)</td>
 </tr>
 </tbody>
 </table>
 <h2 id="demo-evidence">Demo evidence</h2>
-<p>The system demo exhibits: the census reproducing the baseline; the instrument failing on an unreachable action and passing after the fix; the spike's PKCE redirect, SSE update, a read form, a write with <code>If-Match</code>, a destructive action refused without approval, and a deep link; the foundation's Portfolio read and one real write; one read and one write per wing; the retained V1 routes; the a11y and performance measurements; the P6 decision. No demo, no credit.</p>
+<p>The system demo exhibits: the census reproducing the baseline; the instrument failing on an unreachable action and passing after the fix; the spike's PKCE redirect, SSE update, a read form, a write with <code>If-Match</code>, a destructive action refused without approval, and a deep link; the game host's entry and boundary, the real <code>conveyor-game</code> sign-in, and the <code>/walk</code> 308; the foundation's Portfolio read and one real write; one read and one write per wing; the retained V1 routes; the a11y and performance measurements; the P6 decision. No demo, no credit.</p>
 <h2 id="inspect--adapt">Inspect &amp; adapt</h2>
 <p>The retro reads the five scripted decision-task times in both clients, the census's absent/ unreachable counts, the spec pass rate, the accessibility findings and the performance budgets. A systemic contract finding becomes a change request on both clients; a UX finding becomes a kata candidate (T5), not a walk-only patch. A destination that cannot reach parity without backend surface is a stop-and-escalate, never a backend addition.</p>
 <h2 id="links">Links</h2>
@@ -304,6 +317,8 @@
 <li>MSP: <code>04-msp-profile.md</code></li>
 <li>Architecture: <code>02-architecture-design.md</code></li>
 <li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> §11–§13</li>
+<li>ADR 0024: <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code></li>
+<li>Change request: <code>08-change-request-001-host-and-identity.md</code></li>
 </ul>
 </main>
     <footer class="doc-footer">

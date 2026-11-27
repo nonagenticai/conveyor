@@ -80,6 +80,13 @@ pub struct Config {
     pub database_listen_url: String,
     /// `CONVEYOR_*`.
     pub auth: AuthConfig,
+    /// `CONVEYOR_GAME_HOSTS` — the normalised game host(s). A request on one of these is
+    /// served the walk tree only; empty means the game host is not configured.
+    pub game_hosts: Vec<String>,
+    /// `CONVEYOR_GAME_PUBLIC_URL` — the canonical game origin the operator `/walk/*` 308
+    /// points at. Derived as `https://<first game host>` when unset; never read from the
+    /// request `Host`, so the redirect cannot be pointed at another origin.
+    pub game_public_url: Option<String>,
     /// `LICENCES_BASE_URL` (S02b's licence.sync).
     pub licences_base_url: Option<String>,
     /// `APP_KEY`; the licence is looked up for this application.
@@ -168,6 +175,11 @@ impl Config {
             database_listen_url: get("DATABASE_LISTEN_URL")
                 .unwrap_or_else(|| DEFAULT_LISTEN_URL.into()),
             auth: AuthConfig::from_lookup(get)?,
+            game_hosts: parse_game_hosts(get("CONVEYOR_GAME_HOSTS")),
+            game_public_url: game_public_url(
+                get("CONVEYOR_GAME_PUBLIC_URL"),
+                get("CONVEYOR_GAME_HOSTS"),
+            ),
             licences_base_url: get("LICENCES_BASE_URL"),
             app_key: get("APP_KEY").unwrap_or_else(|| "conveyor".into()),
             service_token_url: get("SERVICE_TOKEN_URL"),
@@ -297,7 +309,43 @@ impl Config {
     /// a request, so they must not be blocked by an auth setting (a migration on a box with
     /// no OIDC issuer is legitimate).
     pub fn validate_auth(&self) -> Result<(), ConfigError> {
-        self.auth.validate(&self.app_env).map_err(ConfigError::from)
+        self.auth
+            .validate(&self.app_env)
+            .map_err(ConfigError::from)?;
+        // The game host and its client are one feature: a host without a client id would
+        // serve a walk whose /config.json cannot start a sign-in, and a client id without a
+        // host would silently widen the azp allowlist for no deployed surface. Fail closed.
+        match (
+            self.game_hosts.is_empty(),
+            self.auth.oidc_game_client_id.is_some(),
+        ) {
+            (false, false) => {
+                return Err(ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_OIDC_CLIENT_ID",
+                    reason: "CONVEYOR_GAME_HOSTS is set but no game client id is configured".into(),
+                });
+            }
+            (true, true) => {
+                return Err(ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_HOSTS",
+                    reason: "CONVEYOR_GAME_OIDC_CLIENT_ID is set but no game host is configured"
+                        .into(),
+                });
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    /// True when `host` (a `Host` header or a configured value) is one of the game hosts.
+    pub fn is_game_host(&self, host: &str) -> bool {
+        let host = normalize_host(host);
+        !host.is_empty() && self.game_hosts.iter().any(|configured| configured == &host)
+    }
+
+    /// The game client id `/config.json` answers on the game host.
+    pub fn game_client_id(&self) -> Option<&str> {
+        self.auth.oidc_game_client_id.as_deref()
     }
 
     /// True unless `APP_ENV` is an explicit development/test value
@@ -308,6 +356,57 @@ impl Config {
     pub fn is_production(&self) -> bool {
         !conveyor_auth::is_development_env(&self.app_env)
     }
+}
+
+/// Canonicalise a `Host` header or configured host: trim, ASCII-lowercase, strip a numeric
+/// port, strip a trailing dot. Handles `[v6]:port`; a bare IPv6 literal keeps its colons.
+pub(crate) fn normalize_host(raw: &str) -> String {
+    let host = raw.trim().to_ascii_lowercase();
+    if let Some(rest) = host.strip_prefix('[')
+        && let Some(end) = rest.find(']')
+    {
+        return rest[..end].trim_end_matches('.').to_owned();
+    }
+    let host = if host.matches(':').count() == 1 {
+        match host.rsplit_once(':') {
+            Some((name, port)) if !port.is_empty() && port.chars().all(|c| c.is_ascii_digit()) => {
+                name.to_owned()
+            }
+            _ => host,
+        }
+    } else {
+        host
+    };
+    host.trim_end_matches('.').to_owned()
+}
+
+/// `CONVEYOR_GAME_HOSTS`: comma-separated, normalised, de-duplicated, order preserved.
+fn parse_game_hosts(raw: Option<String>) -> Vec<String> {
+    let Some(raw) = raw else {
+        return Vec::new();
+    };
+    let mut hosts: Vec<String> = Vec::new();
+    for entry in raw.split(',') {
+        let host = normalize_host(entry);
+        if !host.is_empty() && !hosts.contains(&host) {
+            hosts.push(host);
+        }
+    }
+    hosts
+}
+
+/// The canonical game origin for the `/walk` 308. Configuration only, never the request
+/// `Host`; when unset it is `https://<first configured game host>`.
+fn game_public_url(raw: Option<String>, hosts: Option<String>) -> Option<String> {
+    if let Some(raw) = raw {
+        let url = raw.trim().trim_end_matches('/');
+        if !url.is_empty() {
+            return Some(url.to_owned());
+        }
+    }
+    parse_game_hosts(hosts)
+        .first()
+        .map(|host| format!("https://{host}"))
 }
 
 /// `kind=image[,kind=image]`. An empty value is "no runner configured", not an error; a malformed
@@ -412,6 +511,62 @@ mod tests {
         // The same config parses: only serving refuses it, so `migrate` in production is
         // not blocked by an authentication setting it does not use.
         assert!(c.is_production());
+    }
+
+    /// The game host and its client are one feature: either both or neither. A host-only
+    /// deployment would serve a walk whose `/config.json` cannot start a sign-in; a
+    /// client-only one widens the verifier's azp allowlist for a surface nobody serves.
+    #[test]
+    fn the_game_host_and_its_client_are_a_fail_closed_pair() {
+        let hosts_only = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_HOSTS", "game.nonagentic.ai"),
+        ])
+        .unwrap();
+        assert!(
+            matches!(
+                hosts_only.validate_auth().unwrap_err(),
+                ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_OIDC_CLIENT_ID",
+                    ..
+                }
+            ),
+            "a host without a game client must fail closed"
+        );
+
+        let client_only = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_OIDC_CLIENT_ID", "conveyor-game"),
+        ])
+        .unwrap();
+        assert!(
+            matches!(
+                client_only.validate_auth().unwrap_err(),
+                ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_HOSTS",
+                    ..
+                }
+            ),
+            "a game client without a host must fail closed"
+        );
+
+        // The pair is valid, and the host is normalised (case and port stripped).
+        let pair = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_HOSTS", " Game.NonAgentic.AI:443 "),
+            ("CONVEYOR_GAME_OIDC_CLIENT_ID", "conveyor-game"),
+        ])
+        .unwrap();
+        pair.validate_auth().expect("the pair is valid");
+        assert_eq!(pair.game_hosts, vec!["game.nonagentic.ai".to_owned()]);
+        assert_eq!(pair.game_client_id(), Some("conveyor-game"));
+        assert!(pair.is_game_host("game.nonagentic.ai:443"));
+        assert!(!pair.is_game_host("conveyor.nonagentic.ai"));
+
+        let neither = cfg(&[("CONVEYOR_DEV_AUTH", "1")]).unwrap();
+        neither
+            .validate_auth()
+            .expect("no game host is the operator-only shape");
     }
 
     #[test]
