@@ -285,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "cae0c2d8e145e62e4cf2eb679197f28a52223a1e8162b38af96fa955038e6950",
-      "bytes": 26638,
+      "sha256": "6afb5fd3f27b9891fc7cfc1ef7d2c8054bacdb75c7a8dbdcaa916459d4bfd973",
+      "bytes": 26911,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -987,8 +987,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "64b8193aea5425e2e004dc6bd9da5003cc080333a7c9ec7a48960e565b1dc66a",
-      "bytes": 22614,
+      "sha256": "5b06d9f9bc08214495c2d4a052da7a35f882e3f50f281742d696a1ef2d5230db",
+      "bytes": 23541,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -1719,6 +1719,24 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "42811f947bca5b1e716cf6087092d73642fe97b9a1a94d654ee6cf7728b026a2",
       "bytes": 175,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
+    },
+    {
+      "title": "findings",
+      "path": "docs/evidence/units/2026-11-27-findings/findings.html",
+      "source": "docs/evidence/units/2026-11-27-findings/findings.md",
+      "section": "Evidence",
+      "sha256": "10bf9c6f0e68c0cdf4ad9b6d0a59792f8301838f642861567bcf3362b1c6728f",
+      "bytes": 7954,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/findings.md"
+    },
+    {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27-findings/report.html",
+      "source": "docs/evidence/units/2026-11-27-findings/report.md",
+      "section": "Evidence",
+      "sha256": "9c20110bf167a374ac66738aec5285f0b65996fa21ad1417c75639d6cf469ae4",
+      "bytes": 6935,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/report.md"
     },
     {
       "title": "report",

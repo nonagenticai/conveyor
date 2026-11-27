@@ -3,7 +3,7 @@
 // always text; nothing here interpolates into HTML.
 
 import { el, field } from "../dom.js";
-import { ProblemError, problemLine } from "../api/problem.js";
+import { ProblemError, problemText } from "../api/problem.js";
 
 /**
  * @typedef {{name: string, kind: "string"|"number"|"integer"|"boolean"|"enum"|"json",
@@ -185,7 +185,7 @@ export function renderSchemaForm(schema, options) {
     } catch (error) {
       general.textContent =
         error instanceof ProblemError
-          ? problemLine(error.problem)
+          ? problemText(error.problem)
           : error instanceof Error
             ? error.message
             : String(error);
