@@ -168,7 +168,13 @@ def sha256_tree(paths: list[Path]) -> str:
 
 
 def walk_path(pattern: str) -> str:
-    return "/walk" if pattern == "/" else "/walk" + pattern
+    """The walk path is the app path on the game host (ADR 0024).
+
+    The `/walk` prefix was the sub-site shape; the game host serves at the root, so parity is
+    an equality. The no-host dev origin still serves this same tree under `/walk/`, but the
+    census and the route registry use the production path.
+    """
+    return pattern
 
 
 def load_route_parser() -> Any:
@@ -784,20 +790,20 @@ def self_test() -> int:
     census = {
         "baseline": {"date": "2026-01-01", "git_sha": "0" * 40},
         "counts": {"routes": 1, "actions": 1, "attrs": 1, "manual": 0},
-        "routes": [{"pattern": "/x", "walk": "/walk/x", "view": "X", "room": "portfolio",
+        "routes": [{"pattern": "/x", "walk": "/x", "view": "X", "room": "portfolio",
                     "owner": "G0", "spec": "e2e/x/x.spec.ts", "status": "absent"}],
         "actions": [{"name": "x.read", "source": "attr", "kind": "internal",
                      "effect": "read", "confirm": "none", "tenancy": "tenant",
                      "idempotent": True, "timeout_ms": 1, "scopes": ["x:read"],
                      "metadata_complete": True, "status": "absent"}],
     }
-    registry = {"/walk/x": {"walk": "/walk/x", "app": "/x", "room": "portfolio",
+    registry = {"/x": {"walk": "/x", "app": "/x", "room": "portfolio",
                             "spec": "e2e/x/x.spec.ts", "file": "src/router/routes/core.js"}}
     base = build_coverage(census, {}, [], committed=None)
     ok(base["gaps"] == [], "clean baseline has no gaps")
     ok(any("absent at P6" in g for g in strict_gaps(base)), "P6 fails an absent route")
 
-    claim = {"routes": [{"walk": "/walk/x", "status": "registered"}], "actions": []}
+    claim = {"routes": [{"walk": "/x", "status": "registered"}], "actions": []}
     gaps = build_coverage(census, {}, [], committed=claim)["gaps"]
     ok(any("has no registry row" in g for g in gaps), "failure 1: claim without a row")
 

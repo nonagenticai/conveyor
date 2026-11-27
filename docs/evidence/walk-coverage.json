@@ -2,7 +2,7 @@
   "schema": 1,
   "baseline": {
     "date": "2026-11-27",
-    "git_sha": "e2507c8603e3117bd5dcbe6f92c4945e1f34eb3b",
+    "git_sha": "01544010f9ef4b86fb2d17aa8543e093588c0190",
     "prior": {
       "routes": 52,
       "actions": 597,
@@ -17,8 +17,8 @@
   },
   "summary": {
     "routes_total": 52,
-    "routes_absent": 52,
-    "routes_registered": 0,
+    "routes_absent": 49,
+    "routes_registered": 3,
     "routes_verified": 0,
     "actions_total": 598,
     "actions_absent": 598,
@@ -28,18 +28,18 @@
   "routes": [
     {
       "pattern": "/",
-      "walk": "/walk",
+      "walk": "/",
       "view": "Today",
       "room": "portfolio",
       "owner": "G0",
       "spec": "e2e/shell/entrance.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/agents",
-      "walk": "/walk/agents",
+      "walk": "/agents",
       "view": "AgentsScreen",
       "room": "organisation",
       "owner": "S1",
@@ -50,7 +50,7 @@
     },
     {
       "pattern": "/approvals",
-      "walk": "/walk/approvals",
+      "walk": "/approvals",
       "view": "Approvals",
       "room": "utilities",
       "owner": "S3",
@@ -61,7 +61,7 @@
     },
     {
       "pattern": "/architecture",
-      "walk": "/walk/architecture",
+      "walk": "/architecture",
       "view": "ArchitectureScreen",
       "room": "governance",
       "owner": "S2",
@@ -72,7 +72,7 @@
     },
     {
       "pattern": "/authoring",
-      "walk": "/walk/authoring",
+      "walk": "/authoring",
       "view": "Authoring",
       "room": "procedures",
       "owner": "S2",
@@ -83,7 +83,7 @@
     },
     {
       "pattern": "/board/:board_id",
-      "walk": "/walk/board/:board_id",
+      "walk": "/board/:board_id",
       "view": "BoardScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -94,7 +94,7 @@
     },
     {
       "pattern": "/boards",
-      "walk": "/walk/boards",
+      "walk": "/boards",
       "view": "BoardIndex",
       "room": "portfolio",
       "owner": "S4",
@@ -105,7 +105,7 @@
     },
     {
       "pattern": "/build/process-map",
-      "walk": "/walk/build/process-map",
+      "walk": "/build/process-map",
       "view": "ProcessMapList",
       "room": "procedures",
       "owner": "S2",
@@ -116,7 +116,7 @@
     },
     {
       "pattern": "/build/process-map/:map_id",
-      "walk": "/walk/build/process-map/:map_id",
+      "walk": "/build/process-map/:map_id",
       "view": "ProcessMapDetail",
       "room": "procedures",
       "owner": "S2",
@@ -127,7 +127,7 @@
     },
     {
       "pattern": "/build/processes",
-      "walk": "/walk/build/processes",
+      "walk": "/build/processes",
       "view": "ProcessesScreen",
       "room": "procedures",
       "owner": "S2",
@@ -138,7 +138,7 @@
     },
     {
       "pattern": "/build/processes/:process_id",
-      "walk": "/walk/build/processes/:process_id",
+      "walk": "/build/processes/:process_id",
       "view": "ProcessDetail",
       "room": "procedures",
       "owner": "S2",
@@ -149,7 +149,7 @@
     },
     {
       "pattern": "/card/:card_id",
-      "walk": "/walk/card/:card_id",
+      "walk": "/card/:card_id",
       "view": "Cockpit",
       "room": "portfolio",
       "owner": "S4",
@@ -160,7 +160,7 @@
     },
     {
       "pattern": "/copilot",
-      "walk": "/walk/copilot",
+      "walk": "/copilot",
       "view": "CopilotScreen",
       "room": "governance",
       "owner": "S2",
@@ -171,7 +171,7 @@
     },
     {
       "pattern": "/decisions",
-      "walk": "/walk/decisions",
+      "walk": "/decisions",
       "view": "DecisionInboxScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -182,7 +182,7 @@
     },
     {
       "pattern": "/design/adm",
-      "walk": "/walk/design/adm",
+      "walk": "/design/adm",
       "view": "AdmGate",
       "room": "governance",
       "owner": "S2",
@@ -193,7 +193,7 @@
     },
     {
       "pattern": "/design/models",
-      "walk": "/walk/design/models",
+      "walk": "/design/models",
       "view": "ModelsScreen",
       "room": "governance",
       "owner": "S2",
@@ -204,7 +204,7 @@
     },
     {
       "pattern": "/design/models/:model_id",
-      "walk": "/walk/design/models/:model_id",
+      "walk": "/design/models/:model_id",
       "view": "ModelDetail",
       "room": "governance",
       "owner": "S2",
@@ -215,7 +215,7 @@
     },
     {
       "pattern": "/design/requirements",
-      "walk": "/walk/design/requirements",
+      "walk": "/design/requirements",
       "view": "RequirementsScreen",
       "room": "governance",
       "owner": "S2",
@@ -226,7 +226,7 @@
     },
     {
       "pattern": "/design/requirements/:id",
-      "walk": "/walk/design/requirements/:id",
+      "walk": "/design/requirements/:id",
       "view": "RequirementDetail",
       "room": "governance",
       "owner": "S2",
@@ -237,7 +237,7 @@
     },
     {
       "pattern": "/evals",
-      "walk": "/walk/evals",
+      "walk": "/evals",
       "view": "Evals",
       "room": "measure",
       "owner": "S3",
@@ -248,7 +248,7 @@
     },
     {
       "pattern": "/evals/:eval_id",
-      "walk": "/walk/evals/:eval_id",
+      "walk": "/evals/:eval_id",
       "view": "EvalDetail",
       "room": "measure",
       "owner": "S3",
@@ -259,7 +259,7 @@
     },
     {
       "pattern": "/evals/:eval_id/:tab",
-      "walk": "/walk/evals/:eval_id/:tab",
+      "walk": "/evals/:eval_id/:tab",
       "view": "EvalDetail",
       "room": "measure",
       "owner": "S3",
@@ -270,7 +270,7 @@
     },
     {
       "pattern": "/evals/benchmarks",
-      "walk": "/walk/evals/benchmarks",
+      "walk": "/evals/benchmarks",
       "view": "Benchmarks",
       "room": "measure",
       "owner": "S3",
@@ -281,7 +281,7 @@
     },
     {
       "pattern": "/evals/benchmarks/run/:run_id",
-      "walk": "/walk/evals/benchmarks/run/:run_id",
+      "walk": "/evals/benchmarks/run/:run_id",
       "view": "BenchmarkRunDetail",
       "room": "measure",
       "owner": "S3",
@@ -292,7 +292,7 @@
     },
     {
       "pattern": "/evals/improvement",
-      "walk": "/walk/evals/improvement",
+      "walk": "/evals/improvement",
       "view": "Improvement",
       "room": "measure",
       "owner": "S3",
@@ -303,7 +303,7 @@
     },
     {
       "pattern": "/execution",
-      "walk": "/walk/execution",
+      "walk": "/execution",
       "view": "ExecutionScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -314,7 +314,7 @@
     },
     {
       "pattern": "/improve",
-      "walk": "/walk/improve",
+      "walk": "/improve",
       "view": "Improve",
       "room": "measure",
       "owner": "S3",
@@ -325,7 +325,7 @@
     },
     {
       "pattern": "/jobs",
-      "walk": "/walk/jobs",
+      "walk": "/jobs",
       "view": "JobsScreen",
       "room": "organisation",
       "owner": "S1",
@@ -336,7 +336,7 @@
     },
     {
       "pattern": "/knowledge",
-      "walk": "/walk/knowledge",
+      "walk": "/knowledge",
       "view": "KnowledgeGate",
       "room": "knowledge",
       "owner": "S3",
@@ -347,7 +347,7 @@
     },
     {
       "pattern": "/measure/prompt-audit",
-      "walk": "/walk/measure/prompt-audit",
+      "walk": "/measure/prompt-audit",
       "view": "PromptAuditScreen",
       "room": "measure",
       "owner": "S3",
@@ -358,7 +358,7 @@
     },
     {
       "pattern": "/measure/usage",
-      "walk": "/walk/measure/usage",
+      "walk": "/measure/usage",
       "view": "Usage",
       "room": "measure",
       "owner": "S3",
@@ -369,7 +369,7 @@
     },
     {
       "pattern": "/meetings",
-      "walk": "/walk/meetings",
+      "walk": "/meetings",
       "view": "MeetingsScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -380,7 +380,7 @@
     },
     {
       "pattern": "/meetings/:id",
-      "walk": "/walk/meetings/:id",
+      "walk": "/meetings/:id",
       "view": "MeetingRoomScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -391,7 +391,7 @@
     },
     {
       "pattern": "/metering",
-      "walk": "/walk/metering",
+      "walk": "/metering",
       "view": "Metering",
       "room": "measure",
       "owner": "S3",
@@ -402,7 +402,7 @@
     },
     {
       "pattern": "/operations",
-      "walk": "/walk/operations",
+      "walk": "/operations",
       "view": "Operations",
       "room": "operations",
       "owner": "S3",
@@ -413,7 +413,7 @@
     },
     {
       "pattern": "/organisation",
-      "walk": "/walk/organisation",
+      "walk": "/organisation",
       "view": "OrganisationScreen",
       "room": "organisation",
       "owner": "S1",
@@ -424,7 +424,7 @@
     },
     {
       "pattern": "/plan",
-      "walk": "/walk/plan",
+      "walk": "/plan",
       "view": "PlanScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -435,7 +435,7 @@
     },
     {
       "pattern": "/platform",
-      "walk": "/walk/platform",
+      "walk": "/platform",
       "view": "Platform",
       "room": "utilities",
       "owner": "S3",
@@ -446,29 +446,29 @@
     },
     {
       "pattern": "/portfolio",
-      "walk": "/walk/portfolio",
+      "walk": "/portfolio",
       "view": "PortfolioScreen",
       "room": "portfolio",
       "owner": "G0",
       "spec": "e2e/portfolio/portfolio.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/portfolio/:programme_id",
-      "walk": "/walk/portfolio/:programme_id",
+      "walk": "/portfolio/:programme_id",
       "view": "PortfolioScreen",
       "room": "portfolio",
       "owner": "G0",
       "spec": "e2e/portfolio/portfolio.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/procedures",
-      "walk": "/walk/procedures",
+      "walk": "/procedures",
       "view": "ProceduresScreen",
       "room": "procedures",
       "owner": "S2",
@@ -479,7 +479,7 @@
     },
     {
       "pattern": "/programme",
-      "walk": "/walk/programme",
+      "walk": "/programme",
       "view": "ProgrammeScreen",
       "room": "portfolio",
       "owner": "S1",
@@ -490,7 +490,7 @@
     },
     {
       "pattern": "/project-types",
-      "walk": "/walk/project-types",
+      "walk": "/project-types",
       "view": "ProjectTypesScreen",
       "room": "organisation",
       "owner": "S1",
@@ -501,7 +501,7 @@
     },
     {
       "pattern": "/runs",
-      "walk": "/walk/runs",
+      "walk": "/runs",
       "view": "RunQueue",
       "room": "portfolio",
       "owner": "S1",
@@ -512,7 +512,7 @@
     },
     {
       "pattern": "/runs/:run_id",
-      "walk": "/walk/runs/:run_id",
+      "walk": "/runs/:run_id",
       "view": "RunDetail",
       "room": "portfolio",
       "owner": "S1",
@@ -523,7 +523,7 @@
     },
     {
       "pattern": "/search",
-      "walk": "/walk/search",
+      "walk": "/search",
       "view": "SearchScreen",
       "room": "utilities",
       "owner": "S3",
@@ -534,7 +534,7 @@
     },
     {
       "pattern": "/settings/admin",
-      "walk": "/walk/settings/admin",
+      "walk": "/settings/admin",
       "view": "AdminScreen",
       "room": "utilities",
       "owner": "S3",
@@ -545,7 +545,7 @@
     },
     {
       "pattern": "/settings/inference",
-      "walk": "/walk/settings/inference",
+      "walk": "/settings/inference",
       "view": "InferenceEndpoint",
       "room": "utilities",
       "owner": "S3",
@@ -556,7 +556,7 @@
     },
     {
       "pattern": "/settings/members",
-      "walk": "/walk/settings/members",
+      "walk": "/settings/members",
       "view": "Members",
       "room": "utilities",
       "owner": "S3",
@@ -567,7 +567,7 @@
     },
     {
       "pattern": "/settings/roles",
-      "walk": "/walk/settings/roles",
+      "walk": "/settings/roles",
       "view": "Roles",
       "room": "utilities",
       "owner": "S3",
@@ -578,7 +578,7 @@
     },
     {
       "pattern": "/tools",
-      "walk": "/walk/tools",
+      "walk": "/tools",
       "view": "Tools",
       "room": "organisation",
       "owner": "S1",
@@ -589,7 +589,7 @@
     },
     {
       "pattern": "/validation",
-      "walk": "/walk/validation",
+      "walk": "/validation",
       "view": "ValidationScreen",
       "room": "portfolio",
       "owner": "S1",

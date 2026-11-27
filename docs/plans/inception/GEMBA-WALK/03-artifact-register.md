@@ -16,7 +16,8 @@ review_date: 2026-12-03
 
 > **Amendment 2026-11-27 (CR-WALK-001, ADR 0024).** The host and the game's public client
 > change the solution concept, the requirements catalog and the technology view; those typed rows
-> supersede to **v3** (the published v2 rows stay readable), and the GW-A2/A5/A6 documents move to
+> supersede to **version 2** (the live rows are v1; no v2 was recorded for the world layer, so the
+> new instances supersede v1 directly), and the GW-A2/A5/A6 documents move to
 > version 2. The data entity catalog is unchanged: no new entity is introduced.
 
 The typed catalogue of the GEMBA-WALK set. Each row carries the T9 standard's common metadata:
@@ -60,12 +61,12 @@ Each row's document is `02-architecture-design.md` except the register (this fil
 from A1–A6 and realises into C1/C2/D1. A row is approved only by the Architecture Board after the
 P0 spike; until then it is `draft` and is evidence, not a claim.
 
-### v3 rows — host and identity (CR-WALK-001, ADR 0024, 2026-11-27)
+### Version 2 rows — host and identity (CR-WALK-001, ADR 0024, 2026-11-27)
 
 The three rows below change because the client is now served at `https://game.nonagentic.ai/` with
-its own public client; the v3 row supersedes v2 (`architecture.artifacts_supersede`).
+its own public client; the new row supersedes the live v1 row (`architecture.artifacts_supersede`).
 
-| Key | v3 change | Source |
+| Key | Version 2 change | Source |
 |---|---|---|
 | `solution_concept` | the game host, the host boundary and the 308 replace the `/walk/` sub-site in the deployment view | ADR 0024; `02-architecture-design.md` D1 |
 | `requirements_catalog` | adds R17 (host boundary), R18 (`azp` allowlist), R19 (live sign-in) | ADR 0024 |

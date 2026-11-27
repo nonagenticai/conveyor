@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--change-request-001-the-game-host-and-its-own-identity">GEMBA-WALK — Change request 001: the game host and its own identity</h1>
-<h2 id="1-request">1. Request</h2>
+<h2 id="change-requests">Change requests</h2>
 <p>Change the accepted delivery architecture for the Gemba Walk from <strong>a <code>/walk/</code> sub-site on the operator origin using the <code>conveyor-web</code> client, with production sign-in deferred</strong>, to <strong>a first-class client served at <code>https://game.nonagentic.ai/</code> with its own public Keycloak client <code>conveyor-game</code></strong>, while keeping one image, one service, one API and one principal set.</p>
 <p>The owner's direction of 2026-11-27 is the driver: the game is a secondary UI that may become the primary UI, it needs its own Keycloak setup and its own URL, and the UI must work first time.</p>
 <p>This request changes the scope of G0 (#813), the frozen route model (W0), the serving architecture (SPEC §4/§10), the identity contract (ADR 0021 decision 4), and the governing decisions D67 and §10.5.11. It does <strong>not</strong> change the parity goal, the action registry, the data model, the <code>apps/web</code> client, or the primacy decision (P6).</p>
@@ -87,7 +87,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="4-impact-analysis">4. Impact analysis</h2>
+<h2 id="impact">Impact</h2>
 <h3 id="41-scope">4.1 Scope</h3>
 <ul>
 <li><strong>W0 (census and instrument)</strong> is amended: the census's <code>walk</code> field becomes the host-rooted app path (<code>/portfolio</code>, not <code>/walk/portfolio</code>; the entrance is <code>/</code>). The route and action counts stay 52 / 598 at the re-baseline. The instrument's claim checks are unchanged; only the key changes.</li>
@@ -169,7 +169,7 @@
 <li><strong>Typed artefacts</strong> — <code>solution_concept</code>, <code>requirements_catalog</code> and <code>technology_standards</code> supersede to v3; <code>data_entity_catalog</code> is unchanged (no new entity).</li>
 <li><strong>ADR 0021 decisions 1 and 4</strong> — superseded in part by ADR 0024; the rest stands.</li>
 </ul>
-<h2 id="5-decision">5. Decision</h2>
+<h2 id="decisions">Decisions</h2>
 <p><strong>Approved as a delegated rule decision under the published delegation of 2026-11-22 (reference <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; expiry 2027-02-18) — not a human signature.</strong> The Architecture Board decision is recorded live with that reference; the SoAW v2 and the delivery contract are approved by a distinct approver. The owner's direction is the request's driver; the delegation is what permits the routine gate to be decided without a human signature.</p>
 <h2 id="6-implementation-order">6. Implementation order</h2>
 <ol type="1">

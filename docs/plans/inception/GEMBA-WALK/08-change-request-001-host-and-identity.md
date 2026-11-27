@@ -12,7 +12,7 @@ change: CR-WALK-001
 
 # GEMBA-WALK — Change request 001: the game host and its own identity
 
-## 1. Request
+## Change requests
 
 Change the accepted delivery architecture for the Gemba Walk from **a `/walk/` sub-site on the
 operator origin using the `conveyor-web` client, with production sign-in deferred**, to **a
@@ -44,7 +44,7 @@ This request changes the scope of G0 (#813), the frozen route model (W0), the se
 | **B. New realm, new deployment, new host** | realm `game`, its own service and image, `game.nonagentic.ai` | Rejected. A second realm duplicates the user set and breaks single sign-on; a second deployment doubles the runtime, secrets, probes, image and CI surface for no capability. The estate's realm policy is one realm per app, and `conveyor` already is that realm. |
 | **C. Same image and service, second host, dedicated client in the same realm** | `conveyor-public-vs` gains `game.nonagentic.ai`; the server dispatches on `Host`; Keycloak gains public client `conveyor-game` in realm `conveyor`; the API accepts the two-client `azp` allowlist | **Chosen.** It gives the game its own URL, session client and redirect policy with no new runtime, no CORS (the API is same-origin on both hosts), no duplicated users and a reversible rollout. |
 
-## 4. Impact analysis
+## Impact
 
 ### 4.1 Scope
 
@@ -103,7 +103,7 @@ decision without a later migration.
   supersede to v3; `data_entity_catalog` is unchanged (no new entity).
 - **ADR 0021 decisions 1 and 4** — superseded in part by ADR 0024; the rest stands.
 
-## 5. Decision
+## Decisions
 
 **Approved as a delegated rule decision under the published delegation of 2026-11-22 (reference
 `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`; expiry 2027-02-18) — not a human signature.** The

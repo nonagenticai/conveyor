@@ -2220,8 +2220,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/03-artifact-register.html",
       "source": "docs/plans/inception/GEMBA-WALK/03-artifact-register.md",
       "section": "Plans",
-      "sha256": "0ca5464ee0cd1776c67054e8afc3ef05e2f9a72f733daa6b4f03ba2572d00e4e",
-      "bytes": 9630,
+      "sha256": "41fc81a3a48e03f4eee4f4ac8c46c94c3b8fc25ed6724451573280fa9c08f924",
+      "bytes": 9736,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/03-artifact-register.md"
     },
     {
@@ -2256,8 +2256,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.html",
       "source": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md",
       "section": "Plans",
-      "sha256": "96e52435b8233c8ee541fe027ad21a90831119955b84b46dfac77e44ce5564c8",
-      "bytes": 11440,
+      "sha256": "5847c6ec2ce28c755a94dcd197df97f133807e8d11da59c3691046fd523ddc31",
+      "bytes": 11558,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md"
     },
     {
@@ -2265,8 +2265,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.html",
       "source": "docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md",
       "section": "Plans",
-      "sha256": "ec066910b35195ab42f6186401e4397cddf33fac0f643448e2b90fbf84b471b9",
-      "bytes": 10186,
+      "sha256": "d2ff4e28b67e4e509641e167a11ea40f2a19f3d466a932aadb04257276a4a631",
+      "bytes": 10177,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md"
     },
     {
