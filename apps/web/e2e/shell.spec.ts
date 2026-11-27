@@ -33,11 +33,14 @@ test("a signed-out V2 route gets the sign-in gate", async ({ browser, baseURL })
   await context.close();
 });
 
-test("an unwired V2 destination names its owning slice", async ({ page }) => {
-  // /organisation became the real screen in T18-2 and /tools in T18-4; /knowledge is still a
-  // gate (T8 · T15), so it is the honest fixture for this assertion now.
+test("the last gated V2 destination now renders its real screen", async ({ page }) => {
+  // /organisation became the real screen in T18-2 and /tools in T18-4; /knowledge was the last
+  // honest gate (T8 · T15) until T18-5 replaced it with the knowledge-design workbench. No V2
+  // destination renders a "not yet live" gate now.
   await page.goto("/knowledge");
-  await expect(page.getByRole("heading", { name: "Knowledge & memory" })).toBeVisible();
-  await expect(page.getByText("Not yet live")).toBeVisible();
-  await expect(page.getByText(/owner: T8 · T15/)).toBeVisible();
+  await expect(page.locator('[data-testid="knowledge-design"]')).toBeVisible();
+  for (const path of ["/design/adm", "/architecture", "/knowledge/sources", "/knowledge/memory", "/measure"]) {
+    await page.goto(path);
+    await expect(page.getByText("Not yet live")).toHaveCount(0);
+  }
 });

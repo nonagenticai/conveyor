@@ -423,7 +423,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
     };
 
     view! {
-        <section class="screen">
+        <section class="screen" data-testid="adm-screen">
             <div class="screen-head">
                 <h1>"Architecture"</h1>
                 <p class="muted">
@@ -456,14 +456,14 @@ pub fn ArchitectureScreen() -> impl IntoView {
 
             {move || {
                 (!notice.get().is_empty())
-                    .then(|| view! { <p class="panel note">{notice.get()}</p> })
+                    .then(|| view! { <p class="panel note" data-testid="adm-notice">{notice.get()}</p> })
             }}
 
             {move || match tab.get().as_str() {
                 "capability" => {
                     view! {
                         <div class="grid two">
-                            <div class="panel">
+                            <div class="panel" data-testid="adm-profile">
                                 <h2>"The tailored ADM profile"</h2>
                                 {move || match profile.get() {
                                     None => view! { <p class="muted">"Reading the profile…"</p> }.into_any(),
@@ -484,7 +484,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
                                     },
                                 }}
                             </div>
-                            <div class="panel">
+                            <div class="panel" data-testid="adm-board">
                                 <h2>"The Board"</h2>
                                 {move || match board.get() {
                                     None => view! { <p class="muted">"Reading the Board…"</p> }.into_any(),
@@ -539,7 +539,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
                 }
                 "phases" => {
                     view! {
-                        <div class="panel">
+                        <div class="panel" data-testid="adm-phases">
                             <h2>"The phase rail"</h2>
                             <label class="filter">
                                 <span>"Architecture project"</span>
@@ -607,7 +607,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
                 "artefacts" => {
                     view! {
                         <div class="grid two">
-                            <div class="panel">
+                            <div class="panel" data-testid="adm-artefacts">
                                 <h2>"The repository"</h2>
                                 <form class="toolbar" on:submit=move |event| {
                                     event.prevent_default();
@@ -707,7 +707,7 @@ pub fn ArchitectureScreen() -> impl IntoView {
                 }
                 _ => {
                     view! {
-                        <div class="panel">
+                        <div class="panel" data-testid="adm-contracts">
                             <h2>"Contracts and compliance"</h2>
                             {move || match board.get() {
                                 Some(Ok(None)) => view! {
