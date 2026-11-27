@@ -17,12 +17,13 @@ Every status is measured from a committed artefact, never guessed:
 The output is deterministic: sorted arrays, no timestamps. `--check` recomputes and compares
 both committed files without writing; a drift is exit 1.
 
-Regenerate the action dump first, then the coverage, then the seed (the seed carries each
-project's measured status and tranche; the coverage itself never reads the seed's status):
+Regenerate the action dump first, then the coverage:
 
     conveyor admin actions dump --json --out docs/design/data/actions.json
     python3 scripts/build-coverage.py
-    python3 scripts/build-programme-seed.py
+
+The programme seed (`seed/programme.json`) is frozen: it is the bootstrap of record, and the
+coverage reads it without ever writing it back.
 """
 
 from __future__ import annotations
