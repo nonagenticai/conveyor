@@ -14,5 +14,5 @@
     "types": []
   },
   "include": ["src/**/*.js"],
-  "exclude": ["node_modules", "pkg", "e2e", "test-results"]
+  "exclude": ["node_modules", "pkg", "e2e", "test-results", "src/**/*.test.js"]
 }
