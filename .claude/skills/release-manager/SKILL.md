@@ -44,6 +44,11 @@ go-live.
 3. **Resolve the deployed identity**: the running pod's `imageID`, the deployed revision exposed by
    `/health` or the digest inspected from the image; compare it with the release identity. A
    mismatch is **not shipped**.
+
+   ```bash
+   kubectl -n conveyor get deploy conveyor -o jsonpath='{.spec.template.spec.containers[*].image}'
+   kubectl -n conveyor get pods -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.status.containerStatuses[*].imageID}{"\n"}{end}'
+   ```
 4. **Run the V4 checks at that revision** (§V4): workspace checks with **executed test counts**,
    the served-spec lock check, the production UI build and browser workflows, native acceptance
    (fresh tenant → approval → resume → terminal, cancel, restart), the real-dependency results (the
@@ -51,6 +56,12 @@ go-live.
    an idempotent second run. Local hook receipts are not test receipts.
 5. **Probe live**: `/health` and `/health/ready` from the deployed host, plus the declared
    acceptance flow; record the output, status and timestamp. Test rollback and record the result.
+
+   ```bash
+   curl -fsS "$CONVEYOR_URL/health"
+   curl -fsS "$CONVEYOR_URL/health/ready"
+   kubectl -n conveyor rollout undo deploy/conveyor
+   ```
 6. **Write the receipt** at `docs/evidence/RELEASE-<sha>.md`: repo, PR, commit, image digest,
    deployed revision, environment, executed test counts, probe transcripts, rollback result, actor
    and date. A document row is added only where the programme record requires it.
@@ -89,8 +100,6 @@ go-live.
 ## Verify
 
 ```bash
-test -f .claude/skills/release-manager/SKILL.md
-grep -q 'V4' .claude/skills/release-manager/SKILL.md
-grep -q 'deployed' .claude/skills/release-manager/SKILL.md
+git ls-files 'docs/evidence/*RELEASE*'
 test -f docs/evidence/2026-11-10-plan-audit.md
 ```

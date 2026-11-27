@@ -5,7 +5,7 @@
       "title": "T3/T13: the three tranche-3 P0 residuals \u2014 baseline guard, spend budget, write-verify",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/797",
-      "updatedAt": "2026-11-26T22:54:49Z",
+      "updatedAt": "2026-11-26T23:01:54Z",
       "labels": [
         {
           "name": "unit",
@@ -53,9 +53,9 @@
     {
       "number": 791,
       "title": "skills: add the authoring, build, architecture, procedural and analysis role playbooks; harden the six",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/791",
-      "updatedAt": "2026-11-26T22:01:03Z",
+      "updatedAt": "2026-11-26T23:48:30Z",
       "labels": [
         {
           "name": "unit",
@@ -91,9 +91,9 @@
     {
       "number": 788,
       "title": "estate: the conveyor-bundle-minter client and the lean4-prover licence app (#776 P3)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/788",
-      "updatedAt": "2026-11-26T22:08:12Z",
+      "updatedAt": "2026-11-26T23:17:03Z",
       "labels": [
         {
           "name": "unit",
@@ -108,17 +108,17 @@
     {
       "number": 787,
       "title": "prover: a failing lean4.check returns no diagnostics because only stderr is parsed",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/787",
-      "updatedAt": "2026-11-26T21:42:17Z",
+      "updatedAt": "2026-11-27T00:06:39Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -127,7 +127,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/784",
-      "updatedAt": "2026-11-26T22:52:29Z",
+      "updatedAt": "2026-11-26T23:48:37Z",
       "labels": [
         {
           "name": "programme",
@@ -182,15 +182,15 @@
       "title": "skills: the delivery actor \u2014 delivery-unit, programme-sync, and the six roles on the action route",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/781",
-      "updatedAt": "2026-11-26T21:59:31Z",
+      "updatedAt": "2026-11-26T23:49:42Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -203,7 +203,7 @@
       "title": "github: the intent channel \u2014 issue form, DoR on events, sub-issues and tranche milestones",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/780",
-      "updatedAt": "2026-11-26T22:57:58Z",
+      "updatedAt": "2026-11-26T23:07:31Z",
       "labels": [
         {
           "name": "unit",
@@ -222,9 +222,9 @@
     {
       "number": 779,
       "title": "programme: the unit record \u2014 charter, list and close a delivery unit as a row",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/779",
-      "updatedAt": "2026-11-26T22:25:49Z",
+      "updatedAt": "2026-11-26T23:48:30Z",
       "labels": [
         {
           "name": "unit",
@@ -266,7 +266,7 @@
       "title": "add: the mint path uses a dedicated minter credential, and refuses without one",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/776",
-      "updatedAt": "2026-11-26T22:41:18Z",
+      "updatedAt": "2026-11-26T23:17:29Z",
       "labels": [
         {
           "name": "unit",
@@ -352,9 +352,9 @@
     {
       "number": 760,
       "title": "auth: the session channel \u2014 a machine principal and a licence-bearer mint",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/760",
-      "updatedAt": "2026-11-26T16:33:36Z",
+      "updatedAt": "2026-11-26T23:48:30Z",
       "labels": [
         {
           "name": "unit",
@@ -371,7 +371,7 @@
       "title": "design: provenance on every output page and a declared-vs-evidenced register",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/756",
-      "updatedAt": "2026-11-26T22:43:05Z",
+      "updatedAt": "2026-11-26T23:07:18Z",
       "labels": [
         {
           "name": "unit",
@@ -2037,7 +2037,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T22:55:23Z",
+      "updatedAt": "2026-11-27T00:09:50Z",
       "labels": [
         {
           "name": "unit",

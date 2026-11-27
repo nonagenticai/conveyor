@@ -25,13 +25,23 @@ Read, in order: `docs/SPEC.md` → `docs/plans/00-INDEX.md` → `docs/plans/03-D
 
 | Work | Skill |
 |---|---|
-| Tranche review, programme register, baselines, #302/#303 | `programme-manager` |
+| Tranche review, tranche baselines, #302/#303 | `programme-manager` |
+| Programme office: registers, change control, assurance calendar, unit protocol | `pmo-lead` |
 | Architecture contracts, ADM phase/plateau, compliance, waiver, #395 | `programme-architect` |
+| Delivery-level design, analysis/architecture inception, contract request | `solution-architect` |
 | Benefit profiles, baselines, transitions, realization | `benefits-manager` |
 | Project brief and analysis/architecture inception | `business-analyst` |
+| Project charter, WBS, baseline, gates, closure | `project-manager` |
+| Output authoring, artefact standard, standards publication | `standards-author` |
 | Standards fixpoint, closure evidence, independent acceptance | `quality-manager` |
 | Release receipt, deployed identity, cutover, live probe | `release-manager` |
+| Incident, runbook, mitigation, postmortem | `operations` |
+| Flow protection: blocked cards, triage, remedy, escalation | `kanban-coach` |
+| Systemic improvement: the six Gets, instrument, measurement, adoption | `kata` |
 | Queue truth, claim, issue body, PR mechanics | `issue-pickup`, `issue-sweep`, `issue-create`, `issue-deliver` |
+
+`delivery-unit` and `programme-sync` are the queued action-route units (#781); until they land, the
+delivery actor is `issue-deliver` and the project gate is `project-manager`.
 
 **Separation of duties.** The role that builds a gate's subject never certifies it: the builder
 hands a live or end-to-end part to a fresh verifier; the architect's own contract is approved by

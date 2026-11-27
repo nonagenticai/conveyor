@@ -382,8 +382,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 6,
+        "blocked": 3,
+        "claimed": 4,
         "numbers": [
           16,
           17,
@@ -411,19 +411,14 @@
           733,
           755,
           756,
-          760,
-          779,
           780,
           781,
           782,
           783,
-          784,
-          787,
-          788,
-          791
+          784
         ],
-        "open": 24,
-        "ready": 8,
+        "open": 19,
+        "ready": 6,
         "unknown": 0
       }
     },

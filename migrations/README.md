@@ -36,3 +36,17 @@ A deploy's rollback plan records `backward_compatible` (`crates/actions/src/deve
 The `migrate` init container also re-applies `scripts/grants-runtime.sql` after every run; a
 new table is invisible to `conveyor_runtime` until that happens, so never grant from inside a
 migration.
+
+## A new file moves two ledger tests
+
+Adding a migration changes both assertions that pin the embedded set — miss one and the shard
+that owns it goes red after the push, not before:
+
+- `crates/store/src/migrate.rs` — the expected `MIGRATOR` vector in
+  `embedded_migrations_are_exactly_the_s0_set`.
+- `crates/store/tests/s07_schema.rs` — the applied-set vector in
+  `the_migration_ledger_is_gapless_apart_from_the_reserved_six`.
+
+A new action moves a third: every registered action needs a sample in
+`crates/actions/tests/parity_http_mcp.rs` (`samples(&ctx)`), or the parity sweep names it as
+missing.
