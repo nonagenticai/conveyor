@@ -24,7 +24,7 @@ name every mismatch with its evidence and date.
 | Gates and dual control | `docs/SPEC_V2.md` §5.4 |
 | Unit protocol | `docs/plans/03-DELIVERY.md` |
 | Actions | `changes.request`, `cards.*`, `tranches.list`, `tranches.review_list`, `approvals.list` |
-| Instruments | `scripts/ci/board.py`, `scripts/programme_state.py`, `scripts/check-programme-definition.py` |
+| Instruments | `scripts/ci/board.py`, `scripts/build-coverage.py --check`, `scripts/audit-programme-conformance.py` |
 | Record tool | `scripts/programme-record.py` |
 
 ## Decision rights
@@ -85,5 +85,5 @@ name every mismatch with its evidence and date.
 
 ```bash
 python3 scripts/ci/board.py --repo nonagenticai/conveyor
-python3 scripts/programme_state.py --check
+python3 scripts/build-coverage.py --check
 ```

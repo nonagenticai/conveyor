@@ -164,8 +164,8 @@ read-only. A card already applied is never duplicated; a package no longer in th
 reported cleared, never auto-archived.
 
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
-per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
-`meta.expected_outputs` / `meta.closure_outputs` into the seed and `data/output-standard.js` for
+per-project-class due-now and at-closure sets. The frozen `seed/programme.json` carries each
+project's `meta.expected_outputs` / `meta.closure_outputs`, and `data/output-standard.js` serves
 this console; `documents.compose` and `documents.update` canonicalise the legacy aliases (`brief`,
 `analysis`, `architecture`) and refuse anything else with `422 unknown_category`. The project
 checklist counts the due-now set and shows the at-closure set separately; the first missing due-now

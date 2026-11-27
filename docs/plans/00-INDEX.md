@@ -11,7 +11,7 @@ plan's remaining work is **one issue** (owner rule 2026-11-11), unless an explic
 
 **Queue status 2026-11-17.** The V1 `S##` plans, the V2 `T0–T17` slices and the three
 cross-cutting projects are registered. The V2 units are #34 (T0) and #72–#88 (T1–T17);
-`seed/programme.json` links them and `scripts/build-programme-seed.py` regenerates that mapping.
+`seed/programme.json` is the frozen mapping of record — a change is a reviewable data PR.
 Measured 2026-11-17: T0, T1 (`e3d7c4e`) and T2 (`39363ba`) are merged; **#74 (T3) is claimed** and
 #76 (T13) is the other ready unit; #74 is the T-chain's remaining construction blocker and it
 unblocks T9 (#81), T10 (#82), T11 (#84) and T12 (#88). The programme's own state was measured the
@@ -76,8 +76,8 @@ conformance remediation is the follow-on unit.
 ## Programme `conveyor-buildout`
 
 The whole SPEC_V2 buildout is **one programme**. Every current plan is a **project** in it and the
-registered GitHub issues are its units. `seed/programme.json` is the mapping of record;
-`scripts/build-programme-seed.py` regenerates it from these plans and `gh issue list`:
+registered GitHub issues are its units. `seed/programme.json` is the frozen mapping of record,
+reviewed and changed by data PR; the live rows are the record after install:
 
 - `S00`–`S21` — the V1 slice plans in `slices/` (including the `S06a`–`S06d` variants);
 - `T0`–`T19` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
@@ -546,10 +546,9 @@ output grade; S06d is 0037 in the merged lane.
 ## Slices
 
 > ⚠️ **This table is the build record of the 2026-11-07/08 planning passes, not live status.**
-> Live delivery status is derived once — GitHub issue state, then the design pack's coverage,
-> then the plan frontmatter (`scripts/programme_state.py`) — and published as the tracked
-> programme issue (#435, label `programme`), `https://conveyor.nonagentic.ai/design/data/programme.json`
-> and `…/programme.csv`. A "remaining" note here may be stale; the issue is not.
+> Live delivery status is the delivery unit rows (`development_project`), published as
+> `https://conveyor.nonagentic.ai/design/data/programme.json`, `…/delivery.json` and
+> `…/programme.csv`. A "remaining" note here may be stale; the snapshot is the live record.
 
 | # | Plan | Slice | Depends on | Closes with | Status |
 |---|---|---|---|---|---|
