@@ -41,7 +41,8 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build 
     cargo build --release --locked -p conveyor-server \
     && install -D -m 0755 target/release/conveyor /out/conveyor
 
-# ── the static UI (approved 2026-11-09: one image, one host, the server serves it) ────────
+# ── the static UI (one image, two hosts since ADR 0024: the operator origin and the game
+# host, both served by this process; the Host decides which tree) ──────────────────────────
 # cargo-leptos installs into its OWN root: a cache mount over /usr/local/cargo/bin would
 # shadow the rustup cargo shim the base stage just installed.
 FROM ${BASE_IMAGE} AS web
