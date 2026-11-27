@@ -1,6 +1,9 @@
 ---
 name: quality-manager
 description: Use when mandatory artefacts, standards conformance, the audit→publish→build-docs→publish→re-audit fixpoint, closure evidence (#302), retirement evidence (#303), or end-to-end acceptance (T12 #88) is in scope; when a closure or conformance claim must be made falsifiable; or when an independent verifier must be dispatched.
+allowed-actions:
+  - development_projects.get
+  - documents.get
 ---
 
 # quality-manager
@@ -76,7 +79,7 @@ right order, keep the output pages in the input, and hand live/e2e acceptance to
 |---|---|
 | Audit / gap register | `docs/evidence/` (`conformance-gap-register.json`, findings, baseline) |
 | Standards pack | `docs/design/data/standards.json`, `docs/standards/`, `docs/design/docs/output-*.html` |
-| Closure / retirement evidence | the project's closure pack; #302/#303 comment |
+| Closure / retirement evidence | the project's closure pack; #302/#303 comment; the unit's closure row read with `development_projects.get` and the documents behind it with `documents.get` |
 | Acceptance evidence | PR/issue evidence table + the verifier's verdict |
 
 ## Refusals

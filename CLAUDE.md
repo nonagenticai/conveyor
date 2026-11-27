@@ -39,9 +39,13 @@ Read, in order: `docs/SPEC.md` → `docs/plans/00-INDEX.md` → `docs/plans/03-D
 | Flow protection: blocked cards, triage, remedy, escalation | `kanban-coach` |
 | Systemic improvement: the six Gets, instrument, measurement, adoption | `kata` |
 | Queue truth, claim, issue body, PR mechanics | `issue-pickup`, `issue-sweep`, `issue-create`, `issue-deliver` |
+| Charter, advance, gate and close a delivery unit as a `development_project` row | `delivery-unit` |
+| Reconcile issue/PR/CI facts into the unit record; never invent the live digest | `programme-sync` |
 
-`delivery-unit` and `programme-sync` are the queued action-route units (#781); until they land, the
-delivery actor is `issue-deliver` and the project gate is `project-manager`.
+A delivery is one issue, one lane and one unit row: `delivery-unit` owns the row,
+`issue-deliver` owns the git/PR mechanics inside it, and `programme-sync` repairs the row from
+GitHub facts. A step GitHub does not carry (the deployed digest, `/health`, the acceptance exit)
+is `release-manager`'s; it is never invented.
 
 **Separation of duties.** The role that builds a gate's subject never certifies it: the builder
 hands a live or end-to-end part to a fresh verifier; the architect's own contract is approved by

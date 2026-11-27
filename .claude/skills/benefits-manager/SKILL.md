@@ -1,6 +1,11 @@
 ---
 name: benefits-manager
 description: Use when a benefit profile, baseline, target, benefits-map path, transition, realization claim, or the benefit half of a tranche review is created or challenged; when a project delivery is being confused with an improvement; or when the programme's benefit realization must be made measurable. Owns measurement; the SRO/BCM signs.
+allowed-actions:
+  - benefits.transition_upsert
+  - benefits.update
+  - benefits.get
+  - benefits.transition_list
 ---
 
 # benefits-manager
@@ -26,7 +31,7 @@ substitute a deliverable for an improvement.
 | Benefit rows | `seed/programme-definition.json`; `benefits.*`, `tranches.*` |
 | Owner decision | 2026-11-25 — **no token-spend KPI**; drop that premise from benefit measurement |
 | Actions | `benefits.transition_upsert`, `benefits.update`, `benefits.get`, `benefits.transition_list` |
-| Record tool | `scripts/programme-record.py` |
+| Transport | `POST /api/actions/<name>/invocations` with the session bearer (`conveyor auth token --tenant <tenant>`) |
 
 ## Decision rights
 
@@ -56,15 +61,20 @@ substitute a deliverable for an improvement.
    cannot be retired.
 
    ```bash
-   python3 scripts/programme-record.py --action benefits.transition_upsert \
-     --input @/tmp/transition.json --evidence docs/evidence/<file>.md \
-     --read-action benefits.get --read-input '{"id":"<benefit-id>"}'
+   TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/<tenant>.token)
+   curl -fsS -X POST "$CONVEYOR_URL/api/actions/benefits.transition_upsert/invocations" \
+     -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+     -d @/tmp/transition.json
+   curl -fsS -X POST "$CONVEYOR_URL/api/actions/benefits.get/invocations" \
+     -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+     -d '{"input":{"id":"<benefit-id>"}}'
    ```
 
-   Payloads — the baseline first, then the post-transition update with `--if-match <version>`:
-   `{"benefit_id":"<uuid>","baseline_measured_at":"2026-11-01T00:00:00Z","readiness":{"state":"ready"}}`
+   Payloads — the baseline first, then the post-transition update with `If-Match: <version>`:
+   `{"input":{"benefit_id":"<uuid>","baseline_measured_at":"2026-11-01T00:00:00Z","readiness":{"state":"ready"}}}`
    then
-   `{"benefit_id":"<uuid>","post_measured_at":"2026-12-01T00:00:00Z","evidence":["<measurement ref>"]}`.
+   `{"input":{"benefit_id":"<uuid>","post_measured_at":"2026-12-01T00:00:00Z","evidence":["<measurement ref>"]}}`.
+   A stale `If-Match` is refused (`412`), never a blind overwrite.
    Realization is `benefits.update` with `status='realized'` and the BCM/SRO approval; the engine
    refuses it while the baseline or the post-transition measurement is missing.
 6. **Realized only after the transition.** The BCM and SRO sign; the engine refuses
@@ -82,7 +92,7 @@ substitute a deliverable for an improvement.
 | Baseline + transition | `benefits.transition_upsert` with `baseline_measured_at`, readiness, `enacted_at`, `post_measured_at`, evidence |
 | Realization | `benefits.update status='realized'` only with the BCM/SRO approval |
 | Review status | `programme.json` benefit rows; the tranche-review benefit section |
-| Live act | `programme-record.py --action benefits.transition_upsert ... --read-action benefits.get` |
+| Live act | `benefits.transition_upsert` over `/api/actions` with the session bearer; read back with `benefits.get`; the transition history with `benefits.transition_list` |
 
 ## Refusals
 
@@ -109,6 +119,9 @@ substitute a deliverable for an improvement.
 ## Verify
 
 ```bash
-python3 scripts/programme-record.py --check --action benefits.get --input '{"id":"<benefit-id>"}'
-python3 scripts/programme-record.py --check --action benefits.transition_list --input '{"programme_id":"<programme-id>"}'
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/<tenant>.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/benefits.get/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' -d '{"input":{"id":"<benefit-id>"}}'
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/benefits.transition_list/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' -d '{"input":{"programme_id":"<programme-id>"}}'
 ```
