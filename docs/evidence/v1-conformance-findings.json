@@ -2066,7 +2066,7 @@
             "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
             "owner_project": "T3",
             "resolved_by": {
-                "commit": "00d1ebd9b9b7103e6b3bb87937b69a07d1683f99",
+                "commit": "f88ee9186e60f54a32092b45e98b2744eb49661c",
                 "test": "crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline",
                 "evidence": "spine_gates 3/3: a_register_cannot_be_born_approved, a_self_declared_approved_change_cannot_advance_a_baseline, an_approved_change_gate_advances_the_baseline"
             }
@@ -2198,12 +2198,12 @@
                 },
                 {
                     "path": "apps/web/src/app.rs",
-                    "line": 154,
+                    "line": 159,
                     "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>"
                 },
                 {
                     "path": "apps/web/src/app.rs",
-                    "line": 304,
+                    "line": 312,
                     "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">"
                 }
             ],
@@ -2329,7 +2329,7 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 444,
+                    "line": 516,
                     "quote": "        cost: None,"
                 }
             ],
@@ -2366,7 +2366,7 @@
             "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
             "owner_project": "T13",
             "resolved_by": {
-                "commit": "9eb2016827f8edb1aff167520ea08ccf8162e0a9",
+                "commit": "f88ee9186e60f54a32092b45e98b2744eb49661c",
                 "test": "crates/actions/tests/tool_platform.rs::a_two_hundred_with_a_failing_verdict_is_check_failed",
                 "evidence": "tool_platform 11/11; a 200 whose own verdict/checks fail is ledgered check_failed with error_class write_not_verified. The publish half was already on main (0072_tool_meta), proved by estate_toolkits::a_write_tool_without_its_contract_is_refused"
             }
@@ -2392,7 +2392,7 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 322,
+                    "line": 394,
                     "quote": "        idempotency_key: request.idempotency_key.clone(),"
                 },
                 {
@@ -2426,7 +2426,7 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 330,
+                    "line": 402,
                     "quote": "        authority: Authority::Internal,"
                 }
             ],
@@ -2460,7 +2460,7 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 403,
+                    "line": 475,
                     "quote": "                _ => \"backend_error\","
                 }
             ],
@@ -2644,22 +2644,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1900,
+                    "line": 1906,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1901,
+                    "line": 1907,
                     "quote": "        \"crates/actions/src/toolkits\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1904,
+                    "line": 1910,
                     "quote": "      \"key\": \"T14\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1932,
+                    "line": 1938,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -2678,22 +2678,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2503,
+                    "line": 2509,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2506,
+                    "line": 2512,
                     "quote": "        \"migrations/0056_cadence_tranche.sql\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2509,
+                    "line": 2515,
                     "quote": "      \"key\": \"T8\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2530,
+                    "line": 2536,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -2712,22 +2712,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2282,
+                    "line": 2288,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2283,
+                    "line": 2289,
                     "quote": "        \"docs/SPEC_V2.md\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2286,
+                    "line": 2292,
                     "quote": "      \"key\": \"T3\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2307,
+                    "line": 2313,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -3065,7 +3065,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/procedure/ingest.rs",
-                    "line": 1152,
+                    "line": 1238,
                     "quote": "    if ctx.actor_kind != \"user\" {"
                 }
             ],
@@ -3103,7 +3103,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/procedure/ingest.rs",
-                    "line": 723,
+                    "line": 769,
                     "quote": "    let draft = crate::integrations::convert::convert(&ConvertRequest {"
                 },
                 {
@@ -3309,7 +3309,7 @@
             "acceptance": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
             "owner_project": "T13",
             "resolved_by": {
-                "commit": "2c1799da20abd58e2ac6679fdc093524890c4876",
+                "commit": "0d5b7cf59578b64d5cfa3e9fc847210e5e3ab064",
                 "test": "crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_rebinds",
                 "evidence": "cargo test -p conveyor-actions --test sop_ingestion: 14/14 pass at this commit (including an_sop_cannot_grant_a_tool and a_missing_operation_opens_a_tool_request_and_rebinds); audit-programme-conformance --rework-check v1-p116-1:T13 reports is cleared"
             }
@@ -3335,7 +3335,7 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 402,
+                    "line": 474,
                     "quote": "                422 => \"check_failed\","
                 }
             ],
@@ -3536,7 +3536,7 @@
                 },
                 {
                     "path": "crates/actions/src/invoke.rs",
-                    "line": 1169,
+                    "line": 1300,
                     "quote": "    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {"
                 },
                 {

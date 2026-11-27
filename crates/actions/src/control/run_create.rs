@@ -69,6 +69,17 @@ pub(crate) async fn create_bound_run_tx(
         .await
         .map_err(|error| store_error(error, action))?;
 
+    // #526: an internal-agent binding must declare its spend ceiling before any run starts.
+    if let Some(binding_id) = job_binding_id {
+        crate::invoke::ensure_binding_budget(
+            &mut *tx,
+            ctx.tenant,
+            binding_id,
+            &serde_json::Value::Null,
+        )
+        .await?;
+    }
+
     let run = store::run::insert_run_tx(
         &mut *tx,
         ctx.tenant,

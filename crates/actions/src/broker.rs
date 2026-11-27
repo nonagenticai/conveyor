@@ -29,7 +29,9 @@ use serde_json::Value;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::invoke::{ActionError, Authority, HandlerCtx, InvokeOutcome, InvokeRequest, invoke};
+use crate::invoke::{
+    ActionError, Authority, HandlerCtx, InvokeOutcome, InvokeRequest, UsageContext, invoke,
+};
 use crate::registry::registry;
 use crate::spec::{ActionKind, Effect, FieldError, validate_input};
 
@@ -77,6 +79,49 @@ fn field(field: &str, detail: impl Into<String>) -> FieldError {
         code: "invalid_value".to_owned(),
         detail: detail.into(),
     }
+}
+
+/// The SPEC's typed spend refusal (§11.3 step 2): nothing is dispatched, so nothing is charged.
+fn budget_exceeded(detail: String) -> ActionError {
+    ActionError::new(429, "tool_budget_exceeded", detail)
+}
+
+/// Refuse a `spend` call whose run has no budget or has already spent it.
+///
+/// The check reads two ledgers and counts each call once: derived `inference_call` cost (the
+/// handlers that capture usage, including the ones a tool dispatches) plus `tool_call.cost` for
+/// every other tool. The names come from the registry, so a new capturing action cannot silently
+/// be charged twice.
+async fn check_spend_budget(
+    conn: &mut sqlx::PgConnection,
+    tenant: conveyor_domain::TenantId,
+    run: &store::tool::RunToolContext,
+) -> Result<(), ActionError> {
+    let captured: Vec<String> = registry()
+        .iter()
+        .filter(|spec| spec.captures_usage)
+        .map(|spec| spec.name.to_string())
+        .collect();
+    let budget = store::inference::run_budget_tx(conn, tenant, run.run_id, &captured)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, run = %run.run_id, "broker: read the spend budget");
+            ActionError::internal()
+        })?;
+    let Some(limit) = budget.limit_usd else {
+        return Err(budget_exceeded(format!(
+            "run {} has no spend budget: declare `limits.cost_budget_usd` on the job release, \
+             the job binding's meta or the run's inputs before a spend-class tool may be called",
+            run.run_id
+        )));
+    };
+    if budget.spent_usd >= limit {
+        return Err(budget_exceeded(format!(
+            "run {} has spent {} of its {} USD spend budget; the call was refused before dispatch",
+            run.run_id, budget.spent_usd, limit
+        )));
+    }
+    Ok(())
 }
 
 /// The verification a `2xx` write reports against itself (SPEC_V2 §11.3).
@@ -258,6 +303,13 @@ pub(crate) async fn invoke_broker(
         }
     }
 
+    // §11.3 step 2's second half: a spend-class call is refused before the destination when the
+    // run's budget is absent or exhausted. The refusal is typed and, because it happens here,
+    // leaves neither a `tool_call` row nor a charge.
+    if effect == Effect::Spend {
+        check_spend_budget(&mut tx, ctx.tenant, &run).await?;
+    }
+
     // The transaction was read-only; close it before the network call so no lock or connection
     // is held across the destination's latency.
     let _ = tx.rollback().await;
@@ -315,6 +367,26 @@ pub(crate) async fn invoke_broker(
     } else {
         call.input.clone()
     };
+    // A spend call must leave a cost-bearing ledger row, and the cost is derived from the
+    // handler's `inference_call`. The row is attributed to the run being budgeted: a caller that
+    // sent no usage context (a direct admin call) gets one, and a mis-named run is overridden.
+    // Non-spend tools keep the caller's own context: they write no priced row.
+    let mut usage = request.usage.clone();
+    if effect == Effect::Spend {
+        let usage = usage.get_or_insert(UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Other,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: None,
+            prompt_ref: None,
+            prompt_version: None,
+            prompt_sha256: None,
+            correlation_id: None,
+        });
+        usage.run_id = Some(run.run_id);
+        usage.run_step_id = run.run_step_id;
+    }
     let target_request = InvokeRequest {
         action: tool.handler_action.clone(),
         input: target_input,
@@ -332,7 +404,7 @@ pub(crate) async fn invoke_broker(
         trace_id: request.trace_id.clone(),
         depth: request.depth + 1,
         app_key: ctx.app_key.clone(),
-        usage: request.usage.clone(),
+        usage,
     };
 
     let started = Instant::now();
@@ -445,7 +517,11 @@ pub(crate) async fn invoke_broker(
         error_class,
         error_message: error_message.as_deref(),
     };
-    match write_ledger(pool, ctx.tenant, &call_id).await {
+    let invocation_id = outcome
+        .as_ref()
+        .ok()
+        .and_then(|outcome| outcome.invocation_id);
+    match write_ledger(pool, ctx.tenant, &call_id, invocation_id).await {
         Ok(id) => tracing::debug!(
             tool = %call.tool, run = %run.run_id, call = %id, status, latency_ms,
             "broker: call ledgered"
@@ -467,11 +543,24 @@ async fn write_ledger(
     pool: &PgPool,
     tenant: conveyor_domain::TenantId,
     call: &store::tool::NewToolCall<'_>,
+    invocation_id: Option<Uuid>,
 ) -> Result<Uuid, String> {
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| error.to_string())?;
-    let call_id = store::tool::insert_call(&mut tx, tenant, call)
+    // §11.3 step 7's cost, from the handler's actual ledger rows rather than a guess. A priced
+    // call always writes a non-null cost; an unpriced one stays NULL by design.
+    let mut call = *call;
+    if let Some(invocation_id) = invocation_id
+        && let Some(run_id) = call.run_id
+    {
+        let since = chrono::Utc::now() - chrono::Duration::minutes(10);
+        call.cost =
+            store::inference::cost_of_invocation_tx(&mut tx, tenant, run_id, invocation_id, since)
+                .await
+                .map_err(|error| error.to_string())?;
+    }
+    let call_id = store::tool::insert_call(&mut tx, tenant, &call)
         .await
         .map_err(|error| error.to_string())?;
     let event = store::NewEvent {
