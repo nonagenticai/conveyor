@@ -455,9 +455,13 @@ the fact in the model, so the rule stops firing outside its contract.
   **28**, `multi-lane` 5, `closure-open` 2, `branch-live` 1 and `orphan-pr` 11 keep exactly the
   same keys. Rule failures drop only `verifyParts`, 47 → 39. The run is at
   `docs/evidence/units/2026-11-27-scoped/`.
-- **The live half is deployment-gated, and is not claimed here.** `MODEL_SOURCE` is
-  `include_str!` (`crates/actions/src/proof/render.rs:26`), so the deployed engine embeds the model
-  it was built with: at this run, image `sha256:dbb665e1…` built from main@322147b9, which cannot
-  carry this branch's model. The committed facts name `f6020fae…`, so the engine refuses them
-  (`proof_model_mismatch`) until the merged image rolls. The re-certification is recorded after
-  the deploy, in the same pattern by which #844's live certification was carried by #855.
+- **The live certification, on the rolled engine.** The deployed engine carries this merge: image
+  `sha256:3fc08fc1…`, `CONVEYOR_GIT_SHA=da0488297…`, and the model `f6020fae…` the facts name. The
+  lean4 bearer was re-minted immediately before the run (`lean4.token`, source licences, expires
+  21:59:27Z). `collect-units.sh certify` recorded chunk-000 (200 units)
+  `01a21ece-82d8-708b-851c-1e994a203e8d` and chunk-001 (134)
+  `01a21ece-a1d6-7ca6-9826-0d73c2808460`, both `unproven` with kernel `valid: false` — the
+  expected refusal of the 46 failing units — and the programme bundle
+  `01a21ece-bcd4-73e9-ab17-3c8b0158f0d2` `proven` (`valid: true`), which proves the same path
+  accepts a passing set. `report.md` carries the certificate table; `certificates.json` is beside
+  it.
