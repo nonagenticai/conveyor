@@ -93,4 +93,18 @@ export default [
     spec: "e2e/portfolio-organisation/meetings.spec.ts",
     load: () => import("../../destinations/meetings.js"),
   },
+  {
+    walk: "/plan",
+    app: "/plan",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/plan.spec.ts",
+    load: () => import("../../destinations/plan.js"),
+  },
+  {
+    walk: "/board/:board_id",
+    app: "/board/:board_id",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/plan.spec.ts",
+    load: () => import("../../destinations/plan.js"),
+  },
 ];
