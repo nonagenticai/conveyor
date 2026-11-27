@@ -70,19 +70,32 @@ async function expectRowsToMatch(
 }
 
 test("the roll-ups drill to the call", async ({ page, request }) => {
-  const tenant = await usage(request, "tenant");
-  const calls = tenant.rows.reduce((sum, row) => sum + row.calls, 0);
-  const tokens = tenant.rows.reduce((sum, row) => sum + row.tokens, 0);
-
   await page.goto("/metering");
   await expect(page.getByRole("heading", { name: "Metering" })).toBeVisible();
 
-  // The roll-up's tiles are the sums of the rows the action returned.
-  await expect(tile(page, "Calls").locator(".tv")).toHaveText(calls.toLocaleString("en-US"));
-  await expect(tile(page, "Tokens").locator(".tv")).toHaveText(tokens.toLocaleString("en-US"));
+  // The roll-up's tiles are the sums of the rows the action returns — sampled in the same poll
+  // iteration, because the ledger is live while this suite runs (measured 2026-11-27: 150 read,
+  // 151 shown, a call landing between the read and the render).
+  const tileNumber = async (label: string): Promise<number> => {
+    const text = await tile(page, label).locator(".tv").textContent();
+    return Number((text ?? "").replace(/[^0-9]/g, ""));
+  };
+  await expect
+    .poll(
+      async () => {
+        const rows = (await usage(request, "tenant")).rows;
+        const calls = rows.reduce((total, row) => total + row.calls, 0);
+        const tokens = rows.reduce((total, row) => total + row.tokens, 0);
+        const shownCalls = await tileNumber("Calls");
+        const shownTokens = await tileNumber("Tokens");
+        return `${shownCalls - calls}/${shownTokens - tokens}`;
+      },
+      { timeout: 10_000 },
+    )
+    .toBe("0/0");
 
   // The tenant level is one named row; the table is the action's own page.
-  await expect(page.getByTestId("metering-table").locator("tbody tr")).toHaveCount(tenant.rows.length);
+  await expectRowsToMatch(page, request, "tenant");
 
   // The drill-down levels render from the same action; the call level is one row per call.
   await page.getByRole("tab", { name: "Call", exact: true }).click();
