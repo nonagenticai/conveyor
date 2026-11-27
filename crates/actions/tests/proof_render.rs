@@ -239,7 +239,7 @@ fn a_kind_and_a_theorem_name_must_be_known() {
 fn the_model_digest_is_pinned() {
     assert_eq!(
         render::model_sha256(),
-        "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
+        "bbbc56e12e729e6daea3b244d29038819fb5802d187dfbc2a14a0a050a138e57",
         "the embedded model changed; every future certificate carries the new bytes"
     );
 }
@@ -456,4 +456,69 @@ fn each_kind_renders_its_own_checker() {
         ledger.contains("theorem u : checkLedger facts = true"),
         "{ledger}"
     );
+}
+
+/// #837 — a complete engine record renders the `checkRecord` instance the kernel closes.
+fn unit_record_facts() -> Value {
+    json!({
+        "kind": "unit_record",
+        "spec_sha256": "a".repeat(64),
+        "spec_name": "docs/SPEC_V2.md",
+        "model_sha256": render::model_sha256(),
+        "issue_ref": "nonagenticai/conveyor#837",
+        "repo": "nonagenticai/conveyor",
+        "lane": "issue/837-engine-dod",
+        "pull_number": 837,
+        "pull_url": "https://github.com/nonagenticai/conveyor/pull/837",
+        "pull_head": "b".repeat(40),
+        "ci_run_id": "run-837",
+        "ci_sha": "b".repeat(40),
+        "ci_verdict": "green",
+        "merge_sha": "c".repeat(40),
+        "deploy_digest": "sha256:deployed",
+        "serving_digest": "sha256:deployed",
+        "live_health": 200,
+        "live_acceptance_exit": 0,
+        "gate_review": true,
+        "gate_merge": true,
+        "gate_deploy": true,
+    })
+}
+
+#[test]
+fn a_unit_record_renders_the_record_theorem() {
+    let source = render::render(&unit_record_facts(), "unit_record_ok").expect("the unit record");
+    assert!(source.contains("def facts : UnitRecordFacts"), "{source}");
+    assert!(
+        source.contains("theorem unit_record_ok : checkRecord facts = true := by decide"),
+        "{source}"
+    );
+    assert!(
+        source.contains("issueRef := some \"nonagenticai/conveyor#837\""),
+        "{source}"
+    );
+    assert!(
+        source.contains("servingDigest := some \"sha256:deployed\""),
+        "{source}"
+    );
+    // The corpus check streams this exact emission into the prover's own project. It is opt-in
+    // so a normal run stays hermetic.
+    if std::env::var("CONVEYOR_DUMP_UNIT_SOURCE").is_ok() {
+        std::fs::write("/tmp/unit_record_ok.lean", &source).expect("dump the valid unit source");
+    }
+}
+
+/// An incomplete record still renders: the renderer does not hide the defect, the kernel refuses
+/// it. `mergeSha := none` is the fail-closed fact the universal theorem names.
+#[test]
+fn an_incomplete_unit_record_renders_and_fails_closed() {
+    let mut facts = unit_record_facts();
+    facts["merge_sha"] = json!(null);
+    let source =
+        render::render(&facts, "unit_record_incomplete").expect("the incomplete record renders");
+    assert!(source.contains("mergeSha := none"), "{source}");
+    if std::env::var("CONVEYOR_DUMP_UNIT_SOURCE").is_ok() {
+        std::fs::write("/tmp/unit_record_incomplete.lean", &source)
+            .expect("dump the incomplete unit source");
+    }
 }

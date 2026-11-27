@@ -445,3 +445,164 @@ async fn proofs_render_is_the_source_record_requires() {
     .expect_err("a facts document naming another model is refused");
     assert_eq!(error.code, "proof_model_mismatch", "{error:?}");
 }
+
+// ── the engine's own unit (#837) ─────────────────────────────────────────────────────────
+
+/// The unit's facts are re-derived at record time; a caller's exact attestation records.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn record_rederives_unit_facts() {
+    let (pg, seeded) = fixture().await;
+    let unit = proof::charter_unit(&pg, &seeded, 921, true).await;
+    proof::drive_unit_to_live(&pg, &seeded, &unit).await;
+
+    let attested = proof::attest(&pg, &seeded, &unit).await;
+    let source = attested["lean_source"].as_str().expect("the source");
+    let (key, input) = proof::check(&pg, &seeded, source).await;
+    let outcome = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.record",
+            seeded.user_id,
+            json!({
+                "action": "lean4.check",
+                "idempotency_key": key,
+                "invocation_input": input,
+                "subject_type": "unit",
+                "subject_id": unit.development_project_id.as_str(),
+                "spec_name": attested["spec_name"],
+                "spec_sha256": attested["spec_sha256"],
+                "facts_canonical": attested["facts_canonical"],
+                "theorem": attested["theorem"],
+                "trust": "kernel",
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect("proofs.record");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let stored = output(&outcome.body);
+    assert_eq!(stored["subject_type"], "unit");
+    assert_eq!(
+        stored["facts_sha256"], attested["facts_sha256"],
+        "the stored digest is the engine's derivation, not a caller's claim"
+    );
+    assert_eq!(stored["spec_sha256"], proof::spec_sha256());
+}
+
+/// A unit record whose facts differ from the engine's derivation is refused before the
+/// invocation is even resolved.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn record_refuses_caller_facts() {
+    let (pg, seeded) = fixture().await;
+    let unit = proof::charter_unit(&pg, &seeded, 922, true).await;
+    proof::drive_unit_to_live(&pg, &seeded, &unit).await;
+
+    let attested = proof::attest(&pg, &seeded, &unit).await;
+    let source = attested["lean_source"].as_str().expect("the source");
+    let (key, input) = proof::check(&pg, &seeded, source).await;
+    let mut forged: Value = serde_json::from_str(
+        attested["facts_canonical"]
+            .as_str()
+            .expect("the canonical facts"),
+    )
+    .expect("the facts are JSON");
+    forged["lane"] = json!("issue/837-forged");
+
+    let error = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.record",
+            seeded.user_id,
+            json!({
+                "action": "lean4.check",
+                "idempotency_key": key,
+                "invocation_input": input,
+                "subject_type": "unit",
+                "subject_id": unit.development_project_id.as_str(),
+                "spec_name": attested["spec_name"],
+                "spec_sha256": attested["spec_sha256"],
+                "facts_canonical": forged.to_string(),
+                "theorem": attested["theorem"],
+                "trust": "kernel",
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect_err("a caller-authored unit report is refused");
+    assert_eq!(error.status, 422, "{error:?}");
+    assert_eq!(error.code, "proof_facts_not_derived");
+}
+
+/// Even a forged report rendered by the engine's own renderer and checked by the prover is
+/// refused: the facts are compared to the rows, not to the source.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn record_refuses_recomputed_tamper() {
+    let (pg, seeded) = fixture().await;
+    let unit = proof::charter_unit(&pg, &seeded, 923, true).await;
+    proof::drive_unit_to_live(&pg, &seeded, &unit).await;
+
+    let attested = proof::attest(&pg, &seeded, &unit).await;
+    let mut forged: Value = serde_json::from_str(
+        attested["facts_canonical"]
+            .as_str()
+            .expect("the canonical facts"),
+    )
+    .expect("the facts are JSON");
+    forged["lane"] = json!("issue/837-forged");
+    let theorem = attested["theorem"].as_str().expect("the theorem");
+
+    // The forged facts render, and the stub prover answers `valid: true` — so only the
+    // re-derivation can catch it.
+    let render = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.render",
+            seeded.user_id,
+            json!({"facts_canonical": forged.to_string(), "theorem": theorem}),
+            None,
+        ),
+    )
+    .await
+    .expect("the renderer");
+    assert_eq!(render.status, 200, "{}", render.body);
+    let source = output(&render.body)["lean_source"]
+        .as_str()
+        .expect("the source")
+        .to_owned();
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
+
+    let error = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.record",
+            seeded.user_id,
+            json!({
+                "action": "lean4.check",
+                "idempotency_key": key,
+                "invocation_input": input,
+                "subject_type": "unit",
+                "subject_id": unit.development_project_id.as_str(),
+                "spec_name": attested["spec_name"],
+                "spec_sha256": attested["spec_sha256"],
+                "facts_canonical": forged.to_string(),
+                "theorem": theorem,
+                "trust": "kernel",
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect_err("a consistently forged report is still not the engine's derivation");
+    assert_eq!(error.status, 422, "{error:?}");
+    assert_eq!(error.code, "proof_facts_not_derived");
+}

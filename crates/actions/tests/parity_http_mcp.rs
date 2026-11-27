@@ -5297,6 +5297,17 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             200,
         ),
+        // #837: the engine derives the unit's facts and writes nothing. A nil development
+        // project is a subject that cannot exist, so both transports refuse with the same typed
+        // 422 and neither reads a caller-supplied fact.
+        expecting(
+            plain(
+                "proofs.attest",
+                json!({"development_project_id": Uuid::nil()}),
+                None,
+            ),
+            422,
+        ),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
