@@ -21,9 +21,9 @@
     "routes_registered": 3,
     "routes_verified": 0,
     "actions_total": 598,
-    "actions_absent": 598,
+    "actions_absent": 0,
     "actions_reachable": 0,
-    "actions_schema_rendered": 0
+    "actions_schema_rendered": 598
   },
   "routes": [
     {
@@ -613,7 +613,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "actions.list",
@@ -628,7 +628,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "agent.run",
@@ -643,7 +643,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.app",
@@ -658,7 +658,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.brand",
@@ -673,7 +673,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.content",
@@ -688,7 +688,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.report",
@@ -703,7 +703,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.site",
@@ -718,7 +718,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "analyse.video",
@@ -733,7 +733,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "andon.engage",
@@ -748,7 +748,7 @@
         "andon:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "andon.release",
@@ -763,7 +763,7 @@
         "andon:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approval_policies.get",
@@ -778,7 +778,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approval_policies.list",
@@ -793,7 +793,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approval_policies.set",
@@ -808,7 +808,7 @@
         "approvals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approvals.decide",
@@ -823,7 +823,7 @@
         "approvals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approvals.list",
@@ -838,7 +838,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "approvals.request",
@@ -853,7 +853,7 @@
         "approvals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_approve",
@@ -868,7 +868,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_create",
@@ -883,7 +883,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_entries",
@@ -898,7 +898,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_get",
@@ -913,7 +913,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_link",
@@ -928,7 +928,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_links",
@@ -943,7 +943,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_list",
@@ -958,7 +958,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_supersede",
@@ -973,7 +973,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.artifacts_update",
@@ -988,7 +988,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_decide",
@@ -1003,7 +1003,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_get",
@@ -1018,7 +1018,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_list",
@@ -1033,7 +1033,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_open",
@@ -1048,7 +1048,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_sit_decide",
@@ -1063,7 +1063,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.board_sit_open",
@@ -1078,7 +1078,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.contracts_approve",
@@ -1093,7 +1093,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.contracts_get",
@@ -1108,7 +1108,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.contracts_list",
@@ -1123,7 +1123,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.contracts_request",
@@ -1138,7 +1138,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.contracts_supersede",
@@ -1153,7 +1153,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.maturity_assess",
@@ -1168,7 +1168,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.maturity_list",
@@ -1183,7 +1183,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.maturity_plan",
@@ -1198,7 +1198,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.phases_advance",
@@ -1213,7 +1213,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.profile_get",
@@ -1228,7 +1228,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.profile_tailor",
@@ -1243,7 +1243,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.repository_search",
@@ -1258,7 +1258,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.reviews_record",
@@ -1273,7 +1273,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.reviews_waive",
@@ -1288,7 +1288,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.skills_assess",
@@ -1303,7 +1303,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "architecture.skills_list",
@@ -1318,7 +1318,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "artifacts.list",
@@ -1333,7 +1333,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "audit.list",
@@ -1348,7 +1348,7 @@
         "audit:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.assets",
@@ -1363,7 +1363,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.draft",
@@ -1378,7 +1378,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.intake",
@@ -1393,7 +1393,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.intakes",
@@ -1408,7 +1408,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.publish",
@@ -1423,7 +1423,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "authoring.review",
@@ -1438,7 +1438,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "baselines.get",
@@ -1453,7 +1453,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "baselines.list",
@@ -1468,7 +1468,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "baselines.take",
@@ -1483,7 +1483,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_cases.list",
@@ -1498,7 +1498,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.cancel",
@@ -1513,7 +1513,7 @@
         "benchmarks:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.compare",
@@ -1528,7 +1528,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.get",
@@ -1543,7 +1543,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.list",
@@ -1558,7 +1558,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.promote",
@@ -1573,7 +1573,7 @@
         "benchmarks:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.start",
@@ -1588,7 +1588,7 @@
         "benchmarks:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_runs.trend",
@@ -1603,7 +1603,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benchmark_suites.list",
@@ -1618,7 +1618,7 @@
         "benchmarks:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.create",
@@ -1633,7 +1633,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.delete",
@@ -1648,7 +1648,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.get",
@@ -1663,7 +1663,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.link",
@@ -1678,7 +1678,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.link_list",
@@ -1693,7 +1693,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.list",
@@ -1708,7 +1708,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.retire",
@@ -1723,7 +1723,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.transition_list",
@@ -1738,7 +1738,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.transition_upsert",
@@ -1753,7 +1753,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.unlink",
@@ -1768,7 +1768,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "benefits.update",
@@ -1783,7 +1783,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "billing.summary",
@@ -1798,7 +1798,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "boards.get",
@@ -1813,7 +1813,7 @@
         "boards:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "boards.set_member",
@@ -1828,7 +1828,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cadences.create",
@@ -1843,7 +1843,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cadences.delete",
@@ -1858,7 +1858,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cadences.list",
@@ -1873,7 +1873,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cadences.materialise",
@@ -1888,7 +1888,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cadences.update",
@@ -1903,7 +1903,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capabilities.bind_knowledge",
@@ -1918,7 +1918,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capabilities.get",
@@ -1933,7 +1933,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capabilities.list",
@@ -1948,7 +1948,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capability_agents.create",
@@ -1963,7 +1963,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capability_agents.get",
@@ -1978,7 +1978,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capability_agents.list",
@@ -1993,7 +1993,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "capability_agents.update",
@@ -2008,7 +2008,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "card_types.list",
@@ -2023,7 +2023,7 @@
         "cards:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.add_label",
@@ -2038,7 +2038,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.archive",
@@ -2053,7 +2053,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.assign",
@@ -2069,7 +2069,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.claim",
@@ -2084,7 +2084,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.comment",
@@ -2099,7 +2099,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.create",
@@ -2114,7 +2114,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.duplicate",
@@ -2129,7 +2129,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.get",
@@ -2144,7 +2144,7 @@
         "cards:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.ledger_append",
@@ -2159,7 +2159,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.ledger_list",
@@ -2174,7 +2174,7 @@
         "cards:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.list",
@@ -2189,7 +2189,7 @@
         "cards:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.move",
@@ -2204,7 +2204,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.release",
@@ -2219,7 +2219,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.remove_label",
@@ -2234,7 +2234,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.renew",
@@ -2249,7 +2249,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.unarchive",
@@ -2264,7 +2264,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "cards.update",
@@ -2279,7 +2279,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "catalogues.import",
@@ -2294,7 +2294,7 @@
         "catalogues:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "catalogues.list",
@@ -2309,7 +2309,7 @@
         "catalogues:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "changes.request",
@@ -2324,7 +2324,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.bind",
@@ -2339,7 +2339,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.get",
@@ -2354,7 +2354,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.kinds",
@@ -2369,7 +2369,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.list",
@@ -2384,7 +2384,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.policy_get",
@@ -2399,7 +2399,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.policy_reset",
@@ -2414,7 +2414,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.policy_set",
@@ -2429,7 +2429,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.test",
@@ -2444,7 +2444,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "channels.unbind",
@@ -2459,7 +2459,7 @@
         "channels:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coach.escalate",
@@ -2474,7 +2474,7 @@
         "approvals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coach.interrupt",
@@ -2490,7 +2490,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coach.remedy",
@@ -2507,7 +2507,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coach.triage",
@@ -2522,7 +2522,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coding_jobs.create",
@@ -2537,7 +2537,7 @@
         "integrations:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "coding_jobs.get",
@@ -2552,7 +2552,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "comments.delete",
@@ -2567,7 +2567,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "comments.update",
@@ -2582,7 +2582,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "completions.create",
@@ -2597,7 +2597,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "custom_fields.clear_value",
@@ -2612,7 +2612,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "custom_fields.create",
@@ -2627,7 +2627,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "custom_fields.delete",
@@ -2642,7 +2642,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "custom_fields.set_value",
@@ -2657,7 +2657,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "custom_fields.update",
@@ -2672,7 +2672,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decision_option_sets.get",
@@ -2687,7 +2687,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decision_option_sets.set",
@@ -2702,7 +2702,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decision_policies.create",
@@ -2717,7 +2717,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decision_policies.list",
@@ -2732,7 +2732,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decision_policies.update",
@@ -2747,7 +2747,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decisions.create",
@@ -2762,7 +2762,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decisions.get",
@@ -2777,7 +2777,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decisions.list",
@@ -2792,7 +2792,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decisions.transition",
@@ -2807,7 +2807,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decisions.update",
@@ -2822,7 +2822,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "decks.render",
@@ -2837,7 +2837,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "departments.create",
@@ -2852,7 +2852,7 @@
         "departments:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "departments.list",
@@ -2867,7 +2867,7 @@
         "departments:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.change_judging_surface",
@@ -2882,7 +2882,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.charter",
@@ -2897,7 +2897,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.close",
@@ -2912,7 +2912,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.deploy_gate",
@@ -2928,7 +2928,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.get",
@@ -2943,7 +2943,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.list",
@@ -2958,7 +2958,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.merge_gate",
@@ -2974,7 +2974,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.record_step",
@@ -2989,7 +2989,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.review_gate",
@@ -3005,7 +3005,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "development_projects.rollback",
@@ -3020,7 +3020,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.compose",
@@ -3035,7 +3035,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.create",
@@ -3050,7 +3050,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.delete",
@@ -3065,7 +3065,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.download",
@@ -3080,7 +3080,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.get",
@@ -3095,7 +3095,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.ingest",
@@ -3110,7 +3110,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.list",
@@ -3125,7 +3125,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.preview",
@@ -3140,7 +3140,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.publish",
@@ -3155,7 +3155,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.report",
@@ -3170,7 +3170,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.request_publish",
@@ -3185,7 +3185,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.return",
@@ -3200,7 +3200,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.revision_get",
@@ -3215,7 +3215,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.revision_list",
@@ -3230,7 +3230,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.revision_restore",
@@ -3245,7 +3245,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "documents.update",
@@ -3260,7 +3260,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_audits.get",
@@ -3275,7 +3275,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_audits.list",
@@ -3290,7 +3290,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_audits.start",
@@ -3305,7 +3305,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_cases.create",
@@ -3320,7 +3320,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_cases.delete",
@@ -3335,7 +3335,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_cases.import",
@@ -3350,7 +3350,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_cases.list",
@@ -3365,7 +3365,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_cases.update",
@@ -3380,7 +3380,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.compare",
@@ -3395,7 +3395,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.get",
@@ -3410,7 +3410,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.list",
@@ -3425,7 +3425,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.round",
@@ -3440,7 +3440,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.start",
@@ -3455,7 +3455,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_climbs.stop",
@@ -3470,7 +3470,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_findings.decide",
@@ -3485,7 +3485,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_findings.list",
@@ -3500,7 +3500,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_grades.create",
@@ -3515,7 +3515,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_grades.get",
@@ -3530,7 +3530,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_metrics.create",
@@ -3545,7 +3545,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_metrics.delete",
@@ -3560,7 +3560,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_metrics.update",
@@ -3575,7 +3575,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_results.get",
@@ -3590,7 +3590,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_results.label",
@@ -3605,7 +3605,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_results.list",
@@ -3620,7 +3620,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.cancel",
@@ -3635,7 +3635,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.export",
@@ -3650,7 +3650,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.get",
@@ -3665,7 +3665,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.list",
@@ -3680,7 +3680,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.regrade",
@@ -3695,7 +3695,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.report",
@@ -3710,7 +3710,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_runs.start",
@@ -3725,7 +3725,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_signoffs.decide",
@@ -3740,7 +3740,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_signoffs.request",
@@ -3755,7 +3755,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_versions.create",
@@ -3770,7 +3770,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_versions.get",
@@ -3785,7 +3785,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "eval_versions.list",
@@ -3800,7 +3800,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.create",
@@ -3815,7 +3815,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.draw_split",
@@ -3830,7 +3830,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.get",
@@ -3845,7 +3845,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.list",
@@ -3860,7 +3860,7 @@
         "evals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.retire",
@@ -3875,7 +3875,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "evals.update",
@@ -3890,7 +3890,7 @@
         "evals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "events.list",
@@ -3905,7 +3905,7 @@
         "events:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "fixtures.echo",
@@ -3920,7 +3920,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "fixtures.fail",
@@ -3935,7 +3935,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "fixtures.slow",
@@ -3950,7 +3950,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "fixtures.timeout",
@@ -3965,7 +3965,7 @@
         "actions:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "industries.create",
@@ -3980,7 +3980,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "industries.get",
@@ -3995,7 +3995,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "industries.list",
@@ -4010,7 +4010,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "inference.chat",
@@ -4025,7 +4025,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "inference_calls.list",
@@ -4040,7 +4040,7 @@
         "inference:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "inference_endpoint.get",
@@ -4055,7 +4055,7 @@
         "tenants:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "inference_endpoint.set",
@@ -4070,7 +4070,7 @@
         "tenants:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "inference_usage.report",
@@ -4085,7 +4085,7 @@
         "inference:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "invites.create",
@@ -4100,7 +4100,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "invites.list",
@@ -4115,7 +4115,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "invites.revoke",
@@ -4130,7 +4130,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_bindings.create",
@@ -4145,7 +4145,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_bindings.get",
@@ -4160,7 +4160,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_bindings.list",
@@ -4175,7 +4175,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_bindings.retire",
@@ -4190,7 +4190,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_catalogue.create",
@@ -4205,7 +4205,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_catalogue.get",
@@ -4220,7 +4220,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_catalogue.list",
@@ -4235,7 +4235,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_catalogue.retire",
@@ -4250,7 +4250,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_catalogue.update",
@@ -4265,7 +4265,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_releases.list",
@@ -4280,7 +4280,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_releases.publish",
@@ -4295,7 +4295,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "job_releases.retire",
@@ -4310,7 +4310,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "jobs.list",
@@ -4325,7 +4325,7 @@
         "jobs:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "jobs.retry",
@@ -4340,7 +4340,7 @@
         "jobs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.adopt",
@@ -4355,7 +4355,7 @@
         "evals:approve"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.analyse",
@@ -4370,7 +4370,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.get",
@@ -4385,7 +4385,7 @@
         "kata:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.hypothesise",
@@ -4400,7 +4400,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.measure",
@@ -4415,7 +4415,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.observe",
@@ -4430,7 +4430,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.open",
@@ -4445,7 +4445,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.propose",
@@ -4460,7 +4460,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.standardise",
@@ -4475,7 +4475,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.stretch",
@@ -4490,7 +4490,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "kata.sustain",
@@ -4505,7 +4505,7 @@
         "kata:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "knowledge.query",
@@ -4520,7 +4520,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "labels.create",
@@ -4535,7 +4535,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "labels.delete",
@@ -4550,7 +4550,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "labels.update",
@@ -4565,7 +4565,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.apply_draft",
@@ -4581,7 +4581,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.case",
@@ -4596,7 +4596,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.evaluate",
@@ -4611,7 +4611,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.list",
@@ -4626,7 +4626,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.precheck",
@@ -4641,7 +4641,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ladder.record",
@@ -4656,7 +4656,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "laya.judge",
@@ -4671,7 +4671,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "laya_configs.create",
@@ -4686,7 +4686,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "laya_configs.list",
@@ -4701,7 +4701,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lean4.check",
@@ -4716,7 +4716,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lean4.elaborate",
@@ -4731,7 +4731,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lean4.prove",
@@ -4746,7 +4746,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lessons.promote",
@@ -4761,7 +4761,7 @@
         "lessons:review"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lessons.propose",
@@ -4776,7 +4776,7 @@
         "lessons:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lessons.review",
@@ -4791,7 +4791,7 @@
         "lessons:review"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "licences.get",
@@ -4806,7 +4806,7 @@
         "licences:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lists.create",
@@ -4821,7 +4821,7 @@
         "lists:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lists.move",
@@ -4836,7 +4836,7 @@
         "lists:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "lists.update",
@@ -4851,7 +4851,7 @@
         "lists:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "me.get",
@@ -4866,7 +4866,7 @@
         "me:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.analyze_audio",
@@ -4881,7 +4881,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.analyze_video",
@@ -4896,7 +4896,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.capabilities",
@@ -4911,7 +4911,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.compile_video",
@@ -4926,7 +4926,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.concat_audio",
@@ -4941,7 +4941,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.generate_image",
@@ -4956,7 +4956,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.ocr",
@@ -4971,7 +4971,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.probe_video",
@@ -4986,7 +4986,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.produce_video",
@@ -5001,7 +5001,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.record_browser",
@@ -5016,7 +5016,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.render_html",
@@ -5031,7 +5031,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.run_gherkin",
@@ -5046,7 +5046,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.thumbnail",
@@ -5061,7 +5061,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "media.transcribe",
@@ -5076,7 +5076,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.agenda_add",
@@ -5091,7 +5091,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.close",
@@ -5106,7 +5106,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.close_item",
@@ -5121,7 +5121,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.defer",
@@ -5136,7 +5136,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.get",
@@ -5151,7 +5151,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.invite",
@@ -5166,7 +5166,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.list",
@@ -5181,7 +5181,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.minutes_publish",
@@ -5196,7 +5196,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.open",
@@ -5211,7 +5211,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.position",
@@ -5226,7 +5226,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.respond",
@@ -5241,7 +5241,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.schedule",
@@ -5256,7 +5256,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.type_get",
@@ -5271,7 +5271,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "meetings.type_list",
@@ -5286,7 +5286,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "members.list",
@@ -5301,7 +5301,7 @@
         "members:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "members.remove",
@@ -5316,7 +5316,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "members.set_role",
@@ -5331,7 +5331,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "memory.recall",
@@ -5346,7 +5346,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "memory.remember",
@@ -5361,7 +5361,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "messages.send",
@@ -5376,7 +5376,7 @@
         "messages:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.flow",
@@ -5391,7 +5391,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.job",
@@ -5406,7 +5406,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.maturity",
@@ -5421,7 +5421,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.programme",
@@ -5436,7 +5436,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.reconcile",
@@ -5451,7 +5451,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.threshold_get",
@@ -5466,7 +5466,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.threshold_update",
@@ -5481,7 +5481,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "metrics.usage",
@@ -5496,7 +5496,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_elements.create",
@@ -5511,7 +5511,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_elements.delete",
@@ -5526,7 +5526,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_elements.list",
@@ -5541,7 +5541,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_elements.update",
@@ -5556,7 +5556,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_relationships.create",
@@ -5571,7 +5571,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_relationships.delete",
@@ -5586,7 +5586,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_relationships.list",
@@ -5601,7 +5601,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_relationships.update",
@@ -5616,7 +5616,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.create",
@@ -5631,7 +5631,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.delete",
@@ -5646,7 +5646,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.generate",
@@ -5661,7 +5661,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.get",
@@ -5676,7 +5676,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.list",
@@ -5691,7 +5691,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "model_views.update",
@@ -5706,7 +5706,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.compare",
@@ -5721,7 +5721,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.completeness",
@@ -5736,7 +5736,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.create",
@@ -5751,7 +5751,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.delete",
@@ -5766,7 +5766,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.export_xmi",
@@ -5781,7 +5781,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.gaps",
@@ -5796,7 +5796,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.get",
@@ -5811,7 +5811,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.impact",
@@ -5826,7 +5826,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.import_xmi",
@@ -5841,7 +5841,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.list",
@@ -5856,7 +5856,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.publish",
@@ -5871,7 +5871,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.render",
@@ -5886,7 +5886,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.traceability",
@@ -5901,7 +5901,7 @@
         "model:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.update",
@@ -5916,7 +5916,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "models.validate",
@@ -5931,7 +5931,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "notifications.list",
@@ -5946,7 +5946,7 @@
         "notifications:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "notifications.update",
@@ -5961,7 +5961,7 @@
         "notifications:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.ci_status",
@@ -5976,7 +5976,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.deployments",
@@ -5991,7 +5991,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.events",
@@ -6006,7 +6006,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.flag_flip",
@@ -6021,7 +6021,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.flux_status",
@@ -6036,7 +6036,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.host_logs",
@@ -6051,7 +6051,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.host_restart_unit",
@@ -6066,7 +6066,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.host_status",
@@ -6081,7 +6081,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.incident",
@@ -6097,7 +6097,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.logs",
@@ -6112,7 +6112,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.mitigate",
@@ -6128,7 +6128,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.pods",
@@ -6143,7 +6143,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.postmortem",
@@ -6160,7 +6160,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.resolve",
@@ -6176,7 +6176,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.restart",
@@ -6191,7 +6191,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.rollback",
@@ -6206,7 +6206,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.scale",
@@ -6221,7 +6221,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "ops.triage",
@@ -6237,7 +6237,7 @@
         "ops:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "organisation_layers.list",
@@ -6252,7 +6252,7 @@
         "organisation:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "organisation_layers.set",
@@ -6267,7 +6267,7 @@
         "organisation:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "pm.charter",
@@ -6282,7 +6282,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "pm.close",
@@ -6297,7 +6297,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "pm.get",
@@ -6312,7 +6312,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "pm.plan",
@@ -6327,7 +6327,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "pm.route_gate",
@@ -6342,7 +6342,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "portfolio.in_flight",
@@ -6357,7 +6357,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.create",
@@ -6372,7 +6372,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.dismiss_conflict",
@@ -6387,7 +6387,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.get",
@@ -6402,7 +6402,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.list",
@@ -6417,7 +6417,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.list_conflicts",
@@ -6432,7 +6432,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.transition",
@@ -6447,7 +6447,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "principles.update",
@@ -6462,7 +6462,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.create",
@@ -6477,7 +6477,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.get",
@@ -6492,7 +6492,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.ingest_process",
@@ -6507,7 +6507,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.ingest_rdf",
@@ -6522,7 +6522,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.ingest_sop",
@@ -6537,7 +6537,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.list",
@@ -6552,7 +6552,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.publish",
@@ -6567,7 +6567,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.retire",
@@ -6582,7 +6582,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.review_source",
@@ -6597,7 +6597,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.update",
@@ -6612,7 +6612,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "procedures.validate",
@@ -6627,7 +6627,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.create",
@@ -6642,7 +6642,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.get",
@@ -6657,7 +6657,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.list",
@@ -6672,7 +6672,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.publish",
@@ -6687,7 +6687,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.retire",
@@ -6702,7 +6702,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_maps.update",
@@ -6717,7 +6717,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "process_runs.start",
@@ -6732,7 +6732,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.create",
@@ -6747,7 +6747,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.get",
@@ -6762,7 +6762,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.list",
@@ -6777,7 +6777,7 @@
         "processes:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.publish",
@@ -6792,7 +6792,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.retire",
@@ -6807,7 +6807,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "processes.update",
@@ -6822,7 +6822,7 @@
         "processes:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "produce.script",
@@ -6837,7 +6837,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "produce.speech",
@@ -6852,7 +6852,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.baseline",
@@ -6867,7 +6867,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.baseline_approve",
@@ -6882,7 +6882,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.baselines_list",
@@ -6897,7 +6897,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.create",
@@ -6912,7 +6912,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.get",
@@ -6927,7 +6927,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.list",
@@ -6942,7 +6942,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.refresh",
@@ -6957,7 +6957,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "programmes.update",
@@ -6972,7 +6972,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_dependencies.create",
@@ -6987,7 +6987,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_dependencies.delete",
@@ -7002,7 +7002,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_dependencies.list",
@@ -7017,7 +7017,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.approve",
@@ -7032,7 +7032,7 @@
         "requests:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.create",
@@ -7047,7 +7047,7 @@
         "requests:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.get",
@@ -7062,7 +7062,7 @@
         "requests:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.list",
@@ -7077,7 +7077,7 @@
         "requests:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.promote",
@@ -7092,7 +7092,7 @@
         "requests:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.reject",
@@ -7107,7 +7107,7 @@
         "requests:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "project_requests.update",
@@ -7122,7 +7122,7 @@
         "requests:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.activate",
@@ -7137,7 +7137,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.archive",
@@ -7152,7 +7152,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.baseline",
@@ -7167,7 +7167,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.charter",
@@ -7182,7 +7182,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.close",
@@ -7197,7 +7197,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.close_request",
@@ -7212,7 +7212,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.create",
@@ -7227,7 +7227,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.execute",
@@ -7242,7 +7242,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.get",
@@ -7257,7 +7257,7 @@
         "projects:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.pause",
@@ -7272,7 +7272,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.programme_meta",
@@ -7287,7 +7287,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.reopen",
@@ -7302,7 +7302,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "projects.update",
@@ -7317,7 +7317,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_audits.check",
@@ -7332,7 +7332,7 @@
         "inference:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_audits.get",
@@ -7347,7 +7347,7 @@
         "inference:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_audits.list",
@@ -7362,7 +7362,7 @@
         "inference:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_audits.start",
@@ -7377,7 +7377,7 @@
         "inference:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_findings.decide",
@@ -7392,7 +7392,7 @@
         "inference:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_findings.list",
@@ -7407,7 +7407,7 @@
         "inference:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_recipes.activate",
@@ -7422,7 +7422,7 @@
         "prompts:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_recipes.create",
@@ -7437,7 +7437,7 @@
         "prompts:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_recipes.get",
@@ -7452,7 +7452,7 @@
         "prompts:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_recipes.list",
@@ -7467,7 +7467,7 @@
         "prompts:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "prompt_recipes.retire",
@@ -7482,7 +7482,7 @@
         "prompts:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "proofs.get",
@@ -7497,7 +7497,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "proofs.list",
@@ -7512,7 +7512,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "proofs.record",
@@ -7527,7 +7527,7 @@
         "approvals:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "proofs.reverify",
@@ -7542,7 +7542,7 @@
         "approvals:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "providers.list",
@@ -7557,7 +7557,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "publish.start",
@@ -7572,7 +7572,7 @@
         "projects:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "publish.status",
@@ -7587,7 +7587,7 @@
         "jobs:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "quality.score",
@@ -7602,7 +7602,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "refinements.list",
@@ -7617,7 +7617,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "refinements.publish",
@@ -7632,7 +7632,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "registers.create",
@@ -7647,7 +7647,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "registers.delete",
@@ -7662,7 +7662,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "registers.get",
@@ -7677,7 +7677,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "registers.list",
@@ -7692,7 +7692,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "registers.update",
@@ -7707,7 +7707,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.create",
@@ -7722,7 +7722,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.delete",
@@ -7737,7 +7737,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.get",
@@ -7752,7 +7752,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.link",
@@ -7767,7 +7767,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.list",
@@ -7782,7 +7782,7 @@
         "documents:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.unlink",
@@ -7797,7 +7797,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "repositories.update",
@@ -7812,7 +7812,7 @@
         "documents:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.compare",
@@ -7827,7 +7827,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.create",
@@ -7842,7 +7842,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.get",
@@ -7857,7 +7857,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.list",
@@ -7872,7 +7872,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.transition",
@@ -7887,7 +7887,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "requirements.update",
@@ -7902,7 +7902,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "retrieval.query",
@@ -7917,7 +7917,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "roles.policy_get",
@@ -7932,7 +7932,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "roles.policy_reset",
@@ -7947,7 +7947,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "roles.policy_set",
@@ -7962,7 +7962,7 @@
         "members:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.cancel",
@@ -7977,7 +7977,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.create",
@@ -7992,7 +7992,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.finish",
@@ -8007,7 +8007,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.get",
@@ -8022,7 +8022,7 @@
         "runs:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.list",
@@ -8037,7 +8037,7 @@
         "runs:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "runs.start",
@@ -8052,7 +8052,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "schedules.list",
@@ -8067,7 +8067,7 @@
         "schedules:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "schedules.upsert",
@@ -8082,7 +8082,7 @@
         "schedules:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "scientific_formal.translate",
@@ -8097,7 +8097,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "scientific_formal.verify",
@@ -8112,7 +8112,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "scientific_stats.confidence_interval",
@@ -8127,7 +8127,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "scientific_stats.meta_analysis",
@@ -8142,7 +8142,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "scientific_stats.trend",
@@ -8157,7 +8157,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "search.query",
@@ -8172,7 +8172,7 @@
         "search:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "secrets.create",
@@ -8187,7 +8187,7 @@
         "secrets:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "secrets.delete",
@@ -8202,7 +8202,7 @@
         "secrets:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "secrets.get",
@@ -8217,7 +8217,7 @@
         "secrets:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "secrets.list",
@@ -8232,7 +8232,7 @@
         "secrets:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "secrets.rotate",
@@ -8247,7 +8247,7 @@
         "secrets:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "sheets.export",
@@ -8262,7 +8262,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "sheets.import",
@@ -8277,7 +8277,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.create",
@@ -8292,7 +8292,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.delete",
@@ -8307,7 +8307,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.get",
@@ -8322,7 +8322,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.list",
@@ -8337,7 +8337,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.profile_create",
@@ -8352,7 +8352,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.profile_delete",
@@ -8367,7 +8367,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.profile_list",
@@ -8382,7 +8382,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.profile_update",
@@ -8397,7 +8397,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "stakeholders.update",
@@ -8412,7 +8412,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "task_lists.create",
@@ -8427,7 +8427,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "task_lists.delete",
@@ -8442,7 +8442,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "task_lists.update",
@@ -8457,7 +8457,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tasks.create",
@@ -8472,7 +8472,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tasks.delete",
@@ -8487,7 +8487,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tasks.move",
@@ -8502,7 +8502,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tasks.update",
@@ -8517,7 +8517,7 @@
         "cards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tenants.get",
@@ -8532,7 +8532,7 @@
         "tenants:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tenants.update_settings",
@@ -8547,7 +8547,7 @@
         "tenants:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.draft",
@@ -8562,7 +8562,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.promote",
@@ -8577,7 +8577,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.publish",
@@ -8592,7 +8592,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.review",
@@ -8607,7 +8607,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.test",
@@ -8622,7 +8622,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_authoring.validate",
@@ -8637,7 +8637,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_bindings.create",
@@ -8652,7 +8652,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_bindings.list",
@@ -8667,7 +8667,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_bindings.retire",
@@ -8682,7 +8682,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_bindings.update",
@@ -8697,7 +8697,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tool_calls.list",
@@ -8712,7 +8712,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "toolkits.discover_mcp",
@@ -8727,7 +8727,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "toolkits.import_openapi",
@@ -8742,7 +8742,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "toolkits.list",
@@ -8757,7 +8757,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "toolkits.publish",
@@ -8772,7 +8772,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "toolkits.register_mcp",
@@ -8787,7 +8787,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.call",
@@ -8802,7 +8802,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.dispatch",
@@ -8817,7 +8817,7 @@
         "runs:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.get",
@@ -8832,7 +8832,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.list",
@@ -8847,7 +8847,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.probe",
@@ -8862,7 +8862,7 @@
         "tools:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tools.usage",
@@ -8877,7 +8877,7 @@
         "tools:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "trace_links.create",
@@ -8892,7 +8892,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "trace_links.delete",
@@ -8907,7 +8907,7 @@
         "governance:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "trace_links.list",
@@ -8922,7 +8922,7 @@
         "governance:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.authorise",
@@ -8937,7 +8937,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.create",
@@ -8952,7 +8952,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.delete",
@@ -8967,7 +8967,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.list",
@@ -8982,7 +8982,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.retire",
@@ -8997,7 +8997,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.review",
@@ -9012,7 +9012,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.review_list",
@@ -9027,7 +9027,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "tranches.update",
@@ -9042,7 +9042,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_connections.create",
@@ -9057,7 +9057,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_connections.delete",
@@ -9072,7 +9072,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_connections.update",
@@ -9087,7 +9087,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_objects.create",
@@ -9102,7 +9102,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_objects.delete",
@@ -9117,7 +9117,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "view_objects.update",
@@ -9132,7 +9132,7 @@
         "model:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "wbs.create",
@@ -9147,7 +9147,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "wbs.delete",
@@ -9162,7 +9162,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "wbs.get",
@@ -9177,7 +9177,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "wbs.list",
@@ -9192,7 +9192,7 @@
         "portfolio:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "wbs.update",
@@ -9207,7 +9207,7 @@
         "portfolio:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webhooks.create",
@@ -9222,7 +9222,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webhooks.delete",
@@ -9237,7 +9237,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webhooks.test",
@@ -9252,7 +9252,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webhooks.update",
@@ -9267,7 +9267,7 @@
         "boards:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webscraper.scrape_bulk",
@@ -9282,7 +9282,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "webscraper.scrape_url",
@@ -9297,7 +9297,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workers.list",
@@ -9312,7 +9312,7 @@
         "integrations:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflow_runs.cancel",
@@ -9327,7 +9327,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflow_runs.get",
@@ -9342,7 +9342,7 @@
         "workflows:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflow_runs.start",
@@ -9357,7 +9357,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflow_traces.export",
@@ -9372,7 +9372,7 @@
         "workflows:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.create",
@@ -9387,7 +9387,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.get",
@@ -9402,7 +9402,7 @@
         "workflows:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.list",
@@ -9417,7 +9417,7 @@
         "workflows:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.publish",
@@ -9432,7 +9432,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.retire",
@@ -9447,7 +9447,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "workflows.update",
@@ -9462,7 +9462,7 @@
         "workflows:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.client_get",
@@ -9477,7 +9477,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.client_set",
@@ -9492,7 +9492,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.connect",
@@ -9507,7 +9507,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.disconnect",
@@ -9522,7 +9522,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.privacy",
@@ -9537,7 +9537,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.retract",
@@ -9552,7 +9552,7 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.status",
@@ -9567,7 +9567,7 @@
         "capabilities:read"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     },
     {
       "name": "youtube.upload",
@@ -9582,15 +9582,19 @@
         "capabilities:write"
       ],
       "metadata_complete": true,
-      "status": "absent"
+      "status": "schema-rendered"
     }
   ],
   "drift": {
-    "live_routes": 52,
+    "live_routes": 55,
     "census_routes": 52,
     "live_actions": 598,
     "census_actions": 598,
-    "missing_routes": [],
+    "missing_routes": [
+      "/knowledge/memory",
+      "/knowledge/sources",
+      "/measure"
+    ],
     "extra_routes": [],
     "missing_actions": [],
     "extra_actions": []

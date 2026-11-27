@@ -564,13 +564,27 @@ def parse_registry() -> dict[str, dict[str, str]]:
     return rows
 
 
+CAPABILITIES: dict[str, re.Pattern[str]] = {
+    # The capability, not a guessed file path (SPEC §6.1 fixes the seam's name and
+    # responsibility, not the implementation's module layout). A rename must not flip the
+    # status; the per-destination specs remain the proof that a destination is wired.
+    "manifest": re.compile(r"\bmanifest\s*\("),
+    "sheet": re.compile(r"\bopenAction\s*\("),
+    "form": re.compile(r"\brenderSchemaForm\s*\("),
+}
+
+
+def detect_modules(sources: dict[str, str]) -> dict[str, bool]:
+    """Capability detection over the walk's JavaScript sources (path -> text)."""
+    text = "\n".join(sources.values())
+    return {name: bool(pattern.search(text)) for name, pattern in CAPABILITIES.items()}
+
+
 def modules_present() -> dict[str, bool]:
-    return {
-        "manifest": (WALK / "src/api/manifest.js").is_file(),
-        "form": (WALK / "src/forms/index.js").is_file()
-        or (WALK / "src/forms/render.js").is_file(),
-        "sheet": (WALK / "src/shell/sheet-host.js").is_file(),
-    }
+    src = WALK / "src"
+    if not src.is_dir():
+        return {name: False for name in CAPABILITIES}
+    return detect_modules({path.as_posix(): path.read_text() for path in sorted(src.rglob("*.js"))})
 
 
 def load_report(path: str | None) -> set[str]:
@@ -602,9 +616,10 @@ def build_coverage(
     exemptions: list[dict[str, Any]],
     passed: set[str] | None = None,
     committed: dict[str, Any] | None = None,
+    modules: dict[str, bool] | None = None,
 ) -> dict[str, Any]:
     passed = passed or set()
-    modules = modules_present()
+    modules = modules if modules is not None else modules_present()
     today = dt.date.today()
     gaps: list[str] = []
 
@@ -799,27 +814,45 @@ def self_test() -> int:
     }
     registry = {"/x": {"walk": "/x", "app": "/x", "room": "portfolio",
                             "spec": "e2e/x/x.spec.ts", "file": "src/router/routes/core.js"}}
-    base = build_coverage(census, {}, [], committed=None)
+    no_caps = {"manifest": False, "sheet": False, "form": False}
+    all_caps = {"manifest": True, "sheet": True, "form": True}
+    base = build_coverage(census, {}, [], committed=None, modules=no_caps)
     ok(base["gaps"] == [], "clean baseline has no gaps")
     ok(any("absent at P6" in g for g in strict_gaps(base)), "P6 fails an absent route")
 
     claim = {"routes": [{"walk": "/x", "status": "registered"}], "actions": []}
-    gaps = build_coverage(census, {}, [], committed=claim)["gaps"]
+    gaps = build_coverage(census, {}, [], committed=claim, modules=no_caps)["gaps"]
     ok(any("has no registry row" in g for g in gaps), "failure 1: claim without a row")
 
-    gaps = build_coverage(census, registry, [], committed=None)["gaps"]
+    gaps = build_coverage(census, registry, [], committed=None, modules=no_caps)["gaps"]
     ok(any("claims a spec" in g for g in gaps), "failure 3: registered route without its spec")
 
     action_claim = {"routes": [], "actions": [{"name": "x.read", "status": "reachable"}]}
-    gaps = build_coverage(census, {}, [], committed=action_claim)["gaps"]
+    gaps = build_coverage(census, {}, [], committed=action_claim, modules=no_caps)["gaps"]
     ok(any("has no action-sheet module" in g for g in gaps), "failure 2: action claim without a sheet")
 
+    # Capability detection: the seam's capability, wherever the implementation puts it.
+    caps = detect_modules({
+        "src/api/client.js": "  async manifest() {\n    return this.request(\"/api/actions\");\n  }",
+        "src/shell/shell.js": "  async openAction(name, options = {}) {",
+        "src/forms/schema.js": "export function renderSchemaForm(schema, options) {",
+    })
+    ok(caps == all_caps, "capability: the delivered shapes are detected")
+    ok(detect_modules({"src/shell/renamed-sheet.js": "openAction(name)"})["sheet"],
+       "capability: a renamed module is not a false negative")
+    ok(not detect_modules({"src/api/client.js": "function manifestThing() {"})["manifest"],
+       "capability: a lookalike token is not a false positive")
+    ok(build_coverage(census, {}, [], committed=None, modules=all_caps)["actions"][0]["status"]
+       == "schema-rendered", "capability: actions are schema-rendered when the sheet exists")
+    ok(build_coverage(census, {}, [], committed=None, modules=no_caps)["actions"][0]["status"]
+       == "absent", "capability: actions are absent without the sheet")
+
     expired = [{"surface": "/x", "reason": "r", "signer": "s", "expires": "2000-01-01"}]
-    gaps = build_coverage(census, registry, expired)["gaps"]
+    gaps = build_coverage(census, registry, expired, modules=no_caps)["gaps"]
     ok(any("expired" in g for g in gaps), "failure 4: expired exemption")
 
     a = json.dumps(base, sort_keys=True)
-    b = json.dumps(build_coverage(census, {}, [], committed=None), sort_keys=True)
+    b = json.dumps(build_coverage(census, {}, [], committed=None, modules=no_caps), sort_keys=True)
     ok(a == b, "deterministic output")
 
     for label in failures:

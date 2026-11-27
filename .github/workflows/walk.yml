@@ -172,6 +172,14 @@ jobs:
             DEV_AUTH_TOKEN=dev:alice \
             npx playwright test --reporter=list
 
+      - name: the instrument reads the suite's report
+        # A green suite is the browser proof; feeding its JSON report to the instrument is what
+        # marks the passing specs `verified` — a route with no report entry stays `registered`.
+        run: |
+          set -euo pipefail
+          cd apps/walk
+          python3 ../../scripts/build-walk-coverage.py --check --report test-results/walk-report.json
+
       - name: server and dev-server logs on failure
         if: failure()
         run: |
