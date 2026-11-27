@@ -20,4 +20,8 @@ test("a multi-segment deep link boots the app with its assets", async ({ page })
     /(style\.css|src\/main\.js|data\/world\.json)$/.test(line),
   );
   expect(assetFailures).toEqual([]);
+  for (const asset of ["/style.css", "/src/main.js", "/data/world.json"]) {
+    const response = await page.request.get(asset);
+    expect(response.status(), asset).toBe(200);
+  }
 });
