@@ -13,6 +13,10 @@ members = [
     "crates/*",
     "apps/*",
 ]
+# The Gemba Walk is a plain-ESM static sub-site (apps/walk, SPEC §6.1), not a Cargo app; a
+# directory under `apps/` without a Cargo.toml would fail the glob. Its world crate
+# `crates/walk-world` joins through `crates/*` and is the only Rust side.
+exclude = ["apps/walk"]
 
 [workspace.package]
 version = "0.1.0"

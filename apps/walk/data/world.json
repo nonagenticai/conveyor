@@ -1,0 +1,412 @@
+{
+  "schema": 1,
+  "baseline": {
+    "date": "2026-11-27",
+    "git_sha": "e2507c8603e3117bd5dcbe6f92c4945e1f34eb3b",
+    "prior": {
+      "routes": 52,
+      "actions": 597,
+      "source": "inception measurement 2026-11-26"
+    }
+  },
+  "rooms": [
+    {
+      "id": "portfolio",
+      "label": "Portfolio & plan"
+    },
+    {
+      "id": "organisation",
+      "label": "Organisation"
+    },
+    {
+      "id": "procedures",
+      "label": "Procedures & authoring"
+    },
+    {
+      "id": "governance",
+      "label": "Govern & design"
+    },
+    {
+      "id": "knowledge",
+      "label": "Knowledge & memory"
+    },
+    {
+      "id": "measure",
+      "label": "Measure & improve"
+    },
+    {
+      "id": "operations",
+      "label": "Operations"
+    },
+    {
+      "id": "utilities",
+      "label": "Utilities"
+    }
+  ],
+  "walls": [
+    {
+      "route": "/",
+      "walk": "/walk",
+      "room": "portfolio",
+      "view": "Today",
+      "owner": "G0"
+    },
+    {
+      "route": "/agents",
+      "walk": "/walk/agents",
+      "room": "organisation",
+      "view": "AgentsScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/approvals",
+      "walk": "/walk/approvals",
+      "room": "utilities",
+      "view": "Approvals",
+      "owner": "S3"
+    },
+    {
+      "route": "/architecture",
+      "walk": "/walk/architecture",
+      "room": "governance",
+      "view": "ArchitectureScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/authoring",
+      "walk": "/walk/authoring",
+      "room": "procedures",
+      "view": "Authoring",
+      "owner": "S2"
+    },
+    {
+      "route": "/board/:board_id",
+      "walk": "/walk/board/:board_id",
+      "room": "portfolio",
+      "view": "BoardScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/boards",
+      "walk": "/walk/boards",
+      "room": "portfolio",
+      "view": "BoardIndex",
+      "owner": "S4"
+    },
+    {
+      "route": "/build/process-map",
+      "walk": "/walk/build/process-map",
+      "room": "procedures",
+      "view": "ProcessMapList",
+      "owner": "S2"
+    },
+    {
+      "route": "/build/process-map/:map_id",
+      "walk": "/walk/build/process-map/:map_id",
+      "room": "procedures",
+      "view": "ProcessMapDetail",
+      "owner": "S2"
+    },
+    {
+      "route": "/build/processes",
+      "walk": "/walk/build/processes",
+      "room": "procedures",
+      "view": "ProcessesScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/build/processes/:process_id",
+      "walk": "/walk/build/processes/:process_id",
+      "room": "procedures",
+      "view": "ProcessDetail",
+      "owner": "S2"
+    },
+    {
+      "route": "/card/:card_id",
+      "walk": "/walk/card/:card_id",
+      "room": "portfolio",
+      "view": "Cockpit",
+      "owner": "S4"
+    },
+    {
+      "route": "/copilot",
+      "walk": "/walk/copilot",
+      "room": "governance",
+      "view": "CopilotScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/decisions",
+      "walk": "/walk/decisions",
+      "room": "portfolio",
+      "view": "DecisionInboxScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/design/adm",
+      "walk": "/walk/design/adm",
+      "room": "governance",
+      "view": "AdmGate",
+      "owner": "S2"
+    },
+    {
+      "route": "/design/models",
+      "walk": "/walk/design/models",
+      "room": "governance",
+      "view": "ModelsScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/design/models/:model_id",
+      "walk": "/walk/design/models/:model_id",
+      "room": "governance",
+      "view": "ModelDetail",
+      "owner": "S2"
+    },
+    {
+      "route": "/design/requirements",
+      "walk": "/walk/design/requirements",
+      "room": "governance",
+      "view": "RequirementsScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/design/requirements/:id",
+      "walk": "/walk/design/requirements/:id",
+      "room": "governance",
+      "view": "RequirementDetail",
+      "owner": "S2"
+    },
+    {
+      "route": "/evals",
+      "walk": "/walk/evals",
+      "room": "measure",
+      "view": "Evals",
+      "owner": "S3"
+    },
+    {
+      "route": "/evals/:eval_id",
+      "walk": "/walk/evals/:eval_id",
+      "room": "measure",
+      "view": "EvalDetail",
+      "owner": "S3"
+    },
+    {
+      "route": "/evals/:eval_id/:tab",
+      "walk": "/walk/evals/:eval_id/:tab",
+      "room": "measure",
+      "view": "EvalDetail",
+      "owner": "S3"
+    },
+    {
+      "route": "/evals/benchmarks",
+      "walk": "/walk/evals/benchmarks",
+      "room": "measure",
+      "view": "Benchmarks",
+      "owner": "S3"
+    },
+    {
+      "route": "/evals/benchmarks/run/:run_id",
+      "walk": "/walk/evals/benchmarks/run/:run_id",
+      "room": "measure",
+      "view": "BenchmarkRunDetail",
+      "owner": "S3"
+    },
+    {
+      "route": "/evals/improvement",
+      "walk": "/walk/evals/improvement",
+      "room": "measure",
+      "view": "Improvement",
+      "owner": "S3"
+    },
+    {
+      "route": "/execution",
+      "walk": "/walk/execution",
+      "room": "portfolio",
+      "view": "ExecutionScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/improve",
+      "walk": "/walk/improve",
+      "room": "measure",
+      "view": "Improve",
+      "owner": "S3"
+    },
+    {
+      "route": "/jobs",
+      "walk": "/walk/jobs",
+      "room": "organisation",
+      "view": "JobsScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/knowledge",
+      "walk": "/walk/knowledge",
+      "room": "knowledge",
+      "view": "KnowledgeGate",
+      "owner": "S3"
+    },
+    {
+      "route": "/measure/prompt-audit",
+      "walk": "/walk/measure/prompt-audit",
+      "room": "measure",
+      "view": "PromptAuditScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/measure/usage",
+      "walk": "/walk/measure/usage",
+      "room": "measure",
+      "view": "Usage",
+      "owner": "S3"
+    },
+    {
+      "route": "/meetings",
+      "walk": "/walk/meetings",
+      "room": "portfolio",
+      "view": "MeetingsScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/meetings/:id",
+      "walk": "/walk/meetings/:id",
+      "room": "portfolio",
+      "view": "MeetingRoomScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/metering",
+      "walk": "/walk/metering",
+      "room": "measure",
+      "view": "Metering",
+      "owner": "S3"
+    },
+    {
+      "route": "/operations",
+      "walk": "/walk/operations",
+      "room": "operations",
+      "view": "Operations",
+      "owner": "S3"
+    },
+    {
+      "route": "/organisation",
+      "walk": "/walk/organisation",
+      "room": "organisation",
+      "view": "OrganisationScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/plan",
+      "walk": "/walk/plan",
+      "room": "portfolio",
+      "view": "PlanScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/platform",
+      "walk": "/walk/platform",
+      "room": "utilities",
+      "view": "Platform",
+      "owner": "S3"
+    },
+    {
+      "route": "/portfolio",
+      "walk": "/walk/portfolio",
+      "room": "portfolio",
+      "view": "PortfolioScreen",
+      "owner": "G0"
+    },
+    {
+      "route": "/portfolio/:programme_id",
+      "walk": "/walk/portfolio/:programme_id",
+      "room": "portfolio",
+      "view": "PortfolioScreen",
+      "owner": "G0"
+    },
+    {
+      "route": "/procedures",
+      "walk": "/walk/procedures",
+      "room": "procedures",
+      "view": "ProceduresScreen",
+      "owner": "S2"
+    },
+    {
+      "route": "/programme",
+      "walk": "/walk/programme",
+      "room": "portfolio",
+      "view": "ProgrammeScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/project-types",
+      "walk": "/walk/project-types",
+      "room": "organisation",
+      "view": "ProjectTypesScreen",
+      "owner": "S1"
+    },
+    {
+      "route": "/runs",
+      "walk": "/walk/runs",
+      "room": "portfolio",
+      "view": "RunQueue",
+      "owner": "S1"
+    },
+    {
+      "route": "/runs/:run_id",
+      "walk": "/walk/runs/:run_id",
+      "room": "portfolio",
+      "view": "RunDetail",
+      "owner": "S1"
+    },
+    {
+      "route": "/search",
+      "walk": "/walk/search",
+      "room": "utilities",
+      "view": "SearchScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/settings/admin",
+      "walk": "/walk/settings/admin",
+      "room": "utilities",
+      "view": "AdminScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/settings/inference",
+      "walk": "/walk/settings/inference",
+      "room": "utilities",
+      "view": "InferenceEndpoint",
+      "owner": "S3"
+    },
+    {
+      "route": "/settings/members",
+      "walk": "/walk/settings/members",
+      "room": "utilities",
+      "view": "Members",
+      "owner": "S3"
+    },
+    {
+      "route": "/settings/roles",
+      "walk": "/walk/settings/roles",
+      "room": "utilities",
+      "view": "Roles",
+      "owner": "S3"
+    },
+    {
+      "route": "/tools",
+      "walk": "/walk/tools",
+      "room": "organisation",
+      "view": "Tools",
+      "owner": "S1"
+    },
+    {
+      "route": "/validation",
+      "walk": "/walk/validation",
+      "room": "portfolio",
+      "view": "ValidationScreen",
+      "owner": "S1"
+    }
+  ]
+}
