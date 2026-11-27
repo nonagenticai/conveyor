@@ -1,12 +1,8 @@
----
-name: Unit of work
-about: One deliverable, one branch `issue/<n>-<slug>`, exactly one PR
-title: ""
-labels: unit
-assignees: ""
----
+<!-- The reference copy of the unit issue contract. The issue form (`unit.yml`) is what the
+     new-issue page offers; this file keeps the contract readable in the repository and is not a
+     second chooser entry (it carries no template frontmatter on purpose, #780 P1).
 
-<!-- Choose exactly one state label at creation: status:ready | status:blocked | status:needs-human.
+     Choose exactly one state label at creation: status:ready | status:blocked | status:needs-human.
      The template deliberately does not default to ready. Contract: docs/plans/03-DELIVERY.md
      § "Issue content contract". -->
 

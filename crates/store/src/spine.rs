@@ -1820,13 +1820,16 @@ pub async fn update_tranche_tx(
             let change_ref = patch
                 .change_ref
                 .ok_or(PlanStoreError::Illegal(PlanError::RebaselineRequiresChange))?;
-            let approved: bool = sqlx::query_scalar(
+            // The approval is the change gate's decision, never the register row's own
+            // status: a `portfolio:write` caller can write any status string, so reading
+            // `r.status` here would let a self-declared approval move a baseline.
+            let in_programme: bool = sqlx::query_scalar(
                 "SELECT EXISTS (
                     SELECT 1
                       FROM project_register_item r
                       JOIN project p ON p.tenant_id = r.tenant_id AND p.id = r.project_id
                      WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'change'
-                       AND r.status = 'approved' AND p.programme_id = $3
+                       AND p.programme_id = $3
                  )",
             )
             .bind(tenant.as_uuid())
@@ -1834,6 +1837,8 @@ pub async fn update_tranche_tx(
             .bind(current.programme_id)
             .fetch_one(&mut *conn)
             .await?;
+            let approved =
+                in_programme && change_is_approved_tx(&mut *conn, tenant, change_ref, None).await?;
             if !approved {
                 return Err(PlanStoreError::Illegal(PlanError::ChangeNotApproved));
             }

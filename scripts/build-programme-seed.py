@@ -133,6 +133,14 @@ CROSS_CUTTING = {
         # cutover and #102 the CI action pinning.
         "issues": [17, 22, 43, 44, 45, 46, 55, 57, 71, 93, 95, 102],
     },
+    "GEMBA-WALK": {
+        "name": "The Gemba Walk — a separate game-style client",
+        "plan": "docs/plans/GEMBA-WALK.md",
+        "track": "programme",
+        # #792 is the inception unit: the MSP/TOGAF/SAFe set, the registration and the live
+        # publication. The build issues G0/S1–S4 are created after that gate and carry the label.
+        "issues": [792],
+    },
 }
 
 # The output standard is data, not constants: `seed/output-standard.json` owns the vocabulary

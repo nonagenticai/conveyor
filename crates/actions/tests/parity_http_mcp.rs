@@ -4762,6 +4762,9 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             );
             expecting(sample, 200)
         },
+        // The tenant's units, newest first; every filter is optional, so the sample passes a
+        // bound only. A read, so nothing is prepared and the body is compared as served.
+        plain("development_projects.list", json!({"limit": 10}), None),
         {
             // The first step has no predecessor, so this is a real write on both transports.
             let mut sample = plain("development_projects.record_step", json!({}), None);

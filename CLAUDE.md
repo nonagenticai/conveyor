@@ -21,17 +21,38 @@ Read, in order: `docs/SPEC.md` → `docs/plans/00-INDEX.md` → `docs/plans/03-D
 - Stopping before merge? Write the `<!-- handoff -->` comment from `03-DELIVERY.md`. Never end
   on a verbal status.
 
+## Services outside this repository
+
+`lean4-prover` is **not** a crate here: its source of record is `nonagenticai/lean4-prover`
+(public), and the deployed image is built by that repository's CI and published to ghcr. The
+`scientific` app is an HTTP client only. Do not re-add a copy of the prover crate — a merge in
+this repository does not reach the cluster (conveyor#803).
+
 ## Roles — load the skill for the work
 
 | Work | Skill |
 |---|---|
-| Tranche review, programme register, baselines, #302/#303 | `programme-manager` |
+| Tranche review, tranche baselines, #302/#303 | `programme-manager` |
+| Programme office: registers, change control, assurance calendar, unit protocol | `pmo-lead` |
 | Architecture contracts, ADM phase/plateau, compliance, waiver, #395 | `programme-architect` |
+| Delivery-level design, analysis/architecture inception, contract request | `solution-architect` |
 | Benefit profiles, baselines, transitions, realization | `benefits-manager` |
 | Project brief and analysis/architecture inception | `business-analyst` |
+| Project charter, WBS, baseline, gates, closure | `project-manager` |
+| Output authoring, artefact standard, standards publication | `standards-author` |
 | Standards fixpoint, closure evidence, independent acceptance | `quality-manager` |
 | Release receipt, deployed identity, cutover, live probe | `release-manager` |
+| Incident, runbook, mitigation, postmortem | `operations` |
+| Flow protection: blocked cards, triage, remedy, escalation | `kanban-coach` |
+| Systemic improvement: the six Gets, instrument, measurement, adoption | `kata` |
 | Queue truth, claim, issue body, PR mechanics | `issue-pickup`, `issue-sweep`, `issue-create`, `issue-deliver` |
+| Charter, advance, gate and close a delivery unit as a `development_project` row | `delivery-unit` |
+| Reconcile issue/PR/CI facts into the unit record; never invent the live digest | `programme-sync` |
+
+A delivery is one issue, one lane and one unit row: `delivery-unit` owns the row,
+`issue-deliver` owns the git/PR mechanics inside it, and `programme-sync` repairs the row from
+GitHub facts. A step GitHub does not carry (the deployed digest, `/health`, the acceptance exit)
+is `release-manager`'s; it is never invented.
 
 **Separation of duties.** The role that builds a gate's subject never certifies it: the builder
 hands a live or end-to-end part to a fresh verifier; the architect's own contract is approved by

@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — the Gemba Walk client · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--the-gemba-walk-client">GEMBA-WALK — the Gemba Walk client</h1>
+<p>Owner direction: 2026-11-26 · ADR: <code>docs/decisions/0021-gemba-walk-client.md</code> (<strong>Accepted</strong> 2026-11-26 as a delegated rule decision) · Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> · Procedural set: <code>docs/plans/inception/GEMBA-WALK/</code> · Baseline measured at <code>main@d958824f8</code> and re-verified at <code>main@0d6db794b</code> (counts unchanged) and <code>main@cedd84980</code> on 2026-11-26.</p>
+<p>This plan is deliberately <strong>not</strong> a SPEC_V2 §12 <code>T##</code> slice. The programme-seed generator parses only <code>docs/plans/slices/S*.md</code> and <code>**(T##)**</code> rows in §12, so a T-row would silently change <code>seed/programme.json</code> and fail <code>build-programme-seed.py --check</code>. The walk is registered as a cross-cutting project in <code>docs/plans/00-INDEX.md</code>; the inception unit (#792) publishes the MSP/TOGAF/SAFe set and registers the project, and the build issues G0/S1–S4 are created after the publication gate.</p>
+<h2 id="1-objective-and-gate">1. Objective and gate</h2>
+<p>Build a second, game-style client of the conveyor at <code>/walk/</code> with <strong>all features and all functionality</strong> — every read and every write through the existing registry — and measure it well enough that the owner can decide whether it becomes the primary UI.</p>
+<p><strong>Gate (P6):</strong> every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip with the correct headers; the parity instrument is green with no expired exemption; accessibility and performance budgets are met; the owner signs the primacy decision. Until then <code>apps/web</code> is normative.</p>
+<h2 id="2-starting-state-measured-not-assumed">2. Starting state (measured, not assumed)</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>State</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operator UI</td>
+<td>Leptos CSR/WASM; <strong>52</strong> route patterns, <strong>43</strong> screen modules, <strong>46</strong> Playwright specs</td>
+<td><code>apps/web/src/app.rs</code>, <code>apps/web/src/screens/</code>, <code>apps/web/e2e/</code></td>
+</tr>
+<tr>
+<td>Backend contract</td>
+<td><strong>597</strong> registered actions; manifest, <code>actions.describe</code> (input/output JSON Schema, effect, confirm, tenancy, spec_hash), invocation envelope, RFC 9457 problems, <code>next_cursor</code>, SSE</td>
+<td><code>docs/design/data/actions.json</code>, <code>apps/web/src/api.rs</code>, <code>crates/actions/src/views.rs</code></td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>auth-code + PKCE S256, token in memory, verifier in <code>sessionStorage</code>; dev cookie; <code>/config.json</code></td>
+<td><code>apps/web/src/auth.rs</code>, <code>apps/web/public/config.json</code></td>
+</tr>
+<tr>
+<td>Serving</td>
+<td>any directory with <code>index.html</code> is a static sub-site; design pack copied to <code>/out/site/design</code>; <code>/walk/&lt;deep-path&gt;</code> currently falls through to the operator <code>index.html</code></td>
+<td><code>crates/api/src/web.rs</code>, <code>Dockerfile:86-93</code></td>
+</tr>
+<tr>
+<td>Walk client</td>
+<td><strong>absent</strong>: no <code>/walk</code>, no <code>apps/walk</code>, zero mentions of gemba or walk in the tree</td>
+<td><code>grep -rni 'gemba|/walk'</code> at the baseline</td>
+</tr>
+<tr>
+<td>The mock</td>
+<td>a local single-file artefact only; no auth, no registry, programme state in <code>localStorage</code>, embeds a 4.7 MB gzip copy of the design pack</td>
+<td>owner's local file; not a repository input</td>
+</tr>
+<tr>
+<td>Governance</td>
+<td>ADR 0013/D64 say the app is the UI and reject a second frontend; ADR 0021 supersedes them <strong>in part</strong> for this client</td>
+<td><code>docs/decisions/0013-real-v2-ui.md</code>, <code>docs/SPEC_V2.md</code> §10.5.10, D64</td>
+</tr>
+</tbody>
+</table>
+<p>The baseline counts are frozen by W0 into <code>docs/evidence/walk-census.json</code>. The gate is compared to that census, not to a live manifest, so a later slice adding actions cannot make it unpassable; a re-baseline is a signed commit that states what changed.</p>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — a static client at <code>/walk/</code>; route parity with every <code>apps/web</code> path; the seven wings and the destination rooms; the full read and write contract; seats as view presets; the DOM sheet system; the schema-driven action sheet; the world port and the engine decision; the parity instrument and its evidence; per-destination Playwright specs; accessibility and performance budgets; deployment and the scoped deep-link fallback; the primacy runbook.</p>
+<p><strong>OUT</strong> — any new table, action, event, port or backend read model; a second decision store; a replacement for <code>/design/</code>; native mobile; chat/audio/video; customer care (D48); SSR; a public unauthenticated mode in v1; pixel parity with the mock; deleting <code>apps/web</code> before the gate.</p>
+<p><strong>"All functionality" is defined as</strong>: every §10.5 destination and every retained V1 route has a walk route and a spec; every manifest action is reachable and form-renderable; every destination's primary write flow is exercised end to end; every gate the server enforces is surfaced, never pre-empted. It is not defined as pixel or copy parity with either existing client.</p>
+<h2 id="4-relationship-to-the-programme">4. Relationship to the programme</h2>
+<ul>
+<li>Not a §12 <code>T##</code> slice. The inception unit (#792) registers the project and publishes the inception set before any build issue is created; the registration is a reviewable data change through <code>scripts/build-programme-seed.py</code> and <code>seed/programme-definition.json</code>, never a hand-edit of <code>seed/programme.json</code> or <code>docs/design/data/issues.json</code> (see §8.1).</li>
+<li>The V2 coverage instrument (D65, <code>scripts/build-v2-coverage.py</code>) continues to measure <code>apps/web</code> and is not touched. The walk's evidence is <code>docs/evidence/walk-coverage.json</code>.</li>
+<li>The design pack (<code>/design/</code>) keeps its public role and is not rebuilt or embedded.</li>
+</ul>
+<h2 id="5-architecture-decisions-normative-detail-in-the-spec">5. Architecture decisions (normative; detail in the spec)</h2>
+<ol type="1">
+<li>Static sub-site at <code>/walk/</code>, same image and origin, no new port.</li>
+<li>Route parity by construction: walk path = <code>/walk</code> + app path; <code>/walk/</code> is the entrance.</li>
+<li>Full functionality through the existing contract; no backend surface.</li>
+<li>DOM sheets own all work; the world is navigation and state display only.</li>
+<li>Seats are view presets; the manifest and server scopes own authority.</li>
+<li>No fixtures; no client-side programme store; no published snapshot as the app's source.</li>
+<li><code>WorldView</code> port; the simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022); the renderer — canvas-2D baseline against WebGL2 — is decided by the P0 spike in ADR 0023.</li>
+<li>Clean URLs with a scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> (GET/HEAD, non-asset paths) and a Rust test; without it a deep link renders the operator app.</li>
+<li>Schema-driven action sheet so no action is unreachable; unsupported schema falls back to a labelled JSON editor.</li>
+<li>Parity is measured by a frozen census and per-destination specs, never by prose.</li>
+</ol>
+<h2 id="6-the-parity-model-and-instrument">6. The parity model and instrument</h2>
+<p><code>scripts/build-walk-coverage.py</code> (W0) is the only measure of walk parity. It must be able to run in CI with no server and no database.</p>
+<p><strong>Inputs</strong></p>
+<p>The frozen census <code>docs/evidence/walk-census.json</code> is written once at W0 and re-baselined only by a signed commit:</p>
+<pre class="json"><code>{
+  &quot;baseline&quot;: {&quot;date&quot;: &quot;YYYY-MM-DD&quot;, &quot;git_sha&quot;: &quot;&lt;40 hex&gt;&quot;},
+  &quot;routes&quot;: [{&quot;pattern&quot;: &quot;/boards&quot;, &quot;view&quot;: &quot;BoardIndex&quot;, &quot;spec&quot;: &quot;v1/board.spec.ts&quot;}],
+  &quot;actions&quot;: [{&quot;name&quot;: &quot;cards.move&quot;, &quot;kind&quot;: &quot;internal&quot;, &quot;scopes&quot;: [&quot;cards:write&quot;],
+               &quot;effect&quot;: &quot;write&quot;, &quot;confirm&quot;: &quot;none&quot;, &quot;tenancy&quot;: &quot;tenant&quot;,
+               &quot;idempotent&quot;: true}],
+  &quot;counts&quot;: {&quot;routes&quot;: 52, &quot;actions&quot;: 597}
+}</code></pre>
+<p>The census is built from:</p>
+<ul>
+<li>route patterns and views — <code>scripts/build-v2-coverage.py:app_routes()</code> and <code>app_route_views()</code> (its <code>ROUTE</code> regex, line 42), the same parser the V2 record uses;</li>
+<li>action names, scopes, kind, effect, confirm, tenancy and idempotence — parsed from the <code>#[action(...)]</code> attributes under <code>crates/actions/src/**/*.rs</code>; the parsed names are cross-checked against the 597 names in <code>docs/design/data/actions.json</code>, so a parse miss fails the build instead of shrinking the census;</li>
+<li><code>apps/walk/src/router/routes/{core,portfolio-organisation,procedures-governance,measure-operations-utilities,v1}.js</code> — one row per surface (walk path, app path, room, spec file), composed by <code>apps/walk/src/router/registry.js</code>. One route file per delivery sibling; a sibling never edits another's file;</li>
+<li><code>apps/walk/e2e/&lt;wing&gt;/*.spec.ts</code>.</li>
+</ul>
+<p>The census holds no live manifest and no server state.</p>
+<p><strong>Per-action states</strong> (each machine-checkable):</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reachable</code></td>
+<td>the action name is in the census and the walk's action sheet can route to it</td>
+</tr>
+<tr>
+<td><code>schema-rendered</code></td>
+<td><code>actions.describe</code>'s input schema produces a form or the documented JSON fallback</td>
+</tr>
+<tr>
+<td><code>write-roundtrip</code></td>
+<td>a named destination flow invokes the action in dev and refetches its read model</td>
+</tr>
+<tr>
+<td><code>approval-tested</code></td>
+<td>a destructive action without its approval is refused and the refusal is shown</td>
+</tr>
+<tr>
+<td><code>sse-updated</code></td>
+<td>a subscribed screen reflects the topic (where the topic exists)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Per-destination states</strong> — <code>absent</code>, <code>read</code>, <code>write</code>, <code>verified</code>, with the spec path and the last green run. <code>verified</code> requires all four states plus the Playwright spec.</p>
+<p><strong>Behavioural parity</strong> — for each named flow, the same scripted task runs against <code>apps/web</code> and <code>/walk/</code> in dev; the harness captures the <code>POST /api/actions/{name}/invocations</code> trace (names, status, order) and compares it. Pixels are not compared.</p>
+<p><strong>Exemptions</strong> — a separate signed record, <code>docs/evidence/walk-exemptions.json</code>, holding <code>{surface, reason, signer, expires}</code>; an expired exemption fails the gate. The owner or the plan's named maintainer signs; the default expiry is 30 days.</p>
+<p><strong>Output and check</strong> — <code>docs/evidence/walk-coverage.json</code>, emitted by <code>python3 scripts/build-walk-coverage.py</code>; <code>--check</code> exits non-zero when a census route has no registry row, a census action lacks <code>reachable</code> or <code>schema-rendered</code>, a destination lacks its spec, or an exemption is expired. The check runs in the walk workflow and in <code>web.yml</code> (or its successor) once the walk app is on <code>main</code>; it needs no server, database or network.</p>
+<h2 id="7-stages-and-exit-gates">7. Stages and exit gates</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Work</th>
+<th>Exit gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0</strong></td>
+<td>Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike</td>
+<td>The spike proves PKCE redirect to <code>/walk/</code> on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D against WebGL2 for the renderer and ADR 0023 records the winner and budgets (the simulation is <code>bevy_ecs</code> in <code>crates/walk-world</code>, ADR 0022). The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
+</tr>
+<tr>
+<td><strong>P1</strong></td>
+<td>Foundation + Portfolio end-to-end</td>
+<td>Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room <code>portfolio</code> read + <strong>one real write</strong>, deep link and back/forward, dev server, Dockerfile copy, <code>web.rs</code> fallback + test, spec green</td>
+</tr>
+<tr>
+<td><strong>P2</strong></td>
+<td>Read parity across §10.5</td>
+<td>Every destination renders its reads with loading/empty/partial/error/denied and the honest gate; each has its spec</td>
+</tr>
+<tr>
+<td><strong>P3</strong></td>
+<td>Write parity + gates</td>
+<td>Every destination's writes go through the action sheet with <code>If-Match</code>/<code>Idempotency-Key</code>/approval, refusals shown verbatim, no optimistic mutation</td>
+</tr>
+<tr>
+<td><strong>P4</strong></td>
+<td>Retained V1 surfaces</td>
+<td>All 52 route patterns have a walk route; the V1 families have reads and their writes; specs</td>
+</tr>
+<tr>
+<td><strong>P5</strong></td>
+<td>Slice-dependent surfaces</td>
+<td>Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror <code>apps/web</code>'s state; S4 audits every gate, and a gate flips to live only when the owning slice does — as a follow-on issue on the sibling that owns the destination, never as an S4 edit</td>
+</tr>
+<tr>
+<td><strong>P6</strong></td>
+<td>Parity gate + primacy runbook</td>
+<td>Instrument green; a11y/perf met; owner sign-off; if yes, old-route redirect map, <code>apps/web</code> freeze, stabilisation period, retirement; if no, the walk stays an alternative client</td>
+</tr>
+</tbody>
+</table>
+<p><strong>External prerequisites.</strong> The <code>/walk/</code> OIDC redirect-URI registration is an external change: the parent issue records it in Dependencies as an external <code>acceptance-blocked-by</code> with the owner as the actor, not as a <code>status:needs-human</code> label (that label would freeze all construction). The dev cookie (<code>/__dev/login</code>) and the dev origin's redirect URI unblock the spike; the walk never waits on the registration to build.</p>
+<p><strong>Rust builds.</strong> No local cargo: the wasm compile, lint and tests run on GitHub-hosted preflight/CI, and the issue records the run id; the PR opens only after that verdict, per the repository's <code>CLAUDE.md</code>. The spike's throwaway workflow is deleted with the spike.</p>
+<h2 id="8-delivery-model-and-the-issue-split">8. Delivery model and the issue split</h2>
+<p><strong>The repository rule.</strong> <code>docs/plans/03-DELIVERY.md</code> is the authority: one plan = one issue = one branch = exactly one PR by default; a plan may be split into at most <strong>five</strong> file-disjoint siblings only with the written exception, and <code>lane/</code> branches are retired. The exception below is approved.</p>
+<p><strong>Approved exception (2026-11-26) — one parent + four siblings (5 total).</strong> Approved as the written exception by the build's rule approver under the published delegation; the inception unit (#792) is the P0 §5 definition step, not a sixth split. The walk is multi-session by shape (43 screens, 597 actions), so the parent keeps the dependency-bearing foundation and the siblings own disjoint destination wings:</p>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Contains</th>
+<th>Files it owns</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Parent G0</strong></td>
+<td>W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue</td>
+<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code>, the initial <code>docs/evidence/walk-coverage.json</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/api/src/web.rs</code>, <code>Dockerfile</code>, the walk workflow</td>
+<td>P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs</td>
+</tr>
+<tr>
+<td><strong>S1</strong></td>
+<td>W3/W4 for Portfolio &amp; plan (except <code>portfolio.*</code>) + Organisation</td>
+<td><code>src/destinations/{programme,plan,validation,execution,decisions,runs,meetings,organisation,jobs,agents,tools,project-types}.js</code>, <code>src/router/routes/portfolio-organisation.js</code>, <code>e2e/portfolio-organisation/**</code></td>
+<td>Every owned destination <code>read</code> and <code>write</code>; specs assert empty/error/happy/refusal/write; instrument green for its rows</td>
+</tr>
+<tr>
+<td><strong>S2</strong></td>
+<td>W3/W4 for Procedures &amp; authoring + Govern &amp; design</td>
+<td><code>src/destinations/{procedures,processes,process-map,authoring,adm,architecture,requirements,models,copilot}.js</code>, <code>src/router/routes/procedures-governance.js</code>, <code>e2e/procedures-governance/**</code></td>
+<td>Same</td>
+</tr>
+<tr>
+<td><strong>S3</strong></td>
+<td>W3/W4 for Knowledge + Measure &amp; improve + Operations + Utilities</td>
+<td><code>src/destinations/{knowledge,improve,evals,benchmarks,usage,prompt-audit,metering,operations,search,platform,settings,approvals}.js</code>, <code>src/router/routes/measure-operations-utilities.js</code>, <code>e2e/measure-operations-utilities/**</code></td>
+<td>Same</td>
+</tr>
+<tr>
+<td><strong>S4</strong></td>
+<td>W5 retained V1, W6 slice-gate audit, W7 P6 gate + primacy, W8 hardening</td>
+<td><code>src/destinations/v1/**</code>, <code>src/router/routes/v1.js</code>, <code>e2e/v1/**</code>, the regenerated <code>docs/evidence/walk-coverage.json</code>, the P6 runbook and redirect map</td>
+<td>All 52 routes; every slice gate matches <code>apps/web</code>; P6 gate; a11y/perf; owner sign-off</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dependencies.</strong> The parent <code>blocks</code> S1–S4. S1–S3 are parallel and file-disjoint. S4 is <code>blocked-by</code> S1–S3. The parent creates all five route files as empty row lists, so a sibling fills only its own file and the duplicate-PR guard (<code>block-duplicate-pr.py</code>) never sees overlapping edits.</p>
+<p><strong>Work-package map.</strong> W0–W2 are parts of the parent; W3–W4 are the destination work distributed across S1–S3 by wing; W5–W8 are S4. The stage table in §7 stays the content order; the split is by file ownership, not by read/write phase, because a destination module owns both its reads and its writes — splitting reads from writes would make the two issues touch the same files. Where a retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its <code>src/destinations/v1/**</code> holds only V1 surfaces with no owning destination module. W6 is an audit: a slice landing is a follow-on issue on the sibling that owns the destination, not an S4 edit, so the four wings stay file-disjoint.</p>
+<p><strong>Generated record.</strong> <code>docs/evidence/walk-coverage.json</code> is emitted by the instrument, never hand-edited; each issue that changes coverage regenerates and commits it. It is the only shared generated artifact in the split, and a generated-file overlap alone does not merge two siblings' work; every hand-edited file stays disjoint.</p>
+<p><strong>Shared seams.</strong> <code>src/api/manifest.js</code>, <code>src/shell/sheet-host.js</code>, <code>src/world/port.js</code>, <code>src/forms/**</code> and <code>src/a11y/**</code> are parent-owned; siblings consume them and do not edit them. A sibling that needs a seam change stops and asks the parent's owner rather than forking the contract.</p>
+<p><strong>If the split is withdrawn</strong> by change control, the whole plan is one issue (<code>GEMBA-WALK</code>), the stages are commits on one <code>issue/&lt;n&gt;-gemba-walk</code> branch, and the P6 gate closes the same PR. The plan states both paths so no session has to improvise.</p>
+<h3 id="81-inception-and-build-runbook">8.1 Inception and build runbook</h3>
+<ol type="1">
+<li><strong>Precondition — done.</strong> ADR 0021 is Accepted (2026-11-26, delegated rule decision) and this docs unit (#792) carries the inception set. The set is published on the project by #792 before any build issue is claimed: P0 §5 makes an unpublished inception a hard gate, not a waiver.</li>
+<li><strong>The inception unit (#792) registers the project</strong> (a reviewable data change, not prose):
+<ul>
+<li>add <code>GEMBA-WALK</code> to <code>CROSS_CUTTING</code> in <code>scripts/build-programme-seed.py</code> (name, plan path, <code>track: "programme"</code>, the inception issue number) and to <code>seed/programme-definition.json</code> under <code>projects</code> with <code>{"adm_phase": "Preliminary", "plateau": "definition"}</code>;</li>
+<li>run <code>python3 scripts/build-programme-seed.py</code>, <code>scripts/build-coverage.py</code>, <code>scripts/check-programme-definition.py</code>, <code>scripts/programme_state.py --check</code>; fetch the issue registry in-branch and run <code>node docs/design/scripts/check-coverage.cjs</code> — an unknown unit here is the early failure. Never hand-edit <code>docs/design/data/issues.json</code> — <code>.github/workflows/issue-registry.yml</code> owns it.</li>
+<li>the <code>CROSS_CUTTING</code> convention puts the project in tranche 0; the issue's Programme field says <code>Tranche 0 (cross-cutting)</code>.</li>
+</ul></li>
+<li><strong>Publish the inception set</strong> on the project (<code>documents.compose</code> → <code>documents.publish</code>), verify the bodies hash-equal to <code>docs/plans/inception/GEMBA-WALK/</code>, create the 10 typed artefact rows, and record the Phase-A SoAW through the Board with a distinct approver. Publish the benefit profile with the baseline <code>unmeasured</code>. This is the gate before step 4.</li>
+<li><strong>Create G0 and S1–S4 after publication.</strong> Create them from <code>.github/ISSUE_TEMPLATE/unit.md</code> with the <code>GEMBA-WALK</code> label; do not create them before <code>CROSS_CUTTING</code> is on <code>main</code> (the registry would map them to PLATFORM). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the published <code>project-brief</code> + ADR 0021 + this plan; ADM <code>Preliminary</code>/<code>definition</code>; Benefits B-WALK-1 (enabling). Parts W0/W1/W2, each with a BDD <code>Verify:</code>; dependencies as in §8; the OIDC registration as an external <code>acceptance-blocked-by</code>.</li>
+<li><strong>G0's W0 freezes the census and builds the instrument</strong> exactly as §6. Commit <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code> and <code>scripts/build-walk-coverage.py</code>. Acceptance: the script reproduces 52 routes and 597 actions; <code>--check</code> returns non-zero for a missing registry row, an unreachable action, a missing spec and an expired exemption; it runs with no server or database.</li>
+<li><strong>Record the spike and the engine ADR</strong> (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).</li>
+</ol>
+<h2 id="9-parity-matrix-initial-state-at-the-baseline">9. Parity matrix (initial state at the baseline)</h2>
+<p>Every row starts <code>absent</code>. A row reaches <code>verified</code> only through §6.</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Walk route</th>
+<th>Read</th>
+<th>Write</th>
+<th>Spec</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organisation</td>
+<td><code>/walk/organisation</code> (+ <code>/walk/jobs</code>, <code>/walk/agents</code>, <code>/walk/tools</code>, <code>/walk/project-types</code>)</td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>organisation.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Procedures</td>
+<td><code>/walk/procedures</code> (+ <code>/walk/build/processes</code>, <code>/walk/build/process-map</code>)</td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>procedures.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Authoring</td>
+<td><code>/walk/authoring</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>authoring.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Portfolio</td>
+<td><code>/walk/portfolio</code>, <code>/walk/portfolio/:programme_id</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>portfolio.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Meetings</td>
+<td><code>/walk/meetings</code>, <code>/walk/meetings/:id</code></td>
+<td>T19</td>
+<td>T19</td>
+<td><code>meetings.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Programme</td>
+<td><code>/walk/programme</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>programme.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Architecture (ADM)</td>
+<td><code>/walk/design/adm</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>adm.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Plan</td>
+<td><code>/walk/plan</code> (+ <code>/walk/board/:board_id</code>)</td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>plan.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Improve</td>
+<td><code>/walk/improve</code>, <code>/walk/evals/*</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>improve.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td><code>/walk/operations</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>operations.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Tools</td>
+<td><code>/walk/tools</code></td>
+<td>§10.5</td>
+<td>§10.5</td>
+<td><code>tools.spec.ts</code></td>
+<td>absent</td>
+</tr>
+<tr>
+<td>V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform)</td>
+<td><code>/walk</code> + app path</td>
+<td>literal GETs</td>
+<td>actions</td>
+<td>the matching <code>apps/web</code> spec</td>
+<td>absent</td>
+</tr>
+<tr>
+<td>Utilities (palette, sign-in, tenant switch, theme)</td>
+<td><code>/walk/</code></td>
+<td><code>/api/me</code>, config</td>
+<td>none</td>
+<td><code>shell</code>/<code>shell-login</code></td>
+<td>absent</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-risks">10. Risks</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>597 actions and 52 routes is a multi-tranche build</td>
+<td>schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible</td>
+</tr>
+<tr>
+<td>A second shell/auth/test harness drifts from the app</td>
+<td>one contract, one census, behavioural trace parity on named flows, per-destination specs; a change to a contract updates both</td>
+</tr>
+<tr>
+<td>Bevy on the web: bundle, startup, WebGL2/WebGPU, limited text/table widgets</td>
+<td>P0 measures against the canvas baseline; the port keeps the engine replaceable; the baseline is never deleted</td>
+</tr>
+<tr>
+<td>No local Rust builds (owner rule) slows the Bevy loop</td>
+<td>all wasm builds on GitHub-hosted CI; the baseline needs no Rust; the spike is CI-first</td>
+</tr>
+<tr>
+<td>Deep links today fall through to the operator app</td>
+<td>the scoped <code>web.rs</code> fallback plus a Rust test lands in P1, before any link is published</td>
+</tr>
+<tr>
+<td>OIDC redirect URI is an external change</td>
+<td>P0 proves it; if the operator refuses, register a dedicated public client and serve its id to the walk</td>
+</tr>
+<tr>
+<td>Two clients make the coverage record ambiguous</td>
+<td>D67 and §10.5.11 keep D65 measuring <code>apps/web</code>; the walk has its own record and gate</td>
+</tr>
+<tr>
+<td>Scope creep into a second backend</td>
+<td>the Do-Not list in the spec; any need for new surface is a stop-and-escalate, not an action</td>
+</tr>
+<tr>
+<td>The mock's fixtures or embedded pack leak into the client</td>
+<td>explicit Do-Not; no <code>localStorage</code> programme state; a test asserts no snapshot URL is fetched by a signed-in walk</td>
+</tr>
+<tr>
+<td>Accessibility regresses under a game UI</td>
+<td>DOM-only work surfaces; keyboard-only spec; canvas is decorative and duplicated by the map</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-verification-and-definition-of-done">11. Verification and definition of done</h2>
+<p><strong>Per issue</strong> — the issue's own parts and acceptance criteria, its Playwright spec(s), the parity instrument's rows, and a contract test for each write (headers, refusal, refetch). An issue is not done because the screen renders; it is done when the state, the write and the refusal are proven.</p>
+<p><strong>Unit and type</strong> — <code>node --test apps/walk/src</code> and <code>tsc --noEmit</code> (JSDoc) pass; pure modules only.</p>
+<p><strong>Browser</strong> — <code>npx playwright test -c apps/walk/playwright.config.ts</code> with the dev server; every spec asserts empty, error, happy and one refusal or write; auth and deep-link gates included.</p>
+<p><strong>Parity</strong> — <code>python3 scripts/build-walk-coverage.py --check</code> exits 0; the record is committed; an expired exemption fails.</p>
+<p><strong>Accessibility</strong> — keyboard-only navigation of every wing; focus return; contrast from computed styles; 200% zoom and 390 px width with no horizontal scroll.</p>
+<p><strong>Performance</strong> — the §9 budgets; a 5-minute soak; the engine protocol recorded for ADR 0022.</p>
+<p><strong>Docs</strong> — <code>python3 docs/design/scripts/build-docs.py</code> and <code>node docs/design/scripts/check-docs.cjs</code> pass whenever a Markdown file changes.</p>
+<p><strong>DoD for the project</strong> — the P6 gate, not "the UI looks finished". Until P6 the plan's matrix is the truth and <code>apps/web</code> remains normative.</p>
+<h2 id="12-session-guide">12. Session guide</h2>
+<p><strong>Read order</strong> — <code>CLAUDE.md</code> → <code>docs/SPEC.md</code> → <code>docs/plans/00-INDEX.md</code> → <code>docs/plans/03-DELIVERY.md</code> → <code>docs/decisions/0021-gemba-walk-client.md</code> → <code>docs/plans/inception/GEMBA-WALK/README.md</code> (the MSP/TOGAF/SAFe set) → <code>docs/design/GEMBA-WALK-SPEC.md</code> → this plan → SPEC_V2 §10.5 (the destination contracts) → <code>apps/web/src/api.rs</code> and <code>apps/web/src/auth.rs</code> (the client contract) → the owning slice's plan for the destination.</p>
+<p><strong>Commands</strong> (available once W2 lands) —</p>
+<pre><code>node apps/walk/dev-server.mjs                       # :8932, proxies /api to :8930
+npx playwright test -c apps/walk/playwright.config.ts
+node --test apps/walk/src
+npx tsc -p apps/walk --noEmit
+python3 scripts/build-walk-coverage.py --check
+python3 docs/design/scripts/build-docs.py &amp;&amp; node docs/design/scripts/check-docs.cjs</code></pre>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Claim the issue first (<code>issue-pickup</code>); no issue → no branch → no work. Work in <code>.worktrees/issue-&lt;n&gt;</code>, branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code>, one PR with <code>Closes #&lt;n&gt;</code>. Slices are commits on that branch; they never get their own PR. <code>lane/</code> branches and the global lane protocol do not apply in this repository.</li>
+<li>The parent issue's five-sibling split is the only permitted split; a sibling that wants a sixth issue stops and asks the owner.</li>
+<li>No Rust compilation on local hardware; the compile/lint verdict is the repository's GitHub-hosted preflight, and the PR's CI is the final gate. Record the run id on the issue.</li>
+<li>No new table, action, event, port or decision store; if the walk seems to need one, stop and escalate — the answer is a contract-faithful screen, not a backend change.</li>
+<li>The engine ADR (0022) precedes any Bevy code beyond the spike; until then the canvas baseline is the implementation.</li>
+<li>Contract tests per issue: manifest gating, headers, refusal, refetch.</li>
+<li>The Do-Not list in the spec is the review checklist for every PR.</li>
+</ul>
+<h2 id="13-non-goals">13. Non-goals</h2>
+<p>A second backend or decision store; SSR; a native mobile app; chat/AV; customer care; replacing the design pack; a public unauthenticated v1; pixel parity with the mock; retiring <code>apps/web</code> before the P6 gate; adding a SPEC_V2 §12 <code>T##</code> row. The only seed change is the sanctioned GEMBA-WALK registration in the inception unit (#792); no other project's row moves.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/GEMBA-WALK.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

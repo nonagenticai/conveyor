@@ -345,7 +345,7 @@ fn targets(files: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, Vec<u8>> {
 ///
 /// `conformance.json` and `conformance.md` are deliberately absent: only
 /// `scripts/publish-data.sh` writes them, so the app publisher must never delete them.
-const GENERATED_DATA: [&str; 15] = [
+const GENERATED_DATA: [&str; 17] = [
     "programme.json",
     "organisation.json",
     "config.json",
@@ -359,6 +359,8 @@ const GENERATED_DATA: [&str; 15] = [
     "evidence.json",
     "feedback.json",
     "rework.json",
+    "register.json",
+    "register.js",
     "snapshot.js",
     "manifest.json",
 ];

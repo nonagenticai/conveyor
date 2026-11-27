@@ -1472,6 +1472,19 @@ No SSR, no second router, no mobile application, no design tool and no retiremen
 pack. A PR does not invent a live tenant row; the app does not add a table or an action of its own.
 Where a backend capability is absent the destination says so and waits, typed, on its owning slice.
 
+#### 10.5.11 The Walk client
+
+A second client, the **Gemba Walk**, is authorised as a candidate primary UI (D67): a static
+application served at `/walk/` from the same image and origin, reading and writing only through the
+literal `GET` routes and the action registry this section defines. It adds no table, action, event or
+port; it renders the same honest states and the same **not yet live** gate, and it renders no
+fixture. It is not a §10.5 destination and is not measured by the V2 coverage record (D65); its
+parity is measured by `scripts/build-walk-coverage.py` and recorded in
+`docs/evidence/walk-coverage.json`, specified by `docs/design/GEMBA-WALK-SPEC.md` and
+`docs/plans/GEMBA-WALK.md`. `apps/web` remains the normative UI until the owner accepts the parity
+gate; only then may the walk become primary and the app be frozen and retired. The world-renderer
+choice is ADR 0022.
+
 ### 10.6 Deployment and scale
 
 - Same binary, same Postgres, same namespace, **no new port** (8930). New tables/actions only.
@@ -1877,6 +1890,7 @@ decision forum.
 | **D64** | **The real UI is the app; the pack is the public site and the reference** | Every V2 destination is a route in `apps/web` — Leptos CSR in the same binary on port 8930 — not a page in the design pack. The pack stays the public programme site at `/design/` and the reviewed design reference; a mock page is evidence of intent, never of implementation. Production screens read live rows and write only through registered actions; no fixture data ships. The V1 routes stand and the V2 destinations are added around them (proposed 2026-11-22, from the real-UI review) |
 | **D65** | **Measure the real routes, not the mock** | The V2 coverage instrument (`scripts/build-v2-coverage.py`) resolves each §10.5 destination against `apps/web/src/app.rs` and its named Playwright spec. `exists` requires the real route **and** the spec; a V1 ancestor route may justify `extend`, never `exists`; the mock's page is cited as design reference only. A destination's verdict is therefore independent of the pack's page registry (proposed 2026-11-22, from the real-UI review) |
 | **D66** | **Meetings are the decision forum** | Much of the organisation's high-level work — programme management, architecture, analysis, project management — is done in meetings between positions from different departments, and those meetings make the decisions. V2 models a meeting as a **card** (never a fifth unit and never a chat) whose agenda items resolve existing `approval` rows; `meeting_type` policy rows declare `agenda_sources[]`, required cross-department participation, quorum, the decision rule (`unanimous \| majority \| chair`), the evidence minimum, the decision window and the closed outcome set (`decision \| commitment \| action \| information \| deferred`); participants are `job_binding`s or humans with a typed position per item; each qualifying seat writes one `approval_decision` row (`via='meeting'`) on the linked approval, the item outcome derives from those rows by the type's rule, and the stricter of the meeting's rule and the approval's policy wins. Commitments become dependency edges or cards; actions become cards; minutes are a chaired `governed_asset(kind='minutes')` drafted from the rows. **The owner, and any human, holds a seat like any other** — invited, briefed, able to raise items, state positions, attach conditions, make a commitment for their seat, delegate it and record dissent, live in the meeting room or asynchronously from the web UI, Telegram or the agent front end over MCP. The LLM drafts agendas, pre-read packs and minutes; it never selects, decides, infers a position or marks attendance. Meetings are metered in participant-hours as a third D52 source, and a forum that produces no decision over a cycle is retired (owner, 2026-11-22) |
+| **D67** | **The Gemba Walk is a candidate primary client** | The owner directs (2026-11-26) that a separate, game-style client may become the primary UI. It is built at `/walk/` from the same image and origin, with **all features and all functionality** — every read and every write through the existing action registry, no new table, action, event or port, and no fixture data. It is not a §10.5 destination and does not change the V2 coverage record (D65). `apps/web` remains normative until a measured parity gate — every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip; accessibility and performance budgets are met — and the owner selects it. Primacy is then a runbook step with an old-route redirect map and a freeze/retirement path for `apps/web`; the surface is additive and the decision reverses without data loss until the app is deleted. **Supersedes in part** ADR 0013 decision 1 and D64 for this client only; the single action registry, the single decision store and the no-fixture rule are unchanged (owner, 2026-11-26) |
 
 ### 15.2 Open questions at review
 

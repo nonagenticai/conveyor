@@ -597,6 +597,9 @@ window.installV2 = function (api, enterprise) {
             // The audit's rework register rides in the snapshot beside the rows it judges. A pack
             // published from the committed snapshot carries it as its own generated global.
             rework: live.rework || window.CONVEYOR_REWORK || null,
+            // The declared-vs-evidenced output register rides in the snapshot it judges; the
+            // standalone `register.js` is the fallback for a pack that publishes it as a file.
+            register: live.register || window.CONVEYOR_REGISTER || null,
             // The generated MSP/TOGAF/SAFe/PMP record is its own published file.
             standards: window.CONVEYOR_STANDARDS || null,
             generated_at: live.generated_at || null,
@@ -661,6 +664,7 @@ window.installV2 = function (api, enterprise) {
       // pack published from the committed snapshot carries it as CONVEYOR_REWORK. The scorecard
       // labels its own `generated_at` rather than presenting it as "now".
       rework: (live && live.rework) || window.CONVEYOR_REWORK || null,
+      register: (live && live.register) || window.CONVEYOR_REGISTER || null,
       standards: window.CONVEYOR_STANDARDS || null,
       generated_at: null,
     };
@@ -764,7 +768,10 @@ window.installV2 = function (api, enterprise) {
           data.msp ? data.msp.tranche_reconciliation : null,
         )}${D.phaseStrip(data.architecture ? data.architecture.phase_progress : null, view.projects)}${D.cadenceRail(
           view.artefacts,
-        )}${D.reworkRail(data.rework, view.projects)}${D.artefactRail(data.standards, {
+        )}${D.reworkRail(data.rework, view.projects)}${D.registerRail(
+          data.register,
+          view.projects,
+        )}${D.artefactRail(data.standards, {
           programmeId: view.programme ? view.programme.id : "",
         })}${D.projectArtefactRollup(data.standards, view.projects)}${D.governanceLine(
           view.artefacts,

@@ -4995,6 +4995,10 @@ function readBody(req, done) {
        require the row. Without the loader's guard the fetch never happens and this
        times out. */
     {
+      // The 401 case above leaves the stub refusing /api/projects; this page reads them, and a
+      // 401 there (correctly) clears the session — which would strand the manifest this case
+      // holds. Reset the fixture for this case, as 2d does below.
+      consoleState.failProjects = 0;
       let release;
       const held = new Promise((resolve) => {
         release = resolve;
@@ -5008,7 +5012,11 @@ function readBody(req, done) {
       await page.evaluate(() => {
         location.hash = "#procedures";
       });
-      await page.waitForTimeout(150); // the hashchange render lands with `can()` still false
+      // The hashchange render has landed once the crumb names the page; a fixed timer is not a
+      // barrier, and under load it releases the manifest before the render has run.
+      await page.waitForFunction(
+        () => document.getElementById("crumb")?.textContent === "Procedures",
+      );
       consoleState.manifestGate = null;
       release();
       await page.waitForSelector("text=Synthetic receiving SOP");

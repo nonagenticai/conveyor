@@ -34,6 +34,7 @@ static SERIAL: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 struct Stub {
     base: String,
     hits: Arc<AtomicUsize>,
+    answer: Arc<std::sync::Mutex<Value>>,
 }
 
 #[derive(Clone)]
@@ -47,7 +48,7 @@ struct StubState {
     delay_ms: u64,
 }
 
-async fn answer(
+async fn answer_fn(
     axum::extract::State(state): axum::extract::State<StubState>,
     uri: axum::http::Uri,
     headers: axum::http::HeaderMap,
@@ -90,6 +91,7 @@ impl Stub {
 
     async fn start_with_reply(reply: Option<Value>, delay_ms: u64) -> Stub {
         let hits = Arc::new(AtomicUsize::new(0));
+        let shared = Arc::new(std::sync::Mutex::new(answer));
         let app = axum::Router::new()
             .fallback(axum::routing::any(answer))
             .with_state(StubState {
@@ -107,7 +109,13 @@ impl Stub {
         Stub {
             base: format!("http://{addr}"),
             hits,
+            answer: shared,
         }
+    }
+
+    /// Answer every later call with `body` (the path is still filled in).
+    fn answer_with(&self, body: Value) {
+        *self.answer.lock().expect("the stub answer") = body;
     }
 
     fn hits(&self) -> usize {

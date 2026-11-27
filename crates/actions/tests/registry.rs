@@ -301,6 +301,7 @@ const EXPECTED: [&str; 630] = [
     "development_projects.close",
     "development_projects.deploy_gate",
     "development_projects.get",
+    "development_projects.list",
     "development_projects.merge_gate",
     "development_projects.record_step",
     "development_projects.review_gate",

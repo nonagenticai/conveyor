@@ -223,7 +223,7 @@ async fn render_svg(client: &Client, model_id: &str, view_id: &str) -> Result<St
 }
 
 #[component]
-fn Diagram(model_id: String, selected: RwSignal<Option<String>>) -> impl IntoView {
+pub(crate) fn Diagram(model_id: String, selected: RwSignal<Option<String>>) -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
     let diagram = LocalResource::new(move || {
         // Every reactive input is read before the first await.

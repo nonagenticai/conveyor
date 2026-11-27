@@ -512,7 +512,7 @@ mod tests {
         let token_b = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(jsonwebtoken::Algorithm::HS256),
             &serde_json::json!({"sub": "bob"}),
-            &jsonwebtoken::EncodingKey::from_secret(b"bbbbbbbbbbbbbbbb"),
+            &jsonwebtoken::EncodingKey::from_secret(b"bbbbbbbbbbbbbbbb").expect("encoding key"),
         )
         .expect("sign realm B's token");
 
@@ -549,7 +549,7 @@ mod tests {
         let token_b = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(jsonwebtoken::Algorithm::HS256),
             &serde_json::json!({"sub": "bob"}),
-            &jsonwebtoken::EncodingKey::from_secret(b"bbbbbbbbbbbbbbbb"),
+            &jsonwebtoken::EncodingKey::from_secret(b"bbbbbbbbbbbbbbbb").expect("encoding key"),
         )
         .expect("sign realm B's token");
 

@@ -111,13 +111,14 @@
       "key": "S04",
       "name": "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest",
       "description": "Plan: docs/plans/slices/S04-action-registry.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S04-action-registry.md",
         "track": "v1",
         "issues": [
-          3
+          3,
+          812
         ],
         "depends_on": [
           "S02",
@@ -917,13 +918,14 @@
       "key": "T3",
       "name": "PM job",
       "description": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          74
+          74,
+          797
         ],
         "depends_on": [
           "T2",
@@ -1280,7 +1282,7 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1316,7 +1318,7 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1604,6 +1606,40 @@
       }
     },
     {
+      "key": "GEMBA-WALK",
+      "name": "The Gemba Walk — a separate game-style client",
+      "description": "Programme-level unit (plan: docs/plans/GEMBA-WALK.md)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/GEMBA-WALK.md",
+        "track": "programme",
+        "issues": [
+          792,
+          806,
+          813,
+          814,
+          815,
+          816,
+          817
+        ],
+        "depends_on": [],
+        "plan_status": "active",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "planned",
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
+        ],
+        "adm_phase": "Preliminary",
+        "plateau": "definition"
+      }
+    },
+    {
       "key": "P0",
       "name": "Programme definition — vision, blueprint, plan and project briefs",
       "description": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
@@ -1677,27 +1713,16 @@
           223,
           225,
           395,
-          435,
           476,
           526,
-          569,
-          660,
           669,
           733,
           755,
-          756,
-          760,
-          779,
-          780,
-          781,
           782,
           783,
           784,
-          787,
-          788,
-          789,
-          791,
-          792
+          803,
+          819
         ],
         "depends_on": [],
         "plan_status": "active",

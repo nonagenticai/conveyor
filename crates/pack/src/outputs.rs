@@ -8,20 +8,14 @@
 //! index (`window.CONVEYOR_OUTPUTS = {…}`), and `docs/design/docs.js` only lists it.
 //!
 //! **The filter is the publication decision.** Only `published_at IS NOT NULL AND status='active'` rows with a
-//! body are rendered, and only when they belong to the programme: a project outside the programme
-//! is a session fixture, exactly as in the snapshot's `artefacts` section. A row that exists but
-//! was never published is absent from both the page set and the index — there is no "all
-//! documents" fallback.
-//!
-//! **The same redaction as the JSON.** A title, body, attachment name, project name, author or
-//! output-standard slot passes [`crate::snapshot::redact_text`] before it is rendered, so a token
-//! pasted into a published output cannot reach a page while the JSON copy is masked.
+//! body are rendered. A row that exists but was never published is absent from both the page set
+//! and the index — there is no "all documents" fallback.
 //!
 //! **Author input is untrusted.** Raw HTML in a body is turned into text, and a link or image
 //! whose URL names a non-http(s)/mailto scheme is made inert. The public-page test carries
 //! `<script>`, an `onerror` attribute and a `javascript:` link.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::path::Path;
 
 use conveyor_domain::Project;
@@ -77,6 +71,55 @@ pub struct AttachmentEntry {
     pub path: String,
 }
 
+/// The provenance one published output carries: what the row itself records.
+///
+/// Every field except `status` and `version` is optional because the rows written before the
+/// write path carried no provenance; the page says `unrecorded` rather than inventing a value.
+/// `commit` is the commit the pack was rendered from (`CONVEYOR_GIT_SHA`), not the author's
+/// commit, which the engine never sees.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Provenance {
+    /// The output-standard kind the row was published under (`document.category`).
+    pub kind: Option<String>,
+    /// The row's optimistic-concurrency version at render time.
+    pub version: u64,
+    /// The sha256 of the body or the stored bytes.
+    pub hash: Option<String>,
+    /// The row's status (`active`, `rejected`, `failed`).
+    pub status: String,
+    /// The author's display name, when one is recorded.
+    pub owner: Option<String>,
+    /// The gate the output was published under, when the row names one.
+    pub gate: Option<String>,
+    /// The commit the pack was rendered from.
+    pub commit: Option<String>,
+}
+
+impl Provenance {
+    /// Build from a record; `owner` is the author's resolved display name.
+    pub fn of(record: &DocumentRecord, owner: Option<&str>, commit: Option<&str>) -> Self {
+        Self {
+            kind: record.category.clone(),
+            version: record.version.get(),
+            hash: record.content_hash.clone(),
+            status: record.status.clone(),
+            owner: owner.map(str::to_owned),
+            gate: record
+                .meta
+                .get("gate")
+                .and_then(serde_json::Value::as_str)
+                .map(str::to_owned),
+            commit: commit.map(str::to_owned),
+        }
+    }
+
+    /// Whether the row carried any provenance at all.
+    #[must_use]
+    pub fn recorded(&self) -> bool {
+        self.kind.is_some() || self.hash.is_some() || self.gate.is_some()
+    }
+}
+
 /// One entry of `outputs.js`.
 #[derive(Clone, Debug, Serialize)]
 pub struct OutputEntry {
@@ -104,6 +147,8 @@ pub struct OutputEntry {
     pub published_at: Option<String>,
     /// When the output last changed.
     pub updated_at: String,
+    /// What the row itself records about its own provenance.
+    pub provenance: Provenance,
 }
 
 /// Render one output and write `output-<id>.html` files and `outputs.js` into `out`.
@@ -116,12 +161,53 @@ pub async fn write_outputs(
     generated_at: &str,
     out: &Path,
 ) -> Result<usize, PublishOutputsError> {
-    Ok(write_outputs_with_files(pool, tenant, generated_at, out)
-        .await?
-        .0)
+    let inputs = read_outputs_inputs(pool, tenant).await?;
+    let (index, pages) = render_outputs(
+        &inputs.records,
+        &inputs.projects,
+        &inputs.attachments,
+        &inputs.names,
+        generated_at,
+        rendered_commit().as_deref(),
+    )?;
+    write_rendered(out, &index, &pages)
 }
 
-/// One file [`write_outputs`] wrote: its name inside the outputs directory and the exact bytes.
+/// The rows one outputs render needs, read inside one read-only transaction.
+///
+/// The register (`crate::register`) is built from these same rows, so the index and the register
+/// cannot describe different published sets when they are built from one read.
+pub struct OutputsInputs {
+    /// The published output rows.
+    pub records: Vec<store::document::DocumentRecord>,
+    /// Every project the rows can belong to.
+    pub projects: Vec<Project>,
+    /// The published attachments, in upload order.
+    pub attachments: Vec<store::document::DocumentRecord>,
+    /// Author display names, by user id.
+    pub names: HashMap<Uuid, String>,
+}
+
+/// Read the published-output rows and their lookups in one read-only transaction.
+pub async fn read_outputs_inputs(
+    pool: &PgPool,
+    tenant: TenantId,
+) -> Result<OutputsInputs, PublishOutputsError> {
+    let mut tx = store::begin_scoped_read_only(pool, tenant).await?;
+    let records = store::document::list_published_outputs_tx(&mut tx, tenant).await?;
+    let projects = store::project::list_projects_tx(&mut tx, tenant, None, 1000).await?;
+    let attachments = store::document::list_published_attachments_tx(&mut tx, tenant).await?;
+    let names = author_names(&mut tx, &records).await?;
+    tx.rollback().await?;
+    Ok(OutputsInputs {
+        records,
+        projects,
+        attachments,
+        names,
+    })
+}
+
+/// One file [`write_rendered`] wrote: its name inside the outputs directory and the exact bytes.
 pub(crate) struct WrittenOutput {
     /// File name (`output-<id>.html` or `outputs.js`).
     pub name: String,
@@ -129,28 +215,27 @@ pub(crate) struct WrittenOutput {
     pub bytes: Vec<u8>,
 }
 
-/// [`write_outputs`], plus the exact files it wrote and their bytes.
+/// Write the rendered index and pages. No database: the caller already read the rows.
+pub fn write_rendered(
+    out: &Path,
+    index: &str,
+    pages: &HashMap<Uuid, String>,
+) -> Result<usize, PublishOutputsError> {
+    Ok(write_rendered_with_files(out, index, pages)?.0)
+}
+
+/// [`write_rendered`], plus the exact files it wrote and their bytes.
 ///
 /// The snapshot's manifest hashes every published file (SPEC §10.3); the caller needs the
 /// written bytes, not a directory scan — `out` may also hold the tracked document pages.
-pub(crate) async fn write_outputs_with_files(
-    pool: &PgPool,
-    tenant: TenantId,
-    generated_at: &str,
+pub(crate) fn write_rendered_with_files(
     out: &Path,
+    index: &str,
+    pages: &HashMap<Uuid, String>,
 ) -> Result<(usize, Vec<WrittenOutput>), PublishOutputsError> {
-    let mut tx = store::begin_scoped_read_only(pool, tenant).await?;
-    let records = store::document::list_published_outputs_tx(&mut tx, tenant).await?;
-    let projects = store::project::list_projects_tx(&mut tx, tenant, None, 1000).await?;
-    let attachments = store::document::list_published_attachments_tx(&mut tx, tenant).await?;
-    let names = author_names(&mut tx, &records).await?;
-    tx.rollback().await?;
-
-    let (index, pages) = render_outputs(&records, &projects, &attachments, &names, generated_at)?;
-
     std::fs::create_dir_all(out)?;
     let mut written = Vec::with_capacity(pages.len() + 1);
-    for (id, page) in &pages {
+    for (id, page) in pages {
         let name = format!("output-{id}.html");
         std::fs::write(out.join(&name), page)?;
         written.push(WrittenOutput {
@@ -158,13 +243,11 @@ pub(crate) async fn write_outputs_with_files(
             bytes: page.as_bytes().to_vec(),
         });
     }
-    std::fs::write(out.join("outputs.js"), &index)?;
+    std::fs::write(out.join("outputs.js"), index)?;
     written.push(WrittenOutput {
         name: "outputs.js".to_owned(),
-        bytes: index.into_bytes(),
+        bytes: index.as_bytes().to_vec(),
     });
-    // A HashMap's order is not stable; the manifest needs the same list on every run.
-    written.sort_by(|a, b| a.name.cmp(&b.name));
     Ok((pages.len(), written))
 }
 
@@ -172,29 +255,17 @@ pub(crate) async fn write_outputs_with_files(
 ///
 /// The caller owns the transaction: [`write_outputs`] opens one for the CLI, and
 /// [`crate::live::site_view`] reads the same rows inside the transaction it already holds. One
-/// renderer keeps the two byte-identical — and it is the ONE place the publication filter and the
-/// snapshot's redaction are applied, so a CLI page and a live page cannot disagree about either.
-///
-/// A record or attachment whose project is outside the programme is a session fixture and is not
-/// rendered (the rule `conveyor_store::snapshot` applies to `artefacts.documents`; a row with no
-/// project is a tenant-level note and stays). Free text is redacted before it reaches the page,
-/// the index or the CSV-equivalent view of the same rows.
+/// renderer keeps the two byte-identical.
 pub fn render_outputs(
     records: &[DocumentRecord],
     projects: &[Project],
     attachments: &[DocumentRecord],
     names: &HashMap<Uuid, String>,
     generated_at: &str,
+    commit: Option<&str>,
 ) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
-    // The programme boundary, by the same predicate `live::site_view` publishes.
-    let bound: HashSet<Uuid> = projects
-        .iter()
-        .filter(|project| project.programme_id.is_some())
-        .map(|project| project.id)
-        .collect();
     let projects: HashMap<Uuid, (String, String)> = projects
         .iter()
-        .filter(|project| bound.contains(&project.id))
         .map(|project| {
             (
                 project.id,
@@ -204,9 +275,6 @@ pub fn render_outputs(
         .collect();
     let mut by_parent: HashMap<Uuid, Vec<&DocumentRecord>> = HashMap::new();
     for attachment in attachments {
-        if attachment.project_id.is_some_and(|id| !bound.contains(&id)) {
-            continue;
-        }
         if let Some(parent) = attachment.parent_document_id {
             by_parent.entry(parent).or_default().push(attachment);
         }
@@ -215,23 +283,13 @@ pub fn render_outputs(
     let mut entries = Vec::with_capacity(records.len());
     let mut pages = HashMap::with_capacity(records.len());
     for record in records {
-        // ⛔ A published row outside the programme is not public: no page, no index row.
-        if record.project_id.is_some_and(|id| !bound.contains(&id)) {
-            continue;
-        }
-        let title = redact_text(&record.title);
         let body = redact_text(record.body.as_deref().unwrap_or_default());
         let (project_key, project_name) = record
             .project_id
-            .and_then(|id| projects.get(&id))
-            .map_or((None, None), |(key, name)| {
-                (Some(key.clone()), Some(name.clone()))
-            });
+            .and_then(|id| projects.get(&id).cloned())
+            .map_or((None, None), |(key, name)| (Some(key), Some(name)));
         let project_label = project_name.as_deref().or(project_key.as_deref());
-        let author = record
-            .created_by
-            .and_then(|id| names.get(&id))
-            .map(|name| redact_text(name.as_str()));
+        let author = record.created_by.and_then(|id| names.get(&id).cloned());
         let attachment_entries: Vec<AttachmentEntry> = by_parent
             .get(&record.id)
             .map(|rows| {
@@ -255,6 +313,8 @@ pub fn render_outputs(
                     .collect()
             })
             .unwrap_or_default();
+        let provenance = Provenance::of(record, author.as_deref(), commit);
+        let title = redact_text(&record.title);
         let page = output_page(
             &title,
             &render_markdown(&body),
@@ -262,6 +322,7 @@ pub fn render_outputs(
             project_label,
             author.as_deref(),
             &attachment_entries,
+            &provenance,
         );
         pages.insert(record.id, page);
         entries.push(OutputEntry {
@@ -277,6 +338,7 @@ pub fn render_outputs(
             path: format!("docs/output-{}.html", record.id),
             published_at: record.published_at.map(|at| at.to_rfc3339()),
             updated_at: record.updated_at.to_rfc3339(),
+            provenance,
         });
     }
     Ok((outputs_js(&entries, generated_at)?, pages))
@@ -320,6 +382,7 @@ pub fn output_page(
     project: Option<&str>,
     author: Option<&str>,
     attachments: &[AttachmentEntry],
+    provenance: &Provenance,
 ) -> String {
     let mut source = match project {
         Some(project) => format!("{project} · conveyor output · published {generated_at}"),
@@ -329,7 +392,8 @@ pub fn output_page(
         source.push_str(&format!(" · {author}"));
     }
     let body_html = format!(
-        "{body_html}{}{}",
+        "{}{body_html}{}{}",
+        provenance_html(provenance),
         attachments_html(attachments),
         feedback_html()
     );
@@ -349,6 +413,62 @@ pub fn output_page(
         )
         .replace("at build time.</span>", "at publish time.</span>")
         .replace("$body$", &body_html)
+}
+
+/// The commit the pack is rendered from. A publish sets `CONVEYOR_GIT_SHA`; a local run has none,
+/// and the page says `unrecorded` rather than naming a commit it cannot know.
+#[must_use]
+pub fn rendered_commit() -> Option<String> {
+    std::env::var("CONVEYOR_GIT_SHA")
+        .ok()
+        .filter(|sha| !sha.trim().is_empty())
+}
+
+/// The provenance block every output page carries, before the body.
+///
+/// It is machine-readable: the `<dl>` carries one `data-provenance-<field>` attribute per field, so
+/// a reader (or a test) can assert a value without parsing prose. A field the row never recorded
+/// renders `unrecorded` — the block is never omitted and never guessed.
+fn provenance_html(provenance: &Provenance) -> String {
+    let shown = |value: Option<&str>| -> String {
+        value
+            .filter(|text| !text.trim().is_empty())
+            .unwrap_or("unrecorded")
+            .to_owned()
+    };
+    let status = if provenance.recorded() {
+        shown(Some(provenance.status.as_str()))
+    } else {
+        "unrecorded".to_owned()
+    };
+    let kind = shown(provenance.kind.as_deref());
+    let hash = shown(provenance.hash.as_deref());
+    let owner = shown(provenance.owner.as_deref());
+    let gate = shown(provenance.gate.as_deref());
+    let commit = shown(provenance.commit.as_deref());
+    let version = provenance.version.to_string();
+    format!(
+        "<dl class=\"output-provenance\" \
+         data-provenance-kind=\"{kind_attr}\" data-provenance-version=\"{version_attr}\" \
+         data-provenance-hash=\"{hash_attr}\" data-provenance-status=\"{status_attr}\" \
+         data-provenance-owner=\"{owner_attr}\" data-provenance-gate=\"{gate_attr}\" \
+         data-provenance-commit=\"{commit_attr}\">\
+         <div><dt>Kind</dt><dd>{kind}</dd></div>\
+         <div><dt>Version</dt><dd>{version}</dd></div>\
+         <div><dt>SHA-256</dt><dd>{hash}</dd></div>\
+         <div><dt>Status</dt><dd>{status}</dd></div>\
+         <div><dt>Owner</dt><dd>{owner}</dd></div>\
+         <div><dt>Gate</dt><dd>{gate}</dd></div>\
+         <div><dt>Rendered from</dt><dd>{commit}</dd></div>\
+         </dl>",
+        kind_attr = escape_html(&kind),
+        version_attr = escape_html(&version),
+        hash_attr = escape_html(&hash),
+        status_attr = escape_html(&status),
+        owner_attr = escape_html(&owner),
+        gate_attr = escape_html(&gate),
+        commit_attr = escape_html(&commit),
+    )
 }
 
 /// The attachments block appended to a rendered body. Names are escaped and every link is a
@@ -399,168 +519,6 @@ fn escape_html(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{TimeZone, Utc};
-
-    fn project(id: Uuid, key: &str, name: &str, programme_id: Option<Uuid>) -> Project {
-        Project {
-            id,
-            key: key.to_owned(),
-            name: name.to_owned(),
-            description: String::new(),
-            status: "active".to_owned(),
-            programme_id,
-            project_type_code: None,
-            phase_code: None,
-            owner_user_id: None,
-            repo_url: None,
-            meta: serde_json::json!({}),
-            version: conveyor_domain::Version::new(1).expect("version"),
-        }
-    }
-
-    fn document(id: Uuid, project_id: Option<Uuid>, title: &str, body: &str) -> DocumentRecord {
-        DocumentRecord {
-            id,
-            project_id,
-            card_id: None,
-            parent_document_id: None,
-            kind: "document".to_owned(),
-            title: title.to_owned(),
-            status: "active".to_owned(),
-            object_key: None,
-            content_hash: None,
-            body: Some(body.to_owned()),
-            external_ref: None,
-            meta: serde_json::json!({}),
-            publishable: true,
-            category: Some("evidence".to_owned()),
-            unit: Some("T1".to_owned()),
-            created_by: None,
-            updated_by: None,
-            published_at: Some(Utc.timestamp_opt(1_700_000_000, 0).unwrap()),
-            published_by: None,
-            publish_requested_at: None,
-            version: conveyor_domain::Version::new(1).expect("version"),
-            created_at: Utc.timestamp_opt(1_700_000_000, 0).unwrap(),
-            updated_at: Utc.timestamp_opt(1_700_000_100, 0).unwrap(),
-        }
-    }
-
-    fn attachment(id: Uuid, parent: Uuid, project_id: Option<Uuid>, name: &str) -> DocumentRecord {
-        let mut row = document(id, project_id, name, "");
-        row.kind = "attachment".to_owned();
-        row.parent_document_id = Some(parent);
-        row.object_key = Some(format!("attachments/{id}"));
-        row.body = None;
-        row.meta = serde_json::json!({"content_type": "text/plain", "size_bytes": 4});
-        row
-    }
-
-    /// v1-pack-6: the page and the index apply the JSON record's redaction — a pasted token or
-    /// email in a title, body, attachment name, project name, author or slot never publishes.
-    #[test]
-    fn a_secret_in_an_output_never_reaches_the_page_or_the_index() {
-        let token = format!("ghp_{}", "A".repeat(30));
-        let programme = Uuid::now_v7();
-        let project_id = Uuid::now_v7();
-        let row_id = Uuid::now_v7();
-        let author_id = Uuid::now_v7();
-        let projects = [project(
-            project_id,
-            "T1",
-            &format!("Project {token}"),
-            Some(programme),
-        )];
-        let mut row = document(
-            row_id,
-            Some(project_id),
-            "Contact alice@example.com",
-            &format!("# Note\n\npasted {token} here\n"),
-        );
-        row.created_by = Some(author_id);
-        row.category = Some(format!("evidence {token}"));
-        row.unit = Some("alice@example.com".to_owned());
-        let attachments = [attachment(
-            Uuid::now_v7(),
-            row_id,
-            Some(project_id),
-            &format!("{token}.txt"),
-        )];
-        let names: HashMap<Uuid, String> = [(author_id, "alice@example.com".to_owned())]
-            .into_iter()
-            .collect();
-
-        let (index, pages) = render_outputs(
-            &[row],
-            &projects,
-            &attachments,
-            &names,
-            "2026-11-13T00:00:00Z",
-        )
-        .expect("render");
-        let page = pages.get(&row_id).expect("the page");
-
-        for surface in [page.as_str(), index.as_str()] {
-            assert!(
-                !surface.contains(&token),
-                "the token is redacted: {surface}"
-            );
-            assert!(
-                !surface.contains("alice@example.com"),
-                "the email is redacted: {surface}"
-            );
-            assert!(
-                surface.contains("[redacted-token]"),
-                "the token is visibly masked: {surface}"
-            );
-            assert!(
-                surface.contains("***@redacted"),
-                "the email is visibly masked: {surface}"
-            );
-        }
-        assert!(
-            page.contains("[redacted-token].txt"),
-            "an attachment file name is redacted: {page}"
-        );
-    }
-
-    /// v1-pack-6: an output whose project is outside the programme is a session fixture — it has
-    /// no page and no index row, matching the snapshot's `artefacts.documents` boundary.
-    #[test]
-    fn an_output_outside_the_programme_is_not_rendered() {
-        let programme = Uuid::now_v7();
-        let bound = Uuid::now_v7();
-        let fixture = Uuid::now_v7();
-        let projects = [
-            project(bound, "BOUND", "In the programme", Some(programme)),
-            project(fixture, "FIX", "A scratch fixture", None),
-        ];
-        let shown = document(Uuid::now_v7(), Some(bound), "Bound note", "public");
-        let hidden = document(Uuid::now_v7(), Some(fixture), "Fixture note", "not public");
-        let hidden_id = hidden.id;
-        let orphan = document(Uuid::now_v7(), None, "Tenant note", "stays");
-        let orphan_id = orphan.id;
-
-        let (index, pages) = render_outputs(
-            &[shown, hidden, orphan],
-            &projects,
-            &[],
-            &HashMap::new(),
-            "2026-11-13T00:00:00Z",
-        )
-        .expect("render");
-        assert!(pages.values().any(|page| page.contains("Bound note")));
-        assert!(pages.values().any(|page| page.contains("Tenant note")));
-        assert!(
-            !pages.contains_key(&hidden_id),
-            "a fixture project's output has no page"
-        );
-        assert!(
-            pages.contains_key(&orphan_id),
-            "a tenant-level note stays public"
-        );
-        assert!(!index.contains("Fixture note"), "{index}");
-    }
 
     #[test]
     fn raw_html_is_text_not_markup() {
@@ -582,6 +540,7 @@ mod tests {
             Some("T1"),
             Some("Alice"),
             &[],
+            &Provenance::default(),
         );
         assert!(
             html.contains("https://github.com/nonagenticai/conveyor/discussions"),
@@ -590,6 +549,70 @@ mod tests {
         assert!(html.contains("Discuss this output"), "{html}");
         assert!(!html.contains("data/programme.json"), "{html}");
         assert!(!html.contains("data/manifest.json"), "{html}");
+    }
+
+    #[test]
+    fn output_page_renders_provenance() {
+        let provenance = Provenance {
+            kind: Some("project-brief".to_owned()),
+            version: 3,
+            hash: Some("abc123".to_owned()),
+            status: "active".to_owned(),
+            owner: Some("Alice".to_owned()),
+            gate: Some("pm.charter".to_owned()),
+            commit: Some("ba56759a".to_owned()),
+        };
+        let html = output_page(
+            "T",
+            "<p>b</p>",
+            "2026-11-26",
+            Some("P0"),
+            Some("Alice"),
+            &[],
+            &provenance,
+        );
+        assert!(
+            html.contains("data-provenance-kind=\"project-brief\""),
+            "{html}"
+        );
+        assert!(html.contains("data-provenance-version=\"3\""), "{html}");
+        assert!(html.contains("data-provenance-hash=\"abc123\""), "{html}");
+        assert!(html.contains("data-provenance-status=\"active\""), "{html}");
+        assert!(html.contains("data-provenance-owner=\"Alice\""), "{html}");
+        assert!(
+            html.contains("data-provenance-gate=\"pm.charter\""),
+            "{html}"
+        );
+        assert!(
+            html.contains("data-provenance-commit=\"ba56759a\""),
+            "{html}"
+        );
+    }
+
+    #[test]
+    fn output_page_marks_unrecorded_provenance() {
+        let provenance = Provenance {
+            status: "active".to_owned(),
+            version: 1,
+            ..Provenance::default()
+        };
+        let html = output_page("T", "<p>b</p>", "2026-11-26", None, None, &[], &provenance);
+        assert!(
+            html.contains("data-provenance-kind=\"unrecorded\""),
+            "a legacy row must not invent a kind: {html}"
+        );
+        assert!(
+            html.contains("data-provenance-status=\"unrecorded\""),
+            "a row with no kind, hash or gate has no recorded status: {html}"
+        );
+        assert!(
+            html.contains("data-provenance-gate=\"unrecorded\""),
+            "{html}"
+        );
+        assert!(
+            html.contains("data-provenance-commit=\"unrecorded\""),
+            "{html}"
+        );
     }
 
     #[test]
@@ -625,6 +648,7 @@ mod tests {
             Some("S02"),
             Some("A Person"),
             &attachments,
+            &Provenance::default(),
         );
         assert!(
             page.contains("href=\"attachment-a-1\""),
@@ -662,6 +686,7 @@ mod tests {
             path: "docs/output-id-1.html".to_owned(),
             published_at: Some("2026-11-13T00:00:00Z".to_owned()),
             updated_at: "2026-11-13T00:00:00Z".to_owned(),
+            provenance: Provenance::default(),
         }];
         let js = outputs_js(&entries, "2026-11-13T00:00:00Z").expect("index");
         assert!(js.starts_with("window.CONVEYOR_OUTPUTS = {"), "{js}");

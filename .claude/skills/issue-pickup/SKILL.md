@@ -17,7 +17,8 @@ gh issue list --state open --label status:claimed --json number,title,labels
 gh pr list --state open --json number,headRefName,title
 ```
 
-Do not list `status:blocked` as claimable. Default priority is issue-number order; a dependency
+Do not list `status:blocked` or `status:not-ready` as claimable. Default priority is issue-number
+order; a dependency
 blocker overrides it. If the ready queue is empty, say so and stop — do not invent work.
 
 For the full truth table (ready-with-branch, claimed-without-branch, PR-without-`Closes`,
@@ -112,6 +113,9 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
 ## Never
 
 - Create a branch before the issue exists.
-- Claim a `status:blocked` issue, or any issue that fails its Definition of ready.
+- Claim a `status:blocked` or `status:not-ready` issue, or any issue that fails its Definition of
+  ready. `status:not-ready` is written by the `issue-dor` workflow when the body does not meet the
+  content contract; the comment on the issue names the gaps, and the label comes off by itself
+  once the body is complete.
 - Rename or force-push a live branch.
 - End without a handoff comment if you stop before merge.

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0021 — The Gemba Walk is a separate client, a candidate primary UI · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0021-gemba-walk-client.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0021--the-gemba-walk-is-a-separate-client-a-candidate-primary-ui">0021 — The Gemba Walk is a separate client, a candidate primary UI</h1>
+<p>Status: Accepted · Date: 2026-11-26 · Approved: 2026-11-26, rule decision under the published delegation of 2026-11-22 (expiry 2027-02-18) — a delegated approval, not a human signature · Owner direction: 2026-11-26 · Spec: SPEC_V2 §10.5.11, §15.1 D67 Supersedes in part: ADR 0013 decision 1 and its rejected "second frontend" alternative; D64</p>
+<h2 id="context">Context</h2>
+<p>The only spatial interface today is a local mock: a single self-contained HTML file whose world is a hand-written canvas projection, whose programme state is a seeded fixture in <code>localStorage</code>, and whose "reports" and "decisions" are generated in the browser. It has no authentication, no action registry and no server. It is evidence of an interaction model, not an implementation.</p>
+<p>The owner has directed that this game-style interface <strong>may become the primary UI</strong>, and therefore must be specified with all features and all functionality — every read and every write. That direction is incompatible with two current rulings if read literally:</p>
+<ul>
+<li>ADR 0013, decision 1: <em>"The app is the UI. Every V2 destination is a route in <code>apps/web</code>, one Leptos Router, one binary, port 8930."</em> Its alternatives list rejects <em>"SSR or a second frontend… a second application doubles the auth flow, the shell and the test harness."</em></li>
+<li>D64: <em>"Every V2 destination is a route in <code>apps/web</code> … not a page in the design pack."</em></li>
+</ul>
+<p>The existing rulings exist to prevent a second <strong>operator console</strong> built beside the app, and a mock mistaken for an implementation. They do not settle whether a second <strong>client</strong> may exist when the owner is considering replacing the first. This ADR settles that question and leaves the parity decision open until it can be measured.</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><strong>A separate client is authorised at <code>/walk/</code>.</strong> It is a static sub-site served from the same image and origin as the API (the design pack's serving model), with its own assets, router, screens and Playwright suite. It adds no port.</li>
+<li><strong>It is a candidate, not the primary.</strong> <code>apps/web</code> remains the normative operator UI. The walk becomes primary only through the measured gate in decision 7, and that promotion is a runbook step, not a consequence of this ADR.</li>
+<li><strong>It has full functionality through the existing contract.</strong> Every read uses the literal <code>GET</code> routes or a read action; every write is <code>POST /api/actions/{name}/invocations</code> with the standard envelope and headers. It adds no table, action, event or decision store, and it renders no fixture. A capability the server does not expose is an honest gate, exactly as in <code>apps/web</code>.</li>
+<li><strong>It uses the same identity.</strong> auth-code + PKCE S256, access token in memory, PKCE verifier in <code>sessionStorage</code>, the dev cookie for local runs, and the same tenant header. The public OIDC client gains a <code>/walk/</code> redirect URI (or a dedicated public client if the identity operator prefers isolation); no token is ever stored in <code>localStorage</code>.</li>
+<li><strong>The world is a renderer behind a port.</strong> Records, tables, forms and decisions are DOM sheets in every case. The world implements a small <code>WorldView</code> interface. The simulation behind it is <strong><code>bevy_ecs 0.20.1</code></strong> in <code>crates/walk-world</code>, decided in <strong>ADR 0022</strong> (accepted 2026-11-26); the <em>renderer</em> is still measured — canvas-2D against WebGL2 — in the P0 spike, and ADR 0023 records the winner. No <code>bevy_render</code>, <code>bevy_winit</code> or <code>bevy_asset</code> dependency is admitted.</li>
+<li><strong>The spatial model never gates a capability.</strong> Every room, record, form and decision has a deep link and a keyboard path. A user who never walks the world can use every feature.</li>
+<li><strong>Primacy requires a measured parity gate.</strong> The walk reaches parity when every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip; the accessibility and performance budgets are met; and the owner signs the result. The instrument is <code>scripts/build-walk-coverage.py</code> and its record is <code>docs/evidence/walk-coverage.json</code> — never a prose claim.</li>
+<li><strong>Primacy is reversible until <code>apps/web</code> is retired.</strong> The surface is additive: removing the navigation link and the old-route redirect map restores the app with no data loss. Retirement of <code>apps/web</code> is a separate, later decision taken after a stabilisation period.</li>
+<li><strong>The governing spec records the exception.</strong> SPEC_V2 gains §10.5.11 (the client's boundary) and D67 (the owner ruling, the gate and the reversal path). The V2 coverage record (D65) is unchanged and continues to measure <code>apps/web</code>.</li>
+</ol>
+<h2 id="why">Why</h2>
+<ul>
+<li>The owner's direction is explicit, and the interaction model is genuinely different: a spatial, role-oriented walk is not a reskin of a sidebar console.</li>
+<li>A separate surface is the only way to evaluate a game engine without putting a frame loop and a WASM engine into the operator bundle, and the only way to retire either client without rewriting the other.</li>
+<li>The backend already supports it: 597 actions are registered, <code>actions.describe</code> carries the input and output JSON Schema, and every write already has an envelope, headers and a typed refusal. A second client therefore needs no backend fork; it needs a contract-faithful one.</li>
+<li>The risk this ADR accepts is duplication of shell, auth and tests. It is contained by one action registry, one decision store, one set of read models, a shared census, and a parity instrument that makes an omitted destination visible.</li>
+</ul>
+<h2 id="alternatives-considered">Alternatives considered</h2>
+<ul>
+<li><strong>A game mode inside <code>apps/web</code>.</strong> Rejected: it couples a frame loop and (if Bevy) a WASM engine to the operator bundle, forces one release cadence on two very different surfaces, and makes the engine spike unmeasurable in isolation. It also cannot become a clean replacement path.</li>
+<li><strong>A reskin of <code>apps/web</code>.</strong> Rejected: it delivers neither the spatial navigation nor the role/room model the owner asked for, at the cost of a full restyle of 43 screens.</li>
+<li><strong>An iframe or WebView of the mock.</strong> Rejected: the mock has no authentication, no registry and no live rows; ADR 0013 already rejected embedding the design pack as a substitute for an implementation. It would make the coverage record lie.</li>
+<li><strong>A public read-only lens.</strong> Rejected by the owner on 2026-11-26: the walk must have all functionality, so it must be able to write through the registry.</li>
+<li><strong>A second backend for the walk.</strong> Rejected by §3 and P4, and by ADR 0013: one action registry, one decision store, no second source of truth.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>Positive: the game UI can be built and measured without weakening the app; either client can be retired without a backend change; the owner gets a real basis for the primary-UI decision.</li>
+<li>Cost: a second shell, auth flow and browser suite; two clients must track each destination's contract. The parity instrument and per-destination specs are the mitigation, and a change that updates one client without the other is visible in CI.</li>
+<li>Delivery: <code>docs/plans/03-DELIVERY.md</code> defaults to one plan = one issue. The walk is multi-session by shape; the plan's five-issue split — a dependency-bearing parent G0 and four file-disjoint wings S1–S4 — is <strong>approved 2026-11-26</strong> as the written exception (rule decision under the published delegation). The inception unit (#792) is the P0 §5 definition step, not a sixth split. <code>lane/</code> branches are not used for new work; the inception issue adopted the in-flight docs lane.</li>
+<li>Serving: a scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> (GET/HEAD only, non-asset paths) and a Dockerfile copy of the static output; both are serving changes, not API surface. Without the fallback, a walk deep link currently renders the operator app's <code>index.html</code>.</li>
+<li>Identity: an external redirect-URI registration is required before production sign-in works.</li>
+<li>Performance: if Bevy is selected, its wasm bundle and startup are the dominant risk; the P0 spike measures them and the canvas baseline remains a working fallback behind the same port.</li>
+<li>The design pack keeps its role: <code>/design/</code> is unchanged, and the walk does not ship inside it.</li>
+</ul>
+<h2 id="revisit-triggers">Revisit triggers</h2>
+<ul>
+<li>The parity gate cannot be met without adding backend surface (it must not be added).</li>
+<li>Bevy on the web misses the agreed budgets and the canvas baseline cannot close the gap.</li>
+<li>Maintaining two clients costs more than the primacy decision is worth.</li>
+<li>The owner declines primacy at P6; the walk remains an alternative client and this ADR stays proposed rather than accepted.</li>
+</ul>
+<h2 id="links">Links</h2>
+<p>ADR 0001 (CSR by measurement) · ADR 0013 and D64 (the app is the UI) · SPEC_V2 §10.5, §10.5.11, §15.1 D66/D67 · <code>docs/design/GEMBA-WALK-SPEC.md</code> · <code>docs/plans/GEMBA-WALK.md</code> · <code>docs/plans/inception/GEMBA-WALK/</code> (the published inception set) · accepted 2026-11-26; the inception unit #792 publishes the set and the build issues are created after it.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0021-gemba-walk-client.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

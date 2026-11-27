@@ -14,8 +14,8 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 63,
-    "extend": 3,
+    "exists": 64,
+    "extend": 2,
     "new": 3
   },
   "rows": [
@@ -711,12 +711,11 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Architecture",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/design/adm' found",
-        "apps/web/e2e/adm.spec.ts: absent",
-        "docs/design/v2.js: page 'adm' — design reference, not implementation",
-        "apps/web/src/app.rs: route '/design/adm' renders AdmGate (a gate; owner: T9)"
+        "apps/web/e2e/adm.spec.ts: present",
+        "docs/design/v2.js: page 'adm' — design reference, not implementation"
       ],
       "note": "V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9."
     },

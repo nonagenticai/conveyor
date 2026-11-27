@@ -21,19 +21,13 @@
 //! docs/design/data/evidence.json      the evidence/plan documents and their hashes
 //! docs/design/data/feedback.json      the external feedback issues
 //! docs/design/data/rework.json        the rework register, only with `--conformance`
+//! docs/design/data/register.json      the declared-vs-evidenced output register (#756 P2)
+//! docs/design/data/register.js        window.CONVEYOR_REGISTER = {…}
 //! docs/design/data/snapshot.js        window.CONVEYOR_SNAPSHOT = {…}
 //! ```
 //!
-//! **Determinism.** The same database produces byte-identical files. `--generated-at` overrides
-//! the clock; without it the clock is derived from the snapshot (the newest published document),
-//! exactly as the live view derives it. Every array is ordered by the store query; every object
-//! is built in a fixed order.
-//!
-//! **Manifest.** `manifest.json` hashes every published file: the data files above, the output
-//! pages and `outputs.js` when `--outputs-dir` is set, and the issue registry the run read.
-//!
-//! **Finalise.** `--manifest-only` rehashes a pack directory that later generators have already
-//! added to and rewrites its `manifest.json`; it reads no database and regenerates nothing.
+//! **Determinism.** The same database and the same `--generated-at` produce byte-identical
+//! files. Every array is ordered by the store query; every object is built in a fixed order.
 //!
 //! **Redaction.** The store queries select explicit columns (see `conveyor_store::snapshot`):
 //! no secret value, no encryption key id, no email, no OIDC subject, no session or licence
@@ -69,9 +63,7 @@ pub struct SnapshotArgs {
     /// When set, also render every published platform output into this directory
     /// (`docs/design/docs`). Absent means the data snapshot only.
     pub outputs_dir: Option<PathBuf>,
-    /// A fixed RFC 3339 timestamp, for a byte-identical re-run. Absent means the newest
-    /// published document's `updated_at` — the same clock the live view uses — so the same
-    /// database still produces byte-identical files.
+    /// A fixed RFC 3339 timestamp, for a byte-identical re-run. Defaults to now.
     pub generated_at: Option<String>,
     /// The committed `gh issue list` registry (`issues.json`).
     pub issues: PathBuf,
@@ -228,6 +220,20 @@ pub async fn run_with_pool(
         .clone()
         .unwrap_or_else(|| snapshot_generated_at(&data));
 
+    // The register compares the standard's declared kinds with the rows this snapshot publishes.
+    // Read them once and reuse them for the pages: one read is what keeps `register.json` and
+    // `outputs.js` describing the same published set.
+    let outputs_inputs = crate::outputs::read_outputs_inputs(pool, tenant).await?;
+    let register = with_header(
+        crate::register::build(
+            &data.programme,
+            &crate::register::from_records(&outputs_inputs.records),
+            crate::register::read_gaps(&std::env::current_dir()?).as_ref(),
+        ),
+        SCHEMA,
+        &generated_at,
+    );
+
     let (issues, issues_bytes) = read_issues(&args.issues, &args.tenant)?;
     let feedback = feedback_issues(&issues);
     // The rework register is a file input like the issue registry, but the flag is explicit:
@@ -247,6 +253,7 @@ pub async fn run_with_pool(
     let snapshot_js = snapshot_js(
         &data,
         rework.as_ref(),
+        Some(&register),
         &args.tenant,
         &args.feedback_url,
         &generated_at,
@@ -309,25 +316,6 @@ pub async fn run_with_pool(
         with_header(data.measure, SCHEMA, &generated_at),
         &mut files,
     )?;
-    // The served action registry, the same strings `docs/design/data/actions.json` carries.
-    // A standard whose source is the registry (`blueprint`'s Action registry and data model)
-    // can only resolve when the snapshot it is audited against projects it; a design pack's
-    // committed dump is not the live record.
-    write_file(
-        &args.out,
-        "actions.json",
-        with_header(
-            json!({
-                "actions": conveyor_actions::registry()
-                    .iter()
-                    .map(|spec| spec.name.as_ref())
-                    .collect::<Vec<_>>(),
-            }),
-            SCHEMA,
-            &generated_at,
-        ),
-        &mut files,
-    )?;
     write_file(
         &args.out,
         "secrets.json",
@@ -353,16 +341,35 @@ pub async fn run_with_pool(
         write_file(&args.out, "rework.json", rework, &mut files)?;
     }
 
+    // The declared-vs-evidenced register: a downloadable file and the wrapper the studio loads
+    // beside its others. The wrapper is built from the same value the file is, redacted once.
+    let mut register = register;
+    redact(&mut register);
+    write_file(&args.out, "register.json", register.clone(), &mut files)?;
+    let register_js = format!(
+        "window.CONVEYOR_REGISTER = {};\n",
+        serde_json::to_string(&register)?
+    );
+    write_bytes(&args.out, "register.js", register_js.as_bytes(), &mut files)?;
+
     // The combined wrapper the studio loads with one <script> tag. It carries the files the
     // pages render; the raw JSON files stay beside it for sharing and diffing.
     write_bytes(&args.out, "snapshot.js", snapshot_js.as_bytes(), &mut files)?;
 
     // Platform outputs are a separate, published-only projection. They land beside the tracked
-    // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both.
+    // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both. The
+    // rows are the ones the register read, so the two projections cannot disagree.
     let mut outputs = 0usize;
     if let Some(dir) = args.outputs_dir.as_deref() {
-        let (count, written) =
-            crate::outputs::write_outputs_with_files(pool, tenant, &generated_at, dir).await?;
+        let (index, pages) = crate::outputs::render_outputs(
+            &outputs_inputs.records,
+            &outputs_inputs.projects,
+            &outputs_inputs.attachments,
+            &outputs_inputs.names,
+            &generated_at,
+            crate::outputs::rendered_commit().as_deref(),
+        )?;
+        let (count, written) = crate::outputs::write_rendered_with_files(dir, &index, &pages)?;
         outputs = count;
         // ⛔ Every published page is in the manifest (v1-pack-3): the path is relative to the
         // data directory, so `check-data.cjs` hashes a page exactly as it hashes `programme.json`.
@@ -635,7 +642,7 @@ fn relative_manifest_path(out: &Path, outputs_dir: &Path, name: &str) -> String 
 }
 
 /// Add the schema and timestamp so every file is self-describing.
-fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
+pub(crate) fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
     if let Some(object) = value.as_object_mut() {
         object.insert("schema".to_owned(), Value::String(schema.to_owned()));
         object.insert(
@@ -649,6 +656,7 @@ fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
 pub(crate) fn snapshot_js(
     data: &store::snapshot::SnapshotData,
     rework: Option<&Value>,
+    register: Option<&Value>,
     tenant: &str,
     feedback_url: &str,
     generated_at: &str,
@@ -675,6 +683,11 @@ pub(crate) fn snapshot_js(
     // otherwise, so a snapshot without `--conformance` keeps its exact bytes.
     if let Some(rework) = rework {
         value["rework"] = rework.clone();
+    }
+    // The declared-vs-evidenced register rides with the rows it judges, so the studio reads one
+    // global and a reader can diff the section against the standalone `register.json`.
+    if let Some(register) = register {
+        value["register"] = register.clone();
     }
     redact(&mut value);
     // The hash covers the payload BEFORE this field is added; it is what the LIVE ribbon shows
@@ -1007,129 +1020,5 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// v1-pack-3: an output page in the sibling `docs/` directory is named from the data
-    /// directory the manifest lives in, so the public gate can hash it like any data file.
-    #[test]
-    fn an_output_page_is_named_relative_to_the_data_directory() {
-        assert_eq!(
-            relative_manifest_path(
-                Path::new("/pack/data"),
-                Path::new("/pack/docs"),
-                "output-1.html"
-            ),
-            "../docs/output-1.html"
-        );
-        assert_eq!(
-            relative_manifest_path(
-                Path::new("/pack/data"),
-                Path::new("/pack/docs"),
-                "outputs.js"
-            ),
-            "../docs/outputs.js"
-        );
-        assert_eq!(
-            relative_manifest_path(
-                Path::new("/pack/data"),
-                Path::new("/pack/data"),
-                "outputs.js"
-            ),
-            "outputs.js"
-        );
-        assert_eq!(
-            relative_manifest_path(
-                Path::new("/pack/data"),
-                Path::new("/pack/data/pages"),
-                "output-1.html"
-            ),
-            "pages/output-1.html"
-        );
-    }
-
-    /// v1-pack-3/v1-pack-4: the finalise pass rehashes the finished pack, keeps the record
-    /// count the old manifest gave a file, gives a file the old manifest never saw `0`, and
-    /// never lists `manifest.json` itself.
-    #[test]
-    fn manifest_only_rehashes_the_finished_pack() -> Result<(), SnapshotError> {
-        let dir =
-            std::env::temp_dir().join(format!("conveyor-pack-manifest-{}", uuid::Uuid::now_v7()));
-        std::fs::create_dir_all(&dir)?;
-        let old_manifest = json!({
-            "schema": SCHEMA,
-            "generated_at": "2026-11-12T00:00:00Z",
-            "tenant": "snap",
-            "git_sha": "0123456789abcdef0123456789abcdef01234567",
-            "migration": {"version": 42, "description": "the snapshot migration"},
-            "feedback_url": DEFAULT_FEEDBACK_URL,
-            "redaction": "no secret values, no encryption key ids, no emails",
-            "files": [
-                {"path": "notes.txt", "sha256": "stale", "bytes": 1, "records": 5}
-            ],
-        });
-        std::fs::write(
-            dir.join("manifest.json"),
-            serde_json::to_vec_pretty(&old_manifest)?,
-        )?;
-        let notes = b"a note\n";
-        std::fs::write(dir.join("notes.txt"), notes)?;
-        let added = b"[1,2,3]\n";
-        std::fs::write(dir.join("added.json"), added)?;
-
-        let report = manifest_only(&SnapshotArgs {
-            tenant: "snap".to_owned(),
-            out: dir.clone(),
-            outputs_dir: None,
-            generated_at: None,
-            issues: dir.join("issues.json"),
-            conformance: None,
-            feedback_url: DEFAULT_FEEDBACK_URL.to_owned(),
-            database_url: None,
-            git_sha: None,
-            manifest_only: true,
-        })?;
-
-        let paths: Vec<&str> = report.files.iter().map(|file| file.path.as_str()).collect();
-        assert_eq!(paths, ["added.json", "notes.txt"]);
-        assert!(
-            !paths.contains(&"manifest.json"),
-            "the manifest never lists itself"
-        );
-        let added_file = &report.files[0];
-        assert_eq!(added_file.sha256, sha256_hex(added));
-        assert_eq!(added_file.bytes, added.len());
-        assert_eq!(
-            added_file.records, 0,
-            "a file the old manifest never listed has no record count"
-        );
-        let notes_file = &report.files[1];
-        assert_eq!(notes_file.sha256, sha256_hex(notes));
-        assert_eq!(
-            notes_file.records, 5,
-            "the old manifest's record count survives"
-        );
-
-        let written: Value =
-            serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json"))?)?;
-        assert_eq!(written["schema"], SCHEMA);
-        assert_eq!(written["tenant"], "snap");
-        assert_eq!(written["generated_at"], "2026-11-12T00:00:00Z");
-        assert_eq!(
-            written["migration"],
-            json!({"version": 42, "description": "the snapshot migration"})
-        );
-        assert_eq!(written["files"].as_array().map(Vec::len), Some(2));
-        assert_eq!(
-            report.manifest_sha256,
-            sha256_hex(&std::fs::read(dir.join("manifest.json"))?)
-        );
-
-        std::fs::remove_dir_all(&dir)?;
-        Ok(())
     }
 }

@@ -93,6 +93,20 @@ live register, not a plan's status label, decides whether the project is propose
    ```
    Then run `python3 scripts/ci/board.py --repo <owner/name> --dor <new-number>`; exit 0 is the
    gate. Fix the body in place if it fails.
+
+   **Link it into the rollup (#780 P3).** The programme parent owns the unit as a native
+   sub-issue, and the tranche milestone carries the programme's own state:
+   ```bash
+   parent=$(gh issue list --repo <owner/name> --label programme --state open \
+     --json number --jq '.[].number')
+   child=$(gh api "repos/<owner/name>/issues/<new-number>" --jq .id)
+   gh api -X POST "repos/<owner/name>/issues/$parent/sub_issues" -f sub_issue_id="$child"
+   gh issue edit <new-number> --repo <owner/name> --milestone "T<tranche>"
+   ```
+   `parent` must resolve to exactly one number: an empty or multi-line value is a report, never a
+   guess (the sweep flags a unit with no parent). `T<tranche>` is the `## Programme` Tranche value;
+   `pending #N` or an unmapped tranche carries no milestone, and a milestone that does not exist is
+   reported, never created here.
    Labels must exist first (`gh label create`); see `03-DELIVERY.md`. Never use `--add-assignee`
    (the GitHub App token cannot assign). A plan that spans two plans carries two slice labels.
    A docs-only unit (`docs/**`, any `*.md`, `.claude/**`) is budgeted as one short PR run; its merge

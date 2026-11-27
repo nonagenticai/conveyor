@@ -28,7 +28,7 @@ use super::render;
 ///
 /// Pinned so a certificate says which spec it was proven against; the test
 /// `the_pinned_spec_digest_matches_the_spec` is what keeps it true.
-pub const SPEC_V2_SHA256: &str = "a4186da94bdacb0fc22104ad511cc6ab0aed7fe6bed5827da94eb7b99ea07192";
+pub const SPEC_V2_SHA256: &str = "531edb3a0bfdee74c317746f9f4e3934f216ace6ebb4199d5387364ef833a265";
 
 /// The slices the programme is delivered as, per `docs/SPEC_V2.md` §12.
 ///

@@ -2166,6 +2166,15 @@ async fn registers_update(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    // The same rule on the edit path: an open change row cannot be patched to `approved`.
+    // Its gate decides that, and the gate's effect writes the status.
+    if current.kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_is_a_gate_effect",
+            "a change row is approved by its change gate, never by update",
+        ));
+    }
     let record = store::spine::update_register_tx(
         &mut *tx,
         ctx.tenant,

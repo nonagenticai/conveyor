@@ -501,7 +501,7 @@ pub async fn record_dry_run(pg: &Pg, tenant: TenantId, action: &str, input: &Val
         duration_ms: 0,
         trace_id: None,
     };
-    conveyor_store::actions::record_invocation(&mut *tx, tenant, &record)
+    conveyor_store::actions::record_invocation(&mut tx, tenant, &record)
         .await
         .expect("record the dry run");
     tx.commit().await.expect("commit the dry run");
@@ -598,7 +598,7 @@ pub async fn approved_gate(
             duration_ms: 0,
             trace_id: None,
         };
-        conveyor_store::actions::record_invocation(&mut *tx, tenant, &record)
+        conveyor_store::actions::record_invocation(&mut tx, tenant, &record)
             .await
             .expect("record the dry run");
     }

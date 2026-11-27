@@ -10,6 +10,8 @@ pub mod action;
 pub mod install;
 /// `conveyor admin intake` — a GitHub issue becomes a card on a project's board.
 pub mod intake;
+/// `conveyor admin machine-principal` — provision the row a licence bearer resolves to (#760).
+pub mod machine_principal;
 /// `conveyor admin retire-plan-seed` — archive the retired plan-seed cards.
 pub mod retire_plan_seed;
 pub mod trace_diff;

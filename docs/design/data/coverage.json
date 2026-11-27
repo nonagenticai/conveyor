@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1777,
+      "line": 1704,
       "name": "approvals.decide"
     },
     {
-      "line": 6810,
+      "line": 6485,
       "name": "approvals.decide"
     },
     {
-      "line": 6597,
+      "line": 6272,
       "name": "approvals.list"
     },
     {
-      "line": 6598,
+      "line": 6273,
       "name": "approvals.list"
     },
     {
-      "line": 6770,
+      "line": 6445,
       "name": "approvals.request"
     },
     {
-      "line": 1677,
+      "line": 1604,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1678,
+      "line": 1605,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 3014,
+      "line": 2941,
       "name": "documents.compose"
     },
     {
-      "line": 3501,
+      "line": 3428,
       "name": "documents.compose"
     },
     {
-      "line": 3296,
+      "line": 3223,
       "name": "documents.create"
     },
     {
-      "line": 3367,
+      "line": 3294,
       "name": "documents.delete"
     },
     {
-      "line": 3313,
+      "line": 3240,
       "name": "documents.download"
     },
     {
-      "line": 3346,
+      "line": 3273,
       "name": "documents.download"
     },
     {
-      "line": 3036,
+      "line": 2963,
       "name": "documents.get"
     },
     {
-      "line": 3331,
+      "line": 3258,
       "name": "documents.get"
     },
     {
-      "line": 1536,
+      "line": 1463,
       "name": "documents.list"
     },
     {
-      "line": 1559,
+      "line": 1486,
       "name": "documents.list"
     },
     {
-      "line": 1586,
+      "line": 1513,
       "name": "documents.list"
     },
     {
-      "line": 3264,
+      "line": 3191,
       "name": "documents.list"
     },
     {
-      "line": 3398,
+      "line": 3325,
       "name": "documents.preview"
     },
     {
-      "line": 3444,
+      "line": 3371,
       "name": "documents.return"
     },
     {
-      "line": 3185,
+      "line": 3112,
       "name": "documents.revision_get"
     },
     {
-      "line": 3146,
+      "line": 3073,
       "name": "documents.revision_list"
     },
     {
-      "line": 6678,
+      "line": 6353,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6670,
+      "line": 6345,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6686,
+      "line": 6361,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6554,
+      "line": 6229,
       "name": "procedures.list"
     },
     {
-      "line": 6883,
+      "line": 6558,
       "name": "procedures.publish"
     },
     {
-      "line": 6731,
+      "line": 6406,
       "name": "procedures.review_source"
     },
     {
-      "line": 6713,
+      "line": 6388,
       "name": "procedures.validate"
     },
     {
-      "line": 1800,
+      "line": 1727,
       "name": "process_runs.start"
     },
     {
-      "line": 6577,
+      "line": 6252,
       "name": "processes.get"
     },
     {
-      "line": 6557,
+      "line": 6232,
       "name": "processes.list"
     },
     {
-      "line": 6885,
+      "line": 6560,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1013,
+      "line": 1020,
       "name": "programmes.list"
     },
     {
-      "line": 1081,
+      "line": 1088,
       "name": "programmes.refresh"
     },
     {
-      "line": 2945,
+      "line": 2872,
       "name": "projects.close"
     },
     {
-      "line": 2806,
+      "line": 2733,
       "name": "projects.create"
     },
     {
-      "line": 1750,
+      "line": 1677,
       "name": "runs.cancel"
     },
     {
-      "line": 1728,
+      "line": 1655,
       "name": "runs.get"
     },
     {
-      "line": 1705,
+      "line": 1632,
       "name": "runs.list"
     }
   ],
@@ -219,6 +219,7 @@
       },
       "name": "Publish the SPEC_V2 studio design pack, live",
       "parallel_with": [
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -251,6 +252,58 @@
     {
       "blocked_by": [],
       "evidence": [
+        "docs/plans/GEMBA-WALK.md"
+      ],
+      "gap": "unknown project shape; add an evidence row",
+      "key": "GEMBA-WALK",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "The Gemba Walk \u2014 a separate game-style client",
+      "parallel_with": [
+        "DESIGN-PUBLISH",
+        "P0",
+        "PLATFORM",
+        "S00",
+        "S01",
+        "SPEC-V2",
+        "T0"
+      ],
+      "plan": "docs/plans/GEMBA-WALK.md",
+      "status": "planned",
+      "track": "programme",
+      "tranche": 0,
+      "units": {
+        "blocked": 4,
+        "claimed": 1,
+        "numbers": [
+          792,
+          806,
+          813,
+          814,
+          815,
+          816,
+          817
+        ],
+        "open": 5,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
         "docs/plans/P0-programme-definition.md",
         "docs/design/docs/plans/P0-programme-definition.html",
         "seed/programme.json"
@@ -274,6 +327,7 @@
       "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "PLATFORM",
         "S00",
         "S01",
@@ -322,6 +376,7 @@
       "name": "CI, runners and platform",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "S00",
         "S01",
@@ -333,8 +388,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 2,
+        "claimed": 3,
         "numbers": [
           16,
           17,
@@ -353,15 +408,18 @@
           223,
           225,
           395,
-          435,
           476,
           526,
-          569,
-          660,
           669,
-          733
+          733,
+          755,
+          782,
+          783,
+          784,
+          803,
+          819
         ],
-        "open": 12,
+        "open": 15,
         "ready": 6,
         "unknown": 0
       }
@@ -391,6 +449,7 @@
       "name": "Usage inventory \u2192 parity/parity.yaml",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S01",
@@ -434,6 +493,7 @@
       "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -491,8 +551,8 @@
         "numbers": [
           2
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -569,12 +629,13 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          3
+          3,
+          812
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1479,20 +1540,20 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0071_ladder_option_sets.sql"
       ],
-      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
+      "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          6,
-          10
+          12,
+          12
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          4,
-          4
+          5,
+          5
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1501,7 +1562,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "partial",
+      "status": "built",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -1548,6 +1609,7 @@
       "name": "SPEC V2 \u2014 the organisational operating model",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -1564,7 +1626,7 @@
         "numbers": [
           24
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1596,6 +1658,7 @@
       "name": "Model and contracts",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -1651,7 +1714,10 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          72
+          72,
+          744,
+          746,
+          762
         ],
         "open": 0,
         "ready": 0,
@@ -1785,8 +1851,8 @@
         "numbers": [
           88
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1827,7 +1893,8 @@
           76,
           556,
           557,
-          630
+          630,
+          778
         ],
         "open": 0,
         "ready": 0,
@@ -1879,7 +1946,8 @@
           558,
           560,
           561,
-          688
+          688,
+          776
         ],
         "open": 0,
         "ready": 0,
@@ -2062,7 +2130,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           559,
           562,
@@ -2072,7 +2140,7 @@
           566
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2224,8 +2292,8 @@
       "key": "T3",
       "measured": {
         "actions": [
-          7,
-          7
+          6,
+          6
         ],
         "modules": [
           0,
@@ -2247,11 +2315,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          74
+          74,
+          797
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2779,18 +2848,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 46,
-        "partial": 2,
-        "planned": 0,
+        "built": 47,
+        "partial": 1,
+        "planned": 1,
         "proposed": 1,
         "standing": 1
       },
-      "total": 51,
-      "uncovered": [
-        "S21"
-      ],
-      "with_open_units": 11,
-      "without_open_units": 40
+      "total": 52,
+      "uncovered": [],
+      "with_open_units": 10,
+      "without_open_units": 42
     },
     "screens": {
       "actions_invoked": 39,

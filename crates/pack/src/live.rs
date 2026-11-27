@@ -5,22 +5,20 @@
 //! read-only transaction** — the snapshot data, the published documents and the projects —
 //! so the two projections cannot disagree about a row that changed between two reads.
 //!
-//! **Deterministic.** `generated_at` is the same clock `conveyor snapshot` derives from the
-//! snapshot data — the newest published document's `updated_at`, or [`EMPTY_GENERATED_AT`] when
-//! there is none. Never the request clock: two reads of an unchanged database are byte-identical,
-//! which is what makes the HTTP `ETag` stable and what makes the live download the CLI's bytes.
+//! **Deterministic.** `generated_at` is the newest published document's `updated_at`, never the
+//! request clock; an empty tenant gets [`EMPTY_GENERATED_AT`]. Two reads of an unchanged database
+//! are byte-identical, which is what makes the HTTP `ETag` stable.
 //!
-//! **Redacted and safe.** [`crate::outputs::render_outputs`] applies the programme filter and the
-//! snapshot's `redact` safety net to every title, body, attachment name, project name and author
-//! exactly as the JSON record does; the CSV redacts the same fields. The Markdown renderer (in
-//! [`crate::outputs`]) neutralises raw HTML and refuses non-http(s)/mailto URLs. Only
-//! `published_at IS NOT NULL AND status='active'` rows with a body are visible — the same filter
-//! the CLI writer uses.
+//! **Redacted and safe.** Titles and bodies pass the snapshot's `redact` safety net before they
+//! are rendered. The Markdown renderer (in [`crate::outputs`]) neutralises raw HTML and refuses
+//! non-http(s)/mailto URLs. Only `published_at IS NOT NULL AND status='active'` rows with a body are visible —
+//! the same filter the CLI writer uses.
 
 use std::collections::HashMap;
 
 use conveyor_domain::TenantId;
 use conveyor_store as store;
+use conveyor_store::document::DocumentRecord;
 use serde_json::Value;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -84,9 +82,21 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     let names = crate::outputs::author_names(&mut tx, &records).await?;
     tx.rollback().await?;
 
-    // The one clock both producers use. A CLI run without `--generated-at` derives the same
-    // timestamp from the same `SnapshotData`, so the live download is byte-for-byte the file the
-    // CLI writes against this database — `payload_sha256` included.
+    // ⛔ The live view is the PROGRAMME's view. A project outside a programme is a session
+    // fixture (a proof, a scratch reproduction), so its page row and its published documents are
+    // not public — the same rule `snapshot_tx` applies to the work sections (SPEC_V2 §5).
+    let bound: std::collections::HashSet<Uuid> = projects
+        .iter()
+        .filter(|project| project.programme_id.is_some())
+        .map(|project| project.id)
+        .collect();
+    let projects: Vec<_> = projects
+        .into_iter()
+        .filter(|project| project.programme_id.is_some())
+        .collect();
+    let records = in_programme(records, &bound, |record| record.project_id);
+    let attachments = in_programme(attachments, &bound, |attachment| attachment.project_id);
+
     let generated_at = snapshot_generated_at(&data);
 
     // The issue registry is a commit-time artefact, not a database row: inject it before the
@@ -98,11 +108,24 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         object.insert("issue_registry".to_owned(), issues);
         object.insert("feedback".to_owned(), Value::Array(feedback));
     }
+    // The declared-vs-evidenced register, built from the same rows this view renders. The
+    // committed gap register is a checkout artefact; a pod without one reports the posture as
+    // absent rather than inventing zero gaps.
+    let register = crate::snapshot::with_header(
+        crate::register::build(
+            &data.programme,
+            &crate::register::from_records(&records),
+            crate::register::read_gaps(&std::env::current_dir()?).as_ref(),
+        ),
+        crate::snapshot::SCHEMA,
+        &generated_at,
+    );
     // The rework register is a commit-time artefact like the issue registry: it is carried into
     // the wrapper from `args`, and omitted from it when the image has no register.
     let snapshot_js = snapshot_js(
         &data,
         args.rework.as_ref(),
+        Some(&register),
         args.tenant_slug,
         args.feedback_url,
         &generated_at,
@@ -113,10 +136,28 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     let programme_json = section_json(&data.programme, &generated_at)?;
     let programme_csv = programme_csv(&data.programme);
 
-    // The programme filter and the snapshot's redaction are applied inside the one renderer
-    // (`outputs::render_outputs`), so the live pages and the CLI pages cannot diverge.
-    let (outputs_js, pages) =
-        render_outputs(&records, &projects, &attachments, &names, &generated_at)?;
+    // Apply the snapshot's safety net to the one free text the public site renders from a
+    // document row. The rows themselves come from a query that selects explicit columns.
+    let mut redacted = records;
+    for record in &mut redacted {
+        record.title = redact_text(&record.title);
+        if let Some(body) = record.body.as_deref() {
+            record.body = Some(redact_text(body));
+        }
+    }
+    // An attachment's title is the file name the public page shows; it is free text too.
+    let mut redacted_attachments = attachments;
+    for attachment in &mut redacted_attachments {
+        attachment.title = redact_text(&attachment.title);
+    }
+    let (outputs_js, pages) = render_outputs(
+        &redacted,
+        &projects,
+        &redacted_attachments,
+        &names,
+        &generated_at,
+        crate::outputs::rendered_commit().as_deref(),
+    )?;
 
     Ok(SiteView {
         snapshot_js,
@@ -214,28 +255,27 @@ pub(crate) fn programme_csv(programme: &Value) -> String {
             }
         }
         let issues: Vec<String> = numbers.iter().map(|number| format!("#{number}")).collect();
-        // The same safety net the JSON download applies: a project key, name, status or plan path
-        // is free text and can carry a pasted credential or email.
         let fields = [
-            redact_text(key),
-            redact_text(
-                project
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .unwrap_or_default(),
-            ),
-            redact_text(&meta.get("tranche").map(tranche_text).unwrap_or_default()),
-            redact_text(
-                project
-                    .get("status")
-                    .and_then(Value::as_str)
-                    .unwrap_or_default(),
-            ),
-            redact_text(&blocked_by.join(";")),
+            key.to_owned(),
+            project
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+            meta.get("tranche").map(tranche_text).unwrap_or_default(),
+            project
+                .get("status")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+            blocked_by.join(";"),
             open.to_string(),
             claimed.to_string(),
             issues.join(";"),
-            redact_text(meta.get("plan").and_then(Value::as_str).unwrap_or_default()),
+            meta.get("plan")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
         ];
         out.push_str(
             &fields
@@ -266,43 +306,36 @@ fn csv_field(field: &str) -> String {
     }
 }
 
+/// The newest published document's timestamp, or the empty-tenant constant.
+#[cfg(test)]
+fn generated_at(records: &[DocumentRecord]) -> String {
+    records
+        .iter()
+        .map(|record| record.updated_at)
+        .max()
+        .map(|at| at.to_rfc3339())
+        .unwrap_or_else(|| EMPTY_GENERATED_AT.to_owned())
+}
+
+/// Keep the rows whose project is part of the programme. A row with no project (a tenant-level
+/// note the tenant chose to publish) stays: the filter removes fixtures, not orphans.
+fn in_programme<T>(
+    rows: Vec<T>,
+    bound: &std::collections::HashSet<Uuid>,
+    project_of: impl Fn(&T) -> Option<Uuid>,
+) -> Vec<T> {
+    rows.into_iter()
+        .filter(|row| project_of(row).is_none_or(|id| bound.contains(&id)))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn data_with_documents(documents: Value) -> store::snapshot::SnapshotData {
-        store::snapshot::SnapshotData {
-            programme: serde_json::json!({}),
-            organisation: serde_json::json!({}),
-            config: serde_json::json!({}),
-            work: serde_json::json!({}),
-            msp: serde_json::json!({}),
-            artefacts: serde_json::json!({"documents": documents}),
-            architecture: serde_json::json!({}),
-            ops: serde_json::json!({}),
-            measure: serde_json::json!({}),
-            secrets: serde_json::json!({}),
-        }
-    }
-
     #[test]
     fn an_empty_tenant_has_a_constant_clock() {
-        assert_eq!(
-            snapshot_generated_at(&data_with_documents(serde_json::json!([]))),
-            EMPTY_GENERATED_AT
-        );
-    }
-
-    /// v1-pack-2: the live clock is derived from the snapshot data, not the request; the CLI
-    /// derives the same value when `--generated-at` is absent.
-    #[test]
-    fn the_clock_is_the_newest_published_document() {
-        let data = data_with_documents(serde_json::json!([
-            {"id": "a", "updated_at": "2026-11-12T00:00:00+00:00"},
-            {"id": "b", "updated_at": "2026-11-13T00:00:00+00:00"},
-            {"id": "c", "updated_at": "not a timestamp"},
-        ]));
-        assert_eq!(snapshot_generated_at(&data), "2026-11-13T00:00:00+00:00");
+        assert_eq!(generated_at(&[]), EMPTY_GENERATED_AT);
     }
 
     /// The download's shape: one header, one line per project, blockers and unit counts derived.
@@ -340,30 +373,25 @@ mod tests {
         );
     }
 
-    /// v1-pack-6: `programme.csv` passes the JSON download's redaction. A token or email pasted
-    /// into a project name, key, status or plan path is masked in both.
+    /// P2.1 of #382: an unbound project's page row and published documents are not public.
     #[test]
-    fn the_programme_csv_redacts_free_text() {
-        let token = format!("ghp_{}", "B".repeat(30));
-        let programme = serde_json::json!({
-            "projects": [
-                {"key": "T1", "name": format!("Project {token}"), "status": "active",
-                 "meta": {"tranche": 1, "depends_on": ["alice@example.com"],
-                          "issues": [], "plan": "/Users/alice/plan.md"}},
-            ],
-        });
-        let csv = programme_csv(&programme);
-        assert!(!csv.contains(&token), "the token is redacted: {csv}");
-        assert!(
-            !csv.contains("alice@example.com"),
-            "the email is redacted: {csv}"
+    fn an_unbound_project_is_not_public() {
+        let t0 = Uuid::now_v7();
+        let t1 = Uuid::now_v7();
+        let bound: std::collections::HashSet<Uuid> = [t0, t1].into_iter().collect();
+        let unbound = Uuid::now_v7();
+        let rows = vec![
+            (Some(t0), "the programme's own"),
+            (Some(t1), "bound"),
+            (Some(unbound), "a scratch fixture"),
+            (None, "a tenant-level note"),
+        ];
+        let kept = in_programme(rows, &bound, |row| row.0);
+        let names: Vec<&str> = kept.iter().map(|row| row.1).collect();
+        assert_eq!(
+            names,
+            vec!["the programme's own", "bound", "a tenant-level note"],
+            "an unbound project's row and its documents are filtered; orphan rows stay"
         );
-        assert!(
-            !csv.contains("/Users/alice"),
-            "the home path is redacted: {csv}"
-        );
-        assert!(csv.contains("[redacted-token]"), "{csv}");
-        assert!(csv.contains("***@redacted"), "{csv}");
-        assert!(csv.contains("[redacted-path]"), "{csv}");
     }
 }

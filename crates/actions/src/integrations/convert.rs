@@ -126,8 +126,8 @@ pub struct ModelDraft {
     /// The job the SOP defines, when it names one.
     #[serde(default)]
     pub job: Option<ModelJob>,
-    /// Tools the SOP asked for. **Never granted.** `procedures.validate` refuses a non-empty list;
-    /// the field exists so the request is recorded and refused by name, not silently dropped.
+    /// Tools the SOP asked for. **Never granted.** Each name is opened as a governed tool request
+    /// (§11.6.3) and reported by `procedures.validate` until a published tool provides it.
     #[serde(default)]
     pub requested_tools: Vec<String>,
 }

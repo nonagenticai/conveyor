@@ -2565,7 +2565,12 @@
    ],
    "failure_scenario": "A production or QC procedure carries a gate that names analyse.brand or analyse.content (the §10.4.1 example: scoring the subject of the project, not the system). The action does not exist, so the gate cannot produce its evidence row and the step fails at resolution; brand/content/application/report QC is impossible without out-of-band work, while §10.4.1 forbids building it inside metrics/evals.",
    "acceptance": "analyse.app, analyse.brand, analyse.content and analyse.report are registered with schemas and handlers (or explicitly scoped out in SPEC §10.4 by owner decision), and a registry test asserts the final six-verb set.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "7388a4d04983b7acab8eb309bdc5feaa3c07c367",
+    "test": "crates/actions/tests/registry.rs::the_analysis_family_is_the_six_declared_verbs",
+    "evidence": "registered analyse.app, analyse.brand, analyse.content and analyse.report as read-only ActionSpecs over conveyor-analysis; the six-name registry test passes (analyse.app, analyse.brand, analyse.content, analyse.report, analyse.site, analyse.video); cargo-guard test -p conveyor-actions --test registry: 1 passed"
+   }
   },
   {
    "id": "v1-w4a-1",

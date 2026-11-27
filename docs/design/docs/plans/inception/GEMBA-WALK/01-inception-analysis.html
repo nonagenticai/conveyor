@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — Inception analysis · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/01-inception-analysis.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--inception-analysis">GEMBA-WALK — Inception analysis</h1>
+<h2 id="current-state">Current state</h2>
+<p>Measured at <code>main@cedd84980</code> on 2026-11-26; the walk has no code in the tree.</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>State</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operator UI</td>
+<td>DONE (normative)</td>
+<td><code>apps/web/src/app.rs</code> Leptos <code>&lt;Router&gt;</code>: 52 route patterns, 43 screen modules</td>
+</tr>
+<tr>
+<td>Browser specs</td>
+<td>DONE (normative)</td>
+<td><code>apps/web/e2e/**</code>: 46 Playwright specs</td>
+</tr>
+<tr>
+<td>Action registry</td>
+<td>DONE</td>
+<td><code>docs/design/data/actions.json</code>: 597 actions; <code>actions.describe</code> carries input/output JSON Schema, effect, confirm, tenancy, spec hash</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>DONE</td>
+<td><code>apps/web/src/auth.rs</code>: auth-code + PKCE S256, token in memory, verifier in <code>sessionStorage</code>, dev cookie</td>
+</tr>
+<tr>
+<td>Events</td>
+<td>DONE</td>
+<td><code>apps/web/src/sse.rs</code>: fetch stream, bearer header, <code>Last-Event-ID</code>, <code>resync</code></td>
+</tr>
+<tr>
+<td>Static serving</td>
+<td>PARTIAL</td>
+<td><code>crates/api/src/web.rs</code>: a directory with <code>index.html</code> is a sub-site; <code>/walk/&lt;deep-path&gt;</code> falls through to the operator <code>index.html</code> — no scoped fallback</td>
+</tr>
+<tr>
+<td><code>/walk</code> client</td>
+<td>ABSENT</td>
+<td><code>grep -rni 'gemba|/walk' apps crates</code> → no hit; no <code>apps/walk</code></td>
+</tr>
+<tr>
+<td>Programme row</td>
+<td>ABSENT</td>
+<td><code>seed/programme.json</code> has 50 projects, none GEMBA-WALK</td>
+</tr>
+<tr>
+<td>Inception set</td>
+<td>ABSENT</td>
+<td><code>docs/plans/inception/GEMBA-WALK/</code> did not exist before this unit</td>
+</tr>
+<tr>
+<td>The mock</td>
+<td>LOCAL ONLY</td>
+<td><code>docs/Conveyor-Gemba-Walk.html</code> (6.7 MB, untracked): canvas-2D world, seats/committee/studio, a 25 Nov snapshot in <code>localStorage</code>; no auth, no registry, no server</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reuse-sources">Reuse sources</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Path:symbol</th>
+<th>Reuse decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identity</td>
+<td><code>apps/web/src/auth.rs</code> (PKCE, token in memory, dev cookie)</td>
+<td><strong>Reuse the flow</strong>, not the code: the walk implements the same auth-code + PKCE contract; the redirect URI is the only external change</td>
+</tr>
+<tr>
+<td>Action client</td>
+<td><code>apps/web/src/api.rs</code> (<code>actions.describe</code>, invocation envelope)</td>
+<td>Reuse the contract shape; the walk's client is its own module</td>
+</tr>
+<tr>
+<td>Events</td>
+<td><code>apps/web/src/sse.rs</code> (fetch stream, <code>Last-Event-ID</code>)</td>
+<td>Reuse the protocol; one subscription per screen</td>
+</tr>
+<tr>
+<td>Route table</td>
+<td><code>apps/web/src/app.rs</code> (<code>&lt;Router&gt;</code>)</td>
+<td>Reuse as the <strong>census source</strong> — the walk's routes are <code>/walk</code> + the app path by construction</td>
+</tr>
+<tr>
+<td>Static serving</td>
+<td><code>crates/api/src/web.rs</code> (sub-site with <code>index.html</code>)</td>
+<td>Reuse; <strong>extend</strong> with a scoped <code>/walk/*</code> fallback + Rust test</td>
+</tr>
+<tr>
+<td>Design pack</td>
+<td><code>docs/design/README.md</code> (static sub-site, auth bootstrap, console.js)</td>
+<td>Reuse the serving/auth pattern; the walk is not a pack page</td>
+</tr>
+<tr>
+<td>Action specs</td>
+<td><code>crates/actions/src/**</code> <code>#[action(...)]</code></td>
+<td>Reuse as the schema/effect/scope source; no new action</td>
+</tr>
+<tr>
+<td>Specs</td>
+<td><code>apps/web/e2e/**</code></td>
+<td>Reuse the assertions' content; the walk has its own suite</td>
+</tr>
+</tbody>
+</table>
+<h2 id="build-vs-reuse">Build vs reuse</h2>
+<p><strong>Build:</strong> the static sub-site (<code>apps/walk/index.html</code>, <code>src/main.js</code>, auth, api, forms, router registry, shell, world port, state, a11y); the DOM sheet system; the schema-driven action sheet; the seats presets; the canvas world and its <code>WorldView</code> implementation; the parity instrument and the frozen census; the Playwright suite; the serving fallback and Dockerfile copy; the walk CI workflow.</p>
+<p><strong>Reuse, never rebuild:</strong> the action registry, <code>actions.describe</code>, the invocation envelope and headers, the identity provider, the read models, the server's refusals and the design pack. The walk is a client of the existing contract; a capability the contract does not expose is an honest gate.</p>
+<p><strong>Reject:</strong> an iframe or WebView of the mock; a second backend; a second decision store; a <code>localStorage</code> programme state; any fixture or embedded snapshot; a new table, action, event or port.</p>
+<p><strong>The one architectural decision:</strong> the client is a static sub-site served from the same image and origin, with all work in DOM sheets and the world behind a <code>WorldView</code> port. That is what makes the <em>renderer</em> replaceable (canvas-2D first, WebGL2 measured) while the simulation — <code>bevy_ecs</code> in <code>crates/walk-world</code> (ADR 0022) — stays a pure Rust crate with no DOM coupling.</p>
+<h2 id="constraints-and-licences">Constraints and licences</h2>
+<ul>
+<li>Same image and origin, no new port; the Dockerfile copies the static output and <code>web.rs</code> serves it.</li>
+<li>OIDC: the public client gains a <code>/walk/</code> redirect URI (or a dedicated public client); this is an external identity-operator change, recorded as <code>acceptance-blocked-by</code>.</li>
+<li>Renderer candidates: canvas-2D (no dependency); WebGL2 if the spike shows the canvas budget fails. The simulation is <code>bevy_ecs 0.20.1</code> (Apache-2.0 OR MIT) in its own crate. Any embedded font must carry its licence; the mock's embedded font is not carried without its licence.</li>
+<li>No private host, path, token or credential in any page; <code>no-private-refs</code> is a gate.</li>
+<li>The world crate is the only new Rust dependency; its wasm build runs on GitHub preflight.</li>
+</ul>
+<h2 id="risks">Risks</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Evidence it is real</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scope: 597 actions, 52 routes</td>
+<td>measured census</td>
+<td>schema-driven action sheet; frozen census; per-destination specs; P6 is the only done</td>
+</tr>
+<tr>
+<td>Contract drift between clients</td>
+<td>two clients, one registry</td>
+<td>one contract; behavioural trace parity on named flows; a contract test per write</td>
+</tr>
+<tr>
+<td>Auth duplication</td>
+<td>a second PKCE flow</td>
+<td>same flow, shared config, one identity provider; the dev cookie for local runs</td>
+</tr>
+<tr>
+<td>Renderer misses budgets</td>
+<td>WebGL2 startup and frame cost unknown</td>
+<td>measure in P0; the canvas baseline stays; ADR 0023 decides</td>
+</tr>
+<tr>
+<td>Deep links render the operator app</td>
+<td><code>web.rs</code> fallback absent</td>
+<td>scoped fallback + Rust test in P1, before any link is published</td>
+</tr>
+<tr>
+<td>No local Rust builds</td>
+<td>owner rule</td>
+<td>wasm compile on GitHub preflight; the baseline needs no Rust</td>
+</tr>
+<tr>
+<td>Mock leakage</td>
+<td>the mock embeds a snapshot and fixtures</td>
+<td>Do-Not list; a test asserts no snapshot URL is fetched</td>
+</tr>
+<tr>
+<td>Accessibility regression</td>
+<td>a game UI invites canvas-only controls</td>
+<td>DOM-only work; keyboard path; canvas duplicated by the map</td>
+</tr>
+</tbody>
+</table>
+<h2 id="open-questions">Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>canvas-2D or WebGL2 for the renderer?</td>
+<td>undecided until the P0 spike; the simulation is <code>bevy_ecs</code> either way (ADR 0022)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>shared public client with a <code>/walk/</code> redirect, or a dedicated public client?</td>
+<td>shared unless the identity operator prefers isolation; the spike proves the dev path</td>
+</tr>
+<tr>
+<td>3</td>
+<td>how are the seat presets bound to real job keys?</td>
+<td>by the job-key mapping the <code>GET /api/me</code> membership already carries; a preset never changes authority</td>
+</tr>
+<tr>
+<td>4</td>
+<td>does the walk ship in the same image as the app?</td>
+<td>yes; same image and origin, no new port</td>
+</tr>
+</tbody>
+</table>
+<h2 id="links">Links</h2>
+<ul>
+<li>Brief: <code>00-project-brief.md</code></li>
+<li>Architecture: <code>02-architecture-design.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> §1–§3, §10</li>
+<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/GEMBA-WALK/01-inception-analysis.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

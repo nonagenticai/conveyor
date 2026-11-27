@@ -14,7 +14,7 @@
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-use conveyor_bus::Bus;
+use conveyor_bus::{Bus, BusError};
 use tokio::sync::OnceCell;
 use uuid::Uuid;
 
@@ -42,11 +42,39 @@ pub async fn url() -> &'static str {
     .await
 }
 
+/// How many times [`bus`] retries a refused handshake before it fails closed.
+const CONNECT_ATTEMPTS: u32 = 5;
+
 /// A connected [`Bus`] ([`url`] starts the container on first use).
+///
+/// CI shares one Redis across a whole nextest shard (process-per-test), so a handshake can time
+/// out under load while the server is healthy. Measured 2026-11-26 (run 45904034293):
+/// `Redis(timed out)` in `a_large_job_round_trips_intact`. A transient refusal is not a bus
+/// property, so retry a bounded number of times and still fail closed with the last error.
 pub async fn bus() -> Bus {
-    Bus::connect(url().await)
+    let url = url().await;
+    connect_with_retry(CONNECT_ATTEMPTS, || Bus::connect(url))
         .await
         .expect("connect to the test Redis")
+}
+
+/// The retry loop, with the connector injected so a test can prove the budget is bounded.
+async fn connect_with_retry<F, Fut>(attempts: u32, mut connect: F) -> Result<Bus, BusError>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<Bus, BusError>>,
+{
+    let mut last = None;
+    for attempt in 1..=attempts {
+        match connect().await {
+            Ok(bus) => return Ok(bus),
+            Err(error) => {
+                last = Some(error);
+                tokio::time::sleep(Duration::from_millis(200 * u64::from(attempt))).await;
+            }
+        }
+    }
+    Err(last.expect("at least one attempt"))
 }
 
 /// A Redis URL nobody else is using — for the one scenario that wipes the server.
@@ -83,9 +111,21 @@ async fn private_url_with(
 /// The private URL the environment names, if any. Pure, so a test can prove the decision without
 /// touching the process environment.
 fn private_url_from(get: impl Fn(&str) -> Option<String>) -> Option<String> {
-    get("TEST_REDIS_PRIVATE_URL")
+    let private = get("TEST_REDIS_PRIVATE_URL")
         .map(|value| value.trim().to_owned())
-        .filter(|value| !value.is_empty())
+        .filter(|value| !value.is_empty())?;
+    // The FLUSHALL rehearsal would wipe every sibling's streams if this pointed at the shared
+    // server, so a misconfiguration is refused loudly instead of looking like a bus bug.
+    for key in ["TEST_REDIS_URL", "REDIS_URL"] {
+        let shared = get(key)
+            .map(|value| value.trim().to_owned())
+            .filter(|value| !value.is_empty());
+        assert!(
+            shared.as_deref() != Some(private.as_str()),
+            "{key} equals TEST_REDIS_PRIVATE_URL ({private}): the FLUSHALL rehearsal would wipe every sibling's streams"
+        );
+    }
+    Some(private)
 }
 
 fn image() -> String {
@@ -230,5 +270,35 @@ mod tests {
         let url =
             private_url_with(|_| None, std::future::ready("docker-container".to_owned())).await;
         assert_eq!(url, "docker-container");
+    }
+
+    /// A private URL equal to the shared one would point `FLUSHALL` at every sibling's streams.
+    #[test]
+    #[should_panic(expected = "would wipe every sibling's streams")]
+    fn a_private_url_equal_to_the_shared_one_is_refused() {
+        let named = |key: &str| match key {
+            "TEST_REDIS_PRIVATE_URL" | "REDIS_URL" => Some("redis://127.0.0.1:6379/".to_owned()),
+            _ => None,
+        };
+        private_url_from(named);
+    }
+
+    /// The retry is a budget, not an unbounded loop: after the last attempt the last error wins.
+    #[tokio::test]
+    async fn the_connect_retry_is_bounded_and_fails_closed() {
+        use std::cell::Cell;
+        let attempts = Cell::new(0u32);
+        let result = super::connect_with_retry(3, || {
+            attempts.set(attempts.get() + 1);
+            async {
+                Err(conveyor_bus::BusError::MissingEnvelope {
+                    stream: "test".to_owned(),
+                    entry_id: "0-0".to_owned(),
+                })
+            }
+        })
+        .await;
+        assert!(result.is_err(), "every attempt failed");
+        assert_eq!(attempts.get(), 3, "the retry budget is bounded");
     }
 }

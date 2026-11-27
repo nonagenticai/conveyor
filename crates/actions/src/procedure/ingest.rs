@@ -1354,8 +1354,9 @@ async fn procedures_validate(
         steps.len()
     ));
 
-    // P5.2: the SOP may ASK for a tool; the request is never granted and the draft is refused
-    // until it is removed. The agent's `allowed_actions` is empty by construction.
+    // §11.6.3: the SOP may ASK for a tool. Intake records the request as a tool request; it is
+    // never a grant, and it is no longer a refusal — the draft stays retryable until the tool is
+    // published and the step is rebound. The agent's `allowed_actions` is empty by construction.
     if let Some(source_id) = process.source_asset_id {
         let asset = store::governance::get_asset_record_tx(&mut *tx, ctx.tenant, source_id)
             .await

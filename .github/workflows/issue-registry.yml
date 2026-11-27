@@ -239,27 +239,3 @@ jobs:
             echo "No parked pull_request run appeared; dispatching CI (its checks do not associate with the PR)." >> "$GITHUB_STEP_SUMMARY"
             gh workflow run ci-public.yml --repo "$REPO" --ref automation/issue-registry
           fi
-
-  # The programme's one GitHub face (#433). A separate job on purpose: it reads the seed committed
-  # on `main`, so the table can never describe a generated PR that has not merged. An issue body
-  # needs no PR — it is the same rows the public download serves, and it is deterministic.
-  programme-issue:
-    name: Sync the tracked programme issue
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      issues: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-
-      - name: Create the tracked issue once, then update it only when a row changed
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -o pipefail
-          python3 scripts/build-programme-view.py --sync | tee -a "$GITHUB_STEP_SUMMARY"

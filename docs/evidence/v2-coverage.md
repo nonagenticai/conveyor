@@ -5,8 +5,8 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 63 |
-| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 3 |
+| `exists` | the real route and its Playwright spec exist | 64 |
+| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 2 |
 | `new` | neither the route nor an ancestor exists | 3 |
 
 ## Rows
@@ -77,7 +77,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `destination:Portfolio` | §10.5 | destination | Portfolio | `exists` | apps/web/src/app.rs: route '/portfolio' found<br>apps/web/src/app.rs: route '/portfolio/:programme_id' found<br>apps/web/e2e/portfolio.spec.ts: present<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br>*The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.* |
 | `destination:Meetings` | §10.5 | destination | Meetings | `exists` | apps/web/src/app.rs: route '/meetings' found<br>apps/web/src/app.rs: route '/meetings/:id' found<br>apps/web/e2e/meetings.spec.ts: present |
 | `destination:Programme` | §10.5 | destination | Programme | `exists` | apps/web/src/app.rs: route '/programme' found<br>apps/web/e2e/programme.spec.ts: present<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br>*No route; the MSP definition reads are T10.* |
-| `destination:Architecture` | §10.5 | destination | Architecture | `extend` | apps/web/src/app.rs: route '/design/adm' found<br>apps/web/e2e/adm.spec.ts: absent<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br>apps/web/src/app.rs: route '/design/adm' renders AdmGate (a gate; owner: T9)<br>*V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.* |
+| `destination:Architecture` | §10.5 | destination | Architecture | `exists` | apps/web/src/app.rs: route '/design/adm' found<br>apps/web/e2e/adm.spec.ts: present<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br>*V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.* |
 | `destination:Plan` | §10.5 | destination | Plan | `exists` | apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br>*The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards.* |
 | `destination:Improve` | §10.5 | destination | Improve | `exists` | apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br>*V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.* |
 | `destination:Operations` | §10.5 | destination | Operations | `exists` | apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: present<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br>*No route and no operations actions; the incident/runbook/postmortem path is T7.* |

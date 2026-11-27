@@ -27,8 +27,11 @@ use crate::screens::improve::Improve;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::jobs::JobsScreen;
+use crate::screens::knowledge::KnowledgeScreen;
+use crate::screens::measure::MeasureScreen;
 use crate::screens::meetings::{MeetingRoomScreen, MeetingsScreen};
 use crate::screens::members::Members;
+use crate::screens::memory::MemoryScreen;
 use crate::screens::metering::Metering;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::operations::Operations;
@@ -46,10 +49,12 @@ use crate::screens::run_detail::RunDetail;
 use crate::screens::runs::RunQueue;
 use crate::screens::search::SearchScreen;
 use crate::screens::sign_in::SignIn;
+use crate::screens::sources::SourcesScreen;
+use crate::screens::system_architecture::SystemArchitectureScreen;
 use crate::screens::today::Today;
 use crate::screens::tools::Tools;
 use crate::screens::usage::Usage;
-use crate::screens::v2::{AdmGate, KnowledgeGate, PortfolioScreen, ProgrammeScreen};
+use crate::screens::v2::{PortfolioScreen, ProgrammeScreen};
 use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
 
@@ -162,7 +167,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/design/requirements") view=RequirementsScreen/>
                             <Route path=path!("/design/requirements/:id") view=RequirementDetail/>
                             <Route path=path!("/design/models") view=ModelsScreen/>
-                            <Route path=path!("/architecture") view=ArchitectureScreen/>
+                            <Route path=path!("/architecture") view=SystemArchitectureScreen/>
                             <Route path=path!("/design/models/:model_id") view=ModelDetail/>
                             <Route path=path!("/build/processes") view=ProcessesScreen/>
                             <Route path=path!("/build/processes/:process_id") view=ProcessDetail/>
@@ -204,8 +209,11 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/operations") view=Operations/>
                             <Route path=path!("/metering") view=Metering/>
                             <Route path=path!("/tools") view=Tools/>
-                            <Route path=path!("/design/adm") view=AdmGate/>
-                            <Route path=path!("/knowledge") view=KnowledgeGate/>
+                            <Route path=path!("/design/adm") view=ArchitectureScreen/>
+                            <Route path=path!("/knowledge") view=KnowledgeScreen/>
+                            <Route path=path!("/knowledge/sources") view=SourcesScreen/>
+                            <Route path=path!("/knowledge/memory") view=MemoryScreen/>
+                            <Route path=path!("/measure") view=MeasureScreen/>
                         </Routes>
                     </main>
                 </div>
@@ -385,7 +393,7 @@ fn Sidebar() -> impl IntoView {
                 {move || ctx.has_action("architecture.profile_get").then(|| view! {
                     <li><A href="/design/adm"><span class="nav-item">"Architecture capability"</span></A></li>
                 })}
-                {move || ctx.has_action("architecture.profile_get").then(|| view! {
+                {move || ctx.has_action("models.list").then(|| view! {
                     <li><A href="/architecture"><span class="nav-item">"System architecture"</span></A></li>
                 })}
                 {move || ctx.has_action("actions.list").then(|| view! {
@@ -395,12 +403,23 @@ fn Sidebar() -> impl IntoView {
             <div class="grp">"Knowledge & memory"</div>
             <ul class="rail-list">
                 <li><A href="/search"><span class="nav-item">"Search"</span></A></li>
-                {move || ctx.has_action("lessons.promote").then(|| view! {
-                    <li><A href="/knowledge"><span class="nav-item">"Knowledge"</span></A></li>
+                {move || ctx.has_action("job_catalogue.list").then(|| view! {
+                    <li><A href="/knowledge"><span class="nav-item">"Knowledge design"</span></A></li>
+                })}
+                {move || ctx.has_action("knowledge.query").then(|| view! {
+                    <li><A href="/knowledge/sources"><span class="nav-item">"Sources & retrieval"</span></A></li>
+                })}
+                {move || ctx.has_action("memory.recall").then(|| view! {
+                    <li><A href="/knowledge/memory"><span class="nav-item">"Memory"</span></A></li>
                 })}
             </ul>
             <div class="grp">"Measure & improve"</div>
             <ul class="rail-list">
+                {move || (ctx.has_action("metrics.usage")
+                    || ctx.has_action("evals.list")
+                    || ctx.has_action("inference_calls.list")).then(|| view! {
+                    <li><A href="/measure"><span class="nav-item">"Measure"</span></A></li>
+                })}
                 {move || (ctx.has_action("coach.triage") || ctx.has_action("kata.open")).then(|| view! {
                     <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
                 })}

@@ -1256,3 +1256,314 @@ async fn an_application_rollback_across_a_non_additive_migration_is_refused() {
         missing.errors
     );
 }
+
+// ── #779 — the unit record ───────────────────────────────────────────────────────────────
+
+/// A unique, valid `owner/name#N` for one test.
+fn issue_ref(repo: &str) -> String {
+    let number = (Uuid::now_v7().as_u128() % 1_000_000_000) + 1;
+    format!("{repo}#{number}")
+}
+
+/// Charter one unit with the fields the unit-record tests vary.
+#[allow(clippy::too_many_arguments)]
+async fn unit(
+    pg: &support::Pg,
+    tenant: TenantId,
+    admin: Uuid,
+    implementer: Uuid,
+    key: &str,
+    repo: &str,
+    lane: &str,
+    issue_ref: &str,
+) -> Value {
+    ok(
+        pg,
+        tenant,
+        admin,
+        "development_projects.charter",
+        json!({
+            "title": format!("unit {key}"),
+            "key": key,
+            "repo": repo,
+            "lane": lane,
+            "issue_ref": issue_ref,
+            "implementer_id": implementer,
+            "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+        }),
+    )
+    .await
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn charter_is_idempotent_by_key() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-idem", "alice", "Alice").await;
+    let implementer = coder(&pg, alice.tenant).await;
+    let key = format!("issue-779-idem-{}", Uuid::now_v7().simple());
+    let issue = issue_ref("nonagenticai/conveyor");
+
+    let first = unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &key,
+        "nonagenticai/conveyor",
+        "issue/779-idem",
+        &issue,
+    )
+    .await;
+    let second = unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &key,
+        "nonagenticai/conveyor",
+        "issue/779-idem",
+        &issue,
+    )
+    .await;
+
+    assert_eq!(first["id"], second["id"], "a replay returns the same row");
+    assert_eq!(second["issue_ref"], json!(issue));
+    let mut tx = store::begin_scoped(&pg.owner, alice.tenant)
+        .await
+        .expect("scope the unit count");
+    let count: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM development_project WHERE tenant_id = $1 AND lane = $2",
+    )
+    .bind(alice.tenant.as_uuid())
+    .bind("issue/779-idem")
+    .fetch_one(&mut *tx)
+    .await
+    .expect("count the chartered units");
+    assert_eq!(count, 1, "a replay writes no second unit");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn charter_refuses_a_mismatched_replay() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-mismatch", "alice", "Alice").await;
+    let implementer = coder(&pg, alice.tenant).await;
+    let key = format!("issue-779-mismatch-{}", Uuid::now_v7().simple());
+    let issue = issue_ref("nonagenticai/conveyor");
+
+    unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &key,
+        "nonagenticai/conveyor",
+        "issue/779-first",
+        &issue,
+    )
+    .await;
+
+    let mismatch = refused(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.charter",
+        json!({
+            "title": "a second lane under the same key",
+            "key": key,
+            "repo": "nonagenticai/conveyor",
+            "lane": "issue/779-second",
+            "issue_ref": issue,
+            "implementer_id": implementer,
+            "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+        }),
+    )
+    .await;
+
+    assert_eq!(mismatch.status, 409, "{}", mismatch.detail);
+    assert_eq!(mismatch.code, "charter_mismatch");
+    assert!(
+        mismatch.detail.contains("lane"),
+        "the refusal names the field that differs: {}",
+        mismatch.detail
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn charter_records_the_issue_ref() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-issue", "alice", "Alice").await;
+    let implementer = coder(&pg, alice.tenant).await;
+    let key = format!("issue-779-ref-{}", Uuid::now_v7().simple());
+    let issue = issue_ref("nonagenticai/conveyor");
+
+    let project = unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &key,
+        "nonagenticai/conveyor",
+        "issue/779-ref",
+        &issue,
+    )
+    .await;
+    let dev = project["id"].as_str().expect("a project id").to_owned();
+    let read = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.get",
+        json!({"development_project_id": dev}),
+    )
+    .await;
+    assert_eq!(read["issue_ref"], json!(issue));
+
+    let malformed = refused(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.charter",
+        json!({
+            "title": "a unit with a bare issue number",
+            "key": format!("issue-779-bad-{}", Uuid::now_v7().simple()),
+            "repo": "nonagenticai/conveyor",
+            "lane": "issue/779-bad",
+            "issue_ref": "779",
+            "implementer_id": implementer,
+            "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+        }),
+    )
+    .await;
+    assert_eq!(malformed.status, 422, "{}", malformed.detail);
+    assert!(
+        malformed
+            .errors
+            .iter()
+            .any(|error| error.field == "issue_ref" && error.code == "issue_ref_invalid"),
+        "the refusal names the issue_ref field: {:?}",
+        malformed.errors
+    );
+
+    let duplicate = refused(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.charter",
+        json!({
+            "title": "a second unit for the same issue",
+            "key": format!("issue-779-dup-{}", Uuid::now_v7().simple()),
+            "repo": "nonagenticai/conveyor",
+            "lane": "issue/779-dup",
+            "issue_ref": issue,
+            "implementer_id": implementer,
+            "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+        }),
+    )
+    .await;
+    assert_eq!(duplicate.status, 409, "{}", duplicate.detail);
+    assert_eq!(duplicate.code, "issue_already_chartered");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn list_filters_by_repo_status_and_issue() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-list", "alice", "Alice").await;
+    let implementer = coder(&pg, alice.tenant).await;
+    let suffix = Uuid::now_v7().simple();
+    let first_issue = issue_ref("nonagenticai/one");
+    let second_issue = issue_ref("nonagenticai/two");
+
+    let one = unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &format!("issue-779-list-a-{suffix}"),
+        "nonagenticai/one",
+        &format!("issue/779-list-a-{suffix}"),
+        &first_issue,
+    )
+    .await;
+    unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &format!("issue-779-list-b-{suffix}"),
+        "nonagenticai/two",
+        &format!("issue/779-list-b-{suffix}"),
+        &second_issue,
+    )
+    .await;
+    unit(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        &format!("issue-779-list-c-{suffix}"),
+        "nonagenticai/two",
+        &format!("issue/779-list-c-{suffix}"),
+        &issue_ref("nonagenticai/two"),
+    )
+    .await;
+
+    let by_repo = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.list",
+        json!({"repo": "nonagenticai/two"}),
+    )
+    .await;
+    assert_eq!(by_repo.as_array().expect("a list").len(), 2);
+    assert!(
+        by_repo
+            .as_array()
+            .expect("a list")
+            .iter()
+            .all(|row| row["repo"] == json!("nonagenticai/two"))
+    );
+
+    let by_status = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.list",
+        json!({"repo": "nonagenticai/one", "status": "chartered"}),
+    )
+    .await;
+    assert_eq!(by_status.as_array().expect("a list").len(), 1);
+
+    let by_issue = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.list",
+        json!({"issue_ref": first_issue}),
+    )
+    .await;
+    let units = by_issue.as_array().expect("a list");
+    assert_eq!(units.len(), 1);
+    assert_eq!(units[0]["id"], one["id"]);
+    assert_eq!(units[0]["latest_step"], Value::Null);
+
+    let dev = one["id"].as_str().expect("a project id").to_owned();
+    record(
+        &pg,
+        alice.tenant,
+        implementer,
+        &dev,
+        "branch",
+        json!({"name": "issue/779-list-a", "base": "main"}),
+    )
+    .await;
+    let after = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.list",
+        json!({"issue_ref": first_issue}),
+    )
+    .await;
+    assert_eq!(after[0]["latest_step"], json!("branch"));
+}

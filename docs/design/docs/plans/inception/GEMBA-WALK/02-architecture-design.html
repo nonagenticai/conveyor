@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — Architecture design (PSA and HLD) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/02-architecture-design.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--architecture-design-psa-and-hld">GEMBA-WALK — Architecture design (PSA and HLD)</h1>
+<h2 id="context-and-boundary">Context and boundary</h2>
+<p>GEMBA-WALK adds a <strong>second client</strong>, not a second system. It is a static sub-site at <code>/walk/</code>, served from the same image and origin as the API, with its own router, sheets, world and Playwright suite. It adds no table, action, event, port, decision store or read model. Every read is a literal <code>GET</code> route or a read action; every write is <code>POST /api/actions/{name}/invocations</code> with the standard envelope and headers; a capability the server does not expose is an honest gate.</p>
+<p>The design covers the client architecture, the route/action parity model, the <code>WorldView</code> port, the seats-as-presets rule, the serving fallback and the parity instrument. <code>apps/web</code> remains the normative operator UI until the P6 gate. The design pack at <code>/design/</code> is unchanged.</p>
+<p>This is a tailored ADM set for a software delivery project; it is a document set now and imports as typed <code>architecture_artifact</code> rows when the T9 repository is used. Every artefact carries the standard's common metadata: title, status, version, owner, reviewer, review date, purpose, stakeholders, scope, related project and its published document; links use <code>derivation | realization | reuse | dependency</code>.</p>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Artefact</th>
+<th>Type</th>
+<th>Phase / plateau</th>
+<th>Version</th>
+<th>Owner</th>
+<th>Reviewer</th>
+<th>Review date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>Principles applied</td>
+<td>catalog</td>
+<td>Preliminary–A / PSA</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Requirements catalog</td>
+<td>catalog</td>
+<td>A / PSA</td>
+<td>1</td>
+<td>business-analyst</td>
+<td>programme-architect</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Stakeholder map</td>
+<td>matrix</td>
+<td>A / PSA</td>
+<td>1</td>
+<td>business-analyst</td>
+<td>SRO</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>Drivers, goals, objectives</td>
+<td>catalog</td>
+<td>A / PSA</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>SRO</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Solution concept</td>
+<td>diagram</td>
+<td>A / PSA</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>Statement of Architecture Work</td>
+<td>contract</td>
+<td>A / PSA</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>SRO</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>Business interaction matrix</td>
+<td>matrix</td>
+<td>B / HLD</td>
+<td>1</td>
+<td>business-analyst</td>
+<td>SRO</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>Actor / role matrix</td>
+<td>matrix</td>
+<td>B / HLD</td>
+<td>1</td>
+<td>business-analyst</td>
+<td>programme-architect</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>Data entity catalog</td>
+<td>catalog</td>
+<td>C / HLD</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Application / function matrix</td>
+<td>matrix</td>
+<td>C / HLD</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Conceptual data diagram</td>
+<td>diagram</td>
+<td>C / HLD</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>Technology view</td>
+<td>catalog</td>
+<td>D / HLD</td>
+<td>1</td>
+<td>platform lead</td>
+<td>Architecture Board</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>Migration and delivery diagram</td>
+<td>diagram</td>
+<td>F / HLD</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>SRO</td>
+<td>2026-12-03</td>
+<td>draft</td>
+</tr>
+</tbody>
+</table>
+<p>The published document is this file for every row; the future typed repository rows derive from it. No row is approved yet; the review date is the Architecture Board's sitting after the P0 spike.</p>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<h3 id="project-start-architecture-phase-apreliminary">Project Start Architecture (Phase A–Preliminary)</h3>
+<h3 id="a1--principles-applied-catalog">A1 — Principles applied (catalog)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Principle</th>
+<th>Rationale</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>The contract is the product</td>
+<td>the walk exists to prove the action contract is UI-independent</td>
+<td>every read/write is the existing route/action; no client-only capability</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>One backend, one decision store</td>
+<td>a second store or backend makes the record ambiguous</td>
+<td>no new table, action, event, port or read model</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>The sheets own the work</td>
+<td>a canvas cannot carry tables, long text or audit-quality forms</td>
+<td>every record, form and decision is a DOM sheet with HTML semantics</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>The world never gates a capability</td>
+<td>not every user will walk or use a pointer</td>
+<td>every room, record and action has a deep link and a keyboard path</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>Seats are presets, not privileges</td>
+<td>authority lives in the manifest, scopes and server refusals</td>
+<td>changing a seat changes the landing and emphasis only</td>
+</tr>
+<tr>
+<td>P6</td>
+<td>No fixtures, no client store</td>
+<td>a fixture makes the measurement lie</td>
+<td>the client renders real rows or the honest gate; no snapshot as the app's source</td>
+</tr>
+<tr>
+<td>P7</td>
+<td>Parity is measured</td>
+<td>prose cannot prove a UI</td>
+<td>the frozen census and per-destination specs are the only credit</td>
+</tr>
+<tr>
+<td>P8</td>
+<td>Same identity, same origin</td>
+<td>a second identity path doubles the attack surface</td>
+<td>auth-code + PKCE, token in memory, tenant header, no <code>localStorage</code> token</td>
+</tr>
+<tr>
+<td>P9</td>
+<td>The renderer is replaceable</td>
+<td>the simulation is decided, the renderer is not</td>
+<td>the simulation is <code>bevy_ecs</code> behind <code>WorldView</code> (ADR 0022); canvas-2D and WebGL2 are measured in P0 and ADR 0023 picks one</td>
+</tr>
+<tr>
+<td>P10</td>
+<td>The walk is reversible</td>
+<td>primacy must not be a one-way door</td>
+<td>additive surface, redirect map and an <code>apps/web</code> retirement as a later decision</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a2--requirements-catalog-typed">A2 — Requirements catalog (typed)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Type</th>
+<th>Requirement</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>condition</td>
+<td>Every §10.5 destination and every retained V1 route has a walk route <code>/walk</code> + the app path</td>
+<td>spec §4, plan §7</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>condition</td>
+<td>Every action in the frozen census is reachable and schema-rendered, with a labelled JSON fallback</td>
+<td>spec §6.5, plan §6</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>constraint</td>
+<td>Every write uses the standard envelope, <code>If-Match</code>/<code>Idempotency-Key</code>, approval and the server's refusal verbatim</td>
+<td>spec §5, §9</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>constraint</td>
+<td>No new table, action, event, port or decision store</td>
+<td>ADR 0021 decision 3</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>condition</td>
+<td>Auth-code + PKCE S256, token in memory, tenant header, dev cookie locally</td>
+<td>spec §9, ADR 0021 decision 4</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>condition</td>
+<td>SSE via fetch stream, <code>Last-Event-ID</code>, <code>resync</code>; a subscribed screen reflects its topic</td>
+<td>spec §6.4</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>constraint</td>
+<td>Deep links are served by a scoped <code>/walk/*</code> fallback (GET/HEAD, non-asset) and tested</td>
+<td>plan §5.8</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>condition</td>
+<td>The world is a <code>WorldView</code> port; the canvas baseline is always available</td>
+<td>spec §6.2–§6.3</td>
+</tr>
+<tr>
+<td>R9</td>
+<td>constraint</td>
+<td>Seats never change authority; a control absent from the manifest is not rendered</td>
+<td>spec §3</td>
+</tr>
+<tr>
+<td>R10</td>
+<td>condition</td>
+<td>Accessibility: keyboard path for every capability, focus return, contrast, 200 % zoom, 390 px</td>
+<td>spec §8</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>condition</td>
+<td>Performance budgets: the entrance and each destination measured; a 5-minute soak</td>
+<td>spec §9, plan §11</td>
+</tr>
+<tr>
+<td>R12</td>
+<td>constraint</td>
+<td>No fixture, no snapshot URL fetched by a signed-in walk, no <code>localStorage</code> programme state</td>
+<td>spec §14</td>
+</tr>
+<tr>
+<td>R13</td>
+<td>condition</td>
+<td>The parity instrument runs with no server, no database and no network; an expired exemption fails</td>
+<td>plan §6</td>
+</tr>
+<tr>
+<td>R14</td>
+<td>assumption</td>
+<td>The action registry, read routes and identity provider remain the sole authority</td>
+<td>spec §5</td>
+</tr>
+<tr>
+<td>R15</td>
+<td>delta</td>
+<td>The <code>/walk/</code> OIDC redirect URI must be registered; the dev cookie covers construction</td>
+<td>ADR 0021 consequences</td>
+</tr>
+<tr>
+<td>R16</td>
+<td>condition</td>
+<td>The walk adds no port, image or origin; the static output is copied into the existing image</td>
+<td>spec §10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a3--stakeholder-map-matrix">A3 — Stakeholder map (matrix)</h3>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Concern</th>
+<th>Influence</th>
+<th>Interest</th>
+<th>Engagement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner / sponsoring group</td>
+<td>the walk may become primary; the parity claim must be measurable</td>
+<td>high</td>
+<td>high</td>
+<td>P6 primacy decision; reviews the instrument</td>
+</tr>
+<tr>
+<td>Product owner seat</td>
+<td>the board and delivery tasks are complete and fast</td>
+<td>high</td>
+<td>high</td>
+<td>Portfolio/plan wing; write flows</td>
+</tr>
+<tr>
+<td>Programme office seat</td>
+<td>programme, tranche, benefits and ADM tasks are visible</td>
+<td>high</td>
+<td>high</td>
+<td>Programme/design wings</td>
+</tr>
+<tr>
+<td>Tenant owner seat</td>
+<td>approvals, members, tenant settings are governed</td>
+<td>high</td>
+<td>high</td>
+<td>Approvals/settings; destructive actions show refusals</td>
+</tr>
+<tr>
+<td>Reviewer seat</td>
+<td>read-only evidence and decisions are legible</td>
+<td>medium</td>
+<td>high</td>
+<td>read parity; no write affordance</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td>the walk fits the blueprint and its contract</td>
+<td>high</td>
+<td>medium</td>
+<td>SoAW, artefact set, compliance review</td>
+</tr>
+<tr>
+<td>Platform / security</td>
+<td>same origin, headers, identity, no secret leakage</td>
+<td>high</td>
+<td>high</td>
+<td>serving fallback, CSP, auth tests</td>
+</tr>
+<tr>
+<td>Accessibility / UX</td>
+<td>the game UI does not regress keyboard or contrast</td>
+<td>medium</td>
+<td>high</td>
+<td>a11y budget and keyboard spec</td>
+</tr>
+<tr>
+<td>External stakeholder</td>
+<td>reads the public programme pack, not the walk</td>
+<td>low</td>
+<td>medium</td>
+<td><code>/design/</code> remains the public surface (D48)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a4--drivers-goals-objectives-catalog">A4 — Drivers, goals, objectives (catalog)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DR1</td>
+<td>The only spatial interface is a local mock with no auth, registry or live rows</td>
+</tr>
+<tr>
+<td>DR2</td>
+<td>The owner is considering the walk as the primary UI; a decision needs evidence</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>Every operator task is reachable in the walk through the existing contract</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>The contract's UI-independence is proven by a second client, not asserted</td>
+</tr>
+<tr>
+<td>O1</td>
+<td>The P6 gate passes: 52 routes, 597 actions reachable, named flows round-trip, a11y/perf met</td>
+</tr>
+<tr>
+<td>O2</td>
+<td>A contract change that breaks one client is caught by the parity instrument or a spec</td>
+</tr>
+<tr>
+<td>O3</td>
+<td>The walk can be retired or promoted without a backend change</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a5--solution-concept-diagram">A5 — Solution concept (diagram)</h3>
+<pre><code>browser (/walk/)
+  shell ── seats (view presets) ── HUD (principal, tenant, queues, palette)
+    └── router registry ── route row: walk path + app path + room + spec
+          └── destination module ── read model ── GET /api/... | read action
+                                 └── sheet host ── action sheet ── actions.describe
+                                                          └── POST /api/actions/{name}/invocations
+                                                               (envelope, If-Match, Idempotency-Key, approval)
+          └── world (WorldView port) ── canvas-2D baseline | Bevy candidate
+                                 └── rooms/figures/state; never a work surface
+  events: GET /api/events?topics= (SSE) ── subscribed destination resync</code></pre>
+<h3 id="a6--statement-of-architecture-work-draft">A6 — Statement of Architecture Work (draft)</h3>
+<p>Assignment: build the Gemba Walk to the P6 parity gate. Scope: the seven wings, the seven destinations families, the retained V1 surfaces, the serving fallback and the instrument. Responsibilities: the programme architect owns the set; the Architecture Board reviews; the SRO accepts the benefit and tranche evidence; the delivery sessions own their files. Acceptance: the P6 gate (52 routes, 597 actions, named flows, a11y/perf, owner sign-off). The contract is a document now; <code>architecture.contracts_approve</code> makes it live. The full text is <code>06-statement-of-architecture-work.md</code>.</p>
+<h3 id="high-level-design-phases-bd">High-Level Design (Phases B–D)</h3>
+<h3 id="b1--business-interaction-matrix">B1 — Business interaction matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Wing</th>
+<th>Destinations</th>
+<th>Primary seats</th>
+<th>Write flows</th>
+<th>Gate surface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Portfolio &amp; plan</td>
+<td>portfolio, programme, plan/board</td>
+<td>Product owner, Programme</td>
+<td>plan/programme/card moves, decisions</td>
+<td>approval, <code>If-Match</code></td>
+</tr>
+<tr>
+<td>Organisation</td>
+<td>organisation, jobs, agents, tools, project types</td>
+<td>Owner, Programme</td>
+<td>create/update, bindings</td>
+<td>manifest, scopes</td>
+</tr>
+<tr>
+<td>Procedures &amp; authoring</td>
+<td>procedures, processes, map, authoring</td>
+<td>Programme, Product owner</td>
+<td>author/publish, process map</td>
+<td>publish gates</td>
+</tr>
+<tr>
+<td>Govern &amp; design</td>
+<td>decisions, approvals, ADM, architecture, requirements, models, copilot</td>
+<td>Owner, Architecture Board</td>
+<td>approvals, contracts, ADM, models</td>
+<td>dual control, Board</td>
+</tr>
+<tr>
+<td>Knowledge &amp; memory</td>
+<td>knowledge, search</td>
+<td>all seats</td>
+<td>remember/recall</td>
+<td>tenancy</td>
+</tr>
+<tr>
+<td>Measure &amp; improve</td>
+<td>improve, evals, benchmarks, usage, prompt audit, metering</td>
+<td>Programme, Reviewer</td>
+<td>evaluate, benchmark, meter</td>
+<td>read-mostly</td>
+</tr>
+<tr>
+<td>Operations &amp; utilities</td>
+<td>operations, platform, settings, tools</td>
+<td>Owner, platform</td>
+<td>settings, jobs, search</td>
+<td>destructive confirm</td>
+</tr>
+<tr>
+<td>Retained V1</td>
+<td>today, boards, cards, runs, approvals, requirements, models, processes, usage, settings, copilot</td>
+<td>all seats</td>
+<td>per the app route</td>
+<td>same as <code>apps/web</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="b2--actor--role-matrix">B2 — Actor / role matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Seat preset</th>
+<th>Landing</th>
+<th>Queue emphasis</th>
+<th>May change authority?</th>
+<th>May write?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivery (product owner)</td>
+<td>plan/board</td>
+<td>cards, runs, approvals</td>
+<td>no</td>
+<td>only where the manifest and scopes allow</td>
+</tr>
+<tr>
+<td>Programme (project office)</td>
+<td>programme</td>
+<td>tranche, benefits, ADM, registers</td>
+<td>no</td>
+<td>only where the manifest and scopes allow</td>
+</tr>
+<tr>
+<td>Owner (tenant owner)</td>
+<td>approvals/portfolio</td>
+<td>approvals, members, settings</td>
+<td>no — the server owns authority</td>
+<td>yes, per scopes; destructive actions need approval</td>
+</tr>
+<tr>
+<td>Reviewer (observer)</td>
+<td>portfolio/read views</td>
+<td>evidence and decisions</td>
+<td>no</td>
+<td>no; write affordances are absent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c1--data-entity-catalog">C1 — Data entity catalog</h3>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Key content</th>
+<th>Relationships</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>principal / membership</td>
+<td><code>GET /api/me</code>, tenant memberships, job keys</td>
+<td>1→* seats (presets)</td>
+</tr>
+<tr>
+<td>tenant</td>
+<td><code>X-Active-Tenant</code>, config</td>
+<td>1→* read models</td>
+</tr>
+<tr>
+<td>action manifest</td>
+<td>name, effect, scopes, schema, confirm, tenancy, spec hash</td>
+<td>1→* action sheet rows</td>
+</tr>
+<tr>
+<td>board / card / run</td>
+<td>read models of the plan and execution</td>
+<td>1→* destinations</td>
+</tr>
+<tr>
+<td>programme / tranche / benefit</td>
+<td>MSP read models</td>
+<td>1→* programme wing</td>
+</tr>
+<tr>
+<td>approval / decision</td>
+<td>approval lifecycle, decision rows</td>
+<td>1→* govern wing</td>
+</tr>
+<tr>
+<td>document / output</td>
+<td>programme outputs and design pack</td>
+<td>1→* knowledge/design</td>
+</tr>
+<tr>
+<td>architecture contract / artefact</td>
+<td>ADM rows</td>
+<td>1→* design wing</td>
+</tr>
+<tr>
+<td>event</td>
+<td>SSE topic, <code>Last-Event-ID</code></td>
+<td>*→1 subscription</td>
+</tr>
+</tbody>
+</table>
+<p>No entity is new. The client reads them; writes go through actions. A client-side cache is a view cache, never a source of truth.</p>
+<h3 id="c2--application--function-matrix">C2 — Application / function matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Responsibility</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/auth</code></td>
+<td>PKCE, token memory, dev cookie, tenant header</td>
+<td><code>apps/web/src/auth.rs</code> contract</td>
+</tr>
+<tr>
+<td><code>src/api</code></td>
+<td>manifest, <code>actions.describe</code>, invocation envelope, RFC 9457 problems</td>
+<td><code>apps/web/src/api.rs</code></td>
+</tr>
+<tr>
+<td><code>src/sse</code></td>
+<td>fetch stream, <code>Last-Event-ID</code>, resync</td>
+<td><code>apps/web/src/sse.rs</code></td>
+</tr>
+<tr>
+<td><code>src/forms</code></td>
+<td>schema → form; JSON fallback</td>
+<td><code>actions.describe</code> input schema</td>
+</tr>
+<tr>
+<td><code>src/router/registry</code></td>
+<td>route rows + composition</td>
+<td><code>apps/web/src/app.rs</code> census</td>
+</tr>
+<tr>
+<td><code>src/shell</code></td>
+<td>seats, HUD, palette, map, sheet host</td>
+<td>spec §2, §3</td>
+</tr>
+<tr>
+<td><code>src/world</code></td>
+<td><code>WorldView</code> port; canvas baseline; Bevy candidate</td>
+<td>spec §6.2–§6.3</td>
+</tr>
+<tr>
+<td><code>src/state</code></td>
+<td>view state; no programme store</td>
+<td>spec §6.4</td>
+</tr>
+<tr>
+<td><code>src/a11y</code></td>
+<td>focus, keyboard, contrast</td>
+<td>spec §8</td>
+</tr>
+<tr>
+<td><code>src/destinations</code></td>
+<td>one module per destination</td>
+<td>spec §4, §6.1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c3--conceptual-data-diagram">C3 — Conceptual data diagram</h3>
+<pre><code>/api/me → principal ── memberships → tenant ── config
+                            │
+                    seat preset (view only)
+                            │
+manifest + actions.describe → action sheet → invocation → server refusal/result
+                            │
+boards/cards/runs · programme/tranche/benefit · approvals/decisions · documents · architecture
+                            │
+                      destination read model ── SSE topic → resync</code></pre>
+<h3 id="d1--technology-view">D1 — Technology view</h3>
+<p>Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline world simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code>, compiled to wasm32 and loaded behind <code>WorldView</code> (ADR 0022); the renderer is a canvas-2D projection first, with WebGL2 measured against it in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input) and ADR 0023 recording the winner. Browser APIs: fetch, streams, Web Crypto (PKCE), <code>sessionStorage</code> (verifier only), <code>history</code>/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's static assets are copied by the Dockerfile. Tests: Playwright against the dev server; <code>node --test</code> for pure modules. No SSR, no server runtime, no third-party hosted service.</p>
+<h3 id="f1--migration-and-delivery-diagram">F1 — Migration and delivery diagram</h3>
+<pre><code>P0 governance + census/instrument + spike + ADR 0022
+ → P1 foundation + Portfolio read/write + fallback
+ → P2 read parity → P3 write parity → P4 retained V1 → P5 slice-dependent surfaces → P6 parity gate</code></pre>
+<p>Build order: W0 census/instrument → W1 spike → W2 foundation → W3 reads → W4 writes → W5 V1 → W6 slice-gate audit → W7 P6/primacy → W8 hardening. The split by file ownership is G0 (W0–W2), S1–S3 (W3–W4 by wing), S4 (W5–W8). The P0 spike's throwaway workflow is deleted with the spike.</p>
+<h2 id="5-artefact-links">5. Artefact links</h2>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>Kind</th>
+<th>To</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A2 requirements</td>
+<td>derivation</td>
+<td>A5 solution concept</td>
+<td>each requirement maps to a module or contract</td>
+</tr>
+<tr>
+<td>A1 principles</td>
+<td>derivation</td>
+<td>A5 solution concept</td>
+<td>P1–P10 shape the client</td>
+</tr>
+<tr>
+<td>A3 stakeholders</td>
+<td>dependency</td>
+<td>B1 interaction matrix</td>
+<td>each wing names its seats</td>
+</tr>
+<tr>
+<td>B1 interaction matrix</td>
+<td>realization</td>
+<td>C2 modules</td>
+<td>each wing uses the shared seams</td>
+</tr>
+<tr>
+<td>C1 data entities</td>
+<td>realization</td>
+<td>D1 technology view</td>
+<td>reads/actions over the existing contract</td>
+</tr>
+<tr>
+<td>A4 goals</td>
+<td>derivation</td>
+<td>A2 requirements</td>
+<td>R1–R16 serve G1–G2</td>
+</tr>
+<tr>
+<td>F1 migration</td>
+<td>dependency</td>
+<td>W0–W8</td>
+<td>the build order</td>
+</tr>
+<tr>
+<td><code>apps/web</code> route table</td>
+<td>reuse</td>
+<td>census</td>
+<td>the frozen baseline</td>
+</tr>
+<tr>
+<td><code>crates/api/src/web.rs</code></td>
+<td>reuse</td>
+<td>D1 serving</td>
+<td>the static sub-site model</td>
+</tr>
+<tr>
+<td>ADR 0013 / D64</td>
+<td>superseded in part</td>
+<td>A1</td>
+<td>ADR 0021 authorises this client only</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decisions">Decisions</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Decision</th>
+<th>Rationale</th>
+<th>Where it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AD1</td>
+<td>A static sub-site at <code>/walk/</code>, same image and origin</td>
+<td>no new port, image or deploy path</td>
+<td>D1, serving fallback</td>
+</tr>
+<tr>
+<td>AD2</td>
+<td>Route parity by construction (<code>/walk</code> + app path)</td>
+<td>a missing route is visible, not invented</td>
+<td>router registry, census</td>
+</tr>
+<tr>
+<td>AD3</td>
+<td>Full functionality through the existing contract</td>
+<td>a second backend would fork the record</td>
+<td>C1/C2, R3/R4</td>
+</tr>
+<tr>
+<td>AD4</td>
+<td>DOM sheets own all work; the world is navigation/state display</td>
+<td>a canvas cannot carry audit-quality forms</td>
+<td>P3, A5</td>
+</tr>
+<tr>
+<td>AD5</td>
+<td>Seats are view presets; the manifest and scopes own authority</td>
+<td>a preset must never grant a permission</td>
+<td>B2, R9</td>
+</tr>
+<tr>
+<td>AD6</td>
+<td>No fixtures, no client programme store</td>
+<td>a fixture makes the parity claim false</td>
+<td>P6, R12</td>
+</tr>
+<tr>
+<td>AD7</td>
+<td><code>WorldView</code> port; <code>bevy_ecs</code> simulation (ADR 0022); canvas-2D baseline, WebGL2 measured in P0</td>
+<td>the simulation is decided, the renderer is not; the port keeps both renderers</td>
+<td>R8, D1, ADR 0022/0023</td>
+</tr>
+<tr>
+<td>AD8</td>
+<td>The instrument is a frozen census + per-destination specs</td>
+<td>live manifests move; the gate must stay passable</td>
+<td>plan §6, R13</td>
+</tr>
+<tr>
+<td>AD9</td>
+<td>Deep links served by a scoped <code>/walk/*</code> fallback + Rust test</td>
+<td>without it a deep link renders the operator app</td>
+<td>R7, W2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="acceptance">Acceptance</h2>
+<p>The delivery design gate: GEMBA-WALK operates under the P0 brief and the T9 capability. This set is the PSA/HLD evidence; a deviation (a second backend, a fixture, a canvas-only work surface, a seat that grants authority) is a change request, never a silent fork. The compliance review records one level against the delivery contract when the project closes. The full TOGAF repository rows are T9's; this set is publishable now and importable later.</p>
+<p>The acceptance itself is the P6 gate in <code>docs/plans/GEMBA-WALK.md</code> §7 and §11, the instrument's record <code>docs/evidence/walk-coverage.json</code>, and the owner's primacy decision.</p>
+<h2 id="7-review-and-links">7. Review and links</h2>
+<ul>
+<li>Review date: 2026-12-03 (Architecture Board, after the P0 spike)</li>
+<li>Brief: <code>00-project-brief.md</code></li>
+<li>Analysis: <code>01-inception-analysis.md</code></li>
+<li>Register: <code>03-artifact-register.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code></li>
+<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/GEMBA-WALK/02-architecture-design.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
