@@ -90,7 +90,7 @@ jobs:
           set -euo pipefail
           cd apps/walk
           npm ci
-          node --test src
+          find src -name '*.test.js' -exec node --test {} +
           npx tsc -p . --noEmit
 
       - name: the walk-world headless tests

@@ -38,18 +38,25 @@ function shouldProxy(pathname) {
   );
 }
 
+const UPSTREAM = new URL(API);
+
 function proxy(req, res) {
-  // Only the PATH crosses to the upstream. `new URL(req.url, API)` would let an absolute-form
-  // or protocol-relative request URL replace the host (`//evil.example/x`), turning this local
-  // server into an open proxy (CodeQL `js/request-forgery`). Parse against a fixed origin and
-  // rebuild the upstream from pathname + search only.
+  // Only the PATH crosses to the upstream. A URL object built from `req.url` would let an
+  // absolute-form or protocol-relative request replace the host (`//evil.example/x`), turning
+  // this local server into an open proxy (CodeQL `js/request-forgery`). The host and port are
+  // the constant `UPSTREAM` parsed once at startup; the request carries only path + query.
   const incoming = new URL(req.url, "http://127.0.0.1");
-  const target = new URL(incoming.pathname + incoming.search, API);
   const headers = { ...req.headers, host: PROXY_HOST };
   delete headers["accept-encoding"];
   const upstream = httpRequest(
-    target,
-    { method: req.method, headers },
+    {
+      protocol: UPSTREAM.protocol,
+      hostname: UPSTREAM.hostname,
+      port: UPSTREAM.port,
+      path: incoming.pathname + incoming.search,
+      method: req.method,
+      headers,
+    },
     (answer) => {
       res.writeHead(answer.statusCode ?? 502, answer.headers);
       answer.pipe(res);
