@@ -485,6 +485,7 @@
     "prompt_recipes.get",
     "prompt_recipes.list",
     "prompt_recipes.retire",
+    "proofs.attest",
     "proofs.get",
     "proofs.list",
     "proofs.record",

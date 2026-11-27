@@ -9,7 +9,7 @@ source says*, and that is a small, hand-written model plus the facts rendered in
 
 | Grade | What is proven | Where it lives |
 |---|---|---|
-| **Instance** | one record's facts satisfy the model (`checkSlice facts = true` / `checkLedger facts = true`, closed `by decide`) | rendered per record by `crates/actions/src/proof/render.rs` |
+| **Instance** | one record's facts satisfy the model (`checkSlice facts = true` / `checkRecord facts = true` / `checkLedger facts = true`, closed `by decide`) | rendered per record by `crates/actions/src/proof/render.rs` |
 | **Universal** | the model's own properties, for every state (`closed_is_terminal`, `no_self_transition`, `accepted_path_carries_evidence`) | `DeliveryModel.lean`, proven once |
 | **Bundle** | a release's leaf certificate digests are exactly the expected set, with no duplicate and none missing | rendered by `crates/actions/src/proof/programme.rs` |
 
@@ -70,8 +70,12 @@ larger ledger is the collector's to chunk; the renderer refuses it rather than e
 `maxRecDepth`.
 
 This is the **observed** contract. The engine's own rows cannot attest issue state, branch
-liveness, draft flags or run counts, so the future engine-side gate uses a second structure over
-the recorded rows (`checkRecord`) rather than weakening `checkObs` with unknowns.
+liveness, draft flags or run counts, so the engine-side gate uses a second structure over the
+recorded rows — `UnitRecordFacts` / `checkRecord`, derived by `proofs.attest` and resolved by
+`development_projects.close` through the `proof_policy` the charter pins — rather than weakening
+`checkObs` with unknowns. The policy defaults to advisory and a required gate refuses on the same
+typed `gate_evidence_missing` a PM gate returns; the unit's own refusal cycle is recorded in
+`docs/evidence/proof-of-delivery.md`.
 
 ## Model drift
 

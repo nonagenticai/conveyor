@@ -365,9 +365,9 @@ mod tests {
                 // #842 (main): the tenant's feedback about the platform, its triage columns
                 // and the tenant-isolation policy (0080_feedback.sql).
                 (80, "feedback".to_owned()),
-                // v1-w4a-2 (#526): the write tool's declared verification path on the version
-                // it was published with (0081_tool_verify.sql, SPEC_V2 §11.3).
-                (81, "tool verify".to_owned()),
+                // #859 (main): the unit proof policy the engine derives facts under
+                // (0081_unit_proof_policy.sql).
+                (81, "unit proof policy".to_owned()),
                 // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
                 // (0082_cadence_state.sql, SPEC_V2 §8.2).
                 (82, "cadence state".to_owned()),
@@ -458,6 +458,10 @@ mod tests {
                 // (0109_release_layers.sql, renumbered from 0080 because main's #842 took 80;
                 // SPEC_V2 §4.1).
                 (109, "release layers".to_owned()),
+                // v1-w4a-2 (#526): the write tool's declared verification path on the version
+                // it was published with (0110_tool_verify.sql, renumbered from 0081 because
+                // main's #859 took 81; SPEC_V2 §11.3).
+                (110, "tool verify".to_owned()),
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

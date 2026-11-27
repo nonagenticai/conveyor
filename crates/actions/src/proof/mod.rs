@@ -22,6 +22,7 @@
 //! so a successful re-verification returns the stored row unchanged — it is a replay, not a
 //! second claim.
 
+pub mod facts;
 pub mod manifest;
 pub mod programme;
 pub mod render;
@@ -58,7 +59,7 @@ pub struct ProofRecordIn {
     /// The exact input body sent to that action. Its request hash must match the stored one,
     /// which is what binds the certificate's source to what the prover actually checked.
     pub invocation_input: Value,
-    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger | unit`.
     pub subject_type: String,
     /// The subject row this certificate is about.
     pub subject_id: Uuid,
@@ -103,7 +104,7 @@ pub struct ProofGetIn {
 /// `proofs.list`'s input.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProofListIn {
-    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger | unit`.
     pub subject_type: String,
     /// The subject row.
     pub subject_id: Uuid,
@@ -131,12 +132,47 @@ pub struct ProofRenderOut {
     pub spec_sha256: String,
 }
 
+/// `proofs.attest`'s input: the chartered unit whose facts the engine derives.
+#[derive(Clone, Debug, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ProofAttestIn {
+    /// The `development_project` id. The certificate's subject is this row.
+    pub development_project_id: Uuid,
+}
+
+/// `proofs.attest`'s output: the facts, the source the prover must check, and the digests.
+///
+/// It writes nothing. The caller sends `lean_source` to `lean4.check` and then names that
+/// invocation and this exact `facts_canonical` in `proofs.record`; the record path re-derives the
+/// facts and refuses a caller's substitute.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProofAttestOut {
+    /// Always `unit` for this action.
+    pub subject_type: String,
+    /// The `development_project` id as a string.
+    pub subject_id: String,
+    /// The theorem the rendered source closes.
+    pub theorem: String,
+    /// The specification the certificate answers.
+    pub spec_name: String,
+    /// Its pinned digest.
+    pub spec_sha256: String,
+    /// The model digest the binary embeds.
+    pub model_sha256: String,
+    /// The canonical facts, exactly as `proofs.record` will require them.
+    pub facts_canonical: String,
+    /// Their digest.
+    pub facts_sha256: String,
+    /// The source `lean4.check` must be given.
+    pub lean_source: String,
+}
+
 /// One certificate, as an action answer.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProofOut {
     /// The row id.
     pub id: String,
-    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger | unit`.
     pub subject_type: String,
     /// The subject row.
     pub subject_id: String,
@@ -369,8 +405,8 @@ fn render_failure(error: render::RenderError) -> ActionError {
             "facts_canonical",
             "proof_facts_unknown_kind",
             format!(
-                "a certificate is about a slice, a programme, a package or a unit ledger; \
-                 {kind:?} is none"
+                "a certificate is about a slice, a programme, a package, a unit ledger or a \
+                 unit record; {kind:?} is none"
             ),
         ),
         Refused::NotAnObject => refuse(
@@ -473,6 +509,36 @@ async fn proofs_record(
         )
     })?;
 
+    // A unit's facts are the engine's, not the caller's: derive them again from the rows and
+    // accept only the canonical text the engine derives. This is what makes "a caller cannot
+    // author the facts" a property of the path rather than a comment.
+    let facts_canonical = if subject_type == facts::UNIT_SUBJECT {
+        let derived = facts::derive_unit_record(&mut *tx, ctx.tenant, input.subject_id).await?;
+        let canonical = derived.canonical()?;
+        if input.facts_canonical != canonical {
+            return Err(refuse(
+                "facts_canonical",
+                "proof_facts_not_derived",
+                format!(
+                    "a unit certificate's facts are derived by the engine from development \
+                     project {}; the supplied facts differ from that derivation",
+                    input.subject_id
+                ),
+            ));
+        }
+        if spec_name != derived.spec_name || spec_sha256 != derived.spec_sha256 {
+            return Err(refuse(
+                "spec_sha256",
+                "proof_spec_mismatch",
+                "the certificate's specification differs from the unit's proof_policy pin; the \
+                 charter froze the specification the unit answers",
+            ));
+        }
+        canonical
+    } else {
+        input.facts_canonical.clone()
+    };
+
     let resolved = resolve_invocation(
         &mut *tx,
         ctx.tenant,
@@ -524,13 +590,13 @@ async fn proofs_record(
         ));
     }
 
-    let facts_sha256 = content_hash(&Value::String(input.facts_canonical.clone()));
+    let facts_sha256 = content_hash(&Value::String(facts_canonical.clone()));
     let new = NewProof {
         subject_type: subject_type.to_owned(),
         subject_id: input.subject_id,
         spec_name: spec_name.to_owned(),
         spec_sha256: spec_sha256.to_owned(),
-        facts_canonical: input.facts_canonical,
+        facts_canonical,
         facts_sha256,
         lean_source: resolved.source,
         theorem: theorem.to_owned(),
@@ -801,6 +867,48 @@ async fn proofs_render(
         facts_sha256,
         model_sha256: render::model_sha256(),
         spec_sha256,
+    }))
+}
+
+/// `proofs.attest` — derive a unit's facts from the engine's rows and render its source.
+///
+/// The caller cannot author the facts: this action reads the `development_project`, its
+/// `development_step` evidence, the three development gates and the `proof_policy`, and returns
+/// the canonical JSON plus the exact source to check. It writes nothing, so attesting is safe to
+/// retry and safe to run at any point in the unit's life — an incomplete record renders a source
+/// the kernel refuses, never a pass.
+#[crate::action(
+    name = "proofs.attest",
+    version = 1,
+    kind = "internal",
+    scopes = ["approvals:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn proofs_attest(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProofAttestIn,
+) -> Result<HandlerOutput<ProofAttestOut>, ActionError> {
+    let facts =
+        facts::derive_unit_record(&mut *tx, ctx.tenant, input.development_project_id).await?;
+    let facts_canonical = facts.canonical()?;
+    let facts_value = facts.as_value()?;
+    let lean_source = render::render(&facts_value, facts::UNIT_THEOREM).map_err(render_failure)?;
+    let facts_sha256 = content_hash(&Value::String(facts_canonical.clone()));
+    Ok(HandlerOutput::ok(ProofAttestOut {
+        subject_type: facts::UNIT_SUBJECT.to_owned(),
+        subject_id: input.development_project_id.to_string(),
+        theorem: facts::UNIT_THEOREM.to_owned(),
+        spec_name: facts.spec_name.clone(),
+        spec_sha256: facts.spec_sha256.clone(),
+        model_sha256: render::model_sha256(),
+        facts_canonical,
+        facts_sha256,
+        lean_source,
     }))
 }
 

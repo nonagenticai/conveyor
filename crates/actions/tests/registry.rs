@@ -133,7 +133,7 @@ use serde_json::{Value, json};
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// Every action the registry serves, in the order `registry().names()` returns it.
 /// Regenerated at the main merge; the per-lane history above is superseded.
-const EXPECTED: [&str; 634] = [
+const EXPECTED: [&str; 635] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -619,6 +619,7 @@ const EXPECTED: [&str; 634] = [
     "prompt_recipes.get",
     "prompt_recipes.list",
     "prompt_recipes.retire",
+    "proofs.attest",
     "proofs.get",
     "proofs.list",
     "proofs.record",
@@ -865,9 +866,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // `/api/proofs` route): 606 -> 607; external stays 25.
     // #842 adds two internal actions (`feedback.create|list`, the tenant's platform feedback):
     // 607 -> 609; external stays 25.
-    // Measured at the merged head: 634 actions, 609 internal + 25 external. The action dump
+    // #859 adds one internal action (`proofs.attest`): 609 -> 610; external stays 25.
+    // Measured at the merged head: 635 actions, 610 internal + 25 external. The action dump
     // was regenerated from this same registry.
-    assert_eq!((internal, external), (609, 25));
+    assert_eq!((internal, external), (610, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

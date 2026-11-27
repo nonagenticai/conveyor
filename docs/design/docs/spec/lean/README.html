@@ -37,7 +37,7 @@
 <tbody>
 <tr>
 <td><strong>Instance</strong></td>
-<td>one record's facts satisfy the model (<code>checkSlice facts = true</code> / <code>checkLedger facts = true</code>, closed <code>by decide</code>)</td>
+<td>one record's facts satisfy the model (<code>checkSlice facts = true</code> / <code>checkRecord facts = true</code> / <code>checkLedger facts = true</code>, closed <code>by decide</code>)</td>
 <td>rendered per record by <code>crates/actions/src/proof/render.rs</code></td>
 </tr>
 <tr>
@@ -72,7 +72,7 @@
 <h2 id="delivery-units">Delivery units</h2>
 <p><code>checkLedger</code> models one chunk of <code>docs/plans/03-DELIVERY.md</code>'s unit contract: one claim branch, one linked PR that is non-draft or merged, at most two session CI attempts, a merged unit whose issue is closed and whose branch is deleted, the PR body's <code>Closes #N</code>, and a <code>Verify:</code> line on every part of the issue. Each field is an <code>Option</code>: an unobserved fact is <code>none</code> and fails closed. The facts are GitHub observations with provenance (rule id, artifact digest, committed payload), collected by <code>scripts/proof/collect-units.sh</code> — the kernel never fetches anything, so a certificate proves <em>facts ⇒ verdict</em>, not that the collector read the truth.</p>
 <p>A ledger chunk is at most <strong>200 units</strong> (A0's measurement; the shipped model measures 44 714 bytes and ~2 s of kernel work at 200, against the prover's 100 000-character and 120-second caps). A larger ledger is the collector's to chunk; the renderer refuses it rather than emitting <code>maxRecDepth</code>.</p>
-<p>This is the <strong>observed</strong> contract. The engine's own rows cannot attest issue state, branch liveness, draft flags or run counts, so the future engine-side gate uses a second structure over the recorded rows (<code>checkRecord</code>) rather than weakening <code>checkObs</code> with unknowns.</p>
+<p>This is the <strong>observed</strong> contract. The engine's own rows cannot attest issue state, branch liveness, draft flags or run counts, so the engine-side gate uses a second structure over the recorded rows — <code>UnitRecordFacts</code> / <code>checkRecord</code>, derived by <code>proofs.attest</code> and resolved by <code>development_projects.close</code> through the <code>proof_policy</code> the charter pins — rather than weakening <code>checkObs</code> with unknowns. The policy defaults to advisory and a required gate refuses on the same typed <code>gate_evidence_missing</code> a PM gate returns; the unit's own refusal cycle is recorded in <code>docs/evidence/proof-of-delivery.md</code>.</p>
 <h2 id="model-drift">Model drift</h2>
 <p>The model file is embedded into every rendered source, so editing it changes every future source. A stored certificate is re-checkable against the model it was proven on — its <code>facts_canonical</code> carries that model's digest — and a certificate can never be re-rendered against a different model and still pass. Re-proving after a model edit is a <strong>new certificate</strong>, never an edit of the old one.</p>
 <h2 id="limits">Limits</h2>

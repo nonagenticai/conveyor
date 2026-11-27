@@ -239,3 +239,240 @@ pub async fn record(pg: &Pg, seeded: &Seeded, marker: &str) -> (String, String) 
             .to_owned(),
     )
 }
+
+// ── the engine's own unit (#837) ─────────────────────────────────────────────────────────
+
+/// The theorem `proofs.attest` returns.
+pub const UNIT_THEOREM: &str = "unit_record_ok";
+/// The specification a unit fixture pins.
+pub const UNIT_SPEC: &str = "docs/SPEC_V2.md";
+
+/// A chartered development project and the facts its unit certificate derives.
+pub struct Unit {
+    pub development_project_id: String,
+    pub issue_ref: String,
+    pub lane: String,
+    pub head_sha: String,
+    pub digest: String,
+}
+
+async fn invoke_ok(pg: &Pg, seeded: &Seeded, actor: Uuid, action: &str, input: Value) -> Value {
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(action, actor, input, None),
+    )
+    .await
+    .unwrap_or_else(|error| panic!("{action} refused: {} — {}", error.code, error.detail));
+    outcome.body["output"].clone()
+}
+
+/// Charter a unit with a pinned proof policy. The implementer is the seeded admin; the gates
+/// are decided by the distinct reviewer `seed` provisions.
+pub async fn charter_unit(pg: &Pg, seeded: &Seeded, issue_number: u64, required: bool) -> Unit {
+    let lane = format!("issue/837-{}", Uuid::now_v7().simple());
+    let issue_ref = format!("nonagenticai/conveyor#{issue_number}");
+    let project = invoke_ok(
+        pg,
+        seeded,
+        seeded.user_id,
+        "development_projects.charter",
+        json!({
+            "title": format!("proof unit {issue_number} {}", Uuid::now_v7().simple()),
+            "repo": "nonagenticai/conveyor",
+            "lane": lane.as_str(),
+            "issue_ref": issue_ref.as_str(),
+            "implementer_id": seeded.user_id,
+            "acceptance_command": "cargo test -p conveyor-actions --test pm_gate_unit_proof",
+            "proof_policy": {
+                "spec_name": UNIT_SPEC,
+                "spec_sha256": spec_sha256(),
+                "required": required,
+            },
+        }),
+    )
+    .await;
+    Unit {
+        development_project_id: project["id"]
+            .as_str()
+            .expect("a development project id")
+            .to_owned(),
+        issue_ref,
+        lane,
+        head_sha: format!("{:040x}", Uuid::now_v7().as_u128()),
+        digest: format!("sha256:{}", Uuid::now_v7().simple()),
+    }
+}
+
+/// Record one development step as the implementer.
+pub async fn record_step(pg: &Pg, seeded: &Seeded, unit: &Unit, step: &str, evidence: Value) {
+    invoke_ok(
+        pg,
+        seeded,
+        seeded.user_id,
+        "development_projects.record_step",
+        json!({
+            "development_project_id": unit.development_project_id.as_str(),
+            "step": step,
+            "evidence": evidence,
+        }),
+    )
+    .await;
+}
+
+/// Open a development gate and approve it as the distinct reviewer.
+pub async fn approve_gate(pg: &Pg, seeded: &Seeded, unit: &Unit, action: &str) {
+    let gate = invoke_ok(
+        pg,
+        seeded,
+        seeded.user_id,
+        action,
+        json!({"development_project_id": unit.development_project_id.as_str()}),
+    )
+    .await;
+    let approval_id = gate["approval_id"].as_str().expect("an approval id");
+    let reviewer = super::reviewer_id(pg).await;
+    invoke_ok(
+        pg,
+        seeded,
+        reviewer,
+        "approvals.decide",
+        json!({"approval_id": approval_id, "decision": "approve"}),
+    )
+    .await;
+}
+
+/// Drive the unit from lane to live check: branch → PR → CI → review → merge → rollback plan →
+/// deploy → live. The three gates are approved by a principal other than the implementer.
+pub async fn drive_unit_to_live(pg: &Pg, seeded: &Seeded, unit: &Unit) {
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "branch",
+        json!({"name": unit.lane.as_str(), "base": "main"}),
+    )
+    .await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "pull_request",
+        json!({
+            "number": 837,
+            "url": "https://github.com/nonagenticai/conveyor/pull/837",
+            "head_sha": unit.head_sha.as_str(),
+            "paths": ["crates/actions/src/proof/facts.rs"],
+        }),
+    )
+    .await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "ci",
+        json!({"run_id": "run-837", "sha": unit.head_sha.as_str(), "verdict": "green"}),
+    )
+    .await;
+    approve_gate(pg, seeded, unit, "development_projects.review_gate").await;
+    approve_gate(pg, seeded, unit, "development_projects.merge_gate").await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "merge",
+        json!({"merge_sha": format!("{:040x}", Uuid::now_v7().as_u128())}),
+    )
+    .await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "rollback_plan",
+        json!({
+            "prior_digest": "sha256:prior",
+            "method": "redeploy the prior image digest",
+            "tested": true,
+            "evidence": ["the prior digest served /health in the rehearsal"],
+            "backward_compatible": true,
+        }),
+    )
+    .await;
+    approve_gate(pg, seeded, unit, "development_projects.deploy_gate").await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "deploy",
+        json!({"digest": unit.digest.as_str(), "migration_generation": 80}),
+    )
+    .await;
+    record_step(
+        pg,
+        seeded,
+        unit,
+        "live_verify",
+        json!({
+            "health_status": 200,
+            "serving_digest": unit.digest.as_str(),
+            "acceptance_command": "curl -fsS \"$CONVEYOR_BASE_URL/health\"",
+            "acceptance_exit": 0,
+        }),
+    )
+    .await;
+}
+
+/// `proofs.attest`'s answer for the unit.
+pub async fn attest(pg: &Pg, seeded: &Seeded, unit: &Unit) -> Value {
+    invoke_ok(
+        pg,
+        seeded,
+        seeded.user_id,
+        "proofs.attest",
+        json!({"development_project_id": unit.development_project_id.as_str()}),
+    )
+    .await
+}
+
+/// Attest, check and record the unit's certificate. Returns its id and certificate digest.
+pub async fn record_unit(pg: &Pg, seeded: &Seeded, unit: &Unit) -> (String, String) {
+    let attested = attest(pg, seeded, unit).await;
+    let source = attested["lean_source"]
+        .as_str()
+        .expect("the attestation source");
+    let (key, input) = check(pg, seeded, source).await;
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            "proofs.record",
+            seeded.user_id,
+            json!({
+                "action": "lean4.check",
+                "idempotency_key": key,
+                "invocation_input": input,
+                "subject_type": "unit",
+                "subject_id": unit.development_project_id,
+                "spec_name": attested["spec_name"],
+                "spec_sha256": attested["spec_sha256"],
+                "facts_canonical": attested["facts_canonical"],
+                "theorem": attested["theorem"],
+                "trust": "kernel",
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect("proofs.record");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let body = &outcome.body["output"];
+    (
+        body["id"].as_str().expect("the certificate id").to_owned(),
+        body["certificate_sha256"]
+            .as_str()
+            .expect("the certificate digest")
+            .to_owned(),
+    )
+}

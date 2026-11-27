@@ -44,6 +44,93 @@ pub struct EvidenceRef {
     pub id: Uuid,
 }
 
+/// The one `gate_evidence_missing` refusal, so a required kind reads identically whether a PM
+/// gate or the unit's Definition of done resolves it (#837).
+pub(crate) fn missing_required_kind(kind: &str) -> ActionError {
+    ActionError::new(
+        422,
+        "gate_evidence_missing",
+        format!("this gate requires a {kind:?} evidence item to open; the request names none"),
+    )
+}
+
+/// Resolve one `lean_proof` certificate against a gate's specification pin.
+///
+/// Factored out of [`resolve_evidence`] because the unit's Definition of done resolves the same
+/// arm at close (`development_projects.close`, #837) — one evidence path, not a second one that
+/// could disagree. Each refusal names which check failed: a gate that answers only "invalid" is
+/// useless to the person who has to fix the evidence (§5.4).
+pub(crate) async fn resolve_lean_proof(
+    conn: &mut PgConnection,
+    tenant: store::TenantId,
+    id: Uuid,
+    spec_pin: Option<&str>,
+) -> Result<Value, ActionError> {
+    let proof = store::proof::get_tx(&mut *conn, tenant, id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "gate evidence: read proof");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "gate_evidence_not_found",
+                format!("no proof {id} in this tenant"),
+            )
+        })?;
+    if !proof.is_proven() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_proof_unproven",
+            format!(
+                "proof {id} records verdict {}; a gate needs a proven certificate",
+                proof.verdict
+            ),
+        ));
+    }
+    let pin = spec_pin.ok_or_else(|| {
+        ActionError::new(
+            422,
+            "gate_evidence_proof_unpinned",
+            "a lean_proof reference needs the gate's pinned_spec_sha256; a proof of \
+             an unnamed specification evidences nothing",
+        )
+    })?;
+    if proof.spec_sha256 != pin {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_proof_wrong_spec",
+            format!(
+                "proof {id} answers specification {}, not the gate's pinned {}",
+                proof.spec_sha256, pin
+            ),
+        ));
+    }
+    // A row whose digest no longer describes its columns was rewritten after the prover
+    // answered. Certifying it would launder a tampered record into a pass.
+    if !proof.digest_matches() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_proof_digest",
+            format!("proof {id}: certificate_sha256 does not describe the stored columns"),
+        ));
+    }
+    if !proof.facts_match() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_proof_facts",
+            format!("proof {id}: facts_sha256 does not describe the stored facts"),
+        ));
+    }
+    Ok(json!({
+        "kind": "lean_proof",
+        "id": proof.id,
+        "spec_sha256": proof.spec_sha256,
+        "certificate_sha256": proof.certificate_sha256,
+    }))
+}
+
 /// Resolve every typed reference against its live row, refusing the whole request when one is
 /// absent, not in a qualifying state, or of an unknown kind.
 ///
@@ -80,15 +167,14 @@ pub(crate) async fn resolve_evidence(
     if require && evidence.is_empty() {
         // When the gate names what it requires, say so: "requires at least one reference" leaves
         // the caller guessing which one.
-        let detail = match required_kinds.first() {
-            Some(kind) => {
-                format!(
-                    "this gate requires a {kind:?} evidence item to open; the request names none"
-                )
-            }
-            None => "this gate requires at least one typed evidence reference".to_owned(),
-        };
-        return Err(ActionError::new(422, "gate_evidence_missing", detail));
+        return Err(match required_kinds.first() {
+            Some(kind) => missing_required_kind(kind),
+            None => ActionError::new(
+                422,
+                "gate_evidence_missing",
+                "this gate requires at least one typed evidence reference",
+            ),
+        });
     }
     let mut stored = Vec::with_capacity(evidence.len());
     for item in evidence {
@@ -145,77 +231,7 @@ pub(crate) async fn resolve_evidence(
                 }
             }
             "lean_proof" => {
-                let proof = store::proof::get_tx(&mut *conn, tenant, item.id)
-                    .await
-                    .map_err(|error| {
-                        tracing::error!(%error, "gate evidence: read proof");
-                        ActionError::internal()
-                    })?
-                    .ok_or_else(|| {
-                        ActionError::new(
-                            422,
-                            "gate_evidence_not_found",
-                            format!("no proof {} in this tenant", item.id),
-                        )
-                    })?;
-                // Each refusal names which check failed: a gate that answers only "invalid" is
-                // useless to the person who has to fix the evidence (§5.4).
-                if !proof.is_proven() {
-                    return Err(ActionError::new(
-                        422,
-                        "gate_evidence_proof_unproven",
-                        format!(
-                            "proof {} records verdict {}; a gate needs a proven certificate",
-                            item.id, proof.verdict
-                        ),
-                    ));
-                }
-                let pin = spec_pin.ok_or_else(|| {
-                    ActionError::new(
-                        422,
-                        "gate_evidence_proof_unpinned",
-                        "a lean_proof reference needs the gate's pinned_spec_sha256; a proof of \
-                         an unnamed specification evidences nothing",
-                    )
-                })?;
-                if proof.spec_sha256 != pin {
-                    return Err(ActionError::new(
-                        422,
-                        "gate_evidence_proof_wrong_spec",
-                        format!(
-                            "proof {} answers specification {}, not the gate's pinned {}",
-                            item.id, proof.spec_sha256, pin
-                        ),
-                    ));
-                }
-                // A row whose digest no longer describes its columns was rewritten after the
-                // prover answered. Certifying it would launder a tampered record into a pass.
-                if !proof.digest_matches() {
-                    return Err(ActionError::new(
-                        422,
-                        "gate_evidence_proof_digest",
-                        format!(
-                            "proof {}: certificate_sha256 does not describe the stored columns",
-                            item.id
-                        ),
-                    ));
-                }
-                if !proof.facts_match() {
-                    return Err(ActionError::new(
-                        422,
-                        "gate_evidence_proof_facts",
-                        format!(
-                            "proof {}: facts_sha256 does not describe the stored facts",
-                            item.id
-                        ),
-                    ));
-                }
-                let entry = json!({
-                    "kind": item.kind,
-                    "id": item.id,
-                    "spec_sha256": proof.spec_sha256,
-                    "certificate_sha256": proof.certificate_sha256,
-                });
+                let entry = resolve_lean_proof(&mut *conn, tenant, item.id, spec_pin).await?;
                 stored.push(entry);
                 continue;
             }
@@ -241,13 +257,7 @@ pub(crate) async fn resolve_evidence(
             .iter()
             .any(|item| item.get("kind").and_then(Value::as_str) == Some(kind.as_str()))
         {
-            return Err(ActionError::new(
-                422,
-                "gate_evidence_missing",
-                format!(
-                    "this gate requires a {kind:?} evidence item to open; the request names none"
-                ),
-            ));
+            return Err(missing_required_kind(kind));
         }
     }
     Ok(stored)

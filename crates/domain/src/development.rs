@@ -28,7 +28,11 @@ pub const DEFAULT_GATE_SET: [&str; 3] = ["review", "merge", "deploy"];
 
 /// The surfaces a development project may not change for itself (§9.3). A governance project
 /// with a different approver set changes them.
-pub const JUDGING_SURFACES: [&str; 3] = ["gate_set", "approval_policy", "instrument"];
+///
+/// `proof_policy` is the one surface whose `required` flag may be tightened through the action:
+/// the specification pin is never rewritten, and the implementer can never loosen it (#837).
+pub const JUDGING_SURFACES: [&str; 4] =
+    ["gate_set", "approval_policy", "instrument", "proof_policy"];
 
 /// The approver kind an approval-policy row names (§6.4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
