@@ -199,8 +199,22 @@ async fn get(harness: &Harness, path: &str, token: &str) -> (u16, Option<String>
 }
 
 async fn post_bytes(harness: &Harness, path: &str, token: &str, body: Vec<u8>) -> (u16, Value) {
+    send_bytes(harness, reqwest::Method::POST, path, token, body).await
+}
+
+async fn put_bytes(harness: &Harness, path: &str, token: &str, body: Vec<u8>) -> (u16, Value) {
+    send_bytes(harness, reqwest::Method::PUT, path, token, body).await
+}
+
+async fn send_bytes(
+    harness: &Harness,
+    method: reqwest::Method,
+    path: &str,
+    token: &str,
+    body: Vec<u8>,
+) -> (u16, Value) {
     let response = reqwest::Client::new()
-        .post(format!("{}{path}", harness.running.base()))
+        .request(method, format!("{}{path}", harness.running.base()))
         .header("authorization", format!("Bearer {token}"))
         .header("content-type", "application/octet-stream")
         .body(body)
@@ -464,4 +478,49 @@ async fn a_deferred_attempt_can_still_read_its_input() {
         "a deferred attempt is still the live attempt, so its writes stand"
     );
     assert_eq!(bytes, harness.input_bytes);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn progress_is_a_bounded_json_object_whatever_the_content_type() {
+    let harness = harness().await;
+    let token = token_for(&harness, harness.tenant, ChronoDuration::minutes(5));
+    let path = format!("/api/jobs/{}/progress", harness.job_id);
+
+    // `post_bytes` sends `application/octet-stream`; the route has always taken the bytes as
+    // JSON regardless, and the extractor normalises the header before axum parses.
+    let (status, body) = put_bytes(&harness, &path, &token, br#"{"percent": 40}"#.to_vec()).await;
+    assert_eq!(status, 202, "a JSON object is accepted: {body}");
+
+    let (status, body) = put_bytes(&harness, &path, &token, b"{not json".to_vec()).await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "unprocessable", "{body}");
+
+    let (status, body) = put_bytes(&harness, &path, &token, b"[]".to_vec()).await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["detail"], "the progress must be a JSON object",
+        "{body}"
+    );
+
+    let over = vec![b' '; 4 * 1024 + 1];
+    let (status, body) = put_bytes(&harness, &path, &token, over).await;
+    assert_eq!(status, 413, "{body}");
+    assert_eq!(body["type"], "progress_too_large", "{body}");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_result_that_is_not_runner_v1_is_refused() {
+    let harness = harness().await;
+    let token = token_for(&harness, harness.tenant, ChronoDuration::minutes(5));
+    let path = format!("/api/jobs/{}/result", harness.job_id);
+
+    let (status, body) = post_bytes(&harness, &path, &token, b"not json".to_vec()).await;
+    assert_eq!(status, 422, "the bytes are not a JSON document: {body}");
+    assert_eq!(body["type"], "unprocessable", "{body}");
+
+    let (status, body) = post_bytes(&harness, &path, &token, b"{}".to_vec()).await;
+    assert_eq!(
+        status, 422,
+        "a JSON object is not a runner/v1 result: {body}"
+    );
 }

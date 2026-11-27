@@ -15,9 +15,8 @@
 use std::time::Instant;
 
 use axum::Json;
-use axum::body::Bytes;
-use axum::extract::State;
-use axum::http::{HeaderMap, StatusCode, header};
+use axum::extract::{FromRequest, FromRequestParts, Request, State};
+use axum::http::{HeaderMap, HeaderValue, StatusCode, header, request::Parts};
 use axum::response::{IntoResponse, Response};
 use chrono::Utc;
 use conveyor_actions::registry::registry;
@@ -93,6 +92,67 @@ pub async fn manifest(
         .into_response()
 }
 
+/// The licence gate, as a parts extractor so it runs before the body is parsed.
+///
+/// ⛔ A STOP CONTROL MUST NOT DEPEND ON THE ENTITLEMENT IT MAY NEED TO STOP. The andon cord's
+/// own two actions are exempt: while the cord is pulled `licence.sync` is the only writer of
+/// `app_licence.checked_at`, and if the entitlement has gone stale (or licences is down) the
+/// gate would refuse the very call that releases the cord — measured 2026-11-16, the only way
+/// out was a database edit. Both actions still authenticate and still check `andon:write`.
+pub struct Invoiced;
+
+impl FromRequestParts<AppState> for Invoiced {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        let name = parts.uri.path().split('/').nth(3).unwrap_or_default();
+        if matches!(name, "andon.engage" | "andon.release") {
+            return Ok(Invoiced);
+        }
+        let caller = Caller::from_request_parts(parts, state).await?;
+        crate::extract::require_licence(state, caller.tenant).await?;
+        Ok(Invoiced)
+    }
+}
+
+/// The invocation body, deserialized by axum's [`Json`] extractor on the original request, so
+/// the router's 16 MiB transport limit still applies. Callers have always sent the protocol's
+/// JSON whatever the `Content-Type`, so the header is normalised before the framework parses.
+/// Keeping the parse inside axum keeps deserialization out of this crate's own surface; the
+/// rejection is the same RFC 9457 `invalid_json` problem the handler always returned.
+pub struct ActionBody(Value);
+
+impl FromRequest<AppState> for ActionBody {
+    type Rejection = Response;
+
+    async fn from_request(mut request: Request, state: &AppState) -> Result<Self, Self::Rejection> {
+        let instance = request.uri().path().to_owned();
+        let request_id = request
+            .extensions()
+            .get::<RequestId>()
+            .map(|id| id.0.clone())
+            .unwrap_or_default();
+        request.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        match Json::<Value>::from_request(request, state).await {
+            Ok(Json(value)) => Ok(ActionBody(value)),
+            Err(rejection) => {
+                let error = ActionError::invalid_input(vec![conveyor_actions::FieldError {
+                    field: "body".into(),
+                    code: "invalid_json".into(),
+                    detail: rejection.body_text(),
+                }]);
+                Err(problem(&error, &instance, &request_id))
+            }
+        }
+    }
+}
+
 /// The invocation body `{"input": …, "approval_id": "…"}`. Parsed by hand so every failure is
 /// RFC 9457.
 ///
@@ -100,14 +160,7 @@ pub async fn manifest(
 /// spec declares an approval target is refused without it, and every other action ignores it. It
 /// lives beside `input` rather than inside it because every action input is
 /// `deny_unknown_fields` — a field the engine adds could not be added to 27 schemas at once.
-fn parse_body(bytes: &Bytes) -> Result<(Value, Option<uuid::Uuid>), ActionError> {
-    let value: Value = serde_json::from_slice(bytes).map_err(|error| {
-        ActionError::invalid_input(vec![conveyor_actions::FieldError {
-            field: "body".into(),
-            code: "invalid_json".into(),
-            detail: error.to_string(),
-        }])
-    })?;
+fn parse_body(value: Value) -> Result<(Value, Option<uuid::Uuid>), ActionError> {
     let Some(input) = value.get("input") else {
         return Err(ActionError::invalid_input(vec![
             conveyor_actions::FieldError {
@@ -190,24 +243,14 @@ pub async fn invoke_http(
     uri: axum::http::Uri,
     request_id: axum::Extension<RequestId>,
     headers: HeaderMap,
-    body: Bytes,
+    _licensed: Invoiced,
+    body: ActionBody,
 ) -> Response {
     let request_id = request_id.0.0.clone();
     // The name is the path segment the client sent: a literal route has no `{name}`
     // placeholder, and this is what keeps the literal routes and the fallback on ONE
     // handler (the registry lookup is the only authority).
     let name = uri.path().split('/').nth(3).unwrap_or_default().to_owned();
-    // ⛔ A STOP CONTROL MUST NOT DEPEND ON THE ENTITLEMENT IT MAY NEED TO STOP. The cord's own
-    // two actions are exempt from the licence gate: while the cord is pulled `licence.sync` is
-    // the only writer of `app_licence.checked_at`, and if the entitlement has gone stale (or
-    // licences is down) the gate would refuse the very call that releases the cord — measured
-    // 2026-11-16, the only way out was a database edit. Both actions still authenticate the
-    // caller and still check `andon:write`; only this gate is skipped.
-    if !matches!(name.as_str(), "andon.engage" | "andon.release")
-        && let Err(error) = crate::extract::require_licence(&state, caller.tenant).await
-    {
-        return error.into_response();
-    }
     let instance = format!("/api/actions/{name}/invocations");
     let trace_id = headers
         .get("traceparent")
@@ -215,7 +258,7 @@ pub async fn invoke_http(
         .and_then(|value| value.split('-').nth(1))
         .map(str::to_owned);
 
-    let (input, approval_id) = match parse_body(&body) {
+    let (input, approval_id) = match parse_body(body.0) {
         Ok(parsed) => parsed,
         Err(error) => return problem(&error, &instance, &request_id),
     };
