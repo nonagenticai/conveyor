@@ -173,20 +173,6 @@ async fn step_rows(
     .expect("the step rows")
 }
 
-/// The whole `checks` list as one string, for a targeted `contains` assertion.
-fn checks_text(body: &Value) -> String {
-    output(body)["checks"]
-        .as_array()
-        .map(|checks| {
-            checks
-                .iter()
-                .filter_map(Value::as_str)
-                .collect::<Vec<_>>()
-                .join("\n")
-        })
-        .unwrap_or_default()
-}
-
 async fn review_source(running: &support::Running, asset_id: &str) -> (u16, Value) {
     running
         .invoke(
