@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T7 is closed",
-      "detail": "project T7 is active",
+      "detail": "project T7 is closed",
       "id": "T7-project",
       "kind": "snapshot",
       "result": "pass",
@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a211c9-2c25-73c9-bf1f-8bafa65eaa7b approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a216d1-1f41-7345-8163-8719d7129df9 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T7-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -43,25 +43,25 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a21c26-af30-7c3e-ad6d-39f7ae1937ea approved by board decision 01a21c26-afda-78c1-aea9-920275ed65c4 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T7-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a21c26-e355-7d2e-ae8d-bb8a3f163712 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T7-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a211c9-30da-7248-83e4-ca2f7731ce8b decided by a distinct approver",
+      "detail": "latest closure gate 01a216d1-2b94-74f2-8da2-cf9d451386d9 decided by a distinct approver",
       "id": "T7-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -79,7 +79,7 @@
     {
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
-      "detail": "PI cadence 01a211c9-29ad-7747-96f2-97f272e776c9 and refinement 01a211c9-2a26-7dcd-9aa1-e30b6d63998a for tranche-5",
+      "detail": "PI cadence 01a216d1-1913-70dd-8f69-c8ad230f2364 and refinement 01a216d1-1a40-7246-ba5e-254b8c0986fe for tranche-5",
       "id": "T7-pi-cadence",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-2b9c-7669-a9db-8caaf923c053 carries a statement and evidence from the tranche-5 retro",
+      "detail": "lesson 01a216d1-1dde-7519-a046-d30c934c6fb6 carries a statement and evidence from the tranche-5 retro",
       "id": "T7-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -142,50 +142,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "6 mandatory artefact package(s) open: project_in_unauthorised_tranche:T7, contract_missing:T7, mandatory_artefacts:T7, std-pmp-project-baseline-t7:T7, std-pmp-project-registers-t7:T7, std-togaf-compliance-review-t7:T7",
+      "detail": "no open standard artefact package for this project",
       "id": "T7-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "6 unresolved P0/P1 package(s): project_in_unauthorised_tranche:T7 (P1), seed_live_drift:T7 (P1), v1-w1b-4:T7 (P1), v1-w3a-5:T7 (P1), contract_missing:T7 (P1), mandatory_artefacts:T7 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T7-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T7-contract' did not pass; the gate check 'T7-review' did not pass; the gate check 'T7-artefact-standard' did not pass; the gate check 'T7-rework' did not pass",
+      "detail": "gate discharged by executable checks: T7-project, T7-baseline, T7-charter, T7-closure-outputs, T7-contract, T7-review, T7-closure-gate, T7-waivers, T7-pi-cadence, T7-pi-plan, T7-pi-objectives, T7-wsjf, T7-demo-credits, T7-lessons, T7-product, T7-artefact-standard, T7-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T7-contract (P0): no live board-approved delivery contract",
-    "T7-review (P0): no Phase-G compliance review for the project's live contract",
-    "T7-artefact-standard (P1): 6 mandatory artefact package(s) open: project_in_unauthorised_tranche:T7, contract_missing:T7, mandatory_artefacts:T7, std-pmp-project-baseline-t7:T7, std-pmp-project-registers-t7:T7, std-togaf-compliance-review-t7:T7",
-    "T7-rework (P0): 6 unresolved P0/P1 package(s): project_in_unauthorised_tranche:T7 (P1), seed_live_drift:T7 (P1), v1-w1b-4:T7 (P1), v1-w3a-5:T7 (P1), contract_missing:T7 (P1), mandatory_artefacts:T7 (P1)",
-    "gate (P0): the gate check 'T7-contract' did not pass; the gate check 'T7-review' did not pass; the gate check 'T7-artefact-standard' did not pass; the gate check 'T7-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable.",
-  "generated_at": "2026-11-25T10:37:54.669166+00:00",
+  "generated_at": "2026-11-27T08:38:11.421077+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T7.toml",
   "name": "Operations",
   "project": "T7",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-27T08:37:46.833305+00:00",
+    "git_sha": "f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c",
+    "path": "retained-snapshot/f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
