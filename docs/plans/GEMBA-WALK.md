@@ -89,7 +89,8 @@ pre-empted. It is not defined as pixel or copy parity with either existing clien
 5. Seats are view presets; the manifest and server scopes own authority.
 6. No fixtures; no client-side programme store; no published snapshot as the app's source.
 7. `WorldView` port; the simulation is `bevy_ecs 0.20.1` in `crates/walk-world` (ADR 0022); the
-   renderer — canvas-2D baseline against WebGL2 — is decided by the P0 spike in ADR 0023.
+   renderer is canvas-2D (ADR 0023, after the P0 spike measured it against WebGL2; WebGL2 remains a
+   candidate behind the port).
 8. Clean URLs with a scoped `/walk/*` fallback in `crates/api/src/web.rs` (GET/HEAD, non-asset
    paths) and a Rust test; without it a deep link renders the operator app.
 9. Schema-driven action sheet so no action is unreachable; unsupported schema falls back to a
@@ -164,7 +165,7 @@ successor) once the walk app is on `main`; it needs no server, database or netwo
 
 | Stage | Work | Exit gate |
 |---|---|---|
-| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves PKCE redirect to `/walk/` on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own `/walk/*` fallback, and a static copy; it measures canvas-2D against WebGL2 for the renderer and ADR 0023 records the winner and budgets (the simulation is `bevy_ecs` in `crates/walk-world`, ADR 0022). The production `web.rs` fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1 |
+| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves the PKCE S256 construction and records the exact dev issuer/redirect state (the real `/walk/` redirect is the external prerequisite named in §7), SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own `/walk/*` fallback, and a static copy; it measures canvas-2D against WebGL2 and ADR 0023 records the measured budgets and selects canvas-2D (the simulation is `bevy_ecs` in `crates/walk-world`, ADR 0022). The production `web.rs` fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1 |
 | **P1** | Foundation + Portfolio end-to-end | Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room `portfolio` read + **one real write**, deep link and back/forward, dev server, Dockerfile copy, `web.rs` fallback + test, spec green |
 | **P2** | Read parity across §10.5 | Every destination renders its reads with loading/empty/partial/error/denied and the honest gate; each has its spec |
 | **P3** | Write parity + gates | Every destination's writes go through the action sheet with `If-Match`/`Idempotency-Key`/approval, refusals shown verbatim, no optimistic mutation |
@@ -291,7 +292,7 @@ Every row starts `absent`. A row reaches `verified` only through §6.
 |---|---|
 | 597 actions and 52 routes is a multi-tranche build | schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible |
 | A second shell/auth/test harness drifts from the app | one contract, one census, behavioural trace parity on named flows, per-destination specs; a change to a contract updates both |
-| Bevy on the web: bundle, startup, WebGL2/WebGPU, limited text/table widgets | P0 measures against the canvas baseline; the port keeps the engine replaceable; the baseline is never deleted |
+| The world engine: wasm bundle and startup; the canvas renderer's density limit | the P0 spike measured canvas-2D (60 fps, 24 KB, 1.27 s cold load, stable heap); ADR 0023 selects it; the port keeps WebGL2 and the engine replaceable; the baseline is never deleted |
 | No local Rust builds (owner rule) slows the Bevy loop | all wasm builds on GitHub-hosted CI; the baseline needs no Rust; the spike is CI-first |
 | Deep links today fall through to the operator app | the scoped `web.rs` fallback plus a Rust test lands in P1, before any link is published |
 | OIDC redirect URI is an external change | P0 proves it; if the operator refuses, register a dedicated public client and serve its id to the walk |

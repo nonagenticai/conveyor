@@ -203,15 +203,17 @@ map/list view exposes the same rooms and records; no network access; no authorit
 ### 6.3 Renderer candidates
 
 The **simulation is decided**: `bevy_ecs 0.20.1` in `crates/walk-world` (ADR 0022), compiled to
-`wasm32-unknown-unknown` and loaded behind the port. The **renderer is not**: both adapters consume
-the same `FrameView`.
+`wasm32-unknown-unknown` and loaded behind the port. The **renderer is decided**: canvas-2D
+(ADR 0023, accepted 2026-11-27). Both adapters consume the same `FrameView`; the port keeps the
+choice reversible.
 
-- **Baseline — canvas 2D pseudo-3D.** The mock's approach: a hand-written projection, painter's
+- **Selected — canvas 2D pseudo-3D.** The mock's approach: a hand-written projection, painter's
   depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a
-  small payload. It ships first.
-- **Candidate — WebGL2.** The same `FrameView` drawn through a thin WebGL2 layer when the scene's
-  figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR
-  0023 records the winner and the budgets.
+  small payload. It ships first and is the W2 renderer.
+- **Candidate — WebGL2.** The same `FrameView` drawn through a thin WebGL2 layer. Measured
+  head-to-head with the baseline in the P0 spike: it tied at the 60 fps cap with a larger heap and a
+  GPU requirement, so it remains a measured candidate behind the port, not a dependency. ADR 0023
+  records the numbers and the budgets.
 
 No `bevy_render`, `bevy_winit` or `bevy_asset` dependency is admitted: the engine is a simulation
 crate, not a rendering stack.
@@ -373,8 +375,9 @@ Slow 4G for load metrics. It records:
 | CI build time and reproducibility | the no-local-Rust rule makes CI the only build |
 | DOM-overlay input/focus and screen-reader path | the engine must not own the work surface |
 
-ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2
-wins; it remains the fallback behind the port.
+ADR 0023 records the measured budgets and selects canvas-2D; WebGL2 tied on the reference scene
+but carries a larger heap and a GPU requirement, so it remains a candidate behind the port. The
+baseline is never deleted.
 
 ## 13. Parity gate (before any primacy claim)
 

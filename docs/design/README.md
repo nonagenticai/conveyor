@@ -24,7 +24,8 @@ Walk at `/walk/` — a candidate primary UI (ADR 0021, D67) that is **not** a pa
 never served at `/design/`. The pack remains the public site; the app remains normative until the
 walk's measured parity gate. Its world layer is
 [GEMBA-WALK-ECS.md](GEMBA-WALK-ECS.md) — a `bevy_ecs 0.20.1` simulation in `crates/walk-world`
-behind the `WorldView` port (ADR 0022, decision 0023 for the renderer). Its MSP/TOGAF/SAFe inception
+behind the `WorldView` port (ADR 0022); the renderer is canvas-2D (ADR 0023), with WebGL2 behind the
+port. Its MSP/TOGAF/SAFe inception
 set is [`docs/plans/inception/GEMBA-WALK/`](../plans/inception/GEMBA-WALK/README.md).
 
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack

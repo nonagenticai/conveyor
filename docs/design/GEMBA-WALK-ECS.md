@@ -341,8 +341,9 @@ Rules: no draw-list entry carries long text, a table or a form (SPEC §2); the a
 the world — it returns `InputIn`; picking is `pointer → sprite id` in the adapter, resolved against
 `InteractableId`, never a second ray-cast implementation in the ECS.
 
-The renderer remains undecided (canvas-2D vs WebGL2) and is ADR 0023's subject. This document fixes
-only what both renderers consume.
+The renderer is **canvas-2D** (ADR 0023, accepted 2026-11-27), selected by the P0 spike; WebGL2
+remains a measured candidate behind this port, not a dependency. This document fixes only what both
+renderers consume.
 
 ## 14. Testing
 

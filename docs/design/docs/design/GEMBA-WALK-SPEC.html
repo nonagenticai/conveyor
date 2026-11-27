@@ -239,10 +239,10 @@
 <p>The port's producer is the world simulation: <code>crates/walk-world</code> (ADR 0022) emits a <code>FrameView</code> draw list and the adapter draws it. The adapter never mutates the world — it returns input, and <code>setScene</code> carries the draw list the simulation derived from the records.</p>
 <p>Constraints for every implementation: no text input, no tables, no long-form content; all scene text is a short label duplicated in the DOM; the canvas is labelled and never traps focus; a pure-DOM map/list view exposes the same rooms and records; no network access; no authority.</p>
 <h3 id="63-renderer-candidates">6.3 Renderer candidates</h3>
-<p>The <strong>simulation is decided</strong>: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022), compiled to <code>wasm32-unknown-unknown</code> and loaded behind the port. The <strong>renderer is not</strong>: both adapters consume the same <code>FrameView</code>.</p>
+<p>The <strong>simulation is decided</strong>: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022), compiled to <code>wasm32-unknown-unknown</code> and loaded behind the port. The <strong>renderer is decided</strong>: canvas-2D (ADR 0023, accepted 2026-11-27). Both adapters consume the same <code>FrameView</code>; the port keeps the choice reversible.</p>
 <ul>
-<li><strong>Baseline — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a small payload. It ships first.</li>
-<li><strong>Candidate — WebGL2.</strong> The same <code>FrameView</code> drawn through a thin WebGL2 layer when the scene's figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR 0023 records the winner and the budgets.</li>
+<li><strong>Selected — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a small payload. It ships first and is the W2 renderer.</li>
+<li><strong>Candidate — WebGL2.</strong> The same <code>FrameView</code> drawn through a thin WebGL2 layer. Measured head-to-head with the baseline in the P0 spike: it tied at the 60 fps cap with a larger heap and a GPU requirement, so it remains a measured candidate behind the port, not a dependency. ADR 0023 records the numbers and the budgets.</li>
 </ul>
 <p>No <code>bevy_render</code>, <code>bevy_winit</code> or <code>bevy_asset</code> dependency is admitted: the engine is a simulation crate, not a rendering stack.</p>
 <h3 id="64-state">6.4 State</h3>
@@ -401,7 +401,7 @@
 </tr>
 </tbody>
 </table>
-<p>ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2 wins; it remains the fallback behind the port.</p>
+<p>ADR 0023 records the measured budgets and selects canvas-2D; WebGL2 tied on the reference scene but carries a larger heap and a GPU requirement, so it remains a candidate behind the port. The baseline is never deleted.</p>
 <h2 id="13-parity-gate-before-any-primacy-claim">13. Parity gate (before any primacy claim)</h2>
 <p>The walk reaches parity only when all of these are true and recorded:</p>
 <ol type="1">

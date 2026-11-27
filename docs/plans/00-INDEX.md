@@ -57,9 +57,9 @@ parity gate.
 
 **The walk's world layer, added 2026-11-27.** `docs/design/GEMBA-WALK-ECS.md` is the architecture of
 the simulation: `bevy_ecs 0.20.1` in `crates/walk-world`, compiled to wasm, behind the `WorldView`
-port. ADR 0022 accepts it as a delegated rule decision; the *renderer* (canvas-2D against WebGL2) is
-still the P0 spike's, recorded in ADR 0023. The unit is #806; the four affected typed artefact rows
-move to v2.
+port. ADR 0022 accepts it as a delegated rule decision; the renderer is canvas-2D (ADR 0023),
+measured against WebGL2 in the P0 spike; the record is
+`docs/evidence/walk-spike.md`. The unit is #806; the four affected typed artefact rows move to v2.
 
 **T19F added 2026-11-24, built 2026-11-25.** Decision-forum governance is the follow-on T19's
 closure review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy

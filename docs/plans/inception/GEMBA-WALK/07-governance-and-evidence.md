@@ -17,8 +17,8 @@ review_date: 2026-12-03
 
 | ID | Work package | Stage | Owner | Acceptance (the plan's `Verify:`) | Status |
 |---|---|---|---|---|---|
-| W0 | Governance, census and parity instrument | P0 | programme-manager | `python3 scripts/build-walk-coverage.py --check` (to create) | planned |
-| W1 | Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023 | P0 | programme-architect | the spike record; ADR 0023 | planned |
+| W0 | Governance, census and parity instrument | P0 | programme-manager | `python3 scripts/build-walk-coverage.py --check` | in progress (#813) |
+| W1 | Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023 | P0 | programme-architect | `docs/evidence/walk-spike.md`; ADR 0023 | done 2026-11-27 (run 45953201576) |
 | W1a | `crates/walk-world`: entities, components, resources, schedules, projection (§1–§9 of the ECS design) | P1 | delivery (G0) | the headless tests in `walk-world` | planned |
 | W1b | The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11) | P1 | delivery (G0) | refusal + same-frame ordering tests | planned |
 | W1c | The replay/determinism harness and the ambiguity test (§10, §14) | P1 | delivery (G0) | `replay_is_deterministic`, `no_schedule_ambiguity` | planned |

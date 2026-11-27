@@ -1,0 +1,170 @@
+{
+  "proofs": {
+    "me": {
+      "principal": {
+        "id": "01a21bbd-5f8e-77ff-ae4f-08d4f47baf41",
+        "subject": "dev:alice",
+        "display_name": "Alice",
+        "email": "alice@dev.invalid"
+      },
+      "active_tenant": {
+        "tenant_id": "01a21bbd-5f8b-7f1a-997f-def4530f16be",
+        "slug": "dev-a",
+        "name": "Dev A",
+        "role": "admin"
+      }
+    },
+    "pkce": {
+      "ok": true,
+      "url": "https://issuer.example/protocol/openid-connect/auth?client_id=walk&redirect_uri=http%3A%2F%2F127.0.0.1%3A8932%2Fwalk%2F&response_type=code&scope=openid+email+profile&code_challenge=eNZU5dJZfoCWgPjq5V3xs8DnoH8YP1jrJRdErcE8Ch8&code_challenge_method=S256&state=DKh72R7-e9Pfn7VYmJuyjQ",
+      "redirectUri": "http://127.0.0.1:8932/walk/",
+      "challengeMethod": "S256",
+      "verifierLength": 43
+    },
+    "config": {
+      "client_id": "conveyor",
+      "dev_auth": true,
+      "issuer": ""
+    },
+    "forms": {
+      "programmes.list": {
+        "fields": [
+          "cursor",
+          "limit"
+        ],
+        "effect": "read",
+        "confirm": "none",
+        "tenancy": "tenant"
+      },
+      "programmes.update": {
+        "fields": [
+          "id",
+          "name",
+          "owner_user_id",
+          "status"
+        ],
+        "effect": "write",
+        "confirm": "none",
+        "tenancy": "tenant"
+      },
+      "cards.archive": {
+        "fields": [
+          "id"
+        ],
+        "effect": "destructive",
+        "confirm": "none",
+        "tenancy": "tenant"
+      }
+    },
+    "readItems": 0,
+    "createdCard": "01a21bbe-14a8-718c-bbcd-4d71d7f6930d",
+    "createHeaders": {
+      "authorization": "Bearer dev:alice",
+      "idempotency-key": "2d84014d-4256-4909-8772-eed55d9dad4a",
+      "content-type": "application/json"
+    },
+    "moveHeaders": {
+      "authorization": "Bearer dev:alice",
+      "if-match": "1",
+      "content-type": "application/json"
+    },
+    "refusal": {
+      "status": 403,
+      "problem": {
+        "detail": "cards.archive is destructive: an approved approval for `card/01a21bbe-13e5-7c8a-bef6-c704d6d79bf2/archive` must be named in `approval_id`",
+        "instance": "/api/actions/cards.archive/invocations",
+        "request_id": "01a21bbe-14c1-73d5-9e79-2448f91ef4ec",
+        "status": 403,
+        "title": "Forbidden",
+        "type": "approval_required"
+      }
+    },
+    "sseFrames": 4,
+    "sseTypes": [
+      "card.created",
+      "card.created",
+      "card.created",
+      "card.moved"
+    ],
+    "deepLink": "http://127.0.0.1:8932/walk/portfolio/deep-link"
+  },
+  "canvas2d": {
+    "available": true,
+    "runs": 5,
+    "p50": {
+      "min": 16.699999999999818,
+      "median": 16.699999999999818,
+      "max": 16.699999999999818
+    },
+    "p95": {
+      "min": 16.700000000000728,
+      "median": 16.799999999999272,
+      "max": 16.799999999999955
+    },
+    "longTasks": {
+      "min": 0,
+      "median": 0,
+      "max": 0
+    },
+    "heapAfter": {
+      "min": 3137812,
+      "median": 5978230,
+      "max": 8861520
+    },
+    "coldLoad": {
+      "min": 1260.7999999999884,
+      "median": 1269.399999999965,
+      "max": 1282
+    },
+    "bytes": 24388,
+    "requests": 9
+  },
+  "webgl2": {
+    "available": true,
+    "runs": 5,
+    "p50": {
+      "min": 16.699999999999818,
+      "median": 16.699999999999818,
+      "max": 16.699999999999818
+    },
+    "p95": {
+      "min": 16.700000000000728,
+      "median": 16.700000000000728,
+      "max": 16.799999999999727
+    },
+    "longTasks": {
+      "min": 0,
+      "median": 0,
+      "max": 0
+    },
+    "heapAfter": {
+      "min": 4198562,
+      "median": 8856340,
+      "max": 13794526
+    },
+    "coldLoad": {
+      "min": 1263.5,
+      "median": 1266.600000000035,
+      "max": 1280.5
+    },
+    "bytes": 24388,
+    "requests": 9
+  },
+  "soak": {
+    "available": true,
+    "renderer": "canvas2d",
+    "roomChanges": 20,
+    "holdMs": 300000,
+    "heapStart": 2539717,
+    "heapAfterChanges": 2711374,
+    "heapAfterHold": 1932593
+  },
+  "environment": {
+    "browser": "158.0.8127.18",
+    "platform": "linux",
+    "runner": "GitHub Actions 1000055513",
+    "cpuThrottle": 4,
+    "network": "Slow 4G emulation (1.5 Mbps down / 750 kbps up / 150 ms)",
+    "referenceScene": "6 rooms, 12 figures, labels, one moving figure (SPEC §12)"
+  }
+}
