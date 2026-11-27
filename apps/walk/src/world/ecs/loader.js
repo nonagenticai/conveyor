@@ -3,8 +3,10 @@
 // canvas draws a labelled fallback.
 
 export async function loadEngine() {
-  // @ts-expect-error pkg/ is built by the image/CI, never committed; it has no typings.
-  const module = await import("../../../pkg/walk_world.js");
+  // A URL specifier keeps the generated package out of the type graph: pkg/ is built by the
+  // image and CI, never committed, and wasm-bindgen's glue is not written for tsc.
+  const url = new URL("../../../pkg/walk_world.js", import.meta.url);
+  const module = await import(url.href);
   await module.default();
   return module;
 }

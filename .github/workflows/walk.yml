@@ -84,6 +84,15 @@ jobs:
           rustup show
           rustc --version
 
+      - name: the walk unit tests and type check
+        # Before the wasm build: tsc type-checks the hand-written modules only.
+        run: |
+          set -euo pipefail
+          cd apps/walk
+          npm ci
+          node --test src
+          npx tsc -p . --noEmit
+
       - name: the walk-world headless tests
         run: cargo test -p walk-world --locked
 
@@ -149,11 +158,10 @@ jobs:
             -H 'host: game.nonagentic.ai' http://127.0.0.1:8930/mcp)
           test "$code" = "404"
 
-      - name: install the walk dependencies and a browser
+      - name: install a browser
         run: |
           set -euo pipefail
           cd apps/walk
-          npm ci
           npx playwright install --with-deps chromium
 
       - name: the walk Playwright suite
