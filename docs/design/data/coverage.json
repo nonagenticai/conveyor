@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 7,
+        "blocked": 3,
+        "claimed": 5,
         "numbers": [
           16,
           17,
@@ -362,20 +362,15 @@
           733,
           755,
           756,
-          760,
-          779,
           780,
           781,
           782,
           783,
           784,
-          787,
-          788,
-          791,
           792
         ],
-        "open": 25,
-        "ready": 8,
+        "open": 20,
+        "ready": 6,
         "unknown": 0
       }
     },
@@ -2265,13 +2260,13 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           74,
           797
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
