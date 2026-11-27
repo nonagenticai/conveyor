@@ -1,4 +1,4 @@
-### Evaluation — corpus `36439d192a460a9e…`
+### Evaluation — corpus `66544ac7ae1e1ed2…`
 
 Window: nonagenticai/conveyor merged PRs and unit issues from 2026-11-11; collected 2026-11-27T11:00:09.975521+00:00 at `48797526cc3633e5fd7685919f35e35e10ffb988`. Spec `docs/plans/03-DELIVERY.md` `12514c99588f9b8c…`; model `378a1395310416cd…`.
 
@@ -79,4 +79,4 @@ Rules the snapshot cannot reconstruct are named, not dropped: claim timing/comme
 
 **`Verify:` cross-check.** The fact reuses `scripts/ci/board.py`'s `VERIFY_RE` (the line rule `issue-dor` runs) and requires one per `###` part, which is what 03-DELIVERY's DoR says; the CI checker requires only one in the exact `Parts and acceptance criteria` section. Disagreements: 9 pass the checker but fail the model, 6 the reverse, 293 agree. Both answers are recorded; neither is silently adopted.
 
-The kernel certifies *facts ⇒ verdict*; the collector's snapshot, rule ids and artefact digests are what a reviewer checks against GitHub. No unit is attributed to a person.
+The kernel certifies *facts ⇒ verdict*; the collector's snapshot, rule ids and artefact digests are what a reviewer checks against GitHub. The snapshot is redacted per `scripts/ci/no-private-refs.sh` (public GitHub quotations of estate identifiers become placeholders; the facts need none of them). No unit is attributed to a person.

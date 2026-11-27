@@ -211,11 +211,14 @@ measurement and are not emitted.
 ### A2 — the evaluation of the real ledger (offline, 2026-11-27)
 
 The collector (`scripts/proof/collect_units.py`, self-test in the `checks` job) fetched the
-window once and rendered it offline. The raw snapshot is committed at
+window once and rendered it offline. The snapshot is committed at
 `docs/evidence/units/2026-11-27/snapshot.json`: 371 issues, 447 merged PRs (319 non-automation),
-124 live heads and 2 481 workflow runs at 638 shas, collected at `48797526c`. Its digests are in
-`units.json`; two renders of the same snapshot produced the same corpus hash and byte-identical
-facts (`36439d192a460a9e…`).
+124 live heads and 2 481 workflow runs at 638 shas, collected at `48797526c`. It is redacted per
+`scripts/ci/no-private-refs.sh`: public GitHub issue/PR bodies sometimes quote estate identifiers,
+so the committed copy carries deterministic placeholders — the facts the certificate uses (state,
+closing keyword, `Verify:`) need none of them, and the unredacted payloads are the public GitHub
+records. Two renders of the same snapshot produced the same corpus hash and byte-identical facts
+(`66544ac7ae1e1ed2…`).
 
 | Corpus | Count |
 |---|---|

@@ -1,8 +1,8 @@
 {
   "artifacts": {
     "heads": "35858df7ebbcf3e8b85f11917af657dfbd40b53083b5ae2297d9b1eb9576f4ed",
-    "issues": "2c060a8a98ba7997aa715860e798ec055cc8cb9ade30b70e6df3cd9826cb7353",
-    "pulls": "baa19c5e19c65dce882685cd9b3816d5c2060cd45087cbc7ee1540b0ff038752"
+    "issues": "89714500005a04602a7806023b98a8aabca2f7125649f6b6555a6de8e36fdb6f",
+    "pulls": "ff4c3ad68b7c3f3a987aaf834f8c2f385ae59584c97f167d2f6ff1d4d47136d5"
   },
   "baseline": "2026-11-11",
   "chunks": [
@@ -38,9 +38,9 @@
     }
   ],
   "collected_at": "2026-11-27T11:00:09.975521+00:00",
-  "collector_sha256": "e5127d7216221824a3643c50694f97c5073afa68f618d2bd9c4594a4a893403d",
+  "collector_sha256": "de57caa7c8b906875731ca9955eae9c120800e616698e0f24e8e450ea108c86c",
   "commit": "48797526cc3633e5fd7685919f35e35e10ffb988",
-  "corpus_sha256": "36439d192a460a9e251f7d5fc7b1ee2a81c3a132ebb2c6b0c6dac99932e31fca",
+  "corpus_sha256": "66544ac7ae1e1ed21363d12bdc4745ddf077e1e3226e9a80668405ce7e1492fe",
   "counts": {
     "completed": 320,
     "excluded_automation": 128,
@@ -1119,7 +1119,7 @@
       "issue_number": 102,
       "key": "nonagenticai/conveyor#102",
       "provenance": {
-        "artifact": "6140c1a9f43841d389a6eec3e23a97354a5b7fc31464c010938eb1beccff0370",
+        "artifact": "f61150a81fff8a7db3c4d5ccc274f89552f942c32fbb8840bac6817b33c558fa",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1349,7 +1349,7 @@
       "issue_number": 116,
       "key": "nonagenticai/conveyor#116",
       "provenance": {
-        "artifact": "acfeb8d1364701132e3fa272d7565345df1a37ce98783f50d7317ed49fecbaba",
+        "artifact": "c8cc0e4b0512e926373b80095ea25b027be53316575f24d9600a2a58fad5197a",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1579,7 +1579,7 @@
       "issue_number": 128,
       "key": "nonagenticai/conveyor#128",
       "provenance": {
-        "artifact": "45412dfeff9d97d6555f69404e32ad4df41acb988b6814de159d8567299aa263",
+        "artifact": "87405beeb4911535691efe5f90f628851544df85da0c4b01be455d336721f0da",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2573,7 +2573,7 @@
       "issue_number": 17,
       "key": "nonagenticai/conveyor#17",
       "provenance": {
-        "artifact": "ef6d5ab2053d7da02ac98b9fb68a9b67009f201dd971c9d6eecbcca430588976",
+        "artifact": "d3de7b57271b1a7d023cf0c8f57e38bba951620f4d9c817452946e765cd8c078",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2687,7 +2687,7 @@
       "issue_number": 172,
       "key": "nonagenticai/conveyor#172",
       "provenance": {
-        "artifact": "776187288cc6cd9e4c3c87962b4eecbe5ef33da7fc13fdaf14b2b593d1d19edd",
+        "artifact": "c2144383d6c3f0fd4edb45287e201f6518abac9d22b6ea9c85def2857811fb70",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2763,7 +2763,7 @@
       "issue_number": 174,
       "key": "nonagenticai/conveyor#174",
       "provenance": {
-        "artifact": "2d660dda62a1edfce91687f50b4f842b86296cdcf4b729ab5cbcf5d7617760f9",
+        "artifact": "0df7378ee5690215ab86335d8b7eb5844ad07d424abd5be2269114eb422296da",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -3190,7 +3190,7 @@
       "issue_number": 196,
       "key": "nonagenticai/conveyor#196",
       "provenance": {
-        "artifact": "7605825f3a0e4dc15818a095c7127d936424106743fda326394ceab98591c842",
+        "artifact": "34169eff8731767ee75cf891817f4ceb1daef279c6dd46f684cfe07e63005bc1",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -3308,7 +3308,7 @@
       "issue_number": 205,
       "key": "nonagenticai/conveyor#205",
       "provenance": {
-        "artifact": "cade48196886b3f914811f23a83d9495f3d9cb977dcac56e93731872a34a1df3",
+        "artifact": "651296efe853d96be6096c632ffec5d89c0461b61ed19c741fd5c60c65b6476b",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -3428,7 +3428,7 @@
       "issue_number": 213,
       "key": "nonagenticai/conveyor#213",
       "provenance": {
-        "artifact": "70e74146bba8c5b6f089ca05402026ca8f4fe186b26ac02dc51c364eb244245b",
+        "artifact": "d3605a61b6aa92e0249add7312349a5c16f7ce42b7318f7e9b41d381585959a6",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -6947,7 +6947,7 @@
       "issue_number": 43,
       "key": "nonagenticai/conveyor#43",
       "provenance": {
-        "artifact": "30b28aff00ee79ce7de80c6547f74f382e3f086a431a68e9a667d810cabb7297",
+        "artifact": "d0f5314f1be9d0102d89d2b9a4064200ab69a77b98126e584195e60a1f03a5d5",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -7217,7 +7217,7 @@
       "issue_number": 45,
       "key": "nonagenticai/conveyor#45",
       "provenance": {
-        "artifact": "735bb41c4412e4a2c24db6a60094dcfca76e1a3dabc8719aa0add39e2710bc47",
+        "artifact": "8bcf5cda029fc3231f51689bf3bddb6c8ab23f00d7178b0a4fa9784ea1085ea7",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -8365,7 +8365,7 @@
       "issue_number": 55,
       "key": "nonagenticai/conveyor#55",
       "provenance": {
-        "artifact": "0c5fa6f46de083ab03c3c22bf5d753936d1586d81072620f1d61d2d0a8f22b9b",
+        "artifact": "6ed77f45a454d3274164378359b35479751e8b0e96d7ad999b63a256329983e2",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -8859,7 +8859,7 @@
       "issue_number": 571,
       "key": "nonagenticai/conveyor#571",
       "provenance": {
-        "artifact": "c13155233a9f41e1d61e06e9967df44e927ff817ef862cee9d967291b420aa0b",
+        "artifact": "a08263f55352d3eedc783936e73839bb82bf8ca715cc3bcaa72553b9f6212b09",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -11998,7 +11998,7 @@
       "issue_number": 8,
       "key": "nonagenticai/conveyor#8",
       "provenance": {
-        "artifact": "458193e1eccd58ecc4e609ee3d71ce3f83b4f5e2c480147ef574761b135a3a69",
+        "artifact": "1465ec36d599d7d8f8d61c062114aed30bfbe17e430964eb8ef60753cdba5227",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -12076,7 +12076,7 @@
       "issue_number": 803,
       "key": "nonagenticai/conveyor#803",
       "provenance": {
-        "artifact": "c7aee32afaf4eb9318a0d2e3912343f15120446455ab5e515ee573847cec01ad",
+        "artifact": "497361cbeb23bf26f1afc97e9c2479be3e0b61e1a92a993d4c0f3d1c1931700e",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -12231,7 +12231,7 @@
       "issue_number": 813,
       "key": "nonagenticai/conveyor#813",
       "provenance": {
-        "artifact": "5fbe37c009cdf08f2ce96e10379da003157f3426647e5f22fc4827cbd2593e47",
+        "artifact": "fdd0e3b781f49c420fa6aa2e4eb93b58f758adcf6c0fbf0b70e8668ad69259fb",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -13097,7 +13097,7 @@
       "issue_number": null,
       "key": "nonagenticai/conveyor#pr-591",
       "provenance": {
-        "artifact": "481b8e87ce1e54a35c4b3a1b11062db8b1a86b500fe401962508d24dd95a573a",
+        "artifact": "81888bce40685eb3523f1217769417eac39e0e21195ac2c3eff6d1f5132af0c4",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",

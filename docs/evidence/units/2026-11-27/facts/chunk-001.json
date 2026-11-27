@@ -2,7 +2,7 @@
   "kind": "unit_ledger",
   "model_sha256": "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
   "provenance": {
-    "collector_sha256": "e5127d7216221824a3643c50694f97c5073afa68f618d2bd9c4594a4a893403d",
+    "collector_sha256": "de57caa7c8b906875731ca9955eae9c120800e616698e0f24e8e450ea108c86c",
     "units": {
       "nonagenticai/conveyor#564": {
         "artifact": "d542a67c605f348b747f5f302ed7f83ff4e0c832aed6c37069e0d11daf6c2c8e",
@@ -57,7 +57,7 @@
         }
       },
       "nonagenticai/conveyor#571": {
-        "artifact": "c13155233a9f41e1d61e06e9967df44e927ff817ef862cee9d967291b420aa0b",
+        "artifact": "a08263f55352d3eedc783936e73839bb82bf8ca715cc3bcaa72553b9f6212b09",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1123,7 +1123,7 @@
         }
       },
       "nonagenticai/conveyor#8": {
-        "artifact": "458193e1eccd58ecc4e609ee3d71ce3f83b4f5e2c480147ef574761b135a3a69",
+        "artifact": "1465ec36d599d7d8f8d61c062114aed30bfbe17e430964eb8ef60753cdba5227",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1149,7 +1149,7 @@
         }
       },
       "nonagenticai/conveyor#803": {
-        "artifact": "c7aee32afaf4eb9318a0d2e3912343f15120446455ab5e515ee573847cec01ad",
+        "artifact": "497361cbeb23bf26f1afc97e9c2479be3e0b61e1a92a993d4c0f3d1c1931700e",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1201,7 +1201,7 @@
         }
       },
       "nonagenticai/conveyor#813": {
-        "artifact": "5fbe37c009cdf08f2ce96e10379da003157f3426647e5f22fc4827cbd2593e47",
+        "artifact": "fdd0e3b781f49c420fa6aa2e4eb93b58f758adcf6c0fbf0b70e8668ad69259fb",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -1487,7 +1487,7 @@
         }
       },
       "nonagenticai/conveyor#pr-591": {
-        "artifact": "481b8e87ce1e54a35c4b3a1b11062db8b1a86b500fe401962508d24dd95a573a",
+        "artifact": "81888bce40685eb3523f1217769417eac39e0e21195ac2c3eff6d1f5132af0c4",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",

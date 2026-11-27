@@ -2,7 +2,7 @@
   "kind": "unit_ledger",
   "model_sha256": "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
   "provenance": {
-    "collector_sha256": "e5127d7216221824a3643c50694f97c5073afa68f618d2bd9c4594a4a893403d",
+    "collector_sha256": "de57caa7c8b906875731ca9955eae9c120800e616698e0f24e8e450ea108c86c",
     "units": {
       "nonagenticai/conveyor#10": {
         "artifact": "0df3d641736ba197306260167d7a2973aa367203960d84fc9e1c299365291d59",
@@ -31,7 +31,7 @@
         }
       },
       "nonagenticai/conveyor#102": {
-        "artifact": "6140c1a9f43841d389a6eec3e23a97354a5b7fc31464c010938eb1beccff0370",
+        "artifact": "f61150a81fff8a7db3c4d5ccc274f89552f942c32fbb8840bac6817b33c558fa",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -109,7 +109,7 @@
         }
       },
       "nonagenticai/conveyor#116": {
-        "artifact": "acfeb8d1364701132e3fa272d7565345df1a37ce98783f50d7317ed49fecbaba",
+        "artifact": "c8cc0e4b0512e926373b80095ea25b027be53316575f24d9600a2a58fad5197a",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -187,7 +187,7 @@
         }
       },
       "nonagenticai/conveyor#128": {
-        "artifact": "45412dfeff9d97d6555f69404e32ad4df41acb988b6814de159d8567299aa263",
+        "artifact": "87405beeb4911535691efe5f90f628851544df85da0c4b01be455d336721f0da",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -525,7 +525,7 @@
         }
       },
       "nonagenticai/conveyor#17": {
-        "artifact": "ef6d5ab2053d7da02ac98b9fb68a9b67009f201dd971c9d6eecbcca430588976",
+        "artifact": "d3de7b57271b1a7d023cf0c8f57e38bba951620f4d9c817452946e765cd8c078",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -564,7 +564,7 @@
         }
       },
       "nonagenticai/conveyor#172": {
-        "artifact": "776187288cc6cd9e4c3c87962b4eecbe5ef33da7fc13fdaf14b2b593d1d19edd",
+        "artifact": "c2144383d6c3f0fd4edb45287e201f6518abac9d22b6ea9c85def2857811fb70",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -590,7 +590,7 @@
         }
       },
       "nonagenticai/conveyor#174": {
-        "artifact": "2d660dda62a1edfce91687f50b4f842b86296cdcf4b729ab5cbcf5d7617760f9",
+        "artifact": "0df7378ee5690215ab86335d8b7eb5844ad07d424abd5be2269114eb422296da",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -733,7 +733,7 @@
         }
       },
       "nonagenticai/conveyor#196": {
-        "artifact": "7605825f3a0e4dc15818a095c7127d936424106743fda326394ceab98591c842",
+        "artifact": "34169eff8731767ee75cf891817f4ceb1daef279c6dd46f684cfe07e63005bc1",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -772,7 +772,7 @@
         }
       },
       "nonagenticai/conveyor#205": {
-        "artifact": "cade48196886b3f914811f23a83d9495f3d9cb977dcac56e93731872a34a1df3",
+        "artifact": "651296efe853d96be6096c632ffec5d89c0461b61ed19c741fd5c60c65b6476b",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -811,7 +811,7 @@
         }
       },
       "nonagenticai/conveyor#213": {
-        "artifact": "70e74146bba8c5b6f089ca05402026ca8f4fe186b26ac02dc51c364eb244245b",
+        "artifact": "d3605a61b6aa92e0249add7312349a5c16f7ce42b7318f7e9b41d381585959a6",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2007,7 +2007,7 @@
         }
       },
       "nonagenticai/conveyor#43": {
-        "artifact": "30b28aff00ee79ce7de80c6547f74f382e3f086a431a68e9a667d810cabb7297",
+        "artifact": "d0f5314f1be9d0102d89d2b9a4064200ab69a77b98126e584195e60a1f03a5d5",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2098,7 +2098,7 @@
         }
       },
       "nonagenticai/conveyor#45": {
-        "artifact": "735bb41c4412e4a2c24db6a60094dcfca76e1a3dabc8719aa0add39e2710bc47",
+        "artifact": "8bcf5cda029fc3231f51689bf3bddb6c8ab23f00d7178b0a4fa9784ea1085ea7",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",
@@ -2488,7 +2488,7 @@
         }
       },
       "nonagenticai/conveyor#55": {
-        "artifact": "0c5fa6f46de083ab03c3c22bf5d753936d1586d81072620f1d61d2d0a8f22b9b",
+        "artifact": "6ed77f45a454d3274164378359b35479751e8b0e96d7ad999b63a256329983e2",
         "rules": {
           "branchDeleted": "branch.head_liveness/v1",
           "branches": "branch.claim_names/v1",

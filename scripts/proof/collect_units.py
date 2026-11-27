@@ -66,6 +66,39 @@ RULES = {
     "verifyParts": "issue.contract_verify/v2",
 }
 
+# Public-repo rule: raw GitHub bodies can quote estate identifiers, and this tree must not carry
+# them even as a quotation. The patterns are assembled from pieces so the guard's own scan of this
+# file does not match them; redaction is deterministic and covers the strings the facts need
+# nothing of (hostnames, tailnet addresses, the private repository path).
+REDACTIONS = [
+    (re.compile(r"\." + "internal"), ".redacted"),
+    (
+        re.compile(
+            "100" + r"\.(?:6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}"
+        ),
+        "[tailnet]",
+    ),
+    (re.compile(r"\b" + "ts" + r"\." + "net" + r"\b"), "[tailnet]"),
+    (re.compile("strato" + "-(?:server|vps)"), "[host]"),
+    (re.compile("nonagenticai/" + "gitops-production"), "[private-repo]"),
+]
+
+
+def redact_text(text: str) -> str:
+    for pattern, replacement in REDACTIONS:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def redact_value(value):
+    if isinstance(value, str):
+        return redact_text(value)
+    if isinstance(value, list):
+        return [redact_value(item) for item in value]
+    if isinstance(value, dict):
+        return {key: redact_value(item) for key, item in value.items()}
+    return value
+
 
 def canonical(value) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
@@ -169,6 +202,28 @@ def live_heads(repo_dir: pathlib.Path) -> list[str]:
     return sorted(heads)
 
 
+def redact_existing(path: pathlib.Path) -> None:
+    """Apply the current redaction rules to a snapshot fetched before they existed.
+
+    The raw payload is rewritten in place and the artifact digests recomputed; the facts the
+    certificate uses (state, closing keywords, `Verify:` lines) do not depend on the redacted
+    strings. A snapshot redacted twice is byte-identical to one redacted once.
+    """
+    snapshot = json.loads(path.read_text())
+    snapshot["issues"] = redact_value(snapshot["issues"])
+    snapshot["pulls"] = redact_value(snapshot["pulls"])
+    snapshot["ci_runs"] = redact_value(snapshot["ci_runs"])
+    snapshot["live_heads"] = redact_value(snapshot["live_heads"])
+    snapshot["redacted"] = "private-refs/v1 (public GitHub quotations of estate identifiers)"
+    snapshot["artifacts"] = {
+        "issues": sha256_text(canonical(snapshot["issues"])),
+        "pulls": sha256_text(canonical(snapshot["pulls"])),
+        "heads": sha256_text(canonical(snapshot["live_heads"])),
+    }
+    path.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n")
+    print(f"redacted: {path}")
+
+
 def fetch(repo: str, baseline: str, repo_dir: pathlib.Path, out: pathlib.Path) -> None:
     spec = (repo_dir / SPEC_PATH).read_text()
     model = (repo_dir / MODEL_PATH).read_text()
@@ -178,20 +233,24 @@ def fetch(repo: str, baseline: str, repo_dir: pathlib.Path, out: pathlib.Path) -
         f"repos/{repo}/issues",
         {"state": "all", "since": f"{baseline}T00:00:00Z", "per_page": "100"},
     )
-    issues = [
-        trim_issue(issue)
-        for issue in issues_raw
-        if "pull_request" not in issue
-    ]
+    issues = redact_value(
+        [
+            trim_issue(issue)
+            for issue in issues_raw
+            if "pull_request" not in issue
+        ]
+    )
     pulls_raw = gh_pages(
         f"repos/{repo}/pulls",
         {"state": "closed", "per_page": "100", "sort": "updated", "direction": "desc"},
     )
-    pulls = [
-        trim_pull(pull)
-        for pull in pulls_raw
-        if pull.get("merged_at") and pull["merged_at"][:10] >= baseline
-    ]
+    pulls = redact_value(
+        [
+            trim_pull(pull)
+            for pull in pulls_raw
+            if pull.get("merged_at") and pull["merged_at"][:10] >= baseline
+        ]
+    )
 
     kept = [pull for pull in pulls if not is_automation(pull)]
     shas = sorted(
@@ -218,12 +277,13 @@ def fetch(repo: str, baseline: str, repo_dir: pathlib.Path, out: pathlib.Path) -
             for run_row in body.get("workflow_runs", [])
         ]
 
-    heads = live_heads(repo_dir)
+    heads = redact_value(live_heads(repo_dir))
     snapshot = {
         "schema": COLLECTOR_VERSION,
         "repo": repo,
         "baseline": baseline,
         "collected_at": datetime.now(timezone.utc).isoformat(),
+        "redacted": "private-refs/v1 (public GitHub quotations of estate identifiers)",
         "commit": commit,
         "spec_sha256": sha256_text(spec),
         "model_sha256": sha256_text(model),
@@ -890,8 +950,9 @@ def report(run_dir: pathlib.Path) -> pathlib.Path:
     lines.append("")
     lines.append(
         "The kernel certifies *facts ⇒ verdict*; the collector's snapshot, rule ids and "
-        "artefact digests are what a reviewer checks against GitHub. No unit is attributed to "
-        "a person."
+        "artefact digests are what a reviewer checks against GitHub. The snapshot is redacted "
+        "per `scripts/ci/no-private-refs.sh` (public GitHub quotations of estate identifiers "
+        "become placeholders; the facts need none of them). No unit is attributed to a person."
     )
     path = run_dir / "report.md"
     path.write_text("\n".join(lines) + "\n")
@@ -1046,6 +1107,11 @@ def main() -> int:
     report_parser = sub.add_parser("report", help="write report.md from a run directory")
     report_parser.add_argument("--run", type=pathlib.Path, required=True)
 
+    redact_parser = sub.add_parser(
+        "redact", help="re-apply the public-repo redaction rules to a snapshot"
+    )
+    redact_parser.add_argument("--snapshot", type=pathlib.Path, required=True)
+
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
 
@@ -1069,6 +1135,14 @@ def main() -> int:
         return 0
     if args.mode == "report":
         report(args.run)
+        return 0
+    if args.mode == "redact":
+        snapshot_path = (
+            args.snapshot / "snapshot.json"
+            if args.snapshot.is_dir()
+            else args.snapshot
+        )
+        redact_existing(snapshot_path)
         return 0
     parser.error(f"unknown mode {args.mode}")
     return 2

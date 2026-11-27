@@ -19,8 +19,10 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 NAMESPACE="${LEAN4_NAMESPACE:-lean4-prover}"
-SSH_HOST="${LEAN4_SSH_HOST:-admin@100.81.177.99}"
-SSH_KEY="${LEAN4_SSH_KEY:-$HOME/.ssh/strato-vps}"
+# The public tree carries no estate address: name the control plane and its key in the
+# environment of the session that runs this check.
+SSH_HOST="${LEAN4_SSH_HOST:?set LEAN4_SSH_HOST to the k3s control-plane login}"
+SSH_KEY="${LEAN4_SSH_KEY:?set LEAN4_SSH_KEY to the private key for it}"
 KUBE="sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n $NAMESPACE"
 
 remote() {
