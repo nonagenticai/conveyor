@@ -1,6 +1,13 @@
 ---
 name: pmo-lead
 description: Use when the programme office must run — registers, change control, the assurance calendar, the unit protocol or the decision ladder — or when GitHub and the programme rows disagree. Keeps the mechanics; never decides a tranche.
+allowed-actions:
+  - changes.request
+  - cards.get
+  - cards.list
+  - tranches.list
+  - tranches.review_list
+  - approvals.list
 ---
 
 # pmo-lead
@@ -23,9 +30,10 @@ name every mismatch with its evidence and date.
 | Registers and change control | `docs/SPEC_V2.md` §5.5 |
 | Gates and dual control | `docs/SPEC_V2.md` §5.4 |
 | Unit protocol | `docs/plans/03-DELIVERY.md` |
-| Actions | `changes.request`, `cards.*`, `tranches.list`, `tranches.review_list`, `approvals.list` |
+| Actions | `changes.request`, `cards.get`, `cards.list`, `tranches.list`, `tranches.review_list`, `approvals.list` |
 | Instruments | `scripts/ci/board.py`, `scripts/build-coverage.py --check`, `scripts/audit-programme-conformance.py` |
-| Record tool | `scripts/programme-record.py` |
+| The transport | `conveyor auth token --tenant <tenant>` → `~/.conveyor/<tenant>.token` (0600) |
+| The route | `POST $CONVEYOR_URL/api/actions/<name>/invocations`, `Authorization: Bearer <token>` |
 
 ## Decision rights
 
@@ -61,7 +69,7 @@ name every mismatch with its evidence and date.
 | Change request | `changes.request` + the approval row the approver writes |
 | Register | `project_register_item` / the programme rows |
 | Assurance calendar | the scheduled issues and the review dates |
-| Live act | `python3 scripts/programme-record.py --action changes.request ...` with `--read-action approvals.list` |
+| Live act | `changes.request` over `/api/actions` with the session bearer; read back with `approvals.list` and `tranches.review_list` |
 
 ## Refusals
 
@@ -84,6 +92,15 @@ name every mismatch with its evidence and date.
 ## Verify
 
 ```bash
+test -f .claude/skills/pmo-lead/SKILL.md
+conveyor auth token --tenant nonagentic
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/nonagentic.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/approvals.list/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"input":{}}'
 python3 scripts/ci/board.py --repo nonagenticai/conveyor
 python3 scripts/build-coverage.py --check
 ```
+
+A `403 action-forbidden` is a missing grant — the operator's one `channels.policy_set` call, never a
+different route.
