@@ -81,11 +81,39 @@ async fn seed_programme_links_the_registered_issues() {
     .fetch_one(&db.super_pool)
     .await
     .expect("S12 issues");
-    // The public repo re-created every issue, so these numbers are the PUBLIC ones. The authority
-    // is `docs/design/data/issues.json` (the exported registry) → `seed/programme.json`
-    // (`scripts/build-programme-seed.py`); this assertion must follow it, never the retired
-    // private numbering ([16, 41, 42, 43] / [38] before the flip). Derived, not hardcoded: every
-    // new S12-labelled or S12-titled unit must join the set without editing this test.
+    // The seed is FROZEN: `seed/programme.json` is the bootstrap of record, so the live row must
+    // carry exactly the seed's S12 list. The registry export (`docs/design/data/issues.json`) is
+    // still refreshed, but it no longer regenerates the seed; a link below only has to name an
+    // issue that still exists — it is not a set that must track every new S12-labelled unit.
+    let frozen: serde_json::Value =
+        serde_json::from_str(include_str!("../../../seed/programme.json"))
+            .expect("the frozen seed parses");
+    let mut expected: Vec<i64> = frozen["projects"]
+        .as_array()
+        .expect("projects")
+        .iter()
+        .find(|project| project["key"].as_str() == Some("S12"))
+        .expect("S12 in the frozen seed")["meta"]["issues"]
+        .as_array()
+        .expect("S12 issues")
+        .iter()
+        .filter_map(|number| number.as_i64())
+        .collect();
+    expected.sort_unstable();
+    assert!(!expected.is_empty(), "S12 links its units");
+    let mut live: Vec<i64> = issues
+        .as_array()
+        .expect("the live S12 issues array")
+        .iter()
+        .filter_map(|number| number.as_i64())
+        .collect();
+    live.sort_unstable();
+    assert_eq!(
+        live, expected,
+        "the live row carries the frozen seed's S12 list"
+    );
+
+    // A link is only real if the issue exists: the registry still carries every linked number.
     let registry: serde_json::Value = serde_json::from_str(
         &std::fs::read_to_string(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -94,57 +122,21 @@ async fn seed_programme_links_the_registered_issues() {
         .expect("the exported issue registry"),
     )
     .expect("the registry is JSON");
-    // A cross-cutting unit belongs to exactly one project by number
-    // (`CROSS_CUTTING` in `scripts/build-programme-seed.py`), which takes precedence over its
-    // label. The seed itself is the record of that reservation, so a number another project
-    // lists is not S12's even when it carries the S12 label.
-    let seed: serde_json::Value = serde_json::from_str(
-        &std::fs::read_to_string(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../seed/programme.json"
-        ))
-        .expect("the programme seed"),
-    )
-    .expect("the seed is JSON");
-    let reserved: Vec<i64> = seed["projects"]
-        .as_array()
-        .expect("projects")
-        .iter()
-        .filter(|project| project["key"].as_str() != Some("S12"))
-        .flat_map(|project| {
-            project["meta"]["issues"]
-                .as_array()
-                .map(|issues| {
-                    issues
-                        .iter()
-                        .filter_map(|number| number.as_i64())
-                        .collect::<Vec<_>>()
-                })
-                .unwrap_or_default()
-        })
-        .collect();
-    let mut expected: Vec<i64> = registry["issues"]
+    let known: std::collections::HashSet<i64> = registry["issues"]
         .as_array()
         .expect("issues")
         .iter()
-        .filter(|issue| {
-            let labelled = issue["labels"].as_array().is_some_and(|labels| {
-                labels
-                    .iter()
-                    .any(|label| label["name"].as_str() == Some("S12"))
-            });
-            // `scripts/build-programme-seed.py` also links a unit by its title prefix.
-            let titled = issue["title"].as_str().is_some_and(|title| {
-                let title = title.trim_start();
-                title.starts_with("S12 ") || title.starts_with("S12:") || title.starts_with("S12 —")
-            });
-            labelled || titled
-        })
         .filter_map(|issue| issue["number"].as_i64())
-        .filter(|number| !reserved.contains(number))
         .collect();
-    expected.sort_unstable();
-    assert_eq!(issues, serde_json::json!(expected));
+    let missing: Vec<i64> = expected
+        .iter()
+        .copied()
+        .filter(|number| !known.contains(number))
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "S12 links issues the registry does not carry: {missing:?}"
+    );
 
     let spec: serde_json::Value = sqlx::query_scalar(
         "SELECT meta -> 'issues' FROM project WHERE tenant_id = $1 AND key = 'SPEC-V2'",
