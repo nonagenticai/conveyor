@@ -1467,6 +1467,16 @@ async fn registers_create(
             "kind must be risk, issue, assumption, dependency, benefit or change",
         ));
     }
+    // Approval is a gate effect (`approvals.decide` on the `change` gate with
+    // `meta.change_id`), never a status a caller writes: a row born `approved` would let
+    // the tranche baseline guard advance on a self-declaration.
+    if kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_is_a_gate_effect",
+            "a change row is approved by its change gate, never by create",
+        ));
+    }
     let record = store::spine::insert_register_tx(
         &mut *tx,
         ctx.tenant,
@@ -1525,6 +1535,15 @@ async fn registers_update(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    // The same rule on the edit path: an open change row cannot be patched to `approved`.
+    // Its gate decides that, and the gate's effect writes the status.
+    if current.kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_is_a_gate_effect",
+            "a change row is approved by its change gate, never by update",
+        ));
+    }
     let record = store::spine::update_register_tx(
         &mut *tx,
         ctx.tenant,
