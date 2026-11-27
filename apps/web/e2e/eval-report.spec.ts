@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { invoke } from "./helpers";
+import { invoke, waitForReportRun } from "./helpers";
 
 // Screen 17 — the dedicated eval report. The seed's `bug-fix judge` eval has one completed run
 // with six graded cases; the figures are `eval_runs.report`'s, the rows are that run's results,
@@ -16,6 +16,11 @@ test("a finished run renders from eval_runs.report, with its transcript", async 
   await page.getByRole("link", { name: "bug-fix judge" }).click();
   await expect(page).toHaveURL(/\/evals\/[0-9a-f-]+\/report/);
   const evalId = page.url().split("/")[4];
+
+  // The screen renders the eval's newest run; wait for it to be complete, then the reload is
+  // the screen read (#733). A queued run has no report and the page does not refetch by itself.
+  await waitForReportRun(request, evalId);
+  await page.reload();
 
   // The screen is the server's report: fetch the same run's `eval_runs.report` and assert the
   // tiles and the row count against it, so a browser-side recomputation cannot pass this.
