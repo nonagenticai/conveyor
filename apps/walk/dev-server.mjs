@@ -39,7 +39,12 @@ function shouldProxy(pathname) {
 }
 
 function proxy(req, res) {
-  const target = new URL(req.url, API);
+  // Only the PATH crosses to the upstream. `new URL(req.url, API)` would let an absolute-form
+  // or protocol-relative request URL replace the host (`//evil.example/x`), turning this local
+  // server into an open proxy (CodeQL `js/request-forgery`). Parse against a fixed origin and
+  // rebuild the upstream from pathname + search only.
+  const incoming = new URL(req.url, "http://127.0.0.1");
+  const target = new URL(incoming.pathname + incoming.search, API);
   const headers = { ...req.headers, host: PROXY_HOST };
   delete headers["accept-encoding"];
   const upstream = httpRequest(
