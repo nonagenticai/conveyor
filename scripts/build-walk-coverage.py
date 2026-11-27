@@ -31,6 +31,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -564,13 +565,61 @@ def parse_registry() -> dict[str, dict[str, str]]:
     return rows
 
 
+CAPABILITIES: dict[str, re.Pattern[str]] = {
+    # The capability, not a guessed file path (SPEC §6.1 fixes the seam's name and
+    # responsibility, not the implementation's module layout). A rename must not flip the
+    # status; the per-destination specs remain the proof that a destination is wired.
+    "manifest": re.compile(r"\bmanifest\s*\("),
+    "sheet": re.compile(r"\bopenAction\s*\("),
+    "form": re.compile(r"\brenderSchemaForm\s*\("),
+}
+
+
+def detect_modules(sources: dict[str, str]) -> dict[str, bool]:
+    """Capability detection over the walk's JavaScript sources (path -> text)."""
+    text = "\n".join(sources.values())
+    return {name: bool(pattern.search(text)) for name, pattern in CAPABILITIES.items()}
+
+
+def walk_sources(root: Path) -> dict[str, str]:
+    """The ship-able capability sources: a seam module, never a destination caller or a test.
+
+    SPEC §6.1: destinations may import `api`, `forms`, `shell` and `router` — they consume the
+    seam, they are not it. A token found only in a destination or a `*.test.js` proves a call,
+    not the capability.
+    """
+    src = root / "src"
+    if not src.is_dir():
+        return {}
+    sources: dict[str, str] = {}
+    for path in sorted(src.rglob("*.js")):
+        rel = path.relative_to(root).as_posix()
+        if rel.startswith("src/destinations/") or path.name.endswith(".test.js"):
+            continue
+        sources[rel] = path.read_text()
+    return sources
+
+
 def modules_present() -> dict[str, bool]:
-    return {
-        "manifest": (WALK / "src/api/manifest.js").is_file(),
-        "form": (WALK / "src/forms/index.js").is_file()
-        or (WALK / "src/forms/render.js").is_file(),
-        "sheet": (WALK / "src/shell/sheet-host.js").is_file(),
-    }
+    return detect_modules(walk_sources(WALK))
+
+
+def normalize_spec(file: str) -> str:
+    """A Playwright report file as a walk-relative spec path.
+
+    Measured on Playwright 1.65.0: the JSON report's `file` is relative to the config's
+    `testDir` (`shell/entrance.spec.ts`), while the census holds the walk-relative path
+    (`e2e/shell/entrance.spec.ts`); a report may also carry an absolute path. Normalise both.
+    """
+    path = file.replace("\\", "/")
+    marker = "apps/walk/"
+    if marker in path:
+        path = path.split(marker, 1)[1]
+    while path.startswith("./"):
+        path = path[2:]
+    if not path.startswith(SPEC_DIR.relative_to(WALK).as_posix() + "/"):
+        path = f"{SPEC_DIR.relative_to(WALK).as_posix()}/{path}"
+    return path
 
 
 def load_report(path: str | None) -> set[str]:
@@ -587,7 +636,7 @@ def load_report(path: str | None) -> set[str]:
         file = suite.get("file") or inherited
         for spec in suite.get("specs", []):
             if spec.get("ok") and file:
-                passed.add(file)
+                passed.add(normalize_spec(file))
         for child in suite.get("suites", []):
             walk(child, file)
 
@@ -602,9 +651,10 @@ def build_coverage(
     exemptions: list[dict[str, Any]],
     passed: set[str] | None = None,
     committed: dict[str, Any] | None = None,
+    modules: dict[str, bool] | None = None,
 ) -> dict[str, Any]:
     passed = passed or set()
-    modules = modules_present()
+    modules = modules if modules is not None else modules_present()
     today = dt.date.today()
     gaps: list[str] = []
 
@@ -747,6 +797,20 @@ def strict_gaps(coverage: dict[str, Any]) -> list[str]:
     return gaps
 
 
+def unverified_gaps(coverage: dict[str, Any]) -> list[str]:
+    """A registered route whose spec did not run and pass in this run's report.
+
+    Between `--check` (claims integrity) and `--gate=P6` (completeness): once a route has a
+    registry row and a spec, a green suite must actually exercise it — a spec that exists but is
+    skipped or not matched proves nothing.
+    """
+    return [
+        f"route {row['walk']}: registered but not verified by this run's report"
+        for row in coverage["routes"]
+        if row["registered"] and row["status"] != "verified"
+    ]
+
+
 def write_coverage(coverage: dict[str, Any]) -> None:
     COVERAGE.write_text(json.dumps(coverage, indent=2) + "\n")
 
@@ -799,27 +863,79 @@ def self_test() -> int:
     }
     registry = {"/x": {"walk": "/x", "app": "/x", "room": "portfolio",
                             "spec": "e2e/x/x.spec.ts", "file": "src/router/routes/core.js"}}
-    base = build_coverage(census, {}, [], committed=None)
+    no_caps = {"manifest": False, "sheet": False, "form": False}
+    all_caps = {"manifest": True, "sheet": True, "form": True}
+    base = build_coverage(census, {}, [], committed=None, modules=no_caps)
     ok(base["gaps"] == [], "clean baseline has no gaps")
     ok(any("absent at P6" in g for g in strict_gaps(base)), "P6 fails an absent route")
 
     claim = {"routes": [{"walk": "/x", "status": "registered"}], "actions": []}
-    gaps = build_coverage(census, {}, [], committed=claim)["gaps"]
+    gaps = build_coverage(census, {}, [], committed=claim, modules=no_caps)["gaps"]
     ok(any("has no registry row" in g for g in gaps), "failure 1: claim without a row")
 
-    gaps = build_coverage(census, registry, [], committed=None)["gaps"]
+    gaps = build_coverage(census, registry, [], committed=None, modules=no_caps)["gaps"]
     ok(any("claims a spec" in g for g in gaps), "failure 3: registered route without its spec")
 
     action_claim = {"routes": [], "actions": [{"name": "x.read", "status": "reachable"}]}
-    gaps = build_coverage(census, {}, [], committed=action_claim)["gaps"]
+    gaps = build_coverage(census, {}, [], committed=action_claim, modules=no_caps)["gaps"]
     ok(any("has no action-sheet module" in g for g in gaps), "failure 2: action claim without a sheet")
 
+    verified_cov = {"routes": [{"walk": "/x", "registered": True, "status": "verified"}],
+                    "actions": []}
+    ok(unverified_gaps(verified_cov) == [], "require-verified accepts a verified run")
+    registered_cov = {"routes": [{"walk": "/x", "registered": True, "status": "registered"}],
+                      "actions": []}
+    ok(any("not verified by this run" in g for g in unverified_gaps(registered_cov)),
+       "require-verified fails a registered but unverified run")
+    absent_cov = {"routes": [{"walk": "/x", "registered": False, "status": "absent"}],
+                  "actions": []}
+    ok(unverified_gaps(absent_cov) == [], "require-verified ignores an absent row")
+
+    # Capability detection: the seam's capability, wherever the implementation puts it.
+    caps = detect_modules({
+        "src/api/client.js": "  async manifest() {\n    return this.request(\"/api/actions\");\n  }",
+        "src/shell/shell.js": "  async openAction(name, options = {}) {",
+        "src/forms/schema.js": "export function renderSchemaForm(schema, options) {",
+    })
+    ok(caps == all_caps, "capability: the delivered shapes are detected")
+    ok(detect_modules({"src/shell/renamed-sheet.js": "openAction(name)"})["sheet"],
+       "capability: a renamed module is not a false negative")
+    ok(not detect_modules({"src/api/client.js": "function manifestThing() {"})["manifest"],
+       "capability: a lookalike token is not a false positive")
+
+    # The measured report shape (Playwright 1.65.0): relative to testDir, not to the config.
+    ok(normalize_spec("shell/entrance.spec.ts") == "e2e/shell/entrance.spec.ts",
+       "report: a testDir-relative file gains the e2e prefix")
+    ok(normalize_spec("e2e/shell/entrance.spec.ts") == "e2e/shell/entrance.spec.ts",
+       "report: an already walk-relative file is unchanged")
+    ok(normalize_spec("/home/runner/work/conveyor/conveyor/apps/walk/e2e/x/x.spec.ts")
+       == "e2e/x/x.spec.ts", "report: an absolute file is made walk-relative")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "src/destinations").mkdir(parents=True)
+        (root / "src/shell").mkdir(parents=True)
+        (root / "src/destinations/x.js").write_text("ctx.shell.openAction(name)\n")
+        (root / "src/shell/shell.test.js").write_text("openAction(name)\n")
+        ok(not detect_modules(walk_sources(root))["sheet"],
+           "capability: a destination caller or a test is not the seam")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "src/shell").mkdir(parents=True)
+        (root / "src/shell/renamed-sheet.js").write_text("async openAction(name, options = {}) {\n")
+        ok(detect_modules(walk_sources(root))["sheet"],
+           "capability: a seam module under a new name still is")
+    ok(build_coverage(census, {}, [], committed=None, modules=all_caps)["actions"][0]["status"]
+       == "schema-rendered", "capability: actions are schema-rendered when the sheet exists")
+    ok(build_coverage(census, {}, [], committed=None, modules=no_caps)["actions"][0]["status"]
+       == "absent", "capability: actions are absent without the sheet")
+
     expired = [{"surface": "/x", "reason": "r", "signer": "s", "expires": "2000-01-01"}]
-    gaps = build_coverage(census, registry, expired)["gaps"]
+    gaps = build_coverage(census, registry, expired, modules=no_caps)["gaps"]
     ok(any("expired" in g for g in gaps), "failure 4: expired exemption")
 
     a = json.dumps(base, sort_keys=True)
-    b = json.dumps(build_coverage(census, {}, [], committed=None), sort_keys=True)
+    b = json.dumps(build_coverage(census, {}, [], committed=None, modules=no_caps), sort_keys=True)
     ok(a == b, "deterministic output")
 
     for label in failures:
@@ -838,6 +954,11 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--print", action="store_true", help="print the coverage record")
     mode.add_argument("--self-test", action="store_true", help="run the rule matrix")
     parser.add_argument("--gate", choices=["P6"], help="the strict completeness gate")
+    parser.add_argument(
+        "--require-verified",
+        action="store_true",
+        help="fail when a registered route's spec did not run and pass in the report",
+    )
     parser.add_argument("--baseline", help="the code baseline sha for --freeze")
     parser.add_argument("--report", help="a Playwright JSON report; marks passing specs verified")
     args = parser.parse_args(argv)
@@ -865,6 +986,8 @@ def main(argv: list[str] | None = None) -> int:
     gaps = list(coverage["gaps"])
     if args.gate == "P6":
         gaps += strict_gaps(coverage)
+    if args.require_verified:
+        gaps += unverified_gaps(coverage)
 
     if args.print:
         print(json.dumps({**coverage, "gaps": gaps}, indent=2))

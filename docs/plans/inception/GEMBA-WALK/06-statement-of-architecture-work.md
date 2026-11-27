@@ -78,7 +78,15 @@ backend surface stops the work and escalates; it is never added by this project.
 This document is the **Phase-A Statement of Architecture Work**. When the T9 repository is used,
 `architecture.contracts_request` records it, `architecture.board_decide` records the Board's
 decision with a published `delegation_ref`, and `architecture.contracts_approve` is performed by a
-**distinct approver** — never the requester, never a claimed human. The approved body is immutable;
+**distinct approver** — never the requester, never a claimed human.
+
+**Live record (read back 2026-11-27).** The v2 contract `01a21bf7-f6f5-7a41-a88e-12389b89b42d` is
+`live`, approved at 2026-11-27T07:46:25Z by `01a1e8a7-8b23-76a9-9114-aafb95f7a545` through gate
+`01a21bf8-0bd5-779e-9a2d-9824bb1e2b41`; the Phase-F delivery contract
+`01a21bfb-1241-7db1-9874-eacca12914b4` is `live`, approved by the same distinct approver through
+gate `01a21bfb-2710-7e9c-b872-90ccac7f68ec`. Both were read through `architecture.contracts_get`.
+
+The approved body is immutable;
 a change is a new version and re-opens the gate.
 
 The design gate and the Phase-G compliance review use a live **delivery contract**, not this SoAW
