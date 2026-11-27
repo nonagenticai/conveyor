@@ -112,6 +112,35 @@ else
   bad "a missing section exited $rc: $out"
 fi
 
+# 5. One Verify line in a multi-part body is refused: the rule is per part (#865).
+body="$tmp/two-parts-one-verify.md"
+write_body "###" "$body"
+awk '{print} /^  Verify: `true`$/ && !done {
+  print ""; print "### P2 — the second part"
+  print "- **P2.1** Given a state, when an act, then an outcome."; done=1
+}' "$body" >"$body.new" && mv "$body.new" "$body"
+rc=0
+out=$($B --contract-body "$body" 2>&1) || rc=$?
+if [ "$rc" -eq 1 ] && [[ "$out" == *"every part"* ]]; then
+  ok "a second part without a Verify line exits 1 and names the rule"
+else
+  bad "a second part without a Verify line exited $rc: $out"
+fi
+
+# 6. A Verify line on every part passes.
+body="$tmp/two-parts-two-verify.md"
+write_body "###" "$body"
+awk '{print} /^  Verify: `true`$/ && !done {
+  print ""; print "### P2 — the second part"
+  print "- **P2.1** Given a state, when an act, then an outcome."
+  print "  Verify: `true`"; done=1
+}' "$body" >"$body.new" && mv "$body.new" "$body"
+if out=$($B --contract-body "$body" 2>&1); then
+  ok "a Verify line on every part passes"
+else
+  bad "a Verify line on every part failed: $out"
+fi
+
 # 5. An unreadable body file is instrument failure (2), never a verdict on the issue.
 rc=0
 $B --contract-body "$tmp/absent.md" >/dev/null 2>&1 || rc=$?
