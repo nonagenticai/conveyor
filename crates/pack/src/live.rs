@@ -24,7 +24,9 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::outputs::{PublishOutputsError, render_outputs};
-use crate::snapshot::{SnapshotError, feedback_issues, redact_text, section_json, snapshot_js};
+use crate::snapshot::{
+    SnapshotError, SnapshotHeader, feedback_issues, redact_text, section_json, snapshot_js,
+};
 
 /// The clock an empty tenant reports: a constant, so the bytes never depend on the request time.
 pub const EMPTY_GENERATED_AT: &str = "1970-01-01T00:00:00Z";
@@ -63,6 +65,9 @@ pub struct SiteArgs<'a> {
     pub feedback_url: &'a str,
     /// The commit the served image was built from.
     pub git_sha: &'a str,
+    /// When the served image was built (RFC 3339), or `unknown` when the build carried no stamp.
+    /// The page marks its data stale when `generated_at` predates it (#867 / #782 P3.2).
+    pub build_time: &'a str,
 }
 
 /// Build the live view for one tenant in exactly one read-only transaction.
@@ -121,10 +126,13 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         &data,
         args.rework.as_ref(),
         Some(&register),
-        args.tenant_slug,
-        args.feedback_url,
-        &generated_at,
-        args.git_sha,
+        SnapshotHeader {
+            tenant: args.tenant_slug,
+            feedback_url: args.feedback_url,
+            generated_at: &generated_at,
+            git_sha: args.git_sha,
+            deployed_at: args.build_time,
+        },
     )?;
     // The downloadable pair, from the same section the page renders — one header, one redaction
     // pass, so the file and the page cannot disagree.

@@ -121,6 +121,9 @@ pub struct Config {
     pub public_tenant: Option<String>,
     /// `CONVEYOR_GIT_SHA` — the commit the image was built from, carried by the live snapshot.
     pub git_sha: Option<String>,
+    /// `CONVEYOR_BUILD_TIME` — when the image was built (RFC 3339), carried by the live snapshot
+    /// so the page can mark its data stale against the deployed build (#867 / #782 P3.2).
+    pub build_time: Option<String>,
     /// `CONVEYOR_JOB_TOKEN_KEY` — the runner's HMAC key (32 bytes). Unset is fail-closed: no token
     /// can be minted or verified, so every job byte route answers 503 and a dispatch is a
     /// permanent failure rather than a guess at a default key (#144, ADR 0007 §Decision 4).
@@ -196,6 +199,7 @@ impl Config {
             job_lease_secs,
             public_tenant: get("CONVEYOR_PUBLIC_TENANT"),
             git_sha: get("CONVEYOR_GIT_SHA"),
+            build_time: get("CONVEYOR_BUILD_TIME"),
             job_token_key: match get("CONVEYOR_JOB_TOKEN_KEY") {
                 None => None,
                 Some(raw) => Some(conveyor_auth::job_token::JobTokenKey::parse(&raw).map_err(
