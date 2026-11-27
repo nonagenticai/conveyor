@@ -262,15 +262,15 @@ The two open questions the issue carries are answered in the recommendation:
 
 | Scenario | Command / test | Result | SHA |
 |---|---|---|---|
-| P1.1 file exists | `test -f docs/plans/conformance-rows.md` | exit 0 | 40b2f98b4 |
-| P1.1 three generators named | `grep -c 'audit-programme-conformance\|generate-standards\|governance-chain' docs/plans/conformance-rows.md` | 10 (≥ 3) | 40b2f98b4 |
-| P1.1 cited paths resolve | `git cat-file -e origin/main:<path>` for every path in §1-§2 | 19 paths checked, 0 missing | e6f4c3ac9 |
-| P2.1 table count | `grep -c '^\| ' docs/plans/conformance-rows.md` ≥ the invariant count | 145 table rows; 54 invariants in P1 and 54 owner rows in P2 | 40b2f98b4 |
-| P2.2 one owner per row | the P2 table, reviewed | 54 rows, one owner each (action, section, standard, keep or gap) | 40b2f98b4 |
-| P3.1 stages | the P3 table; `git diff --check`; links resolve | the five-stage table with line targets; `git diff --check` exit 0; 0 Markdown links | 40b2f98b4 |
-| P4.2 counts | `grep -n '5,057' docs/plans/conformance-rows.md` and `grep -n '5,450'` | both present (5,057 at §0 and §4; 5,450 at §0, §4 and the stage table) | 40b2f98b4 |
-| Docs gate | `python3 docs/design/scripts/build-docs.py --check` | 303 sources, 0 failures; the page and index are committed | 40b2f98b4 |
-| Programme gate | `python3 scripts/ci/board.py --repo nonagenticai/conveyor --dor 783` | exit 0 | 40b2f98b4 |
+| P1.1 file exists | `test -f docs/plans/conformance-rows.md` | exit 0 | ca5309751 |
+| P1.1 three generators named | `grep -c 'audit-programme-conformance\|generate-standards\|governance-chain' docs/plans/conformance-rows.md` | 10 (≥ 3) | ca5309751 |
+| P1.1 cited paths resolve | `git cat-file -e origin/main:<path>` for every path in §1-§2 | 20 paths checked, 0 missing | e6f4c3ac9 |
+| P2.1 table count | `grep -c '^\| ' docs/plans/conformance-rows.md` ≥ the invariant count | 149 table rows; 55 invariants in P1 and 55 owner rows in P2 | ca5309751 |
+| P2.2 one owner per row | the P2 table, reviewed | 55 rows, one owner each (action, section, standard, keep or gap) | ca5309751 |
+| P3.1 stages | the P3 table; `git diff --check`; links resolve | the five-stage table with line targets; `git diff --check` exit 0; 0 Markdown links | ca5309751 |
+| P4.2 counts | `grep -n '5,057' docs/plans/conformance-rows.md` and `grep -n '5,450'` | both present (5,057 at §0 and §4; 5,450 at §0, §4 and the stage table) | ca5309751 |
+| Docs gate | `python3 docs/design/scripts/build-docs.py --check` | 303 sources, 0 failures; the page and index are committed | ca5309751 |
+| Programme gate | `python3 scripts/ci/board.py --repo nonagenticai/conveyor --dor 783` | exit 0 | ca5309751 |
 | P4.1 decision | the owner's comment on #783 | pending | — |
 
 ## 7. Risks and open points

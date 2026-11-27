@@ -2202,7 +2202,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/conformance-rows.html",
       "source": "docs/plans/conformance-rows.md",
       "section": "Plans",
-      "sha256": "f21dc614461c433f7bd14d5a08ddae65297c4b7fb581edad4d686c69c74d5971",
+      "sha256": "0140e2a0c43fd789dfed6f3ae33510d3bebbcaec95ce6d3640f5f3a9242589de",
       "bytes": 29488,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/conformance-rows.md"
     },
