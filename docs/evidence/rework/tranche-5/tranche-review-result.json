@@ -1,0 +1,25 @@
+{
+  "tranche": 5,
+  "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "review_id": "01a21c2a-c2a2-72ce-9f6e-f05f8f9423a3",
+  "review_gate": "01a21c2a-0b9e-7c97-8520-fe1665051935",
+  "decision": "continue",
+  "reviewed_at": "2026-11-27T08:41:34.092681Z",
+  "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+  "tranche_5_state": "closed",
+  "tranche_6_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+  "tranche_6_state": "authorised",
+  "document_id": "01a21c2b-2236-72db-b35c-225b9370bd89",
+  "document_content_hash": "7cbf23d906968e6e433b3f555b93bb76541843c2d80d0e8eb68534710429477a",
+  "snapshot_sha": "f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c",
+  "snapshot_manifest_sha256": "5f5db96e80e62fb043ecb5fad90d5fda5f337479c7afa6b88023329d657e6fb8",
+  "exit_gate": {
+    "S06": 16,
+    "S08": 18,
+    "S17": 16,
+    "T17": 16,
+    "T7": 18
+  }
+}

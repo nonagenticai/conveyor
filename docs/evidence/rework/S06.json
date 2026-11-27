@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "S06's gate is the golden card-type\u00d7list path, dual-control approval and retry.",
-  "generated_at": "2026-11-27T07:58:02.068613+00:00",
+  "generated_at": "2026-11-27T08:38:39.149328+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06.toml",
   "name": "Control plane \u2014 claims, runs, approvals, andon, comms and notifications",
   "project": "S06",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T23:40:31.789194+00:00",
-    "git_sha": "af57764353aa740a0401f161e110bbc1bfb7a0ae",
-    "path": "retained-snapshot/af57764353aa740a0401f161e110bbc1bfb7a0ae"
+    "generated_at": "2026-11-27T08:37:46.833305+00:00",
+    "git_sha": "f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c",
+    "path": "retained-snapshot/f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c"
   },
   "verdict": "green",
   "warnings": []
