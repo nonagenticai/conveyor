@@ -6,6 +6,157 @@
   },
   "issues": [
     {
+      "number": 869,
+      "title": "delivery: the 8 no-issue PRs \u2014 adopt or exempt",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/869",
+      "updatedAt": "2026-11-27T17:03:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:needs-human",
+          "color": "5319E7"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 868,
+      "title": "proof: verifyParts must apply only to unit-labeled issues",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/868",
+      "updatedAt": "2026-11-27T17:13:01Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 867,
+      "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/867",
+      "updatedAt": "2026-11-27T17:09:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 865,
+      "title": "proof: the live unit ledger's findings \u2014 the real defects and the unfinished queue",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/865",
+      "updatedAt": "2026-11-27T17:09:32Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 864,
+      "title": "coverage: a live unit attaches by its project label, so a frozen seed cannot orphan a project",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/864",
+      "updatedAt": "2026-11-27T16:52:36Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 862,
+      "title": "fix(walk): a multi-segment deep link loads the app without its assets",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/862",
+      "updatedAt": "2026-11-27T16:48:44Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 860,
+      "title": "fix(walk): the action sheet shows the server's field errors in a refusal",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/860",
+      "updatedAt": "2026-11-27T16:43:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 857,
       "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
       "state": "CLOSED",
@@ -186,7 +337,7 @@
       "title": "feedback: in-app bug reports and feature requests for every tenant",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/842",
-      "updatedAt": "2026-11-27T16:12:08Z",
+      "updatedAt": "2026-11-27T16:53:10Z",
       "labels": [
         {
           "name": "unit",
@@ -243,9 +394,9 @@
     {
       "number": 837,
       "title": "proof: engine-derived unit facts and the required DoD gate",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/837",
-      "updatedAt": "2026-11-27T16:34:26Z",
+      "updatedAt": "2026-11-27T17:09:50Z",
       "labels": [
         {
           "name": "unit",
@@ -517,7 +668,7 @@
       "title": "S1 \u2014 Gemba Walk: Portfolio & plan + Organisation read/write parity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/814",
-      "updatedAt": "2026-11-27T16:33:04Z",
+      "updatedAt": "2026-11-27T17:06:35Z",
       "labels": [
         {
           "name": "unit",
@@ -765,7 +916,7 @@
       "title": "design: the unit record on the public site, and the retirement of the superseded Python",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/782",
-      "updatedAt": "2026-11-27T11:24:45Z",
+      "updatedAt": "2026-11-27T16:53:12Z",
       "labels": [
         {
           "name": "unit",
@@ -2629,7 +2780,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-27T12:15:09Z",
+      "updatedAt": "2026-11-27T17:03:32Z",
       "labels": [
         {
           "name": "unit",

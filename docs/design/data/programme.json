@@ -10,6 +10,157 @@
             "name": "unit"
           },
           {
+            "color": "5319E7",
+            "name": "status:needs-human"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 869,
+        "state": "OPEN",
+        "title": "delivery: the 8 no-issue PRs — adopt or exempt",
+        "updatedAt": "2026-11-27T17:03:27Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/869"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 868,
+        "state": "OPEN",
+        "title": "proof: verifyParts must apply only to unit-labeled issues",
+        "updatedAt": "2026-11-27T17:13:01Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/868"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 867,
+        "state": "OPEN",
+        "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
+        "updatedAt": "2026-11-27T17:09:31Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/867"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 865,
+        "state": "OPEN",
+        "title": "proof: the live unit ledger's findings — the real defects and the unfinished queue",
+        "updatedAt": "2026-11-27T17:09:32Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/865"
+      },
+      {
+        "labels": [
+          {
+            "color": "d73a4a",
+            "name": "bug"
+          },
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 864,
+        "state": "OPEN",
+        "title": "coverage: a live unit attaches by its project label, so a frozen seed cannot orphan a project",
+        "updatedAt": "2026-11-27T16:52:36Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/864"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 862,
+        "state": "OPEN",
+        "title": "fix(walk): a multi-segment deep link loads the app without its assets",
+        "updatedAt": "2026-11-27T16:48:44Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/862"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 860,
+        "state": "OPEN",
+        "title": "fix(walk): the action sheet shows the server's field errors in a refusal",
+        "updatedAt": "2026-11-27T16:43:08Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/860"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
             "color": "FBCA04",
             "name": "status:claimed"
           },
@@ -193,7 +344,7 @@
         "number": 842,
         "state": "CLOSED",
         "title": "feedback: in-app bug reports and feature requests for every tenant",
-        "updatedAt": "2026-11-27T16:12:08Z",
+        "updatedAt": "2026-11-27T16:53:10Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/842"
       },
       {
@@ -258,9 +409,9 @@
           }
         ],
         "number": 837,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: engine-derived unit facts and the required DoD gate",
-        "updatedAt": "2026-11-27T16:34:26Z",
+        "updatedAt": "2026-11-27T17:09:50Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/837"
       },
       {
@@ -528,7 +679,7 @@
         "number": 814,
         "state": "OPEN",
         "title": "S1 — Gemba Walk: Portfolio & plan + Organisation read/write parity",
-        "updatedAt": "2026-11-27T16:33:04Z",
+        "updatedAt": "2026-11-27T17:06:35Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/814"
       },
       {
@@ -776,7 +927,7 @@
         "number": 782,
         "state": "CLOSED",
         "title": "design: the unit record on the public site, and the retirement of the superseded Python",
-        "updatedAt": "2026-11-27T11:24:45Z",
+        "updatedAt": "2026-11-27T16:53:12Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/782"
       },
       {
@@ -2640,7 +2791,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-27T12:15:09Z",
+        "updatedAt": "2026-11-27T17:03:32Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -7360,7 +7511,7 @@
       }
     ],
     "provenance": {
-      "sha256": "cd7684348b1cad962d3438920bfdd886fdce29a4586fa677930acd197689252f",
+      "sha256": "48e03e9b2d427c809a8c746789bbcec11130304d7644dc9ba25baed47a0ba731",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },
