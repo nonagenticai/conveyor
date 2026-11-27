@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-// The live proof for S1: after the real `conveyor-e2e` sign-in on the deployed game host, every
-// S1 route renders in-SPA with an h1 and no server error. Read-only: no write control is
-// pressed. Run only through `npm run test:deployed` (D1 scopes OIDC mode to this directory).
+// The live proof for S1: after the real `conveyor-e2e` sign-in on the deployed game host, S1's
+// twelve top-level routes render in-SPA with an h1 and no server error. The three detail routes
+// (/runs/:id, /meetings/:id, /board/:board_id) need a record id and are proven in dev mode.
+// Read-only: no write control is pressed. Run only through `npm run test:deployed` (D1 scopes
+// OIDC mode to this directory).
 
 const ROUTES = [
   "/organisation",
