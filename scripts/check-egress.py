@@ -71,7 +71,6 @@ ALLOW: dict[str, str] = {
     "apps/inference-router/src/auth.rs": "service client: inference-router",
     "apps/inference-router/src/billing.rs": "service client: inference-router",
     "apps/inference-router/src/provider/openai.rs": "service client: inference-router",
-    "apps/lean4-prover/src/auth.rs": "service client: lean4-prover",
     "apps/licenses/src/billing/metering.rs": "service client: licenses",
     "apps/media/src/common/runner.rs": "service client: media",
     "apps/research/src/fetch.rs": "service client: research",
