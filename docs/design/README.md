@@ -34,7 +34,10 @@ is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`
 `/design/docs/outputs.js`, `/design/docs/output-<id>.html` and
 `/design/docs/attachment-<id>` are read from Postgres for the tenant named by
 `CONVEYOR_PUBLIC_TENANT`, so the public reads the real programme and every output marked
-publishable. `console.js` finds the same-origin `/config.json`, signs in against the realm the server
+publishable. The snapshot header also carries the serving image's commit (`git_sha`) and its build
+time (`deployed_at`); the data panel marks the published data `STALE` when `generated_at` predates
+that build, and claims nothing when the build carries no stamp (#867 / #782 P3.2).
+`console.js` finds the same-origin `/config.json`, signs in against the realm the server
 already trusts (auth-code + PKCE S256, token in memory), and turns the same pack into the operator
 console — intake an issue as a card, move it, comment, claim and release, compose an output. Signed
 out there is no API request and no write control; a missing asset is served `no-store`, never

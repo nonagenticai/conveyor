@@ -89,6 +89,26 @@ window.installV2 = function (api, enterprise) {
     projects: 0,
     calls: 0,
   };
+  // #867 / #782 P3.2: the snapshot carries the build time of the image serving it. Data older
+  // than that build is stale; `unknown` (a local build, or a pack from before this field)
+  // makes no claim either way — a badge needs two parseable timestamps.
+  const deployedAt =
+    live && typeof live.deployed_at === "string" && live.deployed_at !== "unknown"
+      ? live.deployed_at
+      : "";
+  const generatedAt = live && typeof live.generated_at === "string" ? live.generated_at : "";
+  const staleLive =
+    deployedAt !== "" &&
+    generatedAt !== "" &&
+    Number.isFinite(Date.parse(generatedAt)) &&
+    Number.isFinite(Date.parse(deployedAt)) &&
+    Date.parse(generatedAt) < Date.parse(deployedAt);
+  const freshness =
+    deployedAt === ""
+      ? ""
+      : staleLive
+        ? ` · ${B("STALE", "amber")} the data predates the deployed build <span class="mono">${E(deployedAt)}</span>`
+        : ` · deployed build <span class="mono">${E(deployedAt)}</span>`;
   const liveSrc = live
     ? `LIVE · snapshot ${E(short(live.payload_sha256))} · ${E(live.generated_at || "")} · ${E(short(live.git_sha, 7))}`
     : "SPEC_V2 draft · local fixture";
@@ -3732,7 +3752,7 @@ window.installV2 = function (api, enterprise) {
     ];
     return panel(
       "Live data &amp; feedback",
-      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>. The public data files:</p>${table(
+      `<p class="muted">Rendered from the conveyor's own rows. Snapshot <span class="mono">${E(short(live.payload_sha256))}</span> generated <strong>${E(live.generated_at || "")}</strong> at <span class="mono">${E(short(live.git_sha, 12))}</span>${freshness}. The public data files:</p>${table(
         ["Data file"],
         files.map(
           ([file, label]) =>

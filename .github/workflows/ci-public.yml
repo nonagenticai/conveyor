@@ -666,6 +666,7 @@ jobs:
           # returns 1 when the test fails and `set -e` would abort a green build.
           args=(--file Dockerfile
                 --build-arg "GIT_SHA=$GITHUB_SHA"
+                --build-arg "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
                 --tag "$IMG"
                 --load
                 --cache-from "type=gha,scope=image")

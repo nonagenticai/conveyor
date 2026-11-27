@@ -146,6 +146,7 @@ pub async fn run(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<(),
             database_url: None,
             git_sha: std::env::var("CONVEYOR_GIT_SHA").ok(),
             manifest_only: false,
+            build_time: std::env::var("CONVEYOR_BUILD_TIME").ok(),
         },
     )
     .await

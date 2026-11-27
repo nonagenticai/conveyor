@@ -216,6 +216,7 @@ async fn build_or_cached(state: &AppState, slug: &str) -> Result<(Arc<SiteView>,
             rework: rework_register(),
             feedback_url: DEFAULT_FEEDBACK_URL,
             git_sha: state.config.git_sha.as_deref().unwrap_or("unknown"),
+            build_time: state.config.build_time.as_deref().unwrap_or("unknown"),
         },
     )
     .await;

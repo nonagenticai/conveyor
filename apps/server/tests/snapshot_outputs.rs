@@ -121,6 +121,7 @@ async fn only_published_outputs_are_public_and_rendered_safely() {
             database_url: None,
             git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
             manifest_only: false,
+            build_time: None,
         },
     )
     .await

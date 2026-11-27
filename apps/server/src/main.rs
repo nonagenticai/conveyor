@@ -122,6 +122,10 @@ enum Command {
         /// regenerated. Requires `--out`.
         #[arg(long)]
         manifest_only: bool,
+        /// When the producing image was built (RFC 3339). Defaults to `CONVEYOR_BUILD_TIME`;
+        /// absent stamps the snapshot `unknown` and the page shows no staleness (#867).
+        #[arg(long)]
+        build_time: Option<String>,
     },
     /// Administrative operations (S14; S04 owns the action-registry commands).
     Admin {
@@ -648,6 +652,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             database_url,
             git_sha,
             manifest_only,
+            build_time,
         } => {
             if manifest_only && out.is_none() {
                 return Err(RunError::Refused(
@@ -665,6 +670,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 database_url,
                 git_sha,
                 manifest_only,
+                build_time: build_time.or_else(|| std::env::var("CONVEYOR_BUILD_TIME").ok()),
             })
             .await?;
             tracing::info!(
