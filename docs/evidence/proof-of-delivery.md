@@ -348,3 +348,33 @@ the in-flight bucket counted closed issues, `verifyParts` fired on non-unit issu
 truncated at a prose `#N` line, and a console publish PR was counted as an orphan — and classifies
 every failure in `findings.md` § The findings. The 11:00 tables above are unchanged; the corrected
 counts are the findings run's.
+
+### The scoped unit ledger (2026-11-27, #868)
+
+The unit rule applied the issue-content contract to *every* issue, while
+`03-DELIVERY.md` § Issue content contract scopes it to `unit` deliverables — so eight
+bug/docs/ci/security/design issues were counted as unit Definition-of-ready failures. #868 carries
+the fact in the model, so the rule stops firing outside its contract.
+
+- **The model.** `UnitObs` gains `unit : Option Bool`; `partsVerified` is vacuously true for
+  `unit = some false`, and `none` (an unreadable issue) still fails closed. The model alone, in
+  the prover's own project: **exit 0, 4 734 ms**. The controls: **12/12 kernel-refused**, the new
+  `control_unknown_unit` included; the positive non-unit case compiles. The A0 corpus at 40, 80
+  and 200 units: **exit 0**.
+- **The renderer and the collector.** A facts document that omits `unit` is refused
+  (`units[i].unit is missing`), never defaulted; an explicit null travels as `none`. The model
+  digest is re-pinned at `f6020fae…`; `proof_render` **22 passed** and `proofs_record` **18
+  passed**, the collector's self-test **ok**.
+- **The offline ledger.** Fresh snapshot collected at `2026-11-27T18:16:03Z` from `63ddf40e6`,
+  corpus `0e0c74e83b5f0787…`, rendered with the scoped model: **334** completed, 24 open in
+  flight, 31 closed without a keyword-linked PR, 11 orphan PRs, 129 automation excluded —
+  **47 findings**. `non-unit-dor` **8 → 0** (the eight keys leave the class); `unit-dor-verify`
+  **28**, `multi-lane` 5, `closure-open` 2, `branch-live` 1 and `orphan-pr` 11 keep exactly the
+  same keys. Rule failures drop only `verifyParts`, 47 → 39. The run is at
+  `docs/evidence/units/2026-11-27-scoped/`.
+- **The live half is deployment-gated, and is not claimed here.** `MODEL_SOURCE` is
+  `include_str!` (`crates/actions/src/proof/render.rs:26`), so the deployed engine embeds the model
+  it was built with: at this run, image `sha256:dbb665e1…` built from main@322147b9, which cannot
+  carry this branch's model. The committed facts name `f6020fae…`, so the engine refuses them
+  (`proof_model_mismatch`) until the merged image rolls. The re-certification is recorded after
+  the deploy, in the same pattern by which #844's live certification was carried by #855.
