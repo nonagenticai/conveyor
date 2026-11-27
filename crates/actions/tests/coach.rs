@@ -1967,7 +1967,6 @@ async fn card_meta_field(
         .expect("read the card's meta field")
 }
 
-
 /// A blocked remedy stops the card's next dispatch, and the block is on the card.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_block_remedy_stops_the_next_dispatch() {

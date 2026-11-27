@@ -527,6 +527,8 @@ async fn the_cadence_states_move_only_along_the_table() {
                 if from == "closed"
         ),
         "a closed cadence cannot re-open: {refused:?}"
+    );
+}
 
 /// v1-p82-1: the PI plan materialises only after a person approves it; the unattended path
 /// cannot turn the backlog into cards.
