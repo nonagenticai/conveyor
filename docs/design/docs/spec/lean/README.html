@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="lean-delivery-certificates">Lean delivery certificates</h1>
-<p>A delivered slice, a delivered work package and the programme release each carry a <strong>certificate</strong>: a Lean source that a third party can re-check from the facts alone. The prover is a compute backend, not an oracle — it answers "this source is valid", so the value is in <em>what the source says</em>, and that is a small, hand-written model plus the facts rendered into it.</p>
+<p>A delivered slice, a delivered work package, a delivery unit and the programme release each carry a <strong>certificate</strong>: a Lean source that a third party can re-check from the facts alone. The prover is a compute backend, not an oracle — it answers "this source is valid", so the value is in <em>what the source says</em>, and that is a small, hand-written model plus the facts rendered into it.</p>
 <h2 id="the-three-grades">The three grades</h2>
 <table>
 <thead>
@@ -37,7 +37,7 @@
 <tbody>
 <tr>
 <td><strong>Instance</strong></td>
-<td>one record's facts satisfy the model (<code>checkSlice facts = true</code>, closed <code>by decide</code>)</td>
+<td>one record's facts satisfy the model (<code>checkSlice facts = true</code> / <code>checkLedger facts = true</code>, closed <code>by decide</code>)</td>
 <td>rendered per record by <code>crates/actions/src/proof/render.rs</code></td>
 </tr>
 <tr>
@@ -54,7 +54,7 @@
 </table>
 <p>An instance certificate is only worth what the model is worth, which is why the model travels <strong>inside every certificate's source</strong>: a reader does not have to trust our copy of it.</p>
 <h2 id="what-is-proven-and-what-is-assumed">What is proven, and what is assumed</h2>
-<p>Proven: the facts, as written, satisfy <code>checkSlice</code> / <code>checkProgramme</code> / <code>checkPackage</code>, and the model's universal theorems. The kernel checks this; nothing is trusted from the prover beyond an answer of <code>valid</code>.</p>
+<p>Proven: the facts, as written, satisfy <code>checkSlice</code> / <code>checkProgramme</code> / <code>checkPackage</code> / <code>checkLedger</code>, and the model's universal theorems. A unit ledger additionally names its per-rule outcomes as a literal (<code>ruleResults facts = [...]</code>), so the kernel proves <em>which</em> rule a failing unit broke, not just that the aggregate is false. The kernel checks all of this; nothing is trusted from the prover beyond an answer of <code>valid</code>.</p>
 <p>Assumed, and stated in every certificate:</p>
 <ul>
 <li><strong>Refinement.</strong> That the engine builds the facts from what it actually recorded — an approved approval row, a card in its done list, a run's evidence. Lean does not see the database. Proving that the Rust implementation refines the model is a different tool's job (Verus, Kani, or a refinement proof); this corpus does not claim it.</li>
@@ -69,6 +69,10 @@
 <li><strong>Record</strong> (<code>proofs.record</code>) that invocation's key and input body. The handler re-reads the persisted response, refuses a caller-supplied verdict and refuses a source that is not the renderer's output for those facts.</li>
 </ol>
 <p>Re-verification is the same shape with a <strong>fresh</strong> invocation: <code>lean4.check</code> again with a new key, then <code>proofs.reverify</code>, which refuses unless the fresh source, verdict and recomputed certificate digest all equal the stored ones. The proof table is append-only, so a successful re-verification returns the same row — it is a replay, not a second claim.</p>
+<h2 id="delivery-units">Delivery units</h2>
+<p><code>checkLedger</code> models one chunk of <code>docs/plans/03-DELIVERY.md</code>'s unit contract: one claim branch, one linked PR that is non-draft or merged, at most two session CI attempts, a merged unit whose issue is closed and whose branch is deleted, the PR body's <code>Closes #N</code>, and a <code>Verify:</code> line on every part of the issue. Each field is an <code>Option</code>: an unobserved fact is <code>none</code> and fails closed. The facts are GitHub observations with provenance (rule id, artifact digest, committed payload), collected by <code>scripts/proof/collect-units.sh</code> — the kernel never fetches anything, so a certificate proves <em>facts ⇒ verdict</em>, not that the collector read the truth.</p>
+<p>A ledger chunk is at most <strong>200 units</strong> (A0's measurement; the shipped model measures 44 714 bytes and ~2 s of kernel work at 200, against the prover's 100 000-character and 120-second caps). A larger ledger is the collector's to chunk; the renderer refuses it rather than emitting <code>maxRecDepth</code>.</p>
+<p>This is the <strong>observed</strong> contract. The engine's own rows cannot attest issue state, branch liveness, draft flags or run counts, so the future engine-side gate uses a second structure over the recorded rows (<code>checkRecord</code>) rather than weakening <code>checkObs</code> with unknowns.</p>
 <h2 id="model-drift">Model drift</h2>
 <p>The model file is embedded into every rendered source, so editing it changes every future source. A stored certificate is re-checkable against the model it was proven on — its <code>facts_canonical</code> carries that model's digest — and a certificate can never be re-rendered against a different model and still pass. Re-proving after a model edit is a <strong>new certificate</strong>, never an edit of the old one.</p>
 <h2 id="limits">Limits</h2>

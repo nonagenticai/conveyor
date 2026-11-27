@@ -227,6 +227,166 @@
 <li>That the facts in a certificate describe what actually happened in the database. That refinement is the assumption every certificate names (see <code>docs/spec/lean/README.md</code>); proving it is Verus/Kani work, not part of the corpus.</li>
 <li>The self-service mint path: the credential above was minted and sealed by an operator, and <code>--mint</code> still needs the dedicated client and the licence-app decision (#776).</li>
 </ul>
+<h2 id="units--a0-the-chunk-size-measurement-2026-11-27">Units — A0, the chunk-size measurement (2026-11-27)</h2>
+<p>Part of #836. The unit model is a draft at this point; this section fixes the certificate size from real kernel runs, not from an estimate. The model under measurement is <code>DeliveryModel.lean</code> at 5 537 bytes, <code>sha256 7bc3a1eb…86f859a</code> (the 3 179-byte row above belongs to the pre-unit model).</p>
+<p><code>scripts/proof/a0_units.py</code> generated the sources at N = 40, 80, 200, 400 and 444 synthetic <code>UnitObs</code> records, plus seven one-unit negative controls, an empty ledger and a <code>startsWith</code> probe. Each file was streamed into the prover's own pod and run with the runner's exact command:</p>
+<pre><code>cd /lean-project &amp;&amp; env -i PATH=/usr/local/bin:/usr/bin:/bin:/opt/elan/bin \
+  ELAN_HOME=/opt/elan /opt/elan/bin/lake env /opt/elan/bin/lean /lean-project/_a0_&lt;n&gt;.lean</code></pre>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>Source bytes</th>
+<th>Warm wall clock (ms)</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>40</td>
+<td>11 010</td>
+<td>1 759 · 1 780 · 1 781 · 1 810</td>
+<td>0</td>
+</tr>
+<tr>
+<td>80</td>
+<td>16 390</td>
+<td>1 899 · 1 902 · 1 925 · 1 839</td>
+<td>0</td>
+</tr>
+<tr>
+<td>200</td>
+<td>32 530</td>
+<td>2 211 · 2 154 · 2 215 · 2 239</td>
+<td>0</td>
+</tr>
+<tr>
+<td>400</td>
+<td>59 430</td>
+<td>2 736 · 2 446 · 2 655 (with <code>set_option maxRecDepth 4000</code>)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>444</td>
+<td>65 348</td>
+<td>2 678 · 2 735 · 2 732 (with <code>set_option maxRecDepth 4000</code>)</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>At the default recursion depth, N = 400 and N = 444 both fail in 2.5–2.9 s with <code>maximum recursion depth has been reached</code>; N = 200 passes untouched. The first run of the session was a smoke theorem at 825 ms; the 10 242 ms cold figure above is the pod's first run after a restart and was not re-measured (the live pod was not restarted).</p>
+<p>The negative controls — two branches, two PRs, a draft PR, three CI runs, merged with the issue pending, merged with the branch live, unknown branches — each exit 1: the kernel refuses <code>checkLedger [bad] = true</code>, it is not a render refusal. An empty ledger is also exit 1 (the <code>!isEmpty</code> guard). A <code>String.startsWith "issue/836-"</code> probe under <code>decide</code> exits 1: <strong><code>startsWith</code> is not kernel-reducible in this toolchain</strong>, so prefix checks must arrive as derived facts, never as Lean computation in the checker.</p>
+<p>One <code>lean4.check</code> at N = 200 through the deployed engine was attempted with a machine principal minted in the conveyor pod. It answered <code>403 action-forbidden</code>: the principal lacks the <code>integrations:read</code> scope the action declares. That is a principal/grant result, not a prover result — the direct runner path above is the command the prover issues. A2 must run with a principal holding <code>integrations:read</code> (the check) and <code>approvals:write</code> (the record). A conveyor rollout replaced the pod during the first attempt; the 403 is from the new deployment.</p>
+<p><strong>Decision.</strong> Certificate chunk = <strong>200 units</strong>. At 200 the source is 32 530 bytes against the 100 000-char cap (3× headroom) and the warm maximum is 2 239 ms against the 120 s prover timeout (53× headroom); with the 10 242 ms cold start the worst case is ≈ 12.5 s. The full 444-unit ledger would fit one certificate (65 348 bytes, ≈ 2.7 s) but needs <code>set_option maxRecDepth 4000</code>; 200 is chosen so a failing chunk is bisected cheaply and the default recursion depth stays in force. The ledger window is therefore <strong>all</strong> merged PRs in the window plus the unit issues — about three chunks. The renderer refuses more than 200 units per source unless it emits the option.</p>
+<p>Same assumption as every certificate: the kernel certifies <em>facts ⇒ verdict</em>. The collector's rules, hashes and committed payloads are what a reviewer checks against reality.</p>
+<h3 id="a1--the-shipped-unit-model-2026-11-27">A1 — the shipped unit model (2026-11-27)</h3>
+<p>The A0 draft had six fields. The shipped model adds the two body-observable facts (the PR's <code>Closes #N</code>, the issue's <code>Verify:</code> lines), names <code>checkUnit</code>, and adds <code>ruleResults</code> so a certificate proves the outcome of every rule, not only the aggregate. Model <code>DeliveryModel.lean</code> at 6 709 bytes, <code>sha256 378a1395…574ddae7</code>.</p>
+<p>Measured with <code>scripts/lean/check-model.sh</code> against the same pod command (wall includes the ssh/exec and stream overhead, so it is an upper bound on the kernel time):</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>Source bytes</th>
+<th>Exit</th>
+<th>Wall (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>40</td>
+<td>14 554</td>
+<td>0</td>
+<td>4 700</td>
+</tr>
+<tr>
+<td>80</td>
+<td>22 094</td>
+<td>0</td>
+<td>4 653</td>
+</tr>
+<tr>
+<td>200</td>
+<td>44 714</td>
+<td>0</td>
+<td>5 892</td>
+</tr>
+</tbody>
+</table>
+<p>The controls file, checked appended to the model, is kernel-refused: 11/11 negative theorems (two branches, two PRs, a draft, three CI runs, merged with the issue pending, merged with the branch live, unknown branches, no <code>Closes</code>, missing <code>Verify:</code>, the empty ledger, a falsified <code>ruleResults</code> literal). The positive control (<code>checkUnit goodUnit = true</code>) elaborates; the refusals are the eleven <code>control_</code> theorems. Renderer tests: 17/17 (<code>cargo-guard test -p conveyor-actions --test proof_render</code>). The <code>unit_ledger</code> subject is recorded end to end by <code>proofs_record::unit_subject_kind</code> (1/1) against an ephemeral PostgreSQL 18: 201, subject <code>unit_ledger</code>, and the stored source is the renderer's output.</p>
+<p>The chunk decision is unchanged: <strong>200 units</strong>. The shipped 200-unit source is 44 714 bytes (2× headroom under the 90 000-byte working limit, 2.2× under the prover's 100 000-character cap) and the warm kernel path is ≈ 2 s; 400 and 444 still require <code>maxRecDepth 4000</code> in the A0 measurement and are not emitted.</p>
+<h3 id="a2--the-evaluation-of-the-real-ledger-offline-2026-11-27">A2 — the evaluation of the real ledger (offline, 2026-11-27)</h3>
+<p>The collector (<code>scripts/proof/collect_units.py</code>, self-test in the <code>checks</code> job) fetched the window once and rendered it offline. The snapshot is committed at <code>docs/evidence/units/2026-11-27/snapshot.json</code>: 371 issues, 447 merged PRs (319 non-automation), 124 live heads and 2 481 workflow runs at 638 shas, collected at <code>48797526c</code>. It is redacted per <code>scripts/ci/no-private-refs.sh</code>: public GitHub issue/PR bodies sometimes quote estate identifiers, so the committed copy carries deterministic placeholders — the facts the certificate uses (state, closing keyword, <code>Verify:</code>) need none of them, and the unredacted payloads are the public GitHub records. Two renders of the same snapshot produced the same corpus hash and byte-identical facts (<code>66544ac7ae1e1ed2…</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Corpus</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Completed units (certified)</td>
+<td>320</td>
+</tr>
+<tr>
+<td>In flight (no merged PR; not certified)</td>
+<td>54</td>
+</tr>
+<tr>
+<td>Orphan merged PRs (no issue)</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Automation PRs excluded (<code>github-actions[bot]</code>, <code>dependabot[bot]</code>, <code>automation/*</code>)</td>
+<td>128</td>
+</tr>
+<tr>
+<td>Chunks at 200 units</td>
+<td>2 (200 + 120)</td>
+</tr>
+</tbody>
+</table>
+<p>The facts documents measure 112 687 and 67 710 bytes (provenance included; the rendered source carries only the observations, so the A1 200-unit source measurement is the prover-side budget). The model is the A1 model (<code>378a1395…</code>); the spec is <code>docs/plans/03-DELIVERY.md</code> <code>12514c99588f8b8c…</code>. The collector's local mirror of the rules reports <strong>56 of 320 completed units failing</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Failing units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ciBudget</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>closesKeyword</code></td>
+<td>12 (the orphans: a merged PR that names no issue)</td>
+</tr>
+<tr>
+<td><code>mergeComplete</code></td>
+<td>15 (orphans, an issue left open, a branch left live)</td>
+</tr>
+<tr>
+<td><code>oneBranch</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>onePull</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>pullUsable</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>verifyParts</code></td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>Verify:</code> cross-check against <code>scripts/ci/board.py</code>: 9 units pass the checker and fail the model (the checker accepts one <code>Verify:</code> in the exact section; the model requires one per part), 6 the reverse, 293 agree. Both answers are in <code>units.json</code>; neither is silently adopted.</p>
+<p><strong>What is not run yet.</strong> The kernel verdict over these chunks is deployment-gated: the collector records through <code>proofs.render</code>, which is added by #836 and deploys with this PR. The live step (two chunk certificates — one proven, one unproven if the findings persist — a <code>proofs.reverify</code>, and the programme bundle) is run after the rollout and recorded here with its response bodies. Until then these are the collector's facts and mirror, not a certificate.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/proof-of-delivery.md</code> at build time.</span>
