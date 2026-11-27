@@ -31,6 +31,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -580,11 +581,27 @@ def detect_modules(sources: dict[str, str]) -> dict[str, bool]:
     return {name: bool(pattern.search(text)) for name, pattern in CAPABILITIES.items()}
 
 
-def modules_present() -> dict[str, bool]:
-    src = WALK / "src"
+def walk_sources(root: Path) -> dict[str, str]:
+    """The ship-able capability sources: a seam module, never a destination caller or a test.
+
+    SPEC §6.1: destinations may import `api`, `forms`, `shell` and `router` — they consume the
+    seam, they are not it. A token found only in a destination or a `*.test.js` proves a call,
+    not the capability.
+    """
+    src = root / "src"
     if not src.is_dir():
-        return {name: False for name in CAPABILITIES}
-    return detect_modules({path.as_posix(): path.read_text() for path in sorted(src.rglob("*.js"))})
+        return {}
+    sources: dict[str, str] = {}
+    for path in sorted(src.rglob("*.js")):
+        rel = path.relative_to(root).as_posix()
+        if rel.startswith("src/destinations/") or path.name.endswith(".test.js"):
+            continue
+        sources[rel] = path.read_text()
+    return sources
+
+
+def modules_present() -> dict[str, bool]:
+    return detect_modules(walk_sources(WALK))
 
 
 def load_report(path: str | None) -> set[str]:
@@ -842,6 +859,21 @@ def self_test() -> int:
        "capability: a renamed module is not a false negative")
     ok(not detect_modules({"src/api/client.js": "function manifestThing() {"})["manifest"],
        "capability: a lookalike token is not a false positive")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "src/destinations").mkdir(parents=True)
+        (root / "src/shell").mkdir(parents=True)
+        (root / "src/destinations/x.js").write_text("ctx.shell.openAction(name)\n")
+        (root / "src/shell/shell.test.js").write_text("openAction(name)\n")
+        ok(not detect_modules(walk_sources(root))["sheet"],
+           "capability: a destination caller or a test is not the seam")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "src/shell").mkdir(parents=True)
+        (root / "src/shell/renamed-sheet.js").write_text("async openAction(name, options = {}) {\n")
+        ok(detect_modules(walk_sources(root))["sheet"],
+           "capability: a seam module under a new name still is")
     ok(build_coverage(census, {}, [], committed=None, modules=all_caps)["actions"][0]["status"]
        == "schema-rendered", "capability: actions are schema-rendered when the sheet exists")
     ok(build_coverage(census, {}, [], committed=None, modules=no_caps)["actions"][0]["status"]
