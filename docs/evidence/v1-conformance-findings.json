@@ -15,33 +15,33 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 605,
+                    "line": 729,
                     "quote": "    pub require_evidence: bool,"
                 },
                 {
                     "path": "crates/actions/src/control/views.rs",
-                    "line": 353,
+                    "line": 374,
                     "quote": "    pub require_evidence: bool,"
                 },
                 {
                     "path": "crates/actions/src/control/approvals.rs",
-                    "line": 388,
+                    "line": 499,
                     "quote": "        input.require_evidence,"
                 },
                 {
                     "path": "crates/actions/src/control/approvals.rs",
-                    "line": 391,
+                    "line": 504,
                     "quote": "    if !evidence.is_empty() {"
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 56,
+                    "line": 78,
                     "quote": "    if require && evidence.is_empty() {"
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 59,
-                    "quote": "            \"gate_evidence_missing\","
+                    "line": 244,
+                    "quote": "                \"gate_evidence_missing\","
                 },
                 {
                     "path": "crates/store/src/metrics.rs",
@@ -147,7 +147,7 @@
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 560,
+                    "line": 684,
                     "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)"
                 },
                 {
@@ -214,7 +214,7 @@
             "evidence": [
                 {
                     "path": "apps/inference-router/src/config.rs",
-                    "line": 275,
+                    "line": 321,
                     "quote": "            None => GateMode::Off,"
                 },
                 {
@@ -229,12 +229,12 @@
                 },
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 848,
+                    "line": 851,
                     "quote": "/// The cost/budget overview, derived from the conveyor's own ledger."
                 },
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 263,
+                    "line": 294,
                     "quote": "/// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is"
                 }
             ],
@@ -258,7 +258,7 @@
                 },
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 329,
+                    "line": 360,
                     "quote": "               FROM inference_call ic"
                 }
             ],
@@ -277,7 +277,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 286,
+                    "line": 317,
                     "quote": "        UsageGroup::Project => \"coalesce(c.project_id::text, '')\","
                 },
                 {
@@ -301,12 +301,12 @@
             "evidence": [
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 333,
+                    "line": 364,
                     "quote": "               LEFT JOIN run r ON r.id = ic.run_id"
                 },
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 261,
+                    "line": 292,
                     "quote": "/// belongs to; a call with no run is the empty bucket, visible rather than dropped."
                 }
             ],
@@ -325,12 +325,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 850,
+                    "line": 853,
                     "quote": "/// V1 read this from a separate Python billing service. #46 (owner, 2026-11-16) ruled billing is"
                 },
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 896,
+                    "line": 899,
                     "quote": "    pub billing_total_usd: Option<f64>,"
                 }
             ],
@@ -349,12 +349,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 841,
+                    "line": 844,
                     "quote": "    pub total_usd: f64,"
                 },
                 {
                     "path": "crates/store/src/inference.rs",
-                    "line": 265,
+                    "line": 296,
                     "quote": "/// `unpriced_calls` — \"no price\" must not render as \"free\"."
                 }
             ],
@@ -373,22 +373,22 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1728,
+                    "line": 1999,
                     "quote": "    let mut satisfied = sets.is_empty();"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1725,
+                    "line": 1996,
                     "quote": "        _ => Vec::new(),"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1018,
+                    "line": 1058,
                     "quote": "            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)"
                 },
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 1213,
+                    "line": 1214,
                     "quote": "    pub profile_key: Option<String>,"
                 }
             ],
@@ -407,7 +407,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1802,
+                    "line": 2073,
                     "quote": "    if requested == \"h\" {"
                 },
                 {
@@ -436,22 +436,22 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1044,
+                    "line": 1084,
                     "quote": "         ON CONFLICT (tenant_id, key) DO UPDATE SET"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1047,
+                    "line": 1087,
                     "quote": "            artifact_requirements = EXCLUDED.artifact_requirements,"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1051,
+                    "line": 1091,
                     "quote": "          WHERE adm_profile.status <> 'retired'"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1079,
+                    "line": 1119,
                     "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
                 },
                 {
@@ -461,7 +461,7 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1051,
+                    "line": 1091,
                     "quote": "          WHERE adm_profile.status <> 'retired'"
                 }
             ],
@@ -480,12 +480,12 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1303,
+                    "line": 1547,
                     "quote": "    get_body_tx(&mut *conn, tenant, body_id)"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1345,
+                    "line": 1616,
                     "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {"
                 },
                 {
@@ -494,18 +494,8 @@
                     "quote": "    charter                 text NOT NULL DEFAULT '',"
                 },
                 {
-                    "path": "docs/design/data/architecture.json",
-                    "line": 574,
-                    "quote": "      \"status\": \"draft\","
-                },
-                {
-                    "path": "docs/design/data/architecture.json",
-                    "line": 563,
-                    "quote": "      \"kind\": \"architecture_board\","
-                },
-                {
                     "path": "docs/design/data/programme.json",
-                    "line": 6204,
+                    "line": 8793,
                     "quote": "        \"gate\": \"an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata\","
                 }
             ],
@@ -524,12 +514,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 254,
+                    "line": 255,
                     "quote": "    pub project_id: Option<Uuid>,"
                 },
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 257,
+                    "line": 258,
                     "quote": "    pub artifact_type_id: Option<Uuid>,"
                 },
                 {
@@ -558,12 +548,12 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1806,
+                    "line": 2077,
                     "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1921,
+                    "line": 2192,
                     "quote": "         ON CONFLICT (tenant_id, project_id, contract_id) DO NOTHING"
                 },
                 {
@@ -573,7 +563,7 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1806,
+                    "line": 2077,
                     "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
                 }
             ],
@@ -597,7 +587,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3194,
+                    "line": 3212,
                     "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
                 },
                 {
@@ -607,28 +597,28 @@
                 },
                 {
                     "path": "docs/design/data/msp.json",
-                    "line": 402,
+                    "line": 10941,
                     "quote": "      \"decision\": \"continue\","
                 },
                 {
                     "path": "docs/design/data/msp.json",
-                    "line": 429,
+                    "line": 10934,
                     "quote": "      \"reviewed_at\": \"2026-11-18T07:17:50.738714+00:00\","
                 },
                 {
                     "path": "docs/design/data/msp.json",
-                    "line": 459,
+                    "line": 539,
                     "quote": "      \"state\": \"planned\","
                 },
                 {
                     "path": "docs/design/data/programme.json",
-                    "line": 5558,
+                    "line": 6585,
                     "quote": "      \"status\": \"closed\","
                 },
                 {
                     "path": "docs/design/data/programme.json",
-                    "line": 5559,
-                    "quote": "      \"updated_at\": \"2026-11-17T13:49:07.723637+00:00\","
+                    "line": 6586,
+                    "quote": "      \"updated_at\": \"2026-11-21T17:55:54.720006+00:00\","
                 }
             ],
             "failure_scenario": "A fresh tenant seeds tranche 1 as authorised with no programme_tranche_review; every tranche-1 project passes assert_project_tranche_authorised_tx and starts. A reviewer can submit evidence {\"baselines\":\"none\",\"benefit_status\":\"none\",\"risk_register\":\"none\"} and the continue/pause/stop gate records it.",
@@ -651,7 +641,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2001,
+                    "line": 2006,
                     "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
                 },
                 {
@@ -661,12 +651,12 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2001,
+                    "line": 2006,
                     "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2489,
+                    "line": 2494,
                     "quote": "    if post.is_some() && baseline.is_none() {"
                 }
             ],
@@ -743,12 +733,12 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3353,
+                    "line": 3371,
                     "quote": "            AND a.kind = 'benefits_realization_plan'"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3363,
+                    "line": 3381,
                     "quote": "    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {"
                 },
                 {
@@ -758,32 +748,32 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3333,
+                    "line": 3351,
                     "quote": "pub async fn close_programme_tx("
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3360,
+                    "line": 3378,
                     "quote": "    let Some(owner) = plans.first() else {"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3349,
+                    "line": 3367,
                     "quote": "        \"SELECT a.meta->>'post_closure_owner'"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3353,
+                    "line": 3371,
                     "quote": "            AND a.kind = 'benefits_realization_plan'"
                 },
                 {
                     "path": "docs/design/data/programme.json",
-                    "line": 5581,
+                    "line": 7950,
                     "quote": "        \"gate\": \"PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized\","
                 },
                 {
                     "path": "docs/design/data/programme.json",
-                    "line": 5597,
+                    "line": 6585,
                     "quote": "      \"status\": \"closed\","
                 },
                 {
@@ -793,12 +783,12 @@
                 },
                 {
                     "path": "docs/design/data/msp.json",
-                    "line": 99,
+                    "line": 135,
                     "quote": "      \"status\": \"draft\","
                 },
                 {
                     "path": "docs/design/data/msp.json",
-                    "line": 459,
+                    "line": 539,
                     "quote": "      \"state\": \"planned\","
                 }
             ],
@@ -836,22 +826,22 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 738,
+                    "line": 739,
                     "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 722,
+                    "line": 723,
                     "quote": "    let remedy = store::coach::insert_remedy_tx("
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 738,
+                    "line": 739,
                     "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 743,
+                    "line": 744,
                     "quote": "    if remedy_class == \"ask\" {"
                 }
             ],
@@ -870,22 +860,22 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 790,
+                    "line": 791,
                     "quote": "        kata_candidate_id = Some(started.value.id);"
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 780,
+                    "line": 781,
                     "quote": "                process_key: Some(\"kata.open\".to_owned()),"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1024,
+                    "line": 1126,
                     "quote": "`development` type and a stricter gate set:"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1208,
+                    "line": 1316,
                     "quote": "| development | `dev.open\\|implement\\|verify\\|merge\\|release\\|rollback` (composes coding/git/CI actions) |"
                 },
                 {
@@ -895,7 +885,7 @@
                 },
                 {
                     "path": "crates/actions/src/lib.rs",
-                    "line": 107,
+                    "line": 131,
                     "quote": "pub mod youtube;"
                 },
                 {
@@ -987,7 +977,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1078,
+                    "line": 1180,
                     "quote": "alert / failed run / eval delta / prompt finding / coach escalation"
                 }
             ],
@@ -1025,7 +1015,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2886,
+                    "line": 2901,
                     "quote": "            SET state = 'materialised', version = version + 1, updated_at = now(),"
                 }
             ],
@@ -1044,7 +1034,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 2949,
+                    "line": 3008,
                     "quote": "            state: input.state,"
                 }
             ],
@@ -1111,7 +1101,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2820,
+                    "line": 2835,
                     "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
                 }
             ],
@@ -1149,7 +1139,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 4842,
+                    "line": 4849,
                     "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
                 }
             ],
@@ -1168,7 +1158,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5921,
+                    "line": 5928,
                     "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]"
                 }
             ],
@@ -1187,7 +1177,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5094,
+                    "line": 5101,
                     "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,"
                 },
                 {
@@ -1211,7 +1201,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 1358,
+                    "line": 1365,
                     "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];"
                 }
             ],
@@ -1230,7 +1220,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 7481,
+                    "line": 7494,
                     "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
                 }
             ],
@@ -1249,7 +1239,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5025,
+                    "line": 5032,
                     "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));"
                 }
             ],
@@ -1303,7 +1293,7 @@
                 },
                 {
                     "path": "crates/pack/src/snapshot.rs",
-                    "line": 332,
+                    "line": 369,
                     "quote": "/// The live `/design/data/programme.json` route serves this from memory, so the download and the"
                 }
             ],
@@ -1322,7 +1312,7 @@
             "evidence": [
                 {
                     "path": "docs/design/scripts/publish-data.sh",
-                    "line": 108,
+                    "line": 110,
                     "quote": "cp \"$tmp/conformance/conformance-gap-register.json\" \"$tmp/data/conformance.json\""
                 },
                 {
@@ -1346,7 +1336,7 @@
             "evidence": [
                 {
                     "path": "docs/design/scripts/publish-data.sh",
-                    "line": 131,
+                    "line": 164,
                     "quote": "python3 \"$pack/scripts/build-docs.py\""
                 },
                 {
@@ -1356,7 +1346,7 @@
                 },
                 {
                     "path": "docs/design/scripts/publish-data.sh",
-                    "line": 136,
+                    "line": 150,
                     "quote": "rsync -a \"$tmp/data/\" \"$data/\""
                 }
             ],
@@ -1380,7 +1370,7 @@
                 },
                 {
                     "path": "crates/pack/src/snapshot.rs",
-                    "line": 196,
+                    "line": 212,
                     "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());"
                 }
             ],
@@ -1398,18 +1388,18 @@
             "problem": "run_with_pool's write_outputs renders document titles, bodies and attachments straight from the database with no redact_text and no in-programme filter, both of which site_view applies. Live programme.csv is also built from unredacted data.programme.",
             "evidence": [
                 {
-                    "path": "crates/pack/src/snapshot.rs",
-                    "line": 299,
-                    "quote": "        outputs = crate::outputs::write_outputs(pool, tenant, &generated_at, dir).await?;"
+                    "path": "crates/pack/src/outputs.rs",
+                    "line": 156,
+                    "quote": "pub async fn write_outputs("
                 },
                 {
                     "path": "crates/pack/src/live.rs",
-                    "line": 119,
+                    "line": 132,
                     "quote": "    let programme_csv = programme_csv(&data.programme);"
                 },
                 {
                     "path": "crates/pack/src/live.rs",
-                    "line": 125,
+                    "line": 138,
                     "quote": "        record.title = redact_text(&record.title);"
                 }
             ],
@@ -1553,7 +1543,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 1533,
+                    "line": 1552,
                     "quote": "        input.status.as_deref(),"
                 },
                 {
@@ -1577,12 +1567,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/organisation.rs",
-                    "line": 606,
+                    "line": 646,
                     "quote": "            status: \"draft\".to_owned(),"
                 },
                 {
                     "path": "crates/store/src/organisation.rs",
-                    "line": 592,
+                    "line": 649,
                     "quote": "    if job.status == \"retired\" {"
                 }
             ],
@@ -1606,7 +1596,7 @@
                 },
                 {
                     "path": "crates/store/src/run.rs",
-                    "line": 385,
+                    "line": 407,
                     "quote": "        None if input.release_hash.is_some() => return Err(RunStoreError::ReleaseWithoutBinding),"
                 }
             ],
@@ -1625,17 +1615,17 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 778,
+                    "line": 779,
                     "quote": "                card_id: interruption.interrupted_card_id,"
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 780,
+                    "line": 781,
                     "quote": "                process_key: Some(\"kata.open\".to_owned()),"
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 781,
+                    "line": 782,
                     "quote": "                inputs: json!({ \"interruption_id\": interruption.id }),"
                 }
             ],
@@ -1654,17 +1644,17 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/control/approvals.rs",
-                    "line": 426,
+                    "line": 539,
                     "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the"
                 },
                 {
                     "path": "crates/actions/src/control/approvals.rs",
-                    "line": 461,
+                    "line": 574,
                     "quote": "    if record.approval.status != ApprovalStatus::Approved {"
                 },
                 {
                     "path": "crates/actions/src/control/approvals.rs",
-                    "line": 318,
+                    "line": 421,
                     "quote": "    let required_decisions = input.required_decisions.unwrap_or(1);"
                 },
                 {
@@ -1688,17 +1678,17 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 160,
+                    "line": 284,
                     "quote": "    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)"
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 643,
+                    "line": 780,
                     "quote": "    let required = input.required_decisions.unwrap_or(1);"
                 },
                 {
                     "path": "crates/store/src/organisation.rs",
-                    "line": 173,
+                    "line": 225,
                     "quote": "    /// `department_scope`, authority, limits override."
                 }
             ],
@@ -1832,17 +1822,17 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 663,
+                    "line": 666,
                     "quote": "                metric: \"knowledge.lesson_promotion_rate\".to_owned(),"
                 },
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 664,
+                    "line": 667,
                     "quote": "                reason: \"the lesson ledger (T8) is not in the schema\".to_owned(),"
                 },
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 668,
+                    "line": 671,
                     "quote": "                reason: \"no knowledge-retrieval ledger exists; inference_call records the prompt, not the pack hit\".to_owned(),"
                 }
             ],
@@ -1861,17 +1851,17 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1706,
+                    "line": 1977,
                     "quote": "    let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1725,
+                    "line": 1996,
                     "quote": "        _ => Vec::new(),"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1728,
+                    "line": 1999,
                     "quote": "    let mut satisfied = sets.is_empty();"
                 }
             ],
@@ -1895,7 +1885,7 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1079,
+                    "line": 1119,
                     "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
                 }
             ],
@@ -1914,7 +1904,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1400,
+                    "line": 1671,
                     "quote": "              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')\","
                 }
             ],
@@ -1957,7 +1947,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3192,
+                    "line": 3210,
                     "quote": "        None => Ok(()),"
                 },
                 {
@@ -1981,17 +1971,17 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 2119,
+                    "line": 2138,
                     "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
                 },
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 2124,
+                    "line": 2143,
                     "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2025,
+                    "line": 2030,
                     "quote": "    let fields = BenefitProfileFields {"
                 }
             ],
@@ -2015,12 +2005,12 @@
                 },
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 2219,
+                    "line": 2238,
                     "quote": "            output_ref: input.output_ref,"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3205,
+                    "line": 3223,
                     "quote": "/// The benefits come from the map's edges — `benefit_link.output_ref` names a `wbs_node` id —"
                 }
             ],
@@ -2039,7 +2029,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 2648,
+                    "line": 2667,
                     "quote": "    /// `pi | sprint | demo | retro | refinement`."
                 }
             ],
@@ -2076,7 +2066,7 @@
             "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
             "owner_project": "T3",
             "resolved_by": {
-                "commit": "c85c4310d213b490f5d547be9d3703bb8203f13b",
+                "commit": "00d1ebd9b9b7103e6b3bb87937b69a07d1683f99",
                 "test": "crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline",
                 "evidence": "spine_gates 3/3: a_register_cannot_be_born_approved, a_self_declared_approved_change_cannot_advance_a_baseline, an_approved_change_gate_advances_the_baseline"
             }
@@ -2150,7 +2140,7 @@
                 },
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 750,
+                    "line": 751,
                     "quote": "            owner_user_id: (ctx.actor_kind == \"user\").then_some(ctx.actor_id),"
                 }
             ],
@@ -2169,22 +2159,22 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 708,
+                    "line": 709,
                     "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
                 },
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 712,
+                    "line": 713,
                     "quote": "            \"a postmortem follows a mitigation; none has been recorded\","
                 },
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 845,
+                    "line": 846,
                     "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
                 },
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
-                    "line": 852,
+                    "line": 853,
                     "quote": "    if meta.get(META_POSTMORTEM).is_none() {"
                 }
             ],
@@ -2202,23 +2192,18 @@
             "problem": "apps/web/src/app.rs calls itself the nine-destination shell and its route table plus Sidebar (app.rs:267-322) contain no route or nav entry for Organisation, Authoring, Portfolio, Programme, Plan or Operations; Procedures/Improve exist only as Build sub-screens and an Evals sub-screen. Any deep link to a documented V2 destination falls through to the literal 'No such page.' fallback (app.rs:138). The §10.5 screens therefore cannot be reached in the live product at all.",
             "evidence": [
                 {
-                    "path": "docs/SPEC_V2.md",
-                    "line": 1243,
-                    "quote": "V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:"
-                },
-                {
                     "path": "apps/web/src/app.rs",
                     "line": 1,
                     "quote": "//! The application root: one boot, then the nine-destination shell."
                 },
                 {
                     "path": "apps/web/src/app.rs",
-                    "line": 138,
+                    "line": 154,
                     "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>"
                 },
                 {
                     "path": "apps/web/src/app.rs",
-                    "line": 267,
+                    "line": 304,
                     "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">"
                 }
             ],
@@ -2237,7 +2222,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1202,
+                    "line": 1309,
                     "quote": "| authoring | `authoring.intake\\|draft\\|review\\|publish`, `authoring.assets` |"
                 },
                 {
@@ -2247,7 +2232,7 @@
                 },
                 {
                     "path": "crates/actions/src/lib.rs",
-                    "line": 107,
+                    "line": 131,
                     "quote": "pub mod youtube;"
                 },
                 {
@@ -2271,8 +2256,8 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1207,
-                    "quote": "| kata | `kata.open\\|observe\\|analyse\\|propose\\|measure\\|adopt\\|propagate\\|close` |"
+                    "line": 1315,
+                    "quote": "| kata | `kata.open\\|observe\\|analyse\\|hypothesise\\|propose\\|measure\\|adopt\\|propagate\\|close`, `kata.get` |"
                 },
                 {
                     "path": "crates/actions/src/ops/incidents.rs",
@@ -2281,7 +2266,7 @@
                 },
                 {
                     "path": "crates/actions/src/coach.rs",
-                    "line": 780,
+                    "line": 781,
                     "quote": "                process_key: Some(\"kata.open\".to_owned()),"
                 }
             ],
@@ -2318,7 +2303,7 @@
             "acceptance": "analyse.app, analyse.brand, analyse.content and analyse.report are registered with schemas and handlers (or explicitly scoped out in SPEC §10.4 by owner decision), and a registry test asserts the final six-verb set.",
             "owner_project": "PLATFORM",
             "resolved_by": {
-                "commit": "d74e2bcf153b75613f54094fe3bab352ea0f88f3",
+                "commit": "7388a4d04983b7acab8eb309bdc5feaa3c07c367",
                 "test": "crates/actions/tests/registry.rs::the_analysis_family_is_the_six_declared_verbs",
                 "evidence": "registered analyse.app, analyse.brand, analyse.content and analyse.report as read-only ActionSpecs over conveyor-analysis; the six-name registry test passes (analyse.app, analyse.brand, analyse.content, analyse.report, analyse.site, analyse.video); cargo-guard test -p conveyor-actions --test registry: 1 passed"
             }
@@ -2334,17 +2319,17 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1386,
+                    "line": 1610,
                     "quote": "   (`429 tool_budget_exceeded`)."
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1413,
+                    "line": 1637,
                     "quote": "| **spend** | LLM generation, w2v render, TTS, paid data source | budget check + ledger |"
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 355,
+                    "line": 444,
                     "quote": "        cost: None,"
                 }
             ],
@@ -2381,7 +2366,7 @@
             "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
             "owner_project": "T13",
             "resolved_by": {
-                "commit": "b7cc3f51a3b04e3638a91b99c02f48683ee2529a",
+                "commit": "9eb2016827f8edb1aff167520ea08ccf8162e0a9",
                 "test": "crates/actions/tests/tool_platform.rs::a_two_hundred_with_a_failing_verdict_is_check_failed",
                 "evidence": "tool_platform 11/11; a 200 whose own verdict/checks fail is ledgered check_failed with error_class write_not_verified. The publish half was already on main (0072_tool_meta), proved by estate_toolkits::a_write_tool_without_its_contract_is_refused"
             }
@@ -2397,7 +2382,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1403,
+                    "line": 1627,
                     "quote": "path cannot be published. Writes take an `idempotency_key`. These two rules are borrowed from the proven"
                 },
                 {
@@ -2407,12 +2392,12 @@
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 250,
+                    "line": 322,
                     "quote": "        idempotency_key: request.idempotency_key.clone(),"
                 },
                 {
                     "path": "crates/actions/src/tools.rs",
-                    "line": 67,
+                    "line": 75,
                     "quote": "        idempotent: false,"
                 }
             ],
@@ -2431,17 +2416,17 @@
             "evidence": [
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 71,
+                    "line": 77,
                     "quote": "    pub credential_alias: Option<String>,"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1389,
+                    "line": 1613,
                     "quote": "4. **Resolve the credential** from the sealed secret store by alias. The broker injects it; the prompt never carries it"
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 258,
+                    "line": 330,
                     "quote": "        authority: Authority::Internal,"
                 }
             ],
@@ -2460,7 +2445,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1399,
+                    "line": 1623,
                     "quote": "**Long operations are bounded.** Every poll has a fixed budget; on timeout the tool returns `pending` with a"
                 },
                 {
@@ -2470,12 +2455,12 @@
                 },
                 {
                     "path": "crates/actions/src/tools.rs",
-                    "line": 70,
+                    "line": 78,
                     "quote": "        timeout_ms: 300_000,"
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 315,
+                    "line": 403,
                     "quote": "                _ => \"backend_error\","
                 }
             ],
@@ -2494,7 +2479,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1424,
+                    "line": 1648,
                     "quote": "A tenant may bring two kinds of tool and only two:"
                 },
                 {
@@ -2523,27 +2508,27 @@
             "evidence": [
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 46,
+                    "line": 49,
                     "quote": "    /// This tenant has opted out for this action; the call runs without one."
                 },
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 47,
+                    "line": 50,
                     "quote": "    Waived,"
                 },
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 115,
+                    "line": 123,
                     "quote": "    pub approval: ApprovalRequirement,"
                 },
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 217,
+                    "line": 261,
                     "quote": "        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),"
                 },
                 {
                     "path": "crates/actions/src/control/policies.rs",
-                    "line": 109,
+                    "line": 116,
                     "quote": "    effect = \"write\","
                 }
             ],
@@ -2562,17 +2547,17 @@
             "evidence": [
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 81,
+                    "line": 84,
                     "quote": "    Allowed,"
                 },
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 117,
+                    "line": 125,
                     "quote": "    pub self_approval: SelfApproval,"
                 },
                 {
                     "path": "crates/store/src/approval.rs",
-                    "line": 850,
+                    "line": 896,
                     "quote": "            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {"
                 }
             ],
@@ -2606,8 +2591,8 @@
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 59,
-                    "quote": "            \"gate_evidence_missing\","
+                    "line": 244,
+                    "quote": "                \"gate_evidence_missing\","
                 }
             ],
             "failure_scenario": "A gate refuses every evidence-less submission at request time (no approval row is written) and approves the few evidenced ones. Its governance row shows decided>0 and rejected=0, so it is reported as never refused, while a gate that genuinely never refused but had one rejection 91 days ago is reported healthy. The audit flags the wrong gates and misses the real rubber stamp.",
@@ -2640,7 +2625,7 @@
                 },
                 {
                     "path": "crates/actions/src/metrics/mod.rs",
-                    "line": 1013,
+                    "line": 1017,
                     "quote": "    store::metrics::record_reconciliation_tx("
                 }
             ],
@@ -2659,22 +2644,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1808,
+                    "line": 1900,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1809,
+                    "line": 1901,
                     "quote": "        \"crates/actions/src/toolkits\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1812,
+                    "line": 1904,
                     "quote": "      \"key\": \"T14\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1838,
+                    "line": 1932,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -2688,38 +2673,28 @@
             "standard": "SPEC",
             "spec": "§12",
             "severity": "P1",
-            "title": "T8 marked built with zero actions and zero modules; its only evidence is the cadence/tranche migration",
-            "problem": "The organisational-memory gate is behavioural: a lesson with one evidence ref must be refused, and two independent refs plus review must promote a source draft. Coverage records T8 with 0 actions, 0 modules and 1 table, and cites migrations/0056_cadence_tranche.sql — the same migration cited for T10's cadence/tranche tables, not a memory action surface. The refusal/promotion behaviour cannot exist with no action.",
+            "title": "T8 marked built on source and migration evidence with no cited behaviour test",
+            "problem": "The organisational-memory gate is behavioural: a lesson with one evidence ref must be refused, and two independent refs plus review must promote a source draft. Coverage records T8 as built and cites only `crates/actions/src/lesson.rs`, `crates/store/src/lesson.rs` and `migrations/0056_cadence_tranche.sql` — the same migration cited for T10's cadence/tranche tables. Neither the refusal/promotion test nor a run record is cited.",
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2244,
+                    "line": 2503,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2245,
+                    "line": 2506,
                     "quote": "        \"migrations/0056_cadence_tranche.sql\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2248,
+                    "line": 2509,
                     "quote": "      \"key\": \"T8\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2269,
+                    "line": 2530,
                     "quote": "      \"status\": \"built\","
-                },
-                {
-                    "path": "docs/design/data/coverage.json",
-                    "line": 2250,
-                    "quote": "        \"actions\": ["
-                },
-                {
-                    "path": "docs/design/data/coverage.json",
-                    "line": 2251,
-                    "quote": "          0,"
                 }
             ],
             "failure_scenario": "A lesson with one evidence ref is accepted or promoted because no refusal path exists; a bad run can become doctrine. T5's kata work and T12's 'lesson' step then rest on a slice that is schema-only.",
@@ -2737,22 +2712,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2026,
+                    "line": 2282,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2027,
+                    "line": 2283,
                     "quote": "        \"docs/SPEC_V2.md\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2030,
+                    "line": 2286,
                     "quote": "      \"key\": \"T3\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2051,
+                    "line": 2307,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -2906,12 +2881,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/workflow/agent.rs",
-                    "line": 330,
+                    "line": 352,
                     "quote": "    let record = store::capability::get_agent_tx(&mut tx, tenant, agent_id)"
                 },
                 {
                     "path": "crates/actions/src/capability/agents.rs",
-                    "line": 152,
+                    "line": 153,
                     "quote": "        .unwrap_or_else(|| current.allowed_actions.clone());"
                 },
                 {
@@ -2922,7 +2897,12 @@
             ],
             "failure_scenario": "Publish release R and bind it; run once with model medium and grants G1. Call capability_agents.update to router/large with G2. The next run executes the new model and grants under the unchanged release hash R, and neither the run nor the ledger records the change.",
             "acceptance": "Execution resolves model_ref, prompt_ref, allowed_actions and the limits from binding.release_snapshot (or pins an immutable agent version); editing an agent used by an active binding requires a new release and binding; a test mutates the agent and asserts the pinned run still uses the snapshot.",
-            "owner_project": "T0"
+            "owner_project": "T0",
+            "resolved_by": {
+                "commit": "6be31fb17d6fedc04766587093f00c2ac123459d",
+                "test": "crates/actions/tests/internal_agent_runtime.rs::the_release_request_renders_and_the_envelope_does_not",
+                "evidence": "agent.rs resolves max_iterations and timeout_ms from the release anatomy (effective_max_iterations/effective_timeout_ms) when a release is present; the runtime test seeds a live agent (router/medium) different from the release pin (router/release) and compiles the request with the binding's release anatomy, not the live row"
+            }
         },
         {
             "id": "v1-p44-1",
@@ -2935,7 +2915,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/organisation.rs",
-                    "line": 695,
+                    "line": 765,
                     "quote": "        capability_agent_id: input.capability_agent_id,"
                 },
                 {
@@ -2959,12 +2939,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/organisation.rs",
-                    "line": 461,
+                    "line": 501,
                     "quote": "    match raw.unwrap_or(\"active\") {"
                 },
                 {
                     "path": "crates/actions/src/organisation.rs",
-                    "line": 806,
+                    "line": 846,
                     "quote": "async fn job_bindings_create("
                 }
             ],
@@ -3008,12 +2988,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/organisation.rs",
-                    "line": 709,
+                    "line": 749,
                     "quote": "    _input: EmptyIn,"
                 },
                 {
                     "path": "crates/store/src/organisation.rs",
-                    "line": 448,
+                    "line": 500,
                     "quote": "        \"SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 ORDER BY job_key, id\""
                 }
             ],
@@ -3032,7 +3012,7 @@
             "evidence": [
                 {
                     "path": "seed/catalogue.json",
-                    "line": 4019,
+                    "line": 4082,
                     "quote": "      \"code\": \"py2rust\","
                 },
                 {
@@ -3061,12 +3041,12 @@
                 },
                 {
                     "path": "crates/actions/src/spine/mod.rs",
-                    "line": 1484,
+                    "line": 1494,
                     "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 1957,
+                    "line": 1962,
                     "quote": "    let link = serde_json::json!([{ \"kind\": \"benefit\", \"id\": benefit_id.to_string() }]);"
                 }
             ],
@@ -3147,7 +3127,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1024,
+                    "line": 1126,
                     "quote": "`development` type and a stricter gate set:"
                 },
                 {
@@ -3181,7 +3161,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1073,
+                    "line": 1175,
                     "quote": "  creates a new version and voids its sign-offs."
                 }
             ],
@@ -3210,7 +3190,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1071,
+                    "line": 1173,
                     "quote": "- **Rollback is mandatory** for deployable changes; a deploy without a tested rollback is refused."
                 }
             ],
@@ -3239,7 +3219,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 614,
+                    "line": 624,
                     "quote": "2. **A handoff is an action** (`cards.assign` / `cards.move` + `comment`/`artifact.attach`) producing an `event`."
                 }
             ],
@@ -3258,7 +3238,7 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 560,
+                    "line": 684,
                     "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)"
                 },
                 {
@@ -3268,7 +3248,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 536,
+                    "line": 546,
                     "quote": "| **Never** | approve its own gates; change an approved baseline without a change request; do the work of a delivery job |"
                 }
             ],
@@ -3287,12 +3267,12 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 533,
+                    "line": 543,
                     "quote": "| **Outputs** | project + charter, WBS, baseline, cards with job bindings, gate decisions, status report, closure record |"
                 },
                 {
                     "path": "crates/actions/src/pm/mod.rs",
-                    "line": 822,
+                    "line": 957,
                     "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates."
                 },
                 {
@@ -3316,7 +3296,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1445,
+                    "line": 1669,
                     "quote": "3. **Missing operation → tool request.** A procedure step that needs an operation with no tool opens a tool-request"
                 },
                 {
@@ -3350,12 +3330,12 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1497,
+                    "line": 1721,
                     "quote": "in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired (P10). A schema-drift"
                 },
                 {
                     "path": "crates/actions/src/broker.rs",
-                    "line": 314,
+                    "line": 402,
                     "quote": "                422 => \"check_failed\","
                 }
             ],
@@ -3384,7 +3364,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1502,
+                    "line": 1726,
                     "quote": "The conveyor does not depend on `artifact_service` :8556 or `storage-api` :8391 for its own bytes. One storage adapter"
                 }
             ],
@@ -3443,7 +3423,7 @@
                 },
                 {
                     "path": "crates/store/src/prompt.rs",
-                    "line": 161,
+                    "line": 211,
                     "quote": "    if let Some(capability_id) = capability_id {"
                 }
             ],
@@ -3522,12 +3502,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/process/step.rs",
-                    "line": 1444,
+                    "line": 1466,
                     "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },"
                 },
                 {
                     "path": "crates/actions/src/process/step.rs",
-                    "line": 1491,
+                    "line": 1513,
                     "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)"
                 },
                 {
@@ -3546,22 +3526,22 @@
             "standard": "SPEC",
             "spec": "§10.2",
             "severity": "P2",
-            "title": "laya's 3 second hard budget is enforced as 30 seconds",
-            "problem": "§10.2 fixes the conveyor-to-laya seam at a 1500 ms default with a 3 s hard budget; the only laya action declares a 30 s timeout and the invoker enforces that value, so no 1500 or 3000 ms constant exists.",
+            "title": "laya's 3 second hard budget is enforced as 60 seconds",
+            "problem": "§10.2 fixes the conveyor-to-laya seam at a 1500 ms default with a 3 s hard budget; the only laya action declares a 60 s timeout and the invoker enforces that value, so no 1500 or 3000 ms constant exists.",
             "evidence": [
                 {
                     "path": "crates/actions/src/process/judge.rs",
-                    "line": 273,
-                    "quote": "        timeout_ms: 30_000,"
+                    "line": 356,
+                    "quote": "        timeout_ms: 60_000,"
                 },
                 {
                     "path": "crates/actions/src/invoke.rs",
-                    "line": 955,
+                    "line": 1169,
                     "quote": "    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1129,
+                    "line": 1231,
                     "quote": "| conveyor → laya | `POST /v1/systemone`, 1500 ms default / 3 s hard budget; fail policy per decision policy |"
                 }
             ],
@@ -3590,7 +3570,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1133,
+                    "line": 1235,
                     "quote": "| conveyor → k8s | the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (§11.4) |"
                 }
             ],
@@ -3619,7 +3599,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1504,
+                    "line": 1728,
                     "quote": "enforced by key prefix and bucket policy: a mandatory tenant prefix (`tenant/<tenant_id>/`), project/run prefixes"
                 }
             ],
@@ -3643,12 +3623,12 @@
                 },
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 179,
+                    "line": 192,
                     "quote": "            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1298,
+                    "line": 1522,
                     "quote": "hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never"
                 }
             ],
@@ -3667,17 +3647,17 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1294,
+                    "line": 1518,
                     "quote": "| **Tool grant** | the release's operation allowlist (`op`, `variant`, `max_side_effect`, `enabled`) and per-call tool gate | the conveyor binding (tool existence + credential) |"
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1420,
+                    "line": 1644,
                     "quote": "choose, and every choice is recorded; the broker never widens the grant."
                 },
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 174,
+                    "line": 187,
                     "quote": "           FROM tool_binding b"
                 }
             ],
@@ -3691,13 +3671,13 @@
             "standard": "SPEC",
             "spec": "§11.1",
             "severity": "P1",
-            "title": "Redaction is unreachable: no tool can declare a field to redact",
-            "problem": "§11.1 lists redaction as part of a tool and §11.3 applies the declared fields to the response; ToolManifest carries only key and action and the insert never names the column, so every published tool keeps the empty default and redaction is a no-op.",
+            "title": "Redaction is implemented but unproven: no call test asserts a redacted value",
+            "problem": "The manifest now declares `redact`, `toolkits.publish` persists it, `insert_tool` names the column and the broker replaces each declared field with `[redacted]` before the result is normalised. But no test publishes a redacting tool, calls it and asserts the value is redacted; the acceptance's end-to-end proof is absent, so the behaviour is claimed rather than measured.",
             "evidence": [
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 523,
-                    "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+                    "line": 617,
+                    "quote": "                           idempotency, timeout_secs, redact, meta, handler_action, status)"
                 },
                 {
                     "path": "migrations/0055_tool_platform.sql",
@@ -3706,7 +3686,7 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1394,
+                    "line": 1618,
                     "quote": "   `ok | precondition_failed | check_failed | pending | backend_error`; declared fields are redacted and the response"
                 }
             ],
@@ -3730,12 +3710,12 @@
                 },
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1306,
+                    "line": 1530,
                     "quote": "| `strata_rag` | pinned-leaf retrieval (`knowledge.query`), routed RAG | live | every job |"
                 },
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 181,
+                    "line": 194,
                     "quote": "            AND k.status = 'published'"
                 }
             ],
@@ -3759,7 +3739,7 @@
                 },
                 {
                     "path": "crates/actions/src/board/cards.rs",
-                    "line": 401,
+                    "line": 415,
                     "quote": "        matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;"
                 },
                 {
@@ -3783,17 +3763,17 @@
             "evidence": [
                 {
                     "path": "crates/store/src/approval.rs",
-                    "line": 873,
+                    "line": 919,
                     "quote": "    if eval_gate.is_some() {"
                 },
                 {
                     "path": "crates/store/src/approval.rs",
-                    "line": 874,
+                    "line": 920,
                     "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
                 },
                 {
                     "path": "crates/store/src/approval_policy.rs",
-                    "line": 117,
+                    "line": 125,
                     "quote": "    pub self_approval: SelfApproval,"
                 }
             ],
@@ -3812,7 +3792,7 @@
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1488,
+                    "line": 1712,
                     "quote": "Reused, not created: V1 `secret` (credential storage), `governed_asset(kind='tool_draft')`, `event`, `audit_event`,"
                 },
                 {
@@ -3836,23 +3816,23 @@
             "standard": "SPEC",
             "spec": "§11.8",
             "severity": "P2",
-            "title": "tool.output_schema is never stored or read",
-            "problem": "§11.8 requires the tool row to carry an input and an output schema; the column exists, but insert_tool supplies only input_schema and the resolution select never reads output_schema, so it is NULL for every published tool.",
+            "title": "tool.output_schema is stored but never selected for resolution or validated",
+            "problem": "§11.8 requires the tool row to carry an input and an output schema. `insert_tool` now stores output_schema and the catalogue lists it, but the resolution select (`RESOLVED_COLUMNS`) still omits it, so a call's resolution never sees the declared output schema and no response is checked against it.",
             "evidence": [
                 {
                     "path": "docs/SPEC_V2.md",
-                    "line": 1483,
+                    "line": 1707,
                     "quote": "| `tool` | one operation version | input/output schema, effect, idempotency, timeout, redact, destination alias, status |"
                 },
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 523,
-                    "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+                    "line": 616,
+                    "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, output_schema, effect,"
                 },
                 {
                     "path": "crates/store/src/tool.rs",
-                    "line": 122,
-                    "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \\"
+                    "line": 128,
+                    "quote": "     k.key AS toolkit_key, k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, \\"
                 }
             ],
             "failure_scenario": "A destination silently renames response fields; the pinned tool version holds no output contract, so the broker passes the changed body to the run and nothing can detect drift from what was published.",
