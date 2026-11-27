@@ -159,7 +159,7 @@
       "entries": [
         {
           "axis_a": "R1 CI node",
-          "axis_b": "hp2 carries the ci-runner taint and the ARC runners",
+          "axis_b": "ci-1 carries the ci-runner taint and the ARC runners",
           "value": {
             "verification": "the runner list and a green preflight"
           },
@@ -167,7 +167,7 @@
         },
         {
           "axis_a": "R2 Registry",
-          "axis_b": "registry.internal:5000 on worker3 with its CA",
+          "axis_b": "registry.example.com:5000 on registry-1 with its CA",
           "value": {
             "verification": "a pull and a push through the CA"
           },
@@ -175,7 +175,7 @@
         },
         {
           "axis_a": "R3 Database",
-          "axis_b": "Postgres 18 primary on strato-server with one standby",
+          "axis_b": "Postgres 18 primary on deploy-host with one standby",
           "value": {
             "verification": "pg_is_in_recovery on both nodes"
           },
@@ -183,7 +183,7 @@
         },
         {
           "axis_a": "R4 Storage",
-          "axis_b": "MinIO on mf1 as a systemd unit, never a pod",
+          "axis_b": "MinIO on storage-1 as a systemd unit, never a pod",
           "value": {
             "verification": "the bucket probe and the restore drill"
           },
@@ -233,51 +233,51 @@
       "entries": [
         {
           "axis_a": "the control plane",
-          "axis_b": "strato-server runs k3s, the Postgres primary and the ingress",
+          "axis_b": "deploy-host runs k3s, the Postgres primary and the ingress",
           "value": {
             "role": "control",
-            "node": "strato-server"
+            "node": "deploy-host"
           },
           "position": 1
         },
         {
           "axis_a": "the image and volume node",
-          "axis_b": "worker3 runs the registry and holds the PVs",
+          "axis_b": "registry-1 runs the registry and holds the PVs",
           "value": {
             "role": "state",
-            "node": "worker3"
+            "node": "registry-1"
           },
           "position": 2
         },
         {
           "axis_a": "the compute node",
-          "axis_b": "hp1 carries the largest pod count",
+          "axis_b": "compute-1 carries the largest pod count",
           "value": {
             "role": "compute",
-            "node": "hp1"
+            "node": "compute-1"
           },
           "position": 3
         },
         {
           "axis_a": "the CI node",
-          "axis_b": "hp2 carries the ARC runners behind the ci-runner taint",
+          "axis_b": "ci-1 carries the ARC runners behind the ci-runner taint",
           "value": {
             "role": "ci",
-            "node": "hp2"
+            "node": "ci-1"
           },
           "position": 4
         },
         {
           "axis_a": "the storage and standby node",
-          "axis_b": "mf1 runs MinIO and the only Postgres standby",
+          "axis_b": "storage-1 runs MinIO and the only Postgres standby",
           "value": {
             "role": "storage",
-            "node": "mf1"
+            "node": "storage-1"
           },
           "position": 5
         }
       ],
-      "body": "## Metadata\n\nThe concept diagram is the estate the platform owns. Five nodes, each with one job: the control plane and primary, the registry and volumes, the compute pool, the only CI node and the storage plus standby. Nothing crosses the site split invisibly: the datacenter pair and the home pair are named in the programme's infrastructure record.\n\n## Entries\n\nThe diagram's rows are the nodes and their roles. The edges the platform cares about are the CI path from hp2 to the registry, the registry pull on every node, the Postgres path through pgbouncer for pods and postgres.internal for hosts, the MinIO path for object bytes and the ingress path from the Cloudflare tunnels to istio.\n\n## Links\n\nEvery path has an owner and a probe: the runner list for CI, the CA-backed push for the registry, pg_is_in_recovery for the database, the bucket probe for MinIO and the public window probe for ingress. The diagram is the map the requirements catalog's verifications walk.\n\n## Document\n\nThe diagram is deliberately small: a platform that needs a second CI node or a second registry is a design change with its own decision, not an extra box. The estate's five-node shape is the current answer and the programme's rules keep it singular where singularity is the requirement.\n",
+      "body": "## Metadata\n\nThe concept diagram is the estate the platform owns. Five nodes, each with one job: the control plane and primary, the registry and volumes, the compute pool, the only CI node and the storage plus standby. Nothing crosses the site split invisibly: the datacenter pair and the home pair are named in the programme's infrastructure record.\n\n## Entries\n\nThe diagram's rows are the nodes and their roles. The edges the platform cares about are the CI path from ci-1 to the registry, the registry pull on every node, the Postgres path through pgbouncer for pods and postgres.example.com for hosts, the MinIO path for object bytes and the ingress path from the Cloudflare tunnels to istio.\n\n## Links\n\nEvery path has an owner and a probe: the runner list for CI, the CA-backed push for the registry, pg_is_in_recovery for the database, the bucket probe for MinIO and the public window probe for ingress. The diagram is the map the requirements catalog's verifications walk.\n\n## Document\n\nThe diagram is deliberately small: a platform that needs a second CI node or a second registry is a design change with its own decision, not an extra box. The estate's five-node shape is the current answer and the programme's rules keep it singular where singularity is the requirement.\n",
       "links": [
         {
           "to": "Requirements Catalog — PLATFORM (retrospective, 2026-11-26)",
@@ -370,7 +370,7 @@
       "entries": [
         {
           "axis_a": "the operational rows",
-          "axis_b": "Postgres 18 on the primary, one standby on mf1",
+          "axis_b": "Postgres 18 on the primary, one standby on storage-1",
           "value": {
             "store": "postgres",
             "owner": "the application schemas"
@@ -379,7 +379,7 @@
         },
         {
           "axis_a": "the document bytes",
-          "axis_b": "MinIO on mf1, tenant-separated buckets",
+          "axis_b": "MinIO on storage-1, tenant-separated buckets",
           "value": {
             "store": "minio",
             "owner": "the documents and evidence path"
@@ -388,7 +388,7 @@
         },
         {
           "axis_a": "the images",
-          "axis_b": "registry.internal:5000 on worker3 with PV-backed blobs",
+          "axis_b": "registry.example.com:5000 on registry-1 with PV-backed blobs",
           "value": {
             "store": "registry",
             "owner": "the release pipeline"
@@ -516,7 +516,7 @@
         },
         {
           "axis_a": "the registry push",
-          "axis_b": "a hand push on worker3 needs the CA copied first",
+          "axis_b": "a hand push on registry-1 needs the CA copied first",
           "value": {
             "gap": "a documented push path",
             "work": "the runbook and the CA step"
@@ -572,7 +572,7 @@
           "position": 1
         },
         {
-          "axis_a": "S2 self-hosted ARC on hp2",
+          "axis_a": "S2 self-hosted ARC on ci-1",
           "axis_b": "the CI node's runner pool for the service workflows",
           "value": {
             "verdict": "chosen for service CI",
@@ -766,7 +766,7 @@
       "entries": [
         {
           "axis_a": "CI and runners",
-          "axis_b": "hp2's runner pool and the hosted preflight",
+          "axis_b": "ci-1's runner pool and the hosted preflight",
           "value": {
             "tranche": 0,
             "state": "live"
@@ -1053,7 +1053,7 @@
     "risk": [
       {
         "title": "The platform's dependency on a single CI node is a single point of failure for every tranche",
-        "body": "hp2 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on hp2's runner pool. A loss of hp2 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
+        "body": "ci-1 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on ci-1's runner pool. A loss of ci-1 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
         "status": "open",
         "severity": "high",
         "probability": "medium",
@@ -1073,7 +1073,7 @@
       },
       {
         "title": "The standby has not been promoted in a drill, so the recovery path is documented but unproven",
-        "body": "The Postgres standby on mf1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
+        "body": "The Postgres standby on storage-1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
         "status": "open",
         "severity": "high",
         "probability": "medium",
@@ -1160,7 +1160,7 @@
       "commitments": "The platform commits to the four capabilities — build and verify, release, store and recover, and observe — each with a live probe, and to the constraints that keep them singular: one CI node, one registry, one primary and one ownership home.",
       "compliance": "Compliance is judged at phase G against this contract: the charter, the baseline, the artefacts, the register and the review must exist and be consistent. The earlier non_conformant review is the baseline; this rework's review is the current verdict.",
       "approval": "The contract is approved by the Architecture Board under the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approval is a recorded decision, not a signature on a document.",
-      "capacity": "The platform's capacity is the five-node estate: hp2's runner pool for CI, worker3's registry and volumes, strato-server's control plane and primary, hp1's compute and mf1's storage and standby. A capacity change is an estate change with its own decision.",
+      "capacity": "The platform's capacity is the five-node estate: ci-1's runner pool for CI, registry-1's registry and volumes, deploy-host's control plane and primary, compute-1's compute and storage-1's storage and standby. A capacity change is an estate change with its own decision.",
       "acceptance": "Acceptance is the manifest's checks passing on a fresh snapshot, with the standing rule that the platform does not close. The deliverable accepted with demo credit is the standing record itself; a later review re-checks it with the same checks.",
       "evidence": "The evidence is this pack, the acceptance manifest, the rework receipt, the acts transcript and the estate's probes. A claim in this contract that the evidence does not support is a finding against the platform, not a wording issue.",
       "manifest": "acceptance/programme/PLATFORM.toml",
@@ -1387,7 +1387,7 @@
         "title": "CI and runners available"
       },
       "acceptance": [
-        "the ARC runner pool lists a live runner on hp2",
+        "the ARC runner pool lists a live runner on ci-1",
         "the hosted preflight returns a verdict at a pushed head"
       ],
       "evidence": [
@@ -1401,8 +1401,8 @@
         "title": "Registry and ingress available"
       },
       "acceptance": [
-        "registry.internal:5000 answers a pull",
-        "a hand push from worker3 succeeds with the CA in place",
+        "registry.example.com:5000 answers a pull",
+        "a hand push from registry-1 succeeds with the CA in place",
         "the public window answers through the ingress"
       ],
       "evidence": [

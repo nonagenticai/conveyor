@@ -18,6 +18,7 @@ use std::collections::HashMap;
 
 use conveyor_domain::TenantId;
 use conveyor_store as store;
+#[cfg(test)]
 use conveyor_store::document::DocumentRecord;
 use serde_json::Value;
 use sqlx::PgPool;

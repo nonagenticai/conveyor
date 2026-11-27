@@ -214,7 +214,7 @@ fn declaring_targets() -> Vec<(&'static str, Value)> {
         ),
         (
             "ops.host_restart_unit",
-            json!({"host": "mini2", "unit": "com.nonagentic.conveyor-probe"}),
+            json!({"host": "media-2", "unit": "com.nonagentic.conveyor-probe"}),
         ),
         // T7 (#78): the incident-scoped mitigation and the fourth write verb.
         (

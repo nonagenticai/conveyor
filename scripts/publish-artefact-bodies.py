@@ -45,6 +45,7 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 ROOT = Path(__file__).resolve().parent.parent
+from private_refs import redact  # noqa: E402
 COMPOSER_PATH = ROOT / "scripts/compose-artefact-bodies.py"
 RECORD = ROOT / "scripts/programme-record.py"
 STANDARD_PATH = ROOT / "seed/output-standard.json"
@@ -460,14 +461,16 @@ def journal_line(
     read_input: dict | None,
     reads_back_by: str,
 ) -> None:
-    line = {
-        "natural_key": natural_key,
-        "action": action,
-        "payload": payload,
-        "read_action": read_action,
-        "read_input": read_input,
-        "reads_back_by": reads_back_by,
-    }
+    line = redact(
+        {
+            "natural_key": natural_key,
+            "action": action,
+            "payload": payload,
+            "read_action": read_action,
+            "read_input": read_input,
+            "reads_back_by": reads_back_by,
+        }
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(line, sort_keys=True) + "\n")

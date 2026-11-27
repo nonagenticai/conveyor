@@ -18,7 +18,7 @@ Every command below is recorded verbatim; all SQL is read-only on master as post
    -> pod/loki-c999b76d5-n52th 1/1 Running, restartCount 0, startTime 2026-11-01T18:05:40Z
       deployment.apps/loki 1/1; service/loki ClusterIP 192.0.2.11:3100 (182d)
    Image grafana/loki:3.7.7. Grafana ns 1/1; Alloy DaemonSet 5/5.
-   PV loki-storage-worker3 50Gi Bound (local-path). gitops: clusters/strato/services/loki/.
+   PV loki-storage-registry-1 50Gi Bound (local-path). gitops: clusters/strato/services/loki/.
    Retention: loki/loki/configmap-loki-config.yaml:67 retention_period: 24h, :32 max_query_length: 25h.
 
    Positive control (1h) at 16:34Z:

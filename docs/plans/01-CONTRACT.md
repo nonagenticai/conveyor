@@ -389,7 +389,7 @@ above exactly.
 ## 16. Toolchain and local environment (measured 2026-11-07; **build host 2026-11-09; retired 2026-11-20**)
 
 - ⛔ **The build host and `rbuild` were retired on 2026-11-20 (owner ruling).** No Rust compile runs on local
-  hardware — not on m1, mini1 or this machine. The **compile/lint verdict comes from the repository's
+  hardware — not on m1, media-1 or this machine. The **compile/lint verdict comes from the repository's
   GitHub-hosted `preflight.yml`** (`gh workflow run preflight.yml --ref <branch>`, then the PR's CI is the final
   gate), which is free, parallel and queue-free. Local gates stay sub-second and non-compiling: the git hooks run
   `cargo fmt --all -- --check`, `cargo metadata --locked --format-version 1` and actionlint on changed workflows.

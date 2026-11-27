@@ -1,0 +1,57 @@
+[
+  {
+    "input": "registry.internal:5000 answers a pull",
+    "python": "registry.example.com:5000 answers a pull",
+    "rust": "registry.example.com:5000 answers a pull"
+  },
+  {
+    "input": "minio.internal:8389 carries the evidence",
+    "python": "minio.example.com:8389 carries the evidence",
+    "rust": "minio.example.com:8389 carries the evidence"
+  },
+  {
+    "input": "nonagenticai/gitops-production is the tree",
+    "python": "gitops-production is the tree",
+    "rust": "gitops-production is the tree"
+  },
+  {
+    "input": "the key is ~/.ssh/strato-vps",
+    "python": "the key is ~/.ssh/deploy-key",
+    "rust": "the key is ~/.ssh/deploy-key"
+  },
+  {
+    "input": "strato-server runs the control plane",
+    "python": "deploy-host runs the control plane",
+    "rust": "deploy-host runs the control plane"
+  },
+  {
+    "input": "reachable at host.tail1234.ts.net",
+    "python": "reachable at host.tail1234.tailnet",
+    "rust": "reachable at host.tail1234.tailnet"
+  },
+  {
+    "input": "the address is 100.85.37.103",
+    "python": "the address is 192.0.2.10",
+    "rust": "the address is [redacted-ip]"
+  },
+  {
+    "input": "hp1 and hp2 and mf1 and worker3",
+    "python": "compute-1 and ci-1 and storage-1 and registry-1",
+    "rust": "compute-1 and ci-1 and storage-1 and registry-1"
+  },
+  {
+    "input": "mini1 and mini2 and pgx",
+    "python": "media-1 and media-2 and gpu-1",
+    "rust": "media-1 and media-2 and gpu-1"
+  },
+  {
+    "input": "strato-worker3 and internal_worker stay readable",
+    "python": "strato-registry-1 and internal_worker stay readable",
+    "rust": "strato-registry-1 and internal_worker stay readable"
+  },
+  {
+    "input": "hp10 and worker30 are not hp1 or worker3",
+    "python": "hp10 and worker30 are not compute-1 or registry-1",
+    "rust": "hp10 and worker30 are not compute-1 or registry-1"
+  }
+]

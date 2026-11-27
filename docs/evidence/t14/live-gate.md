@@ -7,7 +7,7 @@ zero-use report; and a backend outage that unbinds new runs while in-flight runs
 ## 2026-11-26 execution — all four clauses
 
 Destinations were reached from m4 over ssh port-forwards (`:22` is the only port the tailnet
-admits): mini2 tts `:9202` / asr `:9201`, mini1 image `:9204`, MinIO on mf1 `:8389`, and the
+admits): media-2 tts `:9202` / asr `:9201`, media-1 image `:9204`, MinIO on storage-1 `:8389`, and the
 in-cluster `scientific-processor` `:8808`, `coding` `:8687`, `strata-rag` `:8092` and `licences`
 `:8544` through `kubectl port-forward` on strato. The branch binary ran locally against the
 replay record (tenant `nonagentic`); every call below is a real HTTP call to the estate service
@@ -61,7 +61,7 @@ draft (webscraper, lean4).
   Authorization bearer with the bare `X-Tenant-Id`. The refusal is kept at
   `2026-11-26/03-mint-strata.err`.
 - **Object storage.** Speech, transcription and image_gen store documents; the local engine used
-  the deployment's MinIO bucket (`conveyor-documents`) through an mf1 tunnel, with the S3 keys
+  the deployment's MinIO bucket (`conveyor-documents`) through an storage-1 tunnel, with the S3 keys
   read from the deployment's SOPS secret.
 
 ## 2026-11-25 measurement (history)

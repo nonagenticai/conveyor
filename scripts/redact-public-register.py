@@ -15,28 +15,9 @@ from __future__ import annotations
 
 import json
 import pathlib
-import re
 import sys
 
-PATTERNS = (
-    (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"), "[redacted-ip]"),
-    (re.compile(r"\b[A-Za-z0-9][A-Za-z0-9_-]*\.internal\b"), "[redacted-host]"),
-    (re.compile(r"\bstrato-(?:vps|server)\b"), "[redacted-host]"),
-    (re.compile(r"\bts\.net\b"), "tailnet"),
-)
-
-
-def redact(value):
-    if isinstance(value, str):
-        for pattern, replacement in PATTERNS:
-            value = pattern.sub(replacement, value)
-        return value
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    if isinstance(value, dict):
-        return {key: redact(item) for key, item in value.items()}
-    return value
-
+from private_refs import redact
 
 def main() -> int:
     if len(sys.argv) != 2:

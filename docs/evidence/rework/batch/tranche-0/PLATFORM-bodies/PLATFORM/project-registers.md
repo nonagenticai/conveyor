@@ -191,7 +191,7 @@ The record the section derives from, or an explicit absence.
     },
     {
       "baseline_ref": null,
-      "body": "hp2 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on hp2's runner pool. A loss of hp2 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
+      "body": "ci-1 is the only CI node in the cluster; the hosted preflight carries the Rust verdict, but every service workflow still depends on ci-1's runner pool. A loss of ci-1 stalls the cluster-local CI path until the node returns or the workflows move. The risk is recorded, not waived: the hosted preflight is the fallback and the queue's cause has been addressed by the CI budget.",
       "code": "",
       "created_at": "2026-11-26T10:26:55.918017+00:00",
       "id": "01a21764-dd32-713c-93d5-5578b5192040",
@@ -221,7 +221,7 @@ The record the section derives from, or an explicit absence.
     },
     {
       "baseline_ref": null,
-      "body": "The Postgres standby on mf1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
+      "body": "The Postgres standby on storage-1 is live and answers as a replica; no promotion has been exercised end to end. The nightly dump and its offsite relay exist, but a restore receipt from a real promotion is the evidence the platform owes. The risk is a gap in the gap matrix and a row here until the drill's receipt is published.",
       "code": "",
       "created_at": "2026-11-26T10:26:56.048785+00:00",
       "id": "01a21764-ddb4-70a5-b295-53fe1cb1473c",

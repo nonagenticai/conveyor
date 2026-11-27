@@ -8,7 +8,7 @@
 //! The URL is read from `CONVEYOR_STRATA_RAG_URL`, defaulting to the compose name
 //! (`http://strata-rag:8092`) for a run inside that compose network. The token is the compose
 //! profile's local test credential, not an estate secret. No strata instance is deployed on
-//! mini1/mini2 as of 2026-11-21 (v1-s15-1), so this test is the proof the deployment unlocks.
+//! media-1/media-2 as of 2026-11-21 (v1-s15-1), so this test is the proof the deployment unlocks.
 
 use conveyor_actions::integrations::strata::Strata;
 use conveyor_domain::TenantId;

@@ -1,3 +1,5 @@
+<!-- retained raw log: record document 01a21c4a-e2f9-72b4-92aa-97da0af7b7c0; sha256 cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804; the public copy is redacted by scripts/private_refs.py -->
+
 # The full-fidelity snapshot loop
 
 **Why this exists.** Twice on 2026-11-21 the programme's acceptance evidence was taken against a
@@ -8,7 +10,7 @@ the snapshot, not defects in the record — and one closure was paused on them.
 
 The branch binary carries the newer projection, but it cannot read the live primary directly: the
 branch is at migration `0065`, the live database at `0061`, and (measured 2026-11-22) dev Macs
-cannot reach `postgres.internal:5432` at all — the tailnet ACL permits `:22` only. Restoring a copy
+cannot reach `postgres.example.com:5432` at all — the tailnet ACL permits `:22` only. Restoring a copy
 and migrating the copy closes both gaps without touching production and without merging anything.
 
 **What it is not.** Not a second source of truth and not a write path. Records still go through the
@@ -21,9 +23,9 @@ product's actions (`programme-record.py`, or the deployed engine). The copy is r
    disk, no credential in a shell history):
 
    ```sh
-   ssh -i ~/.ssh/strato-vps admin@100.81.177.99 \
+   ssh -i ~/.ssh/deploy-key admin@192.0.2.10 \
      "sudo -u postgres pg_dump -Fc -Z6 -d conveyor -f /tmp/conveyor-lane.dump"
-   scp -i ~/.ssh/strato-vps admin@100.81.177.99:/tmp/conveyor-lane.dump /tmp/conveyor-lane.dump
+   scp -i ~/.ssh/deploy-key admin@192.0.2.10:/tmp/conveyor-lane.dump /tmp/conveyor-lane.dump
    ```
 
    The database was 74 MB on 2026-11-22; the compressed dump is 7.4 MB.

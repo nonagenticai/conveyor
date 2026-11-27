@@ -51,7 +51,7 @@ pub const TRANSCRIBE_SERVICE: &str = "asr";
 
 /// The per-tenant sealed secret carrying the tenant's licence token.
 ///
-/// Both mini2 gates resolve the tenant **from the token itself**, so the token — not the bare
+/// Both media-2 gates resolve the tenant **from the token itself**, so the token — not the bare
 /// tenant id every other external call carries — is the credential that entitles the call. A
 /// tenant seals its own under this name (the licences API mints the JSON envelope that
 /// `bearer_from_secret` unwraps); there is no platform token.

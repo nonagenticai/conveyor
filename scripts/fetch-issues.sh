@@ -31,13 +31,15 @@ gh issue list \
   --json number,title,state,labels,url,updatedAt \
   > "$tmp"
 
-python3 - "$tmp" "$out" <<'PY'
+python3 - "$tmp" "$out" "$root" <<'PY'
 import json
 import os
 import re
 import sys
 
-src, dst = sys.argv[1], sys.argv[2]
+src, dst, root = sys.argv[1], sys.argv[2], sys.argv[3]
+sys.path.insert(0, os.path.join(root, "scripts"))
+from private_refs import redact  # noqa: E402
 tenant = os.environ.get("CONVEYOR_TENANT") or "nonagentic"
 HOME_PATH = re.compile(r"(?:/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|~/)[^\s\"']*")
 EMAIL = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
@@ -54,7 +56,7 @@ def clean(text):
     text = EMAIL.sub("***@redacted", text)
     text = TOKEN.sub("[redacted-token]", text)
     text = IP.sub("[redacted-ip]", text)
-    return IPV6ish.sub("[redacted-ip]", text)
+    return redact(IPV6ish.sub("[redacted-ip]", text))
 
 
 rows = []

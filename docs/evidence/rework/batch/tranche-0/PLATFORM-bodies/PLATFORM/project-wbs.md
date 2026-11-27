@@ -11,7 +11,7 @@ The record the section derives from, or an explicit absence.
   "rows": [
     {
       "acceptance": [
-        "the ARC runner pool lists a live runner on hp2",
+        "the ARC runner pool lists a live runner on ci-1",
         "the hosted preflight returns a verdict at a pushed head"
       ],
       "body": "",
@@ -37,8 +37,8 @@ The record the section derives from, or an explicit absence.
     },
     {
       "acceptance": [
-        "registry.internal:5000 answers a pull",
-        "a hand push from worker3 succeeds with the CA in place",
+        "registry.example.com:5000 answers a pull",
+        "a hand push from registry-1 succeeds with the CA in place",
         "the public window answers through the ingress"
       ],
       "body": "",
@@ -159,7 +159,7 @@ The record the section derives from, or an explicit absence.
   "rows": [
     {
       "acceptance": [
-        "the ARC runner pool lists a live runner on hp2",
+        "the ARC runner pool lists a live runner on ci-1",
         "the hosted preflight returns a verdict at a pushed head"
       ],
       "body": "",
@@ -185,8 +185,8 @@ The record the section derives from, or an explicit absence.
     },
     {
       "acceptance": [
-        "registry.internal:5000 answers a pull",
-        "a hand push from worker3 succeeds with the CA in place",
+        "registry.example.com:5000 answers a pull",
+        "a hand push from registry-1 succeeds with the CA in place",
         "the public window answers through the ingress"
       ],
       "body": "",
@@ -307,7 +307,7 @@ The record the section derives from, or an explicit absence.
   "rows": [
     {
       "acceptance": [
-        "the ARC runner pool lists a live runner on hp2",
+        "the ARC runner pool lists a live runner on ci-1",
         "the hosted preflight returns a verdict at a pushed head"
       ],
       "body": "",
@@ -333,8 +333,8 @@ The record the section derives from, or an explicit absence.
     },
     {
       "acceptance": [
-        "registry.internal:5000 answers a pull",
-        "a hand push from worker3 succeeds with the CA in place",
+        "registry.example.com:5000 answers a pull",
+        "a hand push from registry-1 succeeds with the CA in place",
         "the public window answers through the ingress"
       ],
       "body": "",

@@ -30,6 +30,10 @@ HARD=(
   'ts\.net'
   'strato-(server|vps)'
   'nonagenticai/gitops-production'
+  # The estate's node names are the same kind of private fact as a hostname. They are
+  # distinctive; a false hit is reviewed, never allowlisted. `pgx` stays out: it collides with
+  # the Rust extension crate's name and is scrubbed in docs/evidence only.
+  '(^|[^A-Za-z0-9_])(hp1|hp2|mf1|worker3|mini1|mini2)([^A-Za-z0-9_]|$)'
 )
 
 # Warnings only: RFC1918 literals are usually a test fixture, but they are still an address.

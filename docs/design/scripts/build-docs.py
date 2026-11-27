@@ -38,6 +38,8 @@ from pathlib import Path
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / "scripts"))
+from private_refs import redact  # noqa: E402
 PACK = ROOT / "docs" / "design"
 OUT = PACK / "docs"
 TEMPLATE = PACK / "scripts" / "doc-template.html"
@@ -62,31 +64,10 @@ HREF = re.compile(r'(?P<attr>href|src)="(?P<url>[^"]*)"')
 HEADING = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 MATCH_SCHEME = re.compile(r"^(?:[a-z][a-z0-9+.\-]*:|//)", re.IGNORECASE)
 
-# The generated page is a public artifact. These are the guard's hard set
-# (`scripts/ci/no-private-refs.sh` from #54): the page must never publish an internal
-# hostname, a tailnet address, a Tailscale name, a host login or the private CI repo
-# path — even when the source document still carries it. `check-docs.cjs` asserts the
-# same set, so a generator change cannot silently reintroduce one. The sources are
-# scrubbed separately in #56; this keeps the published documents clean now.
-REDACTIONS = (
-    (re.compile(r"\b([A-Za-z0-9][A-Za-z0-9_-]*)\.internal\b"), r"\1.example.com"),
-    (re.compile(r"nonagenticai/gitops-production"), "gitops-production"),
-    (re.compile(r"strato-vps"), "deploy-key"),
-    (re.compile(r"strato-server"), "deploy-host"),
-    (re.compile(r"\bts\.net\b"), "tailnet"),
-    (
-        re.compile(r"\b100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b"),
-        "192.0.2.10",
-    ),
-)
-
-
-def redact(text: str) -> str:
-    for pattern, replacement in REDACTIONS:
-        text = pattern.sub(replacement, text)
-    return text
-
-
+# The generated page is a public artifact. The host, node and private-path rules live in
+# `scripts/private_refs.py` (shared with the other writers) and mirror the guard's hard set
+# (`scripts/ci/no-private-refs.sh`); `check-docs.cjs` asserts the same set, so a generator
+# change cannot silently reintroduce one.
 def git_files() -> list[str]:
     out = subprocess.check_output(
         ["git", "-C", str(ROOT), "ls-files"], text=True, errors="replace"

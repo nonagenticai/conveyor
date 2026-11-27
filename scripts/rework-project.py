@@ -31,6 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+from private_refs import redact  # noqa: E402
 from rework_register import RegisterError, build as build_rework_register  # noqa: E402
 
 HARNESS = ROOT / "scripts" / "programme-record.py"
@@ -203,14 +204,16 @@ class Runner:
         with self.transcript.open("a", encoding="utf-8") as handle:
             handle.write(
                 json.dumps(
-                    {
-                        "at": now(),
-                        "act": self.acts,
-                        "action": action,
-                        "actor": "e2e" if actor == E2E else "approver",
-                        "input": payload,
-                        "result_id": result.get("id") or result.get("baseline_id"),
-                    },
+                    redact(
+                        {
+                            "at": now(),
+                            "act": self.acts,
+                            "action": action,
+                            "actor": "e2e" if actor == E2E else "approver",
+                            "input": payload,
+                            "result_id": result.get("id") or result.get("baseline_id"),
+                        }
+                    ),
                     sort_keys=True,
                 )
                 + "\n"
