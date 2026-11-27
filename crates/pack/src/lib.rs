@@ -13,4 +13,5 @@
 pub mod export;
 pub mod live;
 pub mod outputs;
+pub(crate) mod register;
 pub mod snapshot;

@@ -1,6 +1,14 @@
 {
   "issues": [
     {
+      "number": 803,
+      "title": "prover: the deployed image is hand-built from nonagenticai/lean4-prover \u2014 a merge here never reaches the cluster",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/803",
+      "updatedAt": "2026-11-27T01:15:43Z",
+      "labels": []
+    },
+    {
       "number": 797,
       "title": "T3/T13: the three tranche-3 P0 residuals \u2014 baseline guard, spend budget, write-verify",
       "state": "OPEN",
@@ -110,7 +118,7 @@
       "title": "prover: a failing lean4.check returns no diagnostics because only stderr is parsed",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/787",
-      "updatedAt": "2026-11-27T00:06:39Z",
+      "updatedAt": "2026-11-27T01:15:37Z",
       "labels": [
         {
           "name": "unit",
@@ -127,7 +135,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/784",
-      "updatedAt": "2026-11-27T00:42:26Z",
+      "updatedAt": "2026-11-27T01:06:09Z",
       "labels": [
         {
           "name": "programme",
@@ -369,9 +377,9 @@
     {
       "number": 756,
       "title": "design: provenance on every output page and a declared-vs-evidenced register",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/756",
-      "updatedAt": "2026-11-26T23:07:18Z",
+      "updatedAt": "2026-11-27T01:26:17Z",
       "labels": [
         {
           "name": "unit",

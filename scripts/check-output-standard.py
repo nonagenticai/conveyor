@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
-"""Validate the programme output standard, the seed's completeness meta and the console copy.
+"""Validate the programme output standard's own shape.
 
 `seed/output-standard.json` is the one vocabulary and the per-project-class required sets.
-`scripts/build-programme-seed.py` reads it, emits `meta.expected_outputs` / `meta.closure_outputs`
-and writes `docs/design/data/output-standard.js` for the console. This gate refuses drift:
+`scripts/build-programme-seed.py` reads it and emits `meta.expected_outputs` /
+`meta.closure_outputs`; this gate refuses a standard that is internally inconsistent:
 
   * an unknown category, alias target or matching fact;
-  * a project whose resolved class or seed meta disagrees with the standard;
-  * a class that matches no project;
+  * a class with no facts, an empty set, or a repeated category;
   * a category with no template, an empty or duplicate required heading, a required heading
     absent from the skeleton, or a URL in a skeleton;
-  * a console copy that is not byte-for-byte the standard's JSON.
+  * a template without its standard, level, subject kind, mandatory flag or spec clause.
+
+The comparisons this gate used to carry — a document's category membership, the seed's recorded
+sets against its class, orphan coverage and the console copy — moved to the runs that own them:
+`documents.publish` refuses an unknown category, and the declared-vs-evidenced register
+(`crates/pack/src/register.rs`) publishes class drift and per-kind gaps on the public record
+(#756 P3).
 
 Run it before every push: `python3 scripts/check-output-standard.py`. `--self-test` proves the
-gate refuses each failure shape; `--check-copy` checks only the generated console copy.
+gate refuses each failure shape.
 """
 
 from __future__ import annotations
@@ -27,8 +32,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
-SEED_PATH = ROOT / "seed" / "programme.json"
-CONSOLE_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
 FACTS = {"key", "track", "status", "measured_status"}
 ON_DEMAND = "decision"
 DEFAULT_ON_DEMAND = [ON_DEMAND]
@@ -75,39 +78,7 @@ def read_json(path: Path) -> dict:
         raise SystemExit(f"check-output-standard: {path} is not JSON: {error}")
 
 
-def console_standard(path: Path) -> dict:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        raise SystemExit(f"check-output-standard: {path} is missing")
-    match = re.search(r"window\.CONVEYOR_OUTPUT_STANDARD\s*=\s*(\{.*\});\s*$", text, re.S)
-    if not match:
-        raise SystemExit(f"check-output-standard: {path} has no CONVEYOR_OUTPUT_STANDARD assignment")
-    try:
-        return json.loads(match.group(1))
-    except json.JSONDecodeError as error:
-        raise SystemExit(f"check-output-standard: {path} is not JSON: {error}")
-
-
-def facts(project: dict) -> dict:
-    meta = project.get("meta") or {}
-    return {
-        "key": project.get("key", ""),
-        "track": meta.get("track", ""),
-        "status": project.get("status", ""),
-        "measured_status": meta.get("measured_status", ""),
-    }
-
-
-def resolve(std: dict, project: dict) -> dict | None:
-    project_facts = facts(project)
-    for cls in std["classes"]:
-        if all(project_facts.get(key) == value for key, value in cls["when"].items()):
-            return cls
-    return None
-
-
-def validate(std: dict, seed: dict, console: dict) -> list[str]:
+def validate(std: dict) -> list[str]:
     errors: list[str] = []
     if std.get("version") != 3:
         errors.append(f"standard version is {std.get('version')!r}, expected 3")
@@ -234,11 +205,6 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
         spec = template.get("spec")
         if not isinstance(spec, str) or not spec.strip():
             errors.append(f"template {category!r} has no spec clause")
-        document_category = template.get("document_category")
-        if document_category is not None and document_category not in categories:
-            errors.append(
-                f"template {category!r} names unknown document category {document_category!r}"
-            )
         sources = template.get("sources", {})
         if not isinstance(sources, dict):
             errors.append(f"template {category!r} sources must be an object")
@@ -276,122 +242,73 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
                         f"template {category!r} section {heading!r} computed source has no name"
                     )
 
-    if not isinstance(seed.get("projects"), list) or not seed["projects"]:
-        errors.append("seed has no projects")
-        projects = []
-    else:
-        projects = seed["projects"]
-    matched: set[str] = set()
-    for project in projects:
-        key = project.get("key", "?")
-        cls = resolve(std, project)
-        if cls is None:
-            errors.append(f"project {key!r} matches no class")
-            continue
-        matched.add(cls["name"])
-        meta = project.get("meta") or {}
-        if meta.get("expected_outputs") != cls.get("now"):
-            errors.append(
-                f"project {key!r} expected_outputs {meta.get('expected_outputs')!r} "
-                f"!= class {cls['name']!r} now {cls.get('now')!r}"
-            )
-        if meta.get("closure_outputs") != cls.get("closure"):
-            errors.append(
-                f"project {key!r} closure_outputs {meta.get('closure_outputs')!r} "
-                f"!= class {cls['name']!r} closure {cls.get('closure')!r}"
-            )
-    for cls in classes:
-        if cls.get("name") not in matched:
-            errors.append(f"class {cls.get('name')!r} matches no project")
-
-    # Every category is either required by some class or explicitly on demand. A new category
-    # that fits nowhere is a vocabulary orphan, not a checklist slot.
-    required: set[str] = set()
-    for cls in classes:
-        required.update(cls.get("now") or [])
-        required.update(cls.get("closure") or [])
-    orphans = set(categories) - required - set(on_demand)
-    if orphans:
-        errors.append(f"categories covered by no class and not on demand: {sorted(orphans)}")
-
-    if console != std:
-        errors.append("docs/design/data/output-standard.js does not equal seed/output-standard.json")
-
     return errors
 
 
-def self_test(std: dict, seed: dict, console: dict) -> int:
-    cases: list[tuple[str, dict, dict, dict]] = []
+def self_test(std: dict) -> int:
+    cases: list[tuple[str, dict]] = []
 
     bad = copy.deepcopy(std)
     bad["classes"][0]["now"].append("not-a-category")
-    cases.append(("unknown category in a set", bad, seed, console))
+    cases.append(("unknown category in a set", bad))
 
     bad = copy.deepcopy(std)
     bad["aliases"]["brief"] = "not-a-category"
-    cases.append(("alias to an unknown category", bad, seed, console))
-
-    bad = copy.deepcopy(seed)
-    bad["projects"][0].setdefault("meta", {})["expected_outputs"] = ["not-a-category"]
-    cases.append(("seed disagrees with its class", std, bad, console))
-
-    bad = copy.deepcopy(console)
-    bad["categories"].append("not-a-category")
-    cases.append(("console copy drifts", std, seed, bad))
+    cases.append(("alias to an unknown category", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"].pop("vision")
-    cases.append(("a category without a template", bad, seed, console))
+    cases.append(("a category without a template", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["required"] = []
-    cases.append(("an empty required list", bad, seed, console))
+    cases.append(("an empty required list", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["required"].append(bad["templates"]["vision"]["required"][0])
-    cases.append(("a duplicate required heading", bad, seed, console))
+    cases.append(("a duplicate required heading", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["skeleton"] = "# Vision\n\n## Purpose\n"
     bad["templates"]["vision"]["required"].append("A heading not in the skeleton")
-    cases.append(("a required heading absent from the skeleton", bad, seed, console))
+    cases.append(("a required heading absent from the skeleton", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["skeleton"] += "\nSee https://example.com for the method.\n"
-    cases.append(("a URL in the skeleton", bad, seed, console))
+    cases.append(("a URL in the skeleton", bad))
 
     bad = copy.deepcopy(std)
     bad["version"] = 2
-    cases.append(("the retired standard version", bad, seed, console))
+    cases.append(("the retired standard version", bad))
 
     bad = copy.deepcopy(std)
     bad["on_demand"].append("not-a-category")
-    cases.append(("an on-demand category that does not exist", bad, seed, console))
+    cases.append(("an on-demand category that does not exist", bad))
 
     bad = copy.deepcopy(std)
     bad["classes"][1]["now"].append(bad["on_demand"][-1])
-    cases.append(("a class that requires an on-demand category", bad, seed, console))
+    cases.append(("a class that requires an on-demand category", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"].pop("standard", None)
-    cases.append(("a template without a standard", bad, seed, console))
+    cases.append(("a template without a standard", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["sources"] = {"Not a required heading": [{"kind": "computed", "name": "x"}]}
-    cases.append(("a source on an undeclared heading", bad, seed, console))
+    cases.append(("a source on an undeclared heading", bad))
 
     bad = copy.deepcopy(std)
     first_heading = bad["templates"]["vision"]["required"][0]
     bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "not-a-kind"}]}
-    cases.append(("an invalid source kind", bad, seed, console))
+    cases.append(("an invalid source kind", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)
-    cases.append(("a template without a subject kind", bad, seed, console))
+    cases.append(("a template without a subject kind", bad))
 
     failures = 0
-    for label, case_std, case_seed, case_console in cases:
-        errors = validate(case_std, case_seed, case_console)
+    for label, case_std in cases:
+        errors = validate(case_std)
         if errors:
             print(f"check-output-standard: self-test refused {label}")
         else:
@@ -404,31 +321,21 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--self-test", action="store_true")
-    parser.add_argument("--check-copy", action="store_true")
     args = parser.parse_args()
 
     std = read_json(STANDARD_PATH)
-    seed = read_json(SEED_PATH)
-    console = console_standard(CONSOLE_PATH)
 
     if args.self_test:
-        return self_test(std, seed, console)
+        return self_test(std)
 
-    if args.check_copy:
-        if console != std:
-            print("check-output-standard: console copy differs from seed/output-standard.json")
-            return 1
-        print("check-output-standard: console copy is current")
-        return 0
-
-    errors = validate(std, seed, console)
+    errors = validate(std)
     if errors:
         for error in errors:
             print(f"check-output-standard: ERROR: {error}")
         return 1
     print(
-        f"check-output-standard: {len(seed['projects'])} projects, "
-        f"{len(std['classes'])} classes, {len(std['categories'])} categories"
+        f"check-output-standard: {len(std['classes'])} classes, "
+        f"{len(std['categories'])} categories"
     )
     return 0
 

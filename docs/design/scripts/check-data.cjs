@@ -334,6 +334,72 @@ if (fs.existsSync(reworkJsPath)) {
   }
 }
 
+// The declared-vs-evidenced output register (#756 P2). The snapshot writes the file, lists it in
+// the manifest, and embeds the same object in snapshot.js; a pack that carries one and not the
+// other is a broken publish. The standalone `.js` wrapper, when present, must carry the same
+// content as the `.json`.
+const registerPath = path.join(dataDir, "register.json");
+const registerJsPath = path.join(dataDir, "register.js");
+if (!fs.existsSync(registerPath)) {
+  ok("register.json is absent (no publish has written the output register yet)");
+} else {
+  if (!(manifest.files || []).some((file) => file.path === "register.json")) {
+    bad("register.json is published but not listed in manifest.json");
+  }
+  let register = null;
+  try {
+    register = JSON.parse(fs.readFileSync(registerPath, "utf8"));
+  } catch (error) {
+    bad(`register.json does not parse: ${error.message}`);
+  }
+  if (register) {
+    if (register.schema !== "design-snapshot/v1") {
+      bad(`register.json schema is ${JSON.stringify(register.schema)}`);
+    }
+    if (!Array.isArray(register.projects)) bad("register.json carries no projects array");
+    if (typeof register.standard_version !== "number") {
+      bad("register.json has no standard_version");
+    }
+    if (!register.totals || typeof register.totals !== "object") {
+      bad("register.json has no totals");
+    }
+    try {
+      const payload = JSON.parse(
+        fs
+          .readFileSync(snapshotJs, "utf8")
+          .replace(/^window\.CONVEYOR_SNAPSHOT = /, "")
+          .replace(/;\s*$/, ""),
+      );
+      if (!payload.register) {
+        bad("snapshot.js carries no register section while register.json is published");
+      } else if (JSON.stringify(payload.register) !== JSON.stringify(register)) {
+        bad("snapshot.js.register differs from data/register.json");
+      } else {
+        ok(`output register matches the payload (${(register.projects || []).length} projects)`);
+      }
+    } catch (error) {
+      bad(`snapshot.js register comparison failed: ${error.message}`);
+    }
+  }
+  if (fs.existsSync(registerJsPath)) {
+    try {
+      const wrapper = JSON.parse(
+        fs
+          .readFileSync(registerJsPath, "utf8")
+          .replace(/^window\.CONVEYOR_REGISTER = /, "")
+          .replace(/;\s*$/, ""),
+      );
+      if (JSON.stringify(wrapper) !== JSON.stringify(register)) {
+        bad("data/register.js differs from data/register.json");
+      } else {
+        ok("data/register.js matches data/register.json");
+      }
+    } catch (error) {
+      bad(`data/register.js does not parse: ${error.message}`);
+    }
+  }
+}
+
 const secretsPath = path.join(dataDir, "secrets.json");if (fs.existsSync(secretsPath)) {
   const secrets = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
   const allowed = new Set(["count", "scopes", "last_rotated_at"]);
