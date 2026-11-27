@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ProblemError, problemLine, readProblem } from "./problem.js";
+import { ProblemError, problemLine, problemText, readProblem } from "./problem.js";
 
 test("maps an RFC 9457 problem with field errors", async () => {
   const response = new Response(
@@ -33,4 +33,31 @@ test("a non-JSON body still yields a usable problem", async () => {
   assert.equal(problem.status, 502);
   assert.equal(problem.title, "Bad Gateway");
   assert.equal(problem.detail, "");
+});
+
+test("problemText appends the field errors", () => {
+  const problem = {
+    status: 422,
+    title: "Unprocessable Entity",
+    code: "action-invalid-input",
+    detail: "the input does not match the action schema",
+    requestId: "req-2",
+    fields: [{ field: "action", detail: "has no approval to waive" }],
+  };
+  assert.equal(
+    problemText(problem),
+    "action-invalid-input — the input does not match the action schema — request req-2 · action: has no approval to waive",
+  );
+});
+
+test("problemText without fields is the problem line", () => {
+  const problem = {
+    status: 409,
+    title: "Conflict",
+    code: "conflict",
+    detail: "already promoted",
+    requestId: "",
+    fields: [],
+  };
+  assert.equal(problemText(problem), problemLine(problem));
 });
