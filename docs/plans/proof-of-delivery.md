@@ -100,6 +100,8 @@ typed `422`, so the gate can fail — which §5.4 requires, and a gate that neve
 |---|---|---|
 | #744 | the store, `proofs.*` actions, the `lean_proof` evidence kind, the credential | provable against a stub prover |
 | #746 | the model, the facts renderer, programme certificates, package manifests, the live gate | needs the deployed engine and a reachable prover |
+| #836 | the unit model (`checkObs` / `checkLedger`, per-rule results), the `unit_ledger` renderer arm and subject, the collector and the evaluation of the real ledger | one chunk certificate over every unit in the window, with the failing units named by rule |
+| #837 | engine-derived facts (`proofs.attest`, `checkRecord`), `proofs.record` refusing caller facts, the close gate | a real unit refused by the model, then the gate required |
 
 ## Out of scope
 

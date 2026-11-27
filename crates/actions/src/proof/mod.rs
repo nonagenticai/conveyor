@@ -58,7 +58,7 @@ pub struct ProofRecordIn {
     /// The exact input body sent to that action. Its request hash must match the stored one,
     /// which is what binds the certificate's source to what the prover actually checked.
     pub invocation_input: Value,
-    /// `card | run | wbs_node | release | programme | package`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
     pub subject_type: String,
     /// The subject row this certificate is about.
     pub subject_id: Uuid,
@@ -103,7 +103,7 @@ pub struct ProofGetIn {
 /// `proofs.list`'s input.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProofListIn {
-    /// `card | run | wbs_node | release | programme | package`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
     pub subject_type: String,
     /// The subject row.
     pub subject_id: Uuid,
@@ -114,7 +114,7 @@ pub struct ProofListIn {
 pub struct ProofOut {
     /// The row id.
     pub id: String,
-    /// `card | run | wbs_node | release | programme | package`.
+    /// `card | run | wbs_node | release | programme | package | unit_ledger`.
     pub subject_type: String,
     /// The subject row.
     pub subject_id: String,
@@ -346,7 +346,10 @@ fn render_failure(error: render::RenderError) -> ActionError {
         Refused::UnknownKind(kind) => refuse(
             "facts_canonical",
             "proof_facts_unknown_kind",
-            format!("a certificate is about a slice, a programme or a package; {kind:?} is none"),
+            format!(
+                "a certificate is about a slice, a programme, a package or a unit ledger; \
+                 {kind:?} is none"
+            ),
         ),
         Refused::NotAnObject => refuse(
             "facts_canonical",

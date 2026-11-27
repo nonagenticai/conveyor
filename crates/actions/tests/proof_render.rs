@@ -239,8 +239,185 @@ fn a_kind_and_a_theorem_name_must_be_known() {
 fn the_model_digest_is_pinned() {
     assert_eq!(
         render::model_sha256(),
-        "d19f8ad344d976d6a1a2e91d7eacdb5e6edc33e0fcd1367896f6af697baca504",
+        "378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7",
         "the embedded model changed; every future certificate carries the new bytes"
+    );
+}
+
+// ── the unit ledger (03-DELIVERY, A0) ────────────────────────────────────────────────────
+
+fn unit(key: &str, issue: Value, branch_deleted: Value, pull: &str, ci_runs: u64) -> Value {
+    json!({
+        "key": key,
+        "issue": issue,
+        "branches": 1,
+        "branchDeleted": branch_deleted,
+        "pulls": 1,
+        "pull": pull,
+        "ciRuns": ci_runs,
+        "closesKeyword": true,
+        "verifyParts": true,
+    })
+}
+
+/// Three units: two merged and complete, one in flight and complete. Every rule holds.
+fn unit_ledger_facts() -> Value {
+    json!({
+        "kind": "unit_ledger",
+        "spec_sha256": "a".repeat(64),
+        "model_sha256": render::model_sha256(),
+        "units": [
+            unit("conveyor#837", json!("closed"), json!(true), "merged", 1),
+            unit("conveyor#836", json!("closed"), json!(true), "merged", 2),
+            unit("conveyor#838", Value::Null, Value::Null, "ready", 1),
+        ],
+    })
+}
+
+/// The exact emission format, including the per-rule literal the kernel proves. This is the A0
+/// template with the two textual fields added; a change here is a deliberate format change.
+#[test]
+fn a_unit_ledger_renders_its_observations_and_rules() {
+    let source = render::render(&unit_ledger_facts(), "ledger").expect("the ledger renders");
+    assert!(source.starts_with(render::MODEL_SOURCE), "{source}");
+    let expected = "\
+def facts : List UnitObs := [
+  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 2, closesKeyword := some true, verifyParts := some true },
+  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 1, closesKeyword := some true, verifyParts := some true },
+  { issue := none, branches := some 1, branchDeleted := none, pulls := some 1, pull := some .ready, ciRuns := some 1, closesKeyword := some true, verifyParts := some true }
+]
+
+theorem ledger_rules : ruleResults facts = [(\"oneBranch\", true), (\"onePull\", true), (\"pullUsable\", true), (\"ciBudget\", true), (\"mergeComplete\", true), (\"closesKeyword\", true), (\"verifyParts\", true)] := by decide
+
+theorem ledger : checkLedger facts = true := by decide
+";
+    assert!(
+        source.ends_with(expected),
+        "the emitted tail changed:\n{source}"
+    );
+}
+
+/// A failing ledger must still render: the kernel, not the renderer, is what refuses it, and the
+/// unproven certificate is the deliverable. Every rule reports its own outcome.
+#[test]
+fn a_failing_unit_ledger_still_renders_and_names_the_rule() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][0]["branches"] = json!(2);
+    facts["units"][1]["verifyParts"] = json!(false);
+
+    let source = render::render(&facts, "bad").expect("a failing ledger renders");
+    assert!(source.contains("(\"oneBranch\", false)"), "{source}");
+    assert!(source.contains("(\"verifyParts\", false)"), "{source}");
+    assert!(source.contains("(\"onePull\", true)"), "{source}");
+    assert!(
+        source.contains("theorem bad : checkLedger facts = true := by decide"),
+        "the aggregate keeps the positive statement so the kernel refuses it: {source}"
+    );
+}
+
+/// Unknown is not true: a null fact fails its rule closed.
+#[test]
+fn an_unknown_fact_fails_closed() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][0]["closesKeyword"] = Value::Null;
+    let source = render::render(&facts, "bad").expect("an unknown fact still renders");
+    assert!(source.contains("(\"closesKeyword\", false)"), "{source}");
+    assert!(
+        source.contains("closesKeyword := none"),
+        "the unknown travels as none: {source}"
+    );
+}
+
+/// Two units with one key would let a ledger hide one behind the other; the renderer refuses.
+#[test]
+fn a_duplicate_unit_key_is_refused() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][1]["key"] = json!("conveyor#836");
+    facts["units"][2]["key"] = json!("conveyor#836");
+    let error = render::render(&facts, "ledger").expect_err("a duplicate key");
+    assert_eq!(
+        error,
+        RenderError::Incomplete("unit \"conveyor#836\" appears more than once".to_owned())
+    );
+}
+
+/// The A0 chunk is the renderer's limit: a bigger ledger is chunked by the caller, never a source
+/// that silently needs `maxRecDepth`.
+#[test]
+fn more_than_two_hundred_units_are_refused() {
+    let units: Vec<Value> = (0..201)
+        .map(|index| {
+            unit(
+                &format!("conveyor#{}", 1000 + index),
+                json!("closed"),
+                json!(true),
+                "merged",
+                1,
+            )
+        })
+        .collect();
+    let facts = json!({
+        "kind": "unit_ledger",
+        "spec_sha256": "a".repeat(64),
+        "model_sha256": render::model_sha256(),
+        "units": units,
+    });
+    let error = render::render(&facts, "ledger").expect_err("a ledger over the chunk");
+    assert_eq!(
+        error,
+        RenderError::Incomplete(
+            "the unit ledger holds 201 units; a certificate chunk is at most 200".to_owned()
+        )
+    );
+}
+
+/// The document's order is not the source's order: the ledger is sorted by key, so the same
+/// snapshot renders the same bytes whatever order the collector wrote.
+#[test]
+fn a_unit_ledger_is_sorted_and_deterministic() {
+    let facts = unit_ledger_facts();
+    let mut reversed = facts.clone();
+    reversed["units"].as_array_mut().expect("units").reverse();
+    assert_eq!(
+        render::render(&facts, "ledger").expect("forward"),
+        render::render(&reversed, "ledger").expect("reversed"),
+    );
+}
+
+/// The unit arm validates the document structurally, exactly like every other kind.
+#[test]
+fn a_malformed_unit_document_is_refused() {
+    let mut unknown = unit_ledger_facts();
+    unknown["units"][0]["pull"] = json!("abandoned");
+    assert!(
+        matches!(
+            render::render(&unknown, "ledger"),
+            Err(RenderError::NotA(_))
+        ),
+        "an enum the model does not have is refused"
+    );
+
+    let mut missing = unit_ledger_facts();
+    missing["units"][0]
+        .as_object_mut()
+        .expect("unit")
+        .remove("ciRuns");
+    assert!(
+        matches!(
+            render::render(&missing, "ledger"),
+            Err(RenderError::NotA(_))
+        ),
+        "a missing observation is refused, never defaulted"
+    );
+
+    let mut negative = unit_ledger_facts();
+    negative["units"][0]["pulls"] = json!(-1);
+    assert!(
+        matches!(
+            render::render(&negative, "ledger"),
+            Err(RenderError::NotA(_))
+        ),
+        "a negative count is not a Nat"
     );
 }
 
@@ -267,5 +444,16 @@ fn each_kind_renders_its_own_checker() {
     assert!(
         package.contains("checks := [(\"parity_http_mcp\", true), (\"registry\", true)]"),
         "the checks are emitted sorted by name: {package}"
+    );
+
+    let ledger = render::render(&unit_ledger_facts(), "u").expect("unit ledger");
+    assert!(ledger.contains("def facts : List UnitObs"), "{ledger}");
+    assert!(
+        ledger.contains("theorem u_rules : ruleResults facts"),
+        "{ledger}"
+    );
+    assert!(
+        ledger.contains("theorem u : checkLedger facts = true"),
+        "{ledger}"
     );
 }

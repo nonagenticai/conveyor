@@ -177,3 +177,33 @@ source unless it emits the option.
 
 Same assumption as every certificate: the kernel certifies *facts ⇒ verdict*. The collector's
 rules, hashes and committed payloads are what a reviewer checks against reality.
+
+### A1 — the shipped unit model (2026-11-27)
+
+The A0 draft had six fields. The shipped model adds the two body-observable facts (the PR's
+`Closes #N`, the issue's `Verify:` lines), names `checkUnit`, and adds `ruleResults` so a
+certificate proves the outcome of every rule, not only the aggregate. Model
+`DeliveryModel.lean` at 6 709 bytes, `sha256 378a1395…574ddae7`.
+
+Measured with `scripts/lean/check-model.sh` against the same pod command (wall includes the
+ssh/exec and stream overhead, so it is an upper bound on the kernel time):
+
+| N | Source bytes | Exit | Wall (ms) |
+|---|---|---|---|
+| 40 | 14 554 | 0 | 4 700 |
+| 80 | 22 094 | 0 | 4 653 |
+| 200 | 44 714 | 0 | 5 892 |
+
+The controls file, checked appended to the model, is kernel-refused: 11/11 negative theorems
+(two branches, two PRs, a draft, three CI runs, merged with the issue pending, merged with the
+branch live, unknown branches, no `Closes`, missing `Verify:`, the empty ledger, a falsified
+`ruleResults` literal). The positive control (`checkUnit goodUnit = true`) elaborates; the
+refusals are the eleven `control_` theorems. Renderer tests: 17/17 (`cargo-guard test -p
+conveyor-actions --test proof_render`). The `unit_ledger` subject is recorded end to end by
+`proofs_record::unit_subject_kind` (1/1) against an ephemeral PostgreSQL 18: 201, subject
+`unit_ledger`, and the stored source is the renderer's output.
+
+The chunk decision is unchanged: **200 units**. The shipped 200-unit source is 44 714 bytes
+(2× headroom under the 90 000-byte working limit, 2.2× under the prover's 100 000-character cap)
+and the warm kernel path is ≈ 2 s; 400 and 444 still require `maxRecDepth 4000` in the A0
+measurement and are not emitted.

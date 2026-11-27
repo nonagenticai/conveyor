@@ -25,7 +25,15 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 /// The subject kinds a certificate can be about (`proof.subject_type`).
-pub const SUBJECT_TYPES: [&str; 6] = ["card", "run", "wbs_node", "release", "programme", "package"];
+pub const SUBJECT_TYPES: [&str; 7] = [
+    "card",
+    "run",
+    "wbs_node",
+    "release",
+    "programme",
+    "package",
+    "unit_ledger",
+];
 
 /// The reduction a proof closed under. `kernel` is `by decide`; `native` is `native_decide`,
 /// which trusts the compiler and is a different claim, so it is recorded and never flattened.

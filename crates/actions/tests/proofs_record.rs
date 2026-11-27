@@ -311,3 +311,73 @@ async fn an_incomplete_snapshot_is_refused() {
         "the refusal names the missing item: {error:?}"
     );
 }
+
+/// The unit-ledger facts (conveyor#836): two observations, every rule holding bar none.
+fn unit_ledger_facts(marker: &str) -> Value {
+    json!({
+        "kind": "unit_ledger",
+        "spec_sha256": proof::spec_sha256(),
+        "model_sha256": conveyor_actions::proof::render::model_sha256(),
+        "units": [
+            {
+                "key": format!("conveyor#{marker}-a"),
+                "issue": "closed",
+                "branches": 1,
+                "branchDeleted": true,
+                "pulls": 1,
+                "pull": "merged",
+                "ciRuns": 2,
+                "closesKeyword": true,
+                "verifyParts": true,
+            },
+            {
+                "key": format!("conveyor#{marker}-b"),
+                "issue": null,
+                "branches": 1,
+                "branchDeleted": null,
+                "pulls": 1,
+                "pull": "ready",
+                "ciRuns": 1,
+                "closesKeyword": true,
+                "verifyParts": true,
+            },
+        ],
+    })
+}
+
+/// #836 P2.4 — a unit ledger is a storable subject, and the stored source is its rendering.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn unit_subject_kind() {
+    let (pg, seeded) = fixture().await;
+    let prover = proof::prover().await;
+
+    let facts = unit_ledger_facts("836");
+    let source = conveyor_actions::proof::render::render(&facts, "unit_ledger_ok")
+        .expect("the ledger renders");
+    prover.accept(&source);
+    let (key, input) = proof::check(&pg, &seeded, &source).await;
+    let subject = Uuid::now_v7();
+    let mut record = proof::record_input(&key, &input, subject, &facts, "unit_ledger_ok", "kernel");
+    record["subject_type"] = json!("unit_ledger");
+
+    let outcome = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request("proofs.record", seeded.user_id, record, None),
+    )
+    .await
+    .expect("a unit ledger is a certificate subject");
+
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let stored = output(&outcome.body);
+    assert_eq!(stored["subject_type"], "unit_ledger");
+    assert_eq!(stored["subject_id"], subject.to_string());
+    assert_eq!(stored["verdict"], "proven");
+    assert!(
+        stored["lean_source"]
+            .as_str()
+            .is_some_and(|source| source.contains("checkLedger facts = true")),
+        "the stored source is the ledger's own rendering: {stored}"
+    );
+}
