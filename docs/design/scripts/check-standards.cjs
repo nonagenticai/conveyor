@@ -104,7 +104,18 @@ function validate(record, documentsRoot, registerKeys) {
         }
       }
     }
-    if (artefact.mandatory && artefact.status !== "evidenced") {
+    // A package is owed exactly when a REQUIRED section is unresolved. `generate-standards.py`
+    // creates no finding for an optional section with no rows (it is the page's honest absence),
+    // so demanding a package for it would queue work no row can discharge. The page's status
+    // still counts every section, so an optional absence keeps the page `partial` and visible.
+    const artefactSections = artefact.sections || [];
+    const missingRequired =
+      artefactSections.length === 0
+        ? artefact.status !== "evidenced"
+        : artefactSections.some(
+            (section) => section.required !== false && section.status !== "evidenced",
+          );
+    if (artefact.mandatory && missingRequired) {
       if (!artefact.package_key) errors.push(`${id}: ${artefact.status} and no package key`);
       if (artefact.package_published !== true) {
         errors.push(`${id}: ${artefact.status} but its package is not in the published register`);
@@ -185,6 +196,26 @@ function selfTest() {
   const unlinked = base();
   unlinked.artefacts[0].package_published = false;
   cases.push(["a mandatory absent artefact with no published package", unlinked, false]);
+  const optionalOnly = base();
+  optionalOnly.summary = { artefacts: 1, mandatory: 1, evidenced: 0, partial: 1, absent: 0, findings: 1 };
+  optionalOnly.by_standard = { MSP: { artefacts: 1, evidenced: 0, partial: 1, absent: 0 } };
+  optionalOnly.artefacts[0].status = "partial";
+  optionalOnly.artefacts[0].sections = [
+    {
+      heading: "Purpose",
+      status: "evidenced",
+      required: true,
+      sources: [{ kind: "rows", pointer: "/x", count: 2 }],
+    },
+    {
+      heading: "Links",
+      status: "absent",
+      required: false,
+      sources: [{ kind: "rows", pointer: "/y", count: 0 }],
+    },
+  ];
+  optionalOnly.artefacts[0].package_published = false;
+  cases.push(["a mandatory page whose only absence is optional", optionalOnly, true]);
   const badSource = base();
   badSource.artefacts[0].sections[0].sources = [{ kind: "not-a-kind", pointer: "/x", count: 0 }];
   cases.push(["an unknown source kind", badSource, false]);

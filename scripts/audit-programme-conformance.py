@@ -2757,18 +2757,22 @@ def self_test() -> None:
 
     def delivery_contract_reviewed(data: Dataset) -> None:
         data.by_key["T1"]["status"] = "closed"
-        data.contracts.append(
-            {
-                "id": "c2",
-                "project_id": "t1",
-                "kind": "delivery_contract",
-                "phase_code": "f",
-                "status": "live",
-                "approved_at": "2026-11-20T01:30:00+00:00",
-                "approved_by": "u1",
-                "requested_by": "u2",
-            }
-        )
+        if not any(
+            row.get("kind") == "delivery_contract" and row.get("project_id") == "t1"
+            for row in data.contracts
+        ):
+            data.contracts.append(
+                {
+                    "id": "c2",
+                    "project_id": "t1",
+                    "kind": "delivery_contract",
+                    "phase_code": "f",
+                    "status": "live",
+                    "approved_at": "2026-11-20T01:30:00+00:00",
+                    "approved_by": "u1",
+                    "requested_by": "u2",
+                }
+            )
         data.reviews_arch[0]["contract_id"] = "c2"
 
     # A Phase-G review of the delivery contract satisfies the rule; the live SoAW is not a
@@ -2782,8 +2786,13 @@ def self_test() -> None:
     expect(delivery_contract_unreviewed, "compliance_review_missing")
 
     def soaw_only(data: Dataset) -> None:
+        # A v2 project whose only live contract is the SoAW: the delivery contract is what a
+        # Phase-G review is of, so with none live and no reviews the rule must stay silent.
         data.by_key["T1"]["status"] = "closed"
         data.reviews_arch.clear()
+        data.contracts[:] = [
+            row for row in data.contracts if row.get("kind") != "delivery_contract"
+        ]
 
     expect_absent(soaw_only, "compliance_review_missing")
 
