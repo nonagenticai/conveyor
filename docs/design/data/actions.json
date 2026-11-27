@@ -220,6 +220,8 @@
     "evals.retire",
     "evals.update",
     "events.list",
+    "feedback.create",
+    "feedback.list",
     "fixtures.echo",
     "fixtures.fail",
     "fixtures.slow",

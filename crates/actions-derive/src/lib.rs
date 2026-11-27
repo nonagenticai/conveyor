@@ -215,6 +215,10 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         // missing here fails the build, which is what keeps the two in step.
         ("scope", "documents:read") => "DocumentsRead",
         ("scope", "documents:write") => "DocumentsWrite",
+        // #842: the tenant's feedback about the platform. A read is open; a submission is a
+        // member write.
+        ("scope", "feedback:read") => "FeedbackRead",
+        ("scope", "feedback:write") => "FeedbackWrite",
         ("scope", "secrets:read") => "SecretsRead",
         ("scope", "secrets:write") => "SecretsWrite",
         ("scope", "integrations:read") => "IntegrationsRead",
