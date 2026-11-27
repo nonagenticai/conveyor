@@ -1014,8 +1014,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "5b06d9f9bc08214495c2d4a052da7a35f882e3f50f281742d696a1ef2d5230db",
-      "bytes": 23541,
+      "sha256": "e6ac11ce165535db3d672f72541b9f6f4d50e341b82ca9107758353bf0a22478",
+      "bytes": 28857,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
