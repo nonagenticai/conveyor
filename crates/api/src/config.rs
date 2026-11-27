@@ -513,6 +513,62 @@ mod tests {
         assert!(c.is_production());
     }
 
+    /// The game host and its client are one feature: either both or neither. A host-only
+    /// deployment would serve a walk whose `/config.json` cannot start a sign-in; a
+    /// client-only one widens the verifier's azp allowlist for a surface nobody serves.
+    #[test]
+    fn the_game_host_and_its_client_are_a_fail_closed_pair() {
+        let hosts_only = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_HOSTS", "game.nonagentic.ai"),
+        ])
+        .unwrap();
+        assert!(
+            matches!(
+                hosts_only.validate_auth().unwrap_err(),
+                ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_OIDC_CLIENT_ID",
+                    ..
+                }
+            ),
+            "a host without a game client must fail closed"
+        );
+
+        let client_only = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_OIDC_CLIENT_ID", "conveyor-game"),
+        ])
+        .unwrap();
+        assert!(
+            matches!(
+                client_only.validate_auth().unwrap_err(),
+                ConfigError::Invalid {
+                    name: "CONVEYOR_GAME_HOSTS",
+                    ..
+                }
+            ),
+            "a game client without a host must fail closed"
+        );
+
+        // The pair is valid, and the host is normalised (case and port stripped).
+        let pair = cfg(&[
+            ("CONVEYOR_DEV_AUTH", "1"),
+            ("CONVEYOR_GAME_HOSTS", " Game.NonAgentic.AI:443 "),
+            ("CONVEYOR_GAME_OIDC_CLIENT_ID", "conveyor-game"),
+        ])
+        .unwrap();
+        pair.validate_auth().expect("the pair is valid");
+        assert_eq!(pair.game_hosts, vec!["game.nonagentic.ai".to_owned()]);
+        assert_eq!(pair.game_client_id(), Some("conveyor-game"));
+        assert!(pair.is_game_host("game.nonagentic.ai:443"));
+        assert!(!pair.is_game_host("conveyor.nonagentic.ai"));
+
+        let neither = cfg(&[("CONVEYOR_DEV_AUTH", "1")]).unwrap();
+        neither
+            .validate_auth()
+            .expect("no game host is the operator-only shape");
+    }
+
     #[test]
     fn app_env_is_normalized_and_an_unknown_value_is_production() {
         let capitalised = cfg(&[("APP_ENV", " Production "), ("CONVEYOR_DEV_AUTH", "1")]).unwrap();

@@ -298,11 +298,7 @@ impl Verifier {
         // `azp` is the only cross-app replay guard: realm clients commonly carry every
         // client's audience, so only the authorised party says who the token was issued to.
         // The allowlist is exactly this application's first-party browser clients.
-        if !claims
-            .azp
-            .as_deref()
-            .is_some_and(|azp| self.client_ids.contains(azp))
-        {
+        if !self.client_is_allowed(claims.azp.as_deref()) {
             return Err(AuthError::InvalidToken);
         }
         Ok(VerifiedClaims {
@@ -311,6 +307,14 @@ impl Verifier {
             preferred_username: claims.preferred_username.filter(|n| !n.trim().is_empty()),
             email_verified: claims.email_verified,
         })
+    }
+
+    /// Whether `azp` names one of this application's first-party browser clients.
+    ///
+    /// The allowlist is exactly the configured clients — the operator client and, when a
+    /// game host is deployed, the game client. A token with no `azp` is refused.
+    fn client_is_allowed(&self, azp: Option<&str>) -> bool {
+        azp.is_some_and(|azp| self.client_ids.contains(azp))
     }
 }
 
@@ -408,6 +412,62 @@ mod tests {
             }],
             JwksCache::new(source),
         )
+    }
+
+    /// The azp allowlist is a membership test over exactly the configured first-party
+    /// clients. This is the assertion the two-host deployment depends on: the game client
+    /// must pass, and a third realm client must not.
+    #[test]
+    fn the_azp_allowlist_is_exactly_the_first_party_clients() {
+        let v = Verifier::with_client_ids(
+            "conveyor",
+            ["conveyor-web".to_owned(), "conveyor-game".to_owned()],
+            vec![TrustedIssuer {
+                issuer: "https://good.example/realms/conveyor".into(),
+                jwks_url: "https://good.example/certs".into(),
+            }],
+            JwksCache::new(CountingSource::new(OCT_SET)),
+        );
+        assert!(v.client_is_allowed(Some("conveyor-web")));
+        assert!(
+            v.client_is_allowed(Some("conveyor-game")),
+            "the game host's own client is first-party"
+        );
+        assert!(!v.client_is_allowed(Some("another-realm-client")));
+        assert!(
+            !v.client_is_allowed(Some("conveyor")),
+            "the audience is not a client id"
+        );
+        assert!(!v.client_is_allowed(None), "a token without azp is refused");
+    }
+
+    /// `from_config` is the production path: the game client must reach the verifier from
+    /// configuration. Without this, dropping the push in `from_config` would keep every
+    /// other test green and 401 the live game host.
+    #[test]
+    fn from_config_carries_the_configured_game_client() {
+        let cfg = crate::config::AuthConfig {
+            dev_auth: false,
+            oidc_issuer: Some("https://good.example/realms/conveyor".into()),
+            oidc_audience: "conveyor".into(),
+            oidc_client_id: "conveyor-web".into(),
+            oidc_game_client_id: Some("conveyor-game".into()),
+            oidc_jwks_url: None,
+        };
+        let v = Verifier::from_config(&cfg).expect("a complete auth config");
+        assert!(v.client_is_allowed(Some("conveyor-web")));
+        assert!(v.client_is_allowed(Some("conveyor-game")));
+        assert!(!v.client_is_allowed(Some("another-realm-client")));
+
+        let operator_only = crate::config::AuthConfig {
+            oidc_game_client_id: None,
+            ..cfg
+        };
+        let v = Verifier::from_config(&operator_only).expect("an operator-only config");
+        assert!(
+            !v.client_is_allowed(Some("conveyor-game")),
+            "an unset game client must not widen the allowlist"
+        );
     }
 
     #[test]
