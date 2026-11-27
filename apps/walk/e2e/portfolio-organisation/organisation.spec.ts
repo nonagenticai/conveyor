@@ -67,7 +67,7 @@ test("a department write carries Idempotency-Key and refetches", async ({ page }
   await dialog.getByLabel(/^Name/).fill(name);
   await dialog.getByLabel(/^Industry id/).fill(industry.id);
   await dialog.getByLabel(/^Ordinal/).fill("1");
-  await dialog.getByLabel(/^Primary/).check();
+  await dialog.getByLabel(/^Is primary/).check();
   await dialog.getByRole("button", { name: "Submit" }).click();
   const invocation = await sent;
   expect(invocation.headers()["idempotency-key"]).toBeTruthy();
