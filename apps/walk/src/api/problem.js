@@ -62,3 +62,15 @@ export function problemLine(problem) {
   if (problem.requestId) parts.push(`request ${problem.requestId}`);
   return parts.join(" — ");
 }
+
+/**
+ * The full server line: the problem line, then each field error as `field: detail` — the same
+ * shape `apps/web` renders for an invalid input (`api.rs` `Invalid`). A bare problem is
+ * unchanged from `problemLine`.
+ * @param {Problem} problem
+ */
+export function problemText(problem) {
+  const parts = [problemLine(problem)];
+  for (const item of problem.fields ?? []) parts.push(`${item.field}: ${item.detail}`);
+  return parts.filter((part) => part !== "").join(" · ");
+}
