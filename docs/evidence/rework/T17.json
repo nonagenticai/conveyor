@@ -3,50 +3,50 @@
     {
       "check": "project",
       "description": "T17 is active",
-      "detail": "status is 'closed', expected 'active'",
+      "detail": "project T17 is active",
       "id": "T17-project",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a21c1d-c59b-72e7-8d33-344387397c9e approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T17-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d38-7db1-b685-d76bd4cebf47\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T17-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a21c1d-a9d1-70d8-8a6a-901c21e4dd7b approved by board decision 01a21c1d-aa55-7091-ae4b-93328e410035 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T17-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a21c1d-da39-740d-b3a5-d0be2d17fe59 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T17-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -61,7 +61,7 @@
     {
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
-      "detail": "PI cadence 01a211c9-29ad-7747-96f2-97f272e776c9 and refinement 01a211c9-2a26-7dcd-9aa1-e30b6d63998a for tranche-5",
+      "detail": "PI cadence 01a216d1-1913-70dd-8f69-c8ad230f2364 and refinement 01a216d1-1a40-7246-ba5e-254b8c0986fe for tranche-5",
       "id": "T17-pi-cadence",
       "kind": "snapshot",
       "result": "pass",
@@ -88,25 +88,25 @@
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "T17-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "T17-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-2b9c-7669-a9db-8caaf923c053 carries a statement and evidence from the tranche-5 retro",
+      "detail": "lesson 01a216d1-1dde-7519-a046-d30c934c6fb6 carries a statement and evidence from the tranche-5 retro",
       "id": "T17-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -115,75 +115,53 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "1 open P0 package(s): closed_without_closure_review:T17",
+      "detail": "no open P0 package for this project",
       "id": "T17-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "10 mandatory artefact package(s) open: closed_without_closure_review:T17, project_in_unauthorised_tranche:T17, unpublished_declared_output:T17, contract_missing:T17, mandatory_artefacts:T17, std-pmp-change-control-t17:T17, std-pmp-project-baseline-t17:T17, std-pmp-project-registers-t17:T17, +2 more",
+      "detail": "no open standard artefact package for this project",
       "id": "T17-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "5 unresolved P0/P1 package(s): closed_without_closure_review:T17 (P0), project_in_unauthorised_tranche:T17 (P0), unpublished_declared_output:T17 (P1), contract_missing:T17 (P1), mandatory_artefacts:T17 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T17-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T17-project' did not pass; the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-product' did not pass; the gate check 'T17-artefact-standard' did not pass; the gate check 'T17-rework' did not pass",
+      "detail": "gate discharged by executable checks: T17-project, T17-baseline, T17-charter, T17-contract, T17-review, T17-waivers, T17-pi-cadence, T17-pi-plan, T17-pi-objectives, T17-wsjf, T17-demo-credits, T17-lessons, T17-product, T17-artefact-standard, T17-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T17-project (P0): status is 'closed', expected 'active'",
-    "T17-baseline (P0): no project baseline",
-    "T17-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "T17-contract (P0): no live board-approved delivery contract",
-    "T17-review (P0): no Phase-G compliance review for the project's live contract",
-    "T17-wsjf (P0): no WBS deliverable carries the plan",
-    "T17-demo-credits (P0): no accepted deliverable to demo",
-    "T17-product (P0): 1 open P0 package(s): closed_without_closure_review:T17",
-    "T17-artefact-standard (P1): 10 mandatory artefact package(s) open: closed_without_closure_review:T17, project_in_unauthorised_tranche:T17, unpublished_declared_output:T17, contract_missing:T17, mandatory_artefacts:T17, std-pmp-change-control-t17:T17, std-pmp-project-baseline-t17:T17, std-pmp-project-registers-t17:T17, +2 more",
-    "T17-rework (P0): 5 unresolved P0/P1 package(s): closed_without_closure_review:T17 (P0), project_in_unauthorised_tranche:T17 (P0), unpublished_declared_output:T17 (P1), contract_missing:T17 (P1), mandatory_artefacts:T17 (P1)",
-    "gate (P0): the gate check 'T17-project' did not pass; the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-product' did not pass; the gate check 'T17-artefact-standard' did not pass; the gate check 'T17-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "A tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.",
-  "generated_at": "2026-11-25T10:37:53.970839+00:00",
+  "generated_at": "2026-11-27T08:27:54.146651+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T17.toml",
   "name": "Tenant asset authoring",
   "project": "T17",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-27T08:27:49.574539+00:00",
+    "git_sha": "c17de2b16d521b47298533168e2691feb22e58ad",
+    "path": "retained-snapshot/c17de2b16d521b47298533168e2691feb22e58ad"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
