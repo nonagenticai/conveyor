@@ -179,13 +179,21 @@ export class Shell {
       return;
     }
     this.screen.append(el("p", { class: "loading", role: "status", text: "Loading…" }));
+    // If the user has already focused a control elsewhere (the room map, the HUD) while the
+    // destination loaded, moving focus into the new screen would steal their place.
+    const before = document.activeElement;
     try {
       const module = await found.row.load();
       const view = await module.render(this.context(found));
       clear(this.screen);
       this.screen.append(view.element);
       document.title = `${view.title} · Gemba Walk`;
-      focusFirst(view.element);
+      const userMoved =
+        before instanceof HTMLElement &&
+        before !== document.body &&
+        document.contains(before) &&
+        !this.screen.contains(before);
+      if (!userMoved) focusFirst(view.element);
       announce(view.title);
     } catch (error) {
       clear(this.screen);

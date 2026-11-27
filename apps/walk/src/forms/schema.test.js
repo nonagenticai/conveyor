@@ -35,6 +35,22 @@ test("required, enum, number and JSON fields are typed", () => {
   assert.equal(fields[2].minimum, 1);
 });
 
+test("an optional field's null union stays its value type, not JSON", () => {
+  const fields = fieldsFromSchema({
+    type: "object",
+    properties: {
+      name: { type: ["string", "null"] },
+      owner: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] },
+      count: { type: ["integer", "null"], minimum: 1 },
+    },
+  });
+  assert.deepEqual(
+    fields.map((field) => field.kind),
+    ["string", "string", "integer"],
+  );
+  assert.equal(fields[2].minimum, 1);
+});
+
 test("a schema without object properties yields no fields", () => {
   assert.deepEqual(fieldsFromSchema({ type: "string" }), []);
   assert.deepEqual(fieldsFromSchema(null), []);

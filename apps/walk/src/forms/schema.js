@@ -39,20 +39,32 @@ export function fieldsFromSchema(schema) {
       hint: typeof property.description === "string" ? property.description : "",
       required: required.has(name),
     };
-    const type = property.type;
-    if (Array.isArray(property.enum) && property.enum.length > 0) {
+    // An optional field (Rust `Option<T>`) is `{"type": ["string", "null"]}`, and an optional
+    // enum can arrive as a `oneOf`/`anyOf` of the value and null. Pick the single non-null
+    // shape; anything still composite is the JSON fallback.
+    let shape = property;
+    if (Array.isArray(property.oneOf) || Array.isArray(property.anyOf)) {
+      const variants = property.oneOf ?? property.anyOf;
+      const nonNull = variants.filter((item) => item && item.type !== "null");
+      if (nonNull.length === 1) shape = nonNull[0];
+    }
+    const type = Array.isArray(shape.type)
+      ? shape.type.find((item) => item !== "null")
+      : shape.type;
+    const enumValues = Array.isArray(shape.enum) ? shape.enum : property.enum;
+    if (Array.isArray(enumValues) && enumValues.length > 0) {
       item.kind = "enum";
-      item.options = property.enum.map((value) => String(value));
+      item.options = enumValues.map((value) => String(value));
     } else if (type === "string") {
       item.kind = "string";
     } else if (type === "integer") {
       item.kind = "integer";
-      if (typeof property.minimum === "number") item.minimum = property.minimum;
-      if (typeof property.maximum === "number") item.maximum = property.maximum;
+      if (typeof shape.minimum === "number") item.minimum = shape.minimum;
+      if (typeof shape.maximum === "number") item.maximum = shape.maximum;
     } else if (type === "number") {
       item.kind = "number";
-      if (typeof property.minimum === "number") item.minimum = property.minimum;
-      if (typeof property.maximum === "number") item.maximum = property.maximum;
+      if (typeof shape.minimum === "number") item.minimum = shape.minimum;
+      if (typeof shape.maximum === "number") item.maximum = shape.maximum;
     } else if (type === "boolean") {
       item.kind = "boolean";
     }

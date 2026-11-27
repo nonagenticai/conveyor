@@ -14,6 +14,9 @@ test("a signed-out deep link is the gate and returns after dev login", async ({ 
 
 test("sign-out returns to the gate", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  await page.getByRole("button", { name: "Continue as dev user" }).click();
+  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
