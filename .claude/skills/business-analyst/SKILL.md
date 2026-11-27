@@ -1,6 +1,11 @@
 ---
 name: business-analyst
 description: Use when a project the live register marks proposed or unbuilt needs a project brief or an analysis/architecture inception before issue-create; when a plan or assessment's project status must be checked against the live record; or when a proposal has no P0 §4 brief. Defines the project; never writes the build issue.
+allowed-actions:
+  - documents.compose
+  - documents.get
+  - development_projects.list
+  - programmes.get
 ---
 
 # business-analyst
@@ -73,6 +78,7 @@ the live register says is not built — and stop a build issue that would skip t
 | Analysis inception | `meta.category='analysis'`; repo copy `docs/plans/inception/<project>/01-inception-analysis.md` |
 | Architecture inception | `meta.category='architecture'`; repo copy `docs/plans/inception/<project>/02-architecture-design.md` |
 | Status evidence | the live-register row and date, in the brief |
+| Live act | `documents.compose` (the brief/analysis/architecture document), read back by `documents.get`; the project's unit is resolved with `development_projects.list` and the programme read with `programmes.get` |
 
 ## Refusals
 

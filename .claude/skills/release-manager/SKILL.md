@@ -1,6 +1,9 @@
 ---
 name: release-manager
 description: Use when a release receipt (#8), deployed revision identity, cutover, rollback, live probe, or post-merge shipped-state verification is required; when a merge or a green CI is being treated as shipped; or when the V4 receipt must be written at one revision. Proves the deployed state; never signs go-live.
+allowed-actions:
+  - development_projects.get
+  - development_projects.rollback
 ---
 
 # release-manager
@@ -76,7 +79,7 @@ go-live.
 | Release receipt | `docs/evidence/RELEASE-<sha>.md` (uppercase path per #8) |
 | Probe / rollback evidence | the receipt, with timestamped output |
 | Programme record | the project/issue comment; a `document` row only if required |
-| Live act | `scripts/programme-record.py` where a gate row is needed |
+| Live act | `development_projects.get` for the deployed digest and the live check; `development_projects.rollback` to record an exercised rollback (both digests, the migration generation, `/health` at the restored digest) |
 
 ## Refusals
 

@@ -68,6 +68,8 @@ flate2 = "1.1.11"
 
 [dev-dependencies]
 tar = "0.4.46"
+# #781: the skill allowlist test parses each role playbook's YAML frontmatter.
+serde_yaml = { workspace = true }
 # #172's host tests run the client against a stand-in `ssh`, so the harness needs a tempdir for
 # the key, the pinned `known_hosts` and the script itself.
 tempfile = "3.27.0"

@@ -1,6 +1,12 @@
 ---
 name: programme-manager
 description: Use when a tranche boundary, end-of-tranche review, programme register or baseline update, declared-vs-authorised-vs-delivered reconciliation, or closure/retirement gate (#302/#303) is in scope; or when tranches 4–13's retrospective reviews must be prepared. Prepares evidence; the sponsoring group decides.
+allowed-actions:
+  - tranches.review
+  - tranches.review_list
+  - tranches.list
+  - documents.compose
+  - documents.get
 ---
 
 # programme-manager
@@ -71,7 +77,7 @@ control. Never sign the decision.
 | Review decision | `tranches.review` with `{id, decision, evidence:{baselines, benefit_status, risk_register}, delegation_ref}` by the sponsoring group |
 | Tranche state | `programme_tranche` row; `programme.json` |
 | Reconciliation | issue comment with the three-column table and the date |
-| Live act | `scripts/programme-record.py` |
+| Live act | `tranches.review` (the sponsoring group's decision) read back by `tranches.review_list`; the review document by `documents.compose`, read back by `documents.get` |
 
 ## Refusals
 
@@ -101,5 +107,7 @@ control. Never sign the decision.
 ```bash
 python3 scripts/programme_state.py --check
 python3 scripts/check-programme-definition.py
-python3 scripts/programme-record.py --check --action tranches.list --input '{"programme_id":"<programme-id>"}'
+TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/<tenant>.token)
+curl -fsS -X POST "$CONVEYOR_URL/api/actions/tranches.list/invocations" \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' -d '{"input":{"programme_id":"<programme-id>"}}'
 ```
