@@ -44,3 +44,21 @@ The run and bind sequence, all live:
   registry; it exposes no per-job row id. A row-level read is `jobs.list`, which this receipt does
   not take. P1.2's acceptance was amended accordingly at `4c3d2df9a`.
 - Nothing here re-runs T14's six toolkit calls; this is #3's P4.1 only.
+
+## Post-receipt re-read (2026-11-27T07:29–07:30Z)
+
+The engine had rolled since the receipt (`sha256:4cd9a9f3…` → `sha256:2aafb685…`). Read again
+through the same CLI transport, read-only:
+
+- `workers.list` → still 47 `(kind,status)` buckets and hosts `mini1`, `mini2`
+  (`30-recheck-workers.json`);
+- `billing.summary {window_days:30}` → `total_usd` 1.417925 again; 649 inference calls, 27 tool
+  calls (two more than the 06:21Z reading — the ledger moved, the figure held)
+  (`31-recheck-billing.json`);
+- `tools.call coding.jobs_get` → the same job `7c5b90bb…` is now `succeeded`; the coding service's
+  result is `status: unsupported` ("profile rust expects Cargo.toml at the root of the source; it
+  is not there"). A typed result from the upstream, not a transport error
+  (`32-recheck-coding.json`).
+
+This re-read confirms the rows persist; it does not replace the receipt's measurement at
+`4cd9a9f3`.

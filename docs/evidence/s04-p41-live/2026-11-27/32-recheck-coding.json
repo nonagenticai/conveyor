@@ -1,0 +1,22 @@
+{
+  "id": "7c5b90bb-7fa0-4e5a-8840-e38d8bb5c6f5",
+  "kind": "check",
+  "result": {
+    "log": {
+      "truncated": false
+    },
+    "source": {
+      "files": 1,
+      "kind": "inline"
+    },
+    "status": "unsupported",
+    "summary": "profile rust expects Cargo.toml at the root of the source; it is not there"
+  },
+  "status": "succeeded",
+  "timings": {
+    "duration_ms": 31516,
+    "finished_at": "2026-11-27T06:24:08Z",
+    "queued_at": "2026-11-27T06:23:36Z",
+    "started_at": "2026-11-27T06:23:37Z"
+  }
+}
