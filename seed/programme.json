@@ -111,13 +111,14 @@
       "key": "S04",
       "name": "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest",
       "description": "Plan: docs/plans/slices/S04-action-registry.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S04-action-registry.md",
         "track": "v1",
         "issues": [
-          3
+          3,
+          812
         ],
         "depends_on": [
           "S02",
@@ -1281,7 +1282,7 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1615,7 +1616,12 @@
         "track": "programme",
         "issues": [
           792,
-          806
+          806,
+          813,
+          814,
+          815,
+          816,
+          817
         ],
         "depends_on": [],
         "plan_status": "active",
