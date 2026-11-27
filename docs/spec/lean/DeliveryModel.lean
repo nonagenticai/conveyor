@@ -100,3 +100,84 @@ theorem accepted_path_carries_evidence : ∀ p, accepted p = true → p.evidence
   cases h' : p.evidence with
   | nil => simp [accepted, endsClosed, h'] at h
   | cons x xs => simp
+
+/-! ## Delivery units — `docs/plans/03-DELIVERY.md`
+
+One issue, one branch, one non-draft PR, at most two CI runs, merged, the issue closed and
+the branch deleted. Every fact is an observation; `none` means "not observed" and fails
+closed. These are the GitHub-observable facts, collected with provenance — not the engine
+rows, which do not carry issue state or branch liveness. -/
+
+inductive IssueState where
+  | pending
+  | closed
+  deriving DecidableEq, BEq, Repr
+
+inductive PrState where
+  | draft
+  | ready
+  | merged
+  deriving DecidableEq, BEq, Repr
+
+structure UnitObs where
+  issue : Option IssueState
+  -- distinct claim-branch names: live `issue/<n>-*` refs ∪ PR head refs
+  branches : Option Nat
+  -- the PR head ref is not live
+  branchDeleted : Option Bool
+  pulls : Option Nat
+  pull : Option PrState
+  -- pipeline runs attributed to the unit (PR run + merge run)
+  ciRuns : Option Nat
+  deriving DecidableEq, BEq, Repr
+
+def oneBranch (o : UnitObs) : Bool :=
+  match o.branches with
+  | some 1 => true
+  | _ => false
+
+def onePull (o : UnitObs) : Bool :=
+  match o.pulls with
+  | some 1 => true
+  | _ => false
+
+def pullUsable (o : UnitObs) : Bool :=
+  match o.pull with
+  | some .ready | some .merged => true
+  | _ => false
+
+def ciBudget (o : UnitObs) : Bool :=
+  match o.ciRuns with
+  | some n => decide (n ≤ 2)
+  | none => false
+
+def mergeComplete (o : UnitObs) : Bool :=
+  match o.pull, o.issue, o.branchDeleted with
+  | some .merged, some .closed, some true => true
+  | some .merged, _, _ => false
+  | _, _, _ => true
+
+def checkObs (o : UnitObs) : Bool :=
+  oneBranch o && onePull o && pullUsable o && ciBudget o && mergeComplete o
+
+def checkLedger (units : List UnitObs) : Bool :=
+  !units.isEmpty && units.all checkObs
+
+theorem merge_complete_implies (o : UnitObs) (h : mergeComplete o = true)
+    (hm : o.pull = some .merged) :
+    o.issue = some .closed ∧ o.branchDeleted = some true := by
+  cases o with
+  | mk issue branches branchDeleted pulls pull ciRuns =>
+    cases hm
+    cases issue with
+    | none => simp [mergeComplete] at h
+    | some i =>
+      cases i with
+      | pending => simp [mergeComplete] at h
+      | closed =>
+        cases branchDeleted with
+        | none => simp [mergeComplete] at h
+        | some b =>
+          cases b with
+          | false => simp [mergeComplete] at h
+          | true => simp

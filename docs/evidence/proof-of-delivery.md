@@ -123,3 +123,57 @@ failure. Worth its own fix; it is not #746's.
   Verus/Kani work, not part of the corpus.
 - The self-service mint path: the credential above was minted and sealed by an operator, and
   `--mint` still needs the dedicated client and the licence-app decision (#776).
+
+## Units — A0, the chunk-size measurement (2026-11-27)
+
+Part of #836. The unit model is a draft at this point; this section fixes the certificate size
+from real kernel runs, not from an estimate. The model under measurement is `DeliveryModel.lean`
+at 5 537 bytes, `sha256 7bc3a1eb…86f859a` (the 3 179-byte row above belongs to the pre-unit model).
+
+`scripts/proof/a0_units.py` generated the sources at N = 40, 80, 200, 400 and 444 synthetic
+`UnitObs` records, plus seven one-unit negative controls, an empty ledger and a `startsWith`
+probe. Each file was streamed into the prover's own pod and run with the runner's exact command:
+
+```
+cd /lean-project && env -i PATH=/usr/local/bin:/usr/bin:/bin:/opt/elan/bin \
+  ELAN_HOME=/opt/elan /opt/elan/bin/lake env /opt/elan/bin/lean /lean-project/_a0_<n>.lean
+```
+
+| N | Source bytes | Warm wall clock (ms) | Exit |
+|---|---|---|---|
+| 40 | 11 010 | 1 759 · 1 780 · 1 781 · 1 810 | 0 |
+| 80 | 16 390 | 1 899 · 1 902 · 1 925 · 1 839 | 0 |
+| 200 | 32 530 | 2 211 · 2 154 · 2 215 · 2 239 | 0 |
+| 400 | 59 430 | 2 736 · 2 446 · 2 655 (with `set_option maxRecDepth 4000`) | 0 |
+| 444 | 65 348 | 2 678 · 2 735 · 2 732 (with `set_option maxRecDepth 4000`) | 0 |
+
+At the default recursion depth, N = 400 and N = 444 both fail in 2.5–2.9 s with
+`maximum recursion depth has been reached`; N = 200 passes untouched. The first run of the
+session was a smoke theorem at 825 ms; the 10 242 ms cold figure above is the pod's first run
+after a restart and was not re-measured (the live pod was not restarted).
+
+The negative controls — two branches, two PRs, a draft PR, three CI runs, merged with the issue
+pending, merged with the branch live, unknown branches — each exit 1: the kernel refuses
+`checkLedger [bad] = true`, it is not a render refusal. An empty ledger is also exit 1 (the
+`!isEmpty` guard). A `String.startsWith "issue/836-"` probe under `decide` exits 1:
+**`startsWith` is not kernel-reducible in this toolchain**, so prefix checks must arrive as
+derived facts, never as Lean computation in the checker.
+
+One `lean4.check` at N = 200 through the deployed engine was attempted with a machine principal
+minted in the conveyor pod. It answered `403 action-forbidden`: the principal lacks the
+`integrations:read` scope the action declares. That is a principal/grant result, not a prover
+result — the direct runner path above is the command the prover issues. A2 must run with a
+principal holding `integrations:read` (the check) and `approvals:write` (the record). A conveyor
+rollout replaced the pod during the first attempt; the 403 is from the new deployment.
+
+**Decision.** Certificate chunk = **200 units**. At 200 the source is 32 530 bytes against the
+100 000-char cap (3× headroom) and the warm maximum is 2 239 ms against the 120 s prover timeout
+(53× headroom); with the 10 242 ms cold start the worst case is ≈ 12.5 s. The full 444-unit
+ledger would fit one certificate (65 348 bytes, ≈ 2.7 s) but needs
+`set_option maxRecDepth 4000`; 200 is chosen so a failing chunk is bisected cheaply and the
+default recursion depth stays in force. The ledger window is therefore **all** merged PRs in the
+window plus the unit issues — about three chunks. The renderer refuses more than 200 units per
+source unless it emits the option.
+
+Same assumption as every certificate: the kernel certifies *facts ⇒ verdict*. The collector's
+rules, hashes and committed payloads are what a reviewer checks against reality.
