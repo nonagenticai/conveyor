@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S04 P4.1 — the live coding, worker and billing receipts · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/s04-p41-live/2026-11-27/README.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s04-p41--the-live-coding-worker-and-billing-receipts">S04 P4.1 — the live coding, worker and billing receipts</h1>
+<p>Measured 2026-11-27T06:21–06:24Z against the deployed engine <code>ghcr.io/nonagenticai/conveyor@sha256:4cd9a9f356d69c520d245e77fb8ea8ad49fc21d8a5ec46bf6aa532285957ad7e</code> (pods started 2026-11-27T03:46Z), tenant <code>nonagentic</code>.</p>
+<p>Transport: the deployed CLI. The admin host is redacted from this public receipt; the command shape is <code>ssh &lt;admin host&gt; 'sudo KUBECONFIG=… kubectl -n conveyor exec -i deploy/conveyor -- conveyor admin action invoke --tenant nonagentic --name &lt;action&gt; --input /dev/stdin'</code>. Each call's input and its response or error stream sit beside this file.</p>
+<h2 id="verdicts">Verdicts</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Verdict</th>
+<th>Command</th>
+<th>Actor</th>
+<th>Returned</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>coding</td>
+<td><strong>executed against the real coding service</strong></td>
+<td><code>tools.call</code> <code>coding.jobs_create</code> on run <code>01a21bab-93d2-7ea7-b0a8-e69af2e17a23</code>, bound to toolkit <code>01a1f353-cf2b-7ed5-b470-2290ef635b0e</code> (effect ceiling <code>write</code>)</td>
+<td>the tenant's first active member (CLI default)</td>
+<td>job <code>7c5b90bb-7fa0-4e5a-8840-e38d8bb5c6f5</code>, <code>queued</code> 06:23:36Z; read back through <code>coding.jobs_get</code> → <code>running</code>, started 06:23:37Z</td>
+<td><code>24-coding.json</code>, <code>25-coding-get.json</code></td>
+</tr>
+<tr>
+<td>worker</td>
+<td><strong>executed over conveyor's durable queue</strong> (#450 retired the Python upstream)</td>
+<td><code>workers.list</code></td>
+<td>same</td>
+<td>47 <code>(kind,status)</code> queue buckets (for example <code>approval.closed.emit</code> succeeded × 20905, <code>benchmark.reap</code> succeeded × 4163) and 2 registered hosts (<code>mini1</code>, <code>mini2</code>)</td>
+<td><code>10-workers.json</code></td>
+</tr>
+<tr>
+<td>billing</td>
+<td><strong>executed over conveyor's ledger</strong> (#46)</td>
+<td><code>billing.summary</code> <code>{window_days: 30}</code></td>
+<td>same</td>
+<td>window 2026-10-28T06:21:42Z → 2026-11-27T06:21:42Z; <code>total_usd</code> 1.417925; 649 inference calls; 25 tool calls</td>
+<td><code>11-billing.json</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-coding-path">The coding path</h2>
+<p>The external action itself (<code>coding_jobs.create</code>) is refused by the admin CLI with "not an internal action" (<code>12-coding-direct.stderr</code>). That is the design: an external action is dispatched by the broker, so the real contract is <code>tools.call</code>, which resolves the run's binding, pins the published toolkit version, validates the input, owns the deadline and ledgers the call.</p>
+<p>The run and bind sequence, all live:</p>
+<ul>
+<li>card <code>01a21bab-7756-766b-a55e-4d8059825076</code> (<code>20-card.json</code>);</li>
+<li>run <code>01a21bab-93d2-7ea7-b0a8-e69af2e17a23</code> created <code>queued</code> (<code>21-run.json</code>), then moved to <code>running</code> at 06:22:41Z (<code>26-run-get.json</code>) — <code>runs.start</code> afterwards refused <code>409 run is running</code> (<code>22-run-start-attempt.stderr</code>);</li>
+<li>toolkit <code>coding</code> published at v1, id <code>01a1f353-cf2b-7ed5-b470-2290ef635b0e</code> (<code>23-toolkits.json</code>);</li>
+<li>binding <code>01a21bac-591d-7b80-a7de-ad394a1c55e3</code>, run-scoped, effect ceiling <code>write</code>, enabled (<code>23-bind.json</code>).</li>
+</ul>
+<h2 id="what-is-not-claimed">What is not claimed</h2>
+<ul>
+<li>No coding <strong>result</strong> is claimed: the job was <code>running</code> at its read-back. The receipt proves the call executed through the real contract; the job's own output is the coding service's record.</li>
+<li>The worker and billing rows are reads over conveyor state, not external calls. That is the contract after #450 and #46, and this receipt says so rather than implying an upstream answered.</li>
+<li><code>workers.list</code> returns the queue as aggregated <code>(kind,status,count)</code> buckets and the host registry; it exposes no per-job row id. A row-level read is <code>jobs.list</code>, which this receipt does not take. P1.2's acceptance was amended accordingly at <code>4c3d2df9a</code>.</li>
+<li>Nothing here re-runs T14's six toolkit calls; this is #3's P4.1 only.</li>
+</ul>
+<h2 id="post-receipt-re-read-2026-11-27t07290730z">Post-receipt re-read (2026-11-27T07:29–07:30Z)</h2>
+<p>The engine had rolled since the receipt (<code>sha256:4cd9a9f3…</code> → <code>sha256:2aafb685…</code>). Read again through the same CLI transport, read-only:</p>
+<ul>
+<li><code>workers.list</code> → still 47 <code>(kind,status)</code> buckets and hosts <code>mini1</code>, <code>mini2</code> (<code>30-recheck-workers.json</code>);</li>
+<li><code>billing.summary {window_days:30}</code> → <code>total_usd</code> 1.417925 again; 649 inference calls, 27 tool calls (two more than the 06:21Z reading — the ledger moved, the figure held) (<code>31-recheck-billing.json</code>);</li>
+<li><code>tools.call coding.jobs_get</code> → the same job <code>7c5b90bb…</code> is now <code>succeeded</code>; the coding service's result is <code>status: unsupported</code> ("profile rust expects Cargo.toml at the root of the source; it is not there"). A typed result from the upstream, not a transport error (<code>32-recheck-coding.json</code>).</li>
+</ul>
+<p>This re-read confirms the rows persist; it does not replace the receipt's measurement at <code>4cd9a9f3</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/s04-p41-live/2026-11-27/README.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

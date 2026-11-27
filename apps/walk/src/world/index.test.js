@@ -49,6 +49,18 @@ const wallView = {
   ],
 };
 
+test("the engine config carries the seed and the census rows", () => {
+  // The defect #839: `WorldConfig` has a required `seed`, and the app's config omitted it, so
+  // the wasm constructor threw and every environment silently rendered the fallback.
+  const { w } = world();
+  const config = w.config();
+  assert.equal(config.seed, 7, "the seed must be in the config the boundary parses");
+  assert.deepEqual(config.rooms, [{ id: "portfolio", label: "Portfolio & plan" }]);
+  assert.deepEqual(config.walls, [
+    { route: "/portfolio", room: "portfolio", label: "Portfolio & plan", view: "Portfolio & plan" },
+  ]);
+});
+
 test("a wall picked on the canvas opens that wall's sheet, not a room", () => {
   const { w, hits, worldData } = world();
   w.view = wallView;

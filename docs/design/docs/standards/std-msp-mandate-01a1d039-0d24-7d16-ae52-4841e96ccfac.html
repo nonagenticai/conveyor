@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor generate-standards.py" />
+    <meta name="description" content="MSP artefact generated from the published record." />
+    <title>Mandate — conveyor buildout · conveyor standards</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+    <style>
+      .std-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }
+      .std-meta div { border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }
+      .std-meta dt { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; }
+      .std-meta dd { margin:.15rem 0 0; }
+      .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
+      .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-source { font-size:.85rem; opacity:.8; }
+      .std-index { list-style:none; padding:0; }
+      .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <span class="doc-sep">/</span>
+      <a href="index.html">Standards</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="../../data/standards.json">data</a>
+    </header>
+    <main class="doc-body">
+      <h1>Mandate — conveyor buildout</h1>
+      <dl class="std-meta">
+        <div><dt>Standard</dt><dd>MSP</dd></div>
+        <div><dt>Level</dt><dd>programme</dd></div>
+        <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>SPEC</dt><dd>§8.3</dd></div>
+        <div><dt>Gate</dt><dd>not recorded</dd></div>
+        <div><dt>Package</dt><dd><code>std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-26T21:15:00Z · 34753fa35fc2</dd></div>
+      </dl>
+      <h2>Strategic fit</h2>
+<p class="std-source">Source: <code>programme.json#/programme</code> — 1 row(s)</p>
+<ul>
+<li>conveyor buildout <span class="std-state">active</span></li>
+</ul><h2>Drivers</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 25 row(s)</p>
+<ul>
+<li>Out-of-sequence closure accepted as a retrospective exception (S03) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S05) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06b) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06c) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06d) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S07) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S08) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S09) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S10) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S11) <span class="std-state">accepted</span></li>
+<li>S14 cutover residual accepted by the owner (2026-11-22) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S16) <span class="std-state">accepted</span></li>
+</ul><h2>Deliverables and boundaries</h2>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 51 row(s)</p>
+<ul>
+<li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
+<li>CI, runners and platform <span class="std-state">active</span></li>
+<li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
+<li>UI spike — Leptos CSR vs Leptos SSR <span class="std-state">closed</span></li>
+<li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">active</span></li>
+<li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
+<li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
+<li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
+<li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
+<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
+</ul>
+<p class="std-source">Source: <code>msp.json#/tranches</code> — 14 row(s)</p>
+<ul>
+<li>01a1e9e0-ced2-7769-b12f-f6fba0997914 <span class="std-state">closed</span></li>
+<li>01a1e9e0-d787-7f5c-b5ed-15b05f3dc531 <span class="std-state">closed</span></li>
+<li>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188 <span class="std-state">closed</span></li>
+<li>01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52 <span class="std-state">authorised</span></li>
+<li>01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce <span class="std-state">planned</span></li>
+<li>01a1e9e0-fe45-77e0-993a-d571fecc5ec1 <span class="std-state">planned</span></li>
+<li>01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7 <span class="std-state">planned</span></li>
+<li>01a1e9e1-0fab-7068-99f2-a233045b1276 <span class="std-state">planned</span></li>
+<li>01a1e9e1-183f-7433-bdf8-e264ca2320d4 <span class="std-state">planned</span></li>
+<li>01a1e9e1-20dd-7cda-bd8b-e4fabe1d5db9 <span class="std-state">planned</span></li>
+<li>01a1e9e1-28de-7da4-a03d-3147cb34a775 <span class="std-state">planned</span></li>
+<li>01a1e9e1-33f4-70a7-8af4-658f1c583e99 <span class="std-state">planned</span></li>
+</ul>
+<p class="std-source">Source: <code>msp.json#/programme_baselines</code> — 1 row(s)</p>
+<ul>
+<li>01a1fba9-d095-757c-91ed-afd21ecfa960</li>
+</ul><h2>Success and constraints</h2>
+<p class="std-source">Source: <code>msp.json#/programme_baselines</code> — 1 row(s)</p>
+<ul>
+<li>01a1fba9-d095-757c-91ed-afd21ecfa960</li>
+</ul>
+    </main>
+  </body>
+</html>

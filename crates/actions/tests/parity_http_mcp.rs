@@ -2061,19 +2061,47 @@ async fn seed_arch_review(pg: &support::Pg, ctx: &Ctx, project: Uuid, contract: 
 /// contract alone (this sample is about the gate's contract rule, not the artefact rule).
 async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx) {
     scoped(pg, ctx, async move |conn| {
-        store::architecture::upsert_profile_tx(
+        let profile = store::architecture::upsert_profile_tx(
             conn,
             ctx.tenant,
             &store::architecture::NewProfile {
                 key: format!("parity-adm-{}", Uuid::now_v7().simple()),
                 name: "Parity ADM".to_owned(),
                 phase_set: json!(["preliminary"]),
-                artifact_requirements: json!({}),
+                // An explicitly empty tailored set: the adopted profile states that
+                // `preliminary` requires no artefacts. An absent key would fall back to the
+                // standard's mandatory rows (v1-p81-1) and refuse the sample.
+                artifact_requirements: json!({"preliminary": []}),
                 contract_kinds: json!({}),
             },
         )
         .await
         .expect("seed a profile");
+        // The phase gate reads an ADOPTED profile (v1-p81-1): adopt it on a real approved
+        // architecture-board decision about this profile, so the sample exercises the success
+        // path rather than the refusal the gate no longer lets a draft through.
+        let decision: Uuid = sqlx::query_scalar(
+            "INSERT INTO approval (tenant_id, gate, kind, status, required_decisions, meta)
+             VALUES ($1, 'architecture_board', 'architecture_board', 'approved', 1, $2)
+             RETURNING id",
+        )
+        .bind(ctx.tenant.as_uuid())
+        .bind(json!({
+            "subject_kind": "adm_profile",
+            "subject_id": profile.id.to_string(),
+        }))
+        .fetch_one(&mut *conn)
+        .await
+        .expect("seed the board decision");
+        store::architecture::adopt_profile_tx(
+            conn,
+            ctx.tenant,
+            profile.id,
+            profile.version,
+            decision,
+        )
+        .await
+        .expect("adopt the profile");
     })
     .await;
 }
@@ -8736,7 +8764,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     let org_release_hash = "a".repeat(64);
     let org_release: Uuid = sqlx::query_scalar(
         "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
-         VALUES ($1, $2, $3, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb) RETURNING id",
+         VALUES ($1, $2, $3, '{\"anatomy\":{\"charter\":\"parity\",\"limits\":{\"cost_budget_usd\":1.0}}}'::jsonb) RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(org_job)
@@ -8748,7 +8776,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         "INSERT INTO job_binding
              (tenant_id, job_id, release_id, release_hash, release_snapshot,
               capability_agent_id, executor_kind, status, meta)
-         VALUES ($1, $2, $3, $4, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb, $5,
+         VALUES ($1, $2, $3, $4, '{\"anatomy\":{\"charter\":\"parity\",\"limits\":{\"cost_budget_usd\":1.0}}}'::jsonb, $5,
                  'internal_agent', 'active', '{}'::jsonb)
          RETURNING id",
     )

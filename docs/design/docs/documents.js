@@ -276,8 +276,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "c330a9bf05e64d2c6ae4277dff8e022db29164bd441027440a64abaafc504263",
-      "bytes": 21163,
+      "sha256": "40574a0ea224ccc8337f10f6571cd78cc34e11909178f0adca4e8ec75717dfef",
+      "bytes": 21107,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -285,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "853a85f9d01560ca977c4a83aa3cb0fcffd3fb6d1c40b24999d12235ca73f7e0",
-      "bytes": 26633,
+      "sha256": "cae0c2d8e145e62e4cf2eb679197f28a52223a1e8162b38af96fa955038e6950",
+      "bytes": 26638,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -990,6 +990,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "7e9b40058881ca44088c6795498464c2688871839a234a35e2187e66c8b221d7",
       "bytes": 8834,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
+    },
+    {
+      "title": "S04 P4.1 — the live coding, worker and billing receipts",
+      "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
+      "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",
+      "section": "Evidence",
+      "sha256": "7f0cd04a74e69228abc8a717d964ab01a592736af04dc605479af43dcdd4f415",
+      "bytes": 4336,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/s04-p41-live/2026-11-27/README.md"
     },
     {
       "title": "T19 — Business capability map — approval",
@@ -1734,8 +1743,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "06a6e7ab013926867010128384b1e8dea330d0f713634a0cfae2ec7a523f1fbf",
-      "bytes": 262870,
+      "sha256": "36a9ea9baec8251703573a23958fb31c4dcba29afd6722e4ed66a696a3d132d6",
+      "bytes": 262754,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1806,8 +1815,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "12514c99588f9b8c02f46592384bd62878cb350d8948fbfa9f9df9987ca26fc0",
-      "bytes": 26151,
+      "sha256": "a15d13a40430a7f58c8b5c66e5deefdd6ff1073be0d283c8a58059abdeaac439",
+      "bytes": 26115,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -1842,8 +1851,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/GEMBA-WALK.html",
       "source": "docs/plans/GEMBA-WALK.md",
       "section": "Plans",
-      "sha256": "e81407ac6d41e7add11786b1a6265901e1cc3cc4a18f9e6b9472b56f4a3bcccb",
-      "bytes": 30255,
+      "sha256": "b7ff16ddfbd87e24a902ccb52fc0ffde7b87fd66b93b2055bb98da9f3503ddc3",
+      "bytes": 30524,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
@@ -2157,8 +2166,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T9-architecture-capability.html",
       "source": "docs/plans/T9-architecture-capability.md",
       "section": "Plans",
-      "sha256": "ea086f6278a33091a43d09cf46f29491e10a8b9610897a29801d7cacda96bb09",
-      "bytes": 18552,
+      "sha256": "244030e0a23f20220656fa756a439cbdafef8a78df38b8231b534b46ae1739a3",
+      "bytes": 18561,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {

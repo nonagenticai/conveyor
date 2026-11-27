@@ -1,0 +1,25 @@
+{
+  "approvals": [],
+  "inputs": {},
+  "run": {
+    "attempt": 1,
+    "card_id": "01a21bab-7756-766b-a55e-4d8059825076",
+    "created_at": "2026-11-27T06:22:38.578489Z",
+    "error_class": null,
+    "error_message": null,
+    "finished_at": null,
+    "id": "01a21bab-93d2-7ea7-b0a8-e69af2e17a23",
+    "output": null,
+    "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+    "started_at": "2026-11-27T06:22:41.955385Z",
+    "status": "running",
+    "version": 2
+  },
+  "steps": [],
+  "tree": {
+    "children": [],
+    "depth": 0,
+    "parent_run_id": null,
+    "step_id": null
+  }
+}

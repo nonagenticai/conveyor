@@ -250,9 +250,8 @@ records, not waivers:
   T14's and S21's seeds derive `closed` from their closed unit issues while the live rows stay
   `active`; closing them in planned tranches 13 and 9 would manufacture tranche P0s, so each
   synchronisation waits on its tranche's authorisation (#526 chain) or a seed install;
-- `scripts/programme_state.py` honours a declared `closure_deferred_to_tranche`, so T19F's
-  deferred closure keeps it active instead of deriving `closed` from its closed issues, and
-  `seed/programme-definition.json` carries the declaration.
+- the seed's declared `closure_deferred_to_tranche` keeps T19F active instead of deriving
+  `closed` from its closed issues, and `seed/programme-definition.json` carries the declaration.
 
 The strict set is 162 P0/P1 gaps (29 P0, 133 P1): each is either fixed or an accepted, owned and
 expiring ledger entry. No tranche is authorised by this record.

@@ -60,7 +60,21 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-e",
     "phase-f",
     "phase-g",
-    "phase-h"
+    "phase-h",
+    "benefits-registry",
+    "benefit-evaluation",
+    "architecture-artifact-instance",
+    "mandate",
+    "programme-risk-register",
+    "adr-register",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis",
+    "pi-plan",
+    "pi-objectives",
+    "system-demo",
+    "inspect-adapt"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -2704,6 +2718,880 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       }
+    },
+    "benefits-registry": {
+      "required": [
+        "Benefit profiles",
+        "Map",
+        "Ownership"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Benefits Registry\n\nThe programme's benefits, indexed to their profiles and linked through the benefits map. A benefit with no profile is a wish, not a benefit.\n\n## Benefit profiles\n\nEvery benefit profile, with its reference, measurable improvement and owner.\n\n## Map\n\nThe output, capability, operational outcome and strategic objective each benefit links through.\n\n## Ownership\n\nThe benefit owner, the operational area the improvement is attributed to, and who realizes it.\n\n## Links\n\nThe projects and tranches the benefits depend on.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "benefits-registry",
+      "sources": {
+        "Benefit profiles": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Map": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          }
+        ],
+        "Ownership": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category benefits-registry"
+    },
+    "benefit-evaluation": {
+      "required": [
+        "Baseline and target",
+        "Measurement method",
+        "Actuals and variance",
+        "Decision"
+      ],
+      "optional": [],
+      "skeleton": "# Benefit Evaluation\n\nOne benefit measured against its profile: the baseline and target, the method, the actual performance and the decision the comparison supports.\n\n## Baseline and target\n\nThe baseline measured before the transition and the target the profile names; a placeholder baseline cannot claim an improvement.\n\n## Measurement method\n\nThe instrument and cadence that produce the measurement.\n\n## Actuals and variance\n\nThe post-transition measurement, the delta against the baseline, and the variance against the target.\n\n## Decision\n\nContinue, correct or stop, with the evidence and the owner of the next measurement.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "benefit",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "benefit-evaluation",
+      "sources": {
+        "Baseline and target": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "reference": "$subject_key"
+            }
+          }
+        ],
+        "Measurement method": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "reference": "$subject_key"
+            }
+          }
+        ],
+        "Actuals and variance": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_id": "$subject_id"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_id": "$subject_id"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category benefit-evaluation"
+    },
+    "architecture-artifact-instance": {
+      "required": [
+        "Metadata",
+        "Entries",
+        "Links",
+        "Document"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "architecture-artifact-instance",
+      "sources": {
+        "Metadata": [
+          {
+            "kind": "computed",
+            "name": "artifact_metadata"
+          }
+        ],
+        "Entries": [
+          {
+            "kind": "computed",
+            "name": "artifact_entries"
+          }
+        ],
+        "Links": [
+          {
+            "kind": "computed",
+            "name": "artifact_links"
+          }
+        ],
+        "Document": [
+          {
+            "kind": "computed",
+            "name": "artifact_document"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category architecture-artifact-instance"
+    },
+    "mandate": {
+      "required": [
+        "Strategic fit",
+        "Drivers",
+        "Deliverables and boundaries",
+        "Success and constraints"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Mandate\n\nThe programme's authority to proceed: strategic fit, drivers, deliverables and boundaries, and the success and constraints the sponsoring group authorised.\n\n## Strategic fit\n\nHow the programme serves the organisation's strategy and the current position it starts from.\n\n## Drivers\n\nThe internal and external drivers that make the programme necessary now.\n\n## Deliverables and boundaries\n\nWhat the programme delivers, what it explicitly excludes, and the delivery and assurance approach.\n\n## Success and constraints\n\nThe success criteria, the constraints the programme accepts, and the assumptions it depends on.\n\n## Links\n\nThe governing assets and decisions the mandate authorises.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "mandate",
+      "sources": {
+        "Strategic fit": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "status": "active"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Drivers": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": [
+                "risk",
+                "issue"
+              ]
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Deliverables and boundaries": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "boundary"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Success and constraints": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "status": "active"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "boundary"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category mandate"
+    },
+    "programme-risk-register": {
+      "required": [
+        "Register",
+        "Owners and review dates"
+      ],
+      "optional": [
+        "Categories",
+        "Escalations",
+        "Links"
+      ],
+      "skeleton": "# Programme Risk Register\n\nThe programme's risks, categorized and owned, with the dates they are reviewed and the escalations they forced.\n\n## Register\n\nEvery open and closed risk, with its impact, probability, status and mitigation.\n\n## Categories\n\nThe categories the risks are grouped by, and the category each risk belongs to.\n\n## Owners and review dates\n\nWho owns each risk and the date it is next reviewed; a risk with no owner or review date is refused.\n\n## Escalations\n\nThe risks escalated to the programme board, the sponsoring group or the SRO, with the decision each escalation seeks.\n\n## Links\n\nThe artefacts and issues the register informs.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "programme-risk-register",
+      "sources": {
+        "Register": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Categories": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Owners and review dates": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Escalations": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category programme-risk-register"
+    },
+    "adr-register": {
+      "required": [
+        "Register",
+        "Status and supersession",
+        "Decisions"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# ADR Register\n\nThe architecture decisions of record, their status, and the decision each supersedes or is superseded by. An ADR without a status is refused.\n\n## Register\n\nEvery architecture decision record, with its reference, title, date and governing project.\n\n## Status and supersession\n\nEach ADR's status and the ADR it supersedes or is superseded by; a superseded ADR names its replacement.\n\n## Decisions\n\nThe decision statement each ADR records, with its rationale and consequences.\n\n## Links\n\nThe artefacts, contracts and issues each decision governs.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "adr-register",
+      "sources": {
+        "Register": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
+          }
+        ],
+        "Status and supersession": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
+          }
+        ],
+        "Decisions": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category adr-register"
+    },
+    "candidate-solutions": {
+      "required": [
+        "Candidates",
+        "Criteria",
+        "Options rejected"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Candidate Solutions\n\nThe solution options the phase evaluated, the criteria they were judged on, and the options rejected.\n\n## Candidates\n\nEach candidate solution, with the capabilities it delivers and the work packages it implies.\n\n## Criteria\n\nThe criteria the candidates were judged on, with the score or verdict for each candidate.\n\n## Options rejected\n\nEach rejected option, with the reason it lost and the condition that would reopen it.\n\n## Links\n\nThe drivers, requirements and architecture artefacts the candidates answer.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "candidate-solutions",
+      "sources": {
+        "Candidates": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Criteria": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Options rejected": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category candidate-solutions",
+      "document_authored": true
+    },
+    "project-context-diagram": {
+      "required": [
+        "Context",
+        "Affected organisation",
+        "Affected systems"
+      ],
+      "optional": [],
+      "skeleton": "# Project Context Diagram\n\nThe work package against the affected organisation, functions, services, applications, data and technology. A context diagram with no affected system is refused.\n\n## Context\n\nThe work package and the boundary of the solution the diagram describes.\n\n## Affected organisation\n\nThe actors, roles and organisational units the solution changes or serves.\n\n## Affected systems\n\nThe applications, data and technology the solution touches, with the interface or change at each.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "project-context-diagram",
+      "sources": {
+        "Context": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Affected organisation": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Affected systems": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category project-context-diagram",
+      "document_authored": true
+    },
+    "benefits-diagram": {
+      "required": [
+        "Goals and outcomes",
+        "Measures",
+        "Benefits and sub-benefits"
+      ],
+      "optional": [],
+      "skeleton": "# Benefits Diagram\n\nThe goals and outcomes a solution serves, their measures, and the benefits and sub-benefits that follow.\n\n## Goals and outcomes\n\nThe goals and measurable outcomes the solution contributes to.\n\n## Measures\n\nThe measure and target for each outcome, with the instrument that reads it.\n\n## Benefits and sub-benefits\n\nThe benefits and sub-benefits the outcomes realise, and how each decomposes into the next.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "benefits-diagram",
+      "sources": {
+        "Goals and outcomes": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Measures": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Benefits and sub-benefits": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category benefits-diagram",
+      "document_authored": true
+    },
+    "gap-analysis": {
+      "required": [
+        "Baseline",
+        "Target",
+        "Gaps and work packages"
+      ],
+      "optional": [],
+      "skeleton": "# Gap Analysis\n\nThe baseline and target states, the gaps between them, and the work packages that close each gap.\n\n## Baseline\n\nThe current state, with the evidence that establishes it.\n\n## Target\n\nThe target state the architecture specifies, with the plateau it belongs to.\n\n## Gaps and work packages\n\nEach gap between baseline and target, and the work package that closes it.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "gap-analysis",
+      "sources": {
+        "Baseline": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "gap-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Target": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "gap-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Gaps and work packages": [
+          {
+            "kind": "computed",
+            "name": "gap-analysis",
+            "severity": "P1"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category gap-analysis",
+      "document_authored": true
+    },
+    "pi-plan": {
+      "required": [
+        "Objectives",
+        "Plan",
+        "WSJF order",
+        "Capacity and WIP",
+        "Evidence",
+        "Dependencies",
+        "Backlog refinement"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n\n## Backlog refinement\n\nThe refinement cadence that re-scored the backlog before this plan was taken.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "pi-plan",
+      "sources": {
+        "Objectives": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-plan",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Plan": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
+          }
+        ],
+        "WSJF order": [
+          {
+            "kind": "computed",
+            "name": "wsjf_order",
+            "severity": "P1",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Capacity and WIP": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences",
+            "match": {
+              "kind": "pi"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-plan",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences"
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "computed",
+            "name": "dependency_graph",
+            "severity": "P1"
+          }
+        ],
+        "Backlog refinement": [
+          {
+            "kind": "computed",
+            "name": "refinement_cadence",
+            "severity": "P1"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category pi-plan",
+      "document_authored": true
+    },
+    "pi-objectives": {
+      "required": [
+        "Objectives",
+        "Business value",
+        "Measurement",
+        "Evidence"
+      ],
+      "optional": [
+        "Risks",
+        "Links"
+      ],
+      "skeleton": "# PI objectives\n\nThe objectives for one programme increment, planned before delivery and assessed at its close.\n\n## Objectives\n\nEach objective, in outcome form: what is true after the increment that is not true now.\n\n## Business value\n\nThe planned business value per objective, typed as an integer; the actual value is recorded at the close.\n\n## Measurement\n\nHow each objective is judged: the acceptance manifest, the evidence and the check that decides it.\n\n## Evidence\n\nThe verification runs and the records that support the assessment.\n\n## Risks\n\nThe objectives at risk and what would move them.\n\n## Links\n\nThe PI plan, the tranche review and the project records.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "pi-objectives",
+      "sources": {
+        "Objectives": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-objectives",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Business value": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
+          }
+        ],
+        "Measurement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-objectives",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category pi-objectives",
+      "document_authored": true
+    },
+    "system-demo": {
+      "required": [
+        "Demonstrated",
+        "Evidence",
+        "Credits",
+        "Findings"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# System demo\n\nThe demo record for one programme increment: every completed deliverable exhibits its evidence. No demo, no credit.\n\n## Demonstrated\n\nEach completed deliverable presented, with its project and the outcome it evidences.\n\n## Evidence\n\nThe evidence each deliverable exhibited: the acceptance manifest run, the published output and the record.\n\n## Credits\n\nThe demo credits recorded per accepted deliverable, copied from the deliverable's evidence.\n\n## Findings\n\nWhat the demo exposed: defects, gaps and follow-ups, with owners.\n\n## Links\n\nThe cadence row, the deliverables and the tranche review.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "system-demo",
+      "sources": {
+        "Demonstrated": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Credits": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Findings": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "system-demo",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category system-demo",
+      "document_authored": true
+    },
+    "inspect-adapt": {
+      "required": [
+        "What went well",
+        "What did not",
+        "Lessons",
+        "Actions",
+        "Kata candidates"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Inspect and adapt\n\nThe retro record for one programme increment: what the evidence showed, the lessons it produced and the actions it set.\n\n## What went well\n\nThe practices and decisions the evidence supports keeping.\n\n## What did not\n\nThe failures, delays and bypasses the evidence exposed, named plainly.\n\n## Lessons\n\nOne lesson per finding, as the organisational-memory record; a retro with no lessons is refused.\n\n## Actions\n\nThe actions, owners and dates that follow from the lessons.\n\n## Links\n\nThe retro cadence, the lessons and the tranche review.\n\n## Kata candidates\n\nThe systemic classes the retro raises as kata candidates, each with its evidence.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "inspect-adapt",
+      "sources": {
+        "What went well": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "inspect-adapt",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "What did not": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "inspect-adapt",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Lessons": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/lessons",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Actions": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/lessons",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Kata candidates": [
+          {
+            "kind": "computed",
+            "name": "kata_candidates",
+            "severity": "P1"
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category inspect-adapt",
+      "document_authored": true
     }
   },
   "on_demand": [
@@ -2735,6 +3623,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-e",
     "phase-f",
     "phase-g",
-    "phase-h"
+    "phase-h",
+    "architecture-artifact-instance",
+    "pi-plan",
+    "pi-objectives",
+    "system-demo",
+    "inspect-adapt",
+    "programme-risk-register",
+    "adr-register",
+    "benefits-registry",
+    "benefit-evaluation",
+    "mandate",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis"
   ]
 };

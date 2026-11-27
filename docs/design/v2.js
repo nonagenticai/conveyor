@@ -601,6 +601,10 @@ window.installV2 = function (api, enterprise) {
             // standalone `register.js` is the fallback for a pack that publishes it as a file.
             register: live.register || window.CONVEYOR_REGISTER || null,
             // The generated MSP/TOGAF/SAFe/PMP record is its own published file.
+            // The delivery record (#782 P1/P2): each unit's steps, gates and closure, and the
+            // programme-health counts the page reads beside them.
+            delivery: live.delivery || { units: [] },
+            programme_health: live.programme_health || null,
             standards: window.CONVEYOR_STANDARDS || null,
             generated_at: live.generated_at || null,
           }
@@ -4659,6 +4663,7 @@ window.installV2 = function (api, enterprise) {
   // shape) must not announce `programme`; a published definition must.
   const PUBLIC_PAGES = new Set([
     "portfolio",
+    "delivery",
     "projects",
     "plan",
     "validation",
@@ -7827,6 +7832,22 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
 
   const pages = {
     portfolio,
+    // #782 P2: one delivery unit's real evidence, read from the snapshot's `delivery` section.
+    // The route id is user input, matched against the rows by `unitDetail`, never a selector.
+    delivery: () => {
+      const D = deliveryPack();
+      const data = deliveryData();
+      if (!D || !data) {
+        return panel(
+          "Delivery unit",
+          note(
+            "No published snapshot is loaded. The unit record reads the programme's own rows.",
+            "bad",
+          ),
+        );
+      }
+      return D.unitDetail(data, routeSegments()[1] || "");
+    },
     programme: programmeDefinitionPage,
     adm: architectureCapabilityPage,
     plan,
@@ -7881,6 +7902,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   };
   const titles = {
     portfolio: "Portfolio",
+    delivery: "Delivery unit",
     programme: "Programme definition",
     adm: "Architecture capability",
     plan: "Plan & WBS",

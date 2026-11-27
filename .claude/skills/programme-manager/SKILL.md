@@ -30,7 +30,7 @@ control. Never sign the decision.
 | Tranche rows, baselines, reviews | `docs/SPEC_V2.md` §8.3 |
 | Issue programme fields | `docs/plans/03-DELIVERY.md` § "Issue content contract" |
 | Live register | `seed/programme-definition.json`, `docs/design/data/programme.json` |
-| Instruments | `scripts/programme_state.py`, `check-programme-definition.py`, `check-programme-export.py`, `audit-programme-conformance.py`, `ci/board.py` |
+| Instruments | `scripts/build-coverage.py --check`, `scripts/audit-programme-conformance.py`, `scripts/ci/board.py` |
 | Queue truth | `issue-sweep` (read it; do not duplicate it) |
 | Owner decision | 2026-11-25 — tranches 4–13 are authorised by retrospective reviews: **nine reviews now (4–12), tranche 13 when T12 delivers**, each recording continue/pause/stop and authorising the next. **No consolidated review, no re-plan.** |
 
@@ -105,8 +105,8 @@ control. Never sign the decision.
 ## Verify
 
 ```bash
-python3 scripts/programme_state.py --check
-python3 scripts/check-programme-definition.py
+python3 scripts/build-coverage.py --check
+node docs/design/scripts/check-coverage.cjs
 TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' ~/.conveyor/<tenant>.token)
 curl -fsS -X POST "$CONVEYOR_URL/api/actions/tranches.list/invocations" \
   -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' -d '{"input":{"programme_id":"<programme-id>"}}'

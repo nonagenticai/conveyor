@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1704,
+      "line": 1708,
       "name": "approvals.decide"
     },
     {
-      "line": 6485,
+      "line": 6490,
       "name": "approvals.decide"
     },
     {
-      "line": 6272,
+      "line": 6277,
       "name": "approvals.list"
     },
     {
-      "line": 6273,
+      "line": 6278,
       "name": "approvals.list"
     },
     {
-      "line": 6445,
+      "line": 6450,
       "name": "approvals.request"
     },
     {
-      "line": 1604,
+      "line": 1608,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1605,
+      "line": 1609,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2941,
+      "line": 2945,
       "name": "documents.compose"
     },
     {
-      "line": 3428,
+      "line": 3432,
       "name": "documents.compose"
     },
     {
-      "line": 3223,
+      "line": 3227,
       "name": "documents.create"
     },
     {
-      "line": 3294,
+      "line": 3298,
       "name": "documents.delete"
     },
     {
-      "line": 3240,
+      "line": 3244,
       "name": "documents.download"
     },
     {
-      "line": 3273,
+      "line": 3277,
       "name": "documents.download"
     },
     {
-      "line": 2963,
+      "line": 2967,
       "name": "documents.get"
     },
     {
-      "line": 3258,
+      "line": 3262,
       "name": "documents.get"
     },
     {
-      "line": 1463,
+      "line": 1467,
       "name": "documents.list"
     },
     {
-      "line": 1486,
+      "line": 1490,
       "name": "documents.list"
     },
     {
-      "line": 1513,
+      "line": 1517,
       "name": "documents.list"
     },
     {
-      "line": 3191,
+      "line": 3195,
       "name": "documents.list"
     },
     {
-      "line": 3325,
+      "line": 3329,
       "name": "documents.preview"
     },
     {
-      "line": 3371,
+      "line": 3375,
       "name": "documents.return"
     },
     {
-      "line": 3112,
+      "line": 3116,
       "name": "documents.revision_get"
     },
     {
-      "line": 3073,
+      "line": 3077,
       "name": "documents.revision_list"
     },
     {
-      "line": 6353,
+      "line": 6358,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6345,
+      "line": 6350,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6361,
+      "line": 6366,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6229,
+      "line": 6234,
       "name": "procedures.list"
     },
     {
-      "line": 6558,
+      "line": 6563,
       "name": "procedures.publish"
     },
     {
-      "line": 6406,
+      "line": 6411,
       "name": "procedures.review_source"
     },
     {
-      "line": 6388,
+      "line": 6393,
       "name": "procedures.validate"
     },
     {
-      "line": 1727,
+      "line": 1731,
       "name": "process_runs.start"
     },
     {
-      "line": 6252,
+      "line": 6257,
       "name": "processes.get"
     },
     {
-      "line": 6232,
+      "line": 6237,
       "name": "processes.list"
     },
     {
-      "line": 6560,
+      "line": 6565,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1020,
+      "line": 1024,
       "name": "programmes.list"
     },
     {
-      "line": 1088,
+      "line": 1092,
       "name": "programmes.refresh"
     },
     {
-      "line": 2872,
+      "line": 2876,
       "name": "projects.close"
     },
     {
-      "line": 2733,
+      "line": 2737,
       "name": "projects.create"
     },
     {
-      "line": 1677,
+      "line": 1681,
       "name": "runs.cancel"
     },
     {
-      "line": 1655,
+      "line": 1659,
       "name": "runs.get"
     },
     {
-      "line": 1632,
+      "line": 1636,
       "name": "runs.list"
     }
   ],
@@ -2655,6 +2655,15 @@
     },
     {
       "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
+      "key": "delivery",
+      "status": "live",
+      "title": "Delivery unit"
+    },
+    {
+      "evidence": [
         "docs/design/docs.js"
       ],
       "gap": "Markdown rendered at build time",
@@ -2863,11 +2872,11 @@
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 15,
+        "live": 16,
         "mixed": 0,
         "proposed": 5
       },
-      "total": 27
+      "total": 28
     }
   },
   "version": 1

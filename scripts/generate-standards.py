@@ -37,6 +37,10 @@ import tempfile
 from pathlib import Path
 from typing import Any, Iterable
 
+# WSJF (§8.2): the four inputs, and the three that must be non-negative.
+WSJF_FIELDS = ("business_value", "time_criticality", "risk_reduction", "job_size")
+WSJF_VALUE_FIELDS = WSJF_FIELDS[:3]
+
 ROOT = Path(__file__).resolve().parents[1]
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
 FINDINGS_PATH = ROOT / "docs" / "evidence" / "standards-findings.json"
@@ -350,12 +354,283 @@ def rows_for(
     return [row for row in value if isinstance(row, dict) and matches(row, wanted)]
 
 
+def json_integer(value: Any) -> int | None:
+    """The value when it is a JSON integer, else None (a bool or float is not an input)."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+def wsjf_inputs(row: dict[str, Any]) -> dict[str, int] | None:
+    """The four inputs when the row is a valid WSJF candidate, else None."""
+    values: dict[str, int] = {}
+    for field in WSJF_FIELDS:
+        value = json_integer(row.get(field))
+        if value is None:
+            return None
+        values[field] = value
+    if values["job_size"] < 1:
+        return None
+    if any(values[field] < 0 for field in WSJF_VALUE_FIELDS):
+        return None
+    return values
+
+def wsjf_ordered(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The rows in WSJF order, or [] when ANY row is malformed.
+
+    An empty list makes the section absent, so one malformed candidate cannot hide behind its
+    valid siblings. The computed `wsjf` and `rank` are rendering fields: the snapshot is never
+    written, and the score stays out of the record.
+    """
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for row in rows:
+        values = wsjf_inputs(row)
+        if values is None:
+            return []
+        score = (
+            values["business_value"] + values["time_criticality"] + values["risk_reduction"]
+        ) / values["job_size"]
+        scored.append((score, row))
+    scored.sort(key=lambda item: (-item[0], str(item[1].get("position") or ""), str(item[1].get("id") or "")))
+    return [
+        {**row, "wsjf": score, "rank": rank}
+        for rank, (score, row) in enumerate(scored, start=1)
+    ]
+
+def artifact_satisfies_requirement(artifact: dict[str, Any], key: str) -> bool:
+    """Does this artefact satisfy a required artifact type?
+
+    The snapshot projects `artifact_kind` (the type's code, e.g. `principles_catalog` or the
+    generic `diagram`) and a UUID `artifact_type_id`, but not the type's `key`. A diagram whose
+    title is "Principle derivation — …" is the `principle_derivation` requirement; matching only
+    the kind would report two of the three Preliminary requirements missing while their artefacts
+    exist. The title fallback requires every distinctive word of the key.
+    """
+    kind = str(artifact.get("artifact_kind") or "").lower()
+    if kind == str(key).lower():
+        return True
+    if str(artifact.get("id") or "") == str(key):
+        return True
+    words = {word for word in re.split(r"[^a-z0-9]+", str(key).lower()) if len(word) > 3}
+    title = {word for word in re.split(r"[^a-z0-9]+", str(artifact.get("title") or "").lower()) if len(word) > 3}
+    return bool(words) and words <= title
+
+def dependency_graph_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """The project dependency graph: the typed rows, else the programme's declared edges.
+
+    `msp.project_dependencies` is the typed `project_dependency` table; `msp.dependencies` is the
+    declared graph (each project's `meta.depends_on`, projected by the store). Either is a real
+    graph; an edge without both endpoints is malformed and yields no rows, so the section cannot
+    pass on a partial graph.
+    """
+    msp = snapshot.get("msp") or {}
+    typed = [row for row in msp.get("project_dependencies") or [] if isinstance(row, dict)]
+    if typed:
+        if any(not str(row.get("from_project") or "").strip() or not str(row.get("to_project") or "").strip()
+               for row in typed):
+            return []
+        return [
+            {
+                **row,
+                "title": (
+                    f"{row.get('from_project')} → {row.get('to_project')}"
+                    f" ({row.get('kind') or 'untyped'})"
+                ),
+            }
+            for row in typed
+        ]
+    declared_doc = msp.get("dependencies")
+    if isinstance(declared_doc, dict):
+        declared = declared_doc.get("edges") or []
+    elif isinstance(declared_doc, list):
+        declared = declared_doc
+    else:
+        declared = []
+    declared = [row for row in declared if isinstance(row, dict)]
+    if any(not str(row.get("from") or "").strip() or not str(row.get("to") or "").strip()
+           for row in declared):
+        return []
+    return [
+        {
+            **row,
+            "title": f"{row.get('from')} → {row.get('to')} ({row.get('kind') or 'untyped'})",
+        }
+        for row in declared
+    ]
+
+def refinement_cadence_rows(
+    snapshot: dict[str, Any],
+    source: dict[str, Any],
+    subject: dict[str, Any],
+    category: str,
+    phase: str | None,
+) -> list[dict[str, Any]]:
+    """The backlog-refinement cadence for a period (§8.2).
+
+    A cadence of kind `refinement` without a period cannot be matched to the PI it refines, so it
+    is malformed and yields no rows. An unfiltered read of `/cadences` is not a refinement row.
+    """
+    wanted = substitute(source.get("match") or {"kind": "refinement"}, subject, category, phase)
+    if not wanted:
+        return []
+    cadences = (snapshot.get("msp") or {}).get("cadences") or []
+    selected = [row for row in cadences if isinstance(row, dict) and matches(row, wanted)]
+    if any(not str(row.get("period") or "").strip() for row in selected):
+        return []
+    return [
+        {
+            **row,
+            "title": f"Refinement — {row.get('period')} ({row.get('state') or 'recorded'})",
+        }
+        for row in selected
+    ]
+
+def kata_candidate_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """Kata candidates: a retro lesson's typed marker, plus the kata register when projected.
+
+    §8.2's inspect-and-adapt produces lessons and kata candidates. A lesson's candidate travels
+    in `meta.kata_candidate` (the typed marker the kata opener consumes); a snapshot may also
+    project the `kata` / `kata_candidate` registers. A candidate with no identifier, signature,
+    title or statement is malformed: the section stays absent rather than counting an empty row.
+    """
+    rows: list[dict[str, Any]] = []
+    for lesson in (snapshot.get("msp") or {}).get("lessons") or []:
+        if not isinstance(lesson, dict):
+            continue
+        meta = lesson.get("meta")
+        marker = meta.get("kata_candidate") if isinstance(meta, dict) else None
+        source_kind = str(lesson.get("source") or "").lower()
+        if marker or source_kind in {"kata", "kata_candidate"}:
+            rows.append({**lesson, "kind": "kata_candidate"})
+    kata_document = snapshot.get("kata")
+    if isinstance(kata_document, dict):
+        registers = [
+            value for key in ("candidates", "kata_candidates", "kata", "katas")
+            if isinstance(value := kata_document.get(key), list)
+        ]
+    elif isinstance(kata_document, list):
+        registers = [kata_document]
+    else:
+        registers = []
+    for register in registers:
+        rows.extend(
+            {**row, "kind": "kata_candidate"}
+            for row in register
+            if isinstance(row, dict)
+        )
+    if not rows:
+        return []
+    malformed = [
+        row for row in rows
+        if not any(
+            str(row.get(field) or "").strip()
+            for field in ("id", "signature", "title", "statement")
+        )
+    ]
+    if malformed:
+        return []
+    seen: set[str] = set()
+    unique: list[dict[str, Any]] = []
+    for row in rows:
+        key = next(
+            (str(row.get(field)) for field in ("id", "signature", "title", "statement") if row.get(field)),
+            "",
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append({
+            **row,
+            "title": str(
+                row.get("title") or row.get("signature") or row.get("statement")
+                or row.get("id") or "kata candidate"
+            ),
+        })
+    return unique
+
+def gap_analysis_rows(
+    snapshot: dict[str, Any], register: dict[str, Any] | None, subject: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """The open gaps as one list (§8.1 gap analysis): rework, phase E and the MSP register.
+
+    Three measured sources. An open rework package is a gap; a suppressed or resolved record is
+    not. A required phase-E artifact type with no artefact that satisfies it is a gap; an
+    evidenced type is not. An MSP `register_items` row of kind `issue`/`dependency` that is not
+    closed is a gap; any other kind, or a closed row, is not. A project subject sees its own
+    packages and its own phase-E artefacts; a programme subject sees every open one.
+    """
+    msp = snapshot.get("msp") or {}
+    architecture = snapshot.get("architecture") or {}
+    is_project = str(subject.get("kind") or "") in {"project", "phase"}
+    project_ids = {
+        str(subject.get("project_id") or ""),
+        str(subject.get("id") or ""),
+        str(subject.get("project_key") or ""),
+        str(subject.get("key") or ""),
+    } - {""}
+    rows: list[dict[str, Any]] = []
+    for package in (register or {}).get("packages") or []:
+        if not isinstance(package, dict) or str(package.get("status") or "") != "open":
+            continue
+        if is_project:
+            applies_to = {
+                str(package.get("apply_to") or ""),
+                str(package.get("owner_project") or ""),
+            }
+            if str(package.get("scope") or "") != "programme" and not (applies_to & project_ids):
+                continue
+        rows.append({
+            "kind": "rework",
+            "id": str(package.get("key") or ""),
+            "title": str(package.get("title") or package.get("rule") or "rework package"),
+            "severity": str(package.get("severity") or ""),
+            "status": "open",
+        })
+    profile = (architecture.get("profiles") or [{}])[0]
+    requirements = profile.get("artifact_requirements") or {}
+    wanted = requirements.get("e") or requirements.get("E") or {}
+    names = {
+        str(row.get("key")): str(row.get("name") or row.get("key"))
+        for row in architecture.get("standard") or []
+    }
+    evidence = [
+        artifact for artifact in architecture.get("artifacts") or []
+        if str(artifact.get("phase_code") or "").lower() == "e"
+        and (not is_project or str(artifact.get("project_id") or "") in project_ids)
+    ]
+    for plateau in sorted(wanted):
+        for key in wanted[plateau] or []:
+            if any(artifact_satisfies_requirement(artifact, str(key)) for artifact in evidence):
+                continue
+            rows.append({
+                "kind": "phase_e",
+                "id": str(key),
+                "title": names.get(str(key), str(key)),
+                "status": "missing",
+            })
+    for item in msp.get("register_items") or []:
+        if not isinstance(item, dict):
+            continue
+        kind = str(item.get("kind") or "")
+        if kind not in {"issue", "dependency"}:
+            continue
+        if str(item.get("status") or "").lower() in {"closed", "resolved", "done"}:
+            continue
+        rows.append({
+            **item,
+            "kind": kind,
+            "title": str(item.get("title") or item.get("statement") or item.get("id") or kind),
+        })
+    return rows
+
 def computed_rows(
     name: str,
     source: dict[str, Any],
     snapshot: dict[str, Any],
     subject: dict[str, Any],
     programme_projects: dict[str, set[str]],
+    register: dict[str, Any] | None = None,
+    category: str = "",
+    phase: str | None = None,
 ) -> list[dict[str, Any]]:
     msp = snapshot.get("msp") or {}
     architecture = snapshot.get("architecture") or {}
@@ -421,6 +696,73 @@ def computed_rows(
             artifact for artifact in architecture.get("artifacts") or []
             if "requirement" in json.dumps(artifact).lower()
         ]
+    if name == "gap-analysis":
+        return gap_analysis_rows(snapshot, register, subject)
+    if name == "dependency_graph":
+        return dependency_graph_rows(snapshot)
+    if name == "refinement_cadence":
+        return refinement_cadence_rows(snapshot, source, subject, category, phase)
+    if name == "kata_candidates":
+        return kata_candidate_rows(snapshot)
+    if name == "wsjf_order":
+        # The plan's candidate set is `status: accepted` unless the source narrows it further.
+        wanted = substitute(source.get("match") or {"status": "accepted"}, subject, category, phase)
+        selected = [
+            row for row in msp.get("wbs_nodes") or []
+            if isinstance(row, dict) and matches(row, wanted)
+        ]
+        return wsjf_ordered(selected)
+    if name == "artifact_metadata":
+        # The snapshot projects the artefact's typed fields on the ROW (artifact_kind,
+        # document_id, entries, ...); meta carries the retrospective binding. Reading only meta
+        # false-reddened every artefact-instance section (measured 2026-11-25: 86 artefacts had
+        # a document while the resolver reported none).
+        meta = dict(subject.get("meta") or {})
+        fields = {
+            key: subject.get(key)
+            for key in (
+                "artifact_kind",
+                "artifact_type_id",
+                "phase_code",
+                "plateau",
+                "status",
+                "version",
+                "contract_id",
+            )
+            if subject.get(key) is not None
+        }
+        fields.update(meta)
+        return [{"kind": str(fields.get("artifact_kind") or "artifact"), **fields}]
+    if name == "artifact_entries":
+        entries = (
+            subject.get("entries")
+            or (subject.get("meta") or {}).get("entries")
+            or []
+        )
+        return [{"kind": "entry", **entry} for entry in entries if isinstance(entry, dict)]
+    if name == "artifact_links":
+        artifact_id = str(subject.get("id") or "")
+        return [
+            {"kind": "link", **link}
+            for link in architecture.get("links") or []
+            if artifact_id and artifact_id in {
+                str(link.get("from_artifact_id") or ""),
+                str(link.get("to_artifact_id") or ""),
+            }
+        ]
+    if name == "artifact_document":
+        document_id = str(
+            subject.get("document_id")
+            or (subject.get("meta") or {}).get("document_id")
+            or ""
+        )
+        if not document_id:
+            return []
+        return [
+            document
+            for document in (snapshot.get("artefacts") or {}).get("documents") or []
+            if str(document.get("id") or "") == document_id
+        ]
     raise GenerationError(f"unknown computed source {name!r}")
 
 
@@ -463,6 +805,7 @@ def resolve_section(
     snapshot: dict[str, Any],
     outputs_dir: Path,
     programme_projects: dict[str, set[str]],
+    register: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     sources = template.get("sources") or {}
     declared = sources.get(heading)
@@ -493,7 +836,10 @@ def resolve_section(
                     missing_headings.append(heading)
                 resolved.append(document_source)
             elif kind == "computed":
-                rows = computed_rows(str(source.get("name")), source, snapshot, subject, programme_projects)
+                rows = computed_rows(
+                    str(source.get("name")), source, snapshot, subject, programme_projects,
+                    register=register, category=category, phase=subject.get("phase"),
+                )
                 resolved.append({
                     "kind": "computed", "name": str(source.get("name")),
                     "count": len(rows), "items": [row_summary(row) for row in rows[:12]],
@@ -632,6 +978,7 @@ def build_instances(
     std: dict[str, Any],
     snapshot: dict[str, Any],
     outputs_dir: Path,
+    register: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     subjects = build_subjects(snapshot)
     programme_doc = snapshot.get("programme") or {}
@@ -659,17 +1006,23 @@ def build_instances(
                 required = list(template.get("required") or [])
                 sections = [
                     resolve_section(
-                        heading, template, category, subject, snapshot, outputs_dir, programme_projects
+                        heading, template, category, subject, snapshot, outputs_dir,
+                        programme_projects, register,
                     )
                     for heading in required
                 ]
                 for heading in template.get("optional") or []:
                     if heading in (template.get("sources") or {}):
                         sections.append(resolve_section(
-                            heading, template, category, subject, snapshot, outputs_dir, programme_projects
+                            heading, template, category, subject, snapshot, outputs_dir,
+                            programme_projects, register,
                         ))
                 evidenced = [section for section in sections if section["status"] == "evidenced"]
-                if len(evidenced) == len(required):
+                # Every section the artefact resolves — the required ones AND the optional ones a
+                # template declares a source for — must be evidenced. Counting only `required`
+                # made any artefact with a resolving optional heading falsely partial, and its
+                # finding's evidence list empty (measured 2026-11-27: programme-risk-register).
+                if len(evidenced) == len(sections):
                     status = "evidenced"
                 elif evidenced:
                     status = "partial"
@@ -1076,7 +1429,7 @@ def generate(
     html_out: Path | None = None,
     covered_keys: set[str] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    instances, _ = build_instances(std, snapshot, outputs_dir)
+    instances, _ = build_instances(std, snapshot, outputs_dir, register)
     findings = build_findings(instances, snapshot, covered_keys)
     if register is not None:
         packages = [package for package in register.get("packages") or [] if isinstance(package, dict)]

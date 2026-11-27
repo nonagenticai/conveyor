@@ -870,6 +870,126 @@ pub struct Prechecked<'a> {
     pub precondition: Option<Precondition>,
 }
 
+/// The SPEC's typed budget refusal: nothing was dispatched, so nothing is charged.
+fn budget_exceeded(detail: String) -> ActionError {
+    ActionError::new(429, "tool_budget_exceeded", detail)
+}
+
+/// The run-level inference pre-call gate (#526; SPEC_V2 §7.5, §11.3 step 2).
+///
+/// A `captures_usage` action dispatches a billable model call. The broker's spend gate covers a
+/// `spend`-class tool, but a run also reaches a capturing action directly — a workflow node, a
+/// process step, the capped agent loop — so the ceiling is enforced here too, before the handler
+/// runs and before any network call.
+///
+/// The budget is the same resolution the broker uses: [`store::inference::run_budget_tx`] reads
+/// the job release's `anatomy.limits.cost_budget_usd`, the binding's `meta.limits` override and a
+/// lower `run.inputs.limits`, and derives the recorded spend from the same ledgers (each call
+/// counted once). A run with no declared budget is refused, never treated as unlimited (D45: a
+/// spend call needs a budget).
+///
+/// A `run_id` that names no row in this tenant is **not** gated: `usage.run_id` is resolved by
+/// the engine (the broker checks the `tools.call` body's run id before copying it here),
+/// `inference_call`'s join keys are deliberately not FKs, and a dangling attribution has no run
+/// whose ceiling could be read. Refusing there would turn an accounting fixture into a false
+/// refusal without closing any caller-controlled path.
+async fn enforce_run_budget(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    run_id: Uuid,
+) -> Result<(), ActionError> {
+    let captured: Vec<String> = registry
+        .iter()
+        .filter(|spec| spec.captures_usage)
+        .map(|spec| spec.name.to_string())
+        .collect();
+    let mut tx = store::begin_scoped_read_only(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, run = %run_id, "scope the run's budget read");
+            ActionError::internal()
+        })?;
+    let budget = store::inference::run_budget_tx(&mut tx, tenant, run_id, &captured).await;
+    let _ = tx.rollback().await;
+    let budget = match budget {
+        Ok(budget) => budget,
+        Err(store::inference::InferenceStoreError::Database(sqlx::Error::RowNotFound)) => {
+            return Ok(());
+        }
+        Err(error) => {
+            tracing::error!(%error, run = %run_id, "read the run's spend budget");
+            return Err(ActionError::internal());
+        }
+    };
+    let Some(limit) = budget.limit_usd else {
+        return Err(budget_exceeded(format!(
+            "run {run_id} has no spend budget: declare `limits.cost_budget_usd` on the job \
+             release, the job binding's meta or the run's inputs before a model-calling action \
+             may run"
+        )));
+    };
+    if budget.spent_usd >= limit {
+        return Err(budget_exceeded(format!(
+            "run {run_id} has spent {} of its {limit} USD spend budget; the model call was \
+             refused before dispatch",
+            budget.spent_usd
+        )));
+    }
+    Ok(())
+}
+
+/// The ceiling a run declares for itself in `inputs.limits.cost_budget_usd`, if any.
+fn input_budget(inputs: &Value) -> Option<Decimal> {
+    let raw = inputs.get("limits")?.get("cost_budget_usd")?;
+    Decimal::try_from(raw.as_f64()?)
+        .ok()
+        .filter(|limit| *limit >= Decimal::ZERO)
+}
+
+/// Refuse to START a run on an `internal_agent` binding that declares no spend ceiling
+/// (#526; SPEC_V2 §4.4, §7.5, D45).
+///
+/// The call-time gate below stops the first model call, but a run that can never legally spend
+/// should not start at all: the refusal belongs at the start, naming the missing declaration and
+/// both places it may be made — the binding's `meta.limits` / its release's `anatomy.limits`, or
+/// this run's `inputs.limits`. A **procedure** binding is not gated: it may legitimately never
+/// call a model, and a declared `cost_budget_usd: 0` is the honest way to say "never spend".
+///
+/// A binding that does not exist in this tenant is left to the caller's own resolution, which
+/// produces the typed not-found before anything is written.
+pub(crate) async fn ensure_binding_budget(
+    conn: &mut sqlx::PgConnection,
+    tenant: TenantId,
+    binding_id: Uuid,
+    inputs: &Value,
+) -> Result<(), ActionError> {
+    let binding = store::inference::binding_budget_tx(conn, tenant, binding_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, binding = %binding_id, "read the binding's spend budget");
+            ActionError::internal()
+        })?;
+    let Some(binding) = binding else {
+        return Ok(());
+    };
+    if binding.executor_kind != "internal_agent"
+        || binding.limit_usd.is_some()
+        || input_budget(inputs).is_some()
+    {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        422,
+        "budget_missing",
+        format!(
+            "the job binding {binding_id} declares no `limits.cost_budget_usd` and this run \
+             declares none; an internal-agent run must declare its spend ceiling before it may \
+             start"
+        ),
+    ))
+}
+
 /// Everything an invocation must satisfy BEFORE any work starts (#579): the action exists, the
 /// caller may call it, and the input satisfies the schema.
 ///
@@ -877,8 +997,10 @@ pub struct Prechecked<'a> {
 /// invalid input or a forbidden caller therefore fails the SUBMIT with the status the
 /// synchronous call would have returned — the work is never queued and the caller never has to
 /// poll to learn that its request was bad.
-pub fn precheck<'a>(
+pub async fn precheck<'a>(
+    pool: &PgPool,
     registry: &'a Registry,
+    tenant: TenantId,
     request: &InvokeRequest,
 ) -> Result<Prechecked<'a>, ActionError> {
     let Some(spec) = registry.get(&request.action) else {
@@ -904,6 +1026,15 @@ pub fn precheck<'a>(
     }
     if spec.kind == ActionKind::Workflow {
         return Err(ActionError::workflow(spec.name));
+    }
+
+    // #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
+    // so the run it belongs to must admit it before the input is parsed (the broker's order:
+    // budget, then validate) and before any handler or destination is reached.
+    if spec.captures_usage
+        && let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id)
+    {
+        enforce_run_budget(pool, registry, tenant, run_id).await?;
     }
 
     // The reserved `_version` member is stripped BEFORE validation (CONTRACT §6); the
@@ -958,7 +1089,7 @@ pub async fn invoke(
         spec,
         input,
         precondition,
-    } = precheck(registry, &request)?;
+    } = precheck(pool, registry, tenant, &request).await?;
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {

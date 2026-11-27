@@ -331,10 +331,6 @@ jobs:
         run: |
           python3 scripts/build-coverage.py --check
           python3 scripts/build-v2-coverage.py --check
-          python3 scripts/build-programme-seed.py --check
-          python3 scripts/check-programme-definition.py
-          python3 scripts/programme_state.py --self-test
-          python3 scripts/programme_state.py --check
           python3 scripts/audit-programme-conformance.py --self-test
           python3 scripts/audit-programme-conformance.py --check-standard
           python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report --out "$RUNNER_TEMP/conformance"
@@ -351,6 +347,7 @@ jobs:
           python3 scripts/proof/collect_units.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
+          node docs/design/scripts/check-delivery.cjs
           node docs/design/scripts/check-standards.cjs --self-test
           node docs/design/scripts/check-standards.cjs --data docs/design/data --documents docs/design
           node docs/design/scripts/check-outputs.cjs --self-test

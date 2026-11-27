@@ -10,6 +10,9 @@ import { roomIndexOf, wallIndexOf } from "./port.js";
 
 const TIMESTEP_MS = 16.666667;
 const MOVE_KEYS = new Set(["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"]);
+// One seed for the engine: the constructor's first argument (BigInt) and the config's `seed`
+// field must agree, and `WorldConfig` on the Rust side requires the field to deserialize.
+const SEED = 7;
 
 export class World {
   /**
@@ -54,6 +57,9 @@ export class World {
 
   config() {
     return {
+      // `WorldConfig` deserializes with a required `seed`; the constructor argument is
+      // authoritative and overwrites it, but the field must be present for the parse.
+      seed: SEED,
       rooms: this.worldData.rooms.map((room) => ({ id: room.id, label: room.label })),
       walls: this.worldData.walls.map((wall) => ({
         route: wall.walk,
@@ -67,7 +73,7 @@ export class World {
   async startEngine() {
     try {
       const module = await loadEngine();
-      this.engine = new module.WasmWalkWorld(7n, JSON.stringify(this.config()));
+      this.engine = new module.WasmWalkWorld(BigInt(SEED), JSON.stringify(this.config()));
       this.canvas.dataset.engine = "ecs";
       this.canvas.setAttribute(
         "aria-label",

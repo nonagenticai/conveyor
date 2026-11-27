@@ -3671,6 +3671,384 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b1",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b1",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b1",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b1:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Auditable decisions is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+        "key": "B1",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Auditable decisions"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b2",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b2",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b2",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b2:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Less bespoke tooling is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+        "key": "B2",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Less bespoke tooling"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b3",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b3",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b3",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b3:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Self-development is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+        "key": "B3",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Self-development"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b4",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b4",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b4",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b4:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Public collaboration is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+        "key": "B4",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Public collaboration"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b5",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b5",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b5",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b5:PLATFORM",
+      "problem": "The benefit-evaluation artefact for One model is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+        "key": "B5",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "One model"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b6",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b6",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b6",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b6:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Predictable delivery is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+        "key": "B6",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Predictable delivery"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "benefit-evaluation",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b7",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b7",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b7",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b7:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Deliberated cross-department decisions is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a20c80-c0c3-7788-9cc2-bb18a102a2f7",
+        "key": "B7",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Deliberated cross-department decisions"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "business-case",
       "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
       "category": "business-case",
@@ -6594,6 +6972,47 @@
         "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
       },
       "title": "PMP artefact partial: project-registers"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "inspect-adapt",
+      "audited_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
+      "category": "inspect-adapt",
+      "evidence": [
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Kata candidates",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Kata candidates"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The inspect-adapt artefact for conveyor buildout is partial; missing required sections: Kata candidates.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact partial: inspect-adapt"
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
