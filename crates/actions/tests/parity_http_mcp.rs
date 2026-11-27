@@ -8743,7 +8743,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     let org_release_hash = "a".repeat(64);
     let org_release: Uuid = sqlx::query_scalar(
         "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
-         VALUES ($1, $2, $3, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb) RETURNING id",
+         VALUES ($1, $2, $3, '{\"anatomy\":{\"charter\":\"parity\",\"limits\":{\"cost_budget_usd\":1.0}}}'::jsonb) RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(org_job)
@@ -8755,7 +8755,7 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         "INSERT INTO job_binding
              (tenant_id, job_id, release_id, release_hash, release_snapshot,
               capability_agent_id, executor_kind, status, meta)
-         VALUES ($1, $2, $3, $4, '{\"anatomy\":{\"charter\":\"parity\"}}'::jsonb, $5,
+         VALUES ($1, $2, $3, $4, '{\"anatomy\":{\"charter\":\"parity\",\"limits\":{\"cost_budget_usd\":1.0}}}'::jsonb, $5,
                  'internal_agent', 'active', '{}'::jsonb)
          RETURNING id",
     )

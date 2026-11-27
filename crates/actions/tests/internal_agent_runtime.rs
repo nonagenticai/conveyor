@@ -231,7 +231,8 @@ async fn bind(
             process_id: None,
             capability_agent_id: Some(agent),
             capability_id: Some(capability),
-            meta: json!({}),
+            // An internal-agent run requires a declared spend ceiling (§7.5, D45).
+            meta: json!({"limits": {"cost_budget_usd": 1.0}}),
             status: conveyor_domain::organisation::BindingStatus::Active,
         },
         &conveyor_domain::executor::Registry::builtin(),

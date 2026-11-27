@@ -582,3 +582,220 @@ async fn emit_recorded_event(
         .await
         .map(|_| ())
 }
+/// **Where a budget is declared.** The job's release carries `anatomy.limits` (§4.2: "max
+/// iterations, timeout, token and cost budget"), and the binding carries the documented limits
+/// override in `job_binding.meta->'limits'`; a run may lower the ceiling in
+/// `run.inputs->'limits'`. The key is `cost_budget_usd`, a JSON number of US dollars. This is the
+/// shape SPEC_V2 §4.2 already gives the two rows — a second typed column would be a second place
+/// to look, and the release is immutable, so the binding's snapshot is the stable default.
+///
+/// **What counts as spend.** Two ledgers, each call counted once:
+///
+/// * the outcome price of every `inference_call` the run made — derived at read time from
+///   `commercial_price`, exactly as every report derives it (D52), including calls a tool
+///   handler made, because those carry the run id the broker forwarded;
+/// * `tool_call.cost` for every tool whose handler does **not** capture usage. A capturing
+///   handler's money is already the inference rows above, so counting its `tool_call.cost` as
+///   well would charge the same call twice.
+///
+/// An unpriced call contributes nothing: "no price" is not "$0", and the ledger cannot invent a
+/// number. `limit_usd = None` means neither row declares a budget, which is the legacy state —
+/// the broker treats that as no spend authority, never as unlimited (D45: spend calls need a
+/// budget).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RunBudget {
+    /// The effective ceiling in USD (`min` of the run override and the binding default).
+    pub limit_usd: Option<Decimal>,
+    /// Tool spend plus derived inference spend already committed against the run.
+    pub spent_usd: Decimal,
+}
+
+/// Read the run's declared ceiling and its spend to date.
+///
+/// `captured_handlers` names the registered actions that write an `inference_call` row; their
+/// tools' `tool_call.cost` is the same money, so it is not added a second time.
+pub async fn run_budget_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    captured_handlers: &[String],
+) -> Result<RunBudget, InferenceStoreError> {
+    #[derive(sqlx::FromRow)]
+    struct Row {
+        limit_usd: Option<Decimal>,
+        spent_usd: Decimal,
+    }
+    let row: Row = sqlx::query_as(
+        "WITH declared AS (
+             SELECT r.id,
+                    CASE WHEN jsonb_typeof(r.inputs->'limits'->'cost_budget_usd') = 'number'
+                         THEN CASE WHEN (r.inputs->'limits'->>'cost_budget_usd')::numeric >= 0
+                                   THEN (r.inputs->'limits'->>'cost_budget_usd')::numeric END
+                    END AS run_budget,
+                    coalesce(
+                        CASE WHEN jsonb_typeof(b.meta->'limits'->'cost_budget_usd') = 'number'
+                             THEN CASE WHEN (b.meta->'limits'->>'cost_budget_usd')::numeric >= 0
+                                       THEN (b.meta->'limits'->>'cost_budget_usd')::numeric END
+                        END,
+                        CASE WHEN jsonb_typeof(
+                                      b.release_snapshot->'anatomy'->'limits'->'cost_budget_usd'
+                                  ) = 'number'
+                             THEN CASE WHEN (b.release_snapshot->'anatomy'->'limits'
+                                             ->>'cost_budget_usd')::numeric >= 0
+                                       THEN (b.release_snapshot->'anatomy'->'limits'
+                                             ->>'cost_budget_usd')::numeric END
+                        END
+                    ) AS binding_budget
+               FROM run r
+               LEFT JOIN job_binding b
+                      ON b.id = r.job_binding_id AND b.tenant_id = r.tenant_id
+              WHERE r.tenant_id = $1 AND r.id = $2
+         )
+         SELECT least(d.run_budget, d.binding_budget) AS limit_usd,
+                coalesce((
+                    SELECT round(sum(cost), 6)
+                      FROM (
+                          SELECT CASE
+                                     WHEN p.model IS NULL THEN NULL
+                                     WHEN p.unit = 'token' THEN
+                                         (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                                          + ic.completion_tokens::numeric * p.output_usd_per_1m)
+                                         / 1000000
+                                     WHEN ic.usage_units IS NOT NULL
+                                         THEN ic.usage_units * p.unit_usd
+                                     ELSE NULL
+                                 END AS cost
+                            FROM inference_call ic
+                            LEFT JOIN commercial_price p
+                                   ON p.model = coalesce(ic.served_model, ic.model)
+                                  AND ((p.unit = 'token' AND ic.usage_unit IS NULL)
+                                       OR p.unit = ic.usage_unit)
+                           WHERE ic.tenant_id = $1 AND ic.run_id = $2
+                          UNION ALL
+                          SELECT tc.cost
+                            FROM tool_call tc
+                            JOIN tool t
+                              ON t.id = tc.tool_id AND t.tenant_id = tc.tenant_id
+                           WHERE tc.tenant_id = $1 AND tc.run_id = $2
+                             AND NOT (t.handler_action = ANY($3::text[]))
+                      ) spend
+                ), 0)::numeric(18,6) AS spent_usd
+           FROM declared d",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(captured_handlers.to_vec())
+    .fetch_one(conn)
+    .await?;
+    Ok(RunBudget {
+        limit_usd: row.limit_usd,
+        spent_usd: row.spent_usd,
+    })
+}
+
+/// A job binding's declared spend authority: what may spend, and up to how much.
+///
+/// The ceiling is the same pair [`run_budget_tx`] resolves — the binding's `meta.limits` override
+/// first, then the pinned release's `anatomy.limits` — with the same guard that only a
+/// non-negative JSON number is a declaration. `executor_kind` decides whether the absence matters:
+/// a procedure binding that never calls a model needs no spend authority, while an
+/// `internal_agent` binding cannot honestly start a run without one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BindingBudget {
+    /// The binding's executor kind (`procedure | internal_agent | external_agent`).
+    pub executor_kind: String,
+    /// The declared ceiling in USD, when one is declared.
+    pub limit_usd: Option<Decimal>,
+}
+
+/// Read one binding's declared ceiling. `None` when the binding does not exist in the tenant;
+/// the caller's own binding resolution produces the typed not-found.
+pub async fn binding_budget_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    binding_id: Uuid,
+) -> Result<Option<BindingBudget>, InferenceStoreError> {
+    #[derive(sqlx::FromRow)]
+    struct Row {
+        executor_kind: String,
+        limit_usd: Option<Decimal>,
+    }
+    let row: Option<Row> = sqlx::query_as(
+        "SELECT executor_kind,
+                coalesce(
+                    CASE WHEN jsonb_typeof(meta->'limits'->'cost_budget_usd') = 'number'
+                         THEN CASE WHEN (meta->'limits'->>'cost_budget_usd')::numeric >= 0
+                                   THEN (meta->'limits'->>'cost_budget_usd')::numeric END
+                    END,
+                    CASE WHEN jsonb_typeof(
+                                  release_snapshot->'anatomy'->'limits'->'cost_budget_usd'
+                              ) = 'number'
+                         THEN CASE WHEN (release_snapshot->'anatomy'->'limits'
+                                         ->>'cost_budget_usd')::numeric >= 0
+                                   THEN (release_snapshot->'anatomy'->'limits'
+                                         ->>'cost_budget_usd')::numeric END
+                    END
+                ) AS limit_usd
+           FROM job_binding
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(binding_id)
+    .fetch_optional(conn)
+    .await?;
+    Ok(row.map(|row| BindingBudget {
+        executor_kind: row.executor_kind,
+        limit_usd: row.limit_usd,
+    }))
+}
+
+/// The derived price of the `inference_call` rows one action invocation wrote, or `None` when
+/// none of them is priced.
+///
+/// This is the broker's "actual cost" for a tool call: the handler's own ledger rows, at the
+/// same read-time formula every report uses (D52). A row with no `commercial_price` match is
+/// unpriced — `None`, never `$0`.
+///
+/// `since` is an index aid, not the match: the invocation id is exact, and the ledger row is
+/// written when the call completes, seconds before the broker reads it. The window keeps the
+/// query on `inference_call_run_idx` instead of scanning a tenant's whole ledger per call.
+pub async fn cost_of_invocation_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    invocation_id: Uuid,
+    since: DateTime<Utc>,
+) -> Result<Option<Decimal>, InferenceStoreError> {
+    #[derive(sqlx::FromRow)]
+    struct Row {
+        priced: i64,
+        cost: Option<Decimal>,
+    }
+    let row: Row = sqlx::query_as(
+        "WITH priced AS (
+             SELECT CASE
+                        WHEN p.model IS NULL THEN NULL
+                        WHEN p.unit = 'token' THEN
+                            (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                             + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
+                        WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * p.unit_usd
+                        ELSE NULL
+                    END AS cost
+               FROM inference_call ic
+               LEFT JOIN commercial_price p
+                      ON p.model = coalesce(ic.served_model, ic.model)
+                     AND ((p.unit = 'token' AND ic.usage_unit IS NULL)
+                          OR p.unit = ic.usage_unit)
+              WHERE ic.tenant_id = $1 AND ic.run_id = $2 AND ic.created_at >= $3
+                AND ic.action_invocation_id = $4
+         )
+         SELECT count(cost)::bigint AS priced, sum(cost) AS cost FROM priced",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(since)
+    .bind(invocation_id)
+    .fetch_one(conn)
+    .await?;
+    Ok((row.priced > 0).then(|| row.cost.unwrap_or_default()))
+}

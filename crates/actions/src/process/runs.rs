@@ -401,6 +401,8 @@ pub(crate) async fn process_runs_start(
                 ),
             ));
         }
+        // #526: an internal-agent binding must declare its spend ceiling before the run starts.
+        crate::invoke::ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
     }
     let new_run = store::run::NewRun {
         card_id: Some(card.id),
