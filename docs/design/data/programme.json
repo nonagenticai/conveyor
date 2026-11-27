@@ -10,6 +10,35 @@
             "name": "unit"
           },
           {
+            "color": "0E8A16",
+            "name": "status:ready"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          },
+          {
+            "color": "6E7781",
+            "name": "T18"
+          },
+          {
+            "color": "B60205",
+            "name": "status:not-ready"
+          }
+        ],
+        "number": 848,
+        "state": "OPEN",
+        "title": "test: T18 — every V2 destination's spec asserts empty, error, happy and one refusal",
+        "updatedAt": "2026-11-27T13:28:36Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/848"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
             "color": "FBCA04",
             "name": "status:claimed"
           },
@@ -188,7 +217,7 @@
         "number": 831,
         "state": "CLOSED",
         "title": "T4/T9/T10: the tranche-4 P0 residuals — six code findings and the two missing reviews",
-        "updatedAt": "2026-11-27T12:57:15Z",
+        "updatedAt": "2026-11-27T13:25:44Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/831"
       },
       {
@@ -7205,7 +7234,7 @@
       }
     ],
     "provenance": {
-      "sha256": "65eacad79daf55df4301a4480a08b2875e90251ab4ecabef063ea0991e29f844",
+      "sha256": "27bf8b0a2c1f69a74e7c8c6fc96c2d8134b90ab3fc3f5e6019841dc43a6b258d",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

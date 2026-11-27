@@ -6,6 +6,35 @@
   },
   "issues": [
     {
+      "number": 848,
+      "title": "test: T18 \u2014 every V2 destination's spec asserts empty, error, happy and one refusal",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/848",
+      "updatedAt": "2026-11-27T13:28:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T18",
+          "color": "6E7781"
+        },
+        {
+          "name": "status:not-ready",
+          "color": "B60205"
+        }
+      ]
+    },
+    {
       "number": 847,
       "title": "walk: G0 conformance \u2014 the record and the parity instrument tell the truth",
       "state": "OPEN",
@@ -165,7 +194,7 @@
       "title": "T4/T9/T10: the tranche-4 P0 residuals \u2014 six code findings and the two missing reviews",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/831",
-      "updatedAt": "2026-11-27T12:57:15Z",
+      "updatedAt": "2026-11-27T13:25:44Z",
       "labels": [
         {
           "name": "unit",

@@ -770,7 +770,7 @@
   ],
   "snapshot": {
     "generated_at": "2026-11-27T12:10:18.740973+00:00",
-    "git_sha": "7f69723b42694f0c28d36cbd1bdc198fd0634161",
+    "git_sha": "9f475dc880590659e89e74a39bfee15a0cd9e4b6",
     "path": "data",
     "tenant": "nonagentic"
   },

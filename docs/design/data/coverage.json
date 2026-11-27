@@ -2137,10 +2137,11 @@
           563,
           564,
           565,
-          566
+          566,
+          848
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2864,11 +2865,9 @@
         "standing": 1
       },
       "total": 52,
-      "uncovered": [
-        "T18"
-      ],
-      "with_open_units": 7,
-      "without_open_units": 45
+      "uncovered": [],
+      "with_open_units": 8,
+      "without_open_units": 44
     },
     "screens": {
       "actions_invoked": 39,

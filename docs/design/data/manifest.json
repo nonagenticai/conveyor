@@ -5111,25 +5111,25 @@
       "bytes": 24503,
       "path": "conformance.json",
       "records": 0,
-      "sha256": "9d5234d7f96b8b596570c4300fe3b787cef98943ad3613dad428f0e4cdca494a"
+      "sha256": "c1ad2d76675f603670367456a181bff51acb9ed0f79624135bc97470e71d4ee4"
     },
     {
       "bytes": 13420,
       "path": "conformance.md",
       "records": 0,
-      "sha256": "c979a8f351ecbf754aaecc431a02e2a5bbc4311b77def9a9a38fc8e5b51f3499"
+      "sha256": "7f7d208bf17f64fb397f5fb009eb4bde0834b568de007b2a53e7d0934682d638"
     },
     {
-      "bytes": 29216,
+      "bytes": 29215,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "c5347bb872fb8ec391e7bb095bc7ce48b07a92034c37e21ebc67b7dc215e53c7"
+      "sha256": "451a958592c2579ac19302eceeddc8ebb1014ae0ccdc1f5fae7ae930b3f02055"
     },
     {
-      "bytes": 54119,
+      "bytes": 54113,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "47e990b0194470f8b85e9dff9e235f2eb43a4082d3093b92e26e094edf5a0547"
+      "sha256": "983d4230370a9ce271cc6a4e3b59955b315af90b848c270ad7a1c14683b7bb9a"
     },
     {
       "bytes": 106,
@@ -5141,7 +5141,7 @@
       "bytes": 90872,
       "path": "evidence.json",
       "records": 491,
-      "sha256": "acff5b8380bc6c4e287e911be4e3b88866e1d161590f6aff143db83ea894ef93"
+      "sha256": "2fc1699ce23d435fbbe628f53f50d1c3072a72f68cb4c15571ba92deb7edfba9"
     },
     {
       "bytes": 107,
@@ -5150,10 +5150,10 @@
       "sha256": "ecdfc187b05c53a3f547cee370dd0aad144e7660857eb38b7febb97f75993b2f"
     },
     {
-      "bytes": 184086,
+      "bytes": 184785,
       "path": "issues.json",
-      "records": 372,
-      "sha256": "c6adde306e936f5f39fb6e0f0132ba95af69430b41e917a9bd1bf025de42ae12"
+      "records": 373,
+      "sha256": "e0b1b9d9976da74a0ae2eb3bce0df2078300d2a636e9efbc345b1106f628b2dd"
     },
     {
       "bytes": 5350,
@@ -5186,10 +5186,10 @@
       "sha256": "77578a0803d04720c27c41a6c6ad8faa93df9dff7baff6c7493e24ecf5157a57"
     },
     {
-      "bytes": 288846,
+      "bytes": 289600,
       "path": "programme.json",
       "records": 54,
-      "sha256": "8027d9a9833b091a7bd565f5bfae71f5b7a3f15a0dbff2a7f3f4330b873a93f1"
+      "sha256": "89cdf335a208f4c43628d8da8ae86bcc5a9743d91541e528cfed7d484f41c559"
     },
     {
       "bytes": 290844,
@@ -5207,13 +5207,13 @@
       "bytes": 844437,
       "path": "rework.js",
       "records": 0,
-      "sha256": "91c307218ea3a8b51aea53ed3498f8e22962c0a3f9789e02f9c56b7c607fe62e"
+      "sha256": "19188895376f3ca313837b9576f8244639401eebc56899187f3ef724164c45ad"
     },
     {
       "bytes": 844411,
       "path": "rework.json",
       "records": 243,
-      "sha256": "20d88173a9034b259de35d64391462e00cc28af4dc49d9ca72219efb5909c754"
+      "sha256": "761614d3121ca0c134e7995dfb1df8da45cc3afbaca2d1d159cea5153eb3e7bf"
     },
     {
       "bytes": 223,
@@ -5222,22 +5222,22 @@
       "sha256": "b84b15e0d6864a7d8ad25860fea05c67b26c46c96fc6a0d46488e27589fd2997"
     },
     {
-      "bytes": 9074691,
+      "bytes": 9075112,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "04482b5c8f8173a78b9fcf78c42d2d8bce5553edfef5299208d7e9eb6490ca1b"
+      "sha256": "ffaca56bff229b2dd4974e18b260ee71409054f8546772ae0e6d7c2e1d3b1d7d"
     },
     {
       "bytes": 6029151,
       "path": "standards.js",
       "records": 0,
-      "sha256": "4e3fd4c26266786051597244946abfd844c4f35f8f9289bcd23c2f0a4e96ca68"
+      "sha256": "867eca26bb44b6ea481cc88fded7af77d759a31870126b702003873a43a85b3d"
     },
     {
       "bytes": 6029122,
       "path": "standards.json",
       "records": 0,
-      "sha256": "e74d51124c97a0127e87246055293bb326a27929fd3c2324665174787abca9f2"
+      "sha256": "71f4c3f1de2324b67999d2c64d2a80fed33d91067a89aea3ca157f333161f05f"
     },
     {
       "bytes": 2650700,
@@ -5247,7 +5247,7 @@
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "7f69723b42694f0c28d36cbd1bdc198fd0634161",
+  "git_sha": "9f475dc880590659e89e74a39bfee15a0cd9e4b6",
   "migration": {
     "description": "tranche review at",
     "version": 108
