@@ -65,4 +65,11 @@ export default [
     spec: "e2e/portfolio-organisation/decisions.spec.ts",
     load: () => import("../../destinations/decisions.js"),
   },
+  {
+    walk: "/validation",
+    app: "/validation",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/validation.spec.ts",
+    load: () => import("../../destinations/validation.js"),
+  },
 ];
