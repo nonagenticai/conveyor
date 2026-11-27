@@ -1,15 +1,21 @@
 import { expect, test } from "./fixture";
 
-import { decideAsReviewer, invoke, isDevAuth } from "./helpers";
+import { decideAsReviewer, invoke, isDevAuth, waitForReportRun } from "./helpers";
 
 // The seeded eval (dev-a, `seed.rs::measure_improve`) has one version, six cases (4 train /
 // 2 test), two metrics (`correct`, `grounded`), a completed baseline run with a result per
 // case, `eval_inputs` approved and `eval_grading` pending, and one planned climb.
-test("the report derives its numbers from the run's result rows", async ({ page }) => {
+test("the report derives its numbers from the run's result rows", async ({ page, request }) => {
   await page.goto("/evals");
   await expect(page.getByRole("heading", { name: "Evals" })).toBeVisible();
   await page.getByRole("link", { name: "bug-fix judge" }).click();
   await expect(page).toHaveURL(/\/evals\/[0-9a-f-]+\/report/);
+
+  // The screen renders the eval's newest run; wait for that run to be complete (the report
+  // exists only then), then the reload is the screen read (#733).
+  const evalId = page.url().split("/")[4];
+  await waitForReportRun(request, evalId);
+  await page.reload();
 
   // Means over the six grades: correct (1+0+1+0.5+1+0)/6 = 0.58, grounded 0.68.
   await expect(page.locator(".tile", { hasText: "Mean correct" }).locator(".tv")).toHaveText("0.58");
@@ -100,6 +106,13 @@ test("the report is the server's; the label and round controls hit their actions
   await page.getByRole("link", { name: "bug-fix judge" }).click();
   await expect(page).toHaveURL(/\/evals\/[0-9a-f-]+\/report/);
 
+  // The screen renders the eval's newest run (`eval_runs.list`'s first row). Wait until that
+  // run is complete — a queued run has no report, and the page does not refetch by itself —
+  // then the reload is the screen read (#733).
+  const evalId = page.url().split("/")[4];
+  await waitForReportRun(request, evalId);
+  await page.reload();
+
   // (a) The tiles carry `eval_runs.report`'s numbers: the case means over the six seeded
   // grades are correct 0.58 and grounded 0.68 — the same figures the browser used to compute,
   // now derived by the server — and the noise floor is the held-out sample's 1/sqrt(2·1).
@@ -113,7 +126,6 @@ test("the report is the server's; the label and round controls hit their actions
   // (a2) Provenance, not just arithmetic: those are the same numbers `eval_runs.report`
   // returns for the run the screen is showing. A browser-side recomputation would agree with
   // itself and could still disagree with the server; this pins the server's own means.
-  const evalId = page.url().split("/")[4];
   const seededRuns = await invoke<{ items: { id: string }[] }>(request, "eval_runs.list", {
     eval_id: evalId,
     limit: 1,
