@@ -10,6 +10,7 @@
 mod support;
 
 use conveyor_store::seed_programme::{seed_programme, seed_programme_tx};
+use uuid::Uuid;
 
 #[tokio::test]
 async fn seed_programme_is_idempotent() {
@@ -263,5 +264,110 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
     assert_eq!(
         after, before,
         "a rolled-back seed adds no project row to the tenant"
+    );
+}
+
+/// #782 P5: the bootstrap seed and the live rows agree, a live unit row never rewrites the
+/// seed, and a re-seed leaves the unit alone. The snapshot's `delivery` section is the row
+/// path; `seed/programme.json` stays the frozen bootstrap.
+#[tokio::test]
+async fn the_frozen_seed_matches_the_live_rows_and_a_unit_never_rewrites_it() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "parity").await;
+    let first = seed_programme(&db.super_pool, Some("parity"))
+        .await
+        .expect("seed the programme");
+    assert_eq!(first[0].1.created, 53);
+
+    let frozen: serde_json::Value =
+        serde_json::from_str(include_str!("../../../seed/programme.json"))
+            .expect("the frozen seed parses");
+    let mut seed_keys: Vec<String> = frozen["projects"]
+        .as_array()
+        .expect("the seed's projects")
+        .iter()
+        .filter_map(|row| {
+            row.get("key")
+                .and_then(|key| key.as_str())
+                .map(str::to_owned)
+        })
+        .collect();
+    seed_keys.sort();
+    let live_keys: Vec<String> = sqlx::query_scalar(
+        "SELECT key FROM project
+          WHERE tenant_id = $1 AND programme_id IS NOT NULL AND meta ? 'track'
+          ORDER BY key",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("the live project keys");
+    assert_eq!(
+        live_keys, seed_keys,
+        "the frozen seed and the live rows agree"
+    );
+
+    // A unit is a live row on its own table; chartering one must not edit the seed's project.
+    sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')")
+        .bind(seeded.tenant)
+        .bind(seeded.user)
+        .execute(&db.super_pool)
+        .await
+        .expect("membership");
+    let project: Uuid =
+        sqlx::query_scalar("SELECT id FROM project WHERE tenant_id = $1 AND key = 'S00'")
+            .bind(seeded.tenant)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("the S00 project");
+    let tenant = conveyor_domain::TenantId::from_uuid(seeded.tenant).expect("non-nil tenant");
+    let mut conn = db.super_pool.acquire().await.expect("connection");
+    let unit = conveyor_store::development::insert_tx(
+        &mut conn,
+        tenant,
+        &conveyor_store::development::NewDevelopmentProject {
+            project_id: project,
+            repo: "nonagenticai/conveyor".to_owned(),
+            lane: "issue/782-unit-record-site".to_owned(),
+            issue_ref: Some("nonagenticai/conveyor#782".to_owned()),
+            implementer_id: seeded.user,
+            gate_set: serde_json::json!(["review", "merge", "deploy"]),
+            instrument_ref: None,
+            acceptance_command: "bash scripts/ci/gate.sh".to_owned(),
+            created_by: Some(seeded.user),
+        },
+    )
+    .await
+    .expect("charter the unit");
+    drop(conn);
+
+    // The re-seed is a no-op and the live unit is untouched: the seed never rewrites the row.
+    let second = seed_programme(&db.super_pool, Some("parity"))
+        .await
+        .expect("second seed");
+    assert_eq!(second[0].1.created, 0, "a re-seed creates nothing");
+    assert_eq!(second[0].1.updated, 0, "a re-seed updates nothing");
+    let still: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM development_project WHERE tenant_id = $1 AND project_id = $2",
+    )
+    .bind(seeded.tenant)
+    .bind(project)
+    .fetch_optional(&db.super_pool)
+    .await
+    .expect("read the unit back");
+    assert_eq!(still, Some(unit.id), "the live unit row is not the seed's");
+
+    let after: Vec<String> = sqlx::query_scalar(
+        "SELECT key FROM project
+          WHERE tenant_id = $1 AND programme_id IS NOT NULL AND meta ? 'track'
+          ORDER BY key",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("the live project keys after the unit");
+    assert_eq!(
+        after, seed_keys,
+        "the unit did not rewrite the seed's projects"
     );
 }
