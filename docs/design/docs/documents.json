@@ -312,7 +312,7 @@
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "474247b4eb5ba339cbdc02fc470124d2c10ea1a0e3f361db1aef608d4f2c74c8",
+      "sha256": "dbd389245a0ecd8c361158516b241f0f5a88d6b2f30aba8a50f2058dd155c89b",
       "bytes": 13420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
@@ -699,7 +699,7 @@
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "474247b4eb5ba339cbdc02fc470124d2c10ea1a0e3f361db1aef608d4f2c74c8",
+      "sha256": "dbd389245a0ecd8c361158516b241f0f5a88d6b2f30aba8a50f2058dd155c89b",
       "bytes": 13420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
@@ -4425,8 +4425,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163",
-      "bytes": 62935,
+      "sha256": "5ca548a564b535110d1b351e1adcc8538bd03587bd4e184897b50748d7a2f53a",
+      "bytes": 63360,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     },
     {

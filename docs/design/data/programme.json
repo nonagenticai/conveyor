@@ -12,6 +12,27 @@
           {
             "color": "FBCA04",
             "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 847,
+        "state": "OPEN",
+        "title": "walk: G0 conformance — the record and the parity instrument tell the truth",
+        "updatedAt": "2026-11-27T13:14:04Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/847"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 842,
@@ -38,7 +59,7 @@
         "number": 839,
         "state": "CLOSED",
         "title": "fix(walk): mount the wasm engine — the config must carry the seed the boundary requires",
-        "updatedAt": "2026-11-27T11:17:05Z",
+        "updatedAt": "2026-11-27T13:00:32Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/839"
       },
       {
@@ -109,7 +130,7 @@
         "number": 836,
         "state": "OPEN",
         "title": "proof: the unit delivery model and the evaluation of the real ledger",
-        "updatedAt": "2026-11-27T11:23:57Z",
+        "updatedAt": "2026-11-27T13:18:01Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/836"
       },
       {
@@ -132,9 +153,9 @@
           }
         ],
         "number": 832,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T13: the spend budget gate (v1-w4a-1, with v1-p75-1) — carve-out from the #526 lane",
-        "updatedAt": "2026-11-27T12:15:02Z",
+        "updatedAt": "2026-11-27T13:02:51Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/832"
       },
       {
@@ -165,9 +186,9 @@
           }
         ],
         "number": 831,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T4/T9/T10: the tranche-4 P0 residuals — six code findings and the two missing reviews",
-        "updatedAt": "2026-11-27T12:09:52Z",
+        "updatedAt": "2026-11-27T12:57:15Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/831"
       },
       {
@@ -7184,7 +7205,7 @@
       }
     ],
     "provenance": {
-      "sha256": "94f13f6af11578725741a79fcdec01cfc2fc2133b478f1432ce8f4b4a88678f2",
+      "sha256": "3c46bb9108aae1971968bf4b06fcabe305b9f6329558d89b0c35afb103f4cd52",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

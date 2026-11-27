@@ -161,9 +161,9 @@
       "sha256": "ed3ef52ce9ba9cca194d7069693bf11a40fdc573443e92585c82c8117f66af2a"
     },
     {
-      "bytes": 22408,
+      "bytes": 13420,
       "path": "docs/design/data/conformance.md",
-      "sha256": "0a67f541770d26dd44ba02685c7bdb8688260f9f443829d6041abbc049f65103"
+      "sha256": "474247b4eb5ba339cbdc02fc470124d2c10ea1a0e3f361db1aef608d4f2c74c8"
     },
     {
       "bytes": 10927,
@@ -506,9 +506,9 @@
       "sha256": "8bf08b389880b52a141cf642b7ed3b34cdb7b7e27ade654a131fb7d9af0b3971"
     },
     {
-      "bytes": 22408,
+      "bytes": 13420,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "0a67f541770d26dd44ba02685c7bdb8688260f9f443829d6041abbc049f65103"
+      "sha256": "474247b4eb5ba339cbdc02fc470124d2c10ea1a0e3f361db1aef608d4f2c74c8"
     },
     {
       "bytes": 33072,
@@ -2451,9 +2451,9 @@
       "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191"
     },
     {
-      "bytes": 62935,
+      "bytes": 63360,
       "path": "docs/plans/slices/S21-message-construction.md",
-      "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163"
+      "sha256": "5ca548a564b535110d1b351e1adcc8538bd03587bd4e184897b50748d7a2f53a"
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",

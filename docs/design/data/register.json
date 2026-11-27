@@ -203,82 +203,52 @@
   "gaps": {
     "by_rule": [
       {
-        "count": 16,
+        "count": 10,
         "rule": "project_in_unauthorised_tranche",
         "severity": "P0"
       },
       {
-        "count": 8,
+        "count": 7,
         "rule": "backlog_refinement_missing",
         "severity": "P1"
       },
       {
-        "count": 1,
-        "rule": "benefit_baseline_placeholder",
-        "severity": "P1"
-      },
-      {
-        "count": 14,
+        "count": 9,
         "rule": "closed_without_closure_review",
         "severity": "P1"
       },
       {
-        "count": 18,
+        "count": 9,
         "rule": "closure_outputs_undeclared",
         "severity": "P1"
       },
       {
-        "count": 2,
-        "rule": "compliance_review_missing",
-        "severity": "P1"
-      },
-      {
-        "count": 11,
+        "count": 5,
         "rule": "contract_missing",
         "severity": "P1"
       },
       {
-        "count": 38,
+        "count": 19,
         "rule": "mandatory_artefacts",
         "severity": "P1"
       },
       {
-        "count": 8,
+        "count": 7,
         "rule": "pi_cadence_missing",
         "severity": "P1"
       },
       {
-        "count": 9,
+        "count": 6,
         "rule": "project_in_unauthorised_tranche",
         "severity": "P1"
       },
       {
-        "count": 8,
-        "rule": "seed_live_drift",
-        "severity": "P1"
-      },
-      {
-        "count": 22,
+        "count": 14,
         "rule": "unpublished_declared_output",
         "severity": "P1"
       },
       {
         "count": 1,
-        "rule": "dependency_untyped",
-        "severity": "P2"
-      },
-      {
-        "count": 1,
-        "rule": "derivation_missing",
-        "severity": "P2"
-      },
-      {
-        "count": 1,
-        "rule": "project_in_unauthorised_tranche",
-        "severity": "P2"
-      },
-      {
-        "count": 7,
         "rule": "seed_live_drift",
         "severity": "P2"
       },
@@ -288,23 +258,18 @@
         "severity": "P2"
       },
       {
-        "count": 3,
-        "rule": "tranche_plan",
-        "severity": "P2"
-      },
-      {
-        "count": 10,
+        "count": 7,
         "rule": "wbs_absent",
         "severity": "P2"
       }
     ],
     "counts": {
-      "P0": 16,
-      "P1": 139,
-      "P2": 24
+      "P0": 10,
+      "P1": 76,
+      "P2": 9
     },
     "source": "docs/evidence/conformance-gap-register.json",
-    "total": 179
+    "total": 95
   },
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "projects": [

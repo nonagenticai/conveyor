@@ -6,6 +6,27 @@
   },
   "issues": [
     {
+      "number": 847,
+      "title": "walk: G0 conformance \u2014 the record and the parity instrument tell the truth",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/847",
+      "updatedAt": "2026-11-27T13:14:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 842,
       "title": "feedback: in-app bug reports and feature requests for every tenant",
       "state": "OPEN",
@@ -27,7 +48,7 @@
       "title": "fix(walk): mount the wasm engine \u2014 the config must carry the seed the boundary requires",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/839",
-      "updatedAt": "2026-11-27T11:17:05Z",
+      "updatedAt": "2026-11-27T13:00:32Z",
       "labels": [
         {
           "name": "unit",
@@ -94,7 +115,7 @@
       "title": "proof: the unit delivery model and the evaluation of the real ledger",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/836",
-      "updatedAt": "2026-11-27T11:23:57Z",
+      "updatedAt": "2026-11-27T13:18:01Z",
       "labels": [
         {
           "name": "unit",
@@ -117,9 +138,9 @@
     {
       "number": 832,
       "title": "T13: the spend budget gate (v1-w4a-1, with v1-p75-1) \u2014 carve-out from the #526 lane",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/832",
-      "updatedAt": "2026-11-27T12:15:02Z",
+      "updatedAt": "2026-11-27T13:02:51Z",
       "labels": [
         {
           "name": "unit",
@@ -142,9 +163,9 @@
     {
       "number": 831,
       "title": "T4/T9/T10: the tranche-4 P0 residuals \u2014 six code findings and the two missing reviews",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/831",
-      "updatedAt": "2026-11-27T12:09:52Z",
+      "updatedAt": "2026-11-27T12:57:15Z",
       "labels": [
         {
           "name": "unit",

@@ -5,7 +5,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b1.html",
-        "sha256": "636517d156a5b2b69c0cd1062668054e794f197af6f6d78f41a481c9af0f7b28"
+        "sha256": "e84f2d458d0956a8e74c9ec39bd6d0b917a3cf738c64d59ec23ac37189cc3bfd"
       },
       "gate": {
         "approval_id": "",
@@ -130,7 +130,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b2.html",
-        "sha256": "673f7a637e81b0d8a8b4abff453232542c2c2653d12178af82471bc029cd63ac"
+        "sha256": "6b9dfbf5f3ccf2efece8f579fc488f3c8aae628f0c464afba32ebba1e0f4d67e"
       },
       "gate": {
         "approval_id": "",
@@ -255,7 +255,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b3.html",
-        "sha256": "8be4e01e92d1dc3da99294193e0c2dc80b1837bf580321dd8ca3bf046ba08282"
+        "sha256": "026ccd514f8cd5fcc72130b817e02f08f4287bf5cf60e6933c302103e519ce37"
       },
       "gate": {
         "approval_id": "",
@@ -380,7 +380,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b4.html",
-        "sha256": "d6d0fc9d13f979774a29ae5eac1fb1506c151b85506751af0da7a7ccbe2041c2"
+        "sha256": "7bc3f01c7195b1dd54a6c8bafc085c7cbe6c831e51fe95cbf340635d4d8f178e"
       },
       "gate": {
         "approval_id": "",
@@ -505,7 +505,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b5.html",
-        "sha256": "454f57fdfcdf09f5f14fc5233c289c33cac4b0ed6fc5130974030dc40325d579"
+        "sha256": "05b495796307e790ab53f8ed9d3cbacdc0a1ab0d7bddeac66e230f57980a8711"
       },
       "gate": {
         "approval_id": "",
@@ -630,7 +630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b6.html",
-        "sha256": "2d675477a0524ae99ff198c55a532451849d3f4168e71a3c918e4760ac04924c"
+        "sha256": "0265e7cc16c656ac82466b4835033d0e0e558961e2aae9145db32e7b5b79c920"
       },
       "gate": {
         "approval_id": "",
@@ -755,7 +755,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-evaluation-b7.html",
-        "sha256": "30c68a59f28eb27986494ceb6503d5926b549c0fa2fbdaaabff5d21fe0160763"
+        "sha256": "f628ec760769d367b62a8e90bc72964bc9fef0e13e857ad9aa1ede0dc78e22a4"
       },
       "gate": {
         "approval_id": "",
@@ -880,7 +880,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b1.html",
-        "sha256": "b104135965d05a8cbfd7d334811503a5c1c56e0ecb6f290820dc722ec3394829"
+        "sha256": "8ec89d05aa02ce81144842a9243376087edcfb8f5e2799972891107e84b1f40f"
       },
       "gate": {
         "approval_id": "",
@@ -1051,7 +1051,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b2.html",
-        "sha256": "21e196351739f9f810d9cddaff983ad215a0b75a1b2e5593fca12b3605988222"
+        "sha256": "0fc0dacfec49f4c27bb06caeb2f8c0a0adcc6d6e83b96dbcc434924c81eb6409"
       },
       "gate": {
         "approval_id": "",
@@ -1222,7 +1222,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b3.html",
-        "sha256": "f5b33cbe1c0d4d3bf71c24145b5b0ab9c93e7f81de4aaac4f98dcf36f9e5f9d3"
+        "sha256": "7d8e1d5b7b50a3d5eca34616914a4499fa50f94e90530278121d49f17bd327c1"
       },
       "gate": {
         "approval_id": "",
@@ -1393,7 +1393,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b4.html",
-        "sha256": "87a70d1d3a93e4faea2fa99ed89e514b7a4a00026841eba026870526616bc2e9"
+        "sha256": "c1f5be1e876b3b81bc2bb5fe847b5d8e78bef8920b73a8f79d206272228cab5a"
       },
       "gate": {
         "approval_id": "",
@@ -1564,7 +1564,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b5.html",
-        "sha256": "2363f67a3fe5a464a47abaaa3ee4d24421b6b5ef7704d4d0bdbfda8f179dea9a"
+        "sha256": "643ec24ae0347da32d1f9cfcbf1e091c9371684e88eee24bbf5867e4ea699120"
       },
       "gate": {
         "approval_id": "",
@@ -1735,7 +1735,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b6.html",
-        "sha256": "e083e646ac0f0cda6e9329eee7864b1405dfb9871369782befc2095d300bd79e"
+        "sha256": "c97f5ca794b596372448a091950d233c46a5e01c26453f164526735ea27e9043"
       },
       "gate": {
         "approval_id": "",
@@ -1906,7 +1906,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b7.html",
-        "sha256": "9c2631ef207dc7b4f6f4fe155faf5613092515f2b80de7c1e426593b0799e7a3"
+        "sha256": "6ce71e3b055191f351c741ca0dd56240f930cacbca671295e120d410146ab4ad"
       },
       "gate": {
         "approval_id": "",
@@ -2077,7 +2077,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b1.html",
-        "sha256": "89e223048b907a6c0064032faa019ebe5d5f0cdf9d2f3b527c8cdfb072f008ed"
+        "sha256": "dd511777c46dacc61d7197053cf0ae7a6f9d3089b899aa1d5ceadfcd4ab7dbf2"
       },
       "gate": {
         "approval_id": "",
@@ -2225,7 +2225,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b2.html",
-        "sha256": "b7d4e1ca2277229726c21866f9ea800a2aaa50043447385883a578b10baa425b"
+        "sha256": "da9f9883d96c76faa9309b7457c39eb4d460cadf2649c1e04b10c35c66a611fa"
       },
       "gate": {
         "approval_id": "",
@@ -2373,7 +2373,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b3.html",
-        "sha256": "6b752ee5628d0b3e1110a0512a1ca5a365999ed3349bba49e2e95ce0083d8bee"
+        "sha256": "28f8419b34080e402891e9cc7e507c7de07f56212b2169eae63a77c16a3f9be3"
       },
       "gate": {
         "approval_id": "",
@@ -2521,7 +2521,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b4.html",
-        "sha256": "9379c7d9827a24be4285293d261e68be4d7d3cf3a83386c025fbb1cb6e74e098"
+        "sha256": "7d29ae71197e75ff4650e706429b7f59fe29734ac4a15937a5c7eda732fd1ff9"
       },
       "gate": {
         "approval_id": "",
@@ -2669,7 +2669,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b5.html",
-        "sha256": "fe0c4219d58df39aaa9419b373127304903ca04eaa0adad76ab6a21c2ab290c9"
+        "sha256": "32f75b88feea5a597b66ce0ea2515fd9ec30346bd57cd69d5e4cf74ed5417225"
       },
       "gate": {
         "approval_id": "",
@@ -2817,7 +2817,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b6.html",
-        "sha256": "986f4faee04e9b970dc7e12cab0ff4210038d52e0289dc6ec8057d6c503d501d"
+        "sha256": "2449b68fcd0720a30248898d9f9ffb5ef2efce4a4deef3ef9d9e79ff36411916"
       },
       "gate": {
         "approval_id": "",
@@ -2965,7 +2965,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b7.html",
-        "sha256": "ee12d76982b211d6dccceb8b46c7ffca50792b2d396e47e801fa80fb2503a653"
+        "sha256": "ad74867bdc80a6ff1ef89fafdd2da7f71befe370408f721a91bbe0d3ae0966a7"
       },
       "gate": {
         "approval_id": "",
@@ -3113,7 +3113,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefits-map-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "05b3718f1c2d498981e5b0cc58b72c371007e71207c393fa580cb2cc3d095f6a"
+        "sha256": "56f096630f1245779f0b6d91364c65ad69cf1ec3cc4944ddc934e58494f8eafa"
       },
       "gate": {
         "approval_id": "",
@@ -3348,7 +3348,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefits-registry-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "b6f21f824c33c765336d485ff48d17a7212496ebcfa4310f386d18703b61dc66"
+        "sha256": "3e4b56b1905ace10541af3a9dec57e65953bd4ed5ef5cabf828287557ece607b"
       },
       "gate": {
         "approval_id": "",
@@ -3555,7 +3555,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefits-strategy-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "b4373496fc73d777d9682cf50675da28e23920cd5e303a85558c690805451558"
+        "sha256": "be26e8063291dc14d5576a3d5d4aa3559f8e246e09a0f591695d01a052518a69"
       },
       "gate": {
         "approval_id": "",
@@ -3685,7 +3685,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "285fd1c39f3f3f3eef618dc387e6e61c94b38a011080add4c9e77145ad37b30d"
+        "sha256": "fbccee95d905187aecaaef29605e5abf6ae5f343666f9f480db80190e62130a4"
       },
       "gate": {
         "approval_id": "",
@@ -4173,7 +4173,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-brief-template-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "c110e854c6772c81dab195808519ba00116485f80aae972a8de0672f6c953977"
+        "sha256": "c601b703dde8ee8d4eb7e5d35b673cf64a44d94fff9418d0eeeb429b0a5eec88"
       },
       "gate": {
         "approval_id": "",
@@ -4278,7 +4278,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "a59e8479e5528909a72c215caedcb2bb749159f07f90e3a4d31350f6c9c454d5"
+        "sha256": "d3756fc299f0394910bfa796391568179a98525bf51abcdbb47565f654b85c97"
       },
       "gate": {
         "approval_id": "",
@@ -4728,7 +4728,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "6d414484c5db81af2e29bfcdcd882c4d582b3842781cb9d8ac9672974fca9a28"
+        "sha256": "a40d5124f1e4a0d8b36f4bc0a6794c9107f2e5ded2534b0139f1325807599bc6"
       },
       "gate": {
         "approval_id": "",
@@ -5236,7 +5236,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "84092e8aa820c8b3ab2dd9938018592dbd92b9e6819f836dbacc97524a6b30ef"
+        "sha256": "01af6788aafad5514d419cafb0d7b8ea0eaf83d0f282e44acdb59cdc953b6022"
       },
       "gate": {
         "approval_id": "",
@@ -5646,7 +5646,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "programme_baselines",
       "document": {
         "path": "docs/standards/std-msp-programme-baselines-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "d9efe8f3f9a7221f173fa9dc94cde17ac7950e723a94d56ef081c3d0ecb80cae"
+        "sha256": "55f078dc16789f7558424ec3a504dab7c8467e9104a8904b99c719d34f0b85d3"
       },
       "gate": {
         "approval_id": "",
@@ -5748,7 +5748,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "e7973a71876cf32534f1ccbddc2537086755dc31474093cf854e45a25f7d3eae"
+        "sha256": "d55f53de4301d5c2daffdf5e7c450aeee2166a4ce3f5b808dd66729609ad3d37"
       },
       "gate": {
         "approval_id": "",
@@ -6157,7 +6157,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "18eb9399d936d4269f8d2278fa9e42238484f77b49394de2cd5ef567d3aa30a7"
+        "sha256": "cc68d472a31bcebb59aa24510de1a18d4747ae7208404a40156aec3afbf28ca2"
       },
       "gate": {
         "approval_id": "",
@@ -6524,7 +6524,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-report-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "92f1cd5f459ae257333bbee8ebac9c0490874945b4fcd7461568ca30264863a3"
+        "sha256": "16f71bd944d050762b1c66ffcecac2343812b211686684d359050b166a6ca9a6"
       },
       "gate": {
         "approval_id": "",
@@ -6707,7 +6707,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "844059b9fda1421df3eedab42280e9c4d002bfcfaac16c97a704b32266000f04"
+        "sha256": "fc8fe11f34da8c2c20ab1963eace4aab703dc0597e5bcd30c5209f18aee10aab"
       },
       "gate": {
         "approval_id": "",
@@ -7052,7 +7052,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "da17c52c2b7e93e335ed3be68874f47fa084b7e9642cf5c6d7441bc173f122f2"
+        "sha256": "4bd54612c2205c47a0548eb85b3838961b8de40638a542c89c44a19c8d226ca0"
       },
       "gate": {
         "approval_id": "",
@@ -7687,7 +7687,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "35c7df5a43c741f8a3d5813ceb60cb27c6fa38b5c17b0f38b7fb32849381c931"
+        "sha256": "08e45d47186f195e4b41a8e3ae03fd51cf539ea5644c045dd858569c6de2ec4c"
       },
       "gate": {
         "approval_id": "",
@@ -7983,7 +7983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-realization-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "292fe3a556c45f399d057eda3d6099467d66acf2ff413fe16b284173caebbce0"
+        "sha256": "94885cda6580ae360809305a82e4c5a62724e39d0fdcc80dd7c9fa16f4d5024f"
       },
       "gate": {
         "approval_id": "",
@@ -8112,7 +8112,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "7b7ce4a7878962f72729129f0328e77dda3aef3ff0390f9372711f51b2925267"
+        "sha256": "53b8354d6454ef12d3fbbf7bd290690243f9cd79ca597c3971161f88a9598208"
       },
       "gate": {
         "approval_id": "",
@@ -8276,7 +8276,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-stakeholder-profiles-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "987015321520ccc0e5cb4e06612132ade4b997c460ff31226f341b4303ac7437"
+        "sha256": "80ac47f2a81e682af2e2819bbd7f19b0c475a67fd937841b9ea81dd1c24259fe"
       },
       "gate": {
         "approval_id": "",
@@ -8549,7 +8549,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "96f1fd62736036f827474bc8da61668018dbdf627111ec0d9139e725aa0314cd"
+        "sha256": "87f2d4df62064aadf7d6a6905fab3465a8b748f34db26f22a4239a2f20dedb6d"
       },
       "gate": {
         "approval_id": "",
@@ -8894,7 +8894,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-0.html",
-        "sha256": "47563642c685fc406619c32922c445780c0b4d1303acfe69421fb860342c27c0"
+        "sha256": "bb0278a13053b58d6c60cd019acce4b7d867c29eba9089aed04a086f743f5566"
       },
       "gate": {
         "approval_id": "",
@@ -9104,7 +9104,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-1.html",
-        "sha256": "f56af21a7b48bc32438861d6f6047fbad35b413125d6e2f2db290ed9ff3cb4a2"
+        "sha256": "1562bd6ec5f05b18bbdedec5c3855137d37f0e4e9388528335b4174efc7b25eb"
       },
       "gate": {
         "approval_id": "",
@@ -9314,7 +9314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-2.html",
-        "sha256": "0283d4762bdf100c68e7d9007c47105c4677e17a06a4306492761638f4f67a7a"
+        "sha256": "48d7addfb98385a7dae7209a8be46317c119d32580d752344aa9cf5e0fc1e719"
       },
       "gate": {
         "approval_id": "",
@@ -9534,7 +9534,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-3.html",
-        "sha256": "3270e63fafc131175404ca05a880e529930c697c16439ed47932669c3bb5e854"
+        "sha256": "2a31eeec7b7ec730c0ff405023aa1b6de59fce1b193973943cd027cf83e8c674"
       },
       "gate": {
         "approval_id": "",
@@ -9744,7 +9744,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-4.html",
-        "sha256": "bbe35f63f6b3bb8ce9c0de6bf80f5d6a241b756bcd32a0d78cad7c67c694294b"
+        "sha256": "50bef3700010149ea01e8107946321b88fe3f665b151623c538f5bbb0e1364b8"
       },
       "gate": {
         "approval_id": "",
@@ -9954,7 +9954,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-5.html",
-        "sha256": "1e733c4181b63cd363563ec53c0b81fe5d6a0c47f4ca43ed61c66f36000a9192"
+        "sha256": "fd39c2fd7745cdc447a27ca749dd68af7db212f4ae6d736f5b4b75c39082a7dd"
       },
       "gate": {
         "approval_id": "",
@@ -10164,7 +10164,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "bf635a3763f5d27f3a4ecfdee920d7d926e9f67c4c34b4c25e7e7b1e2689a724"
+        "sha256": "c57745c5a58f24987da1c5b096b8f7f0f213fd06c58e3d244ad813607734f423"
       },
       "gate": {
         "approval_id": "",
@@ -10293,7 +10293,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-design-publish.html",
-        "sha256": "adb3f1f79056462485ee18c99154349739d551ddec950f06223d98a74fedde10"
+        "sha256": "ce145e2c6d6862221fd6c2c30e0865d144a2273b7a719b27d77bc75748409e24"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -10409,7 +10409,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-p0.html",
-        "sha256": "7cc436d6449f5a0d6190bdc7c921407e218cb3f0a21c72c9c0522c4f4ba27a51"
+        "sha256": "5ab06cdcea11b486a640f51c678ebc968e0cfe59939edcce4e1f4dfb01061fbb"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -10570,7 +10570,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-platform.html",
-        "sha256": "a8242d5faa9bc278f2f132c8de4963eb849435be0cc854250eea856f5e599e75"
+        "sha256": "3b9d64275b58f364bd9d8e77203d217d7b16ff3b0d434898266d1b7cbc04210f"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -10701,7 +10701,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s00.html",
-        "sha256": "3e0c03c437e55fbec032ebb6c9f3aa3891b5bcb12b0040fae06de8f370aebfaf"
+        "sha256": "919c2e75c18cfb245884b9e012c32c0a764e038d64cceb9f73a92ea77af4a947"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -10802,7 +10802,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s01.html",
-        "sha256": "1e7b7d78cfd1b0779352b0ee9e48fe9057bff31503f8c5173e1d9242266d7768"
+        "sha256": "7b980cadd7f157211408875228e14683bd72b6e6ae99ef514db4fff28516c148"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -10903,7 +10903,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s02.html",
-        "sha256": "f175e158198c17e0685646663270df16ec537a6f5dd35a8d6c7de20d1bbdb707"
+        "sha256": "49f4f17ea5563636c7941e04235985bf9fa732a9116ad4ece614ca60818489e7"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -11004,7 +11004,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s03.html",
-        "sha256": "808b8cf0a7f133c1ac31695b5a27139a35b59959802af290b03449cdf332109a"
+        "sha256": "9671dc0a4d2045c46224b0617bc9efce203d37f4c793d343317a27f0cdf96baf"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -11105,7 +11105,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s04.html",
-        "sha256": "3a2e9db5e90bc51b47978a1345593f97d41c6c9da963599d316b14c0fea4c826"
+        "sha256": "2dd3a24128ee0b700e0fbff9e4a44de535229a0804f5d46134640fb71441d5c6"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -11221,7 +11221,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s05.html",
-        "sha256": "ae1578044f0f21290210431c4cefdb87c66f515773e826949f5992ffac509d64"
+        "sha256": "b06e945af3b395acd7c0e9fe55eaf062c65d4d885cec5a9b5c0482ab373947a2"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -11322,7 +11322,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06.html",
-        "sha256": "c5cc49381f55fae835b77fea3bb8dae2a464d22786ae4d77797aae48543439a3"
+        "sha256": "0c8a1eff9939cf0dc73b3a5faa98f20cb56bba472755509ca7371c7a627db681"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -11424,7 +11424,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06b.html",
-        "sha256": "13cfe8500804b66c46902f0cecd1623dbca09d35dd6083ce1483a664437e2384"
+        "sha256": "a4fa0bac872711f16cacc29c6609616bdae1b479e7bfa11145cfdd7627f37485"
       },
       "gate": {
         "approval_id": "",
@@ -11515,7 +11515,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06c.html",
-        "sha256": "0ed132b7d5805943982752064fc7a0e0057680f0ad82187a35e996f88ff973c6"
+        "sha256": "cf4c35c4fddc52b8fd03bf5c2cec3f244dd7fc5e09477369be6960abc8019d48"
       },
       "gate": {
         "approval_id": "",
@@ -11606,7 +11606,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06d.html",
-        "sha256": "de243c8f2b52ae1bd91fa37d4781b2dcdee7b34a8d8ffad8a8e2697903b04a62"
+        "sha256": "e4f9636edcfe35c7a184d1ca85bac6742986e6d2697a8cfec03f772f8dc97177"
       },
       "gate": {
         "approval_id": "",
@@ -11696,7 +11696,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s07.html",
-        "sha256": "8929d6f57995098d829ad27d805cecd9d0ded4b0adcbd10f35fbbbb359a2249f"
+        "sha256": "dbcee3fdeae071fef06c3ed152bd76be0311616201e8595f3a9520b23648afac"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -11797,7 +11797,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s08.html",
-        "sha256": "c2967647914909615caf8f4cab699556053d8270994ba6b0579d564f0286baf2"
+        "sha256": "a246d7af3a5d9d0367bf754633faace550333b30c07544ae727f3a7b6cd53a57"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -11898,7 +11898,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s09.html",
-        "sha256": "843a510eefed8acb7ce98e121e8bf50667f13d1d7098053bc8f25490709148a0"
+        "sha256": "ee7fb340989a1db7c1a99ceb3b7578fdd1f60865d2e088269192b89e3d7734af"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -12000,7 +12000,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s10.html",
-        "sha256": "91f4102fe6cb6dc62e24b67f33db233cad9666bd03cf24b2ccc9d05fda5948e8"
+        "sha256": "e460ca84ae2a0fe61c29700e1fd5300e5a1760ac06f140b734c2b033f57564e3"
       },
       "gate": {
         "approval_id": "",
@@ -12091,7 +12091,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s11.html",
-        "sha256": "071080040f3476df2efc18a5b94e1f86a08b8dac05ed142543ddfa815a76d554"
+        "sha256": "72afbe3f8af9ea577587b75db037a53c3fec6899dab241ac11c76074142defb7"
       },
       "gate": {
         "approval_id": "",
@@ -12182,7 +12182,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s12.html",
-        "sha256": "5635a20706dd4861e23a714e0ca74a696505da147dd8be7a4fdf29113bcf7953"
+        "sha256": "2ddccd924a438016017cd4035a89e4133ddf1a3e16049581784bce7e094e5dd1"
       },
       "gate": {
         "approval_id": "",
@@ -12273,7 +12273,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s13.html",
-        "sha256": "590d023f55d3ba15a04c1b04019c9a47d2a7a30841c3aa2ad63703a48840932e"
+        "sha256": "b4b0c63a4155fdf162ad3af9b2a99a31a71897efe71d88a38e55d602036a54b4"
       },
       "gate": {
         "approval_id": "",
@@ -12364,7 +12364,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s14.html",
-        "sha256": "9332558f7953ac8af2a6134ae13d62bfe28dd3c89aa024b6482499aca5044a13"
+        "sha256": "47b8c2729ebcb7fef55c293f922b318c6bf6d38c69a493fd5ab1c469a2e7144c"
       },
       "gate": {
         "approval_id": "",
@@ -12455,7 +12455,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s15.html",
-        "sha256": "52b7ea4e9c35bf0bcbda1c1dfd88bd4337d8748e8cb900ff5ea1f9f90063e77a"
+        "sha256": "d3cd1db80f926fa4883b9dcbc33e1498ddc5c8b1d17b0508cef41674fc516b83"
       },
       "gate": {
         "approval_id": "",
@@ -12546,7 +12546,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s16.html",
-        "sha256": "720948bae76bf2be8c5f093cd7b2e77fceaa50367b8d5d9148c964a93c2d4bd8"
+        "sha256": "3694f998b918d252f49a9792b477ec457b6228e93d781ac31f1d30f426aa7030"
       },
       "gate": {
         "approval_id": "",
@@ -12636,7 +12636,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s17.html",
-        "sha256": "c1b99fc4a2c1258f47f636fcbcb6cfe04d791d8645a667a87ea1b07cc5575071"
+        "sha256": "c2cd43b697598319cb72ee619df1e1819faa82720022abfcd9de77c45e256cc7"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -12738,7 +12738,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s18.html",
-        "sha256": "f63ef8a950ff76a30ea59a6f5dddcc5f95a689df9c7d4f6ffeebf39654722f95"
+        "sha256": "e19cd2bb98937421913a5ba3eb637925c248e6cbaaa1de4edd3d6f0dbb54d1a6"
       },
       "gate": {
         "approval_id": "",
@@ -12829,7 +12829,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s19.html",
-        "sha256": "3ca265ef7fa654e8e852b7274286a924e7837ecc8ad4e1be759f0f5859ee960a"
+        "sha256": "23fc3f0bdf164458f966af3965611793bb678d9fc0018a5dd60be5b089ea2a6e"
       },
       "gate": {
         "approval_id": "",
@@ -12920,7 +12920,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s20.html",
-        "sha256": "748c1760edd950ad16ba8de956f73ce2e279a3021561ebfeecdd8f2610a4af47"
+        "sha256": "b3ff524fdead894a4cbae71ee5a5cbc5682cf311b7f0bc3e8bfe53e8d2f92f6d"
       },
       "gate": {
         "approval_id": "",
@@ -13011,7 +13011,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s21.html",
-        "sha256": "67ccfb9250bacde46d8da52f8e3ddfae3543ab24bab150dc653edc5b48ae899b"
+        "sha256": "b84ab36839b6e466ae751db0a371755eaa23a597cb8936583ae808a8a2576157"
       },
       "gate": {
         "approval_id": "",
@@ -13101,7 +13101,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-spec-v2.html",
-        "sha256": "7841e1bbefb48895ba7d20e5faf9b366a95ae2cd40d1a1e45e5ad350671eda8d"
+        "sha256": "e33d7e6c5403c34e784f83bc43d6e29da6a4acac8c77ae3c045edddcf5feb56c"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -13202,7 +13202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t0.html",
-        "sha256": "67d127f7dcf4e4c3ef496a592a619955e80871b4d448fb224bbe6ecdd9aef17a"
+        "sha256": "28d2188c85c3ca16e44bf1977153d9fb5ebe04055a135aa392ed8dcb5a2432ed"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -13318,7 +13318,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t1.html",
-        "sha256": "9988f10cf913601090b37a95a67e4839347ea9bb5936cea77f4c2927bf14dc4c"
+        "sha256": "3175072c8c76aeec8a0a2cfb2c771eadb8b75c03f0944b87a848a30862ce28e2"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -13419,7 +13419,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t10.html",
-        "sha256": "8847deb93ff2d13d812c1c70eeba42fc33180cde02adae49db0823d97c3251a0"
+        "sha256": "9b15f202bdc23e165c5b304790f3af3dc849415645a70aa11f12a8b42b70c2c5"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -13520,7 +13520,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t11.html",
-        "sha256": "77f2a491aaf1b8db63850f0c2cec6f8d186888e2c588fb6b83300a19c334610b"
+        "sha256": "9af48547f79f8986c04c1aea6f1a707afad6de1f507a248a47826c1824d658ec"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -13622,7 +13622,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t12.html",
-        "sha256": "c160131d7f7936c84ca38498a20f15c71dd56417c787ff4a4664caf0dac0dce5"
+        "sha256": "9dd7a7b52c257e32f7975cb966fcce2387f2da54b6a8c60884c45bd009a4b5fe"
       },
       "gate": {
         "approval_id": "",
@@ -13712,7 +13712,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t13.html",
-        "sha256": "661fe1d26533c57721a55a67a6767872ed869d1bcb13d4762b7a78fb0aea952e"
+        "sha256": "1932d06c2cfe6cf683b79495ed51f8bdd5fab242fb100ae35c92e18f18616fa1"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -13828,7 +13828,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t14.html",
-        "sha256": "e1b065b10d9e68aafe796a2c08108d6b423de52e7a669f534e35a2742ed0fe8d"
+        "sha256": "d50ac8be5304d8be87be94df5511a7716ff8769c83cc575709f3714b2a3a67da"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -13930,7 +13930,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t15.html",
-        "sha256": "9a33263aa46b14bd490c197f8dd1227cd205d95996f42cafe70cb542058891e0"
+        "sha256": "a7366fa77424c3c2aab22da4644eafa10e7b79d56c596f112d48c41340c35a53"
       },
       "gate": {
         "approval_id": "",
@@ -14020,7 +14020,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t16.html",
-        "sha256": "bc83491deece5011dbdbbb877a6d5249d3e96ffb251d562b821c050782aba571"
+        "sha256": "99e38948525123aaaf9b834d9e2710d9f4fae8daa6c09b9c454b2c80809cbb30"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -14121,7 +14121,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t17.html",
-        "sha256": "a8298045266949bcd3cafa49407449c767690de2bdc43fdc7b2dc09aec95da0e"
+        "sha256": "81afa78d26b845eb93eaebe0db4aade2801dfa6bc4dbf48590321173e6e0341b"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -14222,7 +14222,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t18.html",
-        "sha256": "33b9b133be636819fce7d0fc5a5c06de72485e102c193ec5289083adc3ce229d"
+        "sha256": "6a61f6336c57dfc318e9f206d7a2eab73e88236f4dcf8bf73e780808cf3a5bdb"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -14323,7 +14323,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t19.html",
-        "sha256": "23fe22f8b88d6bd8679f88fc0bb28c1f84ee299d76e3bd97d5ac158a46612186"
+        "sha256": "4c962724b3e13af418daed6f6ad721ac13f07eb4c579d666efdb42e51647ca05"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -14425,7 +14425,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t19f.html",
-        "sha256": "55763b96424792106396fe7c896d6845bca7f021af77063e65381872d8c74069"
+        "sha256": "5570cc3bfd866e763bc73ef0e71ce6a8be6860a0c718c5035fa293f975f9fc6a"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -14515,7 +14515,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t2.html",
-        "sha256": "cd18ebb1a603aeef02211bd66be7090f356b9cef1746f6886217a7d932ad902d"
+        "sha256": "7122327a6088db76670b45becd33796edce0880c2220d5bd0059d70be731030d"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -14616,7 +14616,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t3.html",
-        "sha256": "24a743237317d160172450ff30219a12fa34d033d1ee63a030ff1049c0fa0414"
+        "sha256": "e7c956106e7a71b597a0977f9c84c05173e630bf0e86699837036d73d9271895"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -14717,7 +14717,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t4.html",
-        "sha256": "bb01e11fe014080640e998a636aa38f5aaa3d6f3761b858fa94ff0d1359f4da8"
+        "sha256": "135af5fd493ba51309e5dee0cd25e858b95433e2a04b32a122f18df1d3536aa6"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -14819,7 +14819,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t5.html",
-        "sha256": "590ca972c2b066cf8de9c9700e1f541d20db6f1f7dc6ec5613537f62c1cd6244"
+        "sha256": "8d0529fa94b61b94928dcc7abe56f42e21718b4abb2865118a010cf987135c87"
       },
       "gate": {
         "approval_id": "",
@@ -14910,7 +14910,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t6.html",
-        "sha256": "7c37a1225efd8e2a8694b91d9a3c70480f44f879069aa73978b8812724cb58c9"
+        "sha256": "97fa15d45620ba09813bb85f4a04cb5def598034a9740f69e5349bb36eedfa46"
       },
       "gate": {
         "approval_id": "",
@@ -15000,7 +15000,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t7.html",
-        "sha256": "5e54931f2b72e50d0a2812c120edbfd737f58fa7a03565f8c50327ac6aac9a7d"
+        "sha256": "343d0c32b7c792c50cb852d016ee9ac3b312165da5600cdeb08fa47e6cb562e2"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -15102,7 +15102,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t8.html",
-        "sha256": "71111ceda79c3a30759950d53e29892af02a1bb7a47ea887d356aba7938ad17d"
+        "sha256": "171a4725dee425c649acbd563dd8a4a7a2ba5e3c972a847c373c3312c258ccb3"
       },
       "gate": {
         "approval_id": "",
@@ -15192,7 +15192,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t9.html",
-        "sha256": "2cd85020da47a854db12a11fc1322f01d406d2da593fada0dda6788a8fd76934"
+        "sha256": "9c73d8c2bce9199eea520eaef9fb5d08dcb74884d0ee5f71bca1a3c79e50473c"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -15293,7 +15293,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-design-publish.html",
-        "sha256": "0dce80f5b8b7e382cffe66e1ff33504741ae93c9c73938ad4f1d3810a8f41965"
+        "sha256": "90eba5004e1ef350e96bd2a5606957f9a9cd6b30de1eb35d14c52a53c2bd97e2"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -15422,7 +15422,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-p0.html",
-        "sha256": "ae9ec532fd8cb302b4c89a92ddf5ef2abec298441d22efb5e6b4fe5fd333e3b9"
+        "sha256": "5608938e7a085f3aea6389592cf7a9c6394a16d20b3c3ef22e373582f39a180c"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -15551,7 +15551,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s00.html",
-        "sha256": "7326bb2262f9346ddb49863beea28840332dffb7369917ddae7eeef91b66aaa0"
+        "sha256": "3ec2118b0051cc2e5b1f4b53cf59bfe3eac2d9baf143d4c035ba29cc9d769525"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -15680,7 +15680,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s01.html",
-        "sha256": "138815a6822f518255b46e5c0935ccccea5e31789e9d028c369028bf84126a50"
+        "sha256": "70b13987c70ab753d81c37367ef9c77aa5173df0633d5bb36c7c1a5dedd23434"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -15809,7 +15809,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s02.html",
-        "sha256": "86ce55f3a0ec591eaea5cf6bb89e4d99d72cdc4b49d1c50e429b415adeb56d1a"
+        "sha256": "9c98315e5091ba2572dde2cfc28dc6b41eba0b0fe22a5e6c38d856f0821d3815"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -15938,7 +15938,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s03.html",
-        "sha256": "a84b91a88ca0d6ab3bc31577af9a2af1a351efbeeead4d0500cf8d9c5d4fcfb3"
+        "sha256": "db8c3adc6fe5fda06b333cf426fcce4ad8fe10ccfe9c37fcbfb8dffa0d0e3b63"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -16067,7 +16067,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s04.html",
-        "sha256": "7e53e3c14b08412073721a32233e402fa7e0cb5b6fdfebef4359f8cbcf669e4c"
+        "sha256": "95580775e9eb36413ee410bf54a061ee36b00b02c095d04b0b0c210277faa71c"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -16213,7 +16213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06b.html",
-        "sha256": "e49a75a4622ef76b748664a19d0e64da7c680835f4883aaa7070931afd3f398c"
+        "sha256": "5bdd3f08d2add14fbd73f44bb5e0b5bfba3ea628320d404e4281fc76aeff77d9"
       },
       "gate": {
         "approval_id": "",
@@ -16332,7 +16332,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06c.html",
-        "sha256": "a8de303c3b6b6e149eb1ad6619efd535a990207ee230d913910d3259d4cba563"
+        "sha256": "c271fa2d64027c76ed31b72a9caa3b66d87eec68e9c6cee15cec42d5cc41b71a"
       },
       "gate": {
         "approval_id": "",
@@ -16451,7 +16451,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s06d.html",
-        "sha256": "6ac9bae61dcea0b677c273a1c4fdfd2c4643635c3b4f0d959132d8f1630cea97"
+        "sha256": "92cfbd03e74a376f96d9a940b3dd3ecf920f761e3ab92bcb56fd6ccf95d78a81"
       },
       "gate": {
         "approval_id": "",
@@ -16569,7 +16569,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s07.html",
-        "sha256": "1ce55356541b632edb676413e6d136d80db904abf6f60560f6211b1c7d8244d7"
+        "sha256": "8ff62a3fd090b379678b59eaa9811648323877661e16024895a94bff15fce86c"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -16698,7 +16698,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s08.html",
-        "sha256": "1d60263b9b4ab9c1f2234a5de32c650431af420809afcbefb04fd29c242ee771"
+        "sha256": "29bb3ce2cf41bcd4d604c74efae51a535af1919a7b31f088038c364693160b40"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -16827,7 +16827,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s09.html",
-        "sha256": "f473b7de0035b94d8be4d9e4449d6db7beb3762cef38fe1b2e822c6ce7370230"
+        "sha256": "460ed09ffa0ea34d6f3485bf9204b79ed0d8be1231039ab7e112f2d1604ecb34"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -16957,7 +16957,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s10.html",
-        "sha256": "1efbc0c92f5f5516bd7128456907a4131a4fb24e262f937d60a266ecb3a10efa"
+        "sha256": "68e5f25ba55e562bb0c2c6d74eddd17b610b84c3fbfb802def579c6c8b8e905f"
       },
       "gate": {
         "approval_id": "",
@@ -17076,7 +17076,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s11.html",
-        "sha256": "55e96e60b0746240c85c5124cb60e1ab89d55a5860633c205628b3d357fbb32e"
+        "sha256": "e2c190e92cd30b279fe0b8203a061062c057f1c1e45ad52f7eb247d9f5da33d5"
       },
       "gate": {
         "approval_id": "",
@@ -17195,7 +17195,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s12.html",
-        "sha256": "b03f70f7dbc0592bc780a22b1bb5702e9f6de6790f0216eae9f9de424e347d5e"
+        "sha256": "669fd1b5a167eb362d222142d2a86f6d4012c93a06e621218df489a6f1d5f44a"
       },
       "gate": {
         "approval_id": "",
@@ -17314,7 +17314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s13.html",
-        "sha256": "39029739512a8ba985ab2d50f27307b6faf87f0d63c85d26e6837003175630a3"
+        "sha256": "c506d217cb9ca3243bba95af9d726ef0d7af03b54e5ef5714f75b3b55f0380b6"
       },
       "gate": {
         "approval_id": "",
@@ -17433,7 +17433,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s16.html",
-        "sha256": "816ea161e279dcfd6787bde8a02eecdfc26436cd29cb705faa041922fc651dd0"
+        "sha256": "73e6e44cfeea20153a60f93e8c112fa94617a8926308f118fc385707a715bfb1"
       },
       "gate": {
         "approval_id": "",
@@ -17552,7 +17552,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s20.html",
-        "sha256": "21266bcdd9cbac9eddaf8d6178397ddacfc10ce86c0cff5c237044ef34ebba6d"
+        "sha256": "b7144124432e26e7e5703706049228205b0b026403583a10559abb67247d6157"
       },
       "gate": {
         "approval_id": "",
@@ -17670,7 +17670,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-spec-v2.html",
-        "sha256": "30f39bec49015698f81707ff2b58f212e5fc40c0e200752b6b4271825dc1591e"
+        "sha256": "f1bf1ad95a96ff8dcacde5b1978d989d0ecb65fe372a92621df33af4bac3e5aa"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -17799,7 +17799,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t0.html",
-        "sha256": "b309f5bc5640cae0d62648ad116178bd92ee711561c08a5fec661279ffe64f7c"
+        "sha256": "4eea3e50b0cfeac8ff400bced37c6b628bad81f23ccd457b9044b10deb1c4b1e"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -17928,7 +17928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t1.html",
-        "sha256": "cf66ae8840ca5dea5615d237d6c586fc9c93490a1dc345337fb7806d6ee221ac"
+        "sha256": "43a03edb719bb2740c4de7191f0f9f7f008570b1a6fdd5e2439429785b69e2b8"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -18057,7 +18057,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t10.html",
-        "sha256": "8970f37c78e93307e57ecefac2fd393b0c2ff33148b81cf109152da81189da19"
+        "sha256": "210834fda4b2900c419bde4adf564663d81aafe098b8d9bf15f7b11f53efc511"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -18202,7 +18202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t11.html",
-        "sha256": "4ff64131c7d05a7797e8e7ee47933c46920dd27b4836bb7ea708a798620cc708"
+        "sha256": "35f02698c442cfee921ca978ebf3f457506726a23cb35a88901d1b74be1b84e7"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -18331,7 +18331,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t13.html",
-        "sha256": "c98cb739467a77b4ec89c7621d6ac418b8adaa09183d6671cd542a9704e10823"
+        "sha256": "df08825b157c8987de3c683a3c0e49c247067b8bc92d110a0b3f13e71290bc80"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -18492,7 +18492,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t15.html",
-        "sha256": "91ed63ae2102517d07145d601908fe412b3d30433cebc10309511a41b8a33f37"
+        "sha256": "e1a6d62e2c161f50cfed140d0b6ca518b2ebcfee7a8ae59a974a2d2607d806a2"
       },
       "gate": {
         "approval_id": "",
@@ -18621,7 +18621,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t16.html",
-        "sha256": "cf45e371945ac8f45139a5bd138586ea61cb249b1fd67a46eda13042f695057c"
+        "sha256": "deb3086002a64131756f51acff3a657b671b0a29e41276eaf568ba1f0b1ac39c"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -18766,7 +18766,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t19.html",
-        "sha256": "8131a492e85a5d1d78de4a0a0504abd8524d8222b82bd61a2f87af3b2cc648fb"
+        "sha256": "63d3f6da8e787bedaf19f3facb2829c199a9529adc4bd9303b4f6c3d9e0c1f4e"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -18911,7 +18911,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t2.html",
-        "sha256": "a795f79d8c20b2906fbd2a7b5902207722614fb71dd66297ed19d8d0a6532784"
+        "sha256": "17d324b31cb0b0a177c8ed7e8d7fd7647336c1b29c7bbcfdcf4f92c0529d1d93"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -19040,7 +19040,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t3.html",
-        "sha256": "89e5c3570ad9297b4c5d9ec8306aff6c97efc3179c0fc3cf36172921269e1a1e"
+        "sha256": "0899d4ef7fb9ca4d18762a5411bea0311b99045ee78cc7a38396fcb275972233"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -19185,7 +19185,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t4.html",
-        "sha256": "bd7f5671a4ceb43be08fd756e69e74958ea10b9adad3330324076d72d5161e4e"
+        "sha256": "1138ef365e2145c570480d9373ec439ca053307fa087494aa9448f3dc23a7e76"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -19330,7 +19330,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t5.html",
-        "sha256": "92ba6fdb722f92fee99b96baeaa333141ca767ca4b765a202762a5d2b13d7798"
+        "sha256": "65efbb4327ee4aa17667df58f31550fe548f9eaa69f00e079dd13923acd38800"
       },
       "gate": {
         "approval_id": "",
@@ -19459,7 +19459,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t6.html",
-        "sha256": "86ef0df0e6459dcfceac2d43980b421b7a0b3bf7585f7ccbfe9b3b77633a1a78"
+        "sha256": "f01cdafc6ecaa825e5ccf7df46f752d540c9603ffb43da45ee2f659fc36a9cd2"
       },
       "gate": {
         "approval_id": "",
@@ -19588,7 +19588,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t7.html",
-        "sha256": "cbfbf2883d8aef9e1ee6af28a7149b10f2bfb35ccf54fbe543e788742d5edb80"
+        "sha256": "3874746844d3344e8e49e30ad2edc6eccdb221ae78323285e6d63ffbe7690417"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -19733,7 +19733,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t8.html",
-        "sha256": "f747b1bae3335ea44f9da639a2d990a08edd13dc0f4cfb6c45510adbc894919f"
+        "sha256": "a26fd5a2168378b58313b6b2f54e6aafeee29cde8ae46bd6b01610a420a3d0ee"
       },
       "gate": {
         "approval_id": "",
@@ -19862,7 +19862,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t9.html",
-        "sha256": "fc3d069900c02ac571b33718e5db6c5d0274a4b91f5f77016ac739f96f5d9e05"
+        "sha256": "6a94ce0745c04498f4d72f32479528ff4f1b71012a512c0124f2e83c609bc80c"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -20007,7 +20007,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t1.html",
-        "sha256": "f63c3c48d46f84690ab46f2a75b49c1a550c354e2b2f389eb178dec31a73091f"
+        "sha256": "68aca7badc73092d9c33ebb5091d15796f89a1641d66146d5840679ebe0a78dd"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -20136,7 +20136,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t12.html",
-        "sha256": "d422195b82df3edd8fa93d9f1a283e8353ebd89ac4c89cd41d5b63f9bcecb445"
+        "sha256": "7d4835ce9e92b931345b6d75d5d18c944579e2b394c638479fb9ce32df036fa2"
       },
       "gate": {
         "approval_id": "",
@@ -20265,7 +20265,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t13.html",
-        "sha256": "aee1797bdbd06f4736962a21526b7f512e97eface0603efd74940babb9e2717b"
+        "sha256": "f24b6f011aaaf2e75cb2d557637a5827fc1c3e67489ebcd3c8b0be16420efdc8"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -20394,7 +20394,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t15.html",
-        "sha256": "d5feac3b2233a9086a49be6822b09e4b2232c52b354e5cd0128e5e0ca2e29aaf"
+        "sha256": "8643a7efbe37e2ef8da509b6cd2ec59b9655253a7481ef28d1fe0dbfd2fe111d"
       },
       "gate": {
         "approval_id": "",
@@ -20523,7 +20523,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t17.html",
-        "sha256": "70286f711535f76cab318f421214151383e65d1929f83aae26fe1d1ab9aa007c"
+        "sha256": "111838aece830dc294aa0d7e88171cd4e253ca1ccf91edeea8a40b604daf0b16"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -20652,7 +20652,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t18.html",
-        "sha256": "7a7c679d71730115959ea024f4a3b8b2dd77ad1b428de32906f179ccaf8327e5"
+        "sha256": "fbffbece436fe49673e1f1803839ed0aaef5163167ca0f925c3ae1cf4ae9c6c6"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -20781,7 +20781,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t19.html",
-        "sha256": "f653f15ac1ac1c265aeba27dcd637ef50f8139a48f1fba4e35b0254ace8d2454"
+        "sha256": "492e2034ca3643fc640d7b025c224fcdf2043c6ab23eae967818a7482f57211f"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -20910,7 +20910,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t5.html",
-        "sha256": "4c0b08f80d1d8bffe7d69586d63948a5b2979a7ddce789d06cf3fce37d9cf912"
+        "sha256": "3e5e5a5722dd71428a47e31946177693b3a250b93e93bef5d44e23d46105ecd8"
       },
       "gate": {
         "approval_id": "",
@@ -21039,7 +21039,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t6.html",
-        "sha256": "ca527eaec3171df29a87921f61012fb3c8198bd6d84932b5a937b7501271c675"
+        "sha256": "0c36db75e11a18133c631dc6735ed86986c266d215dc3f105f0a37456b694a2f"
       },
       "gate": {
         "approval_id": "",
@@ -21168,7 +21168,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t9.html",
-        "sha256": "226fe8e2b9f06cd3b834a743d5a0edc3ce9fe98dc563a9c0d482245841fa4416"
+        "sha256": "5fbb21fc08a5cb3ac86cde467aacc342757681708646d22ce20984c905596462"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -21297,7 +21297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-design-publish.html",
-        "sha256": "257e25861e9e96d49e90e9f361b0c9787a15c9f2bc45aebb1d727100f11b9ebb"
+        "sha256": "685257ee6abc39594be75bed00750c7b7b0b5217a13d088b1faab8eb1c5755c1"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -21444,7 +21444,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-p0.html",
-        "sha256": "96d1dd7fc62a0a2ff565373de4e713441e0cbe59e05d4e1be9a440753e737451"
+        "sha256": "d42347059797f692d33cb450f4aa69af5c4baff9cc0c73eee3020d96d6a12d38"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -21591,7 +21591,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-platform.html",
-        "sha256": "941a5a7c4ad9ef6c36c2d4ad127ba14b062b4add2b4ab854354854752b8f75f5"
+        "sha256": "f5a79ad2deffc1f7fdc0d1a38a82d1731ac4e3b3ba6d68e9bbd7fc454e97f7bb"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -21738,7 +21738,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s00.html",
-        "sha256": "28d50f7f1dacdd0184e8b5fcdaff18e64dfada8490e95b1d5a4f9f1e81fbaf40"
+        "sha256": "022c79d22ea81ee03f5d196f1ed73ab0e3401a702d73aa6bcd1c86b330a8bcf6"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -21885,7 +21885,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s01.html",
-        "sha256": "0c5e94c94253668b78c975e787479e5e2cf664687bc5ecb06e4d7da30c44451f"
+        "sha256": "c4c6821c2c78e4a9f733b95be673c1306d357834fb68cfb0d714fe5b3a0e4777"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -22032,7 +22032,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s02.html",
-        "sha256": "c51c8fd64d67ff9cf7874a855811fe93096d5f716890d80d73c2ab4e6bd72188"
+        "sha256": "2d2df8b459c9ad6e238d5e7b21d83b6313f336119934469e05675b61a54f4cc8"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -22179,7 +22179,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s03.html",
-        "sha256": "ab597829bc61b3803f17a2234444d83b9651c79b1785d53185c91087f0eb2d4d"
+        "sha256": "74900a1f09ccf4e45d074783fd5758a32aee0f2a331912da3d10cc5ea22697d7"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -22326,7 +22326,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s04.html",
-        "sha256": "0afc2fd8b1527993d3bf06d475aa3d66ff196eae50ecfdbc2ed2503c3c551d6e"
+        "sha256": "8415090f08cc9f321000b27e61e6790b1cab99f6a2c14ac9ee87e9b5bef1ac59"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -22473,7 +22473,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s05.html",
-        "sha256": "9ec211fa338defede573f70ea8f90fa41c2233ed7fade622d1b6e8e4cdb4871b"
+        "sha256": "48bdce65386b14e0c80abda1fbaf2d5b529e93e34fd57a13b95f7d79c7bd9ef7"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -22620,7 +22620,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06.html",
-        "sha256": "a61a8218a6c7a784808c610efce2e6f01579ce4bc8819324bd407499cbb35559"
+        "sha256": "4d4e34df3f26e74981beb919aeccb444945a8413f495860d7ef0fe3c20c106c0"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -22768,7 +22768,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06b.html",
-        "sha256": "35807b211cce29cb3de2015754993097cfe4ea8c5049e1b9da8ec09e8f904987"
+        "sha256": "d98c59efc4717ff8d9c2b3482ec1d674bafef899b162a69badac0f1a5923fe7f"
       },
       "gate": {
         "approval_id": "",
@@ -22891,7 +22891,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06c.html",
-        "sha256": "dd828ef31f8fa855d7c289792587c0085a78ad339d1abab30ff12be950307fff"
+        "sha256": "1d64c0355f25e950ad04c7f3d2eae8c95561ad7cc1dd8117c55f451aa0f5333f"
       },
       "gate": {
         "approval_id": "",
@@ -23014,7 +23014,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06d.html",
-        "sha256": "b004155a43939639c4054d1699b77407645e734c4943b7f2c2ad3782ac2775cf"
+        "sha256": "ad22e1043e9222cfc643f2c7c720b218082c7a78021d3b6e9216ce18a81b9d73"
       },
       "gate": {
         "approval_id": "",
@@ -23136,7 +23136,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s07.html",
-        "sha256": "75539b2afa82284e2e5b8c1a027f32384db6db278187cf83fa853de77db11527"
+        "sha256": "df96c039f6429adf1dae6393602c5017b7a331fa8e54e5f935c58e0c84982859"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -23283,7 +23283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s08.html",
-        "sha256": "e21eb6fa5503a5095c6c02444de6a5fa0c70306e956c4a3f6133f7223fc1349d"
+        "sha256": "c4ccf953c73b6b26d995498efcad873ec4ab014629e4eb9eb22b4ec6ed75eaec"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -23430,7 +23430,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s09.html",
-        "sha256": "f4273b4867e091ef8c3f351a1aa1cbba6baa7f3a8c375a5da9af2585fd684fe0"
+        "sha256": "959ddc570c0721551c63986f43fd585dc1abefeca50a692e00e5e9309bb31d5b"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -23578,7 +23578,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s10.html",
-        "sha256": "4247acdf812374bfbb51a221d5436369f202115e9b7b9d02deceb679934d9c14"
+        "sha256": "7a9738e448dcfaf37315e8ff51572c3363d487328ce9aad2e18c7c640bbcc61d"
       },
       "gate": {
         "approval_id": "",
@@ -23701,7 +23701,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s11.html",
-        "sha256": "b261b39aa41ece6e24c2d244c1614ca68b4079a4af442e639651e959e9f4008b"
+        "sha256": "fc0b221ddb562fb7033b40c3108451ab75691d033cc0da985fd3459e8413d5cd"
       },
       "gate": {
         "approval_id": "",
@@ -23824,7 +23824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s12.html",
-        "sha256": "12a03a34243bc8dbca17e4f637712d6a4a7b6c78ebb934af5196bfea1b9f1c17"
+        "sha256": "134602eb2b545c7eff6ec06ab3db87b4b053c86077480118b89be09b79880c8a"
       },
       "gate": {
         "approval_id": "",
@@ -23947,7 +23947,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s13.html",
-        "sha256": "7be4d82abde2f4742bf651430e7560c078c1ec3009d1624359e90096a642cffb"
+        "sha256": "5ae9e7cd77662fd5b2511c3874b6f210f42ec77c60db0ae1adccfdd400f8f584"
       },
       "gate": {
         "approval_id": "",
@@ -24070,7 +24070,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s14.html",
-        "sha256": "552dd8f9d840e7eca0b69b0fcbb53bfc812082f11bb7d252409dc01f7dc5f897"
+        "sha256": "012257db5043ce54cb9ca3d01c2003945408d02d23c7ba5bd3363dd79114b316"
       },
       "gate": {
         "approval_id": "",
@@ -24193,7 +24193,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s15.html",
-        "sha256": "06cf8c179fb07fddaea2564203dc18e5bc860d628cdd26adf01b90586e9c5f99"
+        "sha256": "73c0e6ec722e96ba799f05f1990843bb29d3fa08ceabd3c0b9d5131d6285c154"
       },
       "gate": {
         "approval_id": "",
@@ -24316,7 +24316,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s16.html",
-        "sha256": "d43e0c8ca6564393c8907a4bc71a46d342f1a96e2df902c35ba72ac2fdb46f12"
+        "sha256": "23d909b0700ad2579b7a4b2cd9d3d4d8a13b0d483b7ec5586d08774e91e64676"
       },
       "gate": {
         "approval_id": "",
@@ -24438,7 +24438,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s17.html",
-        "sha256": "d362866577fbb516b90a4c2eecf0621e6d4a5806176405b36754aeadb767295a"
+        "sha256": "36a470b0d3bb79ae61524b226953b5ccf6b502de7585c91b25ed41dd3315a079"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -24586,7 +24586,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s18.html",
-        "sha256": "fd2c1015a76084599ab461df2241b244f229b80a31fb57b571c153f455e6d1d9"
+        "sha256": "4532c81be47a1608d9c6f90b913dd63a466e915e157d7c7a03522c8c370900d1"
       },
       "gate": {
         "approval_id": "",
@@ -24709,7 +24709,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s19.html",
-        "sha256": "5c27ad52220a5b3758c6d2eaf79c2409c2500d65c88a8e8a891a68eb17091531"
+        "sha256": "0f83ee4c6ddb5c3b56f0f19dbc91838c282f8440b57b9a79490472ba8783c73c"
       },
       "gate": {
         "approval_id": "",
@@ -24832,7 +24832,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s20.html",
-        "sha256": "982034d0c0caeb1c115aee90fe797eee5e11976b42042f2a1dbf95a644ab8e04"
+        "sha256": "d366e4e30ca7f3a803e23853a9abe591db61465ea665e3e33aa36afca6c3101d"
       },
       "gate": {
         "approval_id": "",
@@ -24955,7 +24955,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s21.html",
-        "sha256": "bff6fae7ee12f1053074a8e59dbd6c1db3e7c588a5c2f63a61173eb6f2e72b3d"
+        "sha256": "5b8bdddeee5ce513ae970792e73fd744c550711b8683432ea5e4a46eb094f862"
       },
       "gate": {
         "approval_id": "",
@@ -25077,7 +25077,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-spec-v2.html",
-        "sha256": "91628bae5e411986d2e2979bc64853cd99e785c1665c1b596a41260b974eaaed"
+        "sha256": "ebccf68bb5f8b0c689afb9403594b31995c53f62205e78ad03ec7ef9dc8962b4"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -25224,7 +25224,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t0.html",
-        "sha256": "ca78d8b2e654c0207df723ce1f23d4c9adb8d94d88606eba25fb19097c6c8c6f"
+        "sha256": "c5f93c58dc1d585c1fcbf353e30dbe6ef394dfe68cc1526c1e9c4fc871bc30de"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -25371,7 +25371,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t1.html",
-        "sha256": "3bdcb7a13508a1099207e798dbec56327ec668dd5634c1c554ca737fa5f4888f"
+        "sha256": "09ed70ed7ad55df24bc13a3c955fbff79b2435921f34dbc403b89c59e04e7c49"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -25518,7 +25518,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t10.html",
-        "sha256": "0b8dfe346703ed0b6f9bbf2c2985ccf4d4b1b0b0f49d90c570d11f631cee0c6a"
+        "sha256": "19a97c2695a5e4cb8b452c94e2a86b0f36ca2af6dbee05af214a20abedaa39af"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -25665,7 +25665,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t11.html",
-        "sha256": "5b2ef3042a3be2ec221948f77228b0637157aa7f840c99230826a2cee8358442"
+        "sha256": "a33096721d2ec567a752703896cc83bfe0bee480cbdcd4677a5316ba6d803e5e"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -25813,7 +25813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t12.html",
-        "sha256": "b80f9e06add9c269b2dbdca639f7b1104896ae79b1611fe1857ad0f1be1d6f41"
+        "sha256": "b14f887f1a73ac6232523049560bf41ce6aa976c2b3be7b4c72b534d317ae927"
       },
       "gate": {
         "approval_id": "",
@@ -25935,7 +25935,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t13.html",
-        "sha256": "7d84388d038f5392cd6adafe918586f55172cff2ead801afce9e6f3913965e0f"
+        "sha256": "6003d90d4834243c63d645771159e39e2152dd1c44039f2e19c84e09ab8e6d34"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -26092,7 +26092,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t14.html",
-        "sha256": "6f5dea51d29cc93f1b10a39d2de510986ed5035ed11ed78fbf70238f15293ed5"
+        "sha256": "790639e4f5e41f9954c87df97b6420f4ba6ca15aad0ede3be383c5b1a443a590"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -26240,7 +26240,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t15.html",
-        "sha256": "58a2f60e512b6ccf83c88918a5873cf7e4064a663ddc63894e591b0c51c3a82c"
+        "sha256": "af6803fef8af350d140b4a05608608a01e9b924b4cd2a1ecbab57c61dcd612fb"
       },
       "gate": {
         "approval_id": "",
@@ -26362,7 +26362,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t16.html",
-        "sha256": "7a40daa0e2ed433dae2199bf477db341d0513fb18be34621ffb8eb634b73925f"
+        "sha256": "c70b865bec63d3a6eb98b66cc308a8995553df58a3f3f7325dc9fd2a10c1fa12"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -26509,7 +26509,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t17.html",
-        "sha256": "6242f687ba4aca7e443825cc680cb27d26fdc29d358adf94d45a781964eec98c"
+        "sha256": "2e12a82a0ff57a0375e687871fdc17436778169517436d01c2960d52c13c4624"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -26656,7 +26656,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t18.html",
-        "sha256": "0089052fb7278d16947e7f67f418fef535ec95d29c1466ff38e1732665bd3217"
+        "sha256": "05e94f291fdbefa9d32e559a68bb888c8552f9edcc1542f274a5f0bab788462c"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -26803,7 +26803,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t19.html",
-        "sha256": "07cbdf386597cf78832508ad6da33395592171a8f66e74b460b2d136cdc910b9"
+        "sha256": "52ca714fc04218dec56bfdc068acc289b6c2d7d9bdcadb420708f735c06264fa"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -26951,7 +26951,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t19f.html",
-        "sha256": "715c252289b1231696319368928b029222ae1a28583d5979a419766f91acd03b"
+        "sha256": "6dbd17f92df9e62b7b4e4f6456bc4915e78c0ac83736f08f1013d2fce4f4ed32"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -27073,7 +27073,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t2.html",
-        "sha256": "eaf03ff97e1fbe19c3b5fca6f2092c8e779d2b30264fb0324be86095e358aee9"
+        "sha256": "1293052b9c9d3eb026e0b6f436134d65ed5bbf85280d2d21a0fbbd8b9d2e8390"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -27220,7 +27220,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t3.html",
-        "sha256": "80cb45715fbeddab5cd10bfe31102337fa9eb855406ce4191631f6b065c73f62"
+        "sha256": "3ae8941dcec721911916ca52b7790abbc02bc88f2e4fa3159fa4016c5a712a1d"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -27367,7 +27367,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t4.html",
-        "sha256": "268a564c67faa53a8027b14c4f156af538b5fc93dd714b4a6ed0043c8f6f00e0"
+        "sha256": "04dd1e4af68e0f5509f7925e66f22dd7c706c92d7d877ebf05ad966efe043323"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -27515,7 +27515,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t5.html",
-        "sha256": "bc0d094d3b458c5a5032a644262c6b9391bf40163a19b46b883c3c706255bb98"
+        "sha256": "e9949ac8943bbbf9bf3466fca77d15b7a6660cc3680a46850178da5d055f1357"
       },
       "gate": {
         "approval_id": "",
@@ -27638,7 +27638,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t6.html",
-        "sha256": "857955ab5010e8de5365c6b0707a74272995cf9743c3f0bada62085cb6421eb9"
+        "sha256": "638102fbacc7653359a25c807daf6f5085190d092f4375837edd164168b39cce"
       },
       "gate": {
         "approval_id": "",
@@ -27760,7 +27760,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t7.html",
-        "sha256": "ae6f111cb6d0b3cc70340ff8b091248e56312b90b6df27b6d67bebb3c8850129"
+        "sha256": "90a53b147ed306e11d4ebff4ad2bf380b347e96c0eacd3b036d3247014947927"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -27908,7 +27908,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t8.html",
-        "sha256": "42ef13bbcf91b8f302c5e125ac1b79956022ef33305b731a667dc48c74d5e655"
+        "sha256": "7d8577af1c8039d4b2e06ea2fd0cb7fbc95e2df886eb9cff8d1cbb564430905d"
       },
       "gate": {
         "approval_id": "",
@@ -28030,7 +28030,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t9.html",
-        "sha256": "49851b6019631f400b88fd4c5618c28705c995c4b5a4803e39a22bfa5dd537f5"
+        "sha256": "9e8a4914ce35c09b7148de07e114e1411563a4e74c9b2543fa0cfe4395ce4deb"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -28177,7 +28177,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-design-publish.html",
-        "sha256": "0a76fbf7855888f8c46773ad399532039e166ab17a116d540509e90636f8a8cc"
+        "sha256": "396e64dfe06067b7ea488ba3042b2fb6be4922776092e852480f3a3e08d2f598"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -28402,7 +28402,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-p0.html",
-        "sha256": "7d07573cfaf2bb23726a50db6a3f61001e684bad0affb2ec5e867e915fde1cbf"
+        "sha256": "2c3b7a56954d5e323643ba1da303cd7b8d4e80ed1afbe9d8cbe32a2d91178e77"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -28627,7 +28627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-platform.html",
-        "sha256": "3156f312c9629db915f5ec34098f8e8b96be9d0d852f59621bd30eed6d256baa"
+        "sha256": "5d186e2cfba36d2c313046eea8ee45b4df39c27b76bf20763dad056d507d8e2c"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -28852,7 +28852,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s00.html",
-        "sha256": "c39ffe1834da9782485ea826992c7a06fcad37cc362cfeab6766f04c9adfb9c0"
+        "sha256": "22ff25a8f2c4ba924d7a0613b08a960fe9f8f783a2fab10fc241999beaa3e8ee"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -29077,7 +29077,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s01.html",
-        "sha256": "af79b5899ed734c8e28e72aa650b9ccfe94bd36bb47f2d551a3cd2be29dd1ce8"
+        "sha256": "e5131473730d1aff70ae6ea1a4d961536abdaa218524b774a307f3e89d07185c"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -29302,7 +29302,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s02.html",
-        "sha256": "efaf1c0c020d12671d866754f2d9777e9eeb2afdf848c571fcd62feba7f12870"
+        "sha256": "df79b165cecf78c0fb22ad7898cd663a6d3d07a13695fd699a796c0c0a7a8af1"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -29527,7 +29527,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s03.html",
-        "sha256": "71c672d7aaf5089770abc6b7eec6b49f199d0892661dfe367985e1fedc0029ed"
+        "sha256": "5e78415c60ec183c7e0c066be0242ba7994b8450e58623ff738e9d08048e436c"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -29752,7 +29752,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s04.html",
-        "sha256": "29e47b47465ce87398c93bd1fddcbbe2bd440734fa04dc062c2fbba5693b4e68"
+        "sha256": "68b50d9560611849fcc9857fe5d3bf5dda037b892aad6efffb1e2c664a706a0e"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -29977,7 +29977,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s05.html",
-        "sha256": "83901efe248b130430caa5236f3e31237c01da95da283c0e145b509affdb7835"
+        "sha256": "15d1b66d29b978d2ca2f1c6e8860c79b38555b075521fbfb184be4ec42f727dc"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -30202,7 +30202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06.html",
-        "sha256": "fc97384efb0c022ee57e360d3027171662c0a753b5f04df02c53ec8c0d4d37f3"
+        "sha256": "230f9ebbda909452365dc4e7328ed362eecd81c5059e9891a39752af6e165fa1"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -30428,7 +30428,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06b.html",
-        "sha256": "dddd7e62efb945f9ab0b0d44c91a6452675b37ae3cd0857ce7fdbb4ccb819e92"
+        "sha256": "ba6c25dd778ba20e1662fccff138ef26379647f906bf17f2ed2fcbfc5bc0d6ca"
       },
       "gate": {
         "approval_id": "",
@@ -30631,7 +30631,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06c.html",
-        "sha256": "1abda410e343766e37939929c740e06643210c5f754fd4a68d837ea04aa568f7"
+        "sha256": "66c93715393cd1bde82d181913d2eb61095afbd4a9416efb5fc22066467fe143"
       },
       "gate": {
         "approval_id": "",
@@ -30834,7 +30834,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06d.html",
-        "sha256": "ebb58f9b9bb94267b3abe8d3d10e93277d2e099041184ebde161a842fdbcc042"
+        "sha256": "89c6bd1e9e4b420dd149d84e5563c42c6ca3ae66375f42ba44156e0a9e0730b8"
       },
       "gate": {
         "approval_id": "",
@@ -31036,7 +31036,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s07.html",
-        "sha256": "ab177efe4c50c00254085d5f39e60aa8ed8e9810c93b4883052716133b4426c2"
+        "sha256": "d5981e85ee2725975c2e014ee05507dc82ccd612f9414e846f284c8be2547c95"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -31261,7 +31261,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s08.html",
-        "sha256": "0edaa5f0938a6406e91390bbb86a5e7dab2a530d65f306a878f14507c79f7f57"
+        "sha256": "75004d8722bfc7342fd2dd06fbdda3ab9e34c4b0549c387faac593d6dc4a6345"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -31486,7 +31486,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s09.html",
-        "sha256": "4a4e24cec6406e6afe26a663c4d7762d6f3229e762b3aa4933b5ecbfb303622c"
+        "sha256": "e21c569bcdf36a501c35029d164f36e39363dbaf0943a420ec0b37c01cd2b315"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -31712,7 +31712,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s10.html",
-        "sha256": "4507024b2fec3b00f61f829f50281ca3aae25d845ddc398802e02c1af2c5fa04"
+        "sha256": "892de70f321ad93417a4df8ad243a1523871d267162d2a92e17c3088ff2c51a2"
       },
       "gate": {
         "approval_id": "",
@@ -31915,7 +31915,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s11.html",
-        "sha256": "18cc78d1feb86a7558e1133c675bf094a186711b3da998c8484652071baf90e9"
+        "sha256": "4fad336413d4dcc146fd724b89632b6c6c1ef49de7420153f407d94cfff16005"
       },
       "gate": {
         "approval_id": "",
@@ -32118,7 +32118,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s12.html",
-        "sha256": "a6febe3eab46b0f8708952983ecc31287f53ebfbf065dccf3ddfcf4c5e165c6a"
+        "sha256": "83015996d8fc068f5d9626d7b828df3a294661cd35fc6b671d98b833b31430df"
       },
       "gate": {
         "approval_id": "",
@@ -32321,7 +32321,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s13.html",
-        "sha256": "92c0d87d43a18ec6b2f91e81b6799efddde93a66d9966065a69e06acae8f00a2"
+        "sha256": "7c31c6cbc778686545e496d51e60b72783310bd87c8c0582f8980ca5c89873b4"
       },
       "gate": {
         "approval_id": "",
@@ -32524,7 +32524,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s14.html",
-        "sha256": "f9fc2ce051938658cc8e956b66f472997657840d3ae2e4933e585a46df63e233"
+        "sha256": "5c33157a2f4a52df4754ac4aa1ba165379b2e492fa2d19bf854f5b9bb7ff2eca"
       },
       "gate": {
         "approval_id": "",
@@ -32727,7 +32727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s15.html",
-        "sha256": "8f215acd9641e7d7013ddce17399686c5cea1828ea8940dbb8a34947dd4dcbe8"
+        "sha256": "ba7d1a567b0359da81964010f08c23fef96fdfc1fe6f9b5e4e1b39bda0a22e54"
       },
       "gate": {
         "approval_id": "",
@@ -32930,7 +32930,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s16.html",
-        "sha256": "0cda5f4f3cef9fcbea13436a6a5e320569ec6b92e3e13ec6e4c18534388a9783"
+        "sha256": "423101d345dea3c2aedd73b1ea5a15c06bb8d3c1d6dbdd271992d334a7f7fc7d"
       },
       "gate": {
         "approval_id": "",
@@ -33132,7 +33132,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s17.html",
-        "sha256": "e9c8e579fead3cd177fc8c34374905670386638c03e12bb0ad324e24f9cfb823"
+        "sha256": "2ff549f32f47a3393e81b4f59277b69b6a288d3c40803a6cd2da0a9a77f06118"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -33358,7 +33358,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s18.html",
-        "sha256": "0623233c57a8d6cd67da5d53f27b1be5d99ff960f33e8a54a22c7ab2dbf4eab7"
+        "sha256": "82df597f2ae62c01c9faee76dff3764cde39052e1c1eb704670c3b90da3ba72c"
       },
       "gate": {
         "approval_id": "",
@@ -33561,7 +33561,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s19.html",
-        "sha256": "5b2a26dcedd274d5faace1859800cf6e0325072af77451ade0e73a52e1c21d0d"
+        "sha256": "77e419abaa6a26b17fa186ab7677ce73677084877298c23516d0c6ffdd83b982"
       },
       "gate": {
         "approval_id": "",
@@ -33764,7 +33764,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s20.html",
-        "sha256": "2b02486ba1f4cb487aea71b36bbfdbab34af3a63943d2829464de201d66732a7"
+        "sha256": "612147280f28cc7c907324a3cbfd897340d9281683bc4b72f6f9c777dccd455f"
       },
       "gate": {
         "approval_id": "",
@@ -33967,7 +33967,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s21.html",
-        "sha256": "bac4af06668aa2c6d64468b1f75a22df3a52f2b59d5bc06f253a273996a43933"
+        "sha256": "9b6ce37250bf4781301677a4bb3f068695d18e2098c8ef476d7116c20bf9a95e"
       },
       "gate": {
         "approval_id": "",
@@ -34169,7 +34169,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-spec-v2.html",
-        "sha256": "f10a2f38f3f16b1a475fb9e046f213a536d9430aa08221ab4cc50bd0797d8372"
+        "sha256": "17dc23c4d3c609f1e8965c0fd0efc51414c2fc2105079a27178627c24267e956"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -34394,7 +34394,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t0.html",
-        "sha256": "99a245b100cf3cbf33c3ee6a293dcf82ee813ef5f10c5fc01fcbf5ff40c1f2f8"
+        "sha256": "9bc693e4fa8232ab53a906a722a0fca52063a6931020120f5e98f11e7589a3b1"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -34619,7 +34619,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t1.html",
-        "sha256": "a3de91642f3ad5176ee1c0bdea5941f2370de027d4c42235c9168b94a6744287"
+        "sha256": "f0fdff7c07541b258d0df7e4b393d007ef13d8bf096abdeb16052aa6e3a25f78"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -34844,7 +34844,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t10.html",
-        "sha256": "2e01cd06c05d355191d283a7975c74dde97daaa429bf0ea95d04fbc3d4f6d254"
+        "sha256": "c64c8cfb98c986588b3b6c6849b7566e07354d890b1fefbd96897b09f382b178"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -35069,7 +35069,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t11.html",
-        "sha256": "8569760fc6d64a658eae11ca4a7936fb03aca15a4e0cc5e194459d34142a4b62"
+        "sha256": "94e1090c92339d0d9052364083633275d60083a417bc982485bd76602094ef16"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -35294,7 +35294,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t12.html",
-        "sha256": "e490d41b09ab490d1773397d43e08f09bcf1e7471f43b85fcc2efa363ffcbf0f"
+        "sha256": "cc486f17e60fe44e273256657a5587fd6e25da74215a86de7e94d439484f82f4"
       },
       "gate": {
         "approval_id": "",
@@ -35519,7 +35519,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t13.html",
-        "sha256": "790fcf5252c16c4d4ac9163c8536fde698b19b65304cbb442f098f48df0c5365"
+        "sha256": "2acb62e9b11c868e9a00540588158b3bd81481439b195b494649570a6602bd9e"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -35744,7 +35744,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t14.html",
-        "sha256": "75858d3fb61516aeb44e200d91fe47715a5cd6ad59c26fead5ceeb0bdaaaa16f"
+        "sha256": "19ec03816d4f770d23ce353fcc5d5549f79198960642b79e783c4e7b33721cdd"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -35969,7 +35969,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t15.html",
-        "sha256": "b1d81f6d7dc588c954ffc247154c61cecc2234d6e86a0a726c55d0fd1447078b"
+        "sha256": "fe30c884f3404d27c99857aecf1b3e9f2c74506c3a87d4e55e141ad3255cb13d"
       },
       "gate": {
         "approval_id": "",
@@ -36194,7 +36194,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t16.html",
-        "sha256": "958b721cc09d8510e47d7d10d8c5ba1edeae68c619d7c2bf46d2a93279f10c0a"
+        "sha256": "5a97a7832bb6096aff88b038d6a2461408dbe7ff9b05f8f957f72d5dbaf3c42d"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -36419,7 +36419,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t17.html",
-        "sha256": "06a7151654dcb67affaeebf9b1f0eaf6cd2373174fcd78ace2038ba8abfb0565"
+        "sha256": "fa9ae4f89c815761ee1917e343eb80cba10c4dec740f3f73bd0d57d533522647"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -36644,7 +36644,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t18.html",
-        "sha256": "1c5ca7a2656165e89ace01caf7d6aa7a63968f79a977fe7d3dfca2537751300f"
+        "sha256": "bfd3bcc3bb51739fc73fedcc70d362411bdf1c925efa39c39fb8b516bda0faec"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -36869,7 +36869,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t19.html",
-        "sha256": "34fe10edc225e89b427c0b15b2a5ad3f74b9812c5828457f7a3abcab713d96dd"
+        "sha256": "3a6fad38678e0af4b3a093f88a8b6ddad6bef36a671e523e34ec47b2a70125d4"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -37094,7 +37094,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t19f.html",
-        "sha256": "24e17d91439169be317bc9cfd29f541abc5df7ae3da42ee7eabddf5253d334e0"
+        "sha256": "dd822bc69a213eeec3001b97d11d383b6b8096511c8e4a3589416ae5b939b84f"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -37319,7 +37319,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t2.html",
-        "sha256": "caa0a41cb62e061a5426c87576e6b34e5519b4ddcea6f907a81eead04f2bbf75"
+        "sha256": "8e1c4465bb98bb90eab60c9663665a4a0f303b61002ca40c255497ad83db6708"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -37544,7 +37544,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t3.html",
-        "sha256": "fd122537b29c8ffc92572db76bc913d2db4876b2e73d0e37102ec2fd4ad8f2c6"
+        "sha256": "ad0d9a2bfad227254d0182f5c78113a040a0b05cc0a6e2078b9bfacd1374114f"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -37769,7 +37769,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t4.html",
-        "sha256": "4a29143fc550ce0a02a0dcbede47645d1943aa220be3645401a84dd420094f74"
+        "sha256": "1163163d5123304583e3c1b55ff80eb52aa0648ec131588975c62ab11d52b721"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -37994,7 +37994,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t5.html",
-        "sha256": "0c7ac19904f978a289fb4b36816e15e47cd7c27384441243dac5bc4ba0a685c6"
+        "sha256": "2d2fd0503a5f112ea9802164b7b406e2b1a9daad66e53190c54eef4e8f7984e0"
       },
       "gate": {
         "approval_id": "",
@@ -38219,7 +38219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t6.html",
-        "sha256": "8f2af4e4340bb25976dbf067b088ca57c29f01fa912d27b3cb2de54f2c052b42"
+        "sha256": "73d898509965b2a12aa8e81fd939cd5e1e90c2a8e66326888fc5b82a03d3c763"
       },
       "gate": {
         "approval_id": "",
@@ -38444,7 +38444,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t7.html",
-        "sha256": "1da41a32a9dea1ed85d29b71d1cac033b060492fb796951e95e722574a5f5222"
+        "sha256": "54d9bf4ab48cb947546eec713323b930a0b5fc22449abbbbd80c961f41f9bb81"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -38669,7 +38669,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t8.html",
-        "sha256": "680d2468661c24ba4c3c0b9f577e15d0a95830d1cf3cbd4c92dfe4de494a93b8"
+        "sha256": "edc8335e25c2663fc3bc4ea8181cd99389462edff08b000d9ed1c6e80d33c5a4"
       },
       "gate": {
         "approval_id": "",
@@ -38894,7 +38894,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t9.html",
-        "sha256": "a4826d823c3d12dde2cf19e2a8aed5a60cc6f0f3a170d8ae8a9e1cf3974b0ac6"
+        "sha256": "3df2df82076be80d8471a278844ec820b53b021db37459c0fd58e4663de686fe"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -39119,7 +39119,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-design-publish.html",
-        "sha256": "bdf5b88d19a5eb5bc0019432a4c2ddc4200efc49e96e62fcc8d8d64b77aaafab"
+        "sha256": "a84790c122739c6ac4e73e6da9d7bc26ed9c3f5f9b7e0d0fb0459b8ac4e199d8"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -39300,7 +39300,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-p0.html",
-        "sha256": "4c71a27739d4ca4bf31bf62afdc0531a97b3908c5dc100c7e579bafa51860cda"
+        "sha256": "cff8ac21f1d333fa344fead604a284a401aa2b3b7f5d039a32d96fdbc02ac091"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -39501,7 +39501,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-platform.html",
-        "sha256": "519c7f29d079055fcbd127d4efd6e6f6ec4b189dc5ff86fd478171d4c630f2f4"
+        "sha256": "e931d92b6e3e9ca72c59fdf352756b0daf9893fbba8efede3e7c157a37ffc919"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -39722,7 +39722,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s00.html",
-        "sha256": "ad654c3a25e4eda42eabfccd5506eb0930cfc839a648709130cc50a6e9405f0e"
+        "sha256": "8943dc9960dd8d438025be4140088516982d57ce1af1f577afc6881a6f795ee2"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -39923,7 +39923,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s01.html",
-        "sha256": "9b4285d9be6ae5040c301763cfaea2250a7e22f4615dc04f890c4fb1ad063d7b"
+        "sha256": "bffbf0f3aaa0abf9d11fbd0c12116bd530f97c5807678ecb0733eda817ca2590"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -40099,7 +40099,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s02.html",
-        "sha256": "42e827943d2ed1401bd0dd681b4a1a5e95e58e125a7b70b8ff8952469332fd03"
+        "sha256": "e206a8595e71ad529026348f8f4165be0d5cf866aba2a519173b30492c6eef3e"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -40290,7 +40290,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s03.html",
-        "sha256": "888242a18945cafc81846227f0f0208357a2328489fbaf647bdc05f06d5a02e3"
+        "sha256": "3d550f585d64ca4d4000cf08b7763dc906d450d64bb5a4a83a673acdc75db4a5"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -40491,7 +40491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s04.html",
-        "sha256": "a306482fa8b11bd018b9dac442f6d4ca7c12e818a91a5d1de3e1597ed34a053b"
+        "sha256": "756827d0ef9eb6d09582d7a718bdf805322b7779f9967e48bd1a5fb6d7f52180"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -40692,7 +40692,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s05.html",
-        "sha256": "ed69aee74ea58d1160455b6d2f8506b67de6ff214ae1ae8537123ede6afd5a11"
+        "sha256": "27e574d55c278d9a373ec3bb05d5046302d20f0418b8321e65969dc60aa46aa9"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -40898,7 +40898,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06.html",
-        "sha256": "be1a6fa2bde5ddc31a8e0f08c2a4e8148b7390865e0c8deae822ed24011219ab"
+        "sha256": "18137a71167b2e78553db9fb82e2e9a4fb57dbc2c5d4873e246d4f9a9c268ff2"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -41105,7 +41105,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06b.html",
-        "sha256": "fe92b08e5b4d8172d19e274ef5a5ddd398b87ae36912fbff837fed96a8cb3927"
+        "sha256": "a2fe40483e6bb116ead60cc4850bc1b99f3ec7eb1fb89acf44f1e15ba004de4d"
       },
       "gate": {
         "approval_id": "",
@@ -41258,7 +41258,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06c.html",
-        "sha256": "c888aa3ac94620d6ca0b6bae8ca011368611246882700ea81a5fc3d89cd9f196"
+        "sha256": "c763678a60cb506fc0237ce8acdd9084b861cb7c31960b1f782845c184f238ac"
       },
       "gate": {
         "approval_id": "",
@@ -41411,7 +41411,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06d.html",
-        "sha256": "83a2ec934857cf91667135280798fdd95922ef401fd40c65e642496b7cf8b6d3"
+        "sha256": "71f6340fdf41a6b2daf39b8b6269e8695590fcf27ebe6601517513b71d8a7d03"
       },
       "gate": {
         "approval_id": "",
@@ -41563,7 +41563,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s07.html",
-        "sha256": "427710659a9516a5be9fdc059c949b316057f07c5a3165c0c20d06c60f4d7e58"
+        "sha256": "557ea6a83f75b03744e5d8fe7a657a38965716ab7afdb17e933c3761e2262b9f"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -41779,7 +41779,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s08.html",
-        "sha256": "d4550d231fdd60888bd3e814ec7f28b962e8480d7a78c43995ea149dc138a8f5"
+        "sha256": "b0b4756e9694dc1ecbf0163969d8df3359f20d90bc19f9eabe7c4fa60ded03f6"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -41960,7 +41960,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s09.html",
-        "sha256": "5d5e54e845f56e68d525c7dde43e67daea9c8c8b86bb462a687f902a7d7051db"
+        "sha256": "87cdbae8e866d3e5100c6a28480d8120f5f2bf9dbd82a682baf1a76f814750ec"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -42182,7 +42182,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s10.html",
-        "sha256": "42ad9f737eb1081b6bd70c26a33a6b3e4507f0477668f51d5b03a6bc102b29d0"
+        "sha256": "2d066cf77a27cd86531ddd86fee4fd78cea00179ae8e943725631e277a8aeb4a"
       },
       "gate": {
         "approval_id": "",
@@ -42335,7 +42335,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s11.html",
-        "sha256": "fd2c10703f213f85ca16f8112759044160c4b6ec01dbc17d0991febfc445f6ef"
+        "sha256": "565a582896b3314c24185adf96078e5e479ac118685eb0d5d85141d6f3ae2192"
       },
       "gate": {
         "approval_id": "",
@@ -42488,7 +42488,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s12.html",
-        "sha256": "b9bb1390590c1bd9f95f59c8da741825e0b7441582f5b79b3656b84818a0ad08"
+        "sha256": "b285c58c9aa663c85c60ccfdfb9080c42b07d51a5f7a9f7bcdc848dd1e613646"
       },
       "gate": {
         "approval_id": "",
@@ -42637,7 +42637,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s13.html",
-        "sha256": "9c9c860fe65f525f09d97ae3dbe9655f2bfb928e1668e37b0918b542ffb5dd18"
+        "sha256": "e347e93c6b855c997be9318ca4c72c31b2f7900a4a72e9c51888e458a1f5179f"
       },
       "gate": {
         "approval_id": "",
@@ -42786,7 +42786,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s14.html",
-        "sha256": "c2d3070113fdf3cd60afbf771e1221a5f7f16de7cf1873bbba119abe6ad7b509"
+        "sha256": "670ad71d3a752dc226f418e4672dd1486e09cecc1a92828b23a3cd1e37152675"
       },
       "gate": {
         "approval_id": "",
@@ -42939,7 +42939,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s15.html",
-        "sha256": "dcbebf59b1f6afcb86f4dcff51bb6a3c4d7e34ee29f166ad1126b558c63d2fae"
+        "sha256": "f46919777f4e8890e8c724d809329c7b7f2fd5237a28a08dffdab3311fee9d34"
       },
       "gate": {
         "approval_id": "",
@@ -43088,7 +43088,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s16.html",
-        "sha256": "9fbac79c7f8dbd5f294b2991382d0e762b8b06ccd7c94a885a101892e47da90b"
+        "sha256": "5f591b2a19e69f188152050ddb3525747230fc9cb2eda28d4c11146f62949cee"
       },
       "gate": {
         "approval_id": "",
@@ -43240,7 +43240,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s17.html",
-        "sha256": "3f0465b6b5024375e1458add3ecbfb12f4c3a4338dcdbf4c17e3c546b7b1e21f"
+        "sha256": "28d4e0bd15e60a07b5f056d415ca607d1db43a3384786b2feda941991b402d22"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -43417,7 +43417,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s18.html",
-        "sha256": "ee1d0da35da8faac01980a2d180093b1659e7e940f01c2f982e230abfd22099a"
+        "sha256": "aa0438fb094522592daa89c4f62b5fa32c545cfa0a402c15969d02c069b7abfe"
       },
       "gate": {
         "approval_id": "",
@@ -43566,7 +43566,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s19.html",
-        "sha256": "42b526ac1b27d3dfad6b6364307a776eeef94a48df60dd3b6316757e634529ee"
+        "sha256": "9bd142c6ac03285c6cfb0750c2630ed7424c927a9c80d69646a6c92e06b9199c"
       },
       "gate": {
         "approval_id": "",
@@ -43715,7 +43715,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s20.html",
-        "sha256": "d0ba5fee3e208a9d99556061684fa2bdafd8599bd71758815922e6de3ca9df8e"
+        "sha256": "b9f62a31302bcf6f22106db2bf3e435806d2d3688b049c895ad3f7ffdfdb6a3c"
       },
       "gate": {
         "approval_id": "",
@@ -43864,7 +43864,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s21.html",
-        "sha256": "b734c833b0574422b7ddf57a5e46124519119e6b1610fa88133b5355f0d2342c"
+        "sha256": "15d398c321e014bca5bc060fccfb0edf17123ad8435eaba1223954edd59d7f06"
       },
       "gate": {
         "approval_id": "",
@@ -44012,7 +44012,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-spec-v2.html",
-        "sha256": "3c14aa2e7ccfc194f985881421f2e6fb1b5336322a5ecb74717ce449eb60b650"
+        "sha256": "6810cc95ee32be6b4eddb1b31adbe34a86a585df0defa23002b6830a07716634"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -44218,7 +44218,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t0.html",
-        "sha256": "95ca62626101fc41b570ca39361073e59f4c9cb8b54cf9948ffa4b9c374726fa"
+        "sha256": "3d7a24f145b0d8905e3e79095b2402ac933a632f4bcb75a23c6518bf279b1d70"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -44414,7 +44414,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t1.html",
-        "sha256": "dab019b90b5d19c30a8dfc31bae670e640ae4eff37359009e375addeb753eb7c"
+        "sha256": "c84cfe11697539c054f0c9f15d5040dcb3f14669827807d96015caa5ac0643c4"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -44625,7 +44625,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t10.html",
-        "sha256": "8e74dbc5bc14afa6712eee0aa651b77a2b66a5fda0cc00749776a9025180251e"
+        "sha256": "4f68d393eb82b8f1b9852cc12d0969ffa67362692707e94a009d6016cc827e0d"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -44836,7 +44836,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t11.html",
-        "sha256": "c16dba7e238d12d5942fb54d5ac81e6b9629dd6d941bc12eb087d800e675e1bd"
+        "sha256": "bc9b7a3883d2d0e71473b24eb2c6e24c6fe48c382e191566e1a82a1cb840765c"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -45038,7 +45038,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t12.html",
-        "sha256": "852cfd36768df3331dc2b334468b911ec8c1db5c2bc2cba6fe7d3953fb61017f"
+        "sha256": "c825722952b8e118d423edf993396768f8d63f235f773bd792d3cf7e389e3d05"
       },
       "gate": {
         "approval_id": "",
@@ -45186,7 +45186,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t13.html",
-        "sha256": "002ca6a914f3b37cb51a6d40cca258c102413958f24e50b7d7bc55211eaff91f"
+        "sha256": "11b56c3cdd5dbb3d74353ee7a8b57f4c2e6b855602a288dd077035374ef75c20"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -45402,7 +45402,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t14.html",
-        "sha256": "1e49490c86882826f8d97bff3f68908a346a0118c5d4af8f2fba0e85fe23db93"
+        "sha256": "6e7a5a0dfeeda430df574b1b06a8824a8ef0df854f05d28ed2deaf1564e37d45"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -45614,7 +45614,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t15.html",
-        "sha256": "cecbc7350f5f6662b9a5d250d783e2aaec10969e8d3e49aa5474622abae64009"
+        "sha256": "6056b8af76976b89917aea8e63de14bf3b0a1469a674dddd72b25405cabed57c"
       },
       "gate": {
         "approval_id": "",
@@ -45762,7 +45762,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t16.html",
-        "sha256": "a4766d48f2588981178c49cea49a4555e2bf100587c13ae293c9bce0155e8ad4"
+        "sha256": "d0ef05ddfcc360d773bd1870e81414cf9a0e8b3b6751a85b74af9928e2820059"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -45963,7 +45963,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t17.html",
-        "sha256": "e226ee8e3d61088293964fd4fedf6a486b9efe4c008125492d24f071c96de526"
+        "sha256": "745696e7171b2800d0907c4841e26325d0d09a719f38c8bb1296c2042bd8b675"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -46139,7 +46139,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t18.html",
-        "sha256": "fd6dda7d0ef165b147a259bbbc36cb1664a3caa4c4a5b60e4e255ca5afc0c24b"
+        "sha256": "c58993cc70df398f35f9181d68cccd145186f74b4ec66ff979c25b588ba457c5"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -46335,7 +46335,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t19.html",
-        "sha256": "42fe164b2b40d170f43a58b62a8b85e74c3f73004066590170b6600c7bd98c9a"
+        "sha256": "4213d2da882bf3b47939fbaf74cf9bfa901c91bdb62e667e9668413761a31d6b"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -46542,7 +46542,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t19f.html",
-        "sha256": "736d01db7f04461ac4b56030ed34ec18b209fe6e3c4bb6a3d7d1f4082762e9ce"
+        "sha256": "5a77bcbef8084eb5434be094855a2c066a696e0066c3bfdb27d05a14c5574177"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -46690,7 +46690,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t2.html",
-        "sha256": "0052ed299305d0d7670c17f30be8c33a2794b2a6d4b903b0a23455fc1920b08a"
+        "sha256": "944f8a5300b812eb69021bd89af096eb2973063b2c3cf1bcc3d9fe931f4c1ad9"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -46901,7 +46901,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t3.html",
-        "sha256": "0f0237900bcc395e22ae6f8d99c0fe8ec55789a674924128807948327e8ec00c"
+        "sha256": "347f071211bc4a488a6aca7edeb6034d187bbb69ffeffd4c7bd5feadb7fdb055"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -47132,7 +47132,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t4.html",
-        "sha256": "b627f0d0798b95c10b356d6d3c8a4f01315f8b9b18b8b06c4caa11d1ff0f5f48"
+        "sha256": "b78431f13d86b03e5d72eabf3b658c964a57f89999e0f019902df8dad639871e"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -47324,7 +47324,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t5.html",
-        "sha256": "e87b4e9c80056c9a9b2f7be8905f5cbc2b879367df1ce2bfb16e5aac3dadab58"
+        "sha256": "241b16bbc466f95ace857d2aa94066833c0fbae481f7bffc7466274fbd60f3a6"
       },
       "gate": {
         "approval_id": "",
@@ -47473,7 +47473,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t6.html",
-        "sha256": "9e2281ebbf11b8a509e82b18ffb47269378832c4ede9b45c62d459ed3e75c8a2"
+        "sha256": "70080d5c45c0f8477e18703b89e350a30bf7eda54e4ee540df955cb87c807834"
       },
       "gate": {
         "approval_id": "",
@@ -47621,7 +47621,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t7.html",
-        "sha256": "5cc6eff49694143d32bcfdb518962f50412e19adb83e9410f3a65f2c1eb3ebbd"
+        "sha256": "652c1df2e3eb8f7085aa88b7d990f095c819ca91233ba8a83f71db2be0283ba5"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -47798,7 +47798,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t8.html",
-        "sha256": "fdcc3654d24d0415100ebc48e5ffecc7e79828aaf90889ada914cfb9be672b4e"
+        "sha256": "de930d9f660755a95c3bde34f6dc517e200f306cd85b034f7055e08fff1034c5"
       },
       "gate": {
         "approval_id": "",
@@ -47946,7 +47946,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t9.html",
-        "sha256": "55db6a92aa64bae2b2e4f850c81e1c75e1e62188ffda8428e4ced1b817cce999"
+        "sha256": "808ff347d767473bba6fb17b32c5b90f12067a48c543057ab9993cde3ab8f424"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -48157,7 +48157,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-design-publish.html",
-        "sha256": "5a603f3936c3d33c54b6245f4f3a41ff0232847555e03add0890388dd8932c49"
+        "sha256": "571ef55dc627b2c45ae39f1c16331b9f73e3d61c7c6609e9161350502acb0f9f"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -48259,7 +48259,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-p0.html",
-        "sha256": "60cb449a1d7f39c2c8e966cb6560146ce1357ba8a069172c5ac77bc501272e5d"
+        "sha256": "979fea6ffcfe33124c977b032c7147da9d000f9e202378fec1c37a46ea08be3d"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -48361,7 +48361,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-platform.html",
-        "sha256": "95cdce7b8436a7597f6f123b1a8cdb8b343eb8694883a5d72f62c0e8f5f22ede"
+        "sha256": "6be5ec3b33dcce4b35febfba9b8bbfa35619a5adaf7bec4c0707199610d46710"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -48523,7 +48523,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s00.html",
-        "sha256": "0d702aeba3c617acf92995e2d25b05e271039fc45eaabb1ac2303eaf1cc1a564"
+        "sha256": "b5ee66134916e1d93a14b5e9a4e53fde197cab3e3af57f9b8e5b64618a8249c4"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -48625,7 +48625,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s01.html",
-        "sha256": "e6bd8f29b21b30af3d8e58a215c13cc276f432ce276c8d4f3cb36e0dbabe9bbc"
+        "sha256": "46ed68c6f3cc68748d3ffbebf9133a6153473a6f117fc27df99a885291f3c195"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -48727,7 +48727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s02.html",
-        "sha256": "de61e9a0220971eea820e49cf853e9d2ac670aa826b8f11e2076ef83c6e086ed"
+        "sha256": "b3a9672c932d9d9f6e962b3f786bd29789759c36ee0de89ea35bd8c5addb6e05"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -48829,7 +48829,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s03.html",
-        "sha256": "dca69715a3f61ce414d300c6c67efc265b377270ac331dbfebbd10394efe1078"
+        "sha256": "97f87cfe879ea1b72c39b318369cbef33bda29012d0a7144550cd00eb8ddf6ee"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -48931,7 +48931,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s04.html",
-        "sha256": "4389673b76a8d7b154b0830cc8303c0344198fe44a58644aec70cadae8587dab"
+        "sha256": "432fec53497cdd99f18c4152a2ce091255c063d45c906773a0d15e07e467cf62"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -49183,7 +49183,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s05.html",
-        "sha256": "6ea9e25253948f126700fb774dc821dacfe6f2ad2399895076db531c44d8bbba"
+        "sha256": "51c62f3d15f59184947e4c54ee5d6e6baec04c931be758995a6ac19c015dd3a9"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -49285,7 +49285,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06.html",
-        "sha256": "5bcc27778a01808336fbf4191f2d86b33461ccbe0fddc0c8fb8d7fbd778c28c0"
+        "sha256": "e8702d63168c517e2007c053bfca73e1e1b4be63835ff8f923b705adca603af4"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -49388,7 +49388,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06b.html",
-        "sha256": "c8fbd117a7c48b261e0c0fa2f53830f7a0df399f19adb43b31b0fca0617e64e0"
+        "sha256": "9f5c7fed27c3800fe81e97e2ad855132c9078f478013af4641aadd46b4b3aa7d"
       },
       "gate": {
         "approval_id": "",
@@ -49480,7 +49480,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06c.html",
-        "sha256": "9cc40cdbe8a4235643ece02fdcf8b02a15185c1712bbef1c189dd02f89b3206e"
+        "sha256": "434717407bb09f7524a75c3932885d29a90b6abd545b5c6a0fe7ac900fec78b6"
       },
       "gate": {
         "approval_id": "",
@@ -49572,7 +49572,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06d.html",
-        "sha256": "f4e3a2032efbc543f9cf5ee44d717ce597fff844989c70190d046f6c2571fcbb"
+        "sha256": "21489f74fe8b514b97a02126ab703dea425be5bd27c531532a317aaef187aef0"
       },
       "gate": {
         "approval_id": "",
@@ -49663,7 +49663,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s07.html",
-        "sha256": "fd710858e7cb8f0590277c258c9bf647aabad2babc573540916f881ba2cefd93"
+        "sha256": "c1c289614b4979bc6e5e0019258cfbe1039dedcb8b0b201d510f00e79bc811b3"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -49765,7 +49765,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s08.html",
-        "sha256": "32678f42775f22e56eea857dadd5381a0c7fa3f086471611e6d837321b6c443b"
+        "sha256": "a9e9a65e72ef83d1bef65402f94b777d464a64748b13092d7790c2929ebcb67d"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -49867,7 +49867,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s09.html",
-        "sha256": "54b309b75886e550e303e01d862f544d329f3cbf28a98a362b179e901bcd2be8"
+        "sha256": "0be6535313708d788ca0b96ce99b95d89ce451a62abeb30a4b2c821284a03934"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -49970,7 +49970,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s10.html",
-        "sha256": "234f3a0f06f876f2ab5ee4350e7300161bd0d08408756c275edd266452aaec9c"
+        "sha256": "789a11671a810aa47034bcc8a524543af04ec8243d4c3b6aa77acc1b50ed66d9"
       },
       "gate": {
         "approval_id": "",
@@ -50062,7 +50062,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s11.html",
-        "sha256": "3c112ef37dc7f34458de63637f21c4ea7cdf5f0dcab895aace1691b4e93e5d2f"
+        "sha256": "8c47f3437f3e286b81bdfd31fcccc7f896e65bb9fc4c0101b3833510b8375aa0"
       },
       "gate": {
         "approval_id": "",
@@ -50154,7 +50154,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s12.html",
-        "sha256": "de8a289625c53b4f1fa64b02eeef645ed51dbdc3cd031f1af5de997de78aad11"
+        "sha256": "82b5d45f159c472219a1fa6d1b1b3bdfb89306fc487dfaabc2ce46ce88863d5b"
       },
       "gate": {
         "approval_id": "",
@@ -50246,7 +50246,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s13.html",
-        "sha256": "0d505bb17b863444372ff2a67c86f2c401e04dfac2666f0d4ead400072722f16"
+        "sha256": "1dfa5ac3096009309b16bf6ebc24e0e5050deaa327cc104998053960a76d904a"
       },
       "gate": {
         "approval_id": "",
@@ -50338,7 +50338,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s14.html",
-        "sha256": "82fb41a27f020aa21d67705bf9b399f257460bc4444acaf5e140bbde2e43ad91"
+        "sha256": "31eaf3b6badc91fd318354fe0c1fb3b46d13b9a5479a82cb3ec6e70fa7d6f87a"
       },
       "gate": {
         "approval_id": "",
@@ -50430,7 +50430,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s15.html",
-        "sha256": "45baa5432c7e31ea587114378032ab2a5e03c9e28501569dd3d14c4c5291392f"
+        "sha256": "d4518814b03864ab13eb8b3998775243d0b646ed747922c36f6b07fa64360df7"
       },
       "gate": {
         "approval_id": "",
@@ -50522,7 +50522,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s16.html",
-        "sha256": "70cec403f6018b513b38ffa9b405117df7a063340f4123796dccbf262dafc103"
+        "sha256": "c7ce9e32456313f534b245f1b23d4cdc14e4c983dd33b846c9fc1fcd3188bc2b"
       },
       "gate": {
         "approval_id": "",
@@ -50613,7 +50613,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s17.html",
-        "sha256": "6dfbef7c7e3eaec671b1c77ca37887ab1fcff4ef69f9ec19a658303a59d7f45e"
+        "sha256": "64aa29d271add1993c8eda8ef083c0418cd8339943646702e42d7f9c8e53c0bc"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -50716,7 +50716,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s18.html",
-        "sha256": "ef0ea10455d8a47f9ce0727dc0e984a176a0a2444ef60b517f43f41f9adc96e4"
+        "sha256": "6a8d2b436dde62e733032324ba14973a1ae02ae110140f29001c5ad072797ed4"
       },
       "gate": {
         "approval_id": "",
@@ -50808,7 +50808,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s19.html",
-        "sha256": "f33d6cd88eeb70ab644f1725c30b034c21abf6fb29627be3fde1fb742a689723"
+        "sha256": "77f193629edb6de2a38a69326f2877daf17c524cc18f65f1426cda33928078ee"
       },
       "gate": {
         "approval_id": "",
@@ -50900,7 +50900,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s20.html",
-        "sha256": "f8cfb98a828b54ec1ebbb05571b2aff6227cc6caa35a103fd2d7c22df607f962"
+        "sha256": "66f0de74991ca48b051b1c36b1f4fc3f8f8d4050890aa7ca0234ffa33c222909"
       },
       "gate": {
         "approval_id": "",
@@ -50992,7 +50992,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s21.html",
-        "sha256": "ba70105c15ad66e17a71d3081189011f33edb6161b884da598237ff63a0cc5af"
+        "sha256": "226f4fb1337072b1cf4eb4b8d101fb62f879274888b2f5ce7c2254f4e61bdf98"
       },
       "gate": {
         "approval_id": "",
@@ -51083,7 +51083,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-spec-v2.html",
-        "sha256": "e90f8212582b8ed373672aaf7d4042c705a11def6f68cc86885e0975201d293b"
+        "sha256": "9124c8616068764e2aa4735c0998e2d4c03c9930e6c52cb614581e8aef265a2c"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -51185,7 +51185,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t0.html",
-        "sha256": "44cb3baf7aed065600641901526c735cecc52f9e59ee9747ac5c00452c9868bd"
+        "sha256": "ef4257641299383fb672c6487cc1ccd9bf763fbd11342758691401fa7d8085f7"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -51287,7 +51287,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t1.html",
-        "sha256": "65eefb8ba4b44e2612e85811a7c2037e1188d28cb6b1afddadbe50908cb27662"
+        "sha256": "b36705d796f1516ceec970f32113763924b0af6258f61eeb34cfd2221f2d99d9"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -51389,7 +51389,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t10.html",
-        "sha256": "c9894b31938dcdaef454826faba9c90996da6b49abcfe99f7a0b4c8435a43eb1"
+        "sha256": "842be5956d318e81d046eecf82a0b17aca936843df6a1794b2dea498dfa088aa"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -51491,7 +51491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t11.html",
-        "sha256": "2e2421c46a1b9769661ee911a0a6b3092711353a5f95f9ede68b7f4530486af2"
+        "sha256": "e2c43142206e89990cf3644f7e922689ef61b448300c8f949dfeba6a041b959b"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -51594,7 +51594,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t12.html",
-        "sha256": "88a358d5cd22a6ffc09e04cbf272d1bba09813da2e51b20b43f2a8ec9493ab1c"
+        "sha256": "0088daa3685b795f679ebd62be45aa1ec911eb52ce61b74fd407a8bd32e56f07"
       },
       "gate": {
         "approval_id": "",
@@ -51685,7 +51685,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t13.html",
-        "sha256": "22924db83a7ba7f0a4825575a0f96304bd31dca2b99b707107a839746435b2f9"
+        "sha256": "7464f9fc914955c3ef3c530635d4a6e0540c1eb3312af976f244225d01ec0de5"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -51802,7 +51802,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t14.html",
-        "sha256": "a88745ff96791466d431335c4061838a90d4f2b7a8ebec5bd270854e1035143e"
+        "sha256": "c703b21846c96f1174a2d0f9349f1e3cc82788753530e039d8bab447a94446fa"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -51905,7 +51905,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t15.html",
-        "sha256": "127ac45519f1320767219ab387e4e4132d63aff9f96b6734f9fb235264ed1631"
+        "sha256": "b643079fcf474133c3576582e3b8dda9d4809fed50901c17917388b372743899"
       },
       "gate": {
         "approval_id": "",
@@ -51996,7 +51996,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t16.html",
-        "sha256": "c3200ee87e0df10b37c84f77b3411fe7b8a8927d2467067592b3ade8c24a4dee"
+        "sha256": "9d48123b80f4e56a1131590e3f68a90026a4abb886c037d358f9eeb44983dfa6"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -52173,7 +52173,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t17.html",
-        "sha256": "841edc2441b8f723c95da82537354c000c29a239e8976be26fdf16f5aeb34491"
+        "sha256": "5523477bbbc9c9177a2ca2684208689f37afd9b0da3eb49765bc90b724e2801f"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -52275,7 +52275,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t18.html",
-        "sha256": "5f957a6a75c450b26ddc9e7fd508fed879c7ff46c10278e6bcdfe254296938e7"
+        "sha256": "782a2c97a723f79b4f7bc023d0ffeb30dd9eb3d7bdb65a31d53d613221c0f51a"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -52377,7 +52377,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t19.html",
-        "sha256": "17db47c992e6c53129f683b24bd0c8397f662d232b1d2b33a25abe294b1b761b"
+        "sha256": "788841fc549a3c869ac7e99fd97b2fc2250dd025aba0419c6007a562e518d360"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -52480,7 +52480,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t19f.html",
-        "sha256": "fd9e2168432a93c52b90684cae231bc32369b0698565895894247bb7134ac952"
+        "sha256": "19a7a5b0b896c1b519ed029c1032cef94bf2186391eb6412a10509ced2f231bf"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -52571,7 +52571,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t2.html",
-        "sha256": "6d1edff73de0812210a6204f5a8fdd888d234ea74a4b0189655006ef1ca2285f"
+        "sha256": "00c7eaf1803ddb7abdb31b0df6894230f2367604de17224f541469cc7fc0a3b9"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -52673,7 +52673,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t3.html",
-        "sha256": "6994b5bde72a0921c42fea78550e7f3a9041429d917aaa69846bf326420ff0d7"
+        "sha256": "4ca4c4e73b9d92cf1df161b59b42105658931d66220f105003fc9b8131f5e5d6"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -52835,7 +52835,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t4.html",
-        "sha256": "a9423ebb5dc538031be1f6b40da1be8b6f12f9405a1e504877377eb8cc4226d1"
+        "sha256": "912ac74be317d77ff24a8c3c5e0711a29cf3e79c341f7de69fefaf62be8d9be2"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -52938,7 +52938,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t5.html",
-        "sha256": "1255df5ff06d0caa00fc88c13e848f3570ad3b07b025e4c158df2abebef6838e"
+        "sha256": "84201b56757fb1fee4785142208ed93bba8eb9fca418dabefdf89a8eabad8ab1"
       },
       "gate": {
         "approval_id": "",
@@ -53030,7 +53030,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t6.html",
-        "sha256": "588b83866570b88753463961dd3f3315c3b96bb0260c911ca73666d76ec8619a"
+        "sha256": "ce79ab1de713e4a366513164fdf452fd3fcd03092291cb6139f27ef0fc12bb0d"
       },
       "gate": {
         "approval_id": "",
@@ -53121,7 +53121,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t7.html",
-        "sha256": "c78913a9f736d28907451792a8b94a6d2f56b322712218a40c7519cbb79e385e"
+        "sha256": "514aa8a6d7c4cd8b031eff81587fe404ab212bcfc775093cdcad5395099d20b9"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -53299,7 +53299,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t8.html",
-        "sha256": "2168b207df9fa975def1c53bc94961fbbf5703846673cb1e001c0346985846dc"
+        "sha256": "0485bd6bb8f6f9b15765ab3e6edff16f071976a5bc45e79c0f9f49d7d5a4109a"
       },
       "gate": {
         "approval_id": "",
@@ -53390,7 +53390,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t9.html",
-        "sha256": "376c4f89c406d3c9cb908a135de935924dfaecd08d902d11fa0415c1598b756f"
+        "sha256": "7f440172dff59232f9ad4c6796eb30205dfeaef04f6a567ec90297c00f08caac"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -53492,7 +53492,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "33044f8f8a525a2474b20e3efd86e4ba33275254b03c16b36efd856cf0ce427b"
+        "sha256": "008126db8d63dce31456a9be06688354f61d1304aebeb605b46d7f6dd6cc8c67"
       },
       "gate": {
         "approval_id": "",
@@ -53775,7 +53775,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "c2281c821c0d670f03f5767a58352bd270a33eeddb06b6d7eea8081355f84473"
+        "sha256": "06e1147794443ed862470117861878e3b0a25399cf5b7e718eaf787e29f0a84b"
       },
       "gate": {
         "approval_id": "",
@@ -54128,7 +54128,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "2a214bbcea1547d0cb6d9a49c56e03e8cb657f937443aa46606b5f51a48c78bf"
+        "sha256": "ca80f9606f0038969b5bb6d6f6644e7b24f9f920cbf99624c65829160eb77824"
       },
       "gate": {
         "approval_id": "",
@@ -54667,7 +54667,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "9f11e9d5c3910b8230e3331ee7f0138aa88f72543321f25a74e55207af2569f6"
+        "sha256": "0b9966249842b6c0d8a0579a6ddd940cc0f4fe9cb637ccbd053ebb8f121510ce"
       },
       "gate": {
         "approval_id": "",
@@ -54844,7 +54844,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "3a87d27ef3c564ae46f107baaad0621d429bdba49a90c01db4fcf1e60cb8b9eb"
+        "sha256": "29f2cfb1214c521acab213014b314c80dfbe1ea13399782242a1f34f1c778bc2"
       },
       "gate": {
         "approval_id": "",
@@ -55108,7 +55108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-portfolio-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "b0ae156b8224f37c87b71e401cd2a359f47a2dd02fcc3fe046835e5fda28ca05"
+        "sha256": "4a50f8d3ff81c99638404eef892cdf1d077edd7a83ecb082450333f575755126"
       },
       "gate": {
         "approval_id": "",
@@ -55284,7 +55284,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "e899a33121009a21952e81914e822ea43c422bb78b8d65e2bb4d0ff57d6f23ae"
+        "sha256": "c7e59c0ad496174bd677843cd7ac613ff2d179df13572160be1a9ffc782ed37b"
       },
       "gate": {
         "approval_id": "",
@@ -55583,7 +55583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-spec-spec-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "543487ba97fd1f3a800bc2a43991322fc3347325b5fe08fa25aba4a7142bc07e"
+        "sha256": "98c7273806f7e022e8b1c46fff9fffee25c75f509b0e96fb3bb1ba3a2392d545"
       },
       "gate": {
         "approval_id": "",
@@ -55712,7 +55712,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-adm-profile-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "7510fe4670bba6c7fbde9b10a94075552fdb31db50ee0b4244441efb1a5e3fb8"
+        "sha256": "8927eee4977c643ddabbe79f7abbe1f55c99edc0a757980c8529349096d02c99"
       },
       "gate": {
         "approval_id": "",
@@ -56053,7 +56053,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "2a61b8311bf9b620cf3f304c341ee2396c226abeb5ddf8bd02e25d069e9c47b8"
+        "sha256": "503e14287dcf14e3dc5c927f98493118a9c851a1aafdae624d99bebc13ccaad7"
       },
       "gate": {
         "approval_id": "",
@@ -56230,7 +56230,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-capability-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "260b8bfee43849311f6b9fded6e426fc19e1d85311bd690d28e8ce3ff80790bb"
+        "sha256": "589e076d1cd8836810f17ac46890fe8498d92643dcce91d9d79edb655a09fe16"
       },
       "gate": {
         "approval_id": "",
@@ -56591,7 +56591,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "7d5f189ff97a153691faeb3c0209cfe0d0429fd70125bcb171ae7ceeac97e870"
+        "sha256": "3508b4f0c13cd280a7ea060eebad6d75009f61774fbed1fb08e4101936fda475"
       },
       "gate": {
         "approval_id": "",
@@ -56750,7 +56750,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-principles-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "80e1b712d37f2d234e830457354eaa3500a938f0e32aa50f492abc066112cd36"
+        "sha256": "4238db3b41a1de59e1afdb2b610eac65bec6ebcc81a134c895f6455ad5e04ee5"
       },
       "gate": {
         "approval_id": "",
@@ -56916,7 +56916,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-artifact-standard-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "482f0385af5f290c85f45716bd499dce5b12fcb2b13a234ba8b9fa06b3f896d6"
+        "sha256": "4828dc6686f6a6410acc880b4f1a7686cc186bbbc476cce6129879db48c74f96"
       },
       "gate": {
         "approval_id": "",
@@ -57413,7 +57413,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-maturity-assessment-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "251cb26cebe928d229e6d2ff8d00664c0d05bf2d8f2e990d6f6610dda88a3672"
+        "sha256": "2ef7e3814da1f89dea4acba45bfc47fd97ba59da2053b26031cafaacb3e7e6ce"
       },
       "gate": {
         "approval_id": "",
@@ -57758,7 +57758,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-preliminary-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "9c1e9d8f7559540b026ece5e1c05f0518f8579f3b2aa39c1b8fe4e2360aa139d"
+        "sha256": "83c87cf813aeb8dc898e8b53abcf4741e22c46f58995b9508cce9f6ed0440bc5"
       },
       "gate": {
         "approval_id": "",
@@ -57912,7 +57912,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "10c306e7ecf496cfaad32c2dd5b3c7e8fa0a8eba5cb5e7b253eedff3145667ed"
+        "sha256": "158073dc52f6369301180bba3ce19b53f59b1ff4e771f9477f23c52d1d0c8293"
       },
       "gate": {
         "approval_id": "",
@@ -58177,7 +58177,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-reuse-map-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "ec8629db32ac117c55a4af6bf26acebc953db386378171f0da1d180ed41eeff4"
+        "sha256": "4a25aef8ab6f9d1de09928ee0e4893b5e06eac007bd4ab8cd1744b13782dcf4f"
       },
       "gate": {
         "approval_id": "",
@@ -58282,7 +58282,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-skills-assessment-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "0284babaa284fee0067d7932b39cdd2b5406c731e93610de94b170a522c4dc4c"
+        "sha256": "0b0e8d0b899c9e57fbd3982934b87c2b7eedbaa4cfe59f8f1b5fc1f4a79747ed"
       },
       "gate": {
         "approval_id": "",
@@ -58627,7 +58627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-design-publish.html",
-        "sha256": "fdcac844e70bfe23f1dd3c037fdf96bdfabec151795c856b8552659a02e53058"
+        "sha256": "59dd9de5758e51c8363c9a033741277d93958f5d1142a4c9969568278793c213"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -58745,7 +58745,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-p0.html",
-        "sha256": "25596bdbbcf913e695a6624bc610fd9e133d67143a96af355596cd752fd0585e"
+        "sha256": "7384b843eb8d295a9b26374b1f6cff4a58dad4eef7d2fa229b700787b56132e2"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -58874,7 +58874,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-platform.html",
-        "sha256": "d6b1ccd2a86019990a1d9d8bb84d916dc9a31205126b9f212694ab944ba8e0c3"
+        "sha256": "c58b68615e7c742e5e101516ffdea2255555c8ae4822ce3e93d3f6a445e0cc6d"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -58992,7 +58992,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s00.html",
-        "sha256": "309fcdf79a5a5e2161a565d2c178e5a12be3ea7f03012d1e9357446c9ad87a95"
+        "sha256": "5a34dd33f9a48f46c0f9dc6e2b07d7a413b35339c6cb5a61ca8232fe5e426ce3"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -59110,7 +59110,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s01.html",
-        "sha256": "e885726d61bb4b53053e4cfb1746db694d37c21b5ba8675eb16e1e8f186f7e4a"
+        "sha256": "ea961cc86bfbab9225b9cb603aa24818b4bbbc24b439ad35dc3f54943aa87405"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -59228,7 +59228,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s02.html",
-        "sha256": "233a504c538467c8dfe62623a098372567cea07f56a8f5671eb529b2a2b81455"
+        "sha256": "739e253909f57c0810c9b8ac3778c4c0eb9392487666ef22bf2964ea6c4e55e6"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -59346,7 +59346,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s03.html",
-        "sha256": "fcaad7fc107d48e8017e530366626632dd5b61655f329c1435a50ab19e061d9d"
+        "sha256": "0a1271a7006425a1edad2a25d146b38102ed0f074b60e81b219a635935a91520"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -59464,7 +59464,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s04.html",
-        "sha256": "6bbf3fbe59902e589cd23c30259a0000ac346a6414a490a231c0d6e431846643"
+        "sha256": "62d35c4b056dc97a6cc26b0b33a4b86c6e6cfd3af87b5190b1d4abed083cfc17"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -59582,7 +59582,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s05.html",
-        "sha256": "b0954a26d2d69ceaa384048befbc314853cc4df90c8bf164806b4eff0af537e5"
+        "sha256": "8bb1cd0c0b86e9d8e8dab2e02fa0d729350e2575a2513563b487a4da70494d6f"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -59700,7 +59700,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s06.html",
-        "sha256": "c55ba89d1299c0bee6ac00a9c0a8ab5b5ed718a3499def257b86e9ca8ed663d7"
+        "sha256": "2f7e9b573002a5323a1e756eb21038564ea7c5a935d56fb100d4cc38d18d0850"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -59818,7 +59818,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s07.html",
-        "sha256": "f645870308e79acdda2295c6a6b55abcc3c63878de469c633f272aea90fecb15"
+        "sha256": "d8530b157c4db6f0a8880489d21cb60bf152b0476382d89c11412421572c3b25"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -59936,7 +59936,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s08.html",
-        "sha256": "4ef6104964edd85c979b023f8102cc99d973761c07a2c190deb43b6550efe640"
+        "sha256": "8c380c2109b48208ea826e4f94e2b1f967010fa9ea8ab006fbdf69dcbd288dad"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -60054,7 +60054,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s09.html",
-        "sha256": "1882888993e23916e0a0af48936fa8e8564efd813dade5c46cbb9c4fefa250e3"
+        "sha256": "0dfc17f26a4d4297cc1ed26a7ec6efe09aa29e2067185825ab1dedba282436d4"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -60172,7 +60172,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s17.html",
-        "sha256": "ff7d61fb186e6cf61e4ab9f4ec7392362ccfedaac8a241a2cb4a4d99532c4af2"
+        "sha256": "c83ea4d8b5a75f2fec49616579b7793cfd5c764d03a6742749ec210f2bb92e1e"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -60290,7 +60290,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-spec-v2.html",
-        "sha256": "de8968f580c4a91aefc0f085d019a25a665ca9dc32fcdb499c373313227fabf7"
+        "sha256": "dc233c217bfcde5b5f0cd024b2fc14226a21d8ba30363299764a7d6e50682ebe"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -60408,7 +60408,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t0.html",
-        "sha256": "e6fe09880d828aabaae939a1abc197ac15afc018a7c05d9f0483782c17673a45"
+        "sha256": "c5e679086942cbfd870769682d0424139d489127e62b8b1df8766c51999ca2d6"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -60526,7 +60526,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t1.html",
-        "sha256": "827bd89ead70848960b008133507f1273658c6522162359339b26cb2d2117a3b"
+        "sha256": "b698301911d24fca972c28063d8cdf378f315bbaa430f5acffd190c19fab012f"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -60644,7 +60644,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t10.html",
-        "sha256": "1dff256d61bc82e445023f5197b50a08671f7aa31be39b5e61af30199a4699ec"
+        "sha256": "428273cb36ad5cdf0cc572f8a673dbb7716f8a28d4a97b5777676ce001b3bd2b"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -60762,7 +60762,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t11.html",
-        "sha256": "6eb6d15810e8e6b56b4bfd4a8837c4aa9cc883191024a03171049a692f6bd388"
+        "sha256": "9fc7951a87c5f216cbe3d05117fac0edac56b025602171fcb7c90368883febaa"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -60880,7 +60880,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t13.html",
-        "sha256": "5bbe87cc2e01def4c436da5ccfa38514b7406352d35fa7134f86baccd30d684b"
+        "sha256": "159067d89a8148ead3b4ff6a31287f0c0aeea466efe9ed592572e3fd77892b14"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -60998,7 +60998,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t14.html",
-        "sha256": "7eb178dd2961a9fcf708ffb0951aea8b633604f0595822cdce4703e60de52ae6"
+        "sha256": "d80d27144f3aec49c0a2d0198997f7959314ccfa6f4098b1c45841751d4d1018"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -61116,7 +61116,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t16.html",
-        "sha256": "94fb86d22fe4d27a322b91e31194ba1a81cc95d59c54c84d174c573a6d4db1b8"
+        "sha256": "be6372c32be088b695f5a441c4e80af9e89a082c9491d2e7d1771bf2cfc3e10c"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -61234,7 +61234,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t17.html",
-        "sha256": "203eca0c158aa6beabecd1f02b6bb5057558c10d1d9d3cae7b1246f0ed1e8f93"
+        "sha256": "74b766c5858f794df79938501589cc0248a9704ea60e9fdf59385a9a195da2ce"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -61352,7 +61352,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t18.html",
-        "sha256": "8f2d1838e9dd20ebb89cf0e77a52a739ed2c7df5bb2a41cad5145795b4712ef4"
+        "sha256": "2b9887d09ef07aee541b467169dfab795c703ace44829aa41f918dea35bc88ae"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -61470,7 +61470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t19.html",
-        "sha256": "13f6a09ce99da7e90dc653dbfecf3375a604f955a2a3f5396ced1b560caf0362"
+        "sha256": "64e5cfe7194ae1c28956fabc9510ed182e05d88c07b7f54fef3279cc38beace3"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -61588,7 +61588,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t19f.html",
-        "sha256": "3f631f7ff2ea1c4526b885576415f05fba55d0bcbe099bfa11a2e0174618c00c"
+        "sha256": "e9d78c154e667323bc263e30fdeb3a3203c4acae225c64ccc46d2320298eee58"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -61706,7 +61706,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t2.html",
-        "sha256": "9b4ddee16d52daf1cf131d39c00b3de3ea2e7cc8cf3d95b4d47d9576681fd258"
+        "sha256": "cd515a04a276f6ca853c2bebbd8388b1b1e17e7a5af8d1393af98a08799b8edf"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -61824,7 +61824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t3.html",
-        "sha256": "33ae183d30f9bede2536dd2f7f6d4f4737cc839f7c36b47380e55c8f8c80820f"
+        "sha256": "0ba96dcb6f7f8dd10321f5e37d1bd909aa7d58e9b4fed23d982aabc34d73085c"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -61942,7 +61942,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t4.html",
-        "sha256": "5d8782728158731565ca2aae6dd5935e211a19b3a07b23bb7796b6614620289b"
+        "sha256": "53ac5841b61a6d486cd9ffa5d8b33dcde3bcc4495eb6054ad1b52af91d528daf"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -62060,7 +62060,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t7.html",
-        "sha256": "99f22f074eb8140e4095f9824082e35d59756b375fca631b3c80a49e71bc92c9"
+        "sha256": "1032aef1df169e6137b71e825fd43bcd6c391f5a24319be66175b40b4d45d796"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -62178,7 +62178,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t9.html",
-        "sha256": "7343b35e12a3436173579fb1220579330a401cdc4f7bdbf8803325b2a81c46de"
+        "sha256": "65dc4d29c610af6abd24c2b8b6434ea9521c75bbe756eae5aa4c5c67aaf12642"
       },
       "gate": {
         "approval_id": "",
@@ -62296,7 +62296,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-design-publish.html",
-        "sha256": "8482de30d7ffa8ced1c957ac4507abf6b73ef77df0524f530fef3adee130c296"
+        "sha256": "df7936b79a3eba7e901338eccfd4f2f7fd9757c62a7170b34fdeeaf199107dc3"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -62630,7 +62630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-p0.html",
-        "sha256": "0dd61c4c1dc826bf5ba457cf7dad3e281f29a8807b56ac207dc90cafb3b385bb"
+        "sha256": "a38d8dbf72d242a57caf106928cd0b95ef66cff4c34df8a2784f39bd153a2deb"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -62964,7 +62964,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-platform.html",
-        "sha256": "b7646cfafdbc8461b1407f8d6e88b50a31b1d8a00c81821250e08d6647596284"
+        "sha256": "1256f648f7135b40c867b2e33b026d46f8b14ec38dfb01b53b96107bc8bc30df"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -63298,7 +63298,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s00.html",
-        "sha256": "d343121d87cb3112d8c27ad16be9cf15352508866b58b09595f4f20b265ebe0f"
+        "sha256": "873c0eccffefae077b778be8c48cd84eed9fb6e7c366d2181cc3ce88f8165c6a"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -63612,7 +63612,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s01.html",
-        "sha256": "1f5e7534d1097edeca5fcc827e54bc10abd3464a694794348543da045044ff32"
+        "sha256": "3ec2ee14b908d65fa6a019c67ca8515c5d9abf90b7e213649b50a639700cc834"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -63926,7 +63926,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s02.html",
-        "sha256": "7965197d09449da38838cbd704f954162403575df13c50c4cf8e4e77e0f3d2f4"
+        "sha256": "701d30285bb1e283a07faf8c69728d5fd41211a7c03fd6b6d44a16759a92353a"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -64240,7 +64240,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s03.html",
-        "sha256": "d3e7f69638fd71097e4fa73aa32c6f5cc7389672f5ca61119c5adab490623cb0"
+        "sha256": "8227d95966fe93c87851bb6faf9d45c5d316d10d1360c56b6bad2d4c94748152"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -64554,7 +64554,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s04.html",
-        "sha256": "6a0c579509d60c040166e40341048378aff089423c9c70897e49d329646e0475"
+        "sha256": "11b93c304a2a25218b898b8dd8ced584e2bef1247aab03d967c6251da455210e"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -64868,7 +64868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s05.html",
-        "sha256": "ceb5a7bab42d3bd416bede9985855359feee62d23ae38945632c2d30f242b09d"
+        "sha256": "3d12b653a5933bd52626f6ee7e2493359df27a4396a79e36c7423ade9c456bc9"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -65112,7 +65112,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06.html",
-        "sha256": "23cd79ef3f1069a316d3b951cf6a00afe6817263ed173ad9c1126e79f64470c3"
+        "sha256": "827193210588f67f2903536459d43c696d28eb89480c0c6b88c03f3658d48497"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -65356,7 +65356,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s07.html",
-        "sha256": "f8d4d2c18b41afcb5f8cc22ba70147c1646eac86668cabc8b4a9bb6501118c4f"
+        "sha256": "72bec853ce92c7d3d2a3495f3a910854dcf0e7dc6396bfc34acf7e9731ea2210"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -65600,7 +65600,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s08.html",
-        "sha256": "651a713b7d5d1d6f562bc49e648ace5aeff9f2a89a3af223b30b54feb8beb738"
+        "sha256": "ff2494fecb26b43a1064d0c8388ef8828872e555886e7612d09c572307dd2542"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -65839,7 +65839,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s09.html",
-        "sha256": "9540145fc707044be2bc3bc5453d61a13ce70c1e5c0a923ee9e6704d0b343118"
+        "sha256": "4860e979412964a6ee36ad30c62f43db103633fc1ad3077cc8c826d7d538415f"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -66083,7 +66083,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s17.html",
-        "sha256": "a74ffe278220eddd6a0c9776d00f0913e146f1ffc52ddfdd134f93a745ec46ca"
+        "sha256": "1018cfc3df14372719428681096c9733cf34df3a9e56d6f887e6683e74db85b8"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -66322,7 +66322,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-spec-v2.html",
-        "sha256": "2f47dcf11406b9d2a199df214370bcec4873059ea5d97bf0036672ec13dd1803"
+        "sha256": "d45e0111fe27aa8913a4f50556c28f8bfe6b0d298404963b3cff4da068377a24"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -66656,7 +66656,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t0.html",
-        "sha256": "8b76eccf0370aa9cc7e4022c7952be2abb51e57afe2ce5d692690de7d811b8ab"
+        "sha256": "6f42ab4f7bd061d47e8ca056268fe6cd5d683f36f3246ba1de97885252775385"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -66970,7 +66970,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t1.html",
-        "sha256": "0a48415a00a2987d8aed7d5965f6e2daf49383b50a9760840ffabcc064a41a01"
+        "sha256": "ac09fd433980cd393302fa71431061552670e43e819dedcaffd3c05b26676ba9"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -67284,7 +67284,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t10.html",
-        "sha256": "4da8214b11c82fab548e79c819b183d2a6602bcd80980e400c2ba0e523b81064"
+        "sha256": "3874d293088dd601fdd828392dc0000ca643a4edb09c5518e9d619a201af7b5d"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -67573,7 +67573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t11.html",
-        "sha256": "455cab7fe2528ff2e1cc69c01159a965ce0799b5291ef35c7d5062a45a1b1c59"
+        "sha256": "4b3954f80079e356f857a5127e3042d12e241b4e33ea82431976dba45ba482ec"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -67887,7 +67887,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t13.html",
-        "sha256": "1671d49fa64912a2e63a2fd0a6605898ae5988a6428528e9880eedee46bddda2"
+        "sha256": "6208a97ae677b7eb2c68c300fdf9455cb0a25449b5e2248479ac993c796a61b0"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -68221,7 +68221,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t14.html",
-        "sha256": "6077342e346aafaf3f4dc3cab06871e2e2b0e2d3dcecc73d0d3821a2e947bd82"
+        "sha256": "f4608f281fafa0f08b51216d19cb8a264b4528333f46409de97b890c5a085c5e"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -68470,7 +68470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t16.html",
-        "sha256": "e3dfcd803e47eecb20c2ff0d6f2bbdb8ccd33aa1db360f0a7d0cbc2a269933bf"
+        "sha256": "92c44f83325b92b1c61fb61577ab04644f42f81b5a9b46443bce693a2320be81"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -68779,7 +68779,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t17.html",
-        "sha256": "45056940a5c8ebeae209f600520ade513c97662959fc8f159a090200b6dc492a"
+        "sha256": "f231e17dcc58ee0a643eebe9481915330d9fe9529ff422decd15ee786daec976"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -69018,7 +69018,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t18.html",
-        "sha256": "cf4512a35068134e4e65e48c0a10d16afbe114344f8c4ff997eb4fa0f87e7d64"
+        "sha256": "3361d2e3f19a9a535fbf3ba38604e7f3a293efe51cd0c22c24085a9d52fa4734"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -69267,7 +69267,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t19.html",
-        "sha256": "8ba8d13423e78c309f916845d9787c530407d75d1033a3488afe97bf9465dd21"
+        "sha256": "6cf65915a6ab4247649a1ca13a12d9db3247044cf5beb6dd6c627fda91aebb80"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -69582,7 +69582,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t19f.html",
-        "sha256": "cf669c58285748d37be81823727b392a6a34e8a135e806056fed755f84f9e5a0"
+        "sha256": "87ec6952e21ed76e5b6d43b9ee039d3496559138617d055ce75ff168fab203d4"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -69795,7 +69795,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t2.html",
-        "sha256": "77de001ed87abbd59dff6616db54a0669a5dcb9efaddead33c4239daa4b688b2"
+        "sha256": "3bc45aeb97c4c56ee65cf5e4403f49586fa36e2bae385f0627728b7433bb3525"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -70109,7 +70109,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t3.html",
-        "sha256": "034a9605ee60f3c3d46093f19d8b95072b728b363a9360adbeba5d45eba34225"
+        "sha256": "8ad638833b6b9e7f8ee49694c268a1be37b211abcb51069dba5188821aa5f14b"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -70358,7 +70358,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t4.html",
-        "sha256": "1e477c07ae3cc04bc6fc03149f52fc0f11f2cb91a80640116786afb3b681d531"
+        "sha256": "2dcd4e4759dee4d5de3419ba088cb30f73db4b2711c7a56a2a1555c3e9898f1e"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -70657,7 +70657,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t7.html",
-        "sha256": "80558601f43456368d12749e79ea9d81f448222c50c2456b4ae42d0c62c66bc6"
+        "sha256": "f0993f820d28195db84c7e4180f1b687345ab59668269bebde80d4815a0fcf91"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -70896,7 +70896,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t9.html",
-        "sha256": "15a196af7bff6554d2b43e6b0ea61ac5e5d55acfed99df4f9f40769646947f2e"
+        "sha256": "59463352e52e7eee034c38ca39faf84a590745cf73862bfe4c10b9aa022e4e12"
       },
       "gate": {
         "approval_id": "",
@@ -71190,7 +71190,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20209-a7ee-7429-9d43-6b85b61d755e.html",
-        "sha256": "e0429abbbcb4eb258b7cb1bec44e33535b9259fb95146bb496e28388a7d032fe"
+        "sha256": "061a5b3f21ddebb4a38223afa8ce195e017769f549d6f2eb8f8a9a7398661529"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -71326,7 +71326,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2020b-3d2f-732f-8513-b5c142fc0460.html",
-        "sha256": "1001a166aac796e830bbb74f1c7ef2ea0eaa2ab57adf1c71ac956cac0fea4a31"
+        "sha256": "8944b470867dc6a42c63302b546f47250081a149581617f2a53558ad271db409"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -71472,7 +71472,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2020b-c9a5-78a2-a4e7-9ccd5c3bc255.html",
-        "sha256": "5b1749166fe752e744db9b8b521aee3a80449d4e85e937cd7e32a69dac33f0f3"
+        "sha256": "a42581ca867cd8ae89a1472c93247b2885924f36039c998211098c7fb83d224d"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -71623,7 +71623,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2020d-80ab-7430-ae79-752c90c55494.html",
-        "sha256": "8b84956d45260cc2eb5ad674dc85dc1c3f7ab92120c6c42cf8686c389349e9aa"
+        "sha256": "878a50de3091f995baf501021a284f436433fb820afb26b453206f966f2d7bcf"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -71774,7 +71774,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2020d-f1ec-72be-9ac1-b24c1135cbe3.html",
-        "sha256": "cf2086bcf9dc1bfac9787d85f4bd0ce35de07de76e56612597253cead05ad079"
+        "sha256": "f224bd6d9801074c25f355b37c5b110ca270675f867fb4c3b4dd7d0b3a3ab39a"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -71925,7 +71925,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2020f-cfa8-70e6-82ea-be53eec94889.html",
-        "sha256": "509d5451f1b2a01cb71bc26f2a3db2aee431df99e615507adeec9def0b6ce0c8"
+        "sha256": "e5eb63fbb3a07f80d9b9b368635f12094505aa5941ddbb24f2bda522c91a9079"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -72086,7 +72086,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20210-4bc6-7e73-b138-002d3c888c43.html",
-        "sha256": "cf7e87b195dfdeeb33cd5429fd583318839f4e684b01f0fc4a5d805a9af64fc5"
+        "sha256": "19b3f1c5907cee9de1ad821860e03b0e04f3fb3c23488ac692e5206e7cf59a3d"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -72272,7 +72272,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20212-5f83-7821-b0c7-74af782987a8.html",
-        "sha256": "5766e4b48628b0b78e8a497ca89e6406df434e71eaeb200b712baa41bb35df32"
+        "sha256": "4759c11e892c936f743b5c376aef35a841580c21f0df03b59ae5c2130960b499"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -72458,7 +72458,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20214-f276-7517-8c31-5f77725576d6.html",
-        "sha256": "9d1d828c31c294decd76ad3975bf731f2515ed963c8835ace76b8387e1656cd8"
+        "sha256": "048635c69eb9896cf725148f14acbd37702941eced2637343b06ee166af2997c"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -72639,7 +72639,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20216-2595-7c2e-b068-90fbda5f38b9.html",
-        "sha256": "a0586d366d0c8b2331294090144478e916401385c2bc5eec842117e4e7cb5c69"
+        "sha256": "0bce2104db65a9870d5fdde3d0df03a57c7d3648e61c25cc356ab632c7b4b84c"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -72795,7 +72795,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20218-bf6f-7a43-be88-f32af148b851.html",
-        "sha256": "2fce05af10439f6750b8e97087d9ae65dbeaca247721909f50a4646479edb8bc"
+        "sha256": "a93b4b3f733541b6fab980c40a75f274b954ae94a96962feac2667f2e45d85a9"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -72946,7 +72946,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20219-979d-7dec-8003-607131640ee5.html",
-        "sha256": "429edabb789fbca013dff3f45173b48e36e3bd0968405078b470a950c42419ce"
+        "sha256": "30ae5e0b7195141066f22d619bbed59a1ff0557505fd1ed583de9712fe03119d"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -73117,7 +73117,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2021b-96cd-7557-a691-69e74d718053.html",
-        "sha256": "2399aab246681fcee0a31fa8136f8f24af05f4f8776879d73b8afaac44492d17"
+        "sha256": "0ce309f85721dde26c28a2aedece7bea028c6165d0b418ee6cf6763cc91ab2eb"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -73298,7 +73298,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2021c-094d-7de4-b2d7-5527fb9b2519.html",
-        "sha256": "79f739c4a99ce188043df26564fa668379dd61db7d3b79d2b3bfabf342b4f2a9"
+        "sha256": "b5bb3f67a3f55e8c570017405e7a8267bbed61ad6372a059c0ba43afbc420bb8"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -73479,7 +73479,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20231-c661-79d8-9871-23b10eb3a2bb.html",
-        "sha256": "8b06bc4d07752cc2153ea7183b84c6acc75db1d4e39e066c9ff8e596089f38c9"
+        "sha256": "b2fc9ebcbf75ab9ef21abbc6b4d1ddc1263bb7c8b231a393a626bd09cf5a723d"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -73630,7 +73630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20233-abbe-7e25-9206-6f3c8bcba167.html",
-        "sha256": "4be70c711c3376633c515490b9b7905a05339c6a1bd1bc991f4fdbd7333ce157"
+        "sha256": "31a2f799da14804db01f3906a4629a99c583b3cfd476078228fda1f3ed90cd0c"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -73776,7 +73776,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20234-1244-74cd-b0e2-1ef1d8e04021.html",
-        "sha256": "ab52c0432f92199cadc19eb3975609f4205a399bef0cbce2dae0aaeda31aa143"
+        "sha256": "6aac8e0a289c33bd72eb83f0142614dd294171dd31e751ae7742694024301dd9"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -73922,7 +73922,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20234-7f65-79ae-976a-a24fdb85bbf1.html",
-        "sha256": "d11f5984c729e48d09281aef6412c92b2722bf0b3c612cc3692f7172c8b8d370"
+        "sha256": "aca0fcba7abfc386ee36f859710dcb89f77e56ed84fd1aebd8c6e8df1e906049"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -74078,7 +74078,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20236-14b6-75be-9ccc-5a4210e127bf.html",
-        "sha256": "0e24749ccc3b9996473edbff37bffcb80e530e172d228815bc344cb73bb6a605"
+        "sha256": "c0a8ac5c44211f92814aeed71697eec50336b7f9779bb96a2f0b6c3c6ca453bc"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -74239,7 +74239,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20236-809a-71c0-9751-c179f716e891.html",
-        "sha256": "64b2814a8af58afe84fa44a6e4f249ae397a1d4d1799a691a58f2d0b775b1358"
+        "sha256": "dab989b42a8ad1a25fbdb5a7c2ffb6bdb10f642509cd880af79c06a532352691"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -74390,7 +74390,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2023a-5a2e-799d-8189-37edc4991b8c.html",
-        "sha256": "39a0fefa89a66b1fe1797d66760f9469b0dbd796c66dbf2427651a27ce560398"
+        "sha256": "168344c671f966f70c544998ff53e199d4b2b3fcc98e436762c43a5f5d6a2692"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -74536,7 +74536,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2023b-20c8-7fd2-be29-311752bc241a.html",
-        "sha256": "e752819e292cefde4413f572a046d704404d62c50a75c564ca1ed57e72d3b85c"
+        "sha256": "013cbdec4127c882cc0400baee8b2c9d8ecc51ec80bf04e3dacaa7861d1dab66"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -74692,7 +74692,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2023d-f152-7714-a99c-08f8bc43c2ae.html",
-        "sha256": "c9c3d2cd5716195ede030ebad96341720b74c7cfee09f67e06ef1cd1e6867b33"
+        "sha256": "d77908693bc01137b0669bfd545aac33caaafd78496f59a2d1bd842fb185a6c8"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -74873,7 +74873,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2023e-a2b1-75a0-be60-db63bb552acd.html",
-        "sha256": "1de716d1b8a3222252e5b80d578fc41445bc0f5f35af371b656825d23aaf0e22"
+        "sha256": "82bab86cd25ea891cd649fc092b4a4174a75205ed3fdd30cfbd28071ad418067"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -75049,7 +75049,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2023f-eb1d-7fe6-b629-3f40a2957641.html",
-        "sha256": "9ea2eb606140ee84dceb02aa2d22f0fb81770e89e8e2ddea454e78c7aa659f7f"
+        "sha256": "76be6a354a364b35b1b297b623f441c835b8117d6c3ff9a5b952d1986ed68c6d"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -75200,7 +75200,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20241-72aa-72b7-b3c0-19efce5099ca.html",
-        "sha256": "1cacadfcace5ed80aa1ea6733945a45eefe6323e38172a9f4bf344a7d3833924"
+        "sha256": "55842e8251eb0b863ce01d6493797b0a2d55b46e86602489c12050cb988c626d"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -75361,7 +75361,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20242-cf14-7421-9c41-e27616f9689f.html",
-        "sha256": "dfe771925ee1741c29bb14ab1f08a1720f5d47ce928e9e9e593e8a061cb63955"
+        "sha256": "5a360dba6a1943f86ee208f8edda46289d3671b27ef94ea62369f723c43eec34"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -75537,7 +75537,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20244-1cc1-7f9d-b9ad-5951ca166296.html",
-        "sha256": "90abfe80d1711403c5b390544eac377dbbe521033db97bc33426634e2f9ca18c"
+        "sha256": "c25aa4d309cc6d340eb070f61f8504482223b8f008f819a221407aa0f2d54def"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -75718,7 +75718,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20244-86e2-7ab3-9ab7-c7cf4a5fc695.html",
-        "sha256": "9a4d0f6522be7d3931cf218d6cfd1b8c89b91efa2a6c9993fd9d9d55214c920e"
+        "sha256": "158618efe05d235dfcc97caff35c67dcd2bad0880e94a3e79031882897eb7c65"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -75899,7 +75899,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20246-368c-7ae7-a9bf-38b45f6139ae.html",
-        "sha256": "353c6aa5fa2ca2c50df6d04705e5d413449e056875fb4f95744692baf600f3c3"
+        "sha256": "cb5eca19c9b3e8bdbea92bda79de7c99f2a5e3fcf79e09fa905139a72044f75f"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -76055,7 +76055,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20246-9794-76be-849b-1902e3020e31.html",
-        "sha256": "fe76ace2eda88b372263080ac241a0294b76df01a00591c500fe2c49cc842130"
+        "sha256": "091ea43892102ad9cd1ff99debff41d77f9187ae67f9f54cc53da81a9612c7f4"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -76231,7 +76231,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20247-f096-7bc9-8225-b70100d25397.html",
-        "sha256": "b8fc9ac4de56b6ffc125034f2a3509a48722a7732fe05172861681dd0f0e9131"
+        "sha256": "9b9621ee7e355dcea17453d61198e9a3a621d93c4eb5a65bc2e435d56251e7b1"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -76407,7 +76407,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20248-50e6-7fa8-855c-3bc3f72a4618.html",
-        "sha256": "a983ea3212ae894982536be1e8f1abe973004a8e2934917b6817e146fb112657"
+        "sha256": "48642a64627743266bd33a29ba732cf52360af84a10fb4d92c158a7572ccc8ff"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -76573,7 +76573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20249-03fc-7d27-9b3c-f9640e23ad1b.html",
-        "sha256": "ed1428bde4858b1a703bf8c6203a2187f7bf069baba42caf3c7c336d37b09d8a"
+        "sha256": "adf5dc8b5f47edfd3c80066da8469d2ed9627f3c084521c44e640a59c4981a4b"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -76719,7 +76719,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a20249-b3aa-7f84-a999-31facdfc10d1.html",
-        "sha256": "f2b9a021cfdb87ac5c9d977123d0f2d1df49ae92ec296eacf901b2c8e108ee57"
+        "sha256": "94ff37cc52a1e1a1a3839a5ca4361d458f25a0ea873d4843c4c3c5b07bee3a1a"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -76875,7 +76875,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2024a-b65e-7ac0-85ae-9d5faa632ab0.html",
-        "sha256": "69f6971e3b6f2b270aa94f191f0ff777d6918dff3896bcb2bd3eae1757852735"
+        "sha256": "266bff7beefd50c5672e9a3995cf6291562ee618cc0aa283ed2d39c753d75ae2"
       },
       "gate": {
         "approval_id": "01a21c27-1a15-733b-b9ad-c2aa2cdaa0bb",
@@ -77041,7 +77041,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2024b-0bc1-7f17-8b1a-d55fc47fcecd.html",
-        "sha256": "3addd7d51de0a353e2c54ceee96033ffb84d88424303d4ead18a842f6f9a41ab"
+        "sha256": "c4352e76ee2b4f55bffca7275c3014e1abc1076f09c82a9eced9aac94376bb3b"
       },
       "gate": {
         "approval_id": "01a21c27-1a15-733b-b9ad-c2aa2cdaa0bb",
@@ -77197,7 +77197,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a2024b-64c6-722f-9001-bd4ef1df6e49.html",
-        "sha256": "40fdac1c48c587b87dc658644d4fdbcea7e4dab8996465460930d10230a333ac"
+        "sha256": "1d24f36f9beb84e7576d5727cca85674814ae62c123038fc85866d61b678b7c8"
       },
       "gate": {
         "approval_id": "01a21c27-1a15-733b-b9ad-c2aa2cdaa0bb",
@@ -77364,7 +77364,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bb-cfc9-72ec-85f5-619bf730fff9.html",
-        "sha256": "fdbd339aede10d68ca6b3f94542eb0fc6076281584e7552a4bf4150ba038962e"
+        "sha256": "26870d8ecee00cd8efbeedac56fd16273f34f6e79495f0f38606cc9a9508360e"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -77508,7 +77508,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bb-f6ea-7d99-b23f-4dc3dace459c.html",
-        "sha256": "ce47bf39c5a06661b6e77ecc85675d612ee921e2945cdd2b7d3b1d2ba0b500ac"
+        "sha256": "a97bf27e9746b44e758ca03728bf7b3cbd9310888f956f195c1f98981e667251"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -77667,7 +77667,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bc-1f7b-7703-bb2d-a0d8695d12bd.html",
-        "sha256": "16c212fb00bc8152d542d029b6d1a341b6ca27c2d81987086e9edfd15368ce17"
+        "sha256": "3cabdaa8e27411c5b85aca9ad089f48447d9660df0ab3ab387923ec72c15a072"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -77826,7 +77826,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bc-465a-7d83-b9c6-7c7b089d8b02.html",
-        "sha256": "05c8e7ee8c5363388620de9e7ea9266892df4061afb95012178bfe8646c91848"
+        "sha256": "b19ff9a61c4bc57b4ddb75bea29d602a9a40ce3944da85fb05df33e8db41c9fe"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -77970,7 +77970,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bc-6b09-7785-ab85-5e72fc64997a.html",
-        "sha256": "3cbc5382280f9b5b5a163d5ff503c254235732563f58b3691fcb05ce09380ebf"
+        "sha256": "a30e2f82dcac1570a4bfa6fdeb5dff42187f74ae5b6a3338b25357445f8e0b8d"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -78109,7 +78109,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bc-92bd-71d7-964f-8d9761e78baa.html",
-        "sha256": "3eabd8ba1271a0a2d609204659a87fd522a6839a6d497a633c495b999e5c2dee"
+        "sha256": "534421576023e949b083d49041e5900ca176dbbc1e9c36a96381bb4f7b3805f5"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -78258,7 +78258,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a210bc-b7e1-7a83-b322-81d74e0a903a.html",
-        "sha256": "06d7d68f57f1ce0fd06750d85abbe491e4d4300455a377cc23cd44742bc42b48"
+        "sha256": "c8978f7a3a2b147a175e54258c8dcfd2bec552caaad0f8a68911abf5a8276c72"
       },
       "gate": {
         "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
@@ -78396,7 +78396,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-28a0-730f-ae0e-3cdf463bfbb9.html",
-        "sha256": "efd1f38158e004a2fb7ba2d6367f0a437c96b82c93cfe9ccabfbef0fbedab830"
+        "sha256": "c24adb6b06faf880858451c51d598c8a48147dc6dc43654a1d5890e19971c50f"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -78547,7 +78547,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-2ade-7c52-8af3-4aca0c68c0da.html",
-        "sha256": "8aef1302ffa387eea1c40ccb22fa5ee3fc45fa6a1c6b371f0f3296d2476fdb1d"
+        "sha256": "058e4d5b55b0a0fe1ac99c5554c875dcc497bf2adc3382e3bfafb972fdd41e13"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -78678,7 +78678,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-2ce8-79fc-944e-720134bd7492.html",
-        "sha256": "7cd14ab68f2e917061ba20d7807dc7243bdcc946c6fb506e3c8fd415e3db42f0"
+        "sha256": "3f5931795b85457024126f7ecbd8f3a099f7ecd187017efd6400b77555d54c12"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -78834,7 +78834,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-2efd-796c-82da-3f4853cfc45e.html",
-        "sha256": "40eb892b1c113665d76962bc1f32369b979a59597b349ad4bd237d26293c8fc1"
+        "sha256": "8397b8eb056edf66a6be1db4a4e750d5a9285503a83ba42be0ec4fe242de6d99"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -78990,7 +78990,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-3106-790e-9aeb-2c2c1a5ab7a6.html",
-        "sha256": "9b38171e13537d416b058cfdce2e2f15bac23c023003acdb460143a30a1fd56f"
+        "sha256": "35e892acda25ff6fc69ff39b4810c61066c34dce8fac98249897520ff5112740"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79136,7 +79136,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-3339-73bf-99bc-06a162737766.html",
-        "sha256": "d2104ece93d4d66afcd34ad84579692a003f67510efee4203c9b4a2607b3d4dc"
+        "sha256": "6958d8dfb858683a5e30a08e0ae38d68ff128fa42296a34d52dd26db8236b06d"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79277,7 +79277,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-354f-72ff-b102-681f5e5b2940.html",
-        "sha256": "788198bdadd6b682e695d3a77c9549701355c04d4f0f9a3dbbeb75746465ee7f"
+        "sha256": "dbb938b86e81f7e9315fd10fb898a3aa4baa5c507bddbda7cbcec75b5352605b"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79418,7 +79418,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-375a-74cc-ac03-3f026f8acd46.html",
-        "sha256": "16076335789ad63313819111f4d1a9328af16163dbd9287670a2b253d5a42af4"
+        "sha256": "9567fec1dcfd89d43ff53e5e6474bb6cfd997bbcd06ad3f6e9932d7be176a9d8"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79554,7 +79554,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-397b-7bed-bb98-dabb06088526.html",
-        "sha256": "2233dd619266aab72dacd5609d5b1c06bfe705c5cd4aec723649558f65cdfe2c"
+        "sha256": "5f6209c902af7079de6ce3943963110181a29d6382e47437522496eab7cc81ff"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79695,7 +79695,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-3bb2-7181-ae59-064a6d463837.html",
-        "sha256": "b9ae021f6abb2ea9791935e357e50ff19865bba9bf873dd0bbc33ce3c23705ea"
+        "sha256": "db69ca01e8310c3a4a243ded49607d80c4a44211126dbab922c7b9ef4f7a8338"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79831,7 +79831,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-3db6-7235-a2ba-313b3b30a903.html",
-        "sha256": "e626503b0c807eb0291e1e6fdb878b7ed5d166c420d88c8ed75df5b73456998f"
+        "sha256": "ad5ec6b9c91cf03081bdfab3cedcb9d092c120d4d8c78e122be0aa6ba769931f"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -79962,7 +79962,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-3fb1-7936-b7f7-ac3a65ce7737.html",
-        "sha256": "3fb17a80cba06a40908ab1ea879172aff55744ad7dc0b67d1da3f1f1e72f812e"
+        "sha256": "de0d14013b12058f387565ba58203d83a19bd9b4ee4200d10cc2562c89457f15"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -80103,7 +80103,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-41bd-784f-971e-ac1cbfbf31a0.html",
-        "sha256": "5c0afb72481bea2a3b22c9be6dee9f5043468e17cb1328d22911c73ea4218de0"
+        "sha256": "03f8f43de134a47da3eba1a3e13897c682066599d66ef210e39714431409d07b"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -80244,7 +80244,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-43c8-714d-aec7-e5a66815a1de.html",
-        "sha256": "3d27cecf77edfc440434d5e93531cbe8ef40b79ae58edc33cf90e8038059b370"
+        "sha256": "26eb5c669bf19b4f631237073412392aad81786fa8c6313db3efee43156f8df5"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -80375,7 +80375,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a216e5-45c4-7cbe-95c0-829f45f411e2.html",
-        "sha256": "23bbebeaf3fcd24ea85e03ae5dba67e677bcadfb96c7a0cdddc34be147450f71"
+        "sha256": "f2e63d2a94ab5a5caafc9c063a98fbe8d05edcc855f37af1d8fbb8536ca5c265"
       },
       "gate": {
         "approval_id": "01a216e5-7104-7a0a-92f5-5708f16a05fa",
@@ -80506,7 +80506,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-361d-7aea-bccf-014b717b224b.html",
-        "sha256": "f7e457c04e4a1ed06c0a68f255fbf3394f0c7e3e340302209f2e4d4138dd68ca"
+        "sha256": "bb892d53f5e2c17364e707c57f2487ca35a32c1164a53efce47deb1d367e1200"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -80667,7 +80667,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-3872-79a8-8eec-6a29fe22ee19.html",
-        "sha256": "19cec9529f619ca8a2d210e2622bb2a1e68c031ad4085a5273afbce71a5b04bf"
+        "sha256": "e07bb0b67188ef1a9d25873f5161457b971d0d5bdb0ae50f9ee8714da60d72ab"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -80808,7 +80808,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-3a93-71d5-86ed-b410388ccb19.html",
-        "sha256": "1e69bebe738e9b8dbe40ba5843367e511e7f07efdf2bad845cd03f47762423d3"
+        "sha256": "ea5107535d4f30042c48fcad23a89eb83fdaa710380e3b862b8253accc8f6bb4"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -80984,7 +80984,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-3cba-79f0-a486-ef7f881efc4b.html",
-        "sha256": "c8d4eabec7eea0b9f41c764db64e97154eaaa803c68d59bbd586585cc8e68584"
+        "sha256": "e4e1a565cdd5e739a424060c69404819d92068f5f39824babd8564cf98c1c7c3"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81145,7 +81145,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-3ee1-7610-8021-85c2564ba23a.html",
-        "sha256": "11c33ba37f661e36e8a0e3e1380101886ac37e6e06f1c4160eda5ed68c7afc06"
+        "sha256": "66eef0d0bf98acc254e67fa9bab17d78aa3237ecf3e8dbd44ae398dcb6036c10"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81311,7 +81311,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-411c-7c6d-a957-fd530cdce8bb.html",
-        "sha256": "13987612d371818cad6695cf357e1983fc9ea01c5ba5845bd69bba5414e1adca"
+        "sha256": "20e90ca299558fa7daf253f65b42ec9358c42920d252f1a1c82c31e636a1ba70"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81472,7 +81472,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-4341-771c-92c9-c1b65df1580e.html",
-        "sha256": "5f2da6a2c016e264064fb0b1448f1c348191e4283289d22057b1adbda05eb4b2"
+        "sha256": "61db842dfe21741804c1f09eb45c5dab3636feb5e270473b834c8efbeb752a8b"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81633,7 +81633,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-4574-7420-903a-5f88c765b0b6.html",
-        "sha256": "01da5a0400eddc255550b970f8aaadb9c91da6559975fb461cfecf65c98d5ec7"
+        "sha256": "f5d2eee21c250adfad89d940a27cae8b8f18577552531113013282316869aab7"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81799,7 +81799,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-479d-7d5a-bc1d-5914fd7ac86d.html",
-        "sha256": "60740a6201cbd84e02a1bd7c3f8b1026625f840490f8999f42e89a0191cea3bb"
+        "sha256": "52276b5510f7b5621d8b65bcc704a51666a06d570030b54c355fbeed90bf7b4f"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -81965,7 +81965,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-49d2-7c5e-8e4b-f2cb1c54999c.html",
-        "sha256": "b157205f885d88a0be5d756fe163ad03b55c8ff213f32b512c2775fa70f9daee"
+        "sha256": "2f201ae6526bc7058044bec003ec0dd83e1d1da1e086035f72a03de025f62e01"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82121,7 +82121,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-4bf5-75c1-8710-154840de422f.html",
-        "sha256": "17b9d5bb6fe111ec5037d189af1bc622fc8990fe87ed2a085154c09bb4ddbc9f"
+        "sha256": "8022b6067071a46791f5a1b8e200ac9eb8ffe5034d00f9aa7378dd8c74abe35c"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82272,7 +82272,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-4e1f-70e6-ace2-046e0235b0f1.html",
-        "sha256": "f17c4191c95fa2bb1c90049b0cca237bb389d8ba26e297ccbf1eb5935b83f951"
+        "sha256": "7f6396309856c3326350bc498bd3775fa2b1797cbf8941854bbdbf359883b019"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82433,7 +82433,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-5064-7ab6-9610-74b55d867eb1.html",
-        "sha256": "0e145ac948c1cdfc81333aaecf48dda4b0787d37353c8d07d6405137f0a4230e"
+        "sha256": "51b0a60ea3cd4b9eee0337335d7f8272170f898a92399715461b0449595f7912"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82589,7 +82589,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-529c-799f-bdb5-657664020e13.html",
-        "sha256": "dbc91cf911cd67cb48dcc94d866816ca868b436092f929bfcdebc4fe1bbfb287"
+        "sha256": "ae9450b3394a35e1b06b132dbc7c66e666443f42ba82d39cfb4b176705b9e5b6"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82740,7 +82740,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21732-54d6-789b-9f44-a061d1d811e2.html",
-        "sha256": "834001903414d39b2658782b4b954b32a78ec2ebafc65aa39c450d06dd8e6dc7"
+        "sha256": "7bd4a91dd10b89a9e2fecb26e86d9cd90b718b1320a7cef47089a35f59394610"
       },
       "gate": {
         "approval_id": "01a21735-3bc8-7646-b1e8-eed0f4ea543f",
@@ -82891,7 +82891,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-5d4f-70c3-92a5-25bab62d92c4.html",
-        "sha256": "3fa524b92a0a45cb6d3e4ea0e0bd0396bf01818e598f644768a83235bab7ab11"
+        "sha256": "561163df9c23d7af36c674587e0a525cf34a3b3848eb9f3215121679526b6129"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83042,7 +83042,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-6002-7e28-b25b-1b420d5bea7b.html",
-        "sha256": "c1ff7795fbaf9efe487b3e4d98dfbe137ecdcb7036b10abc14ee0fb9b22b11be"
+        "sha256": "7603382a38d586721fd8bbbb5e7abbe0e50925168564c8dea7190c61e9315a31"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83193,7 +83193,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-62af-7f10-a16e-ae4daee9589c.html",
-        "sha256": "97024dd588e51c483f94204a4aa748d0e4f73da2c02ebd883d6ac1793d980e65"
+        "sha256": "a6eb93781f59f5a84e7b1a799e7a7183b266fdddfadeb52dc9e9da6e8ba1830a"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83374,7 +83374,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-655d-79c9-87a3-87e8c0d28b34.html",
-        "sha256": "76b98f1b76b63437d7b775c98de1d2d091f24dcdc37481b884fb62c98ef56bd7"
+        "sha256": "eda2710ea4b7b1c96c516ef7ba92b804f9ede88ab039f7a8d1ed810b733faf0d"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83560,7 +83560,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-6807-7410-a2dd-7ca1735d76a3.html",
-        "sha256": "4c7f4852f9ff25f48e4d5c00d37e01946eff98eb26633faf070548b8a9771c5a"
+        "sha256": "9c4953a1423a68c60d0a553d880e15ce36f4ae3823967f4f01c28d14cf075ff9"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83721,7 +83721,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-6ab3-740c-933d-7411527ac10c.html",
-        "sha256": "c67e3ce6af912b3cc52342ac0753ba01257e5889fe74ba6aca43f85921c96651"
+        "sha256": "c62cb6e332efaf0530c91f4de8dd45795c398782262d29b91c6cf3e59500c44c"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -83892,7 +83892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-6d86-7827-8cd1-f4637729e6c8.html",
-        "sha256": "84d8879762537f3b9c50370f63b7e8889b81e66c653d36b76ddf72e42c52579a"
+        "sha256": "02f7114ebca371d564f1b9e0886de373b750f3062fefec49bd09e632e11cd711"
       },
       "gate": {
         "approval_id": "01a21741-9670-7be3-af31-2d7c9b8db77a",
@@ -84048,7 +84048,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-bba7-7138-9478-2586b8ec23c1.html",
-        "sha256": "08c168d7879e7809b37164a61590ce341ef702d27273259d77d0d2492fd5d125"
+        "sha256": "48c40704902c0b80fb8bb789c8aed9c9a9c4ff4fa897b08299d3b7e8d025b070"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -84199,7 +84199,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-be53-71c7-aa45-30c9c4f9e8f3.html",
-        "sha256": "1533097b414e561c96a6bc275813849f55bc9d5e1d2ab2bd893d389b73252a15"
+        "sha256": "73c4b191a497fd367d0a184714ee4c97d017d559e38cb03ffb836d315d4203b5"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -84340,7 +84340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-c0f5-7f96-b388-e1f8f9e6e791.html",
-        "sha256": "f7a97eccbe483b0f41257da67b29b5e8c7b3649f6cf1a09528ec5429ec3ec88b"
+        "sha256": "9181f71de71c205f6af8bfc6ebd185c94644768ae217292dde6b94dd091c69aa"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -84516,7 +84516,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-c39e-76de-b78f-ce2f114560bd.html",
-        "sha256": "3dfc96bdf0d265079e969fb26cd12d520d7793ec3db3559d16f78b6aad4a5071"
+        "sha256": "1ce85f71373ad79c85618bab6fe499559c542d126dff6b862df22d62d2de7ead"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -84677,7 +84677,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-c654-7eb2-89be-2a0ad95e50c3.html",
-        "sha256": "608d20de9046cbd9c26becaa3746aa0614b98586846a83995f3d3851f4cbcaf6"
+        "sha256": "2048894482e9f48fb30ab64ad7a1599a142e67f7f9e1a5c54a785c540417014a"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -84833,7 +84833,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-c8f9-7f82-80c4-04e66ed40083.html",
-        "sha256": "fbd68ae989cfd21fea7221d67f8924b5879ee8bdc6f71b46c65dbb9f1d4b3e7e"
+        "sha256": "548ba3c0e748d46a737731af687c4a72a3ea8c05dab4764f80cb22bc850df296"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -85004,7 +85004,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21741-cb9d-7e63-bd4b-54980eaea848.html",
-        "sha256": "d5c2aaaf9fe697d3584bf294d1ea8120eda37043214873910174898620fd8e89"
+        "sha256": "43d443b23fd7fe95174cedcc97bf4c87d0cf93c829d03f54d850e38d30c119d5"
       },
       "gate": {
         "approval_id": "01a21742-1c9a-7019-a49a-d0a839d3afa5",
@@ -85155,7 +85155,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-70f7-7b9a-8962-2e1168b4865b.html",
-        "sha256": "d6cad165cc1a5ee0513032c3dafb79c1e016aa998d57fa319e91c82b354b8a2d"
+        "sha256": "3c903782bc9f170c7238cf6bed5051cd933e9f669f7f8e6507be0e1a72f69f45"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -85306,7 +85306,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-73cf-71b6-8541-ff40ba5e507c.html",
-        "sha256": "6da598d390f38c73eb5436b6cfc00765985a0b25a80317b7f762263366637252"
+        "sha256": "d1efdaa745b97cbac8c97effaeb7e485c6e840598d5d9cd19cb13cee6c6a0232"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -85452,7 +85452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-7689-7bdf-8d97-5b959c61b327.html",
-        "sha256": "1d609669a0c17e2ee7cf93966d7c2461fac2fbd023bf9c3dfe3907ced7c803d4"
+        "sha256": "88781db0b83fc456f08bb3a5b67c78e68ab94d4b0e3630c3840ed574effc73b7"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -85623,7 +85623,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-7946-76b7-a8c3-274b977e17c0.html",
-        "sha256": "9ac6c1ab707808924dd639e5ec913cd338275a03398284904da0a142cde3b6f2"
+        "sha256": "5a97e412843102e39c860b491adc1fa0f3ac2c6b51dd239e4de1c4a7034288da"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -85784,7 +85784,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-7bf7-768c-8e42-ae219ce5f367.html",
-        "sha256": "eb929e32c85f6f5f3baaa9ed5c78b34cbeed5ae36e91fb04c2c071606e6f6d5f"
+        "sha256": "e644f5a1c9a083d2c2e8c650be3aecfae3b292fe9473274d7d460007c49f8500"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -85945,7 +85945,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-7eae-7b22-b451-1d6118444e11.html",
-        "sha256": "d179c38c457f89f45ce29ae7c55c7d24de48e79626f4ea9c65a5a915a8f30a0f"
+        "sha256": "f599fb12cd9df78698dc540e79c6edcda69e51efa56ac26752fe9650c1a69f35"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -86111,7 +86111,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21742-816c-7f17-9e6a-5f8bf05e7d4a.html",
-        "sha256": "294a5c66385ecf8f53807ef47eb9a72190620a852d9a5e400d049d3cbfcc7e67"
+        "sha256": "12372e7f2a03e510e448e1eaa2a51b12aef84fd72206fa870e649525f5d5337e"
       },
       "gate": {
         "approval_id": "01a21742-ee01-7ebf-b968-1c198508977a",
@@ -86262,7 +86262,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-a5c5-7365-984d-e8bdd0e153bf.html",
-        "sha256": "0f84e6b3d5fe5e2a67987a6f2d81aa0dc292374df13ebf4941229d454b027ef2"
+        "sha256": "362b155a5fe7a0e94296945bdce7ad35b6ec3eb86aef32f4972571944ae80a78"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -86408,7 +86408,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-a7d5-7cb6-83fb-8f260610726c.html",
-        "sha256": "252ae7b44e7359fe4095611a61c4465b3b5c6c95eee6af904025089231ac61de"
+        "sha256": "8891d78f32ab04195508396144dfae964558197efe6692bff194182334fdbf06"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -86549,7 +86549,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-aa12-7ae2-b595-3305b5791207.html",
-        "sha256": "ddc70082dacc3d6021eb2458d3ebfead9d92fa1b56e9ddb3e32cdc7d26f9551b"
+        "sha256": "aa8ab272def5ef1210cbabd82e97c092903a267c7918d1242ecec5a41caf1919"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -86715,7 +86715,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-ac49-7694-b6ba-ca2c286114f1.html",
-        "sha256": "f7e23fb8ca520d3bcc3bd5e89ad5ca3e1937fb175cddd933d1a7eeece5fae048"
+        "sha256": "9c91654385dd5904b5625f72bed2cc949c3df164d9d553353bf53035036859de"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -86876,7 +86876,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-ae6f-7d38-a4ff-852c5e5a1f76.html",
-        "sha256": "34a459c52cfbc2a6f8d83e95a9054c0f2079d757e837a72840fbb9ba28bc2a81"
+        "sha256": "419ebd28eba50a2c3e91eec8298054a04af88fded93e91b2995bc64bc494a9fe"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87032,7 +87032,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-b0b3-782e-9207-baefb586cfe8.html",
-        "sha256": "1f9f917f04acbea8a2ee25bc32e5387aa5cf0bcda77cb6370f255e9f078723db"
+        "sha256": "861b92c2e157d870c40f9808c219f63229a7596ecdaf26fc4f831c4759af3304"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87178,7 +87178,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-b2d2-7c81-bce7-c999d560f0f9.html",
-        "sha256": "1bd2f5687f9eaf48a825b783f8f4e856b53cdcd8d2f8b6b364c77fc75186e178"
+        "sha256": "7a736b9c5dd2f73a84e1c7cbb3e69c7da927ebfb34cb78bbdeca96326699473d"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87329,7 +87329,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-b507-79df-addd-f3f4a803817d.html",
-        "sha256": "936f6d5351f244893fc8385a43d2be0105544fa7ab9dbb85700bcac4006b6ab8"
+        "sha256": "0e5ce69ed47a17e675a466e82b4b329a96f3c4b0c02dc92a344cff83d74abb67"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87485,7 +87485,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-b756-731e-9b80-5157272e25d5.html",
-        "sha256": "ab0fa7f7686557d08d7b08c7e277206b9fd9081e55d509067813d528fb7f1dce"
+        "sha256": "768c60846c95228db84626b79a7218d5ba20526bf778a4af8837a287622b48f2"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87641,7 +87641,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-b979-74e9-8d7f-6d76bbef565c.html",
-        "sha256": "2d5057aa0fcd1d7e32bcada9b58b0bb9a228c131337cc24796489a5a86746683"
+        "sha256": "ba8521aab49acb74b8aa64234a25ab82f443ebeffeb073d01af9243bafd9c8a8"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87787,7 +87787,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-bbb3-7427-9927-d7423aa70532.html",
-        "sha256": "d05d0043824c9a48956db9e3405a29f143c3025d140526a40315333b4226c341"
+        "sha256": "f9d015217ba49c1f43b80f326f4ecbedb3121d2ceafc287767bc41e433121766"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -87933,7 +87933,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-bdd6-7939-904c-03b9984ebbf7.html",
-        "sha256": "3c5aa3f31e2cf5e6775cddacba681c3e6ce6e609fb824d46a84c2047b2fb10f2"
+        "sha256": "261cfaf10df104b05ea8ca12c21cb0e71432730344beba681b7af5222212d650"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -88089,7 +88089,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-bfec-7efb-82c5-28696f5bebd1.html",
-        "sha256": "0008335253408c41d7694dc07cc657381885e7e5f94fc085c4075082e5ee35ff"
+        "sha256": "885b05729dc510ac341fda5fe4752ffc9bb650d73d0b1295e2c8d4405b516aed"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -88230,7 +88230,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-c215-7c10-b039-6e03e57e4695.html",
-        "sha256": "7ae0ee0703fdf84ca35912b2a9ea507c202e78678127f6b632f41467c8e4cbe8"
+        "sha256": "1d7ad35b076d56759fec7846fc34b92dfe7c052e3e922f5b22b5edb6867fb742"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -88371,7 +88371,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21764-c421-72e1-b3a7-54d628894257.html",
-        "sha256": "e30ea877115981f1e1bc2702b16eebbeaa7f5df943c8a109ea6221d9696333cc"
+        "sha256": "62ff3592f42daaf533db3e53b582565550cfa57c307ce632a83c6a5e49104941"
       },
       "gate": {
         "approval_id": "01a21768-3c90-7dce-8e71-c549e65763ea",
@@ -88512,7 +88512,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-a6f7-7b9d-9d4f-849f85b4f4ca.html",
-        "sha256": "2a07ea4e1001b87258229413e678cd49bdc08e9ae0365734429198b11133e4fe"
+        "sha256": "fe79737433ce7fa007e14b5e63c8b5f693bbef0fb7e99ff52c531db7e9555b69"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -88683,7 +88683,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-a98d-7452-a3bb-ec0b89569a1e.html",
-        "sha256": "7f5bceb9337cf8afe7c26ad9167064f0c64a24c0b10413445d56e94c4972266f"
+        "sha256": "173a2721abb2a6b90c51fb3005763a723fecbbb220b17b0795aa6e87ce8fa188"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -88839,7 +88839,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-ac4b-7591-aacc-1ec2d1b5748c.html",
-        "sha256": "5215ae4163b7b0e5e6bc473937950672f476f5ec28e557f9d99dfb1d6a07772a"
+        "sha256": "23e1d682ac6541eabd177e154db52ec9baf4d13ae2bea96964cf099b0e074274"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89040,7 +89040,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-aee3-73d6-a69d-1e8ce21b3c83.html",
-        "sha256": "7b2d7e57ba58a40138c82c0efacd8316965857fa1bc00d1f3b6bcc0dc357325f"
+        "sha256": "447726a8fa25c596f1966b40d90bb68b4652d6b7b43bca97afe245362bd01e16"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89231,7 +89231,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-b176-76ce-870d-e421d74d04ae.html",
-        "sha256": "d54dedd7b3d406ca2f5dcdc75f0651ff3fa13b239f560152d9f38ed419d57637"
+        "sha256": "9346a3f6ce1a2d915c64d87f872240a5f704ea45402853e4137c8dfb555b7a2e"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89427,7 +89427,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-b42b-7ba8-9934-64f59b093a63.html",
-        "sha256": "adbef915e0fc955fb9525d3c65e04a4cc58c53fbe027e944cd73d179970ad05c"
+        "sha256": "6be5ab2d115ca2209ef3fc5bf6af7549f8b3eaa73e3d44166d9b2e0590f55607"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89613,7 +89613,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-b6c1-7b34-9415-3ed3c9409fab.html",
-        "sha256": "e129c9ba58f782f9e40ab862ebee606ed318cda95d6e69b93d85526e56fd26ed"
+        "sha256": "471265383100e82df250ee457dd4ba4facafe5310fce3b93fb77b19f3f9df905"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89799,7 +89799,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-b956-7356-a680-23f66d741c94.html",
-        "sha256": "e527afc5d0cccb6a09dc07487493470a5a6f6d1f568f81205158d85be2de79bc"
+        "sha256": "59708187f267ef358533ac4d051a8cbd2d3491c71328b33bb002dcade74a8b80"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -89975,7 +89975,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-bb66-7d07-85c7-98a7fdbbd661.html",
-        "sha256": "53a81ea511dd877c06ea3c844dde79ab35a76f883a43508625160098615b2619"
+        "sha256": "3e7c900057917a787345d33f88ab92e5b6a5a63573a194a2c989012726798245"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90131,7 +90131,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-bd75-748e-8897-56b927c33676.html",
-        "sha256": "0029d709f223d00e4b4460fabf51a0b626103c0bedb79939f83af54095aba73e"
+        "sha256": "c3fb838fff846b2920b33b846f5a8a8101fb7ee69015ba4dd0d17fdc02e785ac"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90297,7 +90297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-bf85-792c-829c-6f433d2463dd.html",
-        "sha256": "f2d3187d0b73581d8c9a5097183cd06c8a079d47444fa7bd1d83318d7824bb04"
+        "sha256": "4b5d4e750bf947acd4f12b085e108b47532b46b66bd9ded9d0bbe56c60459bbf"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90453,7 +90453,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-c1b4-75ff-8c1d-2a63d3295030.html",
-        "sha256": "39382780c99b5e2831730c5a43d3d5e3b87e7cb3d166ca9cb57a417c3434628d"
+        "sha256": "5dc20caa027e00292b708b8984f16d7db922d217c707cd6110a7559ebf1e1bf7"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90619,7 +90619,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-c3c5-717b-aafa-3e41b0962f78.html",
-        "sha256": "e2af4637bff54897287c08df990bb467a739d5283be89a8a4ceac954af2edd79"
+        "sha256": "1a6a51881eeb3a33d9e3017616741174a17568fb70e414557d163584d70914ed"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90775,7 +90775,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-c5d1-79b6-acf0-a16487e59300.html",
-        "sha256": "3f155929129d57613d81a968825570b19d91703e4d63dc01644a14d95abc9094"
+        "sha256": "adc7127fcf8c5426e8908ac9d5488b8c255b107536c5f6b96453f740e07473e6"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -90926,7 +90926,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217a9-c7e5-734d-962e-bfd2e5baad07.html",
-        "sha256": "cb4e633f78c709ab618d77ced1b31a544c595bbab59bb99800aedc32b56e9dfb"
+        "sha256": "b95425be896c54fc9bfb905ef8d68824b63cd635b8f62c0130627fbf88a90293"
       },
       "gate": {
         "approval_id": "01a217aa-2a0f-7d73-9266-e3a3b51cdc6a",
@@ -91082,7 +91082,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3195-7a2e-a0f7-c102cf408dbb.html",
-        "sha256": "0fac35890351b96d313c03524b60f9854a607d092351244f1ed4bf16df623005"
+        "sha256": "76271ed36dbbb1d88591713102bf7e1acfefada837563fe14cffd671a468eef9"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -91233,7 +91233,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-33d6-78a5-8ea6-ef8506f65726.html",
-        "sha256": "59837ad5192d3ea7bb720ea1475dc29e51f3073da8f65c5c934e33cffc6f8626"
+        "sha256": "e3fe40d533bb27f29b806a7f80580564e07be7b6af69bf20080455cfa28a518f"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -91384,7 +91384,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3610-7221-b473-f803dd668b01.html",
-        "sha256": "e5e062d9993620e9adb8006eec36392415b6182b799bac5577fe4583c5117a97"
+        "sha256": "c050837031a5995ddf72b07814bf89f6aefcdab19eefbeb35c519d1d18d81a6a"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -91565,7 +91565,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3859-752d-81d5-15add35d0aea.html",
-        "sha256": "2793bd2fd745e2880b9f148de01fcd9a3b9f75c8b88e083d72aed28eb61af0a9"
+        "sha256": "57454e4b2e433a6a7f8667529efe5169b6bcab3201e8e0f355c2e5955b2caaf6"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -91751,7 +91751,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3a71-779a-856e-70ddf542a838.html",
-        "sha256": "988ab13d5df598a3e1abfe2ea4024d3ed40830ad9876de8ac3ec519ee808cb1d"
+        "sha256": "456473f6d72c700a2bf909e3068ffe344b6f2d4f26d38de5d5f709c2e32620af"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -91912,7 +91912,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3c90-738c-8c06-f251079c6481.html",
-        "sha256": "b3f932e6222148d611fdefc6dc48816cf36837f77d0ed2363391d5e88ba26cfd"
+        "sha256": "713b5bd4b6085a865ec7a1211de47c254928508e226444a2559a851e3c2f49ab"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -92093,7 +92093,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-3ecf-70c0-9d2d-92e18db29f5e.html",
-        "sha256": "f234d81d0c02fa2c0ed4ca03722458e352d034d1da0c05df1f4fcb1697fee03d"
+        "sha256": "4ae207a916bdf03335627fbcf10a2e1d1a2ddbaafa39f9005aac824774052b01"
       },
       "gate": {
         "approval_id": "01a217f6-e5d9-7b12-b98d-8c4932937391",
@@ -92249,7 +92249,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-d93a-7374-bf2a-be83b98c9036.html",
-        "sha256": "20e9fead3253c78a010d0027af4fc376b79328151f9e7a85900e2ee37dd868f9"
+        "sha256": "1b826a7a967f133e1e57f2bff9b8f5ca0e5cee07da3a1f936d5c27c283ec8ef2"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -92405,7 +92405,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-db72-74f4-bb5e-29c127ef4a1d.html",
-        "sha256": "845c9ddd971b18ed44e96fd476e7e70e20fc415c3e9d7ed350c8ce5e65ff3673"
+        "sha256": "c13765b488601d5739d92003d19c88549cf35285f218cdf64459a2befdf40143"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -92566,7 +92566,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-dda7-7264-80d7-6c0c78628914.html",
-        "sha256": "54c3bb00e932b4d2ae783eaf93bbdcb54065f85fc761d93c150626ff3d936f45"
+        "sha256": "d4e052084028f9c1a57aa31e38a4ae2ff0802cc83cb00348a10edcf031bdc094"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -92757,7 +92757,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-dfe5-7c2e-8eb1-2377385b9ba2.html",
-        "sha256": "0d393c2f4adf291699fbfddcea480df6a7f12f9d0dec2f5f444aa62c1a0f6d74"
+        "sha256": "464497adfe2a93a7ee518a5cdaba78fc6f85d6f8c71328a9e47c369f348f6b2d"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -92943,7 +92943,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-e24d-7418-bc66-f10046664c92.html",
-        "sha256": "d4a751360c07e88ac18dbeba1bfda3e195967dd611a90963d5b9022f02b4e198"
+        "sha256": "1665d0493004d268cb466653edc80eb33f57012a08fd823fa0d2cac91ca30973"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -93129,7 +93129,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-e488-73df-9f49-b9bf27febc10.html",
-        "sha256": "59c0f6f7e6089b77ba88d4a920351bc73968d449fdf356a45eac272cc8e0f773"
+        "sha256": "d4ac44450968a3db5ac372351065a0d795c9d4ec6ae546117df34812aedd5c4d"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -93315,7 +93315,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e8-e6c5-72b4-acd0-2eaec81bcc78.html",
-        "sha256": "5b8f3fe42722da723d52e745fb2a23d86f3be5997150c46b693f28d5d97f2906"
+        "sha256": "1a3418eac87408e4dd29146f60ec8ecace4bee86c784ff47bc3f2ad0cec6a8e3"
       },
       "gate": {
         "approval_id": "01a217f7-2858-7a05-800f-dd3ec6ba41ba",
@@ -93491,7 +93491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-b063-72e3-afbe-0ba27e38e9eb.html",
-        "sha256": "e1a0190ce0a903a9c27e2dc8d8e3e4cfac5563333918f652e425bb24c4e1d4ab"
+        "sha256": "d20854836e6ca8de46cf256d6f68e303ad69a3c26dbb4041de95f5c2586eefe6"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -93657,7 +93657,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-b2b1-7da5-917c-fc06fb4e1a8c.html",
-        "sha256": "6cfa72a8e46ae359d93ba07379b47c5a010be21b2561c8de2ea6657b179f2095"
+        "sha256": "9dafedf6b90dc54aad8b2e5291cabb6441c60e19c6de4c0c758a864d6e1ce332"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -93813,7 +93813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-b503-7e25-8297-48e7a18dcb47.html",
-        "sha256": "dbb27ca394a7a035b1e0da0f141cf6f670e1a3a00a4606b02bb5779f86412a75"
+        "sha256": "4daedc34e5e24a18316a8ca2f4982d85b7685670afc2c307b446187f4f3717f2"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -94004,7 +94004,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-b742-7e28-ba7a-1ebf32b015f1.html",
-        "sha256": "5fb0fb441a03d2391a5d70bbc0ac550da120fc737db0a8df9ac31678ab14151c"
+        "sha256": "02e0c9172089f6e3c030985a9e2e5112a5df52fdbcce24f203355c5ce8eb1cff"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -94190,7 +94190,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-b9b7-7d22-a1bf-a792fb136456.html",
-        "sha256": "1445f90fc198c6812e832f539501d7b01beba1f5b667b4839982cf7c6624d96e"
+        "sha256": "07e5480ea5ecbe9f9897a95bf74dcda938057dfb333caba96dcd3cf834ba97cf"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -94376,7 +94376,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-bc02-7624-b2d3-80d6a1447b0c.html",
-        "sha256": "9460624bcab427c0896037ab2502e1ee47475ed675a27cdae83e8d91e2f6387d"
+        "sha256": "449e00cb749078c81004ca75bf9875a6c1760108c706759e8380cd0753d71da8"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -94562,7 +94562,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217e9-be4f-7237-8d18-28d7cc2750f5.html",
-        "sha256": "ea97d5468a0a37b3ec36e5fcf36b19c2004988d9deb01e3cc5e7395a88aa01ed"
+        "sha256": "6cc8c10ad2da2fcd1d02dcae9ade571be905cdeab5d126b74ecbb11c77fab888"
       },
       "gate": {
         "approval_id": "01a217f7-6a3b-7fa9-8cfa-14a663286805",
@@ -94738,7 +94738,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-d3a8-737a-a02c-a36f79dbbec9.html",
-        "sha256": "293999cf0c2010f4c006266f540344333e31679ed4de514d6f457fb17b321f51"
+        "sha256": "f6facbce0ece8d1422aa945683643d1b91dfb50db3714ec587e86c7b07c29e11"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -94899,7 +94899,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-d651-7e7c-af00-3eacbe5e8869.html",
-        "sha256": "23ab94250400f6a4c72e3e496f415cadfa6f67f2ced709df01c4a725f5f52792"
+        "sha256": "8d143ca0cded4404138de3aa34cd24dcfa4f0162fda6c43b7658bcc817f60a2c"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95055,7 +95055,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-d92e-7817-a0c6-9b8fc6102b29.html",
-        "sha256": "ee9ddfcfbe09213e122b7973f96382551759bc1a61afb349460870d4ea797dcb"
+        "sha256": "a89be46c10434b002e2c6e716727bb0d63eb158f35bce746ce0f0019a4a6ccac"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95231,7 +95231,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-dbf7-74a2-b6f8-d74e504a7d99.html",
-        "sha256": "293f4309ff2fff44de818308e11a43a8a7dc875bb68c95301e7e69bee74210ed"
+        "sha256": "d6dac2f2950e582533d1a59882d817bd23915a51cc931d206a6d709803fcd93d"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95412,7 +95412,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-dea4-7bac-b6af-35a1ac1f168c.html",
-        "sha256": "64a416d489ad70bfde0fe73a821b04cd3e1273ab51b52fe427343e1bd917fc18"
+        "sha256": "ab87fc747cd35081d79a83818a61963a2106f45bb4d8ed2fc7f35e2fd51a996b"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95578,7 +95578,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-e155-743f-8488-1885f0bfbab8.html",
-        "sha256": "132af349e8cf468654772dbb249a10fec13540fb46e0b563d52072d1a875304a"
+        "sha256": "643815f4edeb5c1f390d38584fed575328e849406da5089eedd43acfe2c46193"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95759,7 +95759,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-e420-7494-9c71-ec06fca92c40.html",
-        "sha256": "00faade91adc0d6d9b687fbe745cf67053a4da5d7fc70ba06bb9340f3087f071"
+        "sha256": "df5594da4daa6234947bca73368be5449dd30ba197f845654bb6f8eeddbf8aae"
       },
       "gate": {
         "approval_id": "01a217fb-42ea-741e-9336-a8fec0daeb31",
@@ -95930,7 +95930,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-f82e-7ebb-9a6e-f8ce0925a067.html",
-        "sha256": "55734b76bb99b04bd6d8517167f26b0720d0c27d2b237283c0b7551d6c6aea71"
+        "sha256": "15f88a39d1d825132bf5eaeac949a6276a7b2665571da607b02accb232263ad5"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96096,7 +96096,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-fade-7892-b723-6d4c102bf644.html",
-        "sha256": "884599d4dc5222cd760cf774430ff0b9038f57db3bba023ef18ea1126286f1ce"
+        "sha256": "bb8b4a9e0a3cfdfefef57ed7effbadcf8f4f6d8c98033f4e828b6aecc16019aa"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96262,7 +96262,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f7-fd8e-7c93-b955-b124cf171cb4.html",
-        "sha256": "f33dbf5f2a50982139aeec59a64f8966f5ce397eb66ad6bffd48db3374ab0285"
+        "sha256": "ee4bcf151254253594826d483f9c3fb202cc3dfc1f5a53e49d8b77abac2ff1bb"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96443,7 +96443,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f8-0042-7904-9e19-fb8fc27dde44.html",
-        "sha256": "91e91f5676002f0542b858ad4e5cd85107435a527be5eccf86bd6be95d34b426"
+        "sha256": "4f1c532a38d391ab3d334a159ede0776f32d4d199a2ffa33bd81d1e962a9c5d7"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96624,7 +96624,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f8-030a-7a00-86ea-d6fed72a18c1.html",
-        "sha256": "8abd670d54d026914518636f9633020eb3ef9e33e1fe02acd8ec0e40d02c0cc3"
+        "sha256": "551e3f232d24f7742867534bf97243de2ef7c9e2dcf78622d72e1d9de02819e7"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96800,7 +96800,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f8-05ae-7f9e-bf70-62168aabebe8.html",
-        "sha256": "ccb59df7deb653f8b15522b51c4d75d8af9f63ec14b4b554fc6d128fa37c2694"
+        "sha256": "dfcfe1684bbb4eb01737760514c2744cc29edf05344544405125e8175d3a80cd"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -96971,7 +96971,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217f8-0857-7b20-b204-b43d9e44500c.html",
-        "sha256": "c0b71ff59f5d6223f206e011bb8ea1dd56a29937c080faa89816c25fddc24aca"
+        "sha256": "289e6396a94a6a1f59ca4a735593d5aabe43fd0a37e1a7e80a56063070166611"
       },
       "gate": {
         "approval_id": "01a21810-95ad-7eb0-9685-e51a32f6c42d",
@@ -97147,7 +97147,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-a7d8-7a9e-ab0b-7d273515f402.html",
-        "sha256": "3534d14690062ea3da4c22936aafdea3da2d905aae0538a0b3149aca79c1da55"
+        "sha256": "a5ade94c23fcba98dace35e522a9cf5126dfda236bb64cedddc53a0a0ba995cd"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -97298,7 +97298,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-aa0d-7a3f-a5d2-d9e8e26bc8b4.html",
-        "sha256": "cffa1b0623dd2e222392e54b957565c9b37ddf5a5176f4c7594df8876ff8f04a"
+        "sha256": "7f7bed398dd54722ba913a3fd2a95188414b0787d0782ba2c19959950e32ddbb"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -97449,7 +97449,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-ac2a-7a7e-9b47-ce8c9dfd98eb.html",
-        "sha256": "2e0163a166239109f5f1ffc770cb08729d2bd66b9c29dd6a5b541e405bae3aa9"
+        "sha256": "0324bdfb92d8f5b209cdb6328e6b2e13d1ef215c81b896a03df9674dccbda758"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -97630,7 +97630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-ae4d-7283-906d-b1bc2c8e40a6.html",
-        "sha256": "cc0917ba81df4d6f7dd3fb28932771852eb4e5322e1c9e39c87b1d25c587e493"
+        "sha256": "b9e2e13677e7659d30992e9d724e2895eeed00ceb50cb867a17e3658b263bf78"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -97816,7 +97816,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-b06c-7d1a-9a64-79e7b14d455f.html",
-        "sha256": "e6f5a3764adc394cb1691ab94bc3bc7d845a5a767b000f833c558b12f8f1c5bc"
+        "sha256": "8c028d4b0d6f9f82034e7d5f27bddbf9f3879d33a816640e085f9523adf7a8eb"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -97977,7 +97977,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-b2a2-7aa8-923d-b258f7c62bc4.html",
-        "sha256": "25cf6debcf85449eca431301ffc8bf359a38d78daf924cb20a8aac6b77c75516"
+        "sha256": "1501f68f380a2667d5744a916da3f588a183685492b5c3b53cb08d0d0a1ce8a0"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -98153,7 +98153,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a217fb-b4c2-7380-a98a-85bc204ed886.html",
-        "sha256": "e1354d84561217a121da33c1c1234e4395dfcede90ae0b24df83eaa8f4efce52"
+        "sha256": "0126371e65c7dce73e23e3b81b3d8debe1f7fb34222a1b720269055ea501b84f"
       },
       "gate": {
         "approval_id": "01a217fb-c6a6-7397-a38e-20373d77e6e1",
@@ -98309,7 +98309,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-72e8-7583-b187-5e2de02fcdd6.html",
-        "sha256": "b6b9093eb3b1cf74b9f0cba952bc7aa084f1ae1b49f6f8dfeccf5e467cd2ef96"
+        "sha256": "2e3a56f9772a786a2e8c210178787164e47d848491d8b9bd37e0abd80dc325a6"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -98470,7 +98470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-75cb-7dfe-a7d4-1f9b524adbc8.html",
-        "sha256": "d1bb25726b8718584a67f91641d8228f4aef269830ecd65ac1908a657e995e90"
+        "sha256": "5c889264c5ab2ee4b1564aadee72de9412f5ec6bc7f7b05b2d813ef490a6488c"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -98631,7 +98631,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-78cb-73f6-8b78-2c61c7141f8b.html",
-        "sha256": "eee993204b9d18affcfbd2c1f8c28c4cdaad2cc64a4126228eb7ee80fa3eed19"
+        "sha256": "48059758f936b31146999dbde2440d52ae0eeb4bf26cde1d1f170c7e9ae58607"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -98792,7 +98792,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-7ba6-7e0a-b4df-b6a851ce40a4.html",
-        "sha256": "926f5c8b3ffd051ed8a1d33e7fe86996ec49b577fc72302bc639ae871853a72d"
+        "sha256": "e590b786d46c9ebf428730d42d6ebfab99229778a568acc79b27044cb2d6374e"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -98953,7 +98953,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-7e74-7275-bd0f-2158eb2e8c97.html",
-        "sha256": "835f94300cd68c045b52303ade7a500fd8f5fb869d6182ab0a58bef9a8c8af8a"
+        "sha256": "ef68309bcdb31b81b88b7e62e85076a8e17646a1408f00b531df3d0b01186282"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -99114,7 +99114,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-814c-7dd0-ba4b-e19a4679a103.html",
-        "sha256": "72e8080dece6eca92092b569ff78ee24dba5a8ca4144bcc04d2edc1ef643afb4"
+        "sha256": "769d4a78b54b4cac3418df0227075251fd511973f8a260d25c52b4d5d42f1b09"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -99275,7 +99275,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219c5-8436-7a9f-858c-bbb6a7810101.html",
-        "sha256": "1164815e21e57159f27748db5b0aad5f1a111a21b563bf339518c443310b5161"
+        "sha256": "a879dc0184f34721ee8f2d50c3bf58109a3bdcee8c3b8f361d033888a280ae4c"
       },
       "gate": {
         "approval_id": "01a219c5-e094-7f1c-90e3-c65ca28277bc",
@@ -99436,7 +99436,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-8b85-7cda-bea6-41ad1ef295d6.html",
-        "sha256": "7ee672aab8975ca7a9e69093b6bf8784509972ceb57f4cebe3c6dba34a454d5b"
+        "sha256": "c77e119bd499dc37801053dae2e9a6554da5eb83e44dbe2b28557f7467a21d62"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -99597,7 +99597,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-8dfd-77cf-ac4d-20927561e3d8.html",
-        "sha256": "9b8a304db73799de2d2520e2d760e45dce5548b4d8f33f370c4be7f093e5ef97"
+        "sha256": "a6f2051e64faf181b6efea7a2f3f0e76ba57ed213c3eb6bdf920e1e2c0a6e69c"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -99753,7 +99753,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-9088-7672-9216-b1846e69641a.html",
-        "sha256": "910b22f6c2edbf559c74c426435b15e5c277887579d3d984f89ff40160113ae6"
+        "sha256": "6a123f10736ed30e65bd0e43a608f79fe9482b03ff7d0eeaf6bc42e3c3d47bc1"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -99934,7 +99934,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-9311-70d2-a224-4b3f8b9c95bf.html",
-        "sha256": "67a2bdb2f07ed0a9c7dfe0795e46584691773b11fc1f44d2350f896d697c574e"
+        "sha256": "717253dfc43965c23f12e25c433dad202f398dc44dbb5a18f60187c5e17d37dc"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100120,7 +100120,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-9571-78b5-bae7-d9a2b8c33704.html",
-        "sha256": "1aab57a81965bf7d9b2edf473581ca217e3a7c0b99f261ca9fe34bb003e84174"
+        "sha256": "9bb5684a2ec01a8490d97a6dce0a60e3cd1d3f21164ad57b7fed4f90beb10244"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100286,7 +100286,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-97da-7b04-aacf-9bd8f16541e2.html",
-        "sha256": "c3e85ff84a8b8bc3fed0d1d4a2446f574b0633f6022722c68395a6ffdcf5f5d7"
+        "sha256": "3aad08d14a31eb917332693c3af0cf2e8bcad206fed8ff0a96c2298458892f3a"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100457,7 +100457,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d5-9a76-7d01-b781-c652d48a7606.html",
-        "sha256": "e2f4cf834620c9feeaa17bbcaa713599a0d6a9e4dbf023c9f711d4e23fecfb0b"
+        "sha256": "aa182391d4869612e7e8c28d6400eec19883b33ac73e30cf9deca0809d4eb464"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100613,7 +100613,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-e634-7d07-a59a-d584c1e89643.html",
-        "sha256": "4f4c98d5d658feac7dac9cf46b37581c03b15369031132ae295f75089b8996f5"
+        "sha256": "3e2f07ef40fe0c69466c4a0bd6a8f7023a6399bf34eb241d3cdfea4205765298"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100774,7 +100774,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-e94f-7d3b-9714-db7f0b8168e0.html",
-        "sha256": "5885650e0a4538e30692d4039f045c8d57884e6b2f20cfd234faac0591eac12a"
+        "sha256": "e978deb25ebc85da59682d4fe0a4a5eddaee9d576edc79bf39adb2eb83239550"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -100930,7 +100930,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-ec4d-7cc4-9a21-c903fd3fe880.html",
-        "sha256": "a40ae0098895a862e3a8db7ec2d4a574af7f60154abf9c83284aa09500ba336b"
+        "sha256": "f213150fa3b7a095e6df0328b5fc616fa54bc2100988176940866c8cacf87af1"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -101111,7 +101111,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-ef7d-7431-9c05-7a1d2c5b7e9a.html",
-        "sha256": "bfce17518cab384ddbcf58c12793b7d4d50aa2fc517f7cbfc2a45d9bfc831b4b"
+        "sha256": "ec9b66530308e4d48511cfe7696d9256fb528c008500bf20eaf90c80a55a4b25"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -101297,7 +101297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-f3a8-700d-a7fa-67d4dac310a8.html",
-        "sha256": "f612ec59fa528252af3619e74d2b62ff7b5601863524411abd6fc543f51daa9d"
+        "sha256": "8bb85da81fd1039c3632dc7a8bf5783f88849b3aa71d83ff661f6ebf5cc3539f"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -101463,7 +101463,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-f74b-723f-bbbf-32be7db2f965.html",
-        "sha256": "5afcce4d51f1aac835e604ba1db62b8116f599fad4a84c4d9e126e586caa1b63"
+        "sha256": "55311cc7e73ee804f2c532326251ab645a46f2fc13b408478ae92337fd912e19"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -101634,7 +101634,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d6-fa3c-7a23-b117-9e1c6f55e738.html",
-        "sha256": "bee5621d9f2e085be52c16e9e5bf1d6f5961c9535b5066f3295760201eccd350"
+        "sha256": "712724197ecc22fb35be67b72c141fac86c533574a7f7f0a6cbc003e3a082631"
       },
       "gate": {
         "approval_id": "01a219d7-1c84-78e5-b7a5-2f2f860b2d78",
@@ -101790,7 +101790,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-8f54-7f5b-b0c0-3f8c241b780a.html",
-        "sha256": "c85d1e906207642be12a5ec70716ac21b3a78fb17eff5240f7a23eee160be9c8"
+        "sha256": "6088b33ecf9d5d010411e8e7247a11073c44fa1571bf51f0a362d508568f1252"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -101951,7 +101951,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-91ad-7aa6-913a-daec9ce546bd.html",
-        "sha256": "160143148dbfe00ab609de4d15f25c28b356ee51d120bfbecb5e2def51cd7ba1"
+        "sha256": "2a4b3541524490ef51528e50b39428abc9a72118952d6a82d34b68ae93b6f1bf"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102107,7 +102107,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-9430-7de6-89ec-7f9f2349818c.html",
-        "sha256": "2041bc4f3c6a7b691871d1288670181479a4bbf6a527bd42321eefa24cae948a"
+        "sha256": "b0605b02d82c1a338868b697e1874bbf12e9fcaf92749cd24dda38be0c65b93b"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102278,7 +102278,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-967c-7ae0-8ad6-f51cfc821bfc.html",
-        "sha256": "ce923f8558455267b96237ac13461eb05da600b9d14cf82ba56de96404b65e39"
+        "sha256": "07d1215a7fc46dcdf0f1e0ccb8eb9c1938341c72412d2679ab36a42df9760ade"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102464,7 +102464,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-98da-7cf9-bbe1-4dc368410fbc.html",
-        "sha256": "2cc91b6924eff04abb84dcc3c8e030ca5cc37e5189e38be5038c25406442fcf6"
+        "sha256": "cc41b8d1722fd2e843ae9011648ae200fde0190d5b7d25c1b39c88aa8bc9d07a"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102635,7 +102635,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-9b35-7592-adb0-6af9b46a9919.html",
-        "sha256": "228d1e64aa37f0f09700d5e7864cf24efab8088cefa857a930ace0fe76c69613"
+        "sha256": "0299b33d3005829fb38334ad2302cdebbd38f27e2d835f845de0783d0496535d"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102821,7 +102821,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d8-9d89-71ce-b3a1-851f80f745b3.html",
-        "sha256": "a9b7cfca96e279634a0951eb8da6a3d4fe2da16ccd98171f973c369d3d14908a"
+        "sha256": "e875c6a066878e2d826d1a33c9c4d8f6a343675cdb1862ee6b3d41fd5628128e"
       },
       "gate": {
         "approval_id": "01a219d8-d03d-7d14-8d16-259069e44699",
@@ -102997,7 +102997,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-3332-749c-b91c-41246de98908.html",
-        "sha256": "adc873da3e52db486b2b4d25aa41d50de45142d61c49e71c937de0417174f3b9"
+        "sha256": "c6da0b9a6bba4ae92808647f581099af704763b634594547fe0c26878c92ea78"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -103158,7 +103158,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-35d8-7b58-b217-bfba6374b696.html",
-        "sha256": "5749c950498d08c7e7808e74e1e0d52eb7bb7d65e86740dbe86e7c89aae23de4"
+        "sha256": "5ccf89c8ca832eaf84d58db9d6d9b502c80e59e0c5c87bb5a751bc0cd0092654"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -103304,7 +103304,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-389c-7d03-bcbc-37370b671eee.html",
-        "sha256": "cf81fb85f7a8b5e67225a39c9639207f27b0468442cea06ad46058f50f0d7bf8"
+        "sha256": "7727681d0e2e0330a87cc6527305aca1496721d72727ea4a3e5597a8da0c76fd"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -103485,7 +103485,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-3b18-768a-8fcb-5c7d3a633f41.html",
-        "sha256": "9a2db0a029d04f6de3d3ec382748b3e71af4918b4cfb7e357d9210f31e0d3c21"
+        "sha256": "482236add54a035d28111f1440ac59f53514c25b339f490c8765886dcef5f0bc"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -103666,7 +103666,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-3d85-7fa5-b12b-5b6f6fb43083.html",
-        "sha256": "d0b5e6484fc972f1a12cc275cdbe54f6fe9f456c59b27697b6e905712a12993a"
+        "sha256": "12933db3dedd91017a045d4be43167455ddab61c46d383e6084aaa68911be88f"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -103837,7 +103837,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-4001-7ee3-a580-feb3b260ce88.html",
-        "sha256": "a10174f4ff396d1f023f49aa761b3f9cad776c654acd3cdd77c8ff3e332f9385"
+        "sha256": "95ea9ab2e563360cab4cbb9f045c59fabebf85f3fc0a5f204dbd187fe1703491"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -104008,7 +104008,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-4283-73fb-a523-0cbe93195b57.html",
-        "sha256": "e97e2f248d1bae14ab6edca959d305884559057d685d5e230e96b55135629296"
+        "sha256": "211e2eed9b53dc10ccacb160d2ca4d245ff3c0c3fa5bad9410e49e70cf880bde"
       },
       "gate": {
         "approval_id": "01a21a0c-58ac-7c29-83d0-b989b0fdb866",
@@ -104189,7 +104189,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-f9e1-70a0-ac62-ac0e43e8449b.html",
-        "sha256": "5b388a6c92ab633c5cd10d8400fb0d7fdc6aa89ce8d562ff667d0244b71973ec"
+        "sha256": "12e84f08f6813294c2760e4598bb0c2574e4c484fb7c6565e33a8c1c9807520c"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -104350,7 +104350,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-fc3a-79ce-86d4-381b144a9e3d.html",
-        "sha256": "5a4e51388e86b3608abbf35ab5e27d387d6cce3f1a3f8d936f531baada6ba098"
+        "sha256": "9b464da09811575a0c03b7b182bef43fd187ad1809ba6d59542f68cc76289df4"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -104511,7 +104511,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219d9-feed-78e8-a7e9-1c4857690326.html",
-        "sha256": "59900a11b2906463b099c69d2bdf9bc80630017fe6d91e44667660030634bf40"
+        "sha256": "d26470d97700216fee6abc2f52a2c295d624e8a5fdb7000ba6a36d0499b1cc64"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -104682,7 +104682,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-0163-79aa-913b-dcd10eef1aa9.html",
-        "sha256": "c83ccf97e094ad5efbddaea5fc5d813e732212a742007b6e42babd34c50d9b67"
+        "sha256": "b311f881de898ca5b1c207f2294117baea62a67895c2111d35ec376680b73efd"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -104868,7 +104868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-03b1-7b18-b151-5f314195badf.html",
-        "sha256": "3cd21be8f82a1005aaba0e0ce1b7eeacfa2a5dad7456db5afca1c3d77a493626"
+        "sha256": "7aa020e845ad001db8e20d41f173ddefee0cb20d7cac8385055b8228849e2549"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -105044,7 +105044,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-05f9-7601-8d72-d533a21cc9d8.html",
-        "sha256": "756b4a763e34e4246b6615bbdfdaa31460db9105101858987583986b8ea80ca0"
+        "sha256": "df94d01cb40de3d1c1680e231b55d749c42c14b44d76dae1611ffe61f00b3b32"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -105230,7 +105230,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-0883-7e27-94c9-b73fd9f849f6.html",
-        "sha256": "c7c50eaffa228134f6caf489f52063afea0df7499d7e6e4ed752cf67884d2f6b"
+        "sha256": "64a7308eab0df97fd3597378017f4cae0dd24cfffda4699a324a6772a49d11e8"
       },
       "gate": {
         "approval_id": "01a21a0c-a6e3-7932-be7e-ced3a491a923",
@@ -105406,7 +105406,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-b9b7-79b5-9e13-1f04794cc984.html",
-        "sha256": "084fba7605a01e95f3ceec243f2da4971cdd008a51d2819b391a79a75ee7d094"
+        "sha256": "8988d673045abc3881c970a563e965a3b1bf04d17331c7928c11646242d7d88c"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -105572,7 +105572,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-bca9-73a6-84d6-ee678a79aa59.html",
-        "sha256": "76c3b707295967f35c168f96a8ab201b6cd297b5707fba947136ae33bbd6b2de"
+        "sha256": "b270a3900f3f11ac8e6dcc9ad75263dbf866430e6c6c2c5706e115b618f8ffa6"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -105743,7 +105743,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-c007-7e7b-8193-818d8c0c1f11.html",
-        "sha256": "04edf12223420c81333b30649ff31f8b0704dbabb8602818d0a00766feab28e6"
+        "sha256": "dab31ab0387ff72546185e834618440693250dd48338f5366f19ea23ffb0647f"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -105914,7 +105914,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-c366-751d-b37e-f12b723f1e99.html",
-        "sha256": "5268768059e2c434aab0c6856b3d694a59785f69cb2af20907c80f762a8bde38"
+        "sha256": "0707b014e029546fc984b2414b78296ca17d1f97672cb94346c073cc10a9f6b4"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -106090,7 +106090,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-c6a6-76d8-9376-5b782fe0e3c8.html",
-        "sha256": "273c740993d7ea210479ef49db125c68c9b0c23fef9256ef513c0bf1bdbd3ca5"
+        "sha256": "06b8f13e9349e6628be5893b14918da353de5dbfaec608c4f5b79c4fca727e43"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -106261,7 +106261,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-c990-7cbe-bc85-8490c51ce49e.html",
-        "sha256": "a47fc3537a19c1aad6a69d2eca4756f67c4f666e0dfb82ab26069727f4f6b971"
+        "sha256": "a754b7c3765eb93b8249c964a46ebcd68e5939009cb7893b721a6de2387ede5c"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -106432,7 +106432,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219da-cca6-7f25-82f1-1cf5a0d93173.html",
-        "sha256": "31356cf70d912df3bfc45c0fc72c2fbdb467a0452184be653e0c5e531592ed5c"
+        "sha256": "99e7f87493c19cdc29e9a17150acd4e9f6bca018e93fa4c11b2d7c8e7ffd3458"
       },
       "gate": {
         "approval_id": "01a21a0c-f669-7131-ae85-c4ed826361f9",
@@ -106598,7 +106598,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-49f8-7fc8-9dd0-331e8bdbf586.html",
-        "sha256": "ca16d03ce68293106c38e1e05dffce315fbda73443b35db31919427a45963316"
+        "sha256": "6e4fa177f1c4b73f1a5fe11c20d8ff8c7a5762e50e6ebeaedc2dfefbd2dcc916"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -106769,7 +106769,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-4c43-763b-abb7-c3daddea7699.html",
-        "sha256": "379acbbcd97a28a828ac2d3836ff8bc05ce8f2faac18e6a35d80c4921a5408ba"
+        "sha256": "66c403e0882810648275a8bcd5e18468938b3b05a418144ec573677a3ca42a1c"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -106935,7 +106935,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-4e8d-743a-8841-00c478627c6e.html",
-        "sha256": "5a246cf82483f231f54e4ec0f605119d11b80493392844e6abb0f95ca69496e9"
+        "sha256": "8fa9fe6065128205d144cf1d543b36af01076a064bb758cba7e1826ca1248576"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -107111,7 +107111,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-50f3-719c-bd9f-60e381302caf.html",
-        "sha256": "d65514ed177f992e98d30954d6dd57ddbe21ba8a4d654077f20ce510659a997a"
+        "sha256": "d4bd1f0f96b4758ba96c24b160e42bcfdb5ee788e1695cd0e4488b79b134e062"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -107297,7 +107297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-533f-7e01-91dd-28d7669596de.html",
-        "sha256": "aa5c0a2b02105694654e99fba0b421d76eac6f34a97f2c00c518ded3d2678ade"
+        "sha256": "b86f6dd32047424c37062697befed61ded4deb209c08b262205a1ce19af8e7ed"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -107463,7 +107463,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-558a-79b4-a5a0-bd1beb18c7b3.html",
-        "sha256": "f2a5a79e17f068e3329303ed8ef7f1e29006d5908e3dd2c49aec5118a19f8e98"
+        "sha256": "9de0d94ca4e9099a4de3fb8e860b5461043b4ca80792db647a0b1636c0944cea"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -107649,7 +107649,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-57eb-7f0a-9707-5dbb8b76b97a.html",
-        "sha256": "307c090434de8d4889bfc441dbfcafce06e096d318f46307d495bfc4710fd370"
+        "sha256": "796cf957fe22b91dd93e54845fccf6388ceaf62bc2e5287e58cdee0c4d74f786"
       },
       "gate": {
         "approval_id": "01a219dd-8b73-74ec-8e0c-310c8d4f5355",
@@ -107820,7 +107820,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-f08c-733f-b7ed-ecffd85caaed.html",
-        "sha256": "9b1e868ff8c2c71a3d3b7d2894b3e4bea8b93aec95ed7ce32480a513cecc857e"
+        "sha256": "2d83613ac350541537c37952e4dd9687e196c0079660f6299880b5b8b03a366d"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -107971,7 +107971,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-f360-7004-aa6a-3d0678e25daa.html",
-        "sha256": "76e65c73826077cee14be9858fa320181b43f347b519b40a2959a00f1095c4cd"
+        "sha256": "305fed5ce6df0bc9620274fa97a7f681d2db91aa175eb5e5921f06b41c3c5c2f"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108112,7 +108112,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-f63a-7cd5-81bf-c36dacd8efb8.html",
-        "sha256": "396753d77799fe86f7579c2bff1567016f2abe4d36b19923fd57829a53e5f7a2"
+        "sha256": "fba5e8e01c35e7a8625e6951206eff5d017f7f49ac0e5699aff2cf6c2e7dd95c"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108273,7 +108273,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-f918-7cb6-b4b2-f4744feff7a2.html",
-        "sha256": "2a3c7cfd582dcb09339bb6ffeab946338d4fc6fe360f7b6fa5dc09af2445aa93"
+        "sha256": "7a35d393d4d8fa5b2aff3b1d85ab8346c4318a6f34cca583bbec5d93670565bc"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108429,7 +108429,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-fbf3-7faa-abe1-53e4ee11a26d.html",
-        "sha256": "b83dddcf225bab0879697a19a2e43c3540af43f22c3b04742bf7a27099a0518d"
+        "sha256": "a50f86edca16a78fbcc2a8a462064e4c4e0c0977448c6cbc45a3e58517965d39"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108585,7 +108585,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219dd-fed6-7a7e-9157-834c39eb780c.html",
-        "sha256": "2a3feb418676130cd37df69faf3f3ba06e47238b375f9b8c5e8ea68b1293519b"
+        "sha256": "77b20331feab478f9f7dbc3e4c3096b7c4607b8eef41060504af103577b1dd70"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108741,7 +108741,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-01be-7ac8-b687-0f4dec298452.html",
-        "sha256": "72b3f2ea55c79fa78e5eab23dd1c8d2ad69876d525fed117e8cd0a9cbe8603ab"
+        "sha256": "7128612de28d17b3655e2ad8465db820fa1253a02cdaf0e6d78fc163a8970c87"
       },
       "gate": {
         "approval_id": "01a21a0d-52fc-7c07-a41e-dd657c6b0e01",
@@ -108892,7 +108892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8166-75f4-ad50-fcc2956ff984.html",
-        "sha256": "c6bd54ae0b38ece52b902a264a5993c93643a248c0e261f4f6f24b6740ffd504"
+        "sha256": "89caeb1dad8888b35b5af2b4f35c38aef55e5d95116f6c93ef397ceb00fa76cf"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109053,7 +109053,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-83ae-7e38-888d-96c4f4aaac67.html",
-        "sha256": "fa92a1635676793d1fe126790e164751b6d1fb78e5d8d3598697670b11ee0889"
+        "sha256": "c9190719354506201d7e0da17cc17fadff7d1c5b964e5ae035c0ce3a3b69f135"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109199,7 +109199,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8616-7447-b4e4-af94edaf1de7.html",
-        "sha256": "056de85eeeb367db6fb2b171a7a24823ac7ded08f1bb1b5c81369af3c1549eae"
+        "sha256": "6622d33e124ea42bf42d440de77f9caad3597d037cfdc2ca223154142febf81f"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109380,7 +109380,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8850-7f8c-be90-da1a7bdb476d.html",
-        "sha256": "cd263065c11eba638b2986e8c40abfe1f6c32e2c7209a6ce7099764a4b33459b"
+        "sha256": "15eb7021f8c633264057efe7f79b1307df6ad29a7f23d44fd6a6c66f9f9be6a0"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109546,7 +109546,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8a94-7f11-bd8f-cfa0e0f30dd9.html",
-        "sha256": "efbaa736cd1cd384a039c35c260287bc037627905032f181dda7477e53562586"
+        "sha256": "84fb35f4ce8e96b57fbfc526e6c1487c7e9051fc20f3f22fcfecddc2bbdc4284"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109717,7 +109717,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8ce1-729d-94ad-f3373dc5f751.html",
-        "sha256": "0f6a509378ff2fd9fcd72da974123f32a56c7d712e59433a744af2c0596ff527"
+        "sha256": "1224ef3a59a874ec9c7c28c77317b323f315aeba2dcf43e4b3bcd4cfd9547392"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -109908,7 +109908,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-8f2d-73d9-9aa8-ba475e9566e3.html",
-        "sha256": "ca73b9483926e43b4f3ae33e78708a3356b85134464888de6ab378030dc27b74"
+        "sha256": "32026de4e5568cc0e5a960f25d56501bbe1a0b34aca9c32ca643814e01655379"
       },
       "gate": {
         "approval_id": "01a219de-c25b-7784-8bee-a90e08109a28",
@@ -110084,7 +110084,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-eed4-7eba-baf5-a00c8f2262bc.html",
-        "sha256": "722255e6d6442a3f78115652ee0b981758d62bdcf014f0707abcbd496189ebf6"
+        "sha256": "7d0087b205d52345b44a0ad0ebf91d37086a912106649b94626f9d257eb9207c"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -110245,7 +110245,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-f1b3-76f8-bd02-ae06a87fba0a.html",
-        "sha256": "db565fb74de366eef2bea45cc793baa4699ad8d6116dd9a61170dbcd3a3fd8e1"
+        "sha256": "c24da8ccd51a906786e14590ef51719b17ade01d58297627276ed46a5d5c2e81"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -110411,7 +110411,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-f494-74b4-ab7d-770194289a81.html",
-        "sha256": "5eb1da72cfc020c0622e05208cb65fa31a8d07569d8969ce99b60269c50402b7"
+        "sha256": "45e3bdc64e959d60cab244b5e3f0c2253cc85952a8675c40d96e1b542a1902ab"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -110602,7 +110602,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-f76a-7e5c-bcd2-0f4250bd0d2a.html",
-        "sha256": "078068b1ee18970571a99f30577a2cce3087871c3c126d32a9599ebe153e7d30"
+        "sha256": "c7ecf1d91aff2a0912c9cb9caef9b60eb92aee84b2c17d7966ebfbd1ae78700c"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -110788,7 +110788,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-fa3d-76ee-b559-329c67cf3a95.html",
-        "sha256": "7f55e076af452ade58dca1fa321ff3aa7487dc03836cd3d2dcaad88524105faf"
+        "sha256": "8415389995b0dbc2461bb64fbee8ee324d750e917fddf9340dc2b611cdd2bb6b"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -110969,7 +110969,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-fd14-723b-a9cd-4e099bfc8162.html",
-        "sha256": "5619c963c8aa57dfa81baef2ab32f453e11318854cfef6523cb933c031b65e33"
+        "sha256": "ad0645547445557963548ae393d481bec5f646d645932ebb480685186b53d3dd"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -111145,7 +111145,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219de-ffee-7e47-9aa6-b6df304c8a76.html",
-        "sha256": "5c7fe31eba1bba4e3d580cfae5c9b00af55cb873e7c07d27d31856920c4576b8"
+        "sha256": "a0b1da221a8bfe95b01cb5e8823ea5db19c20ad7ba49fb61b9c3a80639af2aee"
       },
       "gate": {
         "approval_id": "01a21a0d-eb8c-709e-9031-8d7a992f0780",
@@ -111306,7 +111306,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-c03a-7fdf-a00b-ce00bd0258cb.html",
-        "sha256": "86c880c84894f4995398454ffd9b94a6da8021c5b1159e1f5a6d50c25dced1a5"
+        "sha256": "9f1e6ec14b1703459e7a85883013add033d684141135ad0d1cbb6a6249c86865"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -111472,7 +111472,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-c309-7278-89f2-d850e5cb20b9.html",
-        "sha256": "311b3fcba193102a4439c5dc7539dc0de24b050143d44df93439844d52a1c8e0"
+        "sha256": "a475d22fa1a492c943c351188279545894831e7ecea854627ac8250cea4f1e0b"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -111628,7 +111628,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-c5cf-7efb-8679-c48c013d77a9.html",
-        "sha256": "23e92c53b2d5da775b8434dd518bd15fb999ae0693230fc0a1cac6a4e2cc65a5"
+        "sha256": "f700673f4caf0b232d7ff2490baeec55cf73c5654b1353e536cd6ec6006f64f4"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -111809,7 +111809,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-c895-700f-a5ee-e0255f8b291d.html",
-        "sha256": "8befc76959a0f1f43d286cf3d1108a2be198008cc804d7472cf950e96ae4c418"
+        "sha256": "ceb360d68930c3d8e2e5a6cd79411d129237997b14369cc5cfe0b4711a17b17c"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -111995,7 +111995,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-cb54-76cb-bfc6-04922ef63a46.html",
-        "sha256": "d5d388abdaef15a34c09a97649f02e380a53951312a40ed629c2944381354f5d"
+        "sha256": "abaebef75d7de1985368abebcdd2b4d732da42717e8cf80c39247427461b0446"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -112161,7 +112161,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-ce0b-7e26-bbba-29477c04c67e.html",
-        "sha256": "2187e615fd9e115084b2aa00508061667d5471984dc4cded31d2262f72cdfefb"
+        "sha256": "7804ca9e4a7d96d1146be8c8a8d1c7e83a9219bef2a95fc138ec11c75955fe11"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -112332,7 +112332,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219df-d0fd-7972-ac79-66bdcabe0731.html",
-        "sha256": "f5a226d473dc9ceb2eccd341e5724cd2bdea3292c0033c23ab9f8bad27925573"
+        "sha256": "a2a3ea038f5a0b00cab3b5e57b2438b2b15263c1c3aae9c2b1908872ccc2303d"
       },
       "gate": {
         "approval_id": "01a21a0e-3a06-7372-ace5-dcb1b2075116",
@@ -112493,7 +112493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-898f-7242-ab56-6d4e1303ee1b.html",
-        "sha256": "8be221fa5f3fba2257be849af87310465a6950ad03c6b70cc02e0e65eefaf9eb"
+        "sha256": "350e301fedebd5b3ceb400d62398108608a15b35297ffb70e34f0f0f22f6721f"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -112654,7 +112654,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-8c48-7466-b999-ded4dca4d403.html",
-        "sha256": "221aaf785862d4688579f7fde4f181ed0461df85c984d262adb5721735952972"
+        "sha256": "555332526dc911860e74cd340b02686c763f81463d9d3d6e05079c50c6924251"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -112810,7 +112810,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-8efd-7c40-ba37-8b2eda58a116.html",
-        "sha256": "2835309350e4ddc567d3e9b016bfb1f2aae6a8dc326b110c6400b244441a9aa8"
+        "sha256": "88bb8c0cc488a2874af52ff9dd2c88c7f3b9d23e907af958d84153645bc7f659"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -112981,7 +112981,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-91c5-7b73-8253-00ae569d2b6c.html",
-        "sha256": "14b549783dd186da68f3bb8b747f9109acb9ff90943fb690ffa01f0993fe101f"
+        "sha256": "53fcb420beb362eb7160cbee5c21e261ae11cace07d34bcefcb9e52703673d33"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -113167,7 +113167,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-9478-75b8-8871-37e3cdd6201f.html",
-        "sha256": "b84ffb99c518a9f9dcb901b598de831896c088dc8de7618831c1984e36a52092"
+        "sha256": "1a3a29f2d6effb7f94c6739ac88aa4c5be22abaf2fa3996a08e145a2b0908fcf"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -113343,7 +113343,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-9729-72e6-9b91-df20ce651dcc.html",
-        "sha256": "34303e266d8ffd92dd7150a7155edfe6b5ffabb6ad335b8459fd4521b7855aff"
+        "sha256": "b1c2434ad7b8ced707f24af74bbadd21e09431bac4618e6fa109c2c249b6381e"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -113529,7 +113529,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a219e0-99d3-7ad6-b687-ee578d98732b.html",
-        "sha256": "32e70281fdbaa713f67b3b94d682138bdac1e4b674ce2fd28a4660479f34430a"
+        "sha256": "26f21c51e85f9bb448150c6a335cf1f62b6d59c0161e13f955bb4f591a9a8540"
       },
       "gate": {
         "approval_id": "01a21a0e-8a63-70db-ba24-b11e2634a8ce",
@@ -113705,7 +113705,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-ad7d-77f0-9e2a-0d717840b2a9.html",
-        "sha256": "7202e1fe792194cb0791b44d7cfd8e618bc73c3e72f83bd2298382795afe52bb"
+        "sha256": "c6ece766a9171d2a5ddaa0b982f57026ab9f9f86029b434261cad90b60b05a33"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -113876,7 +113876,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-af9f-7e7d-b716-9433cb671c32.html",
-        "sha256": "4204e37c47475d8041697d1edf0f34704678c4731c04cf62786cfd6179bb5b3c"
+        "sha256": "a4e9965d925f46a4b42ea0090e5fc44a6a99749bd0db3feca9235682452643c7"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114032,7 +114032,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-b1ab-739f-9fef-891792b72890.html",
-        "sha256": "456c1933212a9e1f7e2e94d2e6b95af925c3f3dba71d5ac65188a3ee3acbaf0e"
+        "sha256": "1fb0b73e89184634bb1b1ba53b8f6bf9db937fe6bba342b14345dab082f2c487"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114213,7 +114213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-b3b7-7b12-82bd-8368d5b7dfeb.html",
-        "sha256": "3b0e04738856c08c024934c95a560369acf5f6fd7a3a8c7711f0462849ac7199"
+        "sha256": "13cce054e0b1bad39af89c393c6c4df144ea4890539beed6341791939276f15c"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114399,7 +114399,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-b5cc-7908-b3ce-a7420efcad8b.html",
-        "sha256": "d177de9d5d30721a297e99df064dcbded436cea2142998455636240d63f1f397"
+        "sha256": "9479280db901893295b4d8b43319a518656a0a1b1b4e9be79a3cf267ba9efa22"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114570,7 +114570,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-b7d7-798c-9396-0c87ddda4aec.html",
-        "sha256": "ea341253bcb1e72e89846feb1c208ca6e30c40b40d943fd15971b7a564bd4237"
+        "sha256": "659408a12b2feee5c1d64d6491241d83eeffbf09ba6fb575c1eeeeff90c5b900"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114751,7 +114751,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21a39-b9e4-76bd-8042-0863aac195ba.html",
-        "sha256": "da0f71d41ed8e34403263d8eabf6c3eee5a3c77681cad3072c217176104e8176"
+        "sha256": "c6cf6fc2d9ad9bd88d123d001331956e7552d515b0d1dfea09b4e25e1da33248"
       },
       "gate": {
         "approval_id": "01a21a39-ea49-72ee-bbe7-e942ecb57a4d",
@@ -114937,7 +114937,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-8a5d-7933-8e2a-62a13e7bfe6a.html",
-        "sha256": "e583cb7f14d959deecbb3eff8538a274ef6c58a9e5b0aab13cada9e09688ff50"
+        "sha256": "000d298903beea7f57772ee9252b339940433d168cd719d846adafc3b8a68937"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115103,7 +115103,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-8c8d-76ce-8533-28eca1e22d01.html",
-        "sha256": "3d61b54156633a0da3661f835e4b7edc4fc79751a982ea557afd8e3c60c9431d"
+        "sha256": "cef6451daf7cb9ed9f89e9ce53807bcd7a95bdd5eeab7dfe1777c8e773d5a868"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115274,7 +115274,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-8ec6-7c31-a5b3-42359fa04586.html",
-        "sha256": "30bb3dec8c868334fc41ccc213777fb3b4efa6eb87d32b885664bd01d56dc439"
+        "sha256": "4d6ac95dcb66e1ddc385a91ffcc6d5b473e9d09ef05aec88a32d70fc1636a4e0"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115435,7 +115435,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-9105-7f30-9c3b-0dee3a8eefe4.html",
-        "sha256": "a105e65b41a6bf92ebc4d73bc4744b01ce04c085dfe4eeaefdc7168bf4c5a96b"
+        "sha256": "13f3f529d70cd87bfe4479a4dacdd48feb4f89068e088343b599bf76f94e8a76"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115591,7 +115591,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-935d-78ff-acc9-13f253521722.html",
-        "sha256": "1003f774e764e62fcb811e410b0923e7fb344e851f23ee75494fc4472ea25fa4"
+        "sha256": "d71ab7a0d1acc0cc9d5eb90b5e545a9b303b1bec9e94cb4c0a482b286abf3306"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115747,7 +115747,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-95ac-7dbb-b8df-9e2d502d41b4.html",
-        "sha256": "65aa47c2df5a184a83166ecd0759f1d4466660b84ed84b9d7822703d62d55c9c"
+        "sha256": "aa871e11799ac98508870046dd58d1d32227b39b59def7e95cf5308d84640587"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -115928,7 +115928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c16-97e6-7d2d-8c73-71501fff65b7.html",
-        "sha256": "9358d48fdb28e6bacd332ee2682724caa6fdad8a5ff20213ea4b55318dbf6495"
+        "sha256": "8b55ba066b23eb24454d5ffd78e0541f0810a401e3fbda8a6e6f2e0efc9d5680"
       },
       "gate": {
         "approval_id": "01a21c16-edf6-7708-bb5b-3052032de059",
@@ -116089,7 +116089,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-b8a6-7cb4-82be-998ec7394f44.html",
-        "sha256": "66d704c8d840da192bc82134003d294826f40dd6e94322245e9ac1f02eb1c429"
+        "sha256": "33fd6c10742a50126de9e9c08b098f86eddab7bacd52ebd5ec533369855d160f"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -116265,7 +116265,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-bae0-7833-ba89-ff42a834f238.html",
-        "sha256": "d125f9861cae9f320e6562f61006c00cf5be7d31d63915d33a1c8e3def75c443"
+        "sha256": "dbc73bee70f2404a153e6d50bf1dab08521b0a66b24f304f19e2a782ef0aaf1e"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -116441,7 +116441,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-bd23-70fc-b9c3-da95cd0bccdb.html",
-        "sha256": "881d03bad5823f126333bc0fbdb50d7fc84f1f447489fa53e7fd75725c1e3632"
+        "sha256": "63c80ac64b3bd764c81027f0bebe368cd0f7a397bef586de47bcbc4235ab4295"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -116612,7 +116612,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-bf4a-7637-9248-af8d00cb77e6.html",
-        "sha256": "24b78f65437f973c52080f8c33090ea7d41b9455b27fbd1d5a69eda2df71006f"
+        "sha256": "399ef104cc88a14a5e1412acf9d5f7cbab8bdb51913dbb6a48620b6e724b401b"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -116773,7 +116773,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-c16e-7179-9b8c-c5cc87e79676.html",
-        "sha256": "da9864c602c9780eada9d769f2bba742e871457a3da75821b1495051132176ea"
+        "sha256": "39df034dcd36ee2b0187682b9e1d6436b8d1f0e1d4cced8ee8f492eb4a47fb78"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -116929,7 +116929,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-c39f-7bd4-8c3f-50087a11080e.html",
-        "sha256": "2be8f96a753c3b8e780c560eb49b0688d436178e60d88a73c66b17b4bdacd2d3"
+        "sha256": "5bd0b7558bb815c23ce9bbb7621be6e6c103bbfea3ae45fb39848198049ec3a6"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -117090,7 +117090,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1b-c5cc-7259-a65d-73d430530835.html",
-        "sha256": "399c7adbdd2097e9e4c5a238f1e359cde0897383735af031f22aba94d3c5c59b"
+        "sha256": "b8413bf1e2ff1e0dc608d606f69a8d240feb19a715305566dee33ec12955f58b"
       },
       "gate": {
         "approval_id": "01a21c1b-f72b-7ba0-a60e-c8fe91cfca4e",
@@ -117251,7 +117251,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-ad06-7b19-96b3-bee1da610266.html",
-        "sha256": "856e4f476db29ad698cea962f7ef35c0a931c6b068820da0f0474fcbd625dbf6"
+        "sha256": "ced7d956e04684ed994b385caf7a13a34192ba2e407ba2b1dcac8eb515d7e9a0"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -117422,7 +117422,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-af36-76eb-947f-22951452e3b2.html",
-        "sha256": "27ea90d6fbddb73e1046fb2d39bcbd99d94b78511ad6e155fae4f043c6056cce"
+        "sha256": "c27748086b93cc4e7c89bf27260f0ad2bb3180b91cdd534b3839112d6aaf3d68"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -117598,7 +117598,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-b167-78ce-acc2-e7668b578b22.html",
-        "sha256": "4ab64189bf8b553d8c423079303b9f1671d602386bee5cda9d38582eadf0dc94"
+        "sha256": "8d7782d734055d1807b6be1a25a8a59a2106d78a98c523b528ef705e502c04bc"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -117769,7 +117769,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-b38b-785b-804c-f966234801ea.html",
-        "sha256": "19f4c711b7973860f34ea3efecfc742e4d48079b0ee9103339721b90199c99c7"
+        "sha256": "b1430a37b5956e23006218ad534ce3d2b974af4f3811afe6923c8bf381f2907d"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -117925,7 +117925,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-b5b4-7cc4-bbf5-842d262face9.html",
-        "sha256": "c6292aa0ee06ce8a63f60fea128ee15623ce4984d9653a4b620dd82f74126937"
+        "sha256": "ec28057d1043e41ba57c4927476e90a3174e4fb0b5596eeb47814271903d6fea"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -118081,7 +118081,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-b7f8-798a-a0d4-6fa302015f5a.html",
-        "sha256": "3a5e1004f9471db6ed49ad91e705ee2c378759851f0498a54231b48d45bad857"
+        "sha256": "c0cbfc0e0587aa27aeb09d675184217237cc0ee9b90adeff35aac2f942bdb7c5"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -118237,7 +118237,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c1d-ba20-7652-8fef-42a37114b274.html",
-        "sha256": "8d371507cb6cbba17cd1289885b0651a9cc6c3b28fac41a3135deafb62f1c3f2"
+        "sha256": "fc0c883f95c7ba7b196fc657514833c0e8b3e3166f9168a861f8e612e09c299e"
       },
       "gate": {
         "approval_id": "01a21c1d-eb74-78fa-8571-04c7ea8f772f",
@@ -118398,7 +118398,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-b327-7023-badf-f6e5dd14b581.html",
-        "sha256": "ed3613e889e3b88901e625385bfc2f3c41ef5141a9b1dfd4b858fe75b81bed1e"
+        "sha256": "afe842b6250513d282cb9bf0b474e62b99a37addcd15ea5e9f98579ef76a9b6d"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -118569,7 +118569,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-b570-7c75-967b-1b6f0abfbee4.html",
-        "sha256": "ec94bc4646fb49f39c452b5aba120e00740545a850de0b657f75f37836be942f"
+        "sha256": "7ea3f7bd04f74351f2eedb423528d92adef731ffc0f84cfe88909caaec42b346"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -118745,7 +118745,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-b7b2-73a1-b7c5-7783b44484e3.html",
-        "sha256": "f820cef199dc419a67311ba3a1b1954e2aa46ad89423174fbfa267ff52e6919f"
+        "sha256": "88862fdfa720e12da247e19dae4f32c7401b3f013ba01b087e98befd16ffca1d"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -118916,7 +118916,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-b9fe-7f24-a344-ee10dcf34558.html",
-        "sha256": "61cc6be1f026e5078b37789b0d16eabc0dafd7a98dcfa95ba4b79b9a81d35e6e"
+        "sha256": "e08e4090a2ae4be26f90185baf33e3e9b19e7009ed15d81e42af9d64103849ed"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -119072,7 +119072,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-bc28-7383-a444-9f225b1b58d8.html",
-        "sha256": "b87bef13f308bb9ce2ff78d824f29d8e3de0fcece60ff23a9ee60657375eeb19"
+        "sha256": "60df0d9941bd829c20b0635bf5358854502e8e33079af8fad8cf5ecf93706c5a"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -119228,7 +119228,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-be55-7464-abfe-18ebe978b4b5.html",
-        "sha256": "bc0c105260e4a0faf9bd14afb3c29e05561628901600233b8031eebd83ce11ef"
+        "sha256": "1d732efcc0d5dced345d5b5cdfd3ff04839f327453c6d7474c98386fcb311fff"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -119384,7 +119384,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a21c26-c088-7043-88f8-4f7578c7b419.html",
-        "sha256": "47633e068692417286dc921b74b30ee456cf727259fe8fd3e3a008c204c11df0"
+        "sha256": "39675e77248089b20ed547b584a9968588ea6694e968ad3097bfc4df183f92b0"
       },
       "gate": {
         "approval_id": "01a21c26-ce5c-7c00-a527-ee2fee146a11",
@@ -119545,7 +119545,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-design-publish.html",
-        "sha256": "682b1e18a82c75bb68c3e07f92379b0dee80faee18d32f986fcc04c02479865d"
+        "sha256": "1a95e08b9e8a29f77a372659ad137fbb6234620ab16caf70f2f0b594b5a82761"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -119684,7 +119684,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-p0.html",
-        "sha256": "0e0feb4d9ff0f258ca929b225dd6f740268f0ef72461e2c214381a54979bdf96"
+        "sha256": "6f60c9047f53207b10a6b483f6e9e53bfc228ba08d9fc6a1f7710ee4d972a88e"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -119823,7 +119823,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-platform.html",
-        "sha256": "8fb0b79a92e3bddb65f1bad5e4211f16f4bc57bf586d74a07f8f890c76ff8d5f"
+        "sha256": "5b92ad9126b731e7eeb34bb07e957fdfed273a1fe8be3c3c4379edbd991225ac"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -119962,7 +119962,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s00.html",
-        "sha256": "5e535ce60d6dbcb0d5e6bbea9a3abc20249ad1f9679985fbcfea9dc9abcf4c0c"
+        "sha256": "920be3f07566c314decbcf18214635586217d46045cc63ee562de974a1aff0d2"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -120101,7 +120101,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s01.html",
-        "sha256": "744f1fae8222fe2115f8c7cf815d0aa2d0e79765bd2419d74e8d5932c3a16956"
+        "sha256": "4e04c9c59b8f1c8f3bdb970b6569f245161539eb0ec5c5c24c1d099d53447ae2"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -120240,7 +120240,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s02.html",
-        "sha256": "2e91a731b82856ac7d72bcfa646b2eb34c871efaf65eb3639056f104e89b27f9"
+        "sha256": "3209a217dad74949ec28d0d8ead4db68b55b8e5763b9c52713ab6f341871b43a"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -120379,7 +120379,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s03.html",
-        "sha256": "379579fc73c7fa9ba62574bc6253b416ce1d559c4115d50e55378b3dc6b95d57"
+        "sha256": "e508406dda3a682b6ae338885bccbdd84a2d0364f94124ddee353206859ce521"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -120518,7 +120518,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s04.html",
-        "sha256": "fd645a987ace5e501faa31f614952c9d9b6e9b7a0eabffda5f5c6e4cef72da31"
+        "sha256": "7e8583bb5670069facd9667264fea856a8fae50903680a24f72a7535f450a90d"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -120657,7 +120657,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s05.html",
-        "sha256": "05ebe63bac2798941b25a256cc6897a4535444fe991e08289ff979a330398b84"
+        "sha256": "2ac7f25fe8289f51b8ad0165c409db2caa5e15135a24d0d3fe3c059b43c3fa7b"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -120796,7 +120796,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s06.html",
-        "sha256": "88561e697ce7aceb7831784be93001570de679bd39f5f894a7fcf6014709bcc0"
+        "sha256": "a7082b2b4433bcaef49bf164ac68d5e93b31bde8515c23bcdafa37e6eb9c14e3"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -120935,7 +120935,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s07.html",
-        "sha256": "91430ac7fb08ea6fc449656086dcd3d4ae737c76c0fa75829d552c8ccb4ead1f"
+        "sha256": "a4387c27f7d0afc9f3a994ac212a2f995e6325a586f02fa70bece6f70f3630cb"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -121074,7 +121074,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s08.html",
-        "sha256": "52b66eefa7f97d01f0707742be97647b88dbfb42150dbe2f53e8a2a7a585710a"
+        "sha256": "c91ad5acc9ec355c4a860e3b93f071be0878584b0b8449ee12fd890761fe0c7d"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -121213,7 +121213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s09.html",
-        "sha256": "f2e227a54fb7f501beff4bdfb88ec250110d07cfa9df6b9bc7a8cff85766fdf7"
+        "sha256": "9c5fc17c8ae636be8b4f44222928cde64cd32f77deecf678f4cab090d52bd4d5"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -121352,7 +121352,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s17.html",
-        "sha256": "e2aa4519873bc24dc451d25a4a695751728a5b8620fe719c1262787186857197"
+        "sha256": "fcf135488278675283c22e6e0e8cb66a773ba2ce6d5e103f2b155dfc0de288a1"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -121491,7 +121491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-spec-v2.html",
-        "sha256": "410580ba916a985445e67244565f293e64c9b42d34ee3fc40bcd677bdb5fcd29"
+        "sha256": "99a6be55cc813d84b18c4e605357677c911e8500974cd90b6872f62a103b3d1f"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -121630,7 +121630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t0.html",
-        "sha256": "652a2588a14ad634fdf754e1517d1ab85e986e1ac0382f6c572071473a1ab9d5"
+        "sha256": "b263dec2d5b4be0b6bdc79825335bd96e3bf196b40a2c28e77efd581a5c32caa"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -121769,7 +121769,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t1.html",
-        "sha256": "f12a2dca58d19fe1f3ccc26fa717125337136b4ef33fbc1e133f7f6cfa96ed52"
+        "sha256": "8627ff4b904e17ab30cd98d1670a88b5fbe3d85c9f9ccb42e60540939b14a53b"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -121920,7 +121920,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t10.html",
-        "sha256": "b9c6ffe01dd5167536d0f0b52f8c39cb087700481a44c43fdd174a83bdeee028"
+        "sha256": "55d936f54809dd59bc1c57bc7bbea058051a250167f95f2ceed7ad37a24f2240"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -122059,7 +122059,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t11.html",
-        "sha256": "1eda7de0ecfb2e0a248335182d1b3ba2e1cf40fd88c0c99f9ffcbea07d4100dc"
+        "sha256": "6464adacdc22a8743ea6c7e22f71b8b853d764f8d1d2285e85fe023ff703d69a"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -122198,7 +122198,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t12.html",
-        "sha256": "21811eb5f43242ea223f3b1fafa187bcb35d5e7cfa7b94940d5d7e2be68682ef"
+        "sha256": "89a06169d2d03e5ca58b9f0106c19cad9cdf17d6aec7043ff491f6035ec62f55"
       },
       "gate": {
         "approval_id": "",
@@ -122351,7 +122351,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t13.html",
-        "sha256": "04c0388636548d8f2eb7df719c138d38dab17abf27504dca85d36dfb0240cd73"
+        "sha256": "412d725c80e12dc8e9a08c074c22613b58c6402818b90a0e485da126763b26c3"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -122504,7 +122504,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t14.html",
-        "sha256": "a95a77fcac8405431bd79ebb38a19a0bac0c95702458de4962e989d1b1884fa9"
+        "sha256": "6d193dca45633ce4d14076885819ba1306b2914e2fe8a6f72742c59c944e07bf"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -122643,7 +122643,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t15.html",
-        "sha256": "56f6d6162ff438f18632de69629fb87174fb2cccfdf28d61f2fe5ea9ad98a228"
+        "sha256": "50c82aa36d0bf0e320a477243a35d485d5c874f96fc392345f6eb8db52526dcc"
       },
       "gate": {
         "approval_id": "",
@@ -122796,7 +122796,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t16.html",
-        "sha256": "06b6a1b889342a5bec70698946b4ae088926a8cfd10eb2b941306734086c7a2b"
+        "sha256": "a281600ff927b50a03749348dfd0127e629fd11396fef05519ddcd7e05880a24"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -122935,7 +122935,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t17.html",
-        "sha256": "84f37be66575f3cd308e47d1ab1ae2708203d34dc25f45b2d7cd395b86630908"
+        "sha256": "766ca9dc1dfdcd052f6aa554b028de72c4048205f244d6824623ddb03b78bec5"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -123088,7 +123088,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t18.html",
-        "sha256": "39d0a1e0cfd93d50483d2c6c8feef940a33d35f3b98cfae1f801d8dab046c77f"
+        "sha256": "eb76ca1da10abc68f29ee3f9c695f786fd1566b67f9762106cd7a751b573a399"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -123241,7 +123241,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t19.html",
-        "sha256": "a0fdee4d821656ec7439fe86b4d3371f9798d94e35ef534fdb92f756eaeda1a2"
+        "sha256": "1383a1fbe8de86b46fdc508d7d1215ac803d19f149dbc242a2734a02159d459c"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -123394,7 +123394,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t19f.html",
-        "sha256": "dd49b1640bb9832310fd169104c1b28518c77f72bc8525461f7edb81a0b7d95f"
+        "sha256": "9a3b0467fa0dbff3526bf6c599f23834e187be397dd2d1cd0031298f8d35fcad"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -123533,7 +123533,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t2.html",
-        "sha256": "fcf70f587279861e51242b22552023bba141df4c156b6db010456aa8310fe738"
+        "sha256": "86d4aff8ca0de6f344fda31ff05e9123bbd52790a668dcdfd5ee9010ea63caf1"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -123672,7 +123672,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t3.html",
-        "sha256": "4df07bae8b6ab38cd4a189c848b601daa64612b40c3c64984976653a501564b4"
+        "sha256": "e81e90d99a7d2e3b014b5c8e20d51633caf12ae5a87af8a6328102fc77093504"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -123811,7 +123811,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t4.html",
-        "sha256": "638694806c6968a33314fdcbeaee934a28045760c014d7de8a0bb40193ae25ac"
+        "sha256": "431b63d51aecc6cf00acbe9937e08ff11f793c778b1144d9347b7aabd28f8bfb"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -123950,7 +123950,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t5.html",
-        "sha256": "e89705086fe8bc0b3c6b9ba800b68e3e059eec8b0071e2f45b9c479346632c3f"
+        "sha256": "97cd46acda4d1344dd2e31cb08e351c6505c3b073d39f37231a95211f4c15309"
       },
       "gate": {
         "approval_id": "",
@@ -124103,7 +124103,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t6.html",
-        "sha256": "d909490bbeb3ad41207ce03d7bb2e6782ea438158fb2dec7f5291ffe4a32f4a3"
+        "sha256": "8af5f793aaf39f884395dc37e93f330a63bc661bba4df0bb3a84442fb2ff8729"
       },
       "gate": {
         "approval_id": "",
@@ -124256,7 +124256,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t7.html",
-        "sha256": "383b2f780f856b645e87c0f92322e8c2644b7f9b421a5d5b24adeb983f05ef05"
+        "sha256": "53671f2ad7c8bbb84027a47a01ef9d1848fdff5c669742447ff9e7d830958b7b"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -124395,7 +124395,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t9.html",
-        "sha256": "d313553dfa8386352fb6ce3390c76a34761c4468e79a3cb89fa9fdce81620f61"
+        "sha256": "adce8ecc59a2a3ea78b6b71a5e7b8eaf934f16d9a214950c54394b3fafe159d0"
       },
       "gate": {
         "approval_id": "",
@@ -124548,7 +124548,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-benefits-diagram-design-publish.html",
-        "sha256": "de425f501f6fb69bc4a64ce4c073a6286ea6a1c1ac14c005cc333d5806ca4187"
+        "sha256": "ed3682b44b030e4b9120408bfbab820887671cb351001c760e32665b7ef76fb2"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -124653,7 +124653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-benefits-diagram-p0.html",
-        "sha256": "0324f4e9517db175769ad469835640d7b43334afeb7a1cd290bb023a15710abd"
+        "sha256": "0418c5b04f8f5e08e6470eddd24df3c32f1b528c685f81e603da4bf417926726"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -124758,7 +124758,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-benefits-diagram-platform.html",
-        "sha256": "3511b8939357334f39799851bd3e36096a8dc899b907e98799e6b0bc3e810670"
+        "sha256": "a1b7995598d3fef59d3eda500bbfb59a0511328968ed7fd91089f91939d0e12a"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -124863,7 +124863,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-benefits-diagram-spec-v2.html",
-        "sha256": "6bb5616bc76e77c1f296d58365fb5913d7202fa17ff3552ac6982a8b317e8644"
+        "sha256": "1d2157f6bafd63bb1962cce60287b5b77b7ea3c8a6cb8963b0d86b1e0dd3ec62"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -124968,7 +124968,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-candidate-solutions-design-publish.html",
-        "sha256": "68ee544fdc6be80b2b75ce39bd6f3d8c312e9e8a6fc4f6ba4f25516e33c9894e"
+        "sha256": "e2998bc543b2ef62fbd1302ee108fa5b4f18e1921aba4631bd07fffd6949392c"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -125073,7 +125073,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-candidate-solutions-p0.html",
-        "sha256": "8a036e6e2df8aa344b8be8764438e637b9541912a12e0aa528d49edf704a6bb5"
+        "sha256": "ca8f548af6fd880d2c6e727ba7daa66120dd9c24dad3a613e13eb09c90db2948"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -125178,7 +125178,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-candidate-solutions-platform.html",
-        "sha256": "857365490ec55efad03c36a928ce534584f2da5c5d6ba1ae810a800bab88b47e"
+        "sha256": "0145a96782878891f4015d19d5b635aaa07a006908db691726e0fb2246818de4"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -125283,7 +125283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-candidate-solutions-spec-v2.html",
-        "sha256": "6765e8a0da6d254b4654a25580cf3758ef6bc3bf6b7d6995eacd0381ac7ed794"
+        "sha256": "ec58954effedada59e91a2d46de70683e99c5f1acb7055a83e8a102411f49053"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -125388,7 +125388,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-design-publish.html",
-        "sha256": "0db9a1375c0a154195a45b0d747c8689ffb8f249b023d9dc131c0a41f44165c8"
+        "sha256": "d3cb27c47479101b07c821d2c030c4a109f37aa2c3d31a52d429e689b3a603da"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -125521,7 +125521,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-p0.html",
-        "sha256": "da2c659983ca18f9070af6c337ff4e009ed3e794a1d4841da84d3eb65c448f3a"
+        "sha256": "0df4ea8a1d6981e5af96c902525045b11cb5c04c90638c3066098fde34d85f06"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -125654,7 +125654,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-platform.html",
-        "sha256": "2797322448f2e8ddc50ad86338690bcb57ea63450b65a2adc1b93b21f8c3d02e"
+        "sha256": "eb9239623ad2c14283b6efd87089526ff1265852c5e78c4b880aff4ac606c574"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -125787,7 +125787,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s00.html",
-        "sha256": "57bc0195d1c545b9a1632c1dbb5e29471057d0b52ea539ec0ad744d1ba921623"
+        "sha256": "aa1f74f8e7f75b07c93cb2f3951e7234bbefd39c8a7c5f1a10bd681f4e611353"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -125920,7 +125920,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s01.html",
-        "sha256": "1deede7f2c086ebd60a1636854661595fca8b60af189a4511953ab6aab8f959c"
+        "sha256": "0bb681aa12bdfea11ce96c817644820ed6ee7073fee826fd1e7a316915e840bd"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -126053,7 +126053,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s02.html",
-        "sha256": "34483593b7a3b767c2cbab48c439047cf9e02adfb1538bdcfa555bb6a62b8cbf"
+        "sha256": "b702ccd6c6a7a72cdce8fc6bd44f9a60fba7be8bc4ec9bdacba26b02f5bcb0da"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -126186,7 +126186,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s03.html",
-        "sha256": "675488beefc2db6dc7c1ea8f774c6e4341f64d7cb4df1d6df50cff702f10d5a8"
+        "sha256": "41b060764186b44e6ae76943c5eacb2f2c5da44b8006af094f3b30786880d8e6"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -126319,7 +126319,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s04.html",
-        "sha256": "262044938d6419b744b0cec5ec007d482be0d435e55b890c6397f05b3297232e"
+        "sha256": "acbea5cfc989c2ff6ffcd690ee6bf0a4e34c5162d586ac58462d80b43ff97cdb"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -126452,7 +126452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s05.html",
-        "sha256": "1677bc99895aaa93bec002144172b881ae4b1c54fed52be8a40d4bb0353d7f9b"
+        "sha256": "544d115117cbbf4e71c82d91f692e95f410acd463fb2f428b91d2631620937f7"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -126575,7 +126575,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s06.html",
-        "sha256": "e0f9f31e4b4c0f958b864cc01db7d4b0bd442771d0fc5cc79f9869460d0d613d"
+        "sha256": "45df01ba68bf060ae84cfebc9a8bb240e50147f0f25c5e6190b4abe174b7331f"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -126709,7 +126709,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s06b.html",
-        "sha256": "313d1222a668cf636761953f459f0b833a97a815ed2be20c461e5466a4aa63b3"
+        "sha256": "e15ab1996e64cc548a0c4e2bad530a0b79cdf6d2843de4ab92a423fce6290079"
       },
       "gate": {
         "approval_id": "",
@@ -126822,7 +126822,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s06c.html",
-        "sha256": "9f30dda5282187e0a1eca0597cdcde445291b12159251100711fe0f1a294bcfb"
+        "sha256": "5e1e737630bf40ac4c59735f2e0fc26acbe7c5e35912584251b531421f1f02c5"
       },
       "gate": {
         "approval_id": "",
@@ -126935,7 +126935,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s06d.html",
-        "sha256": "19f24c431e6981264f035745eca2e844012bee4e704a757c9148e148b75f4989"
+        "sha256": "019a2cf5e7195eaa19d7d47fff034c027a6b701948a0a9b6c46429dcc5795496"
       },
       "gate": {
         "approval_id": "",
@@ -127047,7 +127047,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s07.html",
-        "sha256": "a5b22bdcae31f2b5bbc68c5a177d150483da773b35987aab36df86f90979e14f"
+        "sha256": "3e897b1cd57c25e41652163439894770a9cccc15ac1a0b5b77e9d8526bf33625"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -127170,7 +127170,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s08.html",
-        "sha256": "8a5c3816b29c42b2e0595a4365944815cd97d6b3f98d42b024d377d9bd0f5067"
+        "sha256": "fa4faa30ef4d32eaf5e7ea8701d84360f94d22f1ea28ec9dfd7cb63846611e92"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -127293,7 +127293,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s09.html",
-        "sha256": "09e67b147228bda783e3cd69aabe0d817575acfe309dcc40389a3a825ba0b728"
+        "sha256": "848a67d0db04dc832719e01b94783c39c626b80243fee3eb50939de3d2a464be"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -127417,7 +127417,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s10.html",
-        "sha256": "4d165ee001c525550d369dc963fb8fe2f4d5d2bb1135e2e4fd942fdb14694f42"
+        "sha256": "a1898211d0b15e5aa9e30de34fbff871340af1123bfa1acb4458d20fbf65b910"
       },
       "gate": {
         "approval_id": "",
@@ -127530,7 +127530,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s11.html",
-        "sha256": "030850cfd6a91ed67dd760cd207d2c8914700c917a44f5973109f0a59edb2b07"
+        "sha256": "7a27f9186ea7e3bd4d65c752b6226c71f4bef0ee9a4e5f67bf7ba2b9af1e0f7c"
       },
       "gate": {
         "approval_id": "",
@@ -127643,7 +127643,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s12.html",
-        "sha256": "295a48cc13aceba0b81e46fdc6f3603a9e433e3ddf69664ba2b9fad418c73e90"
+        "sha256": "7d8675044f8bdeef722fc5d9e3ca9615b68e9b72af10746ef44b949dcc46cd20"
       },
       "gate": {
         "approval_id": "",
@@ -127756,7 +127756,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s13.html",
-        "sha256": "beb7f46215808362a9716d84c6625cfaf214cc883fd9aa9c363f0a8a054ca31e"
+        "sha256": "c3b04d4f1ba9df79a44e695e7b71a0eabd41067e48b2b7602156eb43cc1fdd92"
       },
       "gate": {
         "approval_id": "",
@@ -127869,7 +127869,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s14.html",
-        "sha256": "0751629c4dd3a99e417a50887d55ffa95ad01b90068260cc18260a85727bc02d"
+        "sha256": "2a7cb1a0b106307256c28d0be680930aa17a1c3af5a8828655ffa3f16ca2f2e2"
       },
       "gate": {
         "approval_id": "",
@@ -127982,7 +127982,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s15.html",
-        "sha256": "9630b709f912ba3af8ebfb7b15db39edb8bd87ea5428142523f4643263084367"
+        "sha256": "023b0082dbc0339bc16bc28b77b30be8fdb92e2046c3adfd6cac427f8fe28505"
       },
       "gate": {
         "approval_id": "",
@@ -128095,7 +128095,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s16.html",
-        "sha256": "6a335d0c93b74eb2dff181447f947a6f8fef8342e30ead518cbba9654062c549"
+        "sha256": "a1077959ace692e87c66766714460d8ee0130ec466af1711055e2330199df4a3"
       },
       "gate": {
         "approval_id": "",
@@ -128207,7 +128207,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s17.html",
-        "sha256": "ff1610662e8b1e3f1a0f03abf4627bdab6ccb57336cbcf8300958d75dce79cff"
+        "sha256": "dbdd0bafc8a4b12e7c91c9ccfe8e4495a72aea73c82876b4f9586f16d512ce43"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -128331,7 +128331,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s18.html",
-        "sha256": "d36a2ff51597d60815d9e76ec3c0cb93aaec9bd88fcb7265509df4b42c652c3c"
+        "sha256": "4a65d42e860147ef2beb4160f536da127740f673315d3bf68d4bacc7945aaa67"
       },
       "gate": {
         "approval_id": "",
@@ -128444,7 +128444,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s19.html",
-        "sha256": "eae023129cde94580e9a3588442b08d1b781c099232c03f637622b27c5829579"
+        "sha256": "ec2dd8644af5323a8619a0932264d02a3d22ac1e59a27e3f25d5e7ffb15b04db"
       },
       "gate": {
         "approval_id": "",
@@ -128557,7 +128557,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s20.html",
-        "sha256": "df419aa6df0566ebf4ccba34fb5ea9314f0ed1065bde0fc8c283160ffa80b1ae"
+        "sha256": "9b5caf78e7679aec283f0ff53ed1a8185197826df2061aff71037498ce018ed0"
       },
       "gate": {
         "approval_id": "",
@@ -128670,7 +128670,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s21.html",
-        "sha256": "06819279ab38b0e80a201dbda589a4f158d691b8274736c4ef1925b41065b47b"
+        "sha256": "921091febcd9e1b73fd254373a19835b491f8b51f07e1f9f39f26e0701fe0023"
       },
       "gate": {
         "approval_id": "",
@@ -128782,7 +128782,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-spec-v2.html",
-        "sha256": "18e1b901cdf405f1b3fe9b5afacb6b117367b30a7848977d06926133f8e38c0f"
+        "sha256": "254976dd53812a0f38ccc4e9e2cf710fdf9a7abf4d950e2000761df74a04aa22"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -128915,7 +128915,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t0.html",
-        "sha256": "f3154f385894f53a9fd45b79247956ecae0aa073bcb3aec6d3ec3123bac2f3bf"
+        "sha256": "1433b790cc7e4723d4c86cd13787bbac037e425bf1ce46678684e60d7aa1beb3"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -129048,7 +129048,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t1.html",
-        "sha256": "09625cec25c46115d922a2e1d770470f61510f454ad997736d99a7e72ddd91f4"
+        "sha256": "3db9399effa7490ca2a0f64335632b27db4107bbfecc92950c0cac1253183926"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -129181,7 +129181,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t10.html",
-        "sha256": "b6fd65a3182d9191c83d767ee4538441ba8e939d71af92f81e816d97b89abce2"
+        "sha256": "e16dbf939a9d5db6db9e3c0b02919a3ce666539baf59d27a2a5d02da3d954d70"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -129324,7 +129324,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t11.html",
-        "sha256": "6d77e305d3fd7b6f7b70c1fdcd200f73a572bd1b701905552aa7827b63a8a8f5"
+        "sha256": "1c4c49dd8aa15172d16587c5fd57f83b458e33ca27a76d2499e59c1af130ead8"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -129458,7 +129458,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t12.html",
-        "sha256": "e554857ef1d2ea1bf092283998953aa58f45d3bb902bb0dcd4542b3a640f113e"
+        "sha256": "7e7f52687f8851e43a5afe21f1ae26d111f5202824ea6f943015749f2289921b"
       },
       "gate": {
         "approval_id": "",
@@ -129570,7 +129570,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t13.html",
-        "sha256": "36dcb23192aae0d506ec22913a77b7091f77fd05351f01ae8badb7efa3ddb1f4"
+        "sha256": "79e238a542a69fc0b40e566c15f6ec8d769078fee8d1ab0a5143b509653383c9"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -129713,7 +129713,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t14.html",
-        "sha256": "fa17e7ffdc3a8473ae0af570cb3412bb91d3da9d3e38da4c0fdc5792222a00f4"
+        "sha256": "6a843b9f54de3931a29e073d6715f45e472e989534d01c746856011c86a4ada1"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -129847,7 +129847,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t15.html",
-        "sha256": "58a791cb45d97c46eee357e42ee282f7814a1799197fe57c7f9e338782725a3c"
+        "sha256": "c3e979dad287618b32ac370d387172abd35fdcba310b19fc724b1210c5770a2a"
       },
       "gate": {
         "approval_id": "",
@@ -129959,7 +129959,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t16.html",
-        "sha256": "d08ea71f1d1b783a448393ef728a66b2aa6b3b97259fbd1ec2d3be94c9928c52"
+        "sha256": "fdf27126ca5b0053802b1ab870d790f5ee961f86634a0894dc75183a511d3e61"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -130082,7 +130082,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t17.html",
-        "sha256": "f139fbebd60e86f5d6cd10be50e0aa238a6ca8560b728ac071278972050503d1"
+        "sha256": "27ac5bdc0c9cb0e9a0132f4fd81b4e6df1d91da8cb584ca3cc69fb1517be069e"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -130205,7 +130205,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t18.html",
-        "sha256": "691e44a66cc51c47067255d9a743593181e2ad79c19cf0e771e38e4f2b8cc526"
+        "sha256": "755b403a4c5341881c76ec74411bc984e2015c3b2a1fd42045dcfc82d2bbbc7a"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -130328,7 +130328,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t19.html",
-        "sha256": "56c18786b9aaf416c2ea47ba8d48d179a5ef90dda56f937e712ca4fd7a12015e"
+        "sha256": "f0791db60242ac87bfe8ccb738c5a84bf84c8a1019ba3f6b201f71b86c0d8ec1"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -130471,7 +130471,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t19f.html",
-        "sha256": "0ace6d7dbed04f717f3e509c0a4e6e8e73d6ceb831d5a055d5400e2483b9fa39"
+        "sha256": "64e22c90dbff9a93e9ecd1b381eeb067cdfaee1075f0128b0e48e6a1c62a3156"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -130604,7 +130604,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t2.html",
-        "sha256": "5da3af9d19b13be9c00fee3b97b4deb7b783573df50d9e25753e79cfde764fe3"
+        "sha256": "2f974d1bb246008d439f3c772d0f9552ddc7cf7ad358d23e455d9863f5c9ef69"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -130777,7 +130777,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t3.html",
-        "sha256": "97c135f6d271cbbbd6496bebb31fb2ebf0bfc59e79aa55d10efaaff13b4070ed"
+        "sha256": "aa871df9737c9dbe8cfff8e306c54aaad85161114f7582bb225c82c5efc1ac17"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -130900,7 +130900,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t4.html",
-        "sha256": "953f5e90474c8a741cc24135201829f5c387509ed413f6d0d4eb9249faeabc52"
+        "sha256": "37de6465954e0e5762482415a531bb4600c3cf36a4f35d91c304f62fe9ab7383"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -131034,7 +131034,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t5.html",
-        "sha256": "c4703a9405ad5c736f6dd155b0e41888ea09f2baa668da88a3b65b49b5e0d1ab"
+        "sha256": "0b429c63e52e19ffbc4411be6d4cebc3027846c4b02e0483d07e5d63a49fe6c6"
       },
       "gate": {
         "approval_id": "",
@@ -131147,7 +131147,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t6.html",
-        "sha256": "e4c6027afe7ea1841e800da1b21f8711e37100e1a4bbdf5a0e0d1a1f30ac6ecd"
+        "sha256": "6c6068c7df938264bd98393957a1f95c059888a2ffed9433e995b07966574648"
       },
       "gate": {
         "approval_id": "",
@@ -131259,7 +131259,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t7.html",
-        "sha256": "fc5fc0cd1b5e5bc4450cac0af2d9d3fc0d38f42e6b90fbd4b4038def539f90b3"
+        "sha256": "1087ce7818933b2a01bb5ce19e7d87de1a132b8373701b9781b6aabcf3763aa3"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -131383,7 +131383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t8.html",
-        "sha256": "8876e295df106a1f65bcbbe8dc1ba8937f1ba41a996d44e54dc4d31f51a3cf2e"
+        "sha256": "c7b9dd7aba8a09b35cde1361782e5f83033b07622760ad26afd554c4a564073f"
       },
       "gate": {
         "approval_id": "",
@@ -131495,7 +131495,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t9.html",
-        "sha256": "8d1dabc5ac0cff77acaa5ba52ad68444a5096408155c2b5530d889537af83194"
+        "sha256": "9baac1d90ee58b7f6ee02db4fdc9e103284912292e4c719f2e207b67a0587c7c"
       },
       "gate": {
         "approval_id": "",
@@ -131648,7 +131648,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-design-publish.html",
-        "sha256": "02d854daa5c84fb9a9965b67bd2f1492bbc9fbae2de514983ff87c88e0a681f9"
+        "sha256": "84673a161f725d2237f31d68b8dfc06b801e2d5e91b959f5265cacd933f1ba97"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -131759,7 +131759,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-p0.html",
-        "sha256": "23b5cdd1a372e7fe94e2d2ea8c37a50f4742071d36c5e59fe06cd69b8c46946f"
+        "sha256": "5e259be25d73f71f6f036f791e4b6726008067b805879e3e6b126a23418d7dd2"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -131870,7 +131870,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-platform.html",
-        "sha256": "ae48fe7a1ab5bd88c513c7e791e72ce689b992f41175806a600e31d818547496"
+        "sha256": "ceed1d04bedb15aa6cb3c8ed242f6b2c436b247a400b9386666a765caa49a98f"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -131981,7 +131981,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s00.html",
-        "sha256": "5052d37ce8c9a2df953b065dd5ec2fcab0d00919a51ad9df78ffb601a4986f4a"
+        "sha256": "f3859ed3318800290594cd23e2bae84b747c0135d714703e287bb82e9e071e56"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -132092,7 +132092,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s01.html",
-        "sha256": "813b6d58b476393dd6dfd8fee50a48f1a869861f86b824bc97abfa21d57b157d"
+        "sha256": "f997fa170f8b8863105b9b321bdb68ac4c30b1b40020e8d6f881623a8f0e9bbd"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -132203,7 +132203,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s02.html",
-        "sha256": "a65fdbe06ffe71e09cdb3d50cbe6a44677caff1f4b8403ee83effeaf406e672d"
+        "sha256": "3403c333d800df385da9afce50cda78bbac7e027e898ffac46940fc50a67143c"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -132314,7 +132314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s03.html",
-        "sha256": "23725a12f655e84c3a1fd0640af5476a94df2a2fb23a26cf3a4e58ebf134d9a5"
+        "sha256": "26c0d88452fe95fdbf4b62f84883f50327c1675b20ff79a223ec44383cfc2014"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -132425,7 +132425,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s04.html",
-        "sha256": "3329f70270c67584f5082a9d81f76472846037b3e0168164d41c57fed24c5a77"
+        "sha256": "f1110212cc4b4f27f6ce1ba0d7f85c8244bab8634b03294e994c24c231005d5b"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -132536,7 +132536,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s05.html",
-        "sha256": "8d579c8567e40eccb8725ffb4dc469782a65005abf5c16597b100ca6899795eb"
+        "sha256": "d1d2791a09ff6f3d4ad6a746553d8ff054b2a15d0616b9fed557ef2805144ae0"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -132647,7 +132647,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06.html",
-        "sha256": "f30ae22d8786acb904959a6c52416e2ebd0018b06f85a2118ba0ef2b7d76228d"
+        "sha256": "7f6305d3a651ff9ed760eb80a5a5c9f940bbb9fbfa258eb8e00c0df09554828d"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -132759,7 +132759,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06b.html",
-        "sha256": "a406d690a734e0663654226ec0b0eb3bdbe3025deac26d01fc895bea06b7a43c"
+        "sha256": "2057540502581528c6a5eececeb8a6fc88db81f6fb4b2147e2e48b9c5d98f7ed"
       },
       "gate": {
         "approval_id": "",
@@ -132860,7 +132860,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06c.html",
-        "sha256": "e2289cc567aa513f226cc5bf2b10e6422b5869f694ba75161b855c064d85a1fd"
+        "sha256": "2c08ab5827b0343a88b99eca97c73d0650745e589888db81de37ef649968e221"
       },
       "gate": {
         "approval_id": "",
@@ -132961,7 +132961,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06d.html",
-        "sha256": "9d2c008772a43b8cc24c556a8e9dd9a8e56747ff1fd342bb7cb59e5234783592"
+        "sha256": "2cbe6a757350a48bf0d2dbfa884caca31da3b1820505a254ebf1986216651a2b"
       },
       "gate": {
         "approval_id": "",
@@ -133061,7 +133061,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s07.html",
-        "sha256": "6b06226e5f8260ac0b5c19dcb62c810fa540677143af6f61a9263b8fa932fcb8"
+        "sha256": "ba41212b51ff0ffed95b85514a0df0921dbb64683db2f880dcb1288d72a88b84"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -133172,7 +133172,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s08.html",
-        "sha256": "96299cd28c41d0a702e76760560ae7d4d539c9ef712282658b81b5fadac3ae30"
+        "sha256": "603da4a5a9eccaba7a5196b0a9cc573462e2e8ff3da9fa24e19f5a7d88e1c7ad"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -133283,7 +133283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s09.html",
-        "sha256": "f85bad35601ae68ccff97d19abce376ed1b0f9cf8b8f23afa337af6fd2e8ab91"
+        "sha256": "2a42f90658ccb3799833172a504272a3f12519dabf5ba38c3a3de023ac3a9121"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -133395,7 +133395,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s10.html",
-        "sha256": "6f39c89b11528f1e9eedb2159836628aabac7826d2e024926562ce294ecd163d"
+        "sha256": "07c9aa92ff4c4d9f35df1b8c5d3d068b7addd49e99e78349ea0b383a882ada79"
       },
       "gate": {
         "approval_id": "",
@@ -133496,7 +133496,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s11.html",
-        "sha256": "57fdbb623b0686ba7e0d2e69e1312c057a611f8f1592ad9f26f78479bf28ffbf"
+        "sha256": "a4d6c49df255e92e007a50c33003fef7eb9376ebf1a432f05a14e3a88f9206f8"
       },
       "gate": {
         "approval_id": "",
@@ -133597,7 +133597,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s12.html",
-        "sha256": "11e61140ae3a952f7c420e765ccdf21f2395f9714731bd06cba81470d743134a"
+        "sha256": "876d171563ead2e660159f270c7fe0791232c59b7eccaa7b99393d9aa2e64a46"
       },
       "gate": {
         "approval_id": "",
@@ -133698,7 +133698,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s13.html",
-        "sha256": "f60169b8fbe615633ad370871c39e01e28575f75813a6709608f4362b89ea401"
+        "sha256": "1725a672ca3b92d1d49a0ad8ce2623b7bc1ace02fc2d1c869495b00ab5da139e"
       },
       "gate": {
         "approval_id": "",
@@ -133799,7 +133799,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s14.html",
-        "sha256": "505f88007448951971b7012c4d4521e4849c521659f22dc79c1f44998d407688"
+        "sha256": "ae9cadaba6331281d39c7bc4f34a058b30fda3cc5df8e7dda769dff601541c8d"
       },
       "gate": {
         "approval_id": "",
@@ -133900,7 +133900,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s15.html",
-        "sha256": "bef16e703ad53df7d48abc88cbaca8a6da67d46a7d6de531d984bcde61c35d88"
+        "sha256": "f7e4da9b6e2c88f4c363507e5c8b73d3c4c31816cb9a4b95e4e60eb9c663d151"
       },
       "gate": {
         "approval_id": "",
@@ -134001,7 +134001,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s16.html",
-        "sha256": "cc9768daa23691feb46f13d49596df467f25f13cf9bda231e587b5a0c48bacc6"
+        "sha256": "69c277aea29fbd870dbfa15ed1383cb231478ad7d7d95675bc6238a6300e9ef0"
       },
       "gate": {
         "approval_id": "",
@@ -134101,7 +134101,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s17.html",
-        "sha256": "495488b895f18290bfa132e4ab430c85da0982ee1d6b8f1fede8051caa7a0d11"
+        "sha256": "62d9ff12562a385e9b6ad04b3ecd90b1341b82ff73b7bac3a8dc7755dbb02f80"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -134213,7 +134213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s18.html",
-        "sha256": "549f2c142417bd9e4eb8f1cbc8340855d0f58194631bccb045d4c21b904e0a17"
+        "sha256": "39ae2c894a4fa37485b93d46a43c5dc119624d11f642ca33e73d292ebb9d4997"
       },
       "gate": {
         "approval_id": "",
@@ -134314,7 +134314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s19.html",
-        "sha256": "c4afd80d92edb0043e15bb9b009e997c3fa3a2689398b0c4e776bda91e38fc55"
+        "sha256": "1ed0a2c9e89041790e565aaa0d3d82710e1edd9808dd0492b53f946b734624e6"
       },
       "gate": {
         "approval_id": "",
@@ -134415,7 +134415,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s20.html",
-        "sha256": "ae2cd7370860aa06d2d6b2e8377d1986e61ed44051a04b832027d69da713bebc"
+        "sha256": "ca833c9cc33e51d2487ecc8118a8b2df9514e25ccce948852fe5240f665c723b"
       },
       "gate": {
         "approval_id": "",
@@ -134516,7 +134516,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s21.html",
-        "sha256": "714e7b5f48b0d5a41400cbaa635e6dab0247330a2e1b052d81330ab4a0e7ce33"
+        "sha256": "4bbe9e92fbb99ff5d677e6bf750c0a725e2a736fcae7c86f4b5b0ed25edaf0bc"
       },
       "gate": {
         "approval_id": "",
@@ -134616,7 +134616,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-spec-v2.html",
-        "sha256": "fdc3a6f97b8f071555b5a27eb1a6ea23d4e946d61e9977d4ce91138fda8fd407"
+        "sha256": "1a3000cfa7985c1c0c395ff61afe6b23392bd4503e1bce7a1e2015c90fde82e5"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -134727,7 +134727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t0.html",
-        "sha256": "6897150578898cc021b985fcafd971ceb2d606f1561c409cba4560099bc6641b"
+        "sha256": "7a998c4b162e8581b87dfaa39e7a5ba4da2160faa3fdeae3a08debab4cac069d"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -134838,7 +134838,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t1.html",
-        "sha256": "5cb9957993537409df4b3b3452bdcf1dae081914c395ad88a76e0c2588ffaf26"
+        "sha256": "2ad32690c00acd6999023afe9fdb62e80a24633588a118a27ac76bdfd0c605c8"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -134949,7 +134949,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t10.html",
-        "sha256": "7b2db903ebbf5af246324d4425801a9159ed9a5f0bce2547c37d9951efdee896"
+        "sha256": "0cd4f0fc3039768d20550a7e4fc5ef13ed1d2ccb506845ae76f3d06205b9d946"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -135060,7 +135060,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t11.html",
-        "sha256": "1e05fb167935472f493de37c4d2eef4bd69c12b36af7d7a0586822d70aea8c1f"
+        "sha256": "0aaf921c41dde5648bea427a418f5eb1fc30be2476f283310b3815cf988e326b"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -135172,7 +135172,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t12.html",
-        "sha256": "1f98b9c422aa61f7a68e4010120ee749184fd2ba820ce4b782292c6cde2fd873"
+        "sha256": "36baec101b93167a1a720546fa79982b6a3f08dde3b45b34b3794a65de28aa89"
       },
       "gate": {
         "approval_id": "",
@@ -135272,7 +135272,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t13.html",
-        "sha256": "be6ab60ebe766814098987975b0fba77ede6f0a41b189db3fb93aded492e0545"
+        "sha256": "63b8f02cd4033b4c96e5b4d35b57811d4463d9c2a28ef8380e4d4e73efd90fe5"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -135383,7 +135383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t14.html",
-        "sha256": "720c753d2a02f30501c67be79c903657c7d8a8388591f25641d34376842f8c98"
+        "sha256": "410673dd39b59e0f4d5f3130f610c1f6810d4ed0b38b788c84aeb50019bc81ad"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -135495,7 +135495,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t15.html",
-        "sha256": "57821c593b67ab0abb4dd98b199242d1483e7318da638fe546a7da25f0fdf736"
+        "sha256": "d499ce93591c40ff3277256dca3a1516f44e2a53ae9178105b6f4a740ff89922"
       },
       "gate": {
         "approval_id": "",
@@ -135595,7 +135595,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t16.html",
-        "sha256": "172fa27a1bfcd64bb5ce06f8349744ecc751b81e0d0252ece046e17007ca3c7f"
+        "sha256": "30788f51e27b70f87935082ece28d3aca1bf75e4a10742605bb247e7a36f6bb8"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -135706,7 +135706,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t17.html",
-        "sha256": "46196e0b6b0d334853b9a1c9b1ba5926edd57791cff61776fa8729c3187b84eb"
+        "sha256": "bb1fd369a092cad9085837724db08185f6d177287ab069bd361b6cccac8803b5"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -135817,7 +135817,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t18.html",
-        "sha256": "2d3dc3431995104f245878bbf6af1f23886fb0a463cc6915a9dc737d1f166f78"
+        "sha256": "81da47f1d1e3f3e79aeabfaee688fdf029b507cf416a8a6a26c2ce4ee3ad5006"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -135928,7 +135928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t19.html",
-        "sha256": "b01035992d8c8e9cf3c971b051effb4474f66f406f0affe60bdae7ddc1feeeb4"
+        "sha256": "c187350ed872ec9fa233666f8696ec91d57fa7c7cd0741f8cc9d8f4d6338054b"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -136040,7 +136040,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t19f.html",
-        "sha256": "45c74e29c27bab5a1098c840155f3d49ae02804595b24630a92f4098a839548b"
+        "sha256": "857d482c3f06ecc9c3cfcfde1bf07037f33d3f90453042fd68aa825cef37ad3b"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -136148,7 +136148,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t2.html",
-        "sha256": "ffa2a146a9b558ac2759fba3d16359b95a00f6bbd20937e0c7525d736bee0d85"
+        "sha256": "4a7298df1b7b7489513faed748bd28d37211b8d21343dde279ecbc42874d78e9"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -136259,7 +136259,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t3.html",
-        "sha256": "5c32f092d4459108caadd170e42cc6db50968f76724e9a7a1c195a39377d34fc"
+        "sha256": "94bdd704279bb32c263337b9865a6ea98d9ce97ed13a2c1ccf03f0a058f619d6"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -136370,7 +136370,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t4.html",
-        "sha256": "9929c5bc1817f957446c41ee9f30fdd5eb6194b5dee1d387349ab04966f9c38b"
+        "sha256": "d977647d72f8e86753f39efac2636ff863c6b043ee24f2eb85cdbb796c4e6a6b"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -136482,7 +136482,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t5.html",
-        "sha256": "8737ebeba6b19f36d112f39969104ee62ffcd789c406742552c8d9a0394968c4"
+        "sha256": "dfa467087c58d99a4d424a20ac2d594bbf0561f7b38dc27390f13b30fbb391bc"
       },
       "gate": {
         "approval_id": "",
@@ -136583,7 +136583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t6.html",
-        "sha256": "9fc96017ff8498f5ddab4e12fd7fd51fef6e5cabd830122968ba58fc372a12db"
+        "sha256": "ada28cdeefbafdeaab7915685899a74bbdb0381de7c7f11a3728b043064241ad"
       },
       "gate": {
         "approval_id": "",
@@ -136683,7 +136683,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t7.html",
-        "sha256": "54b4aa29460b7f7eacbdafd695cdadae78cec28b162f44df4bd299c159f90d8e"
+        "sha256": "1ec47a37c441aa059d4fad801931206be6196fe5757583c4eab5c73aaf342cf1"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -136795,7 +136795,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t8.html",
-        "sha256": "81295a883dd8f537855834206a10e6d4444df4e5f89daa98e4de3521954b3556"
+        "sha256": "df4d7b0c7a00b936ff159538e5d3da7aa72e4d4c7b649baf1742b87d7bae026b"
       },
       "gate": {
         "approval_id": "",
@@ -136895,7 +136895,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t9.html",
-        "sha256": "c4d3e2acdf29fe6dc36190b05f7ce6259151560f2e5d9ea69676e58cff2f0a3a"
+        "sha256": "a26a7894536f9587d3fd395fc6b37650a4d9f43c90aaa2aa2c906d8f910ca4f4"
       },
       "gate": {
         "approval_id": "",
@@ -137006,7 +137006,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-design-publish.html",
-        "sha256": "1be1d6a0b371650dd11ed4f79ffaffeb233da24811d8817fb785c5a726c3115c"
+        "sha256": "e40d4b17678e5b0d77f6267771cc2f9507101ddb19053a36351c3348ae1bad54"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -137164,7 +137164,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-p0.html",
-        "sha256": "fc666ea7971293fc84571c5e1772ace1844368b1187c44d61a90b845eb5c92f7"
+        "sha256": "4fb329b5ae70431e915bdb78ad43c9acd861bdc722254aab0adaac8aa7da7ff7"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -137322,7 +137322,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-platform.html",
-        "sha256": "dc64c791618d4f1ac4158c75d400a903f1c7c91dee95d11e28aa9a40207e73d0"
+        "sha256": "239708be300bfecedd40617156cffb2987f98b54d1315c35b04301ce768967ba"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -137480,7 +137480,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-spec-v2.html",
-        "sha256": "a4a4401e3c75464b6ee2095a8249f06a1e11d5331f1c613db8ab27455f2b1458"
+        "sha256": "7ddac489fc23b23ca6f27e00a284db172fb40452b364a30af2e7a94ce1f27ead"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -137638,7 +137638,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-design-publish-a.html",
-        "sha256": "e945cc70e660d861ac8c8eb350b6527cc9333fee488a4081f129099b6188482c"
+        "sha256": "591f199e9a028337685127ebc9f0340f755ec1db4bbc5079acc2be103af03a39"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -137873,7 +137873,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-p0-a.html",
-        "sha256": "2486660c04fe70800125f8b93cfb15acb647771483c0c5be724354452bc22842"
+        "sha256": "b17da5d1a09cf2ca38163c468dc5cdadfa99e53cfd5a7677ab757b1bb837c03c"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -138108,7 +138108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-platform-a.html",
-        "sha256": "41c3380070284b321970228f3a53ecc449d65d497ac285cf8ea6d7f1458ba1b7"
+        "sha256": "e3a23384c35e52743ccbb83e31ad0704cd6d00dd70ccacf247619de2c46faa14"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -138343,7 +138343,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s00-a.html",
-        "sha256": "0e033aa03a6e32cdd9f8c9282f4435508b0c691b89de269861ae24a50e11e31f"
+        "sha256": "d4e87cca7f54c9ca72e820a4ada8dbb5ba94392ebd27e3e8be9e62cf15457616"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -138578,7 +138578,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s01-a.html",
-        "sha256": "9e4a3c2c294ed21f42dfb5c28ca57e686e6145df439518281758599f01804502"
+        "sha256": "117f34412f54f0683f508047e93e05f83da4beafb635d3d45d38adc51f3e8372"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -138813,7 +138813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s02-a.html",
-        "sha256": "17d67da95e70365a3b09c08d993a73e825bb8adf09e5da632d5407a95235c570"
+        "sha256": "347ad3fef819ded6bb4727cff2568d59390c533021f9a704c8641d0b37321c9d"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -139048,7 +139048,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s03-a.html",
-        "sha256": "0b63ad831364dd5420ac560e02e35fcf46a8888bb3cb978ad0c6e74683583b71"
+        "sha256": "b212dad66053f5e4d179ba13f9e8215af604d2de34b35bc0d90b20232a763d57"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -139283,7 +139283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s04-a.html",
-        "sha256": "24196d7fb4e1e6c3470b4f00bd57acc31db37c0997f01608e201b676d1b146b2"
+        "sha256": "87e03b390e0d8fcf7d275f6c519a6e17e40c2c9822204bd0d9d94c88d2dbe369"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -139518,7 +139518,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s05-a.html",
-        "sha256": "aa768225a24d94205233743cd4988e4ec58866585dd75bd42032b3dd6048e2c0"
+        "sha256": "d44f2ff2e53a5a05b7c870b4f1711f4d2bd654d4a273e2f4c04f8639de9d4dd9"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -139753,7 +139753,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s06-a.html",
-        "sha256": "afcc9c30bdac1095782b8833c2b53e3fc81ec9013cc678d0d0634afd5eb31815"
+        "sha256": "cf55a11e441a10d50d8c36cdbbe1f344cc2079e004a87da2541f4fd53f856644"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -139988,7 +139988,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s07-a.html",
-        "sha256": "f647246259a5a353aa74e9a5ed164ba8a1114acd9dd0e27a2af3a9c277a99a06"
+        "sha256": "6ed0da9b53eb4f456925a46baae1e1c57b89792f8be1d3eb5400b72e003ed238"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -140223,7 +140223,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s08-a.html",
-        "sha256": "1ba99fb2fd075e71c36a7fa1e49d1171ba1932ec2a97ade65bc4a89181052273"
+        "sha256": "48d5bed33deee656c4a3486d62b8407a0b1600c692098cea7ac1b58253f2017b"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -140458,7 +140458,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s09-a.html",
-        "sha256": "1b1d822691da757d5c1351a57ac28dd3e5631f550f9713dd22a0ac3ab2265ea9"
+        "sha256": "d4be25887cd66b9cf646c95d48413279509a1415bf0d85f2161a0d8a48987da5"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -140693,7 +140693,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s17-a.html",
-        "sha256": "cba2900b0158f43f6565499f540185aeb24638a6bd3b1ee5224a8d5905885c33"
+        "sha256": "bc88ff64245c48a06647b715a231adba287f6a8cd405f560d44398ce9f0ede67"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -140928,7 +140928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-spec-v2-a.html",
-        "sha256": "2dd0d4f21102873006c8c27a8c580eabf216cc338a9036d770fd7435895aabbc"
+        "sha256": "c478b670212b88b41f8b54841b4781a5fd956a84b5a2d0253472b11425eb85a7"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -141163,7 +141163,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t0-a.html",
-        "sha256": "168b36d2e16e3f53393bf97314aad362f1ab83c3f53f5ce1a1d52052a62020cb"
+        "sha256": "1f8e91332a2757b632d0c2531817a04fd2c4fab363f15c9aac9be911744a4c62"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -141398,7 +141398,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t1-a.html",
-        "sha256": "14c0d4b10bc636cddf9cee511ed6ed6137eabb1dc6a0bc6a67065d7ef70e0b55"
+        "sha256": "88401a1496409be5b302ec2100e493b20e9a6cb359dc04a6e9a2fe284cb10806"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -141633,7 +141633,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t10-a.html",
-        "sha256": "f34321c9dc48c05e3cc99fffe3c7f4879cdb0bd8c751a595f23fbf6a78a061d7"
+        "sha256": "5b042d9775a66019cf4722b24b6a8665f5d20be6f12fa7576972f4f055f83891"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -141868,7 +141868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t11-a.html",
-        "sha256": "7512b019bd6fb3495aa1b3325c3f5b047f3c6d99650c0601363490e0ee195b63"
+        "sha256": "ad9c080863d8dd44d3888b550041bfb84c92681632690859703e9f570b489a81"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -142103,7 +142103,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t13-a.html",
-        "sha256": "1d1e8507e151ff0a52910c8bae40028b360127ab408f0fe76d1d43a555bc16c2"
+        "sha256": "1ebd74e1ac6e14a411bd9f6f1f0050a3cb4d12757e09552cacd10fc6c6a9d2a7"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -142338,7 +142338,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t14-a.html",
-        "sha256": "609ab2f3b11bef9af22a85082f5d51d38513889fd303487b832b8b5f2a1c4ab1"
+        "sha256": "0b20327f9825283ed846c4fd1b1403487e11deb43b84894da13156fedd381425"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -142573,7 +142573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t16-a.html",
-        "sha256": "7d686ac3108a0d6d93725a7e21d53e4dec1e8a9d7d804d2663ef01ccaf7d82de"
+        "sha256": "4370c5037b8fc7e261fe60c72ab24f62c2a6089ee0b75c0a7145f092e2a3d95d"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -142808,7 +142808,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t17-a.html",
-        "sha256": "d9f71af7a6c4ae7351c41f6875ebbc90a398088924a8ef250f463cf54fcd80b8"
+        "sha256": "70bae2956ee70ce1df7979ffe5086f19b8f935262dbc800529256ef1d3a26139"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -143043,7 +143043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t18-a.html",
-        "sha256": "b646aead362c63480c85670f3acd0733c7e5897a449e4a3924ac26f85d776d4a"
+        "sha256": "66d06d6a1b946be0c1739064e1fe44dfdfe2f6686f42f2a412888ea3c4efe188"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -143278,7 +143278,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t19-a.html",
-        "sha256": "799a37933aa873ebdb714bbc3e62587e0e6fd5ca457aa7bccb85294a9a087879"
+        "sha256": "a6ea000ab9d184670d01dfff45404f7608254dcce2370e8b75c8d9c6aa4ea11a"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -143513,7 +143513,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t19f-a.html",
-        "sha256": "e424e66e6d24753e98964690b6fd11f49e8ee767d9beb3824f173f0f722ab477"
+        "sha256": "d275f230c13a12e8124dafd54fb15131b8f5f36c6be0230589a9d278f0681f8d"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -143748,7 +143748,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t2-a.html",
-        "sha256": "42d04dae064332d2cd32baf5ff5db6567673ba3b258e521671bd33cbec0718be"
+        "sha256": "220451055be3f1ca22d35407c0f6b650a674260f36b7f347aa71c595f736b407"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -143983,7 +143983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t3-a.html",
-        "sha256": "afa36e377e08e92ff8490154c9e955af87daa07b1cfc33d7e68519bdc41c7a36"
+        "sha256": "bc9de2aa0a5a891606d51054077b21676c551a379ec265e2f91acdda722df139"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -144218,7 +144218,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t4-a.html",
-        "sha256": "9486baa702972aee5e9874050a67dad1508a50c155a789374cc17b7aa454e263"
+        "sha256": "0f72da9d9838e8cb0de2730836b3d57349091172087093c4a560d5f80b0efd41"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -144453,7 +144453,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t7-a.html",
-        "sha256": "f94c013b257846fc25b1724604dd663e894d6ceefd1794187fb813fb2212c45f"
+        "sha256": "6d7e5f3e0e5b87fdd518059581c9b917f59794e526c8bbd5ce7d494de409d076"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -144688,7 +144688,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t9-a.html",
-        "sha256": "21c2715eebee9889a4860e4a8d5e1e8db4ceb03b81bebb24a0dfbba1149c859d"
+        "sha256": "8e5144c9439ab9cb910e651b7c1a10f17f2ba0a6d88a01b88656d57b881f4272"
       },
       "gate": {
         "approval_id": "",
@@ -144923,7 +144923,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-design-publish-b.html",
-        "sha256": "221b20c1aa55e198f23eb19e044ed146bd366fb681c0a27651fac15b1ca0ce3b"
+        "sha256": "a4f83ef176e8988dcc1f6e4107bc05a7d3c82b483d6e0885c6bd9156fbc91843"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -145093,7 +145093,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-p0-b.html",
-        "sha256": "58606895ff76f67ed480c114325c5acb1c3a6dce0b58ffc6e016ecab411a0525"
+        "sha256": "45c630a0cd17d716457ef8098fb024535a00413c7dee6ef38dae33132f0347ec"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -145263,7 +145263,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-platform-b.html",
-        "sha256": "d9cfeeaea32fb0aeb11b5d774aa717d5ed7f52f039df3416b58264a6636f7360"
+        "sha256": "a9a1ca8c88bc4216b47261f50c34d23c1f345b81dd2047236a83c1ce9a037c07"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -145428,7 +145428,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s00-b.html",
-        "sha256": "542996719a80d8e1bebea9bca6631908207c781ca5f2f344422f4a2bb5fc9d22"
+        "sha256": "63b9f9da560d8131113f25f5e71884cd634a911a1190507076f4a006526a972d"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -145598,7 +145598,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s01-b.html",
-        "sha256": "61102a0bdad5145f171210a7add6c5d6fb6b35c2c9781634138086bfb82cd1ef"
+        "sha256": "a9f5cea2ead5b5e455b345e654cace4a79a9f93ef931253e7c2e57ae252ac99f"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -145768,7 +145768,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s02-b.html",
-        "sha256": "f2955324a478bbbcb02cd36256e611e6863276cb227fd2f8931830a255771aa7"
+        "sha256": "0b7abbba08fd1a00ddba6a1c0ee515b70f8d7388d6854cd312d07de8f315f618"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -145938,7 +145938,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s03-b.html",
-        "sha256": "d3bb3c199b1b07414b2556506ee7d4ff679b8b353b917b2cf6c47d0ad79b314f"
+        "sha256": "436b957c6d627ce097f1bdf9a167356275827037e6a22c31565dec34cc7f160c"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -146108,7 +146108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s04-b.html",
-        "sha256": "ec6181ba5b722018da3cd549d5345b3573dfdbfba4063be6fb7ca53e21882dea"
+        "sha256": "7e2a778550e2268dd010958360021fdf227cb465081f85a44f8bb85cdd8e5f35"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -146273,7 +146273,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s05-b.html",
-        "sha256": "24fe3be83209df64365e91e7b15169b648e635919cf8494583595e14bf9f946a"
+        "sha256": "5ef3ee9d0262bd1581bb569eccbf4fd3972973acb9696076336ce2e78244f28a"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -146438,7 +146438,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s06-b.html",
-        "sha256": "5975126c01fe74e6873532adf5d025fdf640ad1bfe0a7199e6d460a894a15256"
+        "sha256": "6e70c54b50664ca5a5ba97882816da090d6f3042bccea8310609bc4aba6909c0"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -146603,7 +146603,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s07-b.html",
-        "sha256": "c67895844cacdb502ab41f23115c2854b09442e8f3c3ab6858d71e79cee5a2dc"
+        "sha256": "b7cc4254d330fc4f9b79bac99966cd88c9a384f7b5491b3c2f9cea2c0fcafdb3"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -146768,7 +146768,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s08-b.html",
-        "sha256": "c34eca3087ca5810d02ce819044bce8d7cd162d9ebeaf6d22487a4d6e1be7a19"
+        "sha256": "020294ba64e42eac42879543ca9cde1d145dcdfb158a4ec9966f40430dbc177d"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -146933,7 +146933,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s09-b.html",
-        "sha256": "c16e703d55d48feda00574bff33dd0609071e6d03c614f342e7deac5e1a7dc43"
+        "sha256": "27a5e0da48145c8011e93530e3cccb4801c650081b3968f7865c0d467a0152a0"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -147098,7 +147098,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s17-b.html",
-        "sha256": "c40732d8e17ac39f3e3b30a2a6f88598d31e2e03d1b2d4141225968a9e591150"
+        "sha256": "bbc6010cd856d34a8022c3b250a8086b5a3d8487d51bbdb2f4fa4a31e0ab2ddf"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -147263,7 +147263,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-spec-v2-b.html",
-        "sha256": "9f64383f2d05580d83847d2654ed54c56be844fa0e0e0454125b6a3d71f2fce6"
+        "sha256": "c66fdb4c597c19c8dddd988d3eafe40107a5a9ad54e2116aeeb2204abb999ce8"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -147433,7 +147433,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t0-b.html",
-        "sha256": "54d1fb29c56a810eae552000517cc049b124493ba4b05e4bfb1f84610dac1f99"
+        "sha256": "a7fa854827beb25f74b3a1da4869fda4ad5f72725cd449d5afc5171c4493c6b9"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -147603,7 +147603,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t1-b.html",
-        "sha256": "d18b54664a799f0c59482afb4f680bb9fc580eda84f32648887d8d09535ba8a3"
+        "sha256": "72a12a76ee3c338886b6d42ef412b3e2eb44dda2d13e9144d474de8775edb21b"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -147773,7 +147773,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t10-b.html",
-        "sha256": "eaf53f427183ede2d36eb015da68dc7845b6cb7f137c6ef822f1a294153c6c9b"
+        "sha256": "1cbfafdac92fdce41fb26484b44a22558a0eac55f6fc0ff806ad3215f3803b55"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -147943,7 +147943,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t11-b.html",
-        "sha256": "be771791f3a989862f7f8691aeaa7106b42f8e6c98bd32c8bc9637f2eaf34e72"
+        "sha256": "8519d09ef9c21c7a262d1a9f59ca3814bffabe08e98947dd169f90abd98b7130"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -148113,7 +148113,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t13-b.html",
-        "sha256": "145dda5d46d4dea46e8d06a26ac5697d155bdeadd435b9ab15ea33ee4352bfee"
+        "sha256": "19ebd6b3f0065cd8b8771fcd1ed4c9ff201ddad6a9c15ee5c57167e5a609e337"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -148283,7 +148283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t14-b.html",
-        "sha256": "a5b18eaf3c5a825777d4c675f48087a0cb358fd4a176d28c4834c30257971503"
+        "sha256": "bc147ef24770642537d9f6b2237a9edf0fa44b8069c32f378cd309e38fad789c"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -148448,7 +148448,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t16-b.html",
-        "sha256": "148a8b7cc1c612f4a6b0d9be242949abb60c82886f7d71d2bb2b76c38fd1d331"
+        "sha256": "66284c4cfba3517da3108771ee5a3110d8995e631183739ea023750a1408b005"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -148613,7 +148613,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t17-b.html",
-        "sha256": "5bfe3b76d253498cf5acbff7db78d1b752381699e462808232c925c823db2cfb"
+        "sha256": "2027c5ea2a7003a0780b767534f40225d177ac736faa6a3430eb35195fdc06f8"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -148778,7 +148778,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t18-b.html",
-        "sha256": "569f09d542ffe0f2ba766f5edf94d99e1304aff00d67f4afd2461a21f386abcf"
+        "sha256": "c61de1583f244a5fa1241aaa3a3ffa70fd02340128cdf59ca15ebc2227cd4f4b"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -148943,7 +148943,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t19-b.html",
-        "sha256": "631181b923e5a650712fb301cdf73a019dcd2888bfb90180286f619c0ad20fac"
+        "sha256": "689790f285a2e306778dbc94641dbcb7b1b247be9f2311b742b7c15fd8b314b7"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -149113,7 +149113,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t19f-b.html",
-        "sha256": "2bbab7c1b65be9cb76f33ada9f057759aab769f7b5f147b92d34234c9831784f"
+        "sha256": "719b7cd77e4a3bc6a56a30ed956bd3167ca4455d62993a1382353523fbb5d984"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -149288,7 +149288,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t2-b.html",
-        "sha256": "0438ed65fd5533b74b81044d05ee4b56dfa624a94726d3a93ced616f2b72d0a5"
+        "sha256": "0f165e745c0367cc2885b0e622ec4b1b3b9da51a822ba659966cf63361243b93"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -149473,7 +149473,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t3-b.html",
-        "sha256": "1f53c0d68b01564dc92d70412aa49e510b1ac121ec39e51291c9536ba0db8ede"
+        "sha256": "85090a2928ecd1c548f7b323e341b683610d9ab2a6116bfb593933708f137587"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -149638,7 +149638,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t4-b.html",
-        "sha256": "5edf8b6304e30838e487a8b8f58745478b45520fef4d02d22cc521e369e78ac1"
+        "sha256": "6da1606b978dbf5142317a2be1ea49db1c2d34cc44a5b18fcd458d414626540a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -149808,7 +149808,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t7-b.html",
-        "sha256": "99ddd386fbe37ff0ff3aa2d1b29844a53a1ded21fa544dec9585a6031f082af1"
+        "sha256": "b72e4e1c779f10517ea4c17e27d9da1bb8630aaaca335f082c8b756995047be9"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -149973,7 +149973,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t9-b.html",
-        "sha256": "2c99b3c525d831495934b55064fe9ae68bb3a9293b08718429cf60977df9c9fb"
+        "sha256": "5ede7fdddbfea7fb7d6569fc6baf337d8ecaf580dba45c5b270cc5c3056c5cf1"
       },
       "gate": {
         "approval_id": "",
@@ -150143,7 +150143,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-design-publish-c.html",
-        "sha256": "0a509ac531354d546a4b7b6636af4794c05a632029f2ecd6da68854fe7c5924b"
+        "sha256": "d348205a773c7d8673d127c5652c23281ac2f64ac368f6341787ac6e9ad647a3"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -150313,7 +150313,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-p0-c.html",
-        "sha256": "8029911a984dcb71cc1ac38e55c2466bf95676994e8b9442f9ca2dfa350605e2"
+        "sha256": "bce53504fa4ec13c6ae28bf837c6826370d458d80a03206c1279be6711ab875d"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -150483,7 +150483,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-platform-c.html",
-        "sha256": "4842124e32c7f351700184cfd0ecc096955cd01d70483151ac5ee3d548e3f650"
+        "sha256": "85b4935bde2a60438e95d3490b1803029189c366a729829d408ac219d844df66"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -150648,7 +150648,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s00-c.html",
-        "sha256": "8cc02d0c4582d7ce710df9d335415e96c92f0400c515e732f37045a782b00076"
+        "sha256": "b8228031c915cfc631005d5ebd1438a64bb7ddf77ed562a44b688ed7eac8e6b5"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -150818,7 +150818,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s01-c.html",
-        "sha256": "410131ccbdcd2f2b20b3519258e2ded4bda2483673fc7854f259463b43d0804e"
+        "sha256": "9e0234aca4aead63d4e38629a8012912be332252fa7dab98df7be1f5cf9c0352"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -150988,7 +150988,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s02-c.html",
-        "sha256": "2a72cdc07696ef6bcaf61f37c05c8d8ca65b44888c1b597bcf6eadedb27dfbb6"
+        "sha256": "f06209a653ef6bb6f7f3076f4eb011bb2613ebe03f76a18384d2e25b31041e9a"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -151158,7 +151158,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s03-c.html",
-        "sha256": "9520e694ec2f914e2667124e10309d130c68ec72008a62c9e3799718f657c567"
+        "sha256": "841b21cf42fdc4adcf0ecd45b719bd33bbfe30efe66c7e117265be929260e6f0"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -151328,7 +151328,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s04-c.html",
-        "sha256": "07f42bf33807772d2a363bdfc2ac5e1454bc1013fcc8d816070ead24423f8e6a"
+        "sha256": "5844f6b41e12cf5a61a6b21726554b3fe4b553470743aea7d4eeb47fa01f96d6"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -151493,7 +151493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s05-c.html",
-        "sha256": "20cc361173eef3c5548833574859ab1c089876eb35129ccb7609c01f00178528"
+        "sha256": "83e3ac40fc6998c28099b5554e1f92e6b3e6aa9fa1b027f343d58e307e6329ca"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -151658,7 +151658,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s06-c.html",
-        "sha256": "1f388e8acc7880d3c6bd1c1ba210dcd80869b70a0783213da57f68dcc04796ee"
+        "sha256": "e28d256ffe032fa94bb8250119cfa6ab42325b0bb60ec30940baff98223ba88f"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -151823,7 +151823,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s07-c.html",
-        "sha256": "5bdd38ae29c32b2ace043fdc1f5dda914a46489e5144e3aff7ec62f4574031f7"
+        "sha256": "574ed48f4d42b4436c81af69c1512785cb3f627178a121e771bbebed6b4a04ef"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -151988,7 +151988,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s08-c.html",
-        "sha256": "1d7134383ad89f2064c6152757e6af5f011571465d34aa31ba0e4479562afd9f"
+        "sha256": "7658b4c89b0a52210feb58e80ee91b8fba6e5dd386a411905f8fef555a72b949"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -152153,7 +152153,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s09-c.html",
-        "sha256": "22b13fe4c6b9a62352b9b5761b316b0bd52cd395871459481d60ff1043299a5b"
+        "sha256": "0824179b00ba193797fe798cc298999f0f143fb41a46b454f88dd417bcfb4b65"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -152318,7 +152318,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s17-c.html",
-        "sha256": "96468bb0c9fcb6f581d382569ddb5f40cfc95367dde747da53348e605f922848"
+        "sha256": "0e9917159240581c9ba1d438c7b6149d05f907868833e2f797113ddc0381cd65"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -152483,7 +152483,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-spec-v2-c.html",
-        "sha256": "a9a5eeaa67aa818d3f756a00e054e7cca4e5bd871758151f48c3d615e2c4bf5a"
+        "sha256": "04887d00279615bdffeb5af7860bc522eaea8da3e3c64188cdde104b1634c5ba"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -152653,7 +152653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t0-c.html",
-        "sha256": "3a180b8d5ca5beeffcd3c44d5445bb0ffc6914051b5530f9e4a49a9b742117c6"
+        "sha256": "b428fa5e5d98bdfb4ad6669709c27cb54e44d67db0c69be35da8a821bf0d977f"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -152823,7 +152823,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t1-c.html",
-        "sha256": "002c55a5de377995cd3b811636bfa7d7bce7ffb9821937f9020f20c9b9051d94"
+        "sha256": "9da1ee57a4cc566b1f6aa6bf3c3bb2e64e57a60fa346e92b4e4a17a1198e5e7f"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -152993,7 +152993,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t10-c.html",
-        "sha256": "c7c3ea6d241c60c1a794ab9f59334cb5b763adef4ac95bc1c9b9181286699848"
+        "sha256": "99007878f2b02ade75f2ffba4575e0607824dc02d6af9aa544a1cddbc85214fc"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -153163,7 +153163,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t11-c.html",
-        "sha256": "c70c1fe422c839cc225b0e0e3993a324b860c376faa934996ac9f1e969678372"
+        "sha256": "346b0668e8f1fae7625f9bf137fbafeb86ca6c55bb76fb68096ef309ee2ca027"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -153333,7 +153333,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t13-c.html",
-        "sha256": "ce09fbc069bff49623a2dcc9de3900417a5f87c319c3552f0279f6b32fefa18d"
+        "sha256": "f0754e6c73779a189d2a8718207c93d38560063de65cb78f11eb8fbf36b53d0f"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -153503,7 +153503,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t14-c.html",
-        "sha256": "2d9dc1d0ddb8c7e428fc71ebde08639dbcb43414d6ac65e1bf15444c3e14de1f"
+        "sha256": "184b5196f2f4f6f33edcade61d6efa6c95c3e02a97e4029992329e28619d624a"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -153668,7 +153668,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t16-c.html",
-        "sha256": "beb331606359ff991c24eac130a40e03e9a3e14b65e6cfbc1284d9ad7b2cafcc"
+        "sha256": "8380282081e8a78b58af5fce30df200d18419c30536f462f4acafc29814b6c69"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -153833,7 +153833,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t17-c.html",
-        "sha256": "2ffa14fffba81584d6cb38243afaa0eff2858bad82244ee0161ef50fd5f5e48d"
+        "sha256": "53a70da5bdbf4c3a53f367a8262533a790b382fc274f89f165684e148665c7a1"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -153998,7 +153998,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t18-c.html",
-        "sha256": "4338477fc1a63128d139ed04fe553cb980aa731feee03759eec1fa088e7f0e7e"
+        "sha256": "ef50992f52cbbf3a4ef1ccc1623bfe357f3873cbbdee8f664a698b30372c6459"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -154163,7 +154163,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t19-c.html",
-        "sha256": "4951f1ee227fadcf1b866761e96226039168e60f10f028343b73dbfcf0df5f7a"
+        "sha256": "89a0f13210a7935c4ca1f1f51e63049e46f36d4fc690d54b94ba4f87ea5aebcf"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -154333,7 +154333,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t19f-c.html",
-        "sha256": "71a6d840ca2eaaec61cffe0d05d5d3ca235e6bd344f8f8142ab2c5973d5a80f3"
+        "sha256": "26660e59407824e738145764c6175310555f3d738001035937799332e283ddc8"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -154508,7 +154508,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t2-c.html",
-        "sha256": "b12b59281d6ea26408d32612f87f2c407f8f2bc012e0505e1822ef8a11c92edf"
+        "sha256": "4f0b570042ca623b5548fb56e085fc7b07e9517dcf32a3a7a56ddea50c80498d"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -154693,7 +154693,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t3-c.html",
-        "sha256": "50a3b655d147ce8750d799208773d69eca272e4f52fb186f37e2901f1e1b19d5"
+        "sha256": "e1a6be194b2ae0cd9b5891a8686a0dc3da51f93498cc305b40c55a5c8c5c41ff"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -154858,7 +154858,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t4-c.html",
-        "sha256": "8b81901707a65d667d9f291612b34513b134de3c2663c44aa99e6d85f7561d24"
+        "sha256": "bd8b447b3c1f3891e7d3502d977071d200213a15b2d05ef1655235c5f57989ae"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -155028,7 +155028,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t7-c.html",
-        "sha256": "80d8fb1837b702bdffbd5edd033eff5a93da05ce54e45361a288625ff9588c6e"
+        "sha256": "bb45ef3390f5d2724491e9a012a4baa6960a160beb02db1c27fa0ddc2bddebb8"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -155193,7 +155193,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t9-c.html",
-        "sha256": "e7421f8efcd294f90e3f4ba989d034a3ec768a263e37a256bf9794b764f9b3ed"
+        "sha256": "9bf4c3c909942a402b7a20a4f0229cc5de0f1121a0e9f98dd5a800e3e0ef54ed"
       },
       "gate": {
         "approval_id": "",
@@ -155363,7 +155363,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-design-publish-d.html",
-        "sha256": "554fafa745e8acbfe7331694e54ccc1f3c727e1db0056fbb789ab74cc9cbb6be"
+        "sha256": "099493b7cbf24d7d6cae665bdb7bcfdbb68f39c35f99175be5e4a319c272a01f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -155533,7 +155533,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-p0-d.html",
-        "sha256": "73d8ba8aaacfc173f869ba98118ec9709839c3f451ace9f1d75514b531eb2c96"
+        "sha256": "41a8eb14c1a208230e5e3c962136f7412b0dbc0e71285f5f469f0b75ea4da912"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -155703,7 +155703,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-platform-d.html",
-        "sha256": "02179aed79b1c80aba0ff171b159e4da2f6b0257c1303597c3eef9d1f65bf1b8"
+        "sha256": "d3664b177470ce0af5a356027cda81fb67358754194958cf3c03b3d1ebb3b969"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -155868,7 +155868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s00-d.html",
-        "sha256": "f43da050878857a4a250a7f501f2e7671a14b3b9db8200481ef1e4e74663ca98"
+        "sha256": "a82996291de79be70de3f45d90a72ed9a995e56915cf6e7d0b884fb5aefc6a4b"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -156038,7 +156038,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s01-d.html",
-        "sha256": "7e78c2fa1ffb8e68a325f3a27a7113991226abf4dfd5f574a0066f4c3e043f0b"
+        "sha256": "fbb9d90f9d8daaf6584ec4c2460b56a3b901b8b266f450ad81f99177ec3a9ec3"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -156208,7 +156208,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s02-d.html",
-        "sha256": "911cd035e276a84509ae3b7562afc23050b324a33471f8d914692e84489d4c61"
+        "sha256": "214f25c38ad9324e6159fb030f9fc2a688c8ebcb0ec4ba16efef91a415099f97"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -156378,7 +156378,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s03-d.html",
-        "sha256": "edb0cc0d208ecb3000b6ce0cbebc9722ec70a267db3a5e8fbb4352567f684dc9"
+        "sha256": "50ab7d3cbb6d22a8cb6908207e935147736fab018a534370a42b15cfdb502a3f"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -156548,7 +156548,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s04-d.html",
-        "sha256": "62446cd30e68786345f17a86fd064939fc4dca219cecb4ef463cdee91a56c6d4"
+        "sha256": "d024201100d5ffad4d74161c2968b41d96108623a73908c642f4d77241a5426c"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -156713,7 +156713,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s05-d.html",
-        "sha256": "acd7747f72a629f1de5b508a61bb660b593c39adf0e830eaa8b8818093d38e15"
+        "sha256": "f7e2750d91aa812219e84ec575888e7f000f297a2c8e21c48c2b75981f3f4850"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -156878,7 +156878,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s06-d.html",
-        "sha256": "4c436df0091dba8a6e4f0be6bf8729e6e82db6ce193bd92991f9e8a3284f0aaa"
+        "sha256": "e69b841ba1b0884c905f46e7d5f2c11dcb50a2d9738232c023d28cf9351680c4"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -157043,7 +157043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s07-d.html",
-        "sha256": "944b2289fd9c467bfa10632e80aa9bb117cf43351893b8eabafa024d6e8093ad"
+        "sha256": "94bafe353dc4b8d84c82666b645966874bebc5282f1a8081c0eedd28a1326ae3"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -157208,7 +157208,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s08-d.html",
-        "sha256": "1c87b81e2c2e4abb75f04b2b052028834ecd05e5642e8f026aa25ce03d07df12"
+        "sha256": "126cc474ad37c756b7639d1916834ffe63bf50ffda1f026e4d4991c7f5f07f45"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -157373,7 +157373,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s09-d.html",
-        "sha256": "a972f9857f67bd80cec442ea188fdf79356dc21fe15a4b8be1c73f55c97bdb2c"
+        "sha256": "fbef849da37a56159e5dca41f200a205d88663826e039e69977372c90b33c4b4"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -157538,7 +157538,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s17-d.html",
-        "sha256": "2685c2cabf84d2e473e378ed8623a334ff333e1c75d6816ebf4fb82c60134845"
+        "sha256": "5fb41d20f9e7d28cd60782add1226526eb4eb391930beb37ad1cb302af617efd"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -157703,7 +157703,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-spec-v2-d.html",
-        "sha256": "d714a8820a5d6e3571e87c86f6d089cbb06689b2566567037b526e5d84df0e1b"
+        "sha256": "ad7d2311037398372d1cc7171e79c4158f26c91b4e17d7bfad1afba0581b15ef"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -157873,7 +157873,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t0-d.html",
-        "sha256": "2ee9e27c1261fcb95ba0a034e47011effb66979adab7ecd331e1bb865433e42f"
+        "sha256": "901465ffc2583a0077273b7e6b4abd6315b2dd4b1ecee3175f6c35969297880b"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -158043,7 +158043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t1-d.html",
-        "sha256": "934faab3139f11514aa056e263a8bfe65e353cc7a26c82505a2240ef715b96eb"
+        "sha256": "9365fa030dd9fbb6362e2b541339314641da898792b523d571050336260a28be"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -158213,7 +158213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t10-d.html",
-        "sha256": "a3c46352437b261ec0321dee2ecb2113a496582adc13e3177228f592b5836b1a"
+        "sha256": "ff88bc2af9d7939668f77c1ae0256e684dbdd4b0da44d7db0af47e68599ac53b"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -158383,7 +158383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t11-d.html",
-        "sha256": "51d4b66473dcf9e538af4a6abdf4f40d109c74be89e2dd5db5c07711ab04853b"
+        "sha256": "e03dc5694547fe564891dc58ac8447bdc0c2a193ebe2d29cb1837b997179d781"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -158553,7 +158553,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t13-d.html",
-        "sha256": "6e249cebc533092878fdb4eb804566d4e6c80e941d388b66aea3f83f01c9474c"
+        "sha256": "5e412e614805b3e15b2cf9f4a42173bd5ff4052981b498e0ed873b9a0b076f71"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -158723,7 +158723,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t14-d.html",
-        "sha256": "597b6adf646cd3abc3e8dcf7b348ada295b7beaa19ac97be8b0702f8d1bac239"
+        "sha256": "83ddc978cc8380c9474dbf51d1236a1c05adee06425051f2d48f9858d4f37713"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -158888,7 +158888,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t16-d.html",
-        "sha256": "fd8ee0ed1d3ea24bc4e2908bab6b667d1724a1d16b3afca87918a578392a1b46"
+        "sha256": "e3ac1244c9c01279e72f7e4ca4e363b3cea9bd452f391a59e2fb18e257804d91"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -159053,7 +159053,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t17-d.html",
-        "sha256": "9c714c96d80d70d263d5d8cc99b9bed67b758f141e99caf754b55b5bef008c39"
+        "sha256": "e46151ddf777955f96f1f4f0bd0ba7472d1d2cc578fbe5539e3c10c4e8a318b0"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -159218,7 +159218,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t18-d.html",
-        "sha256": "d719303a1a30f6f1245b829c2d930d2de3a8578db8baf0f0c93509fdeb4235ed"
+        "sha256": "3a13c7d3b054b2bd156adbd77da4fa029d9388e9ed9baa7d0306636fa6eaa059"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -159383,7 +159383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t19-d.html",
-        "sha256": "3ac987749c692ed0c9319510e66def9783d1adf391d6c1549ee17a707acdf69c"
+        "sha256": "3fa94491607d0043726d3e88d3cf7302dc20b2c6f8f3471147fc67fa0adec41b"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -159553,7 +159553,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t19f-d.html",
-        "sha256": "e87e0f27d28877b80f9bbae14e0175c9f61b167c0cc03288281b149734f5fb66"
+        "sha256": "4a07733ed385e91f17c7df5008a3f73c9065fe6c7492d7d33676ae253e75bb6e"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -159728,7 +159728,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t2-d.html",
-        "sha256": "42d11b7c6adc66a600847e7815d0a76bd936ecea9d14eb928ff61bcf3782aea2"
+        "sha256": "6af6fe2d575845239658cc4f2a89e47816ce2d23584d788f0ee53f2f779c572f"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -159913,7 +159913,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t3-d.html",
-        "sha256": "e5a079b75197e0cb8e7cde4e58f4e14de564ed4053acc8ebbebd47f8f3ecfc9e"
+        "sha256": "929a5ab791343048e84b7864a4dab1c4ff72eddc21ae0d1858176e21dc1854c0"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -160078,7 +160078,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t4-d.html",
-        "sha256": "fefccc9f82eb457d36dc81813256a47dd8fc445fc0c996a7ca9bf688632d47b0"
+        "sha256": "fe38ac40d4bf82e9cab96ce5173ec29a804984be01ef1dd6dfd075517475b193"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -160248,7 +160248,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t7-d.html",
-        "sha256": "bfac630a181aaa49723f2889ed09da560e3e8038dedcbd28c9284367f7256b97"
+        "sha256": "8eba3116c67ecf7961e33826f60ffbaf7ddce444014cdbc35bf58868fddf83f9"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -160413,7 +160413,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t9-d.html",
-        "sha256": "01774b4d355377d2825dbd36ae458953400a6ec711e3c175c4c7ed7408000c92"
+        "sha256": "6b3d8e28860971954292972ee4dd9b87dba5e2e6c9484294352658df26903352"
       },
       "gate": {
         "approval_id": "",
@@ -160583,7 +160583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-design-publish-e.html",
-        "sha256": "d9888bd497eeeeec383e1570cbbf69fef0cd464f028b5a2038067303d6aa6b9e"
+        "sha256": "b0cabc5bd44d78f3b47c6725aaa79ea305f7a06d037f4f94dde62c7548c7a7d6"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -160850,7 +160850,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-p0-e.html",
-        "sha256": "996459014a684e1423420f4fdd21679f6167646eff5ce25f208d5e761dc7d5c9"
+        "sha256": "44d3b4a47cdcbed8eb1f5ca4afe6aca1e0178b2bf71ad6c1b44c862c95e78563"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -161117,7 +161117,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-platform-e.html",
-        "sha256": "d9d58fabe8755e966b504e65c1cca9df04a3d646e095cefe3395873e1c54562b"
+        "sha256": "2374ea422c1e36f8ab52c69ef858dcea55c682f55e3b580499afea0bfab702cf"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -161399,7 +161399,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-spec-v2-e.html",
-        "sha256": "824075aa0abff4d43df2601ab717b6af2d553d0b7a5b3d2d0b7c402a009cbbef"
+        "sha256": "5a24c24c319525899a8864fc1a29ae21ffa73c31ec8b14e7ece79434325648cc"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -161666,7 +161666,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-design-publish-f.html",
-        "sha256": "e93df7660d380c9c92b9b848ef02472885acd42cbd190fa43d9f2c1681619259"
+        "sha256": "a374f3671dceec2704e0a969c02cecef364bf33188cd444a0ad2d511e9a2d26c"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -161824,7 +161824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-p0-f.html",
-        "sha256": "37d48c96bd82689a7fb7f0070c5835e081e55882a71d2d447dda4337b4a18e97"
+        "sha256": "35a7354c40f608f796c5ce91364ec720ba63d214cc521b6aa1d0bab5b45b494b"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -161982,7 +161982,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-platform-f.html",
-        "sha256": "6056936dfbc9d3dc7cf6b8b0b2886fbd1730ad73fbd88ae7eb302ed2d3b169a0"
+        "sha256": "d0374b39855f32d1f26ba737f91fcda939155cf080445a3d2afa7b9dfdb03159"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -162140,7 +162140,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-spec-v2-f.html",
-        "sha256": "d512cfced2f81ec764431242ff30f3ce18eeffa63935077391b9650de45c3f68"
+        "sha256": "ac97078c371459e69bc67d98db2580f88721132cbb4618d1f97c9edf07a6d5a9"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -162298,7 +162298,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-design-publish-g.html",
-        "sha256": "9dd1ca5353d5a893f7480b07cb8277c1d9a6d4de5f3832655982364cd97d1dc8"
+        "sha256": "dc2c00288070c212c668820bf9b496a8923ceb40de573f4b8868acee0a7e5815"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -162424,7 +162424,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-p0-g.html",
-        "sha256": "428a9578b8a8dd3f9cf3b95a9418d0e53053701e4bc0ac334f873fcd7c223870"
+        "sha256": "3e0ea35ec6e26145efe977bbdca4b54bb340a8c6c4fdc5f3f8cb125bac124ad8"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -162550,7 +162550,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-platform-g.html",
-        "sha256": "299ee71bb5f6c5b3a40ae0bfb1b6e29ad8ff8bc0a0a23a34326b80134d2bcb78"
+        "sha256": "21bfa5ea6e2c2ecab4ccc008dd2a8e93cdae6dd553fc164ecf1dc172ef6b63a8"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -162671,7 +162671,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s00-g.html",
-        "sha256": "7bda18bbaf768fa35ce841afe8f88acf047c250fd1456cf4f08bdaddb2cc40db"
+        "sha256": "bf941ad92c8c3ec934f7efd1cbca8146cd4e62525a1a7865b8d294d522aed34d"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -162797,7 +162797,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s01-g.html",
-        "sha256": "add2fb089550b3cbd6bfe3399bed745bcef6ac623f3626375d1c1a9596233255"
+        "sha256": "b94ac3a08b18e65a9e70264117f6ef2284bacc609d7d2c7aaa855c0568cca1dd"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -162923,7 +162923,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s02-g.html",
-        "sha256": "c36879bf7ea09d6008692285a42ca1ae70840e82d90f98a41fbc65584adf746b"
+        "sha256": "20504706b417f90b3cb71c0d363663c23dbb590bd28aaf6f7d8670fd568b8505"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -163049,7 +163049,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s03-g.html",
-        "sha256": "6431ca91c6b91843b9ea48288f80313acbf47ba307c56415519f7108d765987e"
+        "sha256": "38ff6dc04e96aef8ddf25bbab3787cf266a5c0db1b94af1383fde6a887ec12a5"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -163175,7 +163175,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s04-g.html",
-        "sha256": "43ce4330aa2c9e32b52e1a1ed86ffa22410f09b783acbc3c4bb26d70e528d25e"
+        "sha256": "28737a4e2157a287e72173a28fea3d50ae9fde9f65142f1eb2ede1f1e7ac86a9"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -163296,7 +163296,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s05-g.html",
-        "sha256": "0bc3bf5c3facc8418682032a371bad30febf5522e6102377c3245fa9a46b1cfd"
+        "sha256": "915a00f8d4c4a7883ebc05eb95922d47c5943d8e4cf92ecbb4e31434d810d5bc"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -163412,7 +163412,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06-g.html",
-        "sha256": "34cdc9a0eeb963c53fded8dfab03735145be2789d5624a2448bcf2653784a353"
+        "sha256": "fb19c882c33d790b076f6c0de39422bbc3b357b1928634c11ec5efc141b8e4be"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -163534,7 +163534,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06b-g.html",
-        "sha256": "5cc70b3d6d91459d24a80cc63ab4e4aab74543b066fc1c18a9abadb3f04ebe3e"
+        "sha256": "6993162c1519b3633d9b831d3a7b4e16e40485e9fceb4cdcd764fe13061542bf"
       },
       "gate": {
         "approval_id": "",
@@ -163642,7 +163642,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06c-g.html",
-        "sha256": "214a4d17124fd4e06df540ae076a634123abd2fe4c423f8ae4f857488cf814d2"
+        "sha256": "3456144b460be06f36abd765b73b417336028193092ddaf92895009e42387cf1"
       },
       "gate": {
         "approval_id": "",
@@ -163750,7 +163750,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06d-g.html",
-        "sha256": "cb836418c0c586256c5f35ddb3bbec30c72e76e50a1f4bb7dec6bb6266475f3b"
+        "sha256": "8a31904acf9d01b81316d6d3a666262598bf80cd296314fd628a9b08480ded73"
       },
       "gate": {
         "approval_id": "",
@@ -163857,7 +163857,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s07-g.html",
-        "sha256": "5d9e4ca80433787370c55573b177d660282773f2965ded6eabb2be0d4befae4d"
+        "sha256": "4ad03bd4dd10d6307ed870fe8a666590fa13ecb7b61a2b26da37690e14768e39"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -163973,7 +163973,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s08-g.html",
-        "sha256": "25bb0bcc7fbf87f81ca68513f6e0bc2321b9a123d0b4e55e4be7193c4da41075"
+        "sha256": "593ec59d695651be520e875f8666eac5e0d804d6f3b8aa83a3ca999de764f8b9"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -164089,7 +164089,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s09-g.html",
-        "sha256": "d9de4585544a1ba74c5346de6720ddd3b8f692d039ccf17aff0c966e327fe997"
+        "sha256": "83f4fcd5fd040c074260bb448a729743223bc6598913493e14705d20e4a77d06"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -164206,7 +164206,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s10-g.html",
-        "sha256": "785dc97bc658108ff7de5381930212d3ce01d103ded514e87c088a7373f944ed"
+        "sha256": "6e3b512191b0843d2e86b2ac99ef156d9c443c9e5b8bd3b622537315714ae99a"
       },
       "gate": {
         "approval_id": "",
@@ -164314,7 +164314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s11-g.html",
-        "sha256": "9d76cf6495f892c135c0d34786a2b6a1b5b513b2008192e9661adafd40491f7a"
+        "sha256": "8caa50e8967f7e012e29f07e89bcc1150d0defc0e27cd88611cb5fb56327a387"
       },
       "gate": {
         "approval_id": "",
@@ -164422,7 +164422,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s12-g.html",
-        "sha256": "e757ad3f0314a0e183bc9a791a925171a04d4daeb5f46a741068e5b81c97927d"
+        "sha256": "095712625bf76ab1066b42b6a067c0821301643fc9825ee45a04679faf6fb779"
       },
       "gate": {
         "approval_id": "",
@@ -164530,7 +164530,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s13-g.html",
-        "sha256": "b250c91a6bf42a778266acdc6bf6ec87a927b74ee42bdb443e809c34a28c1da3"
+        "sha256": "8bf0f366c8ae1c59ae94e3190a46653ce1f29bc38098e47d8656ed6689b7aa0d"
       },
       "gate": {
         "approval_id": "",
@@ -164638,7 +164638,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s14-g.html",
-        "sha256": "fc623379e566e1c7ff05e032b7b2caf8759b171b9fcbca1044ad0b94b6fac69c"
+        "sha256": "701aeca0ab2964db0cc264fe62da86371b8ca7165234c2f59b08550306be5d9b"
       },
       "gate": {
         "approval_id": "",
@@ -164746,7 +164746,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s15-g.html",
-        "sha256": "1a6a7dcb6fa2442d6e162b99019ac4f23a0825ebe9b9a35ea4d8a4e213db311f"
+        "sha256": "3f9eb21d033f95d8c327d9253052d617a5db7adf7112f5bf02a8b67757e51c18"
       },
       "gate": {
         "approval_id": "",
@@ -164854,7 +164854,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s16-g.html",
-        "sha256": "62edb6964bfa6c61ca5e42378e36290dc5620f6eecb8933f5326aa0fc5b5d008"
+        "sha256": "2c475455ebaea2fef6d231f57b3d0de54304229594375f6e481e782d52648abd"
       },
       "gate": {
         "approval_id": "",
@@ -164961,7 +164961,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s17-g.html",
-        "sha256": "2cdad57dd37c118c03a8e82b1443dfe9660062ad64c10b733630e7f418bd8482"
+        "sha256": "35cb028a082f18715ac868d77292b646062b60e6c648806628d5055c4b6f89a8"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -165078,7 +165078,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s18-g.html",
-        "sha256": "b2dca500b4dc8a6096b58ddd8ae4cc4fef6c1e5860fcdcda9bd7a1570d1471af"
+        "sha256": "160743ffa78d94e5fa52e3a428ead8038b74ca468e79d80a280b32b2e05172b2"
       },
       "gate": {
         "approval_id": "",
@@ -165186,7 +165186,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s19-g.html",
-        "sha256": "13e4e5aa284ba2aacd075089e5aaf7d1b379c19608a61b0f0257eb18cc382d16"
+        "sha256": "3599a6fd85767866361149f419991f1297838affe2c153f2d481cf0dadebe647"
       },
       "gate": {
         "approval_id": "",
@@ -165294,7 +165294,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s20-g.html",
-        "sha256": "a6c8ae00cf110f366b56187301be968124670ffe332ee4bd96f642c7e87e3ad0"
+        "sha256": "c7666eb7ec63ee6a4153575d79ec6706ebd9af3dd0833db9ed9ffabbf58fae03"
       },
       "gate": {
         "approval_id": "",
@@ -165402,7 +165402,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s21-g.html",
-        "sha256": "2ac1e30bdb824b53cda76bb95563dcbd22259f41b8e3ebed9d102819c314aa8e"
+        "sha256": "c8ef0228403cb7d64aeffbe17f98fe6b09e3fc66cf0f59356ce57ba3d736515b"
       },
       "gate": {
         "approval_id": "",
@@ -165509,7 +165509,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-spec-v2-g.html",
-        "sha256": "a6d00009a68648c5b83ecf77fc34eed3c836eaac9c501f86d563aa21f994468b"
+        "sha256": "f46db56e309c82f50dbc1ca0d4afdac869a043ef2cf8f470c31a9215f7bf7d7d"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -165635,7 +165635,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t0-g.html",
-        "sha256": "785b1fb67fe38a30b156c9ba37f62a793426dd4a9b0ccdeb6086018d8368bb63"
+        "sha256": "031b6504090caa9ea8397301d7faa1c0cd0ac43ddde5146793330cd5d61fddfd"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -165761,7 +165761,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t1-g.html",
-        "sha256": "6acabe0ffef885a57f54edce24df6cf4aa1ae4ba6a45f1c6fae953de457b8cd5"
+        "sha256": "c6b222b4a4b3186c49975aa3a7ecdf8e7cb8dc8950f7704497482419b8fb8304"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -165887,7 +165887,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t10-g.html",
-        "sha256": "c481ec00482f010937fe4416f6e1ae53831f683b49d789624a1810887fa50e9e"
+        "sha256": "9140dbd2c96f1fd86a0f437e60ca360f8302142a14d37d07a39433c5d594981e"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -166018,7 +166018,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t11-g.html",
-        "sha256": "88b94caac8a44239c468cd2d3619e55ceaa0373de0cc140c5aa0088fd11f0937"
+        "sha256": "df85948f8f474157b26efed09aa78bffaa6261cd0c788ab67d491f2dae8edaf8"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -166145,7 +166145,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t12-g.html",
-        "sha256": "0517bac2a459c1d2600a54c508c7681a09baca77cec6d4f6e9f416f37c5f05a3"
+        "sha256": "3891ce04066e26021f95e11cc8edf06e60275798c8a3dfc46606b9faf2bd1157"
       },
       "gate": {
         "approval_id": "",
@@ -166252,7 +166252,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t13-g.html",
-        "sha256": "f3c9d883f9501c2b7e08721b269cc9512959d17cd2b3445ab38b4cc235fa904d"
+        "sha256": "336c553a1a5dedb9975b27700a36cbe1b46c3755af27013b188dacf5f219451b"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -166383,7 +166383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t14-g.html",
-        "sha256": "5261fe30a35d7490c21af9479f2d1ba0d2b42c3eaf6002487482eb53b33c3795"
+        "sha256": "8aae3a3a90eb4fca670e960ff5545c0268283ebef341dd1365dff1033b1a4d27"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -166505,7 +166505,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t15-g.html",
-        "sha256": "514419167fa40a07de962a737f591de7189a1e9cb7f6fe761c1e6c5f04386b19"
+        "sha256": "9e393542f00cd62c006f6e8f113b6273f03ee11240f8e6a72a568405c5de5e20"
       },
       "gate": {
         "approval_id": "",
@@ -166612,7 +166612,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t16-g.html",
-        "sha256": "d9cfc0ec8273cfa849b692129f25102ad9065657dfb0de405d0a59e3ebbe63a1"
+        "sha256": "9b2a8b4ac77e8e42c42a69fcaabc6f4fcbb5e0c081fd2b771c4f08f2d50f393e"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -166728,7 +166728,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t17-g.html",
-        "sha256": "9573befe7a272c4b9d6069bb31a3e518e762f25762772464a81b32908883b152"
+        "sha256": "2b138c116a06be0c787961ac774ca626476b8d3020d093eea5e4bc29c144b112"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -166844,7 +166844,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t18-g.html",
-        "sha256": "518da4fe0c37ff8781f6a7898c19cb6b806f4c012bb0fd322b4e3b9361127646"
+        "sha256": "432eed01f837dbded800f889536f76e9dbc1b41ef33e2660e076b5d91e58a7a0"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -166960,7 +166960,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19-g.html",
-        "sha256": "ea6b1b76af280b178d08c8b51409e14649075c1daa53e23fb4e416c68b7aabd3"
+        "sha256": "027a709e548969afdf60e10714611a542837c1f3663cf0e8a8e5be029f658c8d"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -167091,7 +167091,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19f-g.html",
-        "sha256": "79ca8fd1737a0aa7c2d5637e7be399711c508ec7ddcb2c72096d3187036854f2"
+        "sha256": "b745a502a0f12b2a78cfd71e12ea83298ab34423f8d59c7a84d6aef54f4d3e49"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -167222,7 +167222,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t2-g.html",
-        "sha256": "7f7f3605dcb3c0feeb16128bb5a019ff682ff2a0a5096af8d3fa72ee8f8f690e"
+        "sha256": "c82cdf30cba5eb67e91ee171aa3222a3861cc611744615a3a2df7d5109d21c51"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -167383,7 +167383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t3-g.html",
-        "sha256": "edf2e8cf0e8e461bdb38af09fdc964f53bcec6a0021dc5d2be6637d1f42c3b7a"
+        "sha256": "f70336faba2691d384ecae109843f86d3e2a4476e2933e6228adba7332d1a6cb"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -167499,7 +167499,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t4-g.html",
-        "sha256": "2267b87be264292800b04895bf5d6916cc7fb004ff84437ddcee1e6f2772405e"
+        "sha256": "0092ae8388765e80369aa3fb34207fd89c9df6972d719d9a4e61f467719f5d4a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -167626,7 +167626,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t5-g.html",
-        "sha256": "200e6f902dc5a41f900c51eeaa1d0f9e2a03061997abff5f5b04fc84c29c22bf"
+        "sha256": "532403482d7afbf2a312f0b1c684d7a0119f601bc32cc53bce36f8e4a1a44c06"
       },
       "gate": {
         "approval_id": "",
@@ -167734,7 +167734,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t6-g.html",
-        "sha256": "5a234d5ce1ca26e5b53e15f6a7530171f0253a18e875e22c79601c2002e67057"
+        "sha256": "28822d77393b87447e064a87f8b8249e088d4d8c9a8b027924cf25b4354bd7ae"
       },
       "gate": {
         "approval_id": "",
@@ -167841,7 +167841,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t7-g.html",
-        "sha256": "ee5470222a247598b4acdf8776256ccc6401de2adb4148c1859271817d9b06f1"
+        "sha256": "11730d1c99d98fd2610ec5f440b9baf52c6d3160b6420592ca7236dd1f80c877"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -167958,7 +167958,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t8-g.html",
-        "sha256": "fee71ab47014bc5beff575076f61adf9a18fc8ee1de14f20c604dbc3b08995f4"
+        "sha256": "fd1d673131034583b92a87538ace2458a23492c3e17fb2eef779974a8d551671"
       },
       "gate": {
         "approval_id": "",
@@ -168065,7 +168065,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t9-g.html",
-        "sha256": "cc26fc0d9e10edb2bb5db43027b08a3f5ed1d1114b7f2f56bd56a855e6a874dd"
+        "sha256": "4d84785bc4f598093e9df5e2428a27989587ef815ad3a8cf46188eb8ae7f6fac"
       },
       "gate": {
         "approval_id": "",
@@ -168201,7 +168201,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-design-publish-h.html",
-        "sha256": "d18ae6eb56466311107300329a961bd8e3c024f72d19a9845227242fdc01bcbc"
+        "sha256": "97f75d672eda9dcf5599061081403633773d65ad0f75c43e7a2219037e20044d"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -168329,7 +168329,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-p0-h.html",
-        "sha256": "4c80c6cf96d4b789c688737a2a23311e6a50f7c7150e10e136ada2b72e15633b"
+        "sha256": "bf39940bc1656326af43a1f4ff01cb241ede17785c171140823bf63e54f8f5c8"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -168457,7 +168457,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-platform-h.html",
-        "sha256": "0b781c04f1693eea6c9a69ba262fa0fed721f7cbd4f39275c02bf0b5031794c8"
+        "sha256": "65d967207faf1be8982c1d4e4acd81decb7afc520c6cddd49e151d32eb84d1d9"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -168580,7 +168580,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-spec-v2-h.html",
-        "sha256": "f374d88e45145288b05de39ad103b917105e1644a019d3cc2b901823c1eb7f53"
+        "sha256": "9946fc381e293186c8006573821bab8a291067471758b56f33df184b17f8c9a8"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -168708,7 +168708,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-project-context-diagram-design-publish.html",
-        "sha256": "40140ac60164a0aeb240b8f1ee8bff9f3b5de87da6626277f547865ca23a5eaa"
+        "sha256": "51ca7dc09cd9d452b61c4e45f587f42979e453d8dbbc3f0c8d4c2db913c40b9f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -168813,7 +168813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-project-context-diagram-p0.html",
-        "sha256": "e94320aebb6b5bca61c239833ac3da132f3a10355f9930b9b03e723165b572c5"
+        "sha256": "4b59a92655ab05da043c470f1e6ad87a79783ae8eba3355246a27fc6c284cb9d"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -168918,7 +168918,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-project-context-diagram-platform.html",
-        "sha256": "1d5f30cc4eb0502e4761271943bbee7e5d560d400111c8425069b8b2484ee6dc"
+        "sha256": "92e0f46c92b5a7bb067ad0655b0e0b09f4eb93fbc608fcca66959f4463fef423"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -169023,7 +169023,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-project-context-diagram-spec-v2.html",
-        "sha256": "326d9b7812f8fa4ee491e6b70f10041e8c49cdf94816c2a7793f2b38671ba51f"
+        "sha256": "fb1b93a2e87d176662b33593e2188d225a0eae73b5b802426583e729d027ba24"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -169128,7 +169128,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-design-publish.html",
-        "sha256": "107d67ba3351554fd11db1baec5be4887e576ecf68b05f77876a8945c31208ea"
+        "sha256": "e2ba01a5f2b0f2529d71d6acce83206176377a6a5da0ad0e43fc414c461625e6"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -169219,7 +169219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-p0.html",
-        "sha256": "2be5d6bb46b8141a9e3dbc36400ce477245c8e506fa066e0362368515ce233a7"
+        "sha256": "65bb1a602845f7ba8205635d9d0491ff59c48b64f2f5540dc16d2cf73ca94286"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -169310,7 +169310,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-platform.html",
-        "sha256": "213264bb5c3271e2d320cafd49124d3e12611320616bbe48c64fc1b787e3fda4"
+        "sha256": "35b08a7302a1666034ec0e558e322544c1cdb561fb236fae21b2eccdbc1698fc"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -169401,7 +169401,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-spec-v2.html",
-        "sha256": "749790e908155e75bb4b2089301bbb84fde03eca48d1fc99017e4229305ae8ea"
+        "sha256": "00f0330ee10f1b4e89a7c518ecd4ac31b5e0ddf023fcd8d8e91f73cf8b517fd7"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -169492,7 +169492,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-design-publish.html",
-        "sha256": "a9e07b545bf2703c93ad08be99b1645c12d0ea66b9821976b1728ec184548fbf"
+        "sha256": "8fa3b18fb6ea0c4602a73496ef91fae1f25de02922b7860964a1e93409628f13"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -169640,7 +169640,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-p0.html",
-        "sha256": "d1fdcee01ffe590d1c6324c0aa409393136387605c4a0788c89d331de52ef2bf"
+        "sha256": "fd6bd99752e05545a14499c753f48eba54c9a2a30e975e97d48e4185485d9068"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -169788,7 +169788,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-platform.html",
-        "sha256": "c854ac8567660f6ca7928d430103ad6385b5cf3d39889b41cd84f6bf3cffed6c"
+        "sha256": "8aa87506916ae449b9230bbe6a6a8e3c699a64179c4615ae677c6f86bfaac791"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -169936,7 +169936,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s00.html",
-        "sha256": "43a3b1f3a6f320d306c0345ec22ed84c150fffd67d7885adeba39600c34f7106"
+        "sha256": "a47fd12970e09ff0133350daebf5e14bdb99aa52fab647ec2cee5bc8335cbd1a"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -170084,7 +170084,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s01.html",
-        "sha256": "1b4a827751fd08722362fffa9c3a4ec60656b56e487677fea784cce6846e6874"
+        "sha256": "85053fe542fe9d84f249743ee90c3143c90cb04c7638471d5a192eb499dfa50e"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -170232,7 +170232,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s02.html",
-        "sha256": "e5ed0d1e71c1b31a2d5fe6f3273dc4dfff3ce1346ad5bd5cb1f6ba3e188a3481"
+        "sha256": "0cac1695a0e26e9c534695ea7e3644a696e74e67e3bf08155875f8f2157f155e"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -170380,7 +170380,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s03.html",
-        "sha256": "5a7117369b2568900c8ffcfbc4ddbf9e22bad7787ad03082879687e3ff0ff23b"
+        "sha256": "f9c681f738cf877b13b0615616def2e9537c94f45180f5688526ea6778211cec"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -170528,7 +170528,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s04.html",
-        "sha256": "1ccbcf350faf17c60a47a0792d3b93efee7499726721a716331350e3b11bac7e"
+        "sha256": "25f9e2b98edc0d7d6a03dee4b95e5c9be85d44627bea44fadd910633b0fa676f"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -170676,7 +170676,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s05.html",
-        "sha256": "3bf7a5238d9aa5f6ad1ca5e428633837abe2098009738429fcd9854cb089ee40"
+        "sha256": "1258c35e7a8c4bdb1de4a20959aa6f698649a33be420335faa178e3a5dc37bd4"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -170824,7 +170824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06.html",
-        "sha256": "41be9b967fdaabea11e644adab9aae8a4a647dd905dbb73c046910dba17eab7f"
+        "sha256": "fbf1dbd0f84f360fb6c55a35d52dd2acb77d640e8dff2024bf4e0c153c3e0963"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -170972,7 +170972,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s07.html",
-        "sha256": "9bb4399a6db536ef18fbfa49995242ab6759d9502cc89bcfd287756000d91b1c"
+        "sha256": "580c663918b60c6b3213708c9af129f469950343aa4e5621a0cc6668f5029c26"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -171120,7 +171120,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s08.html",
-        "sha256": "d9cb781e1fa7460a22488fe8883c6b0de2c8410d21d6be6d322237aa492e2880"
+        "sha256": "1c33e698e4146e9cc3d9e8cdcd790e5fe10f0e6052f3cd792f4cd28f3ed1e118"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -171268,7 +171268,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s09.html",
-        "sha256": "b7249890bff59dd689e674225e06b23fe005e7ba1cdbaab11add82e1a0db6efd"
+        "sha256": "98c45b08f89ffbf0e8376777c5d3518bdfa5a603648cd13aa3396e2229f9d66b"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -171416,7 +171416,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s17.html",
-        "sha256": "29e5c9e39f7b7752c693f563006ae02d37d6f04c88a8c2e24b2a6d58e82c7000"
+        "sha256": "2425c0fd0edf27b9bf2e4e9646b6e5bf71bc259f36264d7f028b609fb4b6d2ad"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -171564,7 +171564,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-spec-v2.html",
-        "sha256": "14bb3119d8d021722c5bb2e45595100ff423981ea3cc2547a2b1116826a2a264"
+        "sha256": "f84dd477aa5a9c07fa97fe7d6285c21bdadada098cccea0a32083cdcebde9586"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -171712,7 +171712,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t0.html",
-        "sha256": "e633fbea7b089a8e9d8359f98a5bcb4f29195b91b1c3bf9e7931431c109d7fef"
+        "sha256": "0c84ee284c6b9ef3a1363d5e2dcd1dc497d9b206c405576f047b868ec4b3e74a"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -171860,7 +171860,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t1.html",
-        "sha256": "d640bc93037265c528a45848df9cc95c622319240437d67b08e829baa67a4666"
+        "sha256": "e7142fa86b992d023f59926ed5a770d79451249925de366b5c2146d1eafdeb95"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -172008,7 +172008,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t10.html",
-        "sha256": "763ba5f7745d5da1dcd2eabf5e683035e6a2e218d1e20f1cb4d1cd47c1b6bc2f"
+        "sha256": "cd5f019c51416a1423f4028c9c95cf3c2b56e1ea6bf3de4314b8a8871a2e1cb1"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -172156,7 +172156,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t11.html",
-        "sha256": "090e60bcbece14415f827cbae04b58bf1875106f3ed765df6f27393853f1c728"
+        "sha256": "83f90b8180a104c5ea5c7d456309278a4abc78e6edee16f327589b6135d6c2da"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -172304,7 +172304,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t13.html",
-        "sha256": "1615dcaf3c88840790873ca3607e79df265bda755173b76441dc94d911151d9a"
+        "sha256": "0467101264a99b1d797739d5bcbb5cd5ea820160c75fe1a809e0703f50f5780c"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -172452,7 +172452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t14.html",
-        "sha256": "91b2b861ca4b48d5a94801e0b3ce76fc118cea05073b301008a2715d4ec1531c"
+        "sha256": "4450ad261322bedaf0b67b5792f406cc0ec4b8374e37d4fa7e201f53ff37c987"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -172600,7 +172600,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t16.html",
-        "sha256": "749f2ed8937504598f93cfe5449b24047e16120b4f64df950f438d25e60ef509"
+        "sha256": "73439a66f5964b08376f755441ead85e7dc9dd352d5b0a4b7033fd252a4d0143"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -172748,7 +172748,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t17.html",
-        "sha256": "7e46a718de33fa89f7a713eb44ecb8105f91dc517116834a6323c2229fc2c755"
+        "sha256": "6e882979b22853c806736b6d317d6dfbfd7d5ef10debc8fcb7a020060ec1585a"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -172896,7 +172896,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t18.html",
-        "sha256": "0c8cccc0f75a60c11253ab62f865a7a63408fe8ae4da88c537db55c53993e229"
+        "sha256": "caa78adecad58c94a68d696b26b46fe1d7b3446dceda5286e984a24d90735d9f"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -173044,7 +173044,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t19.html",
-        "sha256": "5c265733fe8e4bbb89277909531c88d8ff3cd95919b1d6c93fc3a934d7b5b2f4"
+        "sha256": "812c3908ebf17078eec828636c63aef671e248c9e97f5f8c3ce8f631c976ae81"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -173192,7 +173192,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t19f.html",
-        "sha256": "4d57ae977f6feaffaf6a53ec3a4851f5b6954f188d1b8cc45d186e6a3778dc02"
+        "sha256": "240e9c1eb2c69155a5429878ec63a9dc8cdd4da188ae5360f86d6707d3bdba4a"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -173340,7 +173340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t2.html",
-        "sha256": "877b8b5ccf9beb3c81d8e38c1b7471c8e001369f68f3dcce8e6dab06bb84af15"
+        "sha256": "7283a7ed71bb48b806b9e2b12d11a034be0a28c46aca26c047acc28866a30d53"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -173513,7 +173513,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t3.html",
-        "sha256": "191763298cb48ab88db4ad09f3d7fc96565b4aad2195012e196a32ac1f556467"
+        "sha256": "8681fcd16c091abf248d1c9a435807a559b2a4847c229e57dceff5f13726f898"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -173661,7 +173661,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t4.html",
-        "sha256": "07157529a052da4d7da6c8c50f0c64a58bc522174f82a212cfaff4343f4aadad"
+        "sha256": "548ee9db67e371af96a0c35cf20de699355b5f30018a66993ad4f6d8269c8288"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -173809,7 +173809,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t7.html",
-        "sha256": "e4f684fcc7f7179e9e62761059b913dde5c39a440d924fa95fc0ec96bb300a83"
+        "sha256": "055daa5b2ce384abf8c6ed3a8d7692dbf275d7f8ab724523d4d934770807afc2"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -173957,7 +173957,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t9.html",
-        "sha256": "e514e08f2b0c69b9dc09177eaa6b7be7da365820a0c0bf50085afc4378e410c2"
+        "sha256": "1826231cb8c693902f4156f902772c6eb8563cdcfb28c4e6997e66666711c4ba"
       },
       "gate": {
         "approval_id": "",
@@ -174130,7 +174130,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-design-publish.html",
-        "sha256": "fa368b58da578a3dfe7334bfa41fe4cbb4ae03cdb79ff184881f122bb06a2059"
+        "sha256": "357d01368732d63a968afd4e5f56b014c1505e65f0717c184e426e3adbae968a"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -174221,7 +174221,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-p0.html",
-        "sha256": "7fde923cd60154ad3efc76df84f669c4eda965b7c7dd625af18ffa0634edcae0"
+        "sha256": "bcc9b23582643f41625cdc54416c633f6c61f4dee9111a6ddfcf8f4a1953949f"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -174312,7 +174312,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-platform.html",
-        "sha256": "bfec28d19750c672995f0da08fee5d3c3318466592312d241c51b461269e5917"
+        "sha256": "5b390d733fe7c7dd4b4053732b7e0f85e7955fefe5ba644fc809875e28ee7e48"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -174403,7 +174403,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s00.html",
-        "sha256": "75d3b4d98b39dfda35373fbebea76474a21611ce3af85175b0fc024cfacbb901"
+        "sha256": "56fb515f471001a37906f4ba7074c6c19fb590c75e489cd54e37d09a0b641fc2"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -174494,7 +174494,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s01.html",
-        "sha256": "d728e897e38753aad9673fcedf972dec675e7ef5368b2b5fe87a76051d2388a0"
+        "sha256": "e63b82df5384083ed32c82de86244751ad2cc721dbb7781eaf192ec066135424"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -174585,7 +174585,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s02.html",
-        "sha256": "c398b6ebeea446be00da8ad1ef5d991ba387f906b18b0e1408dc48feb5c33447"
+        "sha256": "2fc9cdca95ba1c1dc0b08b6e898e2063eab7d7554ffd1b89ccc6bc1a641d53f0"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -174676,7 +174676,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s03.html",
-        "sha256": "3dfa38f901ec55165645d3abf12bb57a223e35a6b002a15b7e34a0c7025c5208"
+        "sha256": "73f43018d188a07e8ec9a45b3f4e32ebbf527ad3a04a74b12ebf43a39ddef0b4"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -174767,7 +174767,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s04.html",
-        "sha256": "27dff348978193567162e8f9957a0d6e467e340717a97bf488214e634e706c84"
+        "sha256": "c3d82b0d8cdd56d7cfca78919c55bfb887e5e51c00ef88d2f0204fbbfe81233b"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -174858,7 +174858,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s05.html",
-        "sha256": "dce6e2dc4a81938e12afce05d800f7fb9c7c739493ee0d8b6a29dcb436937b2d"
+        "sha256": "339d8d463e540182863747bcf60f1d00fc59f5fdc09bee113b27ea4a0d71e2d4"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -174949,7 +174949,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s06.html",
-        "sha256": "778c54ad38bda3a8ce38dba590d0b3e3d22d19cff55a6bd7ccf5f5ee68b16f07"
+        "sha256": "9d1ff659a6f282da5bcaef88127d00c9f8c133d34fba2e57f12ff7932c579355"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -175040,7 +175040,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s07.html",
-        "sha256": "ac5ddd58416bd86c3f9f22b89de6f9f8cd391c7612525faeabcf5ee24e21434d"
+        "sha256": "b71fa6a5b718cfdd2d2d0f3d8a1bc75cf7c911939bd8a05759b69801600eb02b"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -175131,7 +175131,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s08.html",
-        "sha256": "97eebf54fc018bf9f8bb0a0e0ad252a78766cec536b1ff28ead73561ec3a7abd"
+        "sha256": "f377721d789307658939e4af63f3a35cd4c867d3c814f0427ad448c477af407d"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -175222,7 +175222,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s09.html",
-        "sha256": "13fc875716fbcb0184f109512b9528afdde093acd335fd87cd481531f645d9eb"
+        "sha256": "7e793a3c41ab1fa546408e1eb4060d956e1b3ec2fd5fdcdf655665dd0e1d6485"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -175313,7 +175313,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s17.html",
-        "sha256": "1900b5bad0e81ee251fd52ca46c391f75caa63c1cd57885b7ba21ec0d1838e60"
+        "sha256": "bccbba39ed64fc0a64782ec366e75890cdaa86c5c5bc8e43f84e076e1497714d"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -175404,7 +175404,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-spec-v2.html",
-        "sha256": "c8c7aabb3e7b8a7a757dbd50d578ca1e50d81a7d213270d82a1ac9d3abd7e959"
+        "sha256": "7b81501c59f9dee70fe57a8c2a57a2bf9129289aad8aaa92ae4491a52ad29c13"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -175495,7 +175495,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t0.html",
-        "sha256": "682411cadd3f5249b82d509047215014a0eba183d589e104c36267eaba8e2094"
+        "sha256": "52942d78e5fe6e4106281d0b062f5eb893039fe96f1ac2f5c9811fa4433c5232"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -175586,7 +175586,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t1.html",
-        "sha256": "cd0f0eb6a539c3f93e65ad44b9d048dd9adfd641ce7e54666923e39a352af8d9"
+        "sha256": "c22bdd671fedec2fad0a652716fb3a6b47b89fe2423221ae3cd3b6ad16109363"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -175677,7 +175677,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t10.html",
-        "sha256": "0dd041e6387cc8fe86979a27818d252275390538bf421b87ed142a4782f3d2df"
+        "sha256": "1c7baaa394b7af57d1aa4fa281f6b9cf87fa0635d60b8fdf113ae3521845b3b4"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -175768,7 +175768,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t11.html",
-        "sha256": "9246e2ae08a7b5a5607b3dbfb9b430e34bec25b4e427115b9d685594bc18de85"
+        "sha256": "880d6006fb08ec8d2f5673ffeee9cd920223997d74850195f3aeff0ea9d588a7"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -175859,7 +175859,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t13.html",
-        "sha256": "769bfe3999ef3d8f3c51bfff9b7f1228786681d73d18f11bfb2bddf4d50a9755"
+        "sha256": "572f3cb28ac491ef4da211129b0c64f41a59e51df3301932330cffdc2b99398c"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -175950,7 +175950,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t14.html",
-        "sha256": "41925b45622834de50eb503acfde712075575d30ba43666f8ba8fee82371a5e7"
+        "sha256": "05a28bc0db1814025d094d33777ec4c2e94fee9862d72103a4b3bc14d153d37b"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -176041,7 +176041,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t16.html",
-        "sha256": "d562ddfd0f08a0ce7b9684199c685ad7753473c4978f1f95361ce2c130f2c23f"
+        "sha256": "87761504384ccf3d436673735550c04cc8916d451ceac3821aaee8ed78a62519"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -176132,7 +176132,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t17.html",
-        "sha256": "23c0aa42e71b7642018de6207458472b9afc214c78a86228601b5ac9ea7e44da"
+        "sha256": "fecb3b8207a976249164c2874f42037b7946c958b3c68aded1a6865f2a6128ab"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -176223,7 +176223,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t18.html",
-        "sha256": "2a37d36cee9867ebdea4644cc3feade839f3b430687962545ea02bac76708c8a"
+        "sha256": "deb9f6fbd6b16f0e052e1c9337c3477498495e8d0b050aa9512f1c18aa646624"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -176314,7 +176314,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t19.html",
-        "sha256": "70432366af1b36f5cd2bc06238ebd1e4287030856b7b0318ad2e650b50bd876d"
+        "sha256": "1c37f711fb6cfc1a33a70da21b1b6edf771e26d83af3b1bfb1c2498d7c3a6d28"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -176405,7 +176405,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t19f.html",
-        "sha256": "c84a6282b52fcba0fdc605b5aef63aee295a796d598b74a2ce882ed61d306c73"
+        "sha256": "8f127eaa16412b141f814069e018765496d0ca800bf0d28ae1f6db3ee1d4cece"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -176496,7 +176496,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t2.html",
-        "sha256": "1320bfdfa1651db34a38e4e0c3de337420014a8b3927b51cc00f7012df13bb99"
+        "sha256": "a11bb3e5e3857c132894b0321d4c2220e280cca92b406bb3858754ccf143691f"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -176587,7 +176587,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t3.html",
-        "sha256": "985d6ba2ffca39f5c2d5c749d641eb400052d9688cc9ccf664267bfc7fa366f9"
+        "sha256": "e75e08f079f0414fb9764edca0974b0892e28859f2b3fbe2918f811822162590"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -176678,7 +176678,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t4.html",
-        "sha256": "6cf323e5012f5da13b3d0f2046948ee8d0d739cc1c94254ae8f962c92e9e0b93"
+        "sha256": "29f8ec9e40ae8392d6e5e302628675cbfe6b1832157c8d1186dc7d06453f95a9"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -176769,7 +176769,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t7.html",
-        "sha256": "2cfe4fc2226424c728a73c2cae20ced16e10483da95dba1961c98ad45ac31324"
+        "sha256": "a411a518fc0544e5ed07e38b5181d26a648b0ddf260e9be5413ef093dd133ce4"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -176860,7 +176860,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t9.html",
-        "sha256": "ca3f5d495d1186211227c0e7e0db4f281481e84a89e24a7551344a090cc50bb7"
+        "sha256": "ce274e208c9311732d4f33b74b937f028f9e31526fda6c78eb4354afef1527ec"
       },
       "gate": {
         "approval_id": "",
@@ -176951,7 +176951,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-design-publish.html",
-        "sha256": "9585bf2106180c66f785d91f26415e6cc073587fdaa2cf8c6d5c8b8e4eced787"
+        "sha256": "6fffcd48430c57fe94ce7a1d4aff0045da822d21f8ca70142ccff7e8e6fbab68"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -177061,7 +177061,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-p0.html",
-        "sha256": "abb62931e5529d444fa43940723a37900995ce51dccf55d88315b43883bdf386"
+        "sha256": "2c60dd40a35b42d22abde59f1bd51ec07336567e16fa3b1c14c75b629303e1f1"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -177171,7 +177171,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-platform.html",
-        "sha256": "196b77cca7d26fb3b3f1b78d4f17e8cab2807b03ac50dfc7387590b31c4572f1"
+        "sha256": "b916f22efe959f5b14c65f7d724c7c6d9e89db3b1b1b972f7f73afebbc563a08"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -177281,7 +177281,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s00.html",
-        "sha256": "485caa3184f7b09a6c15db2312e22dd5a73abe92a60ebe76cc709f3b3685e1a8"
+        "sha256": "c3c2612bb5386a6acd132c8521c013d5b6bda18e61e2365db17d0581cd5627cc"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -177391,7 +177391,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s01.html",
-        "sha256": "9d4766d5c4dbed8c17a685be061c8a577021127940d943fa8d03017994dd455b"
+        "sha256": "972525ddb4c8d171e67bde977c7c2972c1d35e882250a2fd964aa0c2fc07d7ef"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -177501,7 +177501,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s02.html",
-        "sha256": "df1b1ef80b161d7208c47cdd20960d250aa89fa9364049f84d3db21b467adcda"
+        "sha256": "143d87cea565b4b931cc4159acde4e8866c04c7a3c57c149c50244538b5a0e93"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -177611,7 +177611,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s03.html",
-        "sha256": "9ea4bd9f335b2b567e692b286b825d070a905962fa32f93ced50a4d822eb59b2"
+        "sha256": "688ee25580e8d15fe0a12b1390aa32cb3756fa300229728d829d8f65d7c2a77a"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -177721,7 +177721,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s04.html",
-        "sha256": "e3703066fec5ec96020dd1f4261b6580e6659f8cf64936a107ccdcb8cecfedc8"
+        "sha256": "779f055c4cdf5613176561946627372b9d952d4470661497f0c2f6778da24475"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -177831,7 +177831,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s05.html",
-        "sha256": "a2bd9b511e4ca10c18290b945bda0b3b85d61abc7e151628eecf18e4601ea97d"
+        "sha256": "41dadb01321abc4a814be8b69a8f0c03489ee2916bf9ac15632664f94a9c6f1c"
       },
       "gate": {
         "approval_id": "01a219d8-8c6d-715e-ad85-da38d5f3351c",
@@ -177941,7 +177941,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s06.html",
-        "sha256": "34b537394ca0ddde30104c47f4907f4f0c77dab1c39ada03ebff1009a2de1ed8"
+        "sha256": "fe6a6068da5a998410ce4f9c9e4d898493dcf33fdeeb4d0c4e092f1482af90b9"
       },
       "gate": {
         "approval_id": "01a21a39-aae9-7d90-9069-b0576ed463d4",
@@ -178051,7 +178051,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s07.html",
-        "sha256": "08efcb36b9f67babdecf364f5e78856882a6c962cad23ac4816d27abd18d8173"
+        "sha256": "09e8ad1a0582fbad5a8ed13c1d9a63bf4adf427a3e0e2db8d13dbba0b5503b38"
       },
       "gate": {
         "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
@@ -178161,7 +178161,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s08.html",
-        "sha256": "c5f8e75902d6398edaab2be21b37639084b2bce1bd3c62c7b2fa043dcf96adc0"
+        "sha256": "b0cf94f65fea661d0a6a2324b71e35de272266d2f26e09fab08dac28912d85cf"
       },
       "gate": {
         "approval_id": "01a21c16-879a-765f-9e1b-c788a9c1ef4a",
@@ -178271,7 +178271,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s09.html",
-        "sha256": "480c6932b7097903ce5f067d22a9b0750ba7aed283c6e6071580dbd4a4bcff91"
+        "sha256": "fe7c062f0e55973327e31a75e4a01e1b8161396b39442a3bbd6f26017ce697ca"
       },
       "gate": {
         "approval_id": "01a219d9-f717-73ba-9c86-18adeeecd4ef",
@@ -178381,7 +178381,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s17.html",
-        "sha256": "6467c2eb5bd3d909c2b6bb6015b6e5cea092ddaecd08890b490dc6549037a9e2"
+        "sha256": "dfa2bd093123f351c8537c5898d6b88836d4c176c63bc5bbe663f62687b7e5ee"
       },
       "gate": {
         "approval_id": "01a21c1b-b5de-788c-9918-d57c95016a17",
@@ -178491,7 +178491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-spec-v2.html",
-        "sha256": "80491c508081f33ec7940bd4902bca33d2f17159b61df743ba6b2bdcf5553012"
+        "sha256": "dafa09ee7a047a5e0eaf8b29e6acfa1d760a8913b53917931e2909eba0213c3a"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -178601,7 +178601,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t0.html",
-        "sha256": "24b660f5af893108889d0c5c0730e82afbe1b69bc4399dc38fb8ab0afa1f867b"
+        "sha256": "ab3dbc3af5cf0424de5e66fdd437e83802abe0fdc0859eb39714f518c58a2ee8"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -178711,7 +178711,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t1.html",
-        "sha256": "89ed84ceafd70bc7167e3aa940c5a6706b16786486acb77ffef2de1e94637930"
+        "sha256": "7c2a683dc981eaf96589e69bbc744e69c1aed39aed0bdfa0c3e51af0e9083ec2"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -178821,7 +178821,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t10.html",
-        "sha256": "c37fd300b45537e3ce5cacc01aaf4767e9bda18237175aa073fa2d7ac061adcf"
+        "sha256": "27bdde88924ff866ecfa0542b32ac3b58f5b9d6cd471e924f5f02e8cb07ae353"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -178931,7 +178931,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t11.html",
-        "sha256": "aa95da536223b5df5762140f7c3c0a9f1e1aaa2917d0f3b7593e8e8ce4669d36"
+        "sha256": "ff900865d1d851ea82adc04a3df8bd8d9546940cd7bccc54dc328ae241122486"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -179041,7 +179041,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t13.html",
-        "sha256": "1047b5ae32f508c5119c17c666078dc5aaa20ba0a1cdccaeb5e4a9faecbf69ae"
+        "sha256": "06bc7fead19f17d7a1a51b77019b446f84d9c5d65d90cb305add089f33d74161"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -179151,7 +179151,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t14.html",
-        "sha256": "6c35488c0254c9dccc82f845cf99c36d283d983b5bf6764e584c890b225a36ce"
+        "sha256": "dcc574843961e07a874b0b55b77cc5bdd6def694b2d9522d85c9200ba05b394e"
       },
       "gate": {
         "approval_id": "01a219dd-4701-7342-9adf-f2c47331c4af",
@@ -179261,7 +179261,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t16.html",
-        "sha256": "6539c1ab1f8e3ad262c09f2d073a9530c49cd73e532caae19252d88be4eb091d"
+        "sha256": "acc3e0ba13cbdf09d3a8e12ab44e9f1aed17275e1fb76c545091c1277800941b"
       },
       "gate": {
         "approval_id": "01a219dd-edc0-7da7-a7fd-00eafabf0eae",
@@ -179371,7 +179371,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t17.html",
-        "sha256": "a840b95438fea4e4aa8cf6d8eccf26117dcc7c7a297253c76cca93d14be34ccc"
+        "sha256": "0bd6afe7b72fa61579ea04608e2b0bf10187f90222d633e52adb823cea7d43ff"
       },
       "gate": {
         "approval_id": "01a21c1d-aa55-7091-ae4b-93328e410035",
@@ -179481,7 +179481,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t18.html",
-        "sha256": "36b4db4aaa703ff6e2acbebdb658ca27644cb5e054b2da26d407dc0a606d7321"
+        "sha256": "b46725b1e033d2c079deff12ea1db2599d1b827ba20fe9dc8aaf40a8104b6fd4"
       },
       "gate": {
         "approval_id": "01a219de-7e7e-72db-b751-a17bdd9b013d",
@@ -179591,7 +179591,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t19.html",
-        "sha256": "4e45615c220ce5c587228c2197207741169ea90c3550c28bda2baf642565a896"
+        "sha256": "8ba4ff6f249a21730efe38aabd8b8bc76f78e51478c27896894b943af6d10df0"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -179701,7 +179701,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t19f.html",
-        "sha256": "a2dcfb3cef0cb4b8cd992a6af8ebff6e173073b36c180ce864ae0b333f7763cf"
+        "sha256": "f4b82e03d6ba4313ace872a0f709d6a939c1f407781eb95913d95b809eb3a0b7"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -179811,7 +179811,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t2.html",
-        "sha256": "db391f5d127e811e41c26b69a42ff0545000786cdd5bca1ec9407701c1694833"
+        "sha256": "6c87ec424c95b1cbec3b6ecac208ba1e3e69aa7802d5c8485e4ff9151a79f7dc"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -179921,7 +179921,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t3.html",
-        "sha256": "f703e619b79821236538426136133e4feaf4e1dc2d7fef57dbb2cdc97b651ec5"
+        "sha256": "ef84189c05a40f0e6a3d7705638943fbc06afefef2147d7a90c7a72771016f7e"
       },
       "gate": {
         "approval_id": "01a217fb-a503-7db9-b47b-55a111c1c8de",
@@ -180031,7 +180031,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t4.html",
-        "sha256": "87b8ba6630412328e966eec26f67f854e82d2dd549b0ec9c394e2c4a494395ce"
+        "sha256": "fe16dca9445365bde157bfdc7133cc233de723e55b2ba692a9b2f85184dc9d86"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -180141,7 +180141,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t7.html",
-        "sha256": "f703007a72804647dad4746147585ae2d4099f75b827ea6d44f7f264c3249c40"
+        "sha256": "ac4d6ede62ec32b66de5144733636904518002b8173a3e83f428318a9cdf2478"
       },
       "gate": {
         "approval_id": "01a21c26-afda-78c1-aea9-920275ed65c4",
@@ -180251,7 +180251,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t9.html",
-        "sha256": "72a921046ae920f70c2787d4e431f6c27f53cef1b48580d9d0aea436394d12a4"
+        "sha256": "a2b5f1e5a04d277f736aa8b97ab8894f2db05967a00fffc476782e19b7a32c2c"
       },
       "gate": {
         "approval_id": "",
@@ -180390,8 +180390,8 @@ window.CONVEYOR_STANDARDS = {
     }
   },
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "e10ed9d66ddf5bc860a8bfda73d91fba0509098d",
-  "payload_sha256": "829ba9c0354edaf6c67f203d790f7c9938fca836e469a09724ea0afdcc68b9d9",
+  "git_sha": "9571c03d5e107fc9f13873ad828323ddf9c3dcdb",
+  "payload_sha256": "e948cea8d33562a56cc790311dcb7f09c8000a92ae1b33be5cc14012ad7bad37",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 236,

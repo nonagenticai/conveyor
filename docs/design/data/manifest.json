@@ -5111,25 +5111,25 @@
       "bytes": 24503,
       "path": "conformance.json",
       "records": 0,
-      "sha256": "234d50e04a13d948b852b2d36955452785f20b08638e6e27726b18a4395821fa"
+      "sha256": "f15611b2e564831e57abac6c6f00c5a2506cadff28b3b7a31f09ead2403726b0"
     },
     {
       "bytes": 13420,
       "path": "conformance.md",
       "records": 0,
-      "sha256": "474247b4eb5ba339cbdc02fc470124d2c10ea1a0e3f361db1aef608d4f2c74c8"
+      "sha256": "dbd389245a0ecd8c361158516b241f0f5a88d6b2f30aba8a50f2058dd155c89b"
     },
     {
-      "bytes": 29329,
+      "bytes": 29216,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "3fc3e95501510f611f448c22907268f0649f9224b67c2826e3171d4f2d235d40"
+      "sha256": "c5347bb872fb8ec391e7bb095bc7ce48b07a92034c37e21ebc67b7dc215e53c7"
     },
     {
-      "bytes": 54241,
+      "bytes": 54119,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "51f48e1ae1278c0086322dce42b9e919131f6232375ba7c4713bbf272fa5370c"
+      "sha256": "47e990b0194470f8b85e9dff9e235f2eb43a4082d3093b92e26e094edf5a0547"
     },
     {
       "bytes": 106,
@@ -5141,7 +5141,7 @@
       "bytes": 90872,
       "path": "evidence.json",
       "records": 491,
-      "sha256": "9c6602c052c6da109912c14e9635125f1333dca9ee1efeafd97953211dfb50d2"
+      "sha256": "83f0ec218186d067cd999430b919f34145eaab66116df46e30919a1a7a0adeda"
     },
     {
       "bytes": 107,
@@ -5150,10 +5150,10 @@
       "sha256": "ecdfc187b05c53a3f547cee370dd0aad144e7660857eb38b7febb97f75993b2f"
     },
     {
-      "bytes": 183550,
+      "bytes": 184086,
       "path": "issues.json",
-      "records": 371,
-      "sha256": "28e49160e0d3ef027d8309a0253a0b5f96893142758d97d9901413d2d4d7b168"
+      "records": 372,
+      "sha256": "7dde1634339b3a7ac70e3531ce6b3a4335610bd8445382680658335eff179e1f"
     },
     {
       "bytes": 5350,
@@ -5180,34 +5180,40 @@
       "sha256": "556c47f407561ed5f6d3b0e9f4fb88538d251f860c2721f9cadc39d9dd733c63"
     },
     {
-      "bytes": 288271,
+      "bytes": 161969,
+      "path": "output-standard.js",
+      "records": 0,
+      "sha256": "77578a0803d04720c27c41a6c6ad8faa93df9dff7baff6c7493e24ecf5157a57"
+    },
+    {
+      "bytes": 288846,
       "path": "programme.json",
       "records": 54,
-      "sha256": "0c0328bb32dec0022ad8869ef47f2e386194aedd650d330641bcc3b460c3d202"
+      "sha256": "479f32002fd5cbe3b91fd1724991add0d2e7c975b7819833c337f9caf0e8b659"
     },
     {
-      "bytes": 291264,
+      "bytes": 290844,
       "path": "register.js",
       "records": 0,
-      "sha256": "78c09cf0f9968d707ee24baa1bb98007b7d22141154d06abf3ccfd04ccefb055"
+      "sha256": "54973085694da7eae5802a55a1d4dd643d657c1cfcc8b32e2dbfa3e45e23898e"
     },
     {
-      "bytes": 397163,
+      "bytes": 396435,
       "path": "register.json",
       "records": 73,
-      "sha256": "7424d4886c62dc869b356ad80c38187cb1540d20a7f4fa34540b2d2cd55e2a0f"
+      "sha256": "becb8f4d9f6735ff9664bd61ddbf2aacfad18c54d989bb7c189150b3d098dcc2"
     },
     {
       "bytes": 847451,
       "path": "rework.js",
       "records": 0,
-      "sha256": "8cf2ee200309175ebbec0f52532464d45bbb6d1886fe4ac1d33b22e1200ba3c2"
+      "sha256": "ac3ac4e193ef9f8feb193b4cd03c4a1eeb17ae4058a1d04de6725406fcfb6cd9"
     },
     {
       "bytes": 847425,
       "path": "rework.json",
       "records": 244,
-      "sha256": "f0da789b48c6c44955f882a40d53f0ac904b29114a86567cbfbf34eae032da5a"
+      "sha256": "2e3a9c1ecbd3360e81de1c97f0531e4a19dcd736aaf799a26bb410929546f59f"
     },
     {
       "bytes": 223,
@@ -5216,22 +5222,22 @@
       "sha256": "b84b15e0d6864a7d8ad25860fea05c67b26c46c96fc6a0d46488e27589fd2997"
     },
     {
-      "bytes": 9076831,
+      "bytes": 9076753,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "2e4c489530eb4be78ec2bbc22be6ef14f3690608254ea63605890059ce92c989"
+      "sha256": "eda75cad576e9ed21ed4bb86822a32f226d7c825b521389f1ce34bd08b9b2a45"
     },
     {
       "bytes": 6027590,
       "path": "standards.js",
       "records": 0,
-      "sha256": "6569d104e7aa7b2159a7bd4640c9a2dbcf9db380d5d1229ade883d580591bfac"
+      "sha256": "314c3f9a8fdff7223ef2b33a34825fa8d9ae2408f88b3652dad1be1830ec3004"
     },
     {
       "bytes": 6027561,
       "path": "standards.json",
       "records": 0,
-      "sha256": "1c5c69855c33aac74a169bdde373acebd3e7e4a0a1bfc968ed0cbece88080a3f"
+      "sha256": "64352f7abe9675e7701d7f5982c7c81b3ebe05ba0837b73748d8f893c764a728"
     },
     {
       "bytes": 2650700,
@@ -5241,7 +5247,7 @@
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "e10ed9d66ddf5bc860a8bfda73d91fba0509098d",
+  "git_sha": "9571c03d5e107fc9f13873ad828323ddf9c3dcdb",
   "migration": {
     "description": "tranche review at",
     "version": 108
