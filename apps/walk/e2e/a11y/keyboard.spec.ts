@@ -6,14 +6,23 @@ test("the skip link and the room sheet are a keyboard path with focus return", a
   page,
 }) => {
   await page.goto("/");
+  // The shell renders the map before the world finishes mounting, and `renderSession()` can
+  // rebuild the map; `data-engine` is the settle point (either branch). Keyboarding into a
+  // node that is replaced between focus and keypress is the flake this waits out.
+  await expect(page.locator("#world-canvas")).toHaveAttribute(
+    "data-engine",
+    /ecs|fallback/,
+    { timeout: 20_000 },
+  );
   await page.getByRole("link", { name: "Skip to content" }).focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#screen")).toBeFocused();
 
   const map = page.getByRole("navigation", { name: "Rooms" });
   const room = map.getByRole("button", { name: "Portfolio & plan" });
-  await room.focus();
-  await page.keyboard.press("Enter");
+  // `press` resolves and focuses the live node at action time, so a re-render cannot leave the
+  // keypress addressed to a detached button.
+  await room.press("Enter");
   const dialog = page.getByRole("dialog", { name: "Portfolio & plan" });
   await expect(dialog).toBeVisible();
   expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
