@@ -79,4 +79,18 @@ export default [
     spec: "e2e/portfolio-organisation/execution.spec.ts",
     load: () => import("../../destinations/execution.js"),
   },
+  {
+    walk: "/meetings",
+    app: "/meetings",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/meetings.spec.ts",
+    load: () => import("../../destinations/meetings.js"),
+  },
+  {
+    walk: "/meetings/:id",
+    app: "/meetings/:id",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/meetings.spec.ts",
+    load: () => import("../../destinations/meetings.js"),
+  },
 ];
