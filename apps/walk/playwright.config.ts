@@ -47,8 +47,11 @@ export default defineConfig({
     ? [
         { name: "oidc", testMatch: /deployed\/oidc\.setup\.ts/ },
         {
+          // OIDC mode targets the live host. Only the read-only `deployed/` specs may run there:
+          // the wing specs write (against the dev seed), and an unscoped deployed run would
+          // perform those writes in production.
           name: "app",
-          testIgnore: /deployed\/oidc\.setup\.ts/,
+          testMatch: /deployed\/.*\.spec\.ts$/,
           dependencies: ["oidc"],
           use: { storageState: OIDC_STATE },
         },
