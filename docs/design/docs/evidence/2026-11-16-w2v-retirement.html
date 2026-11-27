@@ -68,7 +68,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Kept, and stated in the kustomization:</strong> the namespace, <code>pv-worker3.yaml</code>, <code>storage.yaml</code> (<strong>the data</strong>), the default-deny <code>networkpolicy.yaml</code>, the ConfigMaps and the Secrets, and the <code>w2v-legacy-redirect</code> VirtualService (which carries no backend — it is why <code>w2v.nonagentic.ai</code> still answers at all). This unit deletes no data; every manifest is one revert away.</p>
+<p><strong>Kept, and stated in the kustomization:</strong> the namespace, <code>pv-registry-1.yaml</code>, <code>storage.yaml</code> (<strong>the data</strong>), the default-deny <code>networkpolicy.yaml</code>, the ConfigMaps and the Secrets, and the <code>w2v-legacy-redirect</code> VirtualService (which carries no backend — it is why <code>w2v.nonagentic.ai</code> still answers at all). This unit deletes no data; every manifest is one revert away.</p>
 <h2 id="evidence-at-completion">Evidence at completion</h2>
 <h3 id="p11--every-deployment-on-the-list-is-00-with-no-pod">P1.1 — every Deployment on the list is <code>0/0</code> with no pod</h3>
 <pre><code>$ kubectl -n w2v get deploy,pods
@@ -84,7 +84,7 @@ deployment.apps/redis                           0/0     0            0          
 deployment.apps/slide-service                   0/0     0            0           192d
 deployment.apps/tts-gateway                     0/0     0            0           138d
 deployment.apps/tts-gateway-worker              0/0     0            0           137d
-deployment.apps/tts-gateway-worker-mini1        0/0     0            0           137d
+deployment.apps/tts-gateway-worker-media-1        0/0     0            0           137d
 deployment.apps/video-analyzer-service          0/0     0            0           192d
 deployment.apps/video-production-service        0/0     0            0           192d
 deployment.apps/w2v-frontend                    0/0     0            0           192d
@@ -105,7 +105,7 @@ deployment.apps/youtube-upload-service          0/0     0            0          
 <td>still holds the PVs, the secrets and the default-deny policy</td>
 </tr>
 <tr>
-<td><code>pv-worker3.yaml</code>, <code>storage.yaml</code></td>
+<td><code>pv-registry-1.yaml</code>, <code>storage.yaml</code></td>
 <td><strong>the data</strong> — this unit deletes none</td>
 </tr>
 <tr>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Plan spine · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--plan-spine">Compliance Review — Plan spine</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a1ff8a-754f-70de-a63a-fa8d00596433&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;sha&quot;: &quot;d367a4a992ca5338c82466e9d6ef308e62b01ba6&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level compliant for T1 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The close carried a mandatory_artefacts gap: at the 2026-11-21T18:51:39Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent, and the architecture compliance-review list was empty. This rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. The gate&#39;s clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The live project had no baseline row at the snapshot; this rework takes the scope baseline from the one WBS deliverable, and the frozen-snapshot behaviour is the P1.1 test.&quot;,
+      &quot;id&quot;: &quot;01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d32-7c81-8365-371217d16ef7&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;contract_id&quot;: &quot;01a217e8-ee60-725f-8c10-676c401569be&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;delivery_contract&quot;: &quot;01a1ff8a-754f-70de-a63a-fa8d00596433&quot;,
+        &quot;live_review&quot;: &quot;01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;rework_note&quot;: &quot;docs/evidence/rework/T1.json&quot;,
+        &quot;scope_baseline&quot;: &quot;01a1ff8a-b4f0-7e6e-9cc7-4231076e1039&quot;,
+        &quot;sha&quot;: &quot;b0449db045a18004c19bbfbd87dd39acedad85a8&quot;,
+        &quot;statement_of_architecture_work&quot;: &quot;01a1ff89-02bd-7b6d-902e-ffa5902cc7f5&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d is compliant against the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 is approved, and the seven Phase A\u2013D artefacts in this pack are authored against the plan spine. The gate clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. Against that, three limits are stated rather than waived: no contemporaneous governance record existed at the 2026-11-17 close, cadence materialisation and PI planning and the benefits-realization procedure are T10, and the console surfaces beyond portfolio.in_flight remain fixtures. Those are scope boundaries of the delivery, not non-compliances.&quot;,
+      &quot;id&quot;: &quot;01a217e9-0808-7378-8e60-e34b690c2385&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d32-7c81-8365-371217d16ef7&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a1ff8a-754f-70de-a63a-fa8d00596433&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;sha&quot;: &quot;d367a4a992ca5338c82466e9d6ef308e62b01ba6&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level compliant for T1 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The close carried a mandatory_artefacts gap: at the 2026-11-21T18:51:39Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent, and the architecture compliance-review list was empty. This rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. The gate&#39;s clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The live project had no baseline row at the snapshot; this rework takes the scope baseline from the one WBS deliverable, and the frozen-snapshot behaviour is the P1.1 test.&quot;,
+      &quot;id&quot;: &quot;01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d32-7c81-8365-371217d16ef7&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:18:27.698069+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;contract_id&quot;: &quot;01a217e8-ee60-725f-8c10-676c401569be&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;delivery_contract&quot;: &quot;01a1ff8a-754f-70de-a63a-fa8d00596433&quot;,
+        &quot;live_review&quot;: &quot;01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T1.toml&quot;,
+        &quot;rework_note&quot;: &quot;docs/evidence/rework/T1.json&quot;,
+        &quot;scope_baseline&quot;: &quot;01a1ff8a-b4f0-7e6e-9cc7-4231076e1039&quot;,
+        &quot;sha&quot;: &quot;b0449db045a18004c19bbfbd87dd39acedad85a8&quot;,
+        &quot;statement_of_architecture_work&quot;: &quot;01a1ff89-02bd-7b6d-902e-ffa5902cc7f5&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d is compliant against the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 is approved, and the seven Phase A\u2013D artefacts in this pack are authored against the plan spine. The gate clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. Against that, three limits are stated rather than waived: no contemporaneous governance record existed at the 2026-11-17 close, cadence materialisation and PI planning and the benefits-realization procedure are T10, and the console surfaces beyond portfolio.in_flight remain fixtures. Those are scope boundaries of the delivery, not non-compliances.&quot;,
+      &quot;id&quot;: &quot;01a217e9-0808-7378-8e60-e34b690c2385&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d32-7c81-8365-371217d16ef7&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: null,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d is compliant against the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 is approved, and the seven Phase A\u2013D artefacts in this pack are authored against the plan spine. The gate clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. Against that, three limits are stated rather than waived: no contemporaneous governance record existed at the 2026-11-17 close, cadence materialisation and PI planning and the benefits-realization procedure are T10, and the console surfaces beyond portfolio.in_flight remain fixtures. Those are scope boundaries of the delivery, not non-compliances.&quot;,
+      &quot;id&quot;: &quot;01a217e9-0808-7378-8e60-e34b690c2385&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:51:17.635037+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a217e9-0808-7378-8e60-e34b690c2385: compliant / no outcome&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/T1-bodies/T1/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

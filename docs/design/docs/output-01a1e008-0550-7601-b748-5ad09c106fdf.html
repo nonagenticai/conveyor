@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — SPEC-V2 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="fc9125d8e87851932d6079b3b93fd1020020722ed5ce1554a76da879f16b70fe" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>fc9125d8e87851932d6079b3b93fd1020020722ed5ce1554a76da879f16b70fe</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Brief — SPEC-V2 (retrospective, 2026-11-26)</h1>
+<h2>Outcome</h2>
+<p>SPEC-V2 delivers <code>docs/SPEC_V2.md</code>, the conveyor's organisational operating model, and publishes it as the <code>spec</code> output: an organisation spine of industry → department(s) → job with an immutable release and a tenant-scoped binding, a work hierarchy from programme to run, a four-rung decision ladder, and TOGAF, SAFe, PMP and MSP implemented as rows and gates rather than documents. The outcome the plan states in §13 is that the organisation's work becomes auditable at the level of a single decision — which option, which confidence, which policy, which person, which evidence.</p>
+<h2>Boundary</h2>
+<p>Out of scope are V1's S-slices, which are not re-opened; the V2 delivery slices T0–T19 and T19F, which are their own projects; and <code>docs/SPEC_LEGACY_KAG.md</code>, which owns the legacy-kag and w2v rewrites (D54). The model explicitly does not do customer care (D48), does not import a manifest from another system (D33), and does not claim TOGAF certification, SAFe compliance, PMP certification, MSP conformance or full ADM conformance (§8.6).</p>
+<h2>Reuse sources</h2>
+<p>The plan reuses the ideas of the agent platform's KH model (D106–D115) and reimplements them, so there is no runtime import (D33). It reuses V1's Rust substrate, its capability → procedure → step → action or gate knowledge, its run, approval, action_invocation and event memory, its capability_agent executor configuration, its inference ledger and its eval and benchmark instruments. The retrospective record reuses the snapshot's approved A–D rows and the rework note's residuals.</p>
+<h2>Inception units</h2>
+<p>The delivery units are the V2 slices: T0 to T3 and T13 in the first three months, T4 to T12 and T14 to T19 as the following work, and T19F as the measured follow-on (§12). The retrospective reconstitution of this project's own lifecycle is the #526 unit, whose 38 acts are recorded in <code>transcript.jsonl</code> and read back one write at a time by <code>programme-record.py</code>. Units T9 and T10 are measured built on 2026-11-23, and T19F on 2026-11-24.</p>
+<h2>Dependencies</h2>
+<p>Every delivery slice depends on the T0 spine and, from T6 and T7 onward, on the T13 tool spine (§12). The decision ladder depends on laya, live on the DGX behind a Jev-compatible bridge on :9210 at roughly 17 to 21 ms per request measured 2026-10-10. Knowledge depends on strata_ingest and strata_rag; bytes depend on MinIO; metering depends on billing_service as the charging system. The project's approvals depend on the standing #526 delegation, and its closure depends on the one gate with an approver other than its requester.</p>
+<h2>Acceptance</h2>
+<p><code>python3 scripts/verify-project.py --project SPEC-V2 --snapshot &lt;fresh&gt;</code> is green with 11 checks and 0 failures at <code>d7293f96</code>, and the strict audit on the same snapshot carries no P0/P1 entry for the project; the rework note records both. The acceptance manifest <code>acceptance/programme/SPEC-V2.toml</code> is the gate's evidence. The seven A–D artefacts are approved rows, the Phase-G review <code>01a1ff43-a1bc-758d-89dc-c97d0fb0265a</code> records level compliant, and the WBS deliverable is accepted.</p>
+<h2>Capabilities</h2>
+<p>The project installs thirteen capabilities: organisation management, work management, programme management, benefits realization, architecture management, decision management, tool governance, measurement, self-development, operations, authoring, organisational memory and the decision forums. Organisation management and decision management are specified and land in T0 and T2; programme management, architecture management and decision forums are built; the rest are partial. Each is recorded with its evidence in the capability map.</p>
+<h2>Plan</h2>
+<p>The retrospective plan runs charter, Statement of Architecture Work, the seven A–D artefacts, the delivery contract and its approval, the scope baseline with one WBS deliverable, the Phase-G review and the <code>spec</code> output, then closure through the one gate. The forward plan is §12: T0 to T3 plus T13 in the first three months, then the remaining slices, with T9 and T10 built, T19 built and T19F measured. The plan is <code>docs/SPEC_V2.md</code>, active, and it remains the source the tranche reviews read.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-27T08:41:58.742706+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

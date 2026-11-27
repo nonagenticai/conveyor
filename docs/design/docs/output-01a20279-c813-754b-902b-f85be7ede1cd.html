@@ -23,34 +23,32 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief — T13 Tool platform (retrospective, 2026-11-22)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="aafdaf8b0ab6a7ce90a12981ac95c015823ca86d8b0f2930059038ac3ba3c649" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>aafdaf8b0ab6a7ce90a12981ac95c015823ca86d8b0f2930059038ac3ba3c649</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T13 tool platform (retrospective, 2026-11-26)</h1>
 <h2>Outcome</h2>
-<p>Every conveyor-internal run reaches a job backend through <code>tools.call</code> under a binding row's authority, with effect, budget and schema decided before any network call and exactly one <code>tool_call</code> row and one <code>tool.called</code> event per call.</p>
+<p>T13 made one governed call path real: every conveyor-internal run reaches a job backend through tools.call under a binding row's authority, with the effect class, the tool budget and the closed input schema decided before any network call, and exactly one tool_call row and one tool.called event recorded per dispatched call. The six SPEC_V2 §12 clauses are proved by named wire-level tests in crates/actions/tests/tool_platform.rs, 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18 and a counting HTTP stub.</p>
 <h2>Boundary</h2>
-<p>Out of scope: the catalogue actions and the estate import (T14); the agent platform gateway <code>nonagenticai_mcp_server</code> (D44/D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); a production <code>tool_binding</code> writer (v1-p111-1). The slice must not fork T2's run/queue or T14's import.</p>
+<p>Out of scope: the catalogue actions and the estate import, which T14 owns; the agent platform gateway nonagenticai_mcp_server, which serves the agent platform's own backends and stays outside the conveyor's path (D44, D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); and a production tool_binding writer (v1-p111-1). The slice must not fork T2's run or durable queue, must not become a second catalogue or runner, and must not carry a credential or an S3 key into a prompt or a ledger row.</p>
 <h2>Reuse sources</h2>
 <ul>
-<li><code>conveyor_store::secret::create_secret_tx</code> — sealed credentials, reused rather than rebuilt (§11.8).</li>
-<li><code>event</code> and <code>audit_event</code> — the call event and audit trail (§11.3 step 7).</li>
-<li><code>governed_asset(kind='tool_draft')</code> — the publication lifecycle (§11.6).</li>
-<li>T2's run and durable queue — <code>tool_binding.run_id</code> targets a run (§12).</li>
+<li>conveyor_store::secret::create_secret_tx — sealed credentials, reused rather than rebuilt (§11.8).</li>
+<li>governed_asset kind='tool_draft' — the publication lifecycle of validation, security review, tools.publish and binding (§11.6).</li>
+<li>event and audit_event — the tool.called event and the audit trail (§11.3 step 7).</li>
+<li>T2's run and durable queue — tool_binding.run_id targets a run, and §12 places T13 after T2.</li>
+<li>The predecessor MCP server's coding toolkit as a reference shape only: eleven operations and the mcp_tool_call_audit model, never routed through (D44, D59).</li>
 </ul>
 <h2>Inception units</h2>
-<p>The analysis T13 starts with is SPEC_V2 §11.1–§11.10 and the §12 T13 row; both are the basis of every artefact in this record.</p>
+<p>The analysis T13 starts from is SPEC_V2 §11.1–§11.10 and the T13 row in SPEC_V2 §12, and its recorded entry point is issue #76, with the follow-on issues #556 (bound toolkits reach the agent executor), #557 (binding and catalogue actions and the full published tool contract) and #630 (the run inspector's executor kind, binding pin and tools panel), all closed on GitHub. The retrospective reconstitutes the governance record over the completed slice — charter, Statement of Architecture Work, the seven A–D artefacts approved by the board, the delivery contract, the WBS deliverable, the Phase-G review, the project brief, the evidence and the closure review.</p>
 <h2>Dependencies</h2>
-<ul>
-<li>blocked-by: T2 (run and queue context).</li>
-<li>related: T14 (estate import, out of this slice), P0 (constitution and gates).</li>
-</ul>
+<p>The project record names depends_on as needs T2 (the run and durable-queue context that tool_binding.run_id targets) and needs P0 (the constitution and gates). In the other direction, T6, T7, T14, T15, T16 and T17 depend on T13, with T14's estate import as the first consumer, and a job's calls additionally depend on a destination alias registered and reviewed at publication. In governance the slice depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and on the approvals 01a20273-4f0f-77e6-8005-9744d1e3a574 and 01a20277-4be1-78c6-8516-728eb4d6068b.</p>
 <h2>Acceptance</h2>
-<p>The §12 gate: a development job calls coding through the broker; a <code>tool_call</code> is recorded; a destructive call without approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed object; the compiled prompt carries no S3 key — proved by six named tests, re-run for this record (tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22), against a fresh Postgres 18 and a counting HTTP stub).</p>
+<p>The SPEC_V2 §12 gate, executed through acceptance/programme/T13.toml and six named tests: a_bound_job_calls_coding_through_the_broker; one_call_is_one_ledger_row; a_destructive_call_without_approvals_is_refused; a_closed_schema_refuses_before_the_call; a_job_round_trips_a_tenant_prefixed_object; the_compiled_prompt_carries_no_s3_key. Each refusal is asserted on the wire through a counting HTTP stub, so a refusal that reached upstream would fail. The recorded run is 17 of 17 passed at lane head 582e2dc6 on 2026-11-22 against a fresh Postgres 18.</p>
 <h2>Capabilities</h2>
-<p>Broker dispatch, effect-class and budget gating, closed-schema input enforcement, credential-alias brokerage, the call ledger, and tenant-separated object storage, as the Phase-B capability map records.</p>
+<p>The platform exercises an immutable tool and toolkit lifecycle; binding-scoped access that narrows but never widens; broker dispatch as the single path to a backend; effect-class gating for read, write, destructive and spend; closed-schema input enforcement before egress; a call ledger that makes each call and its cost visible; tenant-separated object storage under an adapter-built tenant prefix with a content hash; and the probe and retirement rules that T14's estate toolkits exercise.</p>
 <h2>Plan</h2>
-<p>The WBS deliverable "the tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage", accepted with this record; the open items are carried to the tranche review.</p>
+<p>The plan is one WBS deliverable, 'The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage', accepted with WSJF inputs 8, 5, 8 and 5 and evidenced by acceptance/programme/T13.toml and the proving suite. It sits in tranche 3, whose review 01a216d0-d634-738e-985a-00a85cfd48d9 records continue. This brief is retrospective and dated 2026-11-26: it records the slice proved on 2026-11-22 and the governance reconstituted over it, and it does not claim a fresh gate run or a capability the six proofs do not carry.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

@@ -23,7 +23,7 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Closure review — S02 Skeleton (retrospective, 2026-11-21)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="c34014236b13e2d1c72982090a52f381c80b32145468b0d2806cbf2a5080b060" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>c34014236b13e2d1c72982090a52f381c80b32145468b0d2806cbf2a5080b060</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Closure review — S02 Skeleton (retrospective, 2026-11-21)</h1>
 <h2>Outcome vs acceptance</h2>
 <ul>
 <li><strong>Two tenants isolated including RLS.</strong> Pass. <code>apps/server/tests/rls.rs</code> proves the runtime role sees only its tenant, the owner sees 0, and the superuser sees both; <code>migrations/0001_platform.sql</code> carries ENABLE + FORCE RLS with USING and WITH CHECK on the nine tenant-owned tables.</li>
@@ -48,7 +48,7 @@
 <p>Close. S02's acceptance is met at the named SHA; the only outstanding item is the delivery gate (PR, CI, deploy), which is outside the project's acceptance record.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

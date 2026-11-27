@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T4 Kanban coach (Phase C) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="046afe59aed82a43d2a93052ccef4ce7037aca37497943ae38231f496edea5c4" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>046afe59aed82a43d2a93052ccef4ce7037aca37497943ae38231f496edea5c4</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Data Entity/Data Component Catalog — T4 Kanban coach (Phase C)</h1>
+<h2>Metadata</h2>
+<p>Type catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028d-27ab-7464-918c-e0e07c1a43dc; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</p>
+<h2>Entries</h2>
+<p>Nine entities and components. The pair coach_interruption/coach_remedy is deliberately asymmetric: the interruption must change as triage and state advance, while the remedy is append-only and the runtime's grants forbid editing it. The partial unique index is the structural guarantee behind 'one card per signature'. The policy row is data, not code: operators can widen the window, move the confidence floor or declare additional systemic classes without a deploy. The kata and its measurement are referenced here because the coach opens them; their full lifecycle is T5's.</p>
+<h2>Links</h2>
+<p>Derives from the coach store contract in <code>crates/store/src/coach.rs</code>, the policy read in <code>crates/actions/src/coach.rs</code>, the kata open path in <code>crates/actions/src/kata.rs</code>, and the grants in <code>scripts/grants-runtime.sql</code>. Realizes the Phase C data view for the coach capability.</p>
+<h2>Document</h2>
+<p>The catalog describes the entities as the code and migrations define them. It does not assert that every migration ran in production at the snapshot, nor that the measurement path has been exercised; those claims belong to a green gate run that the inputs do not contain.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

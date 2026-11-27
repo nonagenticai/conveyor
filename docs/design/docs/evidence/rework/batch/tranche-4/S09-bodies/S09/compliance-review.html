@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--documents-repositories-secrets-workers-ui-reportsmetrics-billing-display">Compliance Review — Documents, repositories, secrets, workers UI, reports/metrics, billing display</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219da-0ec0-706f-9949-eb2bc03f2fdf&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S09.toml&quot;,
+        &quot;audit_pack&quot;: &quot;docs/evidence/rework/S09.json&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S09.toml&quot;,
+        &quot;published_evidence&quot;: &quot;01a1e687-7682-753d-b60e-1f00243b13a3&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records level consistent for S09 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot carries no earlier review rows for S09 at all: reviews is empty, so there is no prior Phase-G or compliance review to supersede, and the only governance review touching the slice is the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 that authorised tranche 4 at 2026-11-24T17:04:34Z. The pre-rework audit pack docs/evidence/rework/S09.json records verdict red: no project baseline, no charter, no live board-approved delivery contract, no Phase-G review, no closure outputs and no closure gate, while the project is closed (version 10, updated 2026-11-24T07:41:22Z) with meta.measured_status built and plan_status planned. This rework supplies the missing lifecycle record \u2014 charter, Statement of Architecture Work, delivery contract, the seven Phase A\u2013D artefacts, this review, the project brief and the evidence output \u2014 and re-closes the project retrospectively at 2026-11-24 with the closure and closure review in this pack. Remaining limits are explicit: the snapshot records no run of the plan section 7 properties a to g; the deployed MinIO credentials and bucket policy, and the live strata_ingest path, are unproven; documents.ingest is the one unregistered action of 27 and is a follow-up with a live target; the plan frontmatter still reads planned while the measured status is built; the nine linked issues are recorded closed but their acceptance is not re-verified here; and the strata_rag path contract (/query versus /api/query) remains a stated risk. The level is consistent rather than compliant because the governance record is now complete but the functional gate is not evidenced; a non-conformant verdict would require a waiver the programme forbids.&quot;,
+      &quot;id&quot;: &quot;01a219da-2fcd-78b3-9d0b-4159efee9baa&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219da-0ec0-706f-9949-eb2bc03f2fdf&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S09.toml&quot;,
+        &quot;audit_pack&quot;: &quot;docs/evidence/rework/S09.json&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S09.toml&quot;,
+        &quot;published_evidence&quot;: &quot;01a1e687-7682-753d-b60e-1f00243b13a3&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records level consistent for S09 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot carries no earlier review rows for S09 at all: reviews is empty, so there is no prior Phase-G or compliance review to supersede, and the only governance review touching the slice is the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 that authorised tranche 4 at 2026-11-24T17:04:34Z. The pre-rework audit pack docs/evidence/rework/S09.json records verdict red: no project baseline, no charter, no live board-approved delivery contract, no Phase-G review, no closure outputs and no closure gate, while the project is closed (version 10, updated 2026-11-24T07:41:22Z) with meta.measured_status built and plan_status planned. This rework supplies the missing lifecycle record \u2014 charter, Statement of Architecture Work, delivery contract, the seven Phase A\u2013D artefacts, this review, the project brief and the evidence output \u2014 and re-closes the project retrospectively at 2026-11-24 with the closure and closure review in this pack. Remaining limits are explicit: the snapshot records no run of the plan section 7 properties a to g; the deployed MinIO credentials and bucket policy, and the live strata_ingest path, are unproven; documents.ingest is the one unregistered action of 27 and is a follow-up with a live target; the plan frontmatter still reads planned while the measured status is built; the nine linked issues are recorded closed but their acceptance is not re-verified here; and the strata_rag path contract (/query versus /api/query) remains a stated risk. The level is consistent rather than compliant because the governance record is now complete but the functional gate is not evidenced; a non-conformant verdict would require a waiver the programme forbids.&quot;,
+      &quot;id&quot;: &quot;01a219da-2fcd-78b3-9d0b-4159efee9baa&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2d-71f1-a403-c9abe52c1888&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: &quot;none recorded&quot;,
+      &quot;decision&quot;: &quot;consistent&quot;,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records level consistent for S09 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot carries no earlier review rows for S09 at all: reviews is empty, so there is no prior Phase-G or compliance review to supersede, and the only governance review touching the slice is the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 that authorised tranche 4 at 2026-11-24T17:04:34Z. The pre-rework audit pack docs/evidence/rework/S09.json records verdict red: no project baseline, no charter, no live board-approved delivery contract, no Phase-G review, no closure outputs and no closure gate, while the project is closed (version 10, updated 2026-11-24T07:41:22Z) with meta.measured_status built and plan_status planned. This rework supplies the missing lifecycle record \u2014 charter, Statement of Architecture Work, delivery contract, the seven Phase A\u2013D artefacts, this review, the project brief and the evidence output \u2014 and re-closes the project retrospectively at 2026-11-24 with the closure and closure review in this pack. Remaining limits are explicit: the snapshot records no run of the plan section 7 properties a to g; the deployed MinIO credentials and bucket policy, and the live strata_ingest path, are unproven; documents.ingest is the one unregistered action of 27 and is a follow-up with a live target; the plan frontmatter still reads planned while the measured status is built; the nine linked issues are recorded closed but their acceptance is not re-verified here; and the strata_rag path contract (/query versus /api/query) remains a stated risk. The level is consistent rather than compliant because the governance record is now complete but the functional gate is not evidenced; a non-conformant verdict would require a waiver the programme forbids.&quot;,
+      &quot;id&quot;: &quot;01a219da-2fcd-78b3-9d0b-4159efee9baa&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;phase_h_outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:54:19.206993+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a219da-2fcd-78b3-9d0b-4159efee9baa: consistent governs; phase-H outcome not recorded (a phase-G decision is its level)&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S09-bodies/S09/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -23,37 +23,44 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project Brief — S04 Action registry</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="caebbd6919ac5dc74f92c4c9f271f34f0d680a889c25a13c608648bcfe9742c2" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>caebbd6919ac5dc74f92c4c9f271f34f0d680a889c25a13c608648bcfe9742c2</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Brief — S04 Action registry (retrospective, 2026-11-26)</h1>
 <h2>Outcome</h2>
-<p>One action declaration serves HTTP, MCP, OpenAPI, the admin CLI and external ingest: 549 actions
-from a single registry, 580 served operations locked by hash.</p>
+<p>One declaration per invocable operation, projected into the manifest, the OpenAPI document, the
+MCP tool list and the router, so HTTP and MCP cannot diverge. The slice's gate is twenty actions
+identical over HTTP and MCP, proved by the parity test over the sixteen internal and four
+<code>fixtures.*</code> external actions, with one <code>spec_hash</code> across all four projections.</p>
 <h2>Boundary</h2>
-<p>Out of scope: the screens (S12), the board (S05) and the tool platform (T13). The registry must not
-fork per transport; a second declaration path is a defect.</p>
+<p>In: the <code>ActionSpec</code> declaration and <code>#[action]</code> derive, the compile-time registry and its boot
+assertion, <code>GET /api/actions</code>, <code>POST /api/actions/{name}/invocations</code> with idempotency, deadline,
+audit and transaction, <code>rmcp</code> at <code>/mcp</code>, the OpenAPI fold and lock, the <code>openapiv3</code> ingest, and
+<code>migrations/0003_action_registry.sql</code>. Out: domain actions (S05–S11), workflow execution (S13),
+channel-<code>mcp</code> delivery rows (S06) and the signed <code>mcp_server</code> channel (S06-α).</p>
 <h2>Reuse sources</h2>
-<ul>
-<li><code>crates/actions/src/lib.rs</code> and <code>crates/actions-derive</code> — the ActionSpec declaration and macro.</li>
-<li><code>crates/actions/src/invoke.rs</code> — the one invocation path with idempotency and audit.</li>
-<li><code>crates/api/src/actions.rs</code> — the HTTP route over the same registry.</li>
-<li><code>crates/actions/src/lock.rs</code> — the served-spec lock.</li>
-</ul>
+<p>The fr registry's <code>Capability</code> field set and generation approach; the agent runtime catalog's
+<code>OpDef</code>, <code>PinnedCatalog::from_rows</code>, <code>effective_level</code> and outputs. The slice carries the field
+set and the closed <code>effect</code>/<code>confirm</code>/<code>tenancy</code> vocabularies, not Zod, not a legacy handler.</p>
 <h2>Inception units</h2>
-<p>The gate analysis (derive, manifest, OpenAPI, MCP, invocation, ingest), the transport-parity
-choice, and the lock's hash discipline are the inception units.</p>
+<p>The sixteen internal actions and the four external fixtures, the invocation path, the manifest
+and MCP projections, the OpenAPI fold and lock, the ingest diff and the boot assertion — the
+work packages recorded in the project WBS.</p>
 <h2>Dependencies</h2>
-<p>S02 (the skeleton) and S03 (the domain schema); tranche 3; issue #3.</p>
+<p>S02 supplies the tenancy, audit and idempotency spine; S03 the domain aggregates and transitions
+the domain actions build on. Every later slice adds actions through this registry, never a
+surface.</p>
 <h2>Acceptance</h2>
-<p><code>acceptance/programme/S04.toml</code> is the gate: the derive crate, the registry and the vocabularies,
-the parity test, the lock check and the ingest round-trip.</p>
+<p><code>cargo test -p conveyor-actions</code> over the parity, invocation, idempotency, ingest, timeout and
+runtime-resolution targets; the served lock check exits 0; a duplicate registration exits 1
+before bind; schema-invalid input returns RFC 9457 with populated <code>errors[]</code>; and the imported
+action round trip serves over HTTP and MCP across a restart.</p>
 <h2>Capabilities</h2>
-<p>One declaration per action; one invocation path; one served spec; one external-ingest fold.</p>
+<p>Action declaration and projection, a fail-closed registry, idempotent invocation, external action
+ingest under the same contract, contained outbound failures, MCP parity and the OpenAPI lock.</p>
 <h2>Plan</h2>
-<p>Two deliverables — the ActionSpec derive crate and the registry and spec vocabularies — accepted
-under change <code>01a2054b-3f86-7959-b2ad-f1edc5b0bb55</code>, credited at the tranche-3 demo, and closed
-against the frozen baseline <code>01a20256-44d0-731d-b345-fffc5f3ac9e8</code>.</p>
+<p><code>docs/plans/slices/S04-action-registry.md</code>; programme project tier 1 of tranche 3; the runtime
+resolution follow-up merged at <code>6d215982d</code>.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

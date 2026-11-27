@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Decision ladder · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--decision-ladder">Statement Of Architecture Work — Decision ladder</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2005a-8c6e-708a-84df-ab16d175072e&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:04:28.797665+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:04:18.681795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2005a-7886-7f2d-9b49-53d174544ee9&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;superseded&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:14.119814+00:00&quot;,
+      &quot;version&quot;: 3
+    },
+    {
+      &quot;approval_id&quot;: &quot;01a2180f-168b-79af-af7f-e4cc18948e7b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T13:32:51.58027+00:00&quot;,
+      &quot;id&quot;: &quot;01a2180f-15fe-794d-aba4-395c2f06a32f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2005a-8c6e-708a-84df-ab16d175072e&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:04:28.797665+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:04:18.681795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2005a-7886-7f2d-9b49-53d174544ee9&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;superseded&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:14.119814+00:00&quot;,
+      &quot;version&quot;: 3
+    },
+    {
+      &quot;approval_id&quot;: &quot;01a2180f-168b-79af-af7f-e4cc18948e7b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T13:32:51.58027+00:00&quot;,
+      &quot;id&quot;: &quot;01a2180f-15fe-794d-aba4-395c2f06a32f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2005a-8c6e-708a-84df-ab16d175072e&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:04:28.797665+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:04:18.681795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2005a-7886-7f2d-9b49-53d174544ee9&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;superseded&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:14.119814+00:00&quot;,
+      &quot;version&quot;: 3
+    },
+    {
+      &quot;approval_id&quot;: &quot;01a2180f-168b-79af-af7f-e4cc18948e7b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T13:32:51.58027+00:00&quot;,
+      &quot;id&quot;: &quot;01a2180f-15fe-794d-aba4-395c2f06a32f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2005a-8c6e-708a-84df-ab16d175072e&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:04:28.797665+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:04:18.681795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2005a-7886-7f2d-9b49-53d174544ee9&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;superseded&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:14.119814+00:00&quot;,
+      &quot;version&quot;: 3
+    },
+    {
+      &quot;approval_id&quot;: &quot;01a2180f-168b-79af-af7f-e4cc18948e7b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T13:32:51.58027+00:00&quot;,
+      &quot;id&quot;: &quot;01a2180f-15fe-794d-aba4-395c2f06a32f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2005a-8c6e-708a-84df-ab16d175072e&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T23:04:28.797665+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T23:04:18.681795+00:00&quot;,
+      &quot;id&quot;: &quot;01a2005a-7886-7f2d-9b49-53d174544ee9&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;superseded&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:14.119814+00:00&quot;,
+      &quot;version&quot;: 3
+    },
+    {
+      &quot;approval_id&quot;: &quot;01a2180f-168b-79af-af7f-e4cc18948e7b&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 \u00a712 T2 gate: one audit shape across a rule, a laya and a human decision; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions it read; and a generated draft cannot transition a card. The first three are proved by named tests in `crates/actions/tests/decision_ladder.rs`; the fourth is proved on the `ladder.apply_draft` and `documents.update` paths only, and is refuted on the `documents.compose` create path by v1-t2-1. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T2 (SPEC_V2 \u00a77 and \u00a712, issue #73) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the \u00a712 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`). The project remains ACTIVE in this pass: v1-t2-1 (a generated draft can be attached by `documents.compose` with no gate) blocks the fourth gate clause, so no closure is attempted.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the decision ladder and generation split of SPEC_V2 \u00a77: the `decision` write shape and its three rungs; `decision_option`, `decision_policy`, `decision_policy_refinement` and `laya_inference_config`; the `ladder.*`, `decision_policies.*`, `refinements.*` and `laya_configs.*` actions; the human gate and the `draft.apply` gate; and the real-Postgres acceptance suites `decision_ladder.rs` and `ladder_human_gate.rs`. Out of scope: the PM job (T3), the tool platform (T13), metrics and metering (T11), T10 cadence work, the S15 judge&#39;s laya call, and the ADR board&#39;s `decisions.*` family.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-26T13:32:51.58027+00:00&quot;,
+      &quot;id&quot;: &quot;01a2180f-15fe-794d-aba4-395c2f06a32f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7282-b7b0-6dde32c38ab1&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T2 Decision ladder (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:32:51.863706+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-2/T2-bodies/T2/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

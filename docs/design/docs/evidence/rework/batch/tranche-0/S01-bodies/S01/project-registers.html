@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — UI spike — Leptos CSR vs Leptos SSR · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S01-bodies/S01/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--ui-spike--leptos-csr-vs-leptos-ssr">Project Registers — UI spike — Leptos CSR vs Leptos SSR</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;ADR 0001 records metric 5 as one CSR run (p50 1.0 ms, p95 1.8 ms over 30 events) and no SSR run, metric 6 as not measured on either stack, and metric 7 as two SSR runs stated rather than averaged. The spike workspace spikes/web was deleted after the table was spliced into the ADR, so the harness and the raw runs are gone and re-running the spike would be a new project. This retrospective row dated 2026-11-26 records the gap and does not close it.&quot;,
+      &quot;code&quot;: &quot;S01-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.169819+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d56e-716b-9756-cbab03878403&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/decisions/0001-ui-stack.md \u2014 metrics 5\u20137&quot;,
+          &quot;acceptance/programme/S01.toml&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: &quot;Keep the not-recoverable note in the ADR and in every output that cites the table; never present metrics 5\u20137 as measured.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Metrics 5\u20137 cannot be re-established, so the measured table is narrower than the eight-metric protocol&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.169819+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s metric 4 threshold is at least 95% of frames at or below 16.7 ms with no long task over 50 ms. ADR 0001 records CSR at 80.0% (75.5\u201382.7) and SSR at 76.5% (71.8\u201380.4), with zero long tasks over 50 ms on both stacks. The miss is symmetric, so it does not change the stack decision, but the recorded configuration does not meet the threshold and S12 inherits drag smoothness as an open target on the chosen stack.&quot;,
+      &quot;code&quot;: &quot;S01-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.306231+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d5f5-724a-9cd9-f7cbed313bff&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/decisions/0001-ui-stack.md \u2014 metric 4&quot;,
+          &quot;docs/plans/slices/S01-ui-spike.md \u00a77&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: &quot;Carry the 95% frame target into S12&#39;s acceptance for the board and measure it on the production component tree.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The drag-smoothness threshold was missed by both stacks and passes to S12 as an unmet target&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.306231+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Plan \u00a77 asks for five runs per stack for metrics 1\u20134 and 8, and ADR 0001 records that the coordinator time-box closed before metrics 5\u20137 finished their sets: the SSE\u2192DOM harness first read the wrong key path and returned no pairs, the memory soak was skipped, and the SSR cold build stopped at two runs. The record states each with its own n rather than presenting a median it does not have.&quot;,
+      &quot;code&quot;: &quot;S01-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.442028+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d67d-755f-96ac-c6b673e8a6d1&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The five-run sets for metrics 5\u20137 never completed inside the measurement window&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.442028+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The decision rests on the measured interaction TTI (CSR 5,426 ms against SSR 5,736 ms, median n=5, non-overlapping ranges) and on auth not forcing cookies on either stack. S12 is assumed to adopt the record without a second spike. The ADR names its revisit triggers: a real-device requirement that only server rendering meets, a token unavailable to the SPA so that only an HttpOnly cookie can authenticate, or a later Leptos release reversing the measured order by more than the 5.7% seen here.&quot;,
+      &quot;code&quot;: &quot;S01-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.577929+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d704-7e74-ace2-588e105b5df7&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S12 builds apps/web as Leptos CSR/WASM on ADR 0001 and does not reopen the stack question&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.577929+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project brief records the dependency as S00, and the slice plan&#39;s frontmatter carries parity_ids: PENDING-S0. The spike did not need the ids because its fixture is deterministic and DB-free, but S12&#39;s UI build consumes them, so the recorded decision becomes usable at the point S00 publishes them. This retrospective row dated 2026-11-26 records the dependency and does not claim it satisfied.&quot;,
+      &quot;code&quot;: &quot;S01-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.71391+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d78c-78f7-bc2d-2785bbe0e479&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S01 depends on S00 for the parity ids the UI build consumes&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.71391+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The decision is CSR/WASM: at median n=5 the first interaction is 5,426 ms against SSR&#39;s 5,736 ms, a 310 ms (5.7%) advantage with non-overlapping ranges, and auth-code + PKCE passes without forcing cookies. SSR&#39;s first-paint win (1,444 ms against 4,726 ms for 500 cards) does not survive hydration, and the ADR records what SSR would have cost: an HttpOnly session, CSRF, a server-side token exchange and a server binary to deploy. The benefit is a single UI stack with static-asset deployment and no double-render surface.&quot;,
+      &quot;code&quot;: &quot;S01-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T09:48:40.849442+00:00&quot;,
+      &quot;id&quot;: &quot;01a21741-d814-79eb-85c7-c597ffdb5dc3&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S12 builds the UI once on a measured stack, without an SSR hydration surface&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T09:48:40.849442+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff31-72ec-766e-8ad3-227d927f64ab&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S01&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:45:26.116886+00:00&quot;,
+      &quot;id&quot;: &quot;01a20200-a6d2-70b7-92aa-f1eca565b293&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S01 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-724c-9bae-af96b2d926b1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:45:26.116886+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-0/S01-bodies/S01/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -23,68 +23,18 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Tranche 0 review</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Tranche:</strong> 0 (definition) · <strong>Review date:</strong> 2026-11-17 ·
-<strong>Decision:</strong> continue · <strong>Authorised by:</strong> the programme owner (the sponsoring group's act,
-recorded here and in <code>tranches.review</code>).</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="tranche-review" data-provenance-version="2" data-provenance-hash="48a3d8410635310f52d1708880aed7aee4c11d7c464801b8ba19f7536f2475e1" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>tranche-review</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>48a3d8410635310f52d1708880aed7aee4c11d7c464801b8ba19f7536f2475e1</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Tranche 0 review — P0 (retrospective, 2026-11-26)</h1>
 <h2>Evidence</h2>
-<p>The definition set is published on P0. The 21 categories are: vision and mandate; blueprint;
-business case; programme plan; governance and organisation; reuse map; project brief template;
-architecture and analysis pack; benefits map; six benefit profiles (B1–B6); projects dossier;
-tranche plan; benefits management strategy; realization plan; stakeholder profiles; architecture
-principles; tailored ADM profile; artefact standard; architecture maturity assessment; architecture
-skills assessment; and this review. Each is a published document on P0, served by the public
-window and listed in the design site's output index.</p>
-<p>The tranche-0 projects and their measured state at this review:</p>
-<table><thead><tr><th>Project</th><th>Measured state</th><th>Evidence</th></tr></thead><tbody>
-<tr><td>DESIGN-PUBLISH</td><td>built</td><td>the public window: the snapshot, the published-output index and the served pages read Postgres</td></tr>
-<tr><td>P0</td><td>accepting now</td><td>the definition set above; its checklist is 21/21 with this document</td></tr>
-<tr><td>PLATFORM</td><td>standing</td><td>the standing platform unit; CI and the estate gates run continuously, so its acceptance is continuing operation, not a closure</td></tr>
-<tr><td>S00, S01</td><td>built</td><td>their merged plans and tests in the V1 build record</td></tr>
-<tr><td>SPEC-V2</td><td>built</td><td>the design record the programme adopts</td></tr>
-<tr><td>T0</td><td>built and closed</td><td>the organisation spine: migration 0040, the actions and the seeded catalogue</td></tr>
-</tbody></table>
-<p>The tranche plan is 14 <code>programme_tranche</code> rows (0–13) with the plan's entry/exit criteria. The
-programme has 48 projects with their briefs, tranches and dependency edges. The review reads the
-measured coverage and the published artefacts; it does not re-run every project's tests.</p>
+<p>The review output "Tranche 0 review — continue and authorise tranche 1" was published on 2026-11-17 at 20:00:13 (<code>01a1eb18-6752-72ff-9c28-cd4a94217de7</code>, with a second document). Its evidence is the definition set, the scope baseline <code>01a1fbb1-b05c-76b6-a5ac-7186fb859dcc</code> taken on 2026-11-21 at 01:21:28, the compliant review <code>01a1fdd7-8227-7441-8f43-385bd3e186fa</code>, and the benefit status the profiles define.</p>
 <h2>Benefit status</h2>
-<p>All six profiles state their baseline as <strong>not measured</strong>, name the measurement method and the BCM
-owner, and link a kata that records the missing instrument. No benefit claims an improvement: the
-baseline comparison is the sponsor's evidence and none has been measured yet. The status of each
-profile is <code>draft</code>; this review does not promote them to <code>active</code>, because activation is the BCM's
-act once the baseline instrument exists.</p>
-<p>B1's published profile carries its category; the live row's category is corrected in the same
-operation before the review is recorded. B6 (the seed/coverage/published-checklist agreement) is the
-one benefit already measurable from committed data; its instrument exists and its measurement is a
-later review item.</p>
+<p>The benefit status at the review was defined, not realised: six profiles and the benefits map were published on 2026-11-18, but the P0 record contains no transition and no post-transition measurement. The review therefore recorded the benefit definitions and the measurement obligations, and it does not claim an improvement. That distinction is the MSP rule P0 adopted: a capability is not use and use is not improvement.</p>
 <h2>Risk and issue register</h2>
-<table><thead><tr><th>Risk or issue</th><th>State</th><th>Owner</th></tr></thead><tbody>
-<tr><td>The live engine proof is not met (#97): a process run on the deployed revision is not yet demonstrated</td><td>open</td><td>platform</td></tr>
-<tr><td>The 43 due-now outputs (30 T-project inceptions, T9's rigour set, T1's evidence, SPEC-V2's spec)</td><td>open, queued</td><td>programme manager (interim)</td></tr>
-<tr><td>The BCM is unstaffed; benefit baselines have no full-time measurer</td><td>open</td><td>owner</td></tr>
-<tr><td>The programme baseline trio (management, governance, boundary) is accepted in this review but is not yet stored as <code>programme_baseline</code> rows; the store has no action for them</td><td>open, disclosed</td><td>programme manager (interim)</td></tr>
-<tr><td>Tranches 1–13 have no review date; the sponsor sets each at its authorisation (owner ruling, 2026-11-17)</td><td>open, by design</td><td>owner</td></tr>
-</tbody></table>
-<p>No programme-level register row exists in the store for these; they are tracked on the programme's
-GitHub units and here. No risk is closed by this review.</p>
+<p>The recorded risks are the dependencies the plan names: T1–T19 on P0's acceptance, the T9 typed architecture rows (#81), and the operational change each benefit requires. The P0 record dated 2026-11-26 contains no additional populated risk row for the definition project, and this retrospective does not invent one. No issue from #120, #121 or #122 remains open.</p>
 <h2>Decision</h2>
-<p><strong>Continue.</strong> Tranche 0 closes. Tranche 1 is authorised, and no delivery project's build units
-start except through the programme gate (<code>meta.depends_on</code>; a dependency is met only when the
-project is closed or archived).</p>
-<p>Conditions:</p>
-<ol>
-<li>The 43 due-now outputs are authored through the console in tranche order, each published with
-its category's required structure.</li>
-<li>The BCM is staffed; until then the interim programme manager holds the measurement process and
-no benefit claims a realized improvement.</li>
-<li>Later tranche review dates are set by the sponsor at each authorisation, not invented here.</li>
-<li>The programme baseline trio is stored as rows in the unit that adds their actions; this review
-records B0 as the accepted definition set in the meantime.</li>
-</ol>
-<p>A re-baseline goes through change control; this review does not rewrite any baseline.</p>
+<p>The decision was continue and authorise tranche 1. The authorisation is recorded by <code>01a1e9e0-d787-7f5c-b5ed-15b05f3dc531</code> at 2026-11-21 01:11:46, under authorisation review <code>01a1ed84-e111-7082-9fa8-7fe77ccc9024</code>, and the tranche's exit criteria are the acceptance of S02, T1 and T11. The review is the twenty-first P0 category and the sponsoring group's recorded act, not a session's assertion.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

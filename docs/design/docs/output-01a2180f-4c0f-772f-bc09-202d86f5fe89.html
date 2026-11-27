@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — Decision ladder · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="af6e4bd7dc7f465e32ff755eb9449afa4219a4c1ce9845fe14c0a12c900263f9" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>af6e4bd7dc7f465e32ff755eb9449afa4219a4c1ce9845fe14c0a12c900263f9</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — Decision ladder</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 5,
+  "rows": [
+    {
+      "contract_id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+      "created_at": "2026-11-21T23:07:12.690622+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) \u2014 a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth \u00a712 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 \u2014 L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 \u2014 `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although \u00a77.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 \u2014 options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so \u00a77.2's \"options are rows, questions are rows\" is not met. v1-t2-5 \u2014 budget code spelling: \u00a77.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 \u2014 a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
+      "id": "01a2005d-20eb-72af-a5de-4606c0b16008",
+      "level": "non_conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-21T23:07:12.690622+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-21T23:07:12.690622+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+      "created_at": "2026-11-22T00:14:48.42267+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "fix": "920a1dcbfa6427b59aada92a63b6c29eb6bdcde6",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
+        "snapshot": "full-fidelity copy of the live database, 2026-11-22",
+        "test": "crates/actions/tests/documents_compose_gate.rs"
+      },
+      "findings": "Compliant with recorded deviations at the head that fixes v1-t2-1 (P0, 920a1dcb + documents_compose_gate.rs). Deviations, none P0: v1-w1c-3 L1 never invokes laya; v1-w1c-4 options and questions are inline text, not authored rows; v1-p101-1 a per-step judge verdict is a second decision store; v1-t2-5 the budget refusal code differs from the spec; v1-w1c-5 fail_policy is stored but not applied; v1-p102-1 laya\u2019s 3s budget is enforced as 30s. Artefact deviations: project-brief missing the Plan section; architecture-artifact missing Metadata, Entries and Document (both P2 partials).",
+      "id": "01a2009b-0768-72c1-bba1-2a8a3a8dae59",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-22T00:14:48.42267+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T00:14:48.42267+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+      "created_at": "2026-11-26T07:45:22.152544+00:00",
+      "evidence": {
+        "closure_review": "01a2005c-8c03-716a-b6c1-a6389e3a337c",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T2.toml"
+      },
+      "findings": [
+        {
+          "statement": "The T2 Statement of Architecture Work is delivered as written: its scope is the decision ladder and the generation split of SPEC_V2 section 7, its acceptance criterion is the section 12 T2 gate, the contract is live and approved by a distinct approver, and its only recorded deviation (v1-t2-1) is fixed at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6 with crates/actions/tests/documents_compose_gate.rs.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a216d0-f2f0-7261-ba0b-0ea1700403df",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T07:45:22.152544+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T07:45:22.152544+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a217f8-0d9d-744a-918a-bc2ff43ec122",
+      "created_at": "2026-11-26T13:09:14.607569+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "92cc110b022336f0bf00d44815ba6dd3f48e17b1"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) \u2014 a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth \u00a712 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 \u2014 L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 \u2014 `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although \u00a77.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 \u2014 options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so \u00a77.2's \"options are rows, questions are rows\" is not met. v1-t2-5 \u2014 budget code spelling: \u00a77.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 \u2014 a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
+      "id": "01a217f9-76f5-7ba5-a84b-86d34fa50fbb",
+      "level": "non_conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T13:09:14.607569+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T13:09:14.607569+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2180f-1c53-7d7d-ac50-60cdaa37717a",
+      "created_at": "2026-11-26T13:32:56.702984+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "0802b5be882d7f4f32a81097be84e3cacf91f049"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level compliant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The 2026-11-21 review admitted six findings; this re-review re-read every one against the tree at c6341a8a and records the disposition and evidence for each. v1-t2-1 (P0) \u2014 FIXED at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6: documents.compose derives the generated class from the request's attribution, stamps meta.generated server-side, and refuses a card_id on a generated draft with 409 draft_requires_gate; proved by crates/actions/tests/documents_compose_gate.rs. v1-t2-2 \u2014 duplicate of v1-w1c-3, RESOLVED at 864e71c45ce4b95f33dd9d9551901d826db17966: ladder.prepare builds the laya document, laya.classify runs the engine-owned call, and ladder.evaluate records the verified answer; a directly posted confidence cannot produce rung='laya' (decision_ladder.rs::a_confidence_posted_directly_cannot_produce_a_laya_decision, plus a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response, a_forged_laya_key_is_refused, a_tampered_laya_request_does_not_verify). v1-t2-3 (P1) \u2014 FIXED at fcb96fa93b33a0a7689418163d4c2613cc1917e8: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; a missing, wrong-gate or other-policy approval is 422 approval_missing before any row. v1-t2-4 \u2014 duplicate of v1-w1c-4, RESOLVED at 78cdf4ebbaabbdafbc547fbfd4cdb68c526acf7a: option sets are authored and versioned rows (decision_option_set / decision_option_entry), evaluate resolves the set by policy+question and pins its real version, and an answer outside the set is refused 422 answer_not_in_set (decision_ladder.rs::a_caller_cannot_supply_its_own_options). v1-t2-5 (P2) \u2014 FIXED at 624abeb4f5605bea27aa70a95abf021771b4fd2f: SPEC_V2 section 7.5 names the shipped 429 tool_budget_exceeded, matching section 11.3, and tool_budget.rs asserts the refusal at the direct-call, tool and run gates. v1-t2-6 (P1) \u2014 FIXED at 1167127da271d1ae1409806ffc436a0f07b6f3b5: a human decision citing an approval for another gate is refused 422, a cardless decision must cite an approval in its own project, and a matching gate is accepted (ladder_human_gate.rs). The re-review also found and fixed one defect of its own at c6341a8a: decision_policies.update could not clear fire_when because serde read JSON null as an absent member; the patch field now uses the shared double-option deserializer and decision_ladder.rs::a_policy_fire_when_is_validated_and_can_be_cleared passes. At this head the four cited targets pass (decision_ladder 26/26, ladder_human_gate 10/10, documents_compose_gate 7/7, tool_budget 14/14); no open P0/P1/P2 package remains for T2 and nothing is waived.",
+      "id": "01a2180f-2a04-72d7-86b4-4c75a31b85ee",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T13:32:56.702984+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T13:32:56.702984+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 5,
+  "rows": [
+    {
+      "contract_id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+      "created_at": "2026-11-21T23:07:12.690622+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) \u2014 a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth \u00a712 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 \u2014 L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 \u2014 `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although \u00a77.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 \u2014 options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so \u00a77.2's \"options are rows, questions are rows\" is not met. v1-t2-5 \u2014 budget code spelling: \u00a77.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 \u2014 a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
+      "id": "01a2005d-20eb-72af-a5de-4606c0b16008",
+      "level": "non_conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-21T23:07:12.690622+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-21T23:07:12.690622+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+      "created_at": "2026-11-22T00:14:48.42267+00:00",
+      "evidence": {
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "fix": "920a1dcbfa6427b59aada92a63b6c29eb6bdcde6",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
+        "snapshot": "full-fidelity copy of the live database, 2026-11-22",
+        "test": "crates/actions/tests/documents_compose_gate.rs"
+      },
+      "findings": "Compliant with recorded deviations at the head that fixes v1-t2-1 (P0, 920a1dcb + documents_compose_gate.rs). Deviations, none P0: v1-w1c-3 L1 never invokes laya; v1-w1c-4 options and questions are inline text, not authored rows; v1-p101-1 a per-step judge verdict is a second decision store; v1-t2-5 the budget refusal code differs from the spec; v1-w1c-5 fail_policy is stored but not applied; v1-p102-1 laya\u2019s 3s budget is enforced as 30s. Artefact deviations: project-brief missing the Plan section; architecture-artifact missing Metadata, Entries and Document (both P2 partials).",
+      "id": "01a2009b-0768-72c1-bba1-2a8a3a8dae59",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-22T00:14:48.42267+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T00:14:48.42267+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+      "created_at": "2026-11-26T07:45:22.152544+00:00",
+      "evidence": {
+        "closure_review": "01a2005c-8c03-716a-b6c1-a6389e3a337c",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T2.toml"
+      },
+      "findings": [
+        {
+          "statement": "The T2 Statement of Architecture Work is delivered as written: its scope is the decision ladder and the generation split of SPEC_V2 section 7, its acceptance criterion is the section 12 T2 gate, the contract is live and approved by a distinct approver, and its only recorded deviation (v1-t2-1) is fixed at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6 with crates/actions/tests/documents_compose_gate.rs.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a216d0-f2f0-7261-ba0b-0ea1700403df",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T07:45:22.152544+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T07:45:22.152544+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a217f8-0d9d-744a-918a-bc2ff43ec122",
+      "created_at": "2026-11-26T13:09:14.607569+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "92cc110b022336f0bf00d44815ba6dd3f48e17b1"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level non_conformant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. It names the six findings this batch admitted, each by id and by what is missing. v1-t2-1 (P0) \u2014 a generated draft can be attached by `documents.compose` with no gate: the action accepts `card_id` and `meta.generated = true` and writes an attached, active document; the `draft.apply` gate exists only in `ladder.apply_draft` and the generated-class refusal only in `documents.update`, so the create path bypasses both. This finding blocks closure of the fourth \u00a712 clause, \"a generated draft cannot transition a card\", and therefore blocks closure of T2. v1-t2-2 \u2014 L1 never calls laya: `ladder.evaluate` records the `answer`, `confidence`, `probabilities` and `latency_ms` supplied by its caller; `laya_configs` pins model_ref, params and timeout_ms, but no T2 path issues `POST /v1/systemone`, so the recorded L1 decision is a shape, not an inference. v1-t2-3 \u2014 `refinements.publish` is ungated: the action writes the tenant's threshold, rule and fail-action override and bumps its version with `confirm = \"none\"` and no approval, although \u00a77.2 calls a refinement change a gated policy change; `decision_policies.update` is likewise ungated. v1-t2-4 \u2014 options and questions are inline free text: `ladder.evaluate` accepts an `options` array of key/label/payload objects and a free `question` string in the request, and `decision_policy` carries kind, gate, threshold, fail_policy and action but no authored question, `fire_when` or `min_confidence`, so \u00a77.2's \"options are rows, questions are rows\" is not met. v1-t2-5 \u2014 budget code spelling: \u00a77.5 records `429 budget_exceeded`, but T2 enforces no inference budget and the only budget refusal in the tree is the tool-spend `429 tool_budget_exceeded` in `crates/actions/src/invoke.rs` and `crates/actions/src/broker.rs` (#526), so the documented slug has no implementation. v1-t2-6 \u2014 a human decision cites any approved approval, not its gate: `ladder.record` calls `human_approved_gate_tx(..., None, card_id)`, so the `gate` it was given is never compared with `approval.gate`; only `ladder.apply_draft` passes `Some(DRAFT_APPLY_GATE)`, and a `gate.precheck` decision can cite an approval for a different gate on the same card. The delivered clauses are proved by named tests: `decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change`, `::every_decision_pins_the_refinement_and_laya_config_versions` and, on the apply/update paths, `::a_generated_draft_cannot_transition_a_card`, with `ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision`, `::a_human_decision_without_an_approved_human_gate_is_refused`, `::a_pending_approval_cannot_gate_a_draft` and `::a_human_draft_apply_decision_and_approval_applies_the_draft`. The close also carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A\u2013D artefacts, the Statement of Architecture Work and the delivery contract were absent; this rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent.\n\nDispositions at this review. v1-t2-1 is FIXED: `documents.compose` now derives the generated class from the request's attribution and stamps `meta.generated` server-side, so a caller cannot unset it, and a `card_id` on a generated draft is refused `409 draft_requires_gate`; proved at `920a1dcbfa6427b59aada92a63b6c29eb6bdcde6` by `crates/actions/tests/documents_compose_gate.rs` (4/4) with `process_step` (20/20). The P0 that blocked closure is therefore lifted and the ledger carries it resolved. v1-t2-3 (`refinements.publish` ungated) and v1-t2-6 (a human decision cites any approved approval) remain open P1 packages owned by T2 and scheduled behind this batch; v1-t2-5 is a P2 correction. Under this programme's manifest the product gate is P0-only, so the two P1s do not block closure, and they are carried as packages rather than waived.",
+      "id": "01a217f9-76f5-7ba5-a84b-86d34fa50fbb",
+      "level": "non_conformant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T13:09:14.607569+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T13:09:14.607569+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a2180f-1c53-7d7d-ac50-60cdaa37717a",
+      "created_at": "2026-11-26T13:32:56.702984+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T2.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T2.toml",
+        "sha": "0802b5be882d7f4f32a81097be84e3cacf91f049"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level compliant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The 2026-11-21 review admitted six findings; this re-review re-read every one against the tree at c6341a8a and records the disposition and evidence for each. v1-t2-1 (P0) \u2014 FIXED at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6: documents.compose derives the generated class from the request's attribution, stamps meta.generated server-side, and refuses a card_id on a generated draft with 409 draft_requires_gate; proved by crates/actions/tests/documents_compose_gate.rs. v1-t2-2 \u2014 duplicate of v1-w1c-3, RESOLVED at 864e71c45ce4b95f33dd9d9551901d826db17966: ladder.prepare builds the laya document, laya.classify runs the engine-owned call, and ladder.evaluate records the verified answer; a directly posted confidence cannot produce rung='laya' (decision_ladder.rs::a_confidence_posted_directly_cannot_produce_a_laya_decision, plus a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response, a_forged_laya_key_is_refused, a_tampered_laya_request_does_not_verify). v1-t2-3 (P1) \u2014 FIXED at fcb96fa93b33a0a7689418163d4c2613cc1917e8: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; a missing, wrong-gate or other-policy approval is 422 approval_missing before any row. v1-t2-4 \u2014 duplicate of v1-w1c-4, RESOLVED at 78cdf4ebbaabbdafbc547fbfd4cdb68c526acf7a: option sets are authored and versioned rows (decision_option_set / decision_option_entry), evaluate resolves the set by policy+question and pins its real version, and an answer outside the set is refused 422 answer_not_in_set (decision_ladder.rs::a_caller_cannot_supply_its_own_options). v1-t2-5 (P2) \u2014 FIXED at 624abeb4f5605bea27aa70a95abf021771b4fd2f: SPEC_V2 section 7.5 names the shipped 429 tool_budget_exceeded, matching section 11.3, and tool_budget.rs asserts the refusal at the direct-call, tool and run gates. v1-t2-6 (P1) \u2014 FIXED at 1167127da271d1ae1409806ffc436a0f07b6f3b5: a human decision citing an approval for another gate is refused 422, a cardless decision must cite an approval in its own project, and a matching gate is accepted (ladder_human_gate.rs). The re-review also found and fixed one defect of its own at c6341a8a: decision_policies.update could not clear fire_when because serde read JSON null as an absent member; the patch field now uses the shared double-option deserializer and decision_ladder.rs::a_policy_fire_when_is_validated_and_can_be_cleared passes. At this head the four cited targets pass (decision_ladder 26/26, ladder_human_gate 10/10, documents_compose_gate 7/7, tool_budget 14/14); no open P0/P1/P2 package remains for T2 and nothing is waived.",
+      "id": "01a2180f-2a04-72d7-86b4-4c75a31b85ee",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "reviewed_at": "2026-11-26T13:32:56.702984+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-26T13:32:56.702984+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": "none recorded",
+      "decision": "compliant",
+      "findings": "This retrospective Phase-G review records the compliance level compliant for T2 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The 2026-11-21 review admitted six findings; this re-review re-read every one against the tree at c6341a8a and records the disposition and evidence for each. v1-t2-1 (P0) \u2014 FIXED at 920a1dcbfa6427b59aada92a63b6c29eb6bdcde6: documents.compose derives the generated class from the request's attribution, stamps meta.generated server-side, and refuses a card_id on a generated draft with 409 draft_requires_gate; proved by crates/actions/tests/documents_compose_gate.rs. v1-t2-2 \u2014 duplicate of v1-w1c-3, RESOLVED at 864e71c45ce4b95f33dd9d9551901d826db17966: ladder.prepare builds the laya document, laya.classify runs the engine-owned call, and ladder.evaluate records the verified answer; a directly posted confidence cannot produce rung='laya' (decision_ladder.rs::a_confidence_posted_directly_cannot_produce_a_laya_decision, plus a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response, a_forged_laya_key_is_refused, a_tampered_laya_request_does_not_verify). v1-t2-3 (P1) \u2014 FIXED at fcb96fa93b33a0a7689418163d4c2613cc1917e8: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; a missing, wrong-gate or other-policy approval is 422 approval_missing before any row. v1-t2-4 \u2014 duplicate of v1-w1c-4, RESOLVED at 78cdf4ebbaabbdafbc547fbfd4cdb68c526acf7a: option sets are authored and versioned rows (decision_option_set / decision_option_entry), evaluate resolves the set by policy+question and pins its real version, and an answer outside the set is refused 422 answer_not_in_set (decision_ladder.rs::a_caller_cannot_supply_its_own_options). v1-t2-5 (P2) \u2014 FIXED at 624abeb4f5605bea27aa70a95abf021771b4fd2f: SPEC_V2 section 7.5 names the shipped 429 tool_budget_exceeded, matching section 11.3, and tool_budget.rs asserts the refusal at the direct-call, tool and run gates. v1-t2-6 (P1) \u2014 FIXED at 1167127da271d1ae1409806ffc436a0f07b6f3b5: a human decision citing an approval for another gate is refused 422, a cardless decision must cite an approval in its own project, and a matching gate is accepted (ladder_human_gate.rs). The re-review also found and fixed one defect of its own at c6341a8a: decision_policies.update could not clear fire_when because serde read JSON null as an absent member; the patch field now uses the shared double-option deserializer and decision_ladder.rs::a_policy_fire_when_is_validated_and_can_be_cleared passes. At this head the four cited targets pass (decision_ladder 26/26, ladder_human_gate 10/10, documents_compose_gate 7/7, tool_budget 14/14); no open P0/P1/P2 package remains for T2 and nothing is waived.",
+      "id": "01a2180f-2a04-72d7-86b4-4c75a31b85ee",
+      "kind": "governing_review",
+      "level": "compliant",
+      "phase_h_outcome": null,
+      "reviewed_at": "2026-11-26T13:32:56.702984+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a2180f-2a04-72d7-86b4-4c75a31b85ee: compliant governs; phase-H outcome not recorded (a phase-G decision is its level)"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

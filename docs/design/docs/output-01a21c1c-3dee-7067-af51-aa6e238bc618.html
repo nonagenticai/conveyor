@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Baseline — Native benchmark harness · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-baseline" data-provenance-version="1" data-provenance-hash="c315e132c1c002512f75db088e7eed0ad299efbbfe3acdd4c192af037f3159ae" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-baseline</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>c315e132c1c002512f75db088e7eed0ad299efbbfe3acdd4c192af037f3159ae</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Baseline — Native benchmark harness</h1>
+<h2>Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:25:14.864089+00:00",
+      "id": "01a21c1b-d17a-7a7f-9482-8101d9f71ab0",
+      "kind": "scope",
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+        "register": [
+          {
+            "code": "S17-B1",
+            "id": "01a21c1b-d0c9-756f-b6a4-f45c80c7eb5e",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One measurement loop in Rust replaces the Python harness and makes a run's number publishable"
+          },
+          {
+            "code": "S17-D1",
+            "id": "01a21c1b-d043-7828-bf03-35e2a05d62ad",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S17 depends on S02, S03, S04 and S09"
+          },
+          {
+            "code": "S17-A1",
+            "id": "01a21c1b-cfbd-76ac-8df3-78d8821eb444",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S17"
+          },
+          {
+            "code": "S17-I1",
+            "id": "01a21c1b-cf35-7434-bd27-28278005195d",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built and closed but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S17-R2",
+            "id": "01a21c1b-ceac-7fbc-bdcb-d7611c88e90e",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live sandbox proof depends on the compute-1 grading node and a digest-pinned image"
+          },
+          {
+            "code": "S17-R1",
+            "id": "01a21c1b-ce25-7dc0-862a-444dcc165140",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The conveyor arm is refused until S18, so the comparison the programme ultimately wants is not yet measurable"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c1b-d176-709b-8cf4-7b478e2f8710",
+            "job_size": 8,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S17 native benchmark harness \u2014 the retrospective active record"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:25:14.864089+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:25:15.015742+00:00",
+      "id": "01a21c1b-d20e-7ecd-baef-59efec8ba076",
+      "kind": "schedule",
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+        "register": [
+          {
+            "code": "S17-B1",
+            "id": "01a21c1b-d0c9-756f-b6a4-f45c80c7eb5e",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One measurement loop in Rust replaces the Python harness and makes a run's number publishable"
+          },
+          {
+            "code": "S17-D1",
+            "id": "01a21c1b-d043-7828-bf03-35e2a05d62ad",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S17 depends on S02, S03, S04 and S09"
+          },
+          {
+            "code": "S17-A1",
+            "id": "01a21c1b-cfbd-76ac-8df3-78d8821eb444",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S17"
+          },
+          {
+            "code": "S17-I1",
+            "id": "01a21c1b-cf35-7434-bd27-28278005195d",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built and closed but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S17-R2",
+            "id": "01a21c1b-ceac-7fbc-bdcb-d7611c88e90e",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live sandbox proof depends on the compute-1 grading node and a digest-pinned image"
+          },
+          {
+            "code": "S17-R1",
+            "id": "01a21c1b-ce25-7dc0-862a-444dcc165140",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The conveyor arm is refused until S18, so the comparison the programme ultimately wants is not yet measurable"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c1b-d176-709b-8cf4-7b478e2f8710",
+            "job_size": 8,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S17 native benchmark harness \u2014 the retrospective active record"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:25:15.015742+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:25:15.308926+00:00",
+      "id": "01a21c1b-d334-79ef-abaa-235a914ec592",
+      "kind": "cost",
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+        "register": [
+          {
+            "code": "S17-B1",
+            "id": "01a21c1b-d0c9-756f-b6a4-f45c80c7eb5e",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One measurement loop in Rust replaces the Python harness and makes a run's number publishable"
+          },
+          {
+            "code": "S17-D1",
+            "id": "01a21c1b-d043-7828-bf03-35e2a05d62ad",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S17 depends on S02, S03, S04 and S09"
+          },
+          {
+            "code": "S17-A1",
+            "id": "01a21c1b-cfbd-76ac-8df3-78d8821eb444",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S17"
+          },
+          {
+            "code": "S17-I1",
+            "id": "01a21c1b-cf35-7434-bd27-28278005195d",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built and closed but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S17-R2",
+            "id": "01a21c1b-ceac-7fbc-bdcb-d7611c88e90e",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live sandbox proof depends on the compute-1 grading node and a digest-pinned image"
+          },
+          {
+            "code": "S17-R1",
+            "id": "01a21c1b-ce25-7dc0-862a-444dcc165140",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The conveyor arm is refused until S18, so the comparison the programme ultimately wants is not yet measurable"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c1b-d176-709b-8cf4-7b478e2f8710",
+            "job_size": 8,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S17 native benchmark harness \u2014 the retrospective active record"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:25:15.308926+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 3,
+  "rows": [
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:25:14.864089+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c1b-d17c-7ec1-833c-9b2e9b1e77cb",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c1b-d17a-7a7f-9482-8101d9f71ab0",
+        "description": "Approve the scope baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:25:24.200524+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:25:15.015742+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c1b-d210-7fa7-b169-8df1cdefe7e9",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c1b-d20e-7ecd-baef-59efec8ba076",
+        "description": "Approve the schedule baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:25:15.157564+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:25:15.308926+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c1b-d336-7c91-b41d-dddf9f11d6b5",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c1b-d334-79ef-abaa-235a914ec592",
+        "description": "Approve the cost baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:25:15.452843+00:00",
+      "version": 2
+    }
+  ],
+  "source": "work.json#/approvals"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Native benchmark harness · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

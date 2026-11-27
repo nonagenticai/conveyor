@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Change Control — CI, runners and platform · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="1" data-provenance-hash="103b904f4bf41829d1bf8bbdef40c396728558e90dc98240a0b4ba6d804f73ea" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>103b904f4bf41829d1bf8bbdef40c396728558e90dc98240a0b4ba6d804f73ea</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Change Control — CI, runners and platform</h1>
+<h2>Change requests</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "Change request: rebuild PLATFORM's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-PLATFORM",
+      "created_at": "2026-11-22T06:45:04.5686+00:00",
+      "id": "01a20200-562e-7a53-9fcd-e136048a00fb",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of PLATFORM under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:04.5686+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The programme's acceptance standard changes. A project is done only when (a) every gate clause is discharged by executable checks with an explicit kind (record/probe/code); (b) every mandatory artefact is evidenced with a published document; (c) every P0/P1 package is resolved; (d) every gate records a rule decision with a resolving delegation_ref; (e) outputs are published at the head; (f) the SAFe rows exist; (g) a Phase-G review with snapshot_sha triages findings; (h) the risk, ADR and benefit registers are operated; (i) no finding and no waiver is open; (j) the published pack is current at the head. No deferral is a disposition. Impact analysis and the affected verdicts are in meta.impact and the #526 work table (comment 7077202144). This change row stays open until its `change` gate can be approved: the guard reads meta.change_id, which no action writes today (v1-change-1, fix in flight). Approving it before that fix would be a false record, so it is not approved here.",
+      "code": "U5-ACCEPTANCE-STANDARD",
+      "created_at": "2026-11-22T09:39:00.040076+00:00",
+      "id": "01a2029f-8e2e-78de-bc99-119da42fdfbf",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a2029c-9254-7605-8a7c-3013b28ee794",
+            "kind": "document"
+          },
+          {
+            "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "kind": "register_item"
+          }
+        ]
+      },
+      "meta": {
+        "blocked_by": "v1-change-1: the change gate's approval reads meta.change_id, which approvals.request does not write",
+        "change": {
+          "board": "issue #526 comment 7077202144",
+          "snapshot_sha": "58645942341648d61628029e4e46c5c367c022f6",
+          "standard": "v5 \u00a75 clauses (a)-(j)"
+        },
+        "decision": {
+          "decided_at": "2026-11-22",
+          "decided_by_kind": "rule",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "document": "01a2029c-9254-7605-8a7c-3013b28ee794",
+          "record": "#526"
+        },
+        "impact": {
+          "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+          "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+          "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": "P1",
+      "status": "open",
+      "title": "Change: the enhanced acceptance standard (gates executed, no deferrals)",
+      "updated_at": "2026-11-22T09:39:00.040076+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The retrospective rework completes the project's record: its work packages carry acceptance and evidence, its register rows are owned and dated, and the probe rows are retired. This change authorises those edits against the approved scope baseline.",
+      "code": "",
+      "created_at": "2026-11-26T10:30:36.937041+00:00",
+      "id": "01a21768-3c8e-759c-ae58-97e0e5fa6810",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the record fixes' WBS acceptance and evidence"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework's record fixes",
+      "updated_at": "2026-11-26T10:30:37.068266+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Impact</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "Change request: rebuild PLATFORM's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-PLATFORM",
+      "created_at": "2026-11-22T06:45:04.5686+00:00",
+      "id": "01a20200-562e-7a53-9fcd-e136048a00fb",
+      "impact": {
+        "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+        "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+        "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+        "scope": "the record and declared outputs are rebuilt and republished"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of PLATFORM under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:04.5686+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The programme's acceptance standard changes. A project is done only when (a) every gate clause is discharged by executable checks with an explicit kind (record/probe/code); (b) every mandatory artefact is evidenced with a published document; (c) every P0/P1 package is resolved; (d) every gate records a rule decision with a resolving delegation_ref; (e) outputs are published at the head; (f) the SAFe rows exist; (g) a Phase-G review with snapshot_sha triages findings; (h) the risk, ADR and benefit registers are operated; (i) no finding and no waiver is open; (j) the published pack is current at the head. No deferral is a disposition. Impact analysis and the affected verdicts are in meta.impact and the #526 work table (comment 7077202144). This change row stays open until its `change` gate can be approved: the guard reads meta.change_id, which no action writes today (v1-change-1, fix in flight). Approving it before that fix would be a false record, so it is not approved here.",
+      "code": "U5-ACCEPTANCE-STANDARD",
+      "created_at": "2026-11-22T09:39:00.040076+00:00",
+      "id": "01a2029f-8e2e-78de-bc99-119da42fdfbf",
+      "impact": {
+        "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+        "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+        "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a2029c-9254-7605-8a7c-3013b28ee794",
+            "kind": "document"
+          },
+          {
+            "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "kind": "register_item"
+          }
+        ]
+      },
+      "meta": {
+        "blocked_by": "v1-change-1: the change gate's approval reads meta.change_id, which approvals.request does not write",
+        "change": {
+          "board": "issue #526 comment 7077202144",
+          "snapshot_sha": "58645942341648d61628029e4e46c5c367c022f6",
+          "standard": "v5 \u00a75 clauses (a)-(j)"
+        },
+        "decision": {
+          "decided_at": "2026-11-22",
+          "decided_by_kind": "rule",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "document": "01a2029c-9254-7605-8a7c-3013b28ee794",
+          "record": "#526"
+        },
+        "impact": {
+          "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+          "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+          "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": "P1",
+      "status": "open",
+      "title": "Change: the enhanced acceptance standard (gates executed, no deferrals)",
+      "updated_at": "2026-11-22T09:39:00.040076+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The retrospective rework completes the project's record: its work packages carry acceptance and evidence, its register rows are owned and dated, and the probe rows are retired. This change authorises those edits against the approved scope baseline.",
+      "code": "",
+      "created_at": "2026-11-26T10:30:36.937041+00:00",
+      "id": "01a21768-3c8e-759c-ae58-97e0e5fa6810",
+      "impact": {
+        "scope": "the record fixes' WBS acceptance and evidence"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the record fixes' WBS acceptance and evidence"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework's record fixes",
+      "updated_at": "2026-11-26T10:30:37.068266+00:00",
+      "version": 1
+    }
+  ],
+  "source": "computed:change_impact"
+}
+</code></pre>
+<h2>Decisions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "Change request: rebuild PLATFORM's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-PLATFORM",
+      "created_at": "2026-11-22T06:45:04.5686+00:00",
+      "id": "01a20200-562e-7a53-9fcd-e136048a00fb",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of PLATFORM under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:04.5686+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The programme's acceptance standard changes. A project is done only when (a) every gate clause is discharged by executable checks with an explicit kind (record/probe/code); (b) every mandatory artefact is evidenced with a published document; (c) every P0/P1 package is resolved; (d) every gate records a rule decision with a resolving delegation_ref; (e) outputs are published at the head; (f) the SAFe rows exist; (g) a Phase-G review with snapshot_sha triages findings; (h) the risk, ADR and benefit registers are operated; (i) no finding and no waiver is open; (j) the published pack is current at the head. No deferral is a disposition. Impact analysis and the affected verdicts are in meta.impact and the #526 work table (comment 7077202144). This change row stays open until its `change` gate can be approved: the guard reads meta.change_id, which no action writes today (v1-change-1, fix in flight). Approving it before that fix would be a false record, so it is not approved here.",
+      "code": "U5-ACCEPTANCE-STANDARD",
+      "created_at": "2026-11-22T09:39:00.040076+00:00",
+      "id": "01a2029f-8e2e-78de-bc99-119da42fdfbf",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a2029c-9254-7605-8a7c-3013b28ee794",
+            "kind": "document"
+          },
+          {
+            "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "kind": "register_item"
+          }
+        ]
+      },
+      "meta": {
+        "blocked_by": "v1-change-1: the change gate's approval reads meta.change_id, which approvals.request does not write",
+        "change": {
+          "board": "issue #526 comment 7077202144",
+          "snapshot_sha": "58645942341648d61628029e4e46c5c367c022f6",
+          "standard": "v5 \u00a75 clauses (a)-(j)"
+        },
+        "decision": {
+          "decided_at": "2026-11-22",
+          "decided_by_kind": "rule",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "document": "01a2029c-9254-7605-8a7c-3013b28ee794",
+          "record": "#526"
+        },
+        "impact": {
+          "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+          "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+          "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": "P1",
+      "status": "open",
+      "title": "Change: the enhanced acceptance standard (gates executed, no deferrals)",
+      "updated_at": "2026-11-22T09:39:00.040076+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+      "body": "The retrospective rework completes the project's record: its work packages carry acceptance and evidence, its register rows are owned and dated, and the probe rows are retired. This change authorises those edits against the approved scope baseline.",
+      "code": "",
+      "created_at": "2026-11-26T10:30:36.937041+00:00",
+      "id": "01a21768-3c8e-759c-ae58-97e0e5fa6810",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the record fixes' WBS acceptance and evidence"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework's record fixes",
+      "updated_at": "2026-11-26T10:30:37.068266+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

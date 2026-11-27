@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution concept — UI stack · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="27bc1aaf81d939edf98e5bcae3a1e2926b7915bfd6930d0f4590d945472a7e63" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>27bc1aaf81d939edf98e5bcae3a1e2926b7915bfd6930d0f4590d945472a7e63</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>Retrospective diagram artefact for S01, authored 2026-11-26 from the slice plan, ADR 0001 and the rework note. Phase a, plateau psa, kind diagram. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.</p>
+<h2>Entries</h2>
+<p>Seven rows: six components and one edge. The fixture is a single DB-free axum server; the shared tree is the same Rust components compiled into both packages, so the measurement compares stacks and not implementations. CSR and SSR are separate packages on separate ports, each served from its own built output. The harness is Playwright with CDP throttling, and Lighthouse is supplementary. ADR 0001 survives the spike, and the edge names the three metrics whose sets are incomplete.</p>
+<h2>Links</h2>
+<p>The artefact carries one typed edge: Requirements catalog — UI stack as realization. The edge names another artefact this pack creates, so the set has no orphan, and it records which components realise the measurement requirements; the diagram claims no component beyond the spike's own deliverables.</p>
+<h2>Document</h2>
+<p>Purpose: show how one fixture and one component tree produced two measured stacks, and which artefact survives. Scope: the fixture, the shared tree, the CSR and SSR packages, the harness, ADR 0001 and the unrecoverable metric set. It was drawn retrospectively on 2026-11-26 from the plan and the ADR, not from a design session, and it records the spike as deleted rather than as available to re-run.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

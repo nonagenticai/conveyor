@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Requirements, catalogues, revisions, quality scoring, search · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--requirements-catalogues-revisions-quality-scoring-search">Compliance Review — Requirements, catalogues, revisions, quality scoring, search</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219d9-4891-7eb2-ad11-095d4ddd9051&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S07.toml&quot;,
+        &quot;content_check&quot;: &quot;scripts/rework-content-check.py --project S07 --closes true&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;evidence_page&quot;: &quot;01a1e687-4d95-70a0-8cf9-a624a30dcb36&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S07.toml&quot;,
+        &quot;plan&quot;: &quot;docs/plans/slices/S07-requirements-search.md&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;,
+        &quot;snapshot&quot;: &quot;/tmp/conv526-w1-snap/data&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level consistent for S07 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 with the row last updated 2026-11-21T01:06:16Z, inside tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. At the snapshot the project has no charter, Statement of Architecture Work, delivery contract, Phase A\u2013D artefact set, Phase-G review, closure review, baseline row or linked issue; its only publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z. The project meta records measured_status built, plan_status planned, expected_outputs project-brief/evidence, closure_outputs empty and no issues. The plan \u00a77 functional gate has no recorded run and \u00a75.6&#39;s relevance targets have no recorded numbers. This content supplies the charter, the Statement of Architecture Work, the seven A\u2013D artefacts, the delivery contract, this review, the project brief, the evidence statement and the closure review; the level is consistent because the record set now matches the snapshot and nothing beyond the record is claimed. A level of compliant, conformant or fully_conformant would require a recorded gate and eval run, which the snapshot does not carry; non_conformant would require a waiver the programme forbids. The plan&#39;s traps remain constraints: no Rust-side filtering, SQL predicates with per-arm limits, the generated tsvector with a literal english config, trigram and full-text as distinct indexes, no quality scoring inside the mutation transaction, and the unversioned action path. The gate run and the relevance eval are carried as open verification items in this rework.&quot;,
+      &quot;id&quot;: &quot;01a219d9-6600-7a4f-bd43-a6d8d4a8fd7b&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219d9-4891-7eb2-ad11-095d4ddd9051&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S07.toml&quot;,
+        &quot;content_check&quot;: &quot;scripts/rework-content-check.py --project S07 --closes true&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;evidence_page&quot;: &quot;01a1e687-4d95-70a0-8cf9-a624a30dcb36&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S07.toml&quot;,
+        &quot;plan&quot;: &quot;docs/plans/slices/S07-requirements-search.md&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;,
+        &quot;snapshot&quot;: &quot;/tmp/conv526-w1-snap/data&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level consistent for S07 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 with the row last updated 2026-11-21T01:06:16Z, inside tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. At the snapshot the project has no charter, Statement of Architecture Work, delivery contract, Phase A\u2013D artefact set, Phase-G review, closure review, baseline row or linked issue; its only publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z. The project meta records measured_status built, plan_status planned, expected_outputs project-brief/evidence, closure_outputs empty and no issues. The plan \u00a77 functional gate has no recorded run and \u00a75.6&#39;s relevance targets have no recorded numbers. This content supplies the charter, the Statement of Architecture Work, the seven A\u2013D artefacts, the delivery contract, this review, the project brief, the evidence statement and the closure review; the level is consistent because the record set now matches the snapshot and nothing beyond the record is claimed. A level of compliant, conformant or fully_conformant would require a recorded gate and eval run, which the snapshot does not carry; non_conformant would require a waiver the programme forbids. The plan&#39;s traps remain constraints: no Rust-side filtering, SQL predicates with per-arm limits, the generated tsvector with a literal english config, trigram and full-text as distinct indexes, no quality scoring inside the mutation transaction, and the unversioned action path. The gate run and the relevance eval are carried as open verification items in this rework.&quot;,
+      &quot;id&quot;: &quot;01a219d9-6600-7a4f-bd43-a6d8d4a8fd7b&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: &quot;none recorded&quot;,
+      &quot;decision&quot;: &quot;consistent&quot;,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level consistent for S07 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 with the row last updated 2026-11-21T01:06:16Z, inside tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. At the snapshot the project has no charter, Statement of Architecture Work, delivery contract, Phase A\u2013D artefact set, Phase-G review, closure review, baseline row or linked issue; its only publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z. The project meta records measured_status built, plan_status planned, expected_outputs project-brief/evidence, closure_outputs empty and no issues. The plan \u00a77 functional gate has no recorded run and \u00a75.6&#39;s relevance targets have no recorded numbers. This content supplies the charter, the Statement of Architecture Work, the seven A\u2013D artefacts, the delivery contract, this review, the project brief, the evidence statement and the closure review; the level is consistent because the record set now matches the snapshot and nothing beyond the record is claimed. A level of compliant, conformant or fully_conformant would require a recorded gate and eval run, which the snapshot does not carry; non_conformant would require a waiver the programme forbids. The plan&#39;s traps remain constraints: no Rust-side filtering, SQL predicates with per-arm limits, the generated tsvector with a literal english config, trigram and full-text as distinct indexes, no quality scoring inside the mutation transaction, and the unversioned action path. The gate run and the relevance eval are carried as open verification items in this rework.&quot;,
+      &quot;id&quot;: &quot;01a219d9-6600-7a4f-bd43-a6d8d4a8fd7b&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;consistent&quot;,
+      &quot;phase_h_outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:53:27.547242+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a219d9-6600-7a4f-bd43-a6d8d4a8fd7b: consistent governs; phase-H outcome not recorded (a phase-G decision is its level)&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S07-bodies/S07/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Baseline — Decision forums (meetings) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-baseline" data-provenance-version="1" data-provenance-hash="86fca2ce46e111c9776a33b1813a6c732d8b01f9ece5ca32e93e38f58b5e06d3" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-baseline</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>86fca2ce46e111c9776a33b1813a6c732d8b01f9ece5ca32e93e38f58b5e06d3</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Baseline — Decision forums (meetings)</h1>
+<h2>Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-26T21:59:38.64063+00:00",
+      "id": "01a219df-0f99-7a6c-826e-1cdc4dc0ef81",
+      "kind": "scope",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+        "register": [
+          {
+            "code": "T19-B3",
+            "id": "01a219df-0f04-7419-8b54-d974888ba2ca",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room"
+          },
+          {
+            "code": "T19-B2",
+            "id": "01a219df-0e78-7bd6-b992-6f677dc55804",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "A meeting is a card under the existing DoD and WIP limits, so forums inherit the board's governance for free"
+          },
+          {
+            "code": "T19-B1",
+            "id": "01a219df-0dec-7eb2-92f2-92723a7d0424",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Every decision is one approval_decision row per qualifying seat with via='meeting', so no decision escapes the governed store"
+          },
+          {
+            "code": "T19-D2",
+            "id": "01a219df-0d60-7b89-be7f-77b721f177fe",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "P0 supplies the acceptance instrument and the ledger discipline the re-close stands on"
+          },
+          {
+            "code": "T19-D1",
+            "id": "01a219df-0cd4-745c-9588-7e9c0db03055",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference"
+          },
+          {
+            "code": "T19-A2",
+            "id": "01a219df-0c48-74d5-8e84-0511300b8166",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The consistent verdict stands without a waiver because the record shows no refused gate"
+          },
+          {
+            "code": "T19-A1",
+            "id": "01a219df-0bbc-746d-b8b9-3c9ad5f1e6e3",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-24 rework snapshot is the authoritative record for T19"
+          },
+          {
+            "code": "T19-I3",
+            "id": "01a219df-0b31-7826-bbba-689a399e8b8a",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live owner-seat gate has no record at the rework head"
+          },
+          {
+            "code": "T19-I2",
+            "id": "01a219df-0aa0-7f4e-994b-4f91fd478310",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them"
+          },
+          {
+            "code": "T19-I1",
+            "id": "01a219df-0a0d-7a8b-a8d8-c38a2e1318a9",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "open",
+            "title": "No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head"
+          },
+          {
+            "code": "T19-R2",
+            "id": "01a219df-0981-7b8e-9826-9fdcbd0e9866",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "A meeting_position row could be read as a decision, creating the second decision store R-12 forbids"
+          },
+          {
+            "code": "T19-R1",
+            "id": "01a219df-08f2-7ac2-bf97-d1817b2ca071",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 10,
+            "id": "01a219df-0f96-71cb-8f81-0f029c776f00",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 10,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "The decision-forums slice \u2014 meetings as the decision forum over cards, approvals, positions and governed minutes"
+          }
+        ]
+      },
+      "taken_at": "2026-11-26T21:59:38.64063+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-26T21:59:38.790374+00:00",
+      "id": "01a219df-102e-7149-8570-94ea7f402669",
+      "kind": "schedule",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+        "register": [
+          {
+            "code": "T19-B3",
+            "id": "01a219df-0f04-7419-8b54-d974888ba2ca",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room"
+          },
+          {
+            "code": "T19-B2",
+            "id": "01a219df-0e78-7bd6-b992-6f677dc55804",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "A meeting is a card under the existing DoD and WIP limits, so forums inherit the board's governance for free"
+          },
+          {
+            "code": "T19-B1",
+            "id": "01a219df-0dec-7eb2-92f2-92723a7d0424",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Every decision is one approval_decision row per qualifying seat with via='meeting', so no decision escapes the governed store"
+          },
+          {
+            "code": "T19-D2",
+            "id": "01a219df-0d60-7b89-be7f-77b721f177fe",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "P0 supplies the acceptance instrument and the ledger discipline the re-close stands on"
+          },
+          {
+            "code": "T19-D1",
+            "id": "01a219df-0cd4-745c-9588-7e9c0db03055",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference"
+          },
+          {
+            "code": "T19-A2",
+            "id": "01a219df-0c48-74d5-8e84-0511300b8166",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The consistent verdict stands without a waiver because the record shows no refused gate"
+          },
+          {
+            "code": "T19-A1",
+            "id": "01a219df-0bbc-746d-b8b9-3c9ad5f1e6e3",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-24 rework snapshot is the authoritative record for T19"
+          },
+          {
+            "code": "T19-I3",
+            "id": "01a219df-0b31-7826-bbba-689a399e8b8a",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live owner-seat gate has no record at the rework head"
+          },
+          {
+            "code": "T19-I2",
+            "id": "01a219df-0aa0-7f4e-994b-4f91fd478310",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them"
+          },
+          {
+            "code": "T19-I1",
+            "id": "01a219df-0a0d-7a8b-a8d8-c38a2e1318a9",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "open",
+            "title": "No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head"
+          },
+          {
+            "code": "T19-R2",
+            "id": "01a219df-0981-7b8e-9826-9fdcbd0e9866",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "A meeting_position row could be read as a decision, creating the second decision store R-12 forbids"
+          },
+          {
+            "code": "T19-R1",
+            "id": "01a219df-08f2-7ac2-bf97-d1817b2ca071",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 10,
+            "id": "01a219df-0f96-71cb-8f81-0f029c776f00",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 10,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "The decision-forums slice \u2014 meetings as the decision forum over cards, approvals, positions and governed minutes"
+          }
+        ]
+      },
+      "taken_at": "2026-11-26T21:59:38.790374+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-26T21:59:39.090552+00:00",
+      "id": "01a219df-1159-7f98-845b-f7fc38a54cab",
+      "kind": "cost",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+        "register": [
+          {
+            "code": "T19-B3",
+            "id": "01a219df-0f04-7419-8b54-d974888ba2ca",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room"
+          },
+          {
+            "code": "T19-B2",
+            "id": "01a219df-0e78-7bd6-b992-6f677dc55804",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "A meeting is a card under the existing DoD and WIP limits, so forums inherit the board's governance for free"
+          },
+          {
+            "code": "T19-B1",
+            "id": "01a219df-0dec-7eb2-92f2-92723a7d0424",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "baselined",
+            "title": "Every decision is one approval_decision row per qualifying seat with via='meeting', so no decision escapes the governed store"
+          },
+          {
+            "code": "T19-D2",
+            "id": "01a219df-0d60-7b89-be7f-77b721f177fe",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "P0 supplies the acceptance instrument and the ledger discipline the re-close stands on"
+          },
+          {
+            "code": "T19-D1",
+            "id": "01a219df-0cd4-745c-9588-7e9c0db03055",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "satisfied",
+            "title": "T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference"
+          },
+          {
+            "code": "T19-A2",
+            "id": "01a219df-0c48-74d5-8e84-0511300b8166",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The consistent verdict stands without a waiver because the record shows no refused gate"
+          },
+          {
+            "code": "T19-A1",
+            "id": "01a219df-0bbc-746d-b8b9-3c9ad5f1e6e3",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-24 rework snapshot is the authoritative record for T19"
+          },
+          {
+            "code": "T19-I3",
+            "id": "01a219df-0b31-7826-bbba-689a399e8b8a",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The live owner-seat gate has no record at the rework head"
+          },
+          {
+            "code": "T19-I2",
+            "id": "01a219df-0aa0-7f4e-994b-4f91fd478310",
+            "impact": null,
+            "kind": "issue",
+            "severity": "medium",
+            "status": "open",
+            "title": "The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them"
+          },
+          {
+            "code": "T19-I1",
+            "id": "01a219df-0a0d-7a8b-a8d8-c38a2e1318a9",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "open",
+            "title": "No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head"
+          },
+          {
+            "code": "T19-R2",
+            "id": "01a219df-0981-7b8e-9826-9fdcbd0e9866",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "A meeting_position row could be read as a decision, creating the second decision store R-12 forbids"
+          },
+          {
+            "code": "T19-R1",
+            "id": "01a219df-08f2-7ac2-bf97-d1817b2ca071",
+            "impact": 4,
+            "kind": "risk",
+            "severity": "high",
+            "status": "open",
+            "title": "The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 10,
+            "id": "01a219df-0f96-71cb-8f81-0f029c776f00",
+            "job_size": 13,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 10,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "The decision-forums slice \u2014 meetings as the decision forum over cards, approvals, positions and governed minutes"
+          }
+        ]
+      },
+      "taken_at": "2026-11-26T21:59:39.090552+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 3,
+  "rows": [
+    {
+      "card_id": null,
+      "created_at": "2026-11-26T21:59:38.64063+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a219df-0f9b-7ffb-9d63-13be1bb5a978",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a219df-0f99-7a6c-826e-1cdc4dc0ef81",
+        "description": "Approve the scope baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-26T21:59:48.059461+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-26T21:59:38.790374+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a219df-1030-7a99-8bc4-57d197b4bb19",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a219df-102e-7149-8570-94ea7f402669",
+        "description": "Approve the schedule baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-26T21:59:38.934102+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-26T21:59:39.090552+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a219df-115c-73fa-84b3-66226c354e77",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a219df-1159-7f98-845b-f7fc38a54cab",
+        "description": "Approve the cost baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-26T21:59:39.236514+00:00",
+      "version": 2
+    }
+  ],
+  "source": "work.json#/approvals"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

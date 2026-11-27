@@ -23,32 +23,30 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="23f18161a906f5766529aeb9af898a83d20572ae00b0d0a6fbf378b2f8f3f727" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>23f18161a906f5766529aeb9af898a83d20572ae00b0d0a6fbf378b2f8f3f727</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T16 SOP, RDF/OWL and process-document ingestion (retrospective, 2026-11-24)</h1>
 <h2>Outcome</h2>
-<p>The conveyor ingests SOPs, RDF/OWL ontologies and BPMN/Visio/draw.io documents into governed procedure drafts
-that a person publishes, and a bound job executes the PDDL steps.</p>
+<p>T16 is the procedure-ingestion slice of SPEC_V2 §12: a real SOP becomes a PDDL procedure draft with capability and job drafts; an RDF/OWL/Turtle file becomes a knowledge pack bound to the procedure by knowledge_pack_ref; BPMN, Visio and draw.io exports become PDDL procedure drafts; the draft is published only behind a human decision; a re-ingest versions the draft while the published row keeps its source and pack; a bound job runs the PDDL steps and an unreviewed source never binds. The project row records meta.measured_status: built, and this brief completes the record rather than re-running the gate.</p>
 <h2>Boundary</h2>
-<p>Not in scope: the procedure catalogue UI (T18) and the process engine (S13).</p>
+<p>Out of scope: any runtime RDF store, graph store or reasoner — decision D53 (owner 2026-11-19) removed the PKO store and made RDF/OWL/Turtle a strata knowledge-pack import; T17's generalisation to every tenant asset; T19's meetings record set; the /procedures destination's live-over-intake work recorded by issue #448; and any new ingestion capability. No second draft path, no drafting-job publication and no unreviewed binding may exist.</p>
 <h2>Reuse sources</h2>
-<p>The action spine's governed assets and documents, the capability/job families, the process executor (S13), and
-the D53 decision (knowledge pack, no RDF store at runtime).</p>
+<ul>
+<li>docs/SPEC_V2.md §12 — the T16 row and the Procedures destination row (capability → procedure → step, SOP intake, RDF/OWL and BPMN/Visio/draw.io intake, the PDDL step workspace, knowledge-pack pairing, the process map and publish).</li>
+<li>Decision D53 — the action space and procedural knowledge are two faces of one procedure, never a separate relational ontology, with every derived artefact a draft behind a review gate.</li>
+<li>The seven approved Phase A–D artefacts (01a216d1-00c2-7697-a69d-95f17c13ded9, 01a216d1-022c-798f-9c70-d80ae5fc1372, 01a216d1-03a4-75d7-b179-f0779eceb977, 01a216d1-0508-7333-9b49-bbdec7931317, 01a216d1-0667-7d27-b2b2-33c668b77857, 01a216d1-07ca-7336-9400-5de4096994c6, 01a216d1-092e-79a1-bdd6-66d886074986), the T16 acceptance manifest and the published retrospective documents listed in the evidence output.</li>
+</ul>
 <h2>Inception units</h2>
-<p>The ingestion actions (<code>procedures.ingest_*</code>), the review/publish gates, and the re-ingest versioning path.</p>
+<p>The units are the two closed issues — #85 'T16 — SOP, RDF/OWL and process-document ingestion' and #448 'T16 — the Procedures destination live over the intake and its gates' — carried into the requirements catalogue R1–R6: SOP intake, RDF/OWL intake, process-document intake, the publication gate, versioning and bound execution, each with a must-priority acceptance line in the approved artefacts.</p>
 <h2>Dependencies</h2>
-<p>T2 (plan spine), T13 (governed assets), P0 (programme definition); S13 for execution.</p>
+<p>T16 depends on T2, T13 and P0; SPEC_V2 places T16 after T2 and T13, with T17 after T16 and T3, and T16 follows the tool spine as the first authoring feature built on it. The slice sits in tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) of programme 01a1d039-0d24-7d16-ae52-4841e96ccfac; the tranche-4 PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 lists T16 in its scope and capacity, and the refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e records its WSJF inputs.</p>
 <h2>Acceptance</h2>
-<p>SPEC_V2 §12 T16, proven by 25/25 named tests at lane head <code>46fc49e2</code>; manifest <code>acceptance/programme/T16.toml</code>.</p>
+<p>The gate is carried by acceptance/programme/T16.toml: a real SOP, an OWL file and a BPMN diagram each ingested end to end; the procedure draft published behind a human gate; a re-ingest creating the next draft version while the published row keeps its source and pack; a job bound to the procedure running the PDDL steps; an unreviewed source never binding. The P0 checks cover project state, baseline, charter, closure outputs, contract, review, closure gate, waivers, PI cadence/plan/objectives, WSJF, demo credits, product findings and rework; lessons and artefact standard are P1. This retrospective validates the record, not a fresh live run.</p>
 <h2>Capabilities</h2>
-<p>A team can turn its written procedures into executable, versioned procedures without hand-authoring the
-action space.</p>
+<p>Five capabilities, each recorded live in the Phase B map 01a216d1-0667-7d27-b2b2-33c668b77857: procedure governance (ingest and publish behind a gate), knowledge management (knowledge packs bound by reference), process execution (a bound job runs the PDDL steps), version management (re-ingest versions the draft) and assurance (an unreviewed source cannot bind). Together they cover the intake-to-execution path without a second store or a side channel.</p>
 <h2>Plan</h2>
-<p>Delivered in tranche 4; the PI plan for tranche 4 carries the objectives and capacity.</p>
-<h2>Risks</h2>
-<p>The systemic-improvement loop (T5) and the operations path (T7) are the coupled slices; the human gate and the
-knowledge-pack decision are the mitigations.</p>
+<p>Reopen decision → charter and scope baseline 01a216d0-f529-7bcb-81a7-d429d008d638 → the seven Phase A–D artefacts → SoAW and delivery contract → this Phase-G retrospective review → publish the project brief 01a216d0-7bc9-7449-9670-cc77c6bba3e5 and evidence 01a216d0-fc70-7260-8ded-e230423d633e. The WSJF inputs recorded by the tranche-4 refinement cadence are 10/8/7/8 with 14 open packages (0 P0, 1 P1, 13 P2). The project stays active; the tranche-4 review decides continue against its exit criteria, and any close is a separate gate decision.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

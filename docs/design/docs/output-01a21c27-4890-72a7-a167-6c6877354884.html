@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Operations · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="818d69e06d78b6721f0283202470ceba0bd2a8a28e88a0539436823a5ce0b308" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>818d69e06d78b6721f0283202470ceba0bd2a8a28e88a0539436823a5ce0b308</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Operations</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "docs/evidence/record/evidence/T7-acceptance.md records the executed 31-test operations suite as the manifest's gate and states that scripts/ops-live-proof.sh did not run: the operator CLI it drives is absent on this box and the deployed conveyor was digest sha256:60898434 (rollout 2026-11-21), older than the lane. The live proof remains a deploy-bound item, not a green claim; the record must not present the suite as the live cluster proof.",
+      "code": "T7-R1",
+      "created_at": "2026-11-27T08:37:13.755453+00:00",
+      "id": "01a21c26-c9a0-7424-83ac-ebd5b932a16d",
+      "impact": 2,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D2 Approval + dry run + dual control"
+        ],
+        "requirements": [
+          "R10 Executed suite",
+          "R4 Refused unapproved write"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": "After the deployed image carries the lane (at least ca155fada), run scripts/ops-live-proof.sh against the cluster and record the incident, the approved write, the postmortem and the resolution; cite the receipt, not this suite, for the live clause.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The live cluster proof is deploy-bound and was not run on this box",
+      "updated_at": "2026-11-27T08:37:13.755453+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The \u00a76.5 gate and the no-action mitigation are fixed at ca155fada. A deployed conveyor older than that commit still admits a one-decision ops gate and still refuses a zero-write mitigation. Until the image rolls, the live behaviour is the old behaviour; the tests and the receipt prove the lane, not the deployment.",
+      "code": "T7-R2",
+      "created_at": "2026-11-27T08:37:13.897092+00:00",
+      "id": "01a21c26-ca2c-7a40-8233-985a5dfa1d6d",
+      "impact": 2,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D5 A no-action mitigation is a record, not a write"
+        ],
+        "requirements": [
+          "R5 Dual control and dry run",
+          "R7 Zero-write incident"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": "Verify the deployed CONVEYOR_GIT_SHA is at least ca155fada before any live ops proof; if it is older, record the gap and do not claim the fix live.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The deployed image predates the dual-control and zero-write fixes",
+      "updated_at": "2026-11-27T08:37:13.897092+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "At the 2026-11-27 snapshot the T7 project row is active at version 12 with a scope baseline and a charter but no delivery contract, Phase A\u2013D artefact set, Phase-G compliance review or closure evidence; the seed says closed, so the record also drifts. This pack supplies the lifecycle set, the contract and the review, closes the project through the one gate, and resolves the seed/live drift.",
+      "code": "T7-I1",
+      "created_at": "2026-11-27T08:37:14.07882+00:00",
+      "id": "01a21c26-cae2-7121-9e03-28f4ad22744e",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": "Supplied by this rework and re-verified by verify-project.py --project T7 at a fresh snapshot.",
+      "review_at": null,
+      "severity": "high",
+      "status": "closed",
+      "title": "The record claimed built without the lifecycle set the close gate reads",
+      "updated_at": "2026-11-27T08:37:14.07882+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The rework reads the project row, the SPEC row, the issue #78 delivery and the T7 acceptance evidence at the 2026-11-27 snapshot. It assumes that snapshot is the authoritative lifecycle state and that no contemporaneous T7 approval exists outside it. If one is found, the retrospective review must be re-read against it rather than silently overwritten.",
+      "code": "T7-A1",
+      "created_at": "2026-11-27T08:37:14.22098+00:00",
+      "id": "01a21c26-cb6f-7eab-9003-16c879cb7b82",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The 2026-11-27 rework snapshot is the authoritative record for T7",
+      "updated_at": "2026-11-27T08:37:14.22098+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "T7 builds on T2's job, event and audit rows, T4's ActionSpec registry and destructive effect, T13's tools and bindings, and P0's programme definition. The dependency is one-way: T7 consumes those surfaces and ships no duplicate of them, and an ops asset may request a tool grant but never widen one.",
+      "code": "T7-D1",
+      "created_at": "2026-11-27T08:37:14.358982+00:00",
+      "id": "01a21c26-cbf9-7e2b-bbbd-b5bb8428eb87",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "T7 depends on T2, T4, T13 and P0",
+      "updated_at": "2026-11-27T08:37:14.358982+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 and D2/G2 record the benefit: one incident card with one lifecycle, and every destructive ops write behind an approval, a recorded dry run and two distinct human approvers. The benefit is declared in the record and carried by the operations suite, the two fixes at ca155fada and the /operations console; the live proof remains deploy-bound.",
+      "code": "T7-B1",
+      "created_at": "2026-11-27T08:37:14.49604+00:00",
+      "id": "01a21c26-cc83-743d-bce7-bbb546402302",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "One incident lifecycle makes every destructive ops write gated, dry-run and dual-controlled",
+      "updated_at": "2026-11-27T08:37:14.49604+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a216d1-1f41-7345-8163-8719d7129df9",
+      "body": "The six T7 deliverables are complete against the frozen scope baseline. This change authorises recording their acceptance and evidence on the WBS rows.",
+      "code": "CH-T7-7ef17d",
+      "created_at": "2026-11-26T07:45:33.839184+00:00",
+      "id": "01a216d1-2096-76f0-acc0-4c62a87ef17d",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "WBS deliverables 1-6: status accepted, evidence refs, no scope change"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Accept the T7 deliverables with their evidence",
+      "updated_at": "2026-11-27T08:37:24.561768+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

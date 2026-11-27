@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Control plane — claims, runs, approvals, andon, comms and notifications · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--control-plane--claims-runs-approvals-andon-comms-and-notifications">Compliance Review — Control plane — claims, runs, approvals, andon, comms and notifications</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a21a39-c074-7cac-a6d0-ca18a59d30b7&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S06.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S06.toml&quot;,
+        &quot;sha&quot;: &quot;7e3883b05e167fca6c10cedb351b2bac90a0b75f&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level non_conformant for S06 under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3, because the acceptance is not evidenced. At the 2026-11-27 snapshot the project row is status active at version 10 (track v1, ADM phase G, delivery plateau, tranche 5) with meta.measured_status built, meta.plan_status planned, meta.viability rework, expected_outputs project-brief/evidence and closure_outputs empty; issues #4 (open) and #604 (closed) are linked. The project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no gate receipt; its only document is the published evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). The seven plan \u00a77 properties (golden path, dual control, retry, andon, delivery retry, no timers, human versus agent) have no recorded run, and acceptance/programme/S06.toml is not evidenced. The findings are named honestly rather than rounded up: issue #4 records that the shared decision boundary and the Telegram sender identity were still open, and issue #604 closed with the multicast approval test timing out at 10 s under full-suite load, which is a closed issue and not a green re-run. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the expected outputs; the level stays non_conformant until the gate runs and their receipts are read, and a conformant level would require evidence the snapshot does not contain.&quot;,
+      &quot;id&quot;: &quot;01a21a39-dab0-733c-a041-9cf36da4703b&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a21a39-c074-7cac-a6d0-ca18a59d30b7&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S06.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S06.toml&quot;,
+        &quot;sha&quot;: &quot;7e3883b05e167fca6c10cedb351b2bac90a0b75f&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level non_conformant for S06 under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3, because the acceptance is not evidenced. At the 2026-11-27 snapshot the project row is status active at version 10 (track v1, ADM phase G, delivery plateau, tranche 5) with meta.measured_status built, meta.plan_status planned, meta.viability rework, expected_outputs project-brief/evidence and closure_outputs empty; issues #4 (open) and #604 (closed) are linked. The project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no gate receipt; its only document is the published evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). The seven plan \u00a77 properties (golden path, dual control, retry, andon, delivery retry, no timers, human versus agent) have no recorded run, and acceptance/programme/S06.toml is not evidenced. The findings are named honestly rather than rounded up: issue #4 records that the shared decision boundary and the Telegram sender identity were still open, and issue #604 closed with the multicast approval test timing out at 10 s under full-suite load, which is a closed issue and not a green re-run. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the expected outputs; the level stays non_conformant until the gate runs and their receipts are read, and a conformant level would require evidence the snapshot does not contain.&quot;,
+      &quot;id&quot;: &quot;01a21a39-dab0-733c-a041-9cf36da4703b&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2a-7007-bcd8-29bb24f36b54&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: &quot;none recorded&quot;,
+      &quot;decision&quot;: &quot;non_conformant&quot;,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the level non_conformant for S06 under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3, because the acceptance is not evidenced. At the 2026-11-27 snapshot the project row is status active at version 10 (track v1, ADM phase G, delivery plateau, tranche 5) with meta.measured_status built, meta.plan_status planned, meta.viability rework, expected_outputs project-brief/evidence and closure_outputs empty; issues #4 (open) and #604 (closed) are linked. The project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no gate receipt; its only document is the published evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). The seven plan \u00a77 properties (golden path, dual control, retry, andon, delivery retry, no timers, human versus agent) have no recorded run, and acceptance/programme/S06.toml is not evidenced. The findings are named honestly rather than rounded up: issue #4 records that the shared decision boundary and the Telegram sender identity were still open, and issue #604 closed with the multicast approval test timing out at 10 s under full-suite load, which is a closed issue and not a green re-run. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the expected outputs; the level stays non_conformant until the gate runs and their receipts are read, and a conformant level would require evidence the snapshot does not contain.&quot;,
+      &quot;id&quot;: &quot;01a21a39-dab0-733c-a041-9cf36da4703b&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;non_conformant&quot;,
+      &quot;phase_h_outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T23:38:48.874985+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a21a39-dab0-733c-a041-9cf36da4703b: non_conformant governs; phase-H outcome not recorded (a phase-G decision is its level)&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-5/S06-bodies/S06/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

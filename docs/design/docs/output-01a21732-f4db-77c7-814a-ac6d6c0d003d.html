@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Change Control — Programme definition — vision, blueprint, plan and project briefs · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="1" data-provenance-hash="fd47018c0ef02c2d7c129a25c8f950683d0074bd3615b9f2377d631d87c5fd5b" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>fd47018c0ef02c2d7c129a25c8f950683d0074bd3615b9f2377d631d87c5fd5b</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Change Control — Programme definition — vision, blueprint, plan and project briefs</h1>
+<h2>Change requests</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 5,
+  "rows": [
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+      "code": "U3-REBASELINE",
+      "created_at": "2026-11-21T01:21:50.581194+00:00",
+      "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+      "impact": 0,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "impact": {
+          "cost": 0,
+          "schedule": 0,
+          "scope": "record correction"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+      "updated_at": "2026-11-21T01:21:55.82619+00:00",
+      "version": 2
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:54.167507+00:00",
+      "id": "01a216d0-859e-7b45-b353-58e21b46c2e6",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the six benefit profile baselines and six field groups",
+      "updated_at": "2026-11-26T07:44:54.793217+00:00",
+      "version": 3
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The architecture decision register has zero governed_asset(kind='adr') rows. This change authorises seeding every docs/decisions record and every SPEC_V2 D## decision through the decisions.* actions, with the linked approval recorded in meta until the register's own approval gate lands.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:57.575713+00:00",
+      "id": "01a216d0-92ed-7d8a-9faf-a6cee37f6e5c",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') rows, their published index and the Architecture screen"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Seed the architecture decision register",
+      "updated_at": "2026-11-26T07:44:57.796377+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The seed wrote file-backed ADRs under filename-stem keys; the register grammar is adr-NNNN. This change authorises archiving the stem-keyed rows and re-seeding adr-0001..adr-0012, with the no-deferrals row keeping its delegation evidence on adr-0012.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.051327+00:00",
+      "id": "01a216d0-98b1-7468-bbc7-1834732b0e25",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-key the architecture decision register to its grammar",
+      "updated_at": "2026-11-26T07:44:59.274124+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The baseline dicts carry value/unit/definition but not measured_at/method; B7 has no benefits-map edge and no preconditions. This change authorises completing those records under the programme-level profiles.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.394858+00:00",
+      "id": "01a216d0-9a08-79de-b214-15238740db5b",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Complete the benefit records: B7 link, B7 conditions, and the baseline measurement fields",
+      "updated_at": "2026-11-26T07:45:17.175637+00:00",
+      "version": 3
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Impact</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 5,
+  "rows": [
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+      "code": "U3-REBASELINE",
+      "created_at": "2026-11-21T01:21:50.581194+00:00",
+      "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+      "impact": 0,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "impact": {
+          "cost": 0,
+          "schedule": 0,
+          "scope": "record correction"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+      "updated_at": "2026-11-21T01:21:55.82619+00:00",
+      "version": 2
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:54.167507+00:00",
+      "id": "01a216d0-859e-7b45-b353-58e21b46c2e6",
+      "impact": {
+        "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the six benefit profile baselines and six field groups",
+      "updated_at": "2026-11-26T07:44:54.793217+00:00",
+      "version": 3
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The architecture decision register has zero governed_asset(kind='adr') rows. This change authorises seeding every docs/decisions record and every SPEC_V2 D## decision through the decisions.* actions, with the linked approval recorded in meta until the register's own approval gate lands.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:57.575713+00:00",
+      "id": "01a216d0-92ed-7d8a-9faf-a6cee37f6e5c",
+      "impact": {
+        "scope": "governed_asset(kind='adr') rows, their published index and the Architecture screen"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') rows, their published index and the Architecture screen"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Seed the architecture decision register",
+      "updated_at": "2026-11-26T07:44:57.796377+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The seed wrote file-backed ADRs under filename-stem keys; the register grammar is adr-NNNN. This change authorises archiving the stem-keyed rows and re-seeding adr-0001..adr-0012, with the no-deferrals row keeping its delegation evidence on adr-0012.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.051327+00:00",
+      "id": "01a216d0-98b1-7468-bbc7-1834732b0e25",
+      "impact": {
+        "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-key the architecture decision register to its grammar",
+      "updated_at": "2026-11-26T07:44:59.274124+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The baseline dicts carry value/unit/definition but not measured_at/method; B7 has no benefits-map edge and no preconditions. This change authorises completing those records under the programme-level profiles.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.394858+00:00",
+      "id": "01a216d0-9a08-79de-b214-15238740db5b",
+      "impact": {
+        "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Complete the benefit records: B7 link, B7 conditions, and the baseline measurement fields",
+      "updated_at": "2026-11-26T07:45:17.175637+00:00",
+      "version": 3
+    }
+  ],
+  "source": "computed:change_impact"
+}
+</code></pre>
+<h2>Decisions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 5,
+  "rows": [
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+      "code": "U3-REBASELINE",
+      "created_at": "2026-11-21T01:21:50.581194+00:00",
+      "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+      "impact": 0,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "impact": {
+          "cost": 0,
+          "schedule": 0,
+          "scope": "record correction"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+      "updated_at": "2026-11-21T01:21:55.82619+00:00",
+      "version": 2
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:54.167507+00:00",
+      "id": "01a216d0-859e-7b45-b353-58e21b46c2e6",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the six benefit profile baselines and six field groups",
+      "updated_at": "2026-11-26T07:44:54.793217+00:00",
+      "version": 3
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The architecture decision register has zero governed_asset(kind='adr') rows. This change authorises seeding every docs/decisions record and every SPEC_V2 D## decision through the decisions.* actions, with the linked approval recorded in meta until the register's own approval gate lands.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:57.575713+00:00",
+      "id": "01a216d0-92ed-7d8a-9faf-a6cee37f6e5c",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') rows, their published index and the Architecture screen"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Seed the architecture decision register",
+      "updated_at": "2026-11-26T07:44:57.796377+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The seed wrote file-backed ADRs under filename-stem keys; the register grammar is adr-NNNN. This change authorises archiving the stem-keyed rows and re-seeding adr-0001..adr-0012, with the no-deferrals row keeping its delegation evidence on adr-0012.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.051327+00:00",
+      "id": "01a216d0-98b1-7468-bbc7-1834732b0e25",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-key the architecture decision register to its grammar",
+      "updated_at": "2026-11-26T07:44:59.274124+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The baseline dicts carry value/unit/definition but not measured_at/method; B7 has no benefits-map edge and no preconditions. This change authorises completing those records under the programme-level profiles.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.394858+00:00",
+      "id": "01a216d0-9a08-79de-b214-15238740db5b",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Complete the benefit records: B7 link, B7 conditions, and the baseline measurement fields",
+      "updated_at": "2026-11-26T07:45:17.175637+00:00",
+      "version": 3
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

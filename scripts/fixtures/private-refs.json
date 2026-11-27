@@ -17,7 +17,12 @@
   {
     "input": "the key is ~/.ssh/strato-vps",
     "python": "the key is ~/.ssh/deploy-key",
-    "rust": "the key is ~/.ssh/deploy-key"
+    "rust": "the key is [redacted-path]"
+  },
+  {
+    "input": "the key name strato-vps",
+    "python": "the key name deploy-key",
+    "rust": "the key name deploy-key"
   },
   {
     "input": "strato-server runs the control plane",

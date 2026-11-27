@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology standards — metrics, metering and maturity · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="3d5da9ee2b6f24ebadb851c924249b8979c603607543f575fa4683d9d6ab933b" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>3d5da9ee2b6f24ebadb851c924249b8979c603607543f575fa4683d9d6ab933b</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Technology standards — metrics, metering and maturity</h1>
+<h2>Metadata</h2>
+<p>Retrospective catalogue for T11, authored 2026-11-26 from the 2026-11-21 rework transcript and the delivered code. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; subject project 01a1d039-0d36-782b-8b18-ff07a64dedbe.</p>
+<h2>Entries</h2>
+<p>Twelve standards. PostgreSQL 18 with forced row-level security holds both T11 tables; migrations are forward-only and numbered; the Rust workspace is edition 2024 with unsafe code forbidden, and the dependency direction runs from api through actions and store to domain. One ActionSpec declaration projects to HTTP, MCP and OpenAPI, and the served-spec lock pins the eight metrics actions. Measurement is derived at read time, with no stored metric and no stored cost; money is numeric(18,6) compared at six decimals; thresholds are versioned tenant rows over a closed nine-name vocabulary. Errors use stable problem slugs, cache classes follow V1 decision D23, routes are unversioned, and the console reads only the published snapshot.</p>
+<h2>Links</h2>
+<p>This artefact carries one typed edge: Data entity catalog — metrics, metering and maturity as derivation, because each entity is held in one of these formats. Every edge names another artefact this pack creates, so the set has no orphan.</p>
+<h2>Document</h2>
+<p>Purpose: name the formats, disciplines and instruments T11 fixes for measurement, precision, configuration and the console. Scope: store, migrations, the action surface, precision, error slugs and the snapshot-only console rule. It was authored retrospectively on 2026-11-26 and names only standards that the delivered migration, code and tests actually apply.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

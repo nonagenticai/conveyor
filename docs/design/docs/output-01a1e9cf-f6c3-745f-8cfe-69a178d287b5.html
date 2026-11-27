@@ -23,153 +23,16 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Architecture principles</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
-programme architect (<code>architect</code>, job catalogue) · <strong>Reviewer:</strong> the Architecture Board (charter
-proposed here; the board is convened when T9 lands — see <em>Application</em>) · <strong>Artefact:</strong> PF-1,
-<code>principles_catalog</code>, plateaus PSA/HLD/SD.</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-principles" data-provenance-version="4" data-provenance-hash="83fc7282b494333658c7c7d3c0ded1bae26dec68a6b8f32d2322ea2d6c477629" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-principles</dd></div><div><dt>Version</dt><dd>4</dd></div><div><dt>SHA-256</dt><dd>83fc7282b494333658c7c7d3c0ded1bae26dec68a6b8f32d2322ea2d6c477629</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture principles — P0 (retrospective, 2026-11-26)</h1>
 <h2>Principles</h2>
-<p>Each entry is a statement, its rationale, and the implications a project must design under. The
-evidence column names where the principle is already enforced; a principle the code does not yet
-enforce says so.</p>
-<h3>P1 — One model, one store, one action registry</h3>
-<p><strong>Statement.</strong> A programme, its projects, their work, their decisions and their evidence are rows in
-one Postgres database written through one action registry. A concept has one table and one set of
-actions; it never has a second system of record.</p>
-<p><strong>Rationale.</strong> <code>docs/SPEC_V2.md</code> §10 and <code>docs/decisions/0005-absorption-sequence-and-repo-scope.md</code>:
-the estate's pain is not missing services but distributed fragments of one model. One registry makes
-permission, audit and replay uniform; the registry is compiled, not configured, and its exact set
-is asserted by its own test (<code>crates/actions/tests/registry.rs</code>), so a new action cannot appear
-unseen.</p>
-<p><strong>Implications.</strong> A new capability is a table plus actions in this workspace, not a new service. A
-service that must run separately is absorbed behind an action (ADR 0005's sequence), and its data
-joins the one store. No feature may keep a private file or cache as its record of truth.</p>
-<p><strong>Evidence.</strong> <code>crates/actions/src/lib.rs</code> (the registry), <code>migrations/*.sql</code>, the S04 registry
-tests; the console's action manifest is generated from the same registry.</p>
-<h3>P2 — Every mutation is an action; the database is not the API</h3>
-<p><strong>Statement.</strong> A write goes through an action, with its scope, tenant, precondition and event. No
-handler, UI or script writes rows by SQL; the operator CLI calls the same actions the HTTP surface
-calls.</p>
-<p><strong>Rationale.</strong> RFC 9457 errors, <code>If-Match</code>/<code>_version</code> preconditions, revision history and audit all
-hang off the action envelope (<code>crates/actions/src/invoke.rs</code>). A SQL write bypasses every one of
-them and produces a row no event describes.</p>
-<p><strong>Implications.</strong> A new write is an action with a schema, a scope and a test. Read-only probes on the
-primary are allowed and must be <code>BEGIN READ ONLY</code>; anything else is a defect. The CLI's bulk content
-path (<code>documents.compose</code> with <code>publishable: true</code>) is still an action and is gated like the console.</p>
-<p><strong>Evidence.</strong> <code>crates/actions/src/invoke.rs</code> (dispatch, precondition, error shape); the registry
-test <code>committed_action_dump_matches_the_registry</code>.</p>
-<h3>P3 — Tenant isolation is structural, not a filter</h3>
-<p><strong>Statement.</strong> Every tenant-owned table has RLS enabled and forced, and every query runs under the
-tenant's scope. A cross-tenant id resolves to <code>404</code>, never to a filtered row or a <code>403</code> that
-confirms existence.</p>
-<p><strong>Rationale.</strong> <code>docs/SPEC_V2.md</code> §5.4; migration <code>0001</code>'s <code>app_current_tenant()</code> and the
-<code>tenant_isolation</code> policies; the store's <code>begin_scoped</code> is the only path that sets the GUC.</p>
-<p><strong>Implications.</strong> A new table ships with its policy in the same migration. A test that proves a
-foreign tenant's id is <code>404</code> accompanies the aggregate. A session-level GUC is forbidden through a
-transaction pooler (it leaks to the next client — measured 2026-09-22); a read-only probe uses
-<code>BEGIN READ ONLY</code> or a direct primary connection.</p>
-<p><strong>Evidence.</strong> <code>crates/store/src/scope.rs</code>; <code>crates/actions/tests/registry.rs</code>'s
-<code>a_foreign_tenant_parent_id_resolves_to_404_never_to_a_write</code>.</p>
-<h3>P4 — Publication is a decision, never a side effect</h3>
-<p><strong>Statement.</strong> A row is public only when an admin's publish decision makes it public. The public
-window serves <code>publishable AND status='active'</code> rows; an author's write never publishes, and an
-author's raw HTML is never executable on the public page.</p>
-<p><strong>Rationale.</strong> <code>docs/SPEC_V2.md</code> §3 P4 (the executor never approves its own work); the document
-aggregate keeps <code>publishable</code> separate from content, and <code>documents.publish</code> is the only action that
-moves it. <code>conveyor_render::markdown</code> neutralises raw HTML and refuses non-http(s)/mailto schemes.</p>
-<p><strong>Implications.</strong> A new public surface filters on the public bit and carries the tenant. A publish
-transition is reversible (unpublish is free) and versioned. A preview uses the same renderer as the
-public page, so an author cannot be promised markup the public page would refuse.</p>
-<p><strong>Evidence.</strong> <code>crates/actions/src/documents/revisions.rs</code> (<code>documents.publish</code>,
-<code>documents.request_publish</code>, <code>documents.return</code>); <code>crates/render/src/markdown.rs</code>.</p>
-<h3>P5 — Every output is versioned, attributable and reversible</h3>
-<p><strong>Statement.</strong> A text output carries its author, a content hash and a revision history; every edit
-is versioned, and a restore copies a version forward rather than rewriting the timeline. The public
-page is served from the same Postgres rows the console edits.</p>
-<p><strong>Rationale.</strong> The programme is judged on its intermediate work products; a published output a
-reviewer cannot trace back to its author, version and evidence is not auditable (<code>docs/SPEC_V2.md</code>
-§8.5's trace chain).</p>
-<p><strong>Implications.</strong> A new aggregate that holds work products reuses the document model or carries the
-same provenance. Deletion is a tombstone, not a disappearance, and a purge is a job with its own
-record.</p>
-<p><strong>Evidence.</strong> migration <code>0042</code>; <code>crates/store/src/document.rs</code> (<code>write_document_revision_tx</code>);
-<code>crates/api/tests/document_workflow.rs</code>.</p>
-<h3>P6 — Programme truth is computed, never hand-written</h3>
-<p><strong>Statement.</strong> A project's status, its units, its dependencies and its expected outputs come from
-measured sources — the slice plans, migrations, the compiled registry, the console and GitHub — and
-are regenerated by scripts. A checklist is derived from the standard, not typed into a document.</p>
-<p><strong>Rationale.</strong> <code>docs/design/data/coverage.json</code> is built by <code>scripts/build-coverage.py</code> from the
-slice frontmatter, the migrations, the action dump and <code>v2.js</code>; the output standard generates every
-project's <code>meta.expected_outputs</code>. A hand-written status is the first thing to rot.</p>
-<p><strong>Implications.</strong> A new programme fact gets a generator and a <code>--check</code> gate. A document may explain
-the truth; it may not be the only place the truth lives.</p>
-<p><strong>Evidence.</strong> <code>scripts/build-coverage.py</code>, <code>scripts/build-programme-seed.py</code>,
-<code>scripts/check-output-standard.py</code>; the design-pack CI job.</p>
-<h3>P7 — Gates refuse; a gate that never refuses is broken</h3>
-<p><strong>Statement.</strong> A quality gate is a refusal with an actionable reason, exercised by a test that
-proves the refusal. A gate that has never refused in a full cycle is treated as broken, not healthy.</p>
-<p><strong>Rationale.</strong> <code>docs/SPEC_V2.md</code> §3 P3/P4 and §8.3's rule; the estate's measured history: the
-<code>projects.create</code> gate and the output-incomplete gate exist because a publish without evidence
-happened.</p>
-<p><strong>Implications.</strong> A gate names what is missing and offers the next step (edit, return, kata). A
-refusal is covered by a test at the boundary the caller uses (HTTP, CLI), not only by a unit test.
-A gate that cannot refuse for a category or a path is a gap, not a default.</p>
-<p><strong>Evidence.</strong> <code>crates/actions/tests/authoring_standard.rs</code> (the seven authoring-standard boundary tests, most of them refusals); the programme gate's
-<code>409 blocked_by</code>; <code>crates/api/tests/document_workflow.rs</code>.</p>
-<h3>P8 — Typed dependencies, explicit gates</h3>
-<p><strong>Statement.</strong> A dependency between projects is typed (<code>blocked-by</code>, <code>acceptance-blocked-by</code>,
-<code>blocks</code>, <code>related</code>) and the programme gate enforces the blocking kind. A tranche review is a
-programme decision on evidence, not a demo.</p>
-<p><strong>Rationale.</strong> <code>docs/SPEC_V2.md</code> §8.3; T1's plan spine (<code>project_dependency</code>,
-<code>programme_tranche</code>); the <code>process_runs.start</code> gate answers <code>409 blocked_by</code> naming the open
-dependency.</p>
-<p><strong>Implications.</strong> A project's inception names its dependencies and the contract it sits under. A
-deviation from the blueprint is a decision record; a slip names the benefits put at risk through the
-benefits map.</p>
-<p><strong>Evidence.</strong> <code>migrations/0044_plan_spine.sql</code>; <code>crates/actions/src/spine/</code>;
-<code>crates/actions/tests/plan_spine.rs</code>; the run gate's <code>409 blocked_by</code> (<code>crates/actions/src/programme.rs</code>).</p>
-<h3>P9 — Secrets never leave their boundary</h3>
-<p><strong>Statement.</strong> A secret is write-only: no action returns its value, a sealed form is the only stored
-form, and no secret, token or private host enters the public repository or a published output.</p>
-<p><strong>Rationale.</strong> S09's secret aggregate and <code>scripts/ci/no-private-refs.sh</code>; the repository is public,
-so a leak is permanent.</p>
-<p><strong>Implications.</strong> A credential is referenced, never printed. A test asserts the manifest has no
-reveal action. A public output and the snapshot are scanned before publication.</p>
-<p><strong>Evidence.</strong> <code>crates/actions/src/documents/secrets.rs</code>; <code>scripts/ci/no-private-refs.sh</code>;
-<code>.github/workflows/ci-public.yml</code> (secret-scan).</p>
-<h3>P10 — The estate is one deployable service per concept, absorbed not duplicated</h3>
-<p><strong>Statement.</strong> A service the organisation depends on is either this workspace's own code or an
-absorbed, contract-tested module behind an action. A second deployment of the same concept is
-retired, not maintained.</p>
-<p><strong>Rationale.</strong> ADR 0005 (the absorption sequence ends at #45; the V2 spine is unblocked) and the
-measured estate: the absorbed services are modules in this workspace, and the public repository
-cannot carry a hidden dependency on a private host.</p>
-<p><strong>Implications.</strong> A new integration adds an action and a client in this workspace; it does not add
-a runtime hop the programme cannot test. A retired service's data is migrated, not forked.</p>
-<p><strong>Evidence.</strong> <code>docs/decisions/0005-absorption-sequence-and-repo-scope.md</code>; <code>crates/actions/src/ops/</code>;
-<code>apps/inference-router/</code>.</p>
+<p>The principles catalogue published on 2026-11-18 at 08:18:15 (<code>01a1e9cf-f6c3-745f-8cfe-69a178d287b5</code>) carries each principle with its statement, rationale and implications, as plan §3 item 14 requires. It is part of the architecture capability baseline that a delivery project needs before it starts, alongside the tailored ADM profile, the artefact standard, the board charter, and the maturity and skills baselines.</p>
 <h2>Approval</h2>
-<p>The principles are proposed for P0's definition-set acceptance; the sponsor's acceptance is the
-adopting act. The Architecture Board charter — membership, commissioning authority and decision
-limits — is proposed for adoption with this catalogue; the board's rows and its <code>board.decide</code> action are T9's
-deliverable (issue #81, proposed). Until the board is convened, a principles change is a <code>decision</code>
-document on P0 with the programme architect and the SRO as reviewers.</p>
-<p><strong>Open gap (kata).</strong> The board is a charter here, not rows: T9's <code>governance_body</code>,
-<code>architecture_contract</code> and <code>architecture_waiver</code> tables are not built. A deviation cannot yet be
-waived as a row; it is recorded as a decision, and the waiver discipline (accepting owner, reason,
-cost, risk, reassessment date) is applied by hand. The gap is recorded as a kata candidate on the
-kata project.</p>
+<p>The catalogue was published by #122's A7 as "proposed for P0 acceptance", and the plan records that the typed rows behind the architecture categories are T9's (#81). Approval therefore has two measurable parts on 2026-11-26: the document is published in the definition set, and the typed acceptance is an open T9 obligation rather than a P0 completion. The Architecture Board charter supplies the decision limits for applying the principles.</p>
 <h2>Application</h2>
-<p>Every delivery project's architecture inception cites the principles it applies and names any
-deviation. A deviation is a <code>decision</code> document with the alternative and the consequence; when T9
-lands, the same deviation becomes an <code>architecture_waiver</code> row with an accepting owner and a
-reassessment date, and a delivery design gate that resolves against a live contract refuses a
-project with no contract.</p>
-<p>The principles are reviewed at each tranche review (P0 §7): a principle that no project applied, or
-a gate that never refused, is evidence that the principle or the gate is wrong.</p>
+<p>A delivery project applies the principles in its architecture inception and records the artefacts its phase and plateau require. A deviation is a decision record, not a silent fork. The project must fit the blueprint and operate under a live <code>architecture_contract</code>, and a design gate without that contract is refused. The principles are therefore binding on T1–T19, while P0 itself only defines and publishes them.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

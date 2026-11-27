@@ -23,84 +23,32 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>T19 — Project brief</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="0b6ddc550052a1dd324d3e494296dd3098fcf5afb5a7a506ebd9dd7e6fa547c4" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>0b6ddc550052a1dd324d3e494296dd3098fcf5afb5a7a506ebd9dd7e6fa547c4</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T19 Decision forums (meetings) (retrospective, 2026-11-24)</h1>
 <h2>Outcome</h2>
-<p>A tenant convenes a cross-department meeting, resolves existing approvals through typed agenda
-items and positions, records each outcome by the forum's rule and the linked approval's stricter
-policy, and keeps the commitments, actions, dissent and minutes as governed rows — with any human,
-including the owner, deciding live in the web room or asynchronously over MCP.</p>
+<p>T19 makes the meeting the organisation's decision forum over the four existing primitives rather than a fifth unit: a meeting is a card, its agenda items resolve existing approvals, participants record typed positions, and <code>close_item</code> derives each item's outcome by arithmetic over one <code>approval_decision</code> row per qualifying seat under the stricter of the meeting type's rule and the approval's policy. After the slice the record shows who decided, for which department, with what conditions, dissent and commitments, and minutes are a chaired governed asset, without a chat system or a second decision store.</p>
 <h2>Boundary</h2>
-<p><strong>In:</strong> the five meeting tables and the two additive alterations; the <code>meetings.*</code> action family;
-the meeting card and DoD; the Meetings console destination; the <code>governance_body</code> and
-<code>programme_cadence</code> consumer seams; the seven decision instruments and the never-decided flag.</p>
-<p><strong>Out:</strong> chat, transcripts, AV integration, a calendar dependency, an LLM that selects or decides,
-a second decision store, a rebuild of T9's board or T10's cadence, and the T18 UI lane
-(#562–#566, PR #603). The approval primitive is extended for job-binding participants; no other
-V1 table changes.</p>
+<p>Out of scope: any chat, transcript store or AV product; a calendar dependency (an ICS feed is a read of attendance); an LLM that selects items, decides, infers a position or marks attendance; a second decision store; a rebuild of the approval primitive beyond the participant extension; a rebuild of T9's board or T10's cadence; the T18 UI lane; and ArchiMate-style rendering of minutes. The slice must not fork the approval, card, governed-asset or dependency primitives, and it must not let a position row stand in for a decision.</p>
 <h2>Reuse sources</h2>
-<table><thead><tr><th>Source</th><th>Path:symbol</th><th>Question the analysis answers</th></tr></thead><tbody>
-<tr><td>Approval primitive</td><td><code>migrations/0002_domain.sql:188</code> <code>approval</code>; <code>:231</code> <code>approval_decision</code></td><td>can a job-binding seat write a decision row? (No — extension required)</td></tr>
-<tr><td>Surface record</td><td><code>migrations/0002_domain.sql:241</code> <code>approval_decision.via jsonb</code>; <code>crates/api/tests/approval_dual.rs:147</code></td><td>how is a surface recorded today?</td></tr>
-<tr><td>Human participants</td><td><code>migrations/0002_domain.sql</code> <code>app_user</code></td><td>can every human hold a seat? (Yes)</td></tr>
-<tr><td>Card and DoD</td><td><code>card</code>, <code>card_type</code>; <code>seed/catalogue.json</code></td><td>is <code>meeting</code> a card type, or a new unit? (A card)</td></tr>
-<tr><td>Governed assets</td><td><code>migrations/0044_plan_spine.sql:411-419</code></td><td>is <code>minutes</code> a kind? (No — widen)</td></tr>
-<tr><td>Dependencies</td><td><code>migrations/0044_plan_spine.sql</code> <code>project_dependency</code></td><td>commitment → dependency edge</td></tr>
-<tr><td>Board context</td><td><code>migrations/0054_architecture.sql</code> <code>governance_body</code></td><td>convener seam, built by T9</td></tr>
-<tr><td>Cadence context</td><td><code>migrations/0056_cadence_tranche.sql</code> <code>programme_cadence</code></td><td>cadence-slot agenda source, built by T10</td></tr>
-<tr><td>Action registry</td><td><code>crates/actions/src/control/approvals.rs</code>; <code>crates/actions/tests/</code></td><td>the declaration → HTTP/MCP/OpenAPI pattern</td></tr>
-<tr><td>Console</td><td><code>apps/web/src/app.rs</code>; <code>docs/design/v2.js</code> §10.5</td><td>route and screen contract, owned by T18/T19</td></tr>
-</tbody></table>
-<h2>Inception units</h2>
-<p>The analysis and architecture outputs are published with this brief:
-<code>docs/plans/T19/inception-analysis.md</code> and <code>docs/plans/T19/architecture-design.md</code>. Both carry the
-standard's metadata; the architecture set is catalogued in <code>artifact-register.md</code>.</p>
-<h2>Dependencies</h2>
-<table><thead><tr><th>Relation</th><th>Issue</th><th>Why</th></tr></thead><tbody>
-<tr><td>blocked-by</td><td>#72 (T1)</td><td>plan spine, registers, <code>project_dependency</code></td></tr>
-<tr><td>blocked-by</td><td>#73 (T2)</td><td>L3 ladder and policy evaluation</td></tr>
-<tr><td>blocked-by</td><td>#74 (T3)</td><td>gate routing and the card/closure path</td></tr>
-<tr><td>blocked-by</td><td>#120 (P0)</td><td>the programme gate and this brief's standard</td></tr>
-<tr><td>related</td><td>#81 (T9)</td><td><code>governance_body</code> consumer; follow-up binding, not a rebuild</td></tr>
-<tr><td>related</td><td>#82 (T10)</td><td><code>programme_cadence</code> consumer; follow-up binding, not a rebuild</td></tr>
-<tr><td>related</td><td>#562–#566</td><td>T18 UI lane, separate files</td></tr>
-</tbody></table>
-<h2>Acceptance</h2>
-<p>The SPEC §12 T19 gate, in six clauses: a three-department majority with recorded dissent; an
-<code>inquorate</code> deferral that cannot decide; no lowering of dual control or waiving of evidence; the
-owner decides one item live and one over MCP, both <code>via-&gt;&gt;'surface'='meeting'</code>; minutes behind the
-chair's gate and every action a card; a decision-free forum flagged. The plan's D1–D8 carry the
-per-part BDD; the implementation issue is #606.</p>
-<h2>Capabilities</h2>
-<p>Programme manager, programme architect, business analyst, project manager, the SRO/BCM and the
-department positions that must be represented. The organization's high-level work is the
-capability this brief serves; the meeting is its decision forum, not a new job.</p>
-<h2>Plan</h2>
-<p><code>docs/plans/T19-decision-forums.md</code> (this unit). Implementation: #606.</p>
-<h2>Risks</h2>
-<table><thead><tr><th>Risk</th><th>Posture</th></tr></thead><tbody>
-<tr><td>R20 meeting theatre</td><td>typed items, evidence minimum, closed outcomes, owner+date commitments, minutes matching rows, metered and retired</td></tr>
-<tr><td>Lowering dual control or waiving evidence</td><td>stricter-wins arithmetic; the approval's policy is evaluated after the meeting rule</td></tr>
-<tr><td>Job-seat misattribution</td><td>the participant extension is explicit and tested; no human approver is borrowed</td></tr>
-<tr><td>Calendar/AV dependency</td><td>attendance is the record; ICS is a read; no calendar or AV service is required</td></tr>
-<tr><td>T18 lane collision</td><td>different files and routes; T19 owns <code>/meetings</code>, T18's shell links it</td></tr>
-</tbody></table>
-<h2>Gaps</h2>
-<p>The meeting code, migrations, actions and screen are absent; this unit delivers the plan and the
-programme artefacts only. The <code>approval_decision</code> participant extension and the <code>minutes</code> kind are
-the two measured schema gaps.</p>
-<h2>Links</h2>
 <ul>
-<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
-<li>Analysis: <code>docs/plans/T19/inception-analysis.md</code></li>
-<li>Architecture: <code>docs/plans/T19/architecture-design.md</code></li>
-<li>MSP: <code>docs/plans/T19/msp-profile.md</code></li>
-<li>SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
-<li>Register: <code>docs/plans/T19/artifact-register.md</code></li>
-<li>Spec: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
+<li>SPEC_V2 §6.8 (Meetings — the decision forum), the T19 row at §12 and decision D66, with the gate at <code>acceptance/programme/T19.toml</code>.</li>
+<li>The slice plan <code>docs/plans/T19-decision-forums.md</code>: its D1–D8 deliverables, §6 data model and §7 actions.</li>
+<li>The existing approval and approval_decision primitives with the P4 conflict exclusion; the card and its DoD; the run and governed-asset standards; the event and job outbox.</li>
+<li>T9's <code>governance_body</code> and T10's <code>programme_cadence</code> as declared consumers, not rebuilt here.</li>
+<li>The SvelteKit console with <code>apps/web/e2e/meetings.spec.ts</code>, the MCP agent front end and the Telegram surface.</li>
 </ul>
+<h2>Inception units</h2>
+<p>The project row 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1 records T19 in tranche 4 with ADM phase G, capability plateau and track v2. Its meta names plan <code>docs/SPEC_V2.md#12</code> (draft), depends_on T1, T2, T3 and P0, expected outputs <code>project-brief</code> and <code>evidence</code>, and measured_status built; issue #605 carried the plan and programme artefacts and issue #606 carried the slice, and both are CLOSED at the snapshot. The seven Phase A–D artefacts are approved and the two contracts are live with conformant reviews.</p>
+<h2>Dependencies</h2>
+<p>T19 depends on T1, T2 and T3 for the typed primitives the meeting references — the approval and its decision rows, the card, the governed asset and the dependency edge — and on P0 for the acceptance and ledger discipline. Its tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The T9 governance_body and T10 programme_cadence bindings are follow-up integration units, not dependencies of this slice.</p>
+<h2>Acceptance</h2>
+<p>The gate in <code>acceptance/programme/T19.toml</code> requires the meeting-as-card-plus-typed-record shape, one approval per deciding item, one position per qualifying seat, per-seat approval_decision rows with <code>via='meeting'</code>, the stricter-wins arithmetic including quorum, required departments, dual control, evidence and the P4 exclusion, an observer never counting, <code>inquorate</code> deferral on a missing required department, no close without an outcome, and no transcript or chat treated as a decision. The eight suites <code>meetings_policy</code>, <code>meetings_agenda</code>, <code>meetings_attendance</code>, <code>meetings_decision</code>, <code>meetings_outcomes</code>, <code>meetings_human_seat</code>, <code>meetings_metering</code> and <code>meetings_console</code>, plus <code>meetings.spec.ts</code>, are the declared checks; the snapshot records no rework-time run, and this pack does not claim one.</p>
+<h2>Capabilities</h2>
+<p>The slice delivers convened forums with versioned policy, an agenda derived from L0 queries plus explicit additions, attendance for job bindings and human seats, one live typed position per participant per item, the decision arithmetic and the closed outcome set, commitments as dependencies or cards, actions as cards, minutes as a governed asset, human participation live in the web room or asynchronously over web, Telegram and MCP, participant-hours metering, the never-decided forum flag, and the <code>/meetings</code> console destination.</p>
+<h2>Plan</h2>
+<p>The plan of record is <code>docs/plans/T19-decision-forums.md</code>, whose D1–D8 deliverables cover policy and convening, the agenda query, attendance and quorum, the outcome arithmetic, outcomes and minutes, the human seat across surfaces, metering and retirement, and the console. This retrospective authors the governance record around that plan; it changes no code and re-runs no suite, and it records the retrospective re-close dated 2026-11-24, consistent with the row's <code>status: closed</code> and the CLOSED linked issues #605 and #606.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

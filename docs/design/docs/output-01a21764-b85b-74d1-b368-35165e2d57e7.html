@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Context Diagram — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="6fa2585aab0b2ba92ce423d945a453631ef740b076a1831b68933fd3e29f6388" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>6fa2585aab0b2ba92ce423d945a453631ef740b076a1831b68933fd3e29f6388</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>The context diagram places the platform between the programme it serves and the external services it uses. The programme is the conveyor buildout; the estate is the five nodes; the externals are GitHub for source and CI, Cloudflare for the public window and the tailnet for private transport; the tenants are nonagentic, AHTAPol and w2v.</p>
+<h2>Entries</h2>
+<p>The diagram's rows are relationships, not boxes: the programme is served, GitHub is depended on in both directions, the network is exposed through two paths, and the tenants are served under separate boundaries. The tenant boundary is the platform's licensing and isolation rule, not a deployment detail.</p>
+<h2>Links</h2>
+<p>Each relationship has a failure mode the platform owns: a GitHub outage stops merges and preflight; a Cloudflare outage closes the public window; a tailnet fault splits the sites; and a tenant boundary breach is the one failure the platform must never allow. The diagram is the map the platform's incident procedures use.</p>
+<h2>Document</h2>
+<p>The context is stable across tranches, which is why it is a platform artefact rather than a project one. A new external service or a new tenant is a context change with a decision, and the diagram is updated with the decision rather than after it.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

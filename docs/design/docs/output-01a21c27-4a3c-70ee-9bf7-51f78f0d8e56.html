@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Wbs — Operations · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-wbs" data-provenance-version="1" data-provenance-hash="ea50b35eb5e5cd4f55703e9c84e2946a5898b5c710dedbcde0ff89952824679e" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-wbs</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>ea50b35eb5e5cd4f55703e9c84e2946a5898b5c710dedbcde0ff89952824679e</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Wbs — Operations</h1>
+<h2>Work packages</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-wbs",
+  "count": 6,
+  "rows": [
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_is_triaged_with_no_write"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f37-7e0c-a0a8-d98c746d25cb",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 1,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "Incidents are opened and triaged on the board from the operations queue",
+      "updated_at": "2026-11-26T07:45:34.211379+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_resolves_with_a_linked_postmortem"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f39-7359-8947-3937f7dd46e1",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 2,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "Runbooks and postmortems are governed documents linked to the incident",
+      "updated_at": "2026-11-26T07:45:34.362126+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_four_write_verbs_are_callable_and_read_back"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_undeclared_verb_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::the_write_reads_back"
+        }
+      ],
+      "id": "01a216d1-1f3a-73b4-b114-56c2ac444e66",
+      "job_size": 3,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 3,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 8,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "The four write verbs are callable and read back; an undeclared verb is refused",
+      "updated_at": "2026-11-26T07:45:34.509222+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::a_destructive_call_without_approval_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::an_approval_for_another_target_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_tenant_policy_sets_the_quorum"
+        }
+      ],
+      "id": "01a216d1-1f3b-76a7-a7bf-3d8e7813b8b3",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 4,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 9,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "A destructive call without the tenant's configured approvals is refused",
+      "updated_at": "2026-11-26T07:45:34.663531+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f3c-7873-bd04-7cb1a033e52c",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 5,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "An approved mitigation sets mitigated_at with a read-back",
+      "updated_at": "2026-11-26T07:45:34.823073+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 7,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_host.rs",
+          "ref": "ops_host::an_unregistered_host_refuses"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::a_systemic_finding_opens_exactly_one_kata"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_read.rs",
+          "ref": "ops_read::the_live_read_returns_the_pod_list (skipped: harness env)"
+        }
+      ],
+      "id": "01a216d1-1f3d-79fc-9e07-1ab4f5182106",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 6,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 6,
+      "title": "Hosts are registered before use and a systemic finding opens exactly one kata",
+      "updated_at": "2026-11-26T07:45:34.982718+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/wbs_nodes"
+}
+</code></pre>
+<h2>Acceptance</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-wbs",
+  "count": 6,
+  "rows": [
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_is_triaged_with_no_write"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f37-7e0c-a0a8-d98c746d25cb",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 1,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "Incidents are opened and triaged on the board from the operations queue",
+      "updated_at": "2026-11-26T07:45:34.211379+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_resolves_with_a_linked_postmortem"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f39-7359-8947-3937f7dd46e1",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 2,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "Runbooks and postmortems are governed documents linked to the incident",
+      "updated_at": "2026-11-26T07:45:34.362126+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_four_write_verbs_are_callable_and_read_back"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_undeclared_verb_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::the_write_reads_back"
+        }
+      ],
+      "id": "01a216d1-1f3a-73b4-b114-56c2ac444e66",
+      "job_size": 3,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 3,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 8,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "The four write verbs are callable and read back; an undeclared verb is refused",
+      "updated_at": "2026-11-26T07:45:34.509222+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::a_destructive_call_without_approval_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::an_approval_for_another_target_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_tenant_policy_sets_the_quorum"
+        }
+      ],
+      "id": "01a216d1-1f3b-76a7-a7bf-3d8e7813b8b3",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 4,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 9,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "A destructive call without the tenant's configured approvals is refused",
+      "updated_at": "2026-11-26T07:45:34.663531+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f3c-7873-bd04-7cb1a033e52c",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 5,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "An approved mitigation sets mitigated_at with a read-back",
+      "updated_at": "2026-11-26T07:45:34.823073+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 7,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_host.rs",
+          "ref": "ops_host::an_unregistered_host_refuses"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::a_systemic_finding_opens_exactly_one_kata"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_read.rs",
+          "ref": "ops_read::the_live_read_returns_the_pod_list (skipped: harness env)"
+        }
+      ],
+      "id": "01a216d1-1f3d-79fc-9e07-1ab4f5182106",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 6,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 6,
+      "title": "Hosts are registered before use and a systemic finding opens exactly one kata",
+      "updated_at": "2026-11-26T07:45:34.982718+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/wbs_nodes"
+}
+</code></pre>
+<h2>Status</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-wbs",
+  "count": 6,
+  "rows": [
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_is_triaged_with_no_write"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f37-7e0c-a0a8-d98c746d25cb",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 1,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "Incidents are opened and triaged on the board from the operations queue",
+      "updated_at": "2026-11-26T07:45:34.211379+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_incident_resolves_with_a_linked_postmortem"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f39-7359-8947-3937f7dd46e1",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 2,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "Runbooks and postmortems are governed documents linked to the incident",
+      "updated_at": "2026-11-26T07:45:34.362126+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_four_write_verbs_are_callable_and_read_back"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_undeclared_verb_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::the_write_reads_back"
+        }
+      ],
+      "id": "01a216d1-1f3a-73b4-b114-56c2ac444e66",
+      "job_size": 3,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 3,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 8,
+      "status": "accepted",
+      "time_criticality": 8,
+      "title": "The four write verbs are callable and read back; an undeclared verb is refused",
+      "updated_at": "2026-11-26T07:45:34.509222+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 9,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::a_destructive_call_without_approval_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_write.rs",
+          "ref": "ops_write::an_approval_for_another_target_is_refused"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::the_tenant_policy_sets_the_quorum"
+        }
+      ],
+      "id": "01a216d1-1f3b-76a7-a7bf-3d8e7813b8b3",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 4,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 9,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "A destructive call without the tenant's configured approvals is refused",
+      "updated_at": "2026-11-26T07:45:34.663531+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 8,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+        },
+        {
+          "kind": "document",
+          "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+          "ref": "T7 acceptance transcript"
+        }
+      ],
+      "id": "01a216d1-1f3c-7873-bd04-7cb1a033e52c",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 5,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 7,
+      "status": "accepted",
+      "time_criticality": 7,
+      "title": "An approved mitigation sets mitigated_at with a read-back",
+      "updated_at": "2026-11-26T07:45:34.823073+00:00",
+      "version": 2
+    },
+    {
+      "acceptance": [],
+      "body": "",
+      "business_value": 7,
+      "card_id": null,
+      "created_at": "2026-11-26T07:45:33.488799+00:00",
+      "evidence": [
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_host.rs",
+          "ref": "ops_host::an_unregistered_host_refuses"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops.rs",
+          "ref": "ops::a_systemic_finding_opens_exactly_one_kata"
+        },
+        {
+          "kind": "test",
+          "path": "crates/actions/tests/ops_read.rs",
+          "ref": "ops_read::the_live_read_returns_the_pod_list (skipped: harness env)"
+        }
+      ],
+      "id": "01a216d1-1f3d-79fc-9e07-1ab4f5182106",
+      "job_size": 2,
+      "kind": "deliverable",
+      "parent_id": null,
+      "position": 6,
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "risk_reduction": 6,
+      "status": "accepted",
+      "time_criticality": 6,
+      "title": "Hosts are registered before use and a systemic finding opens exactly one kata",
+      "updated_at": "2026-11-26T07:45:34.982718+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/wbs_nodes"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

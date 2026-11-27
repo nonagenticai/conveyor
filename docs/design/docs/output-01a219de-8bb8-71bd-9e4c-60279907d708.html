@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T18 The real V2 UI (Phase C) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="69c5817a544d96c6eeded810b98caed1adc04669cdc1d22f965fd6b65061d463" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>69c5817a544d96c6eeded810b98caed1adc04669cdc1d22f965fd6b65061d463</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Data Entity/Data Component Catalog — T18 The real V2 UI (Phase C)</h1>
+<h2>Metadata</h2>
+<p>Type catalog; phase C; plateau hld; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The catalog records the data entities the UI consumes and the application components it adds; the decisive entry is that T18 adds no migration, table, action or event, so the data architecture is unchanged.</p>
+<h2>Entries</h2>
+<p>Twelve rows: seven entity groups owned by T0–T17 and five component groups in apps/web and the measurement scripts. The entity rows name who owns the writes and which destination reads them; the component rows distinguish what T18 adds (the route registry, screen modules, specs) from what it reuses (the api, auth, state, SSE and shared components). No entity is new in T18, and the architecture rows are read-only from the UI while /design/adm remains a gate. The run and tool rows are the read-model gap the execution room names.</p>
+<h2>Links</h2>
+<p>Derives from docs/plans/T18/architecture-design.md (aggregates, tables and actions), the SPEC_V2 §10.3 data model and §10.4 action registry, and the migration tree that T18 does not extend. Links apps/web/src/app.rs, apps/web/src/screens, apps/web/e2e, scripts/build-v2-coverage.py, docs/evidence/v2-coverage.json and acceptance/programme/T18.toml. The design pack is not a component of the production path.</p>
+<h2>Document</h2>
+<p>The document this catalog sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py. It is the Phase C counterpart to the Phase A solution concept: the UI is a client of the registry and the rows, not a second store, and the catalogue shows that the project's data footprint is zero new entities. The dirty evidence is recorded: the coverage record is stale and the run read model does not yet expose the executor kind, binding pin or tool ledger. Project id 01a20c80-b734-748a-b299-879ea19be681.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The real V2 UI · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

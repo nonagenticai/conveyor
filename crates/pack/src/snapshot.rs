@@ -787,6 +787,27 @@ static HOME_PATH_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLoc
     regex::Regex::new(r#"(?:/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|~/)[^\s"']*"#)
         .expect("the home-path pattern is a constant")
 });
+static INTERNAL_HOST_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b([A-Za-z0-9][A-Za-z0-9_-]*)\.internal\b")
+        .expect("the internal-host pattern is a constant")
+});
+static PRIVATE_REPO_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"nonagenticai/gitops-production")
+        .expect("the private-repo pattern is a constant")
+});
+static DEPLOY_KEY_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"strato-vps").expect("the deploy-key pattern is a constant")
+});
+static DEPLOY_HOST_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"strato-server").expect("the deploy-host pattern is a constant")
+});
+static TAILNET_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\bts\.net\b").expect("the tailnet pattern is a constant")
+});
+static NODE_PATTERN: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b(hp1|hp2|mf1|worker3|mini1|mini2|pgx)\b")
+        .expect("the node-name pattern is a constant")
+});
 
 /// Mask emails, credential-shaped strings, IPs and home paths anywhere in a value.
 ///
@@ -803,6 +824,24 @@ pub(crate) fn redact(value: &mut Value) {
             let masked = PRIVATE_KEY_PATTERN.replace_all(&masked, "[redacted-key]");
             let masked = IP_PATTERN.replace_all(&masked, "[redacted-ip]");
             let masked = HOME_PATH_PATTERN.replace_all(&masked, "[redacted-path]");
+            let masked = INTERNAL_HOST_PATTERN.replace_all(&masked, "$1.example.com");
+            let masked = PRIVATE_REPO_PATTERN.replace_all(&masked, "gitops-production");
+            let masked = DEPLOY_KEY_PATTERN.replace_all(&masked, "deploy-key");
+            let masked = DEPLOY_HOST_PATTERN.replace_all(&masked, "deploy-host");
+            let masked = TAILNET_PATTERN.replace_all(&masked, "tailnet");
+            let masked = NODE_PATTERN.replace_all(&masked, |caps: &regex::Captures<'_>| {
+                match &caps[1] {
+                    "hp1" => "compute-1",
+                    "hp2" => "ci-1",
+                    "mf1" => "storage-1",
+                    "worker3" => "registry-1",
+                    "mini1" => "media-1",
+                    "mini2" => "media-2",
+                    "pgx" => "gpu-1",
+                    _ => "",
+                }
+                .to_owned()
+            });
             if masked.as_ref() != text.as_str() {
                 *text = masked.into_owned();
             }
@@ -1020,5 +1059,23 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
+    }
+}
+
+#[cfg(test)]
+mod private_ref_tests {
+    use super::redact_text;
+    use serde_json::Value;
+
+    #[test]
+    fn redact_matches_the_shared_private_refs_fixture() {
+        let cases: Vec<Value> =
+            serde_json::from_str(include_str!("../../../scripts/fixtures/private-refs.json"))
+                .expect("the shared private-refs fixture is valid JSON");
+        for case in cases {
+            let input = case["input"].as_str().expect("input");
+            let expected = case["rust"].as_str().expect("rust expectation");
+            assert_eq!(redact_text(input), expected, "input: {input}");
+        }
     }
 }

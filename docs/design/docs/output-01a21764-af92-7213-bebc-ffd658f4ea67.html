@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="83193dad5b1e62d82cfc7ca2954db3be63841080a7702336f565be66cfd61d80" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>83193dad5b1e62d82cfc7ca2954db3be63841080a7702336f565be66cfd61d80</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>The catalog names the platform's four data families and the store that owns each. It is an inventory with an owner per row, not a schema: the schemas live with the application and the stores live with the platform. A data family without an owner is a finding.</p>
+<h2>Entries</h2>
+<p>The operational rows are the record: projects, cards, runs, approvals, programme rows and the rework register, all in Postgres. The document bytes are in MinIO with tenant separation. The images are in the one registry. The secrets are per-service and never cross a service boundary, which is the platform's blast-radius rule.</p>
+<h2>Links</h2>
+<p>Each family names its backup or restore path: the nightly dump and its offsite relay for Postgres, the MinIO bucket probe and the restore drill for bytes, the PV snapshots for the registry and the SOPS layout for secrets. The catalog is what the restore drill walks.</p>
+<h2>Document</h2>
+<p>The catalog is the platform's data boundary. A new store is a design change; a second database user for another service is forbidden by the programme's invariants. The four families are the whole platform state, and the deliverable's evidence includes the restore path for the first.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

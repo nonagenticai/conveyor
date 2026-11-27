@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — S17 (retrospective, 2026-11-27) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="9158f3248d151b2a4c447c0ad2c00b42b2387e941ace784766ff154ccffee2c3" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>9158f3248d151b2a4c447c0ad2c00b42b2387e941ace784766ff154ccffee2c3</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S17 Native Benchmark Harness (retrospective, 2026-11-27)</h1>
+<h2>Outcome</h2>
+<p>S17 delivers one measurement loop: seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict and compare runs. The outcome the record closes on is the acceptance manifest at a fresh snapshot plus the recorded live compute-1 lifecycle, not the built status alone.</p>
+<h2>Boundary</h2>
+<p>In scope are the four benchmark tables, the hashed seed artifact and image lock, the standalone seed generator, the pure grader and 12 parsers, the exact McNemar, the k8s Job sandbox, the gold/empty/baseline arms, the eight actions, two scopes, two events and the declared S12 screens. Out of scope are the conveyor arm (S18), model hosting, HF calls, the old CLI, a second service and Python. The boundary is the slice plan's §3, restated so a later reader can see the exclusions are deliberate.</p>
+<h2>Reuse sources</h2>
+<p>S17 reuses S02's job, event and audit_event tables for the poll chain and reaper; S03's tenant RLS spine and document row; S04's ActionSpec registry, scopes and parity projection; and S09's document and object store for the eval log. It ships no duplicate of those surfaces: the benchmark tables are S17's, the log sink is S09's.</p>
+<h2>Inception units</h2>
+<p>The build units are the slice plan's 12 steps: the seed artifact and its Rust specgen; the migration and ledger; the arm derivation; the exact McNemar; the 12 parsers and the verdict ladder; the banked parity test; the store and its RLS; the eight actions and scopes; the sandbox adapter; the poll chain and reaper; the served-spec lock; and the gate. The live sandbox test is the deployment-gated P1 proof, not a unit of the offline gate.</p>
+<h2>Dependencies</h2>
+<p>S17 depends on S02 (job/event/audit), S03 (RLS spine, document), S04 (registry, scopes) and S09 (object store). It is a tranche-5 member; the S18 conveyor arm is an out-of-scope successor, and the two declared S12 screens are declarations, not builds.</p>
+<h2>Acceptance</h2>
+<p>The acceptance is <code>acceptance/programme/S17.toml</code> with 15 checks, backed by the banked parity oracle (555/555), the gold/empty controls (50/50, 0/50), the golden eval scripts (50/50), the exact McNemar vectors, RLS on the four tables, the fail-closed sandbox, the deterministic Job name, the no-answers-to-producers rule, the no-benchmark-action-in-AGENT_TOOLS rule and the live compute-1 lifecycle.</p>
+<h2>Capabilities</h2>
+<p>The built capability set is sixfold: suite identity (the hashed seed and image lock), run orchestration (start/get/list/cancel plus the poll chain), sandbox execution (the k8s Job adapter and the 1 MiB ConfigMap cap), grading (the verdict ladder and 12 parsers), comparison and controls (exact McNemar, the control gates and baseline promotion), and the live proof (the ignored lifecycle test and its recorded compute-1 run).</p>
+<h2>Plan</h2>
+<p>The plan is the slice plan's 12-step build order, completed and measured on 2026-11-09, with the live sandbox proof added and recorded on 2026-11-22. This rework does not rebuild it: it supplies the lifecycle record the build did not leave behind, re-runs the acceptance at a fresh snapshot and keeps S17 active. The remaining work is S18's conveyor arm and a re-run of the live proof if the grading node or image changes.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Native benchmark harness · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Candidate Solutions — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="candidate-solutions" data-provenance-version="1" data-provenance-hash="6739366327a1f4cc9ae8024ae7d79faaa5e8ccd02fb1bd0aea03ca0cfbef22ce" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>candidate-solutions</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>6739366327a1f4cc9ae8024ae7d79faaa5e8ccd02fb1bd0aea03ca0cfbef22ce</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Candidate Solutions — PLATFORM</h1>
+<h2>Candidates</h2>
+<p>Three candidates for the platform's CI and delivery shape: the GitHub-hosted preflight as the
+only Rust verdict; the cluster's own ARC runners for the service workflows; and the one-registry,
+Flux-only delivery path. Each candidate names the path it serves and the failure it prevents.</p>
+<h2>Criteria</h2>
+<p>The criteria are the owner's directions and the measured lessons: no local Rust compilation, a
+bounded CI budget, one failure model per shared path, and a verification a reader can run. A
+candidate that cannot name its verification is not a candidate; it is a wish.</p>
+<h2>Options rejected</h2>
+<p>A second CI node was rejected because it doubles the failure surface without addressing the queue,
+whose cause was miniature pull requests rather than capacity. Keeping the local compilation was
+rejected on the owner's direction and the measured 91 and 61 runs two tickets consumed. Doing
+nothing was rejected because the programme's own tranches depend on the platform's paths.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

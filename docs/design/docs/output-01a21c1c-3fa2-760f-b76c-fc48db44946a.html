@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Native benchmark harness · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="2d6e0c89e0aaee7d6f5fe67c0c34c68dd3cc38a8fcc14cf7e6d3ce3aee7c8979" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>2d6e0c89e0aaee7d6f5fe67c0c34c68dd3cc38a8fcc14cf7e6d3ce3aee7c8979</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Native benchmark harness</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The slice plan puts the conveyor arm out of scope: it measures a capability-agent/procedure version and belongs to S18, which waits for S13 and S15. S17 ships the columns and refuses the arm with 409 arm_not_ready. The benchmark can therefore measure the gold, empty and baseline arms now, but the product-vs-baseline comparison the programme wants is not yet a runnable number.",
+      "code": "S17-R1",
+      "created_at": "2026-11-27T08:25:14.018454+00:00",
+      "id": "01a21c1b-ce25-7dc0-862a-444dcc165140",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D6 The conveyor arm is S18's"
+        ],
+        "requirements": [
+          "R4 Exact McNemar",
+          "R1 Banked parity"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": "Land S18's conveyor arm and its S13/S15 dependencies; then run the paired comparison and record the McNemar result. Do not read a gold/empty control as a product improvement.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The conveyor arm is refused until S18, so the comparison the programme ultimately wants is not yet measurable",
+      "updated_at": "2026-11-27T08:25:14.018454+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The 2026-11-22 live run used SANDBOX_NODE_SELECTOR=conveyor.ai/grading=compute-1 and a digest-pinned swebench image, and took several minutes to pull. The proof is recorded, but a re-run on a missing or repointed node, an unpinned image or a cold image pull can fail for estate reasons that look like a product failure. The sandbox is fail-closed: a missing config is 503 benchmark_sandbox_not_configured, not a silent default.",
+      "code": "S17-R2",
+      "created_at": "2026-11-27T08:25:14.153921+00:00",
+      "id": "01a21c1b-ceac-7fbc-bdcb-d7611c88e90e",
+      "impact": 2,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D5 The grading node is deployment config"
+        ],
+        "requirements": [
+          "R6 Fail-closed sandbox",
+          "R10 Live sandbox proof"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": "Before any re-run, verify the grading node selector, the namespace and the digest-pinned image; treat a 503 as config, not as a benchmark result, and record the Job id with the run.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The live sandbox proof depends on the compute-1 grading node and a digest-pinned image",
+      "updated_at": "2026-11-27T08:25:14.153921+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "At the 2026-11-27 rework snapshot the S17 project row is closed at version 10 with no baseline, charter, contract, Phase A\u2013D artefact set, Phase-G review or gate receipt. The product is built and measured on 2026-11-09 and the live sandbox ran on 2026-11-22, but the record's closure rested on the build claim alone. This pack supplies the missing lifecycle set and the Phase-G review retrospectively; S17 stays active, and the receipt at a fresh snapshot is the acceptance the active state names.",
+      "code": "S17-I1",
+      "created_at": "2026-11-27T08:25:14.290278+00:00",
+      "id": "01a21c1b-cf35-7434-bd27-28278005195d",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": "Supplied by this rework: the seven artefacts, the charter, the Statement of Architecture Work, the delivery contract, the Phase-G review and the outputs; re-verified by verify-project.py --project S17 at a fresh snapshot.",
+      "review_at": null,
+      "severity": "high",
+      "status": "closed",
+      "title": "The record claimed built and closed but carried no lifecycle set or Phase-G review",
+      "updated_at": "2026-11-27T08:25:14.290278+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The rework reads the project row, the plan, the S17-CORE receipt and the live-run record at the 2026-11-27 snapshot. It assumes that snapshot is the authoritative lifecycle state and that no contemporaneous S17 approval or publication exists outside it. The assumption is stated so a later reader can challenge it: if a contemporaneous record is found, the retrospective review must be re-read against it rather than silently overwritten.",
+      "code": "S17-A1",
+      "created_at": "2026-11-27T08:25:14.426564+00:00",
+      "id": "01a21c1b-cfbd-76ac-8df3-78d8821eb444",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The 2026-11-27 rework snapshot is the authoritative record for S17",
+      "updated_at": "2026-11-27T08:25:14.426564+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "S17 builds on S02's job, event and audit_event tables for the poll chain and reaper; on S03's tenant RLS spine and document row; on S04's ActionSpec registry, scopes and parity projection; and on S09's document and object store for the eval log. The dependency is one-way: S17 consumes those surfaces and ships no duplicate of them.",
+      "code": "S17-D1",
+      "created_at": "2026-11-27T08:25:14.560836+00:00",
+      "id": "01a21c1b-d043-7828-bf03-35e2a05d62ad",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "S17 depends on S02, S03, S04 and S09",
+      "updated_at": "2026-11-27T08:25:14.560836+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 and D2/G2 record the benefit: the conveyor becomes the whole measurement loop, the banked parity oracle proves the parser row for row (555/555), and the gold/empty controls (50/50, 0/50) make a run's number publishable. The benefit is declared in the record and carried by the benchmark_parity and benchmark_specgen tests; the conveyor arm that would measure the product is S18's.",
+      "code": "S17-B1",
+      "created_at": "2026-11-27T08:25:14.694286+00:00",
+      "id": "01a21c1b-d0c9-756f-b6a4-f45c80c7eb5e",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "One measurement loop in Rust replaces the Python harness and makes a run's number publishable",
+      "updated_at": "2026-11-27T08:25:14.694286+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a21c1b-d17a-7a7f-9482-8101d9f71ab0",
+      "body": "The retrospective MSP/TOGAF/SAFe rework changed this project's record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.",
+      "code": "CH-S17-2ea369",
+      "created_at": "2026-11-27T08:25:24.515593+00:00",
+      "id": "01a21c1b-f728-7e51-b714-c27d6e2ea369",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the retrospective rework's record acts"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework of S17",
+      "updated_at": "2026-11-27T08:25:24.871995+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Native benchmark harness · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

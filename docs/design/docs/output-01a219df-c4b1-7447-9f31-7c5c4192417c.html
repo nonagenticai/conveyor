@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — T4 Kanban coach (Phase A) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="b9aaf70dd87301300a636321a472fda54d3934ea20ffc04bedcca929f6f6d470" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>b9aaf70dd87301300a636321a472fda54d3934ea20ffc04bedcca929f6f6d470</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Requirements Catalog — T4 Kanban coach (Phase A)</h1>
+<h2>Metadata</h2>
+<p>Type catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d33-7e7e-890e-b437b0c78db9; artefact 01a2028c-94d6-7e50-9d94-9e94feda14aa; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</p>
+<h2>Entries</h2>
+<p>Ten requirements. R1–R6 restate SPEC_V2 §12 in testable form and bind each clause to its named test in <code>crates/actions/tests/coach.rs</code>. R7 keeps the remedy honest: the effect runs before the row and a failure rolls both back. R8 makes the confidence floor explicit (0.7, ask below it). R9 requires the gate to be an instrument, not a prose claim, and binds its evidence to the checked-out HEAD. R10 protects the audit trail by grant rather than convention.</p>
+<h2>Links</h2>
+<p>Derives from SPEC_V2 §12 and §6.2, the module documentation in <code>crates/actions/src/coach.rs</code>, the kata open gate in <code>crates/actions/src/kata.rs</code>, and the gate instrument <code>scripts/check-t4-coach-gate.py</code>. Realizes the Phase A requirements view for the coach capability.</p>
+<h2>Document</h2>
+<p>The catalogue states what must hold. It does not state that it held at the snapshot: the executable mapping exists and names twelve tests, but no sha-bound run is present in the inputs, and the project acceptance record is red on governance checks.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology standards — UI stack · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="91b6645e0f451d5ec0d08a89d13f9c9d0968b9f659caaea41fd1ed0292223054" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>91b6645e0f451d5ec0d08a89d13f9c9d0968b9f659caaea41fd1ed0292223054</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>Retrospective catalog artefact for S01, authored 2026-11-26 from the slice plan's measurement protocol, ADR 0001 and the rework note. Phase d, plateau hld, kind catalog. The owner is the programme architect under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews and the programme approver decides the gate.</p>
+<h2>Entries</h2>
+<p>Seven standards. The version triad is a hard constraint: three Leptos crates on one minor, or the build fails with a type error that names neither crate. cargo-leptos is the build route, with release and wasm-opt and the built output served directly. The throttling protocol is what makes the numbers comparable, and Lighthouse is only a cross-check. Chrome 156 through Playwright is the browser of record. The last two standards are the report itself: gzip-9 bundle bytes, and the ADR's eight-by-two table with an explicit not-recoverable note where the set is incomplete.</p>
+<h2>Links</h2>
+<p>The artefact carries one typed edge: Data entity catalog — UI stack as derivation. The edge names another artefact this pack creates, so the set has no orphan, and it records that every measured entity is produced under one of these standards.</p>
+<h2>Document</h2>
+<p>Purpose: name the versions, tools and measurement standards the spike pinned, and where each is enforced. Scope: Leptos 0.9.0-rc1, cargo-leptos 0.3.11, Playwright, Chrome and Lighthouse, the throttling protocol and the ADR's own standard. Authored retrospectively on 2026-11-26, it names only versions and settings the plan and the ADR actually record.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

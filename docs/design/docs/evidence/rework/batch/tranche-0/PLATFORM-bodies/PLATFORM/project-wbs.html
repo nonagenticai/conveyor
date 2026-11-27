@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Wbs — CI, runners and platform · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-wbs.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-wbs--ci-runners-and-platform">Project Wbs — CI, runners and platform</h1>
+<h2 id="work-packages">Work packages</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-wbs&quot;,
+  &quot;count&quot;: 5,
+  &quot;rows&quot;: [
+    {
+      &quot;acceptance&quot;: [
+        &quot;the ARC runner pool lists a live runner on ci-1&quot;,
+        &quot;the hosted preflight returns a verdict at a pushed head&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e11c-7df6-be83-a4dedc25c763&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/plans/development-process-speed.md&quot;,
+        &quot;the preflight run at the rework head&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cdf3-7108-aac5-0cec790e988d&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 1,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;CI and runners available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:24.745122+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;registry.example.com:5000 answers a pull&quot;,
+        &quot;a hand push from registry-1 succeeds with the CA in place&quot;,
+        &quot;the public window answers through the ingress&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e297-7801-90f7-788212c63c49&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the registry&#39;s CA and pull record&quot;,
+        &quot;the public window probe&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-ce5c-70c8-87be-2dd12bf61cb0&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 2,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Registry and ingress available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.120029+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the primary reports pg_is_in_recovery false and the standby true&quot;,
+        &quot;the nightly dump exists with its offsite relay&quot;,
+        &quot;one restore drill reads the rows back&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e40d-72c8-9348-507a60229366&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the database recovery check&quot;,
+        &quot;the restore drill&#39;s receipt&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cedd-74c2-bad5-a22aa9918c87&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 3,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;Postgres primary, backups and restore&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.494727+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the service workflow is consumable unchanged&quot;,
+        &quot;a consuming project&#39;s CI runs on it&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 2,
+      &quot;card_id&quot;: &quot;01a21769-e587-714f-8d81-409d734ebcad&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the shared workflow revision&quot;,
+        &quot;a consuming project&#39;s run&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cf24-737d-a364-b0bdc88eac00&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 4,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Shared workflows and archetypes&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.869863+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the manifest&#39;s checks pass on a fresh snapshot&quot;,
+        &quot;the deliverable&#39;s evidence list resolves&quot;,
+        &quot;the standing rule is recorded: the platform does not close&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 5,
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-21T17:25:54.271515+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/evidence/rework/PLATFORM.json&quot;,
+        &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;docs/evidence/rework/tranche-0/acts.md&quot;
+      ],
+      &quot;id&quot;: &quot;01a1ff24-a6c6-7504-a811-0fecfbc460f6&quot;,
+      &quot;job_size&quot;: 6,
+      &quot;kind&quot;: &quot;deliverable&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 5,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;time_criticality&quot;: 5,
+      &quot;title&quot;: &quot;The standing platform record \u2014 charter, baseline and the estate verification&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:26.090677+00:00&quot;,
+      &quot;version&quot;: 3
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/wbs_nodes&quot;
+}</code></pre>
+<h2 id="acceptance">Acceptance</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-wbs&quot;,
+  &quot;count&quot;: 5,
+  &quot;rows&quot;: [
+    {
+      &quot;acceptance&quot;: [
+        &quot;the ARC runner pool lists a live runner on ci-1&quot;,
+        &quot;the hosted preflight returns a verdict at a pushed head&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e11c-7df6-be83-a4dedc25c763&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/plans/development-process-speed.md&quot;,
+        &quot;the preflight run at the rework head&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cdf3-7108-aac5-0cec790e988d&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 1,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;CI and runners available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:24.745122+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;registry.example.com:5000 answers a pull&quot;,
+        &quot;a hand push from registry-1 succeeds with the CA in place&quot;,
+        &quot;the public window answers through the ingress&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e297-7801-90f7-788212c63c49&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the registry&#39;s CA and pull record&quot;,
+        &quot;the public window probe&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-ce5c-70c8-87be-2dd12bf61cb0&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 2,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Registry and ingress available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.120029+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the primary reports pg_is_in_recovery false and the standby true&quot;,
+        &quot;the nightly dump exists with its offsite relay&quot;,
+        &quot;one restore drill reads the rows back&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e40d-72c8-9348-507a60229366&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the database recovery check&quot;,
+        &quot;the restore drill&#39;s receipt&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cedd-74c2-bad5-a22aa9918c87&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 3,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;Postgres primary, backups and restore&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.494727+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the service workflow is consumable unchanged&quot;,
+        &quot;a consuming project&#39;s CI runs on it&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 2,
+      &quot;card_id&quot;: &quot;01a21769-e587-714f-8d81-409d734ebcad&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the shared workflow revision&quot;,
+        &quot;a consuming project&#39;s run&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cf24-737d-a364-b0bdc88eac00&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 4,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Shared workflows and archetypes&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.869863+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the manifest&#39;s checks pass on a fresh snapshot&quot;,
+        &quot;the deliverable&#39;s evidence list resolves&quot;,
+        &quot;the standing rule is recorded: the platform does not close&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 5,
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-21T17:25:54.271515+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/evidence/rework/PLATFORM.json&quot;,
+        &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;docs/evidence/rework/tranche-0/acts.md&quot;
+      ],
+      &quot;id&quot;: &quot;01a1ff24-a6c6-7504-a811-0fecfbc460f6&quot;,
+      &quot;job_size&quot;: 6,
+      &quot;kind&quot;: &quot;deliverable&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 5,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;time_criticality&quot;: 5,
+      &quot;title&quot;: &quot;The standing platform record \u2014 charter, baseline and the estate verification&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:26.090677+00:00&quot;,
+      &quot;version&quot;: 3
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/wbs_nodes&quot;
+}</code></pre>
+<h2 id="status">Status</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-wbs&quot;,
+  &quot;count&quot;: 5,
+  &quot;rows&quot;: [
+    {
+      &quot;acceptance&quot;: [
+        &quot;the ARC runner pool lists a live runner on ci-1&quot;,
+        &quot;the hosted preflight returns a verdict at a pushed head&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e11c-7df6-be83-a4dedc25c763&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/plans/development-process-speed.md&quot;,
+        &quot;the preflight run at the rework head&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cdf3-7108-aac5-0cec790e988d&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 1,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;CI and runners available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:24.745122+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;registry.example.com:5000 answers a pull&quot;,
+        &quot;a hand push from registry-1 succeeds with the CA in place&quot;,
+        &quot;the public window answers through the ingress&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e297-7801-90f7-788212c63c49&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the registry&#39;s CA and pull record&quot;,
+        &quot;the public window probe&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-ce5c-70c8-87be-2dd12bf61cb0&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 2,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Registry and ingress available&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.120029+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the primary reports pg_is_in_recovery false and the standby true&quot;,
+        &quot;the nightly dump exists with its offsite relay&quot;,
+        &quot;one restore drill reads the rows back&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 3,
+      &quot;card_id&quot;: &quot;01a21769-e40d-72c8-9348-507a60229366&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the database recovery check&quot;,
+        &quot;the restore drill&#39;s receipt&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cedd-74c2-bad5-a22aa9918c87&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 3,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 3,
+      &quot;title&quot;: &quot;Postgres primary, backups and restore&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.494727+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the service workflow is consumable unchanged&quot;,
+        &quot;a consuming project&#39;s CI runs on it&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 2,
+      &quot;card_id&quot;: &quot;01a21769-e587-714f-8d81-409d734ebcad&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T11:23:26.290608+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;the shared workflow revision&quot;,
+        &quot;a consuming project&#39;s run&quot;
+      ],
+      &quot;id&quot;: &quot;01a1fdd8-cf24-737d-a364-b0bdc88eac00&quot;,
+      &quot;job_size&quot;: 1,
+      &quot;kind&quot;: &quot;work_package&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 4,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 2,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;time_criticality&quot;: 2,
+      &quot;title&quot;: &quot;Shared workflows and archetypes&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:25.869863+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;acceptance&quot;: [
+        &quot;the manifest&#39;s checks pass on a fresh snapshot&quot;,
+        &quot;the deliverable&#39;s evidence list resolves&quot;,
+        &quot;the standing rule is recorded: the platform does not close&quot;
+      ],
+      &quot;body&quot;: &quot;&quot;,
+      &quot;business_value&quot;: 5,
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-21T17:25:54.271515+00:00&quot;,
+      &quot;evidence&quot;: [
+        &quot;docs/evidence/rework/PLATFORM.json&quot;,
+        &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;docs/evidence/rework/tranche-0/acts.md&quot;
+      ],
+      &quot;id&quot;: &quot;01a1ff24-a6c6-7504-a811-0fecfbc460f6&quot;,
+      &quot;job_size&quot;: 6,
+      &quot;kind&quot;: &quot;deliverable&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;position&quot;: 5,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;risk_reduction&quot;: 3,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;time_criticality&quot;: 5,
+      &quot;title&quot;: &quot;The standing platform record \u2014 charter, baseline and the estate verification&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T10:32:26.090677+00:00&quot;,
+      &quot;version&quot;: 3
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/wbs_nodes&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-wbs.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

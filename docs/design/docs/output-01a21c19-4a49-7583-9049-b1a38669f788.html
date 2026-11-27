@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Governance, modelling, render and export · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="a2fb2263f85c68b188e754aea7dcd0be9d2eaf6acf9b133ed22144e499611939" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>a2fb2263f85c68b188e754aea7dcd0be9d2eaf6acf9b133ed22144e499611939</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Governance, modelling, render and export</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The slice plan's open question 5 records the ArchiMate XMI flavour as the Open Group 3.2 exchange format and the Archi 5.10 round-trip as a manual check. The automated xmi_roundtrip test proves the canonical multiset, the re-export equality and the unsupported[] reporting for the checked-in fixtures, but it does not run a third-party Archi import. Until a manual Archi round-trip is recorded, the interoperability claim rests on the format subset and the codec's own tests.",
+      "code": "S08-R1",
+      "created_at": "2026-11-27T08:19:34.642122+00:00",
+      "id": "01a21c16-a076-711a-815f-7043ab841533",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D4 XMI is profile-scoped with stated guarantees"
+        ],
+        "requirements": [
+          "R6 XMI round-trip",
+          "R4 golden render"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": "Run one manual Archi 5.10 import and re-export against the S08 profile, record the document and the observed unsupported constructs, and re-read this risk on that evidence.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The Archi 5.10 XMI round-trip is manual, so interoperability is not continuously proven",
+      "updated_at": "2026-11-27T08:19:34.642122+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The \u00a77.2 completion record measured zero rows in RM's architecture and UML tables, so the ArchiMate and UML profiles were derived from the 61-concept registry, fr's render map and the standard rather than from live consumer data. The fit is argued from three consumers and the registry, not measured against a populated RM estate. A future RM import could surface a kind the profile defers; the profile is versioned, so adding a kind is a data change with a ruleset bump only when a rule's meaning changes.",
+      "code": "S08-R2",
+      "created_at": "2026-11-27T08:19:34.780974+00:00",
+      "id": "01a21c16-a0ff-7dd2-ab1f-74ce913e9168",
+      "impact": 2,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [
+          "D2 Profiles are curated and versioned"
+        ],
+        "requirements": [
+          "R5 Profile rejection",
+          "R4 golden render"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": "If RM's modelling tables become populated, re-run the three-consumer extract and record the kinds actually seen; add an in-profile kind rather than widen the renderer silently.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The profiles were derived from an empty RM dataset, so consumer fit is argued rather than measured live",
+      "updated_at": "2026-11-27T08:19:34.780974+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.",
+      "code": "U3-EXC-S08",
+      "created_at": "2026-11-21T01:17:21.578675+00:00",
+      "id": "01a1fbad-ebfd-7f4d-9bc2-5e151d3dc040",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": null,
+      "review_at": null,
+      "severity": "P0",
+      "status": "accepted",
+      "title": "Out-of-sequence closure accepted as a retrospective exception (S08)",
+      "updated_at": "2026-11-21T01:17:21.578675+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "At the 2026-11-27 rework snapshot the S08 project row is closed at version 8 with no baseline, charter, contract, Phase A\u2013D artefact set, Phase-G review or gate receipt. The product is built and measured on 2026-11-08, but the record's closure rested on the build claim alone. This pack supplies the missing lifecycle set and the Phase-G review retrospectively; the receipt at a fresh snapshot is the acceptance the closure names.",
+      "code": "S08-I1",
+      "created_at": "2026-11-27T08:19:34.923738+00:00",
+      "id": "01a21c16-a18e-7d1b-a05c-659504458183",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": "Supplied by this rework: the seven artefacts, the charter, the Statement of Architecture Work, the delivery contract, the Phase-G review, the outputs and the closure review; re-verified by verify-project.py --project S08 at a fresh snapshot.",
+      "review_at": null,
+      "severity": "high",
+      "status": "closed",
+      "title": "The record claimed built but carried no lifecycle set or Phase-G review",
+      "updated_at": "2026-11-27T08:19:34.923738+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The rework reads the project row, the plan and the \u00a77.2 completion record at the 2026-11-27 snapshot. It assumes that snapshot is the authoritative lifecycle state and that no contemporaneous S08 approval or publication exists outside it. The assumption is stated so a later reader can challenge it: if a contemporaneous record is found, the retrospective review must be re-read against it rather than silently overwritten.",
+      "code": "S08-A1",
+      "created_at": "2026-11-27T08:19:35.068459+00:00",
+      "id": "01a21c16-a21f-7d4e-bd7b-074221f00d64",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The 2026-11-27 rework snapshot is the authoritative record for S08",
+      "updated_at": "2026-11-27T08:19:35.068459+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "S08 builds on S03's governed_asset, revision, catalogue_entry, trace_link, programme and project spine with RLS and outbox; on S04's ActionSpec registry, invocation route and OpenAPI/MCP projection; and on S07's outline/outline_node plus the principles.*/decisions.* actions. The dependency is one-way: S08 consumes those surfaces and ships no duplicate of them.",
+      "code": "S08-D1",
+      "created_at": "2026-11-27T08:19:35.212538+00:00",
+      "id": "01a21c16-a2af-7d1f-be75-5a65e48412f1",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "S08 depends on S03, S04 and S07",
+      "updated_at": "2026-11-27T08:19:35.212538+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 and D3/G3 record the benefit: one model shape with language as the discriminator, one renderer producing SVG, PNG and PDF from the same parse, and byte-identical output keyed on content_hash, view, format and renderer version. The benefit is declared in the record and carried by the golden and model_profile tests; the manual Archi round-trip remains the one open interoperability item.",
+      "code": "S08-B1",
+      "created_at": "2026-11-27T08:19:35.355973+00:00",
+      "id": "01a21c16-a33f-726c-b1f8-2660148ffff6",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "One model shape and one deterministic renderer replace per-language tables and non-reproducible pictures",
+      "updated_at": "2026-11-27T08:19:35.355973+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a21c16-a3d8-7a45-8038-350b8db5c082",
+      "body": "The retrospective MSP/TOGAF/SAFe rework changed this project's record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.",
+      "code": "CH-S08-536501",
+      "created_at": "2026-11-27T08:19:45.220432+00:00",
+      "id": "01a21c16-c9c9-7c7c-8a2c-31f863536501",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the retrospective rework's record acts"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework of S08",
+      "updated_at": "2026-11-27T08:22:17.50871+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Governance, modelling, render and export · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

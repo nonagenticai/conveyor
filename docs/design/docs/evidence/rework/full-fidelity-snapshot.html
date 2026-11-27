@@ -23,7 +23,9 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="the-full-fidelity-snapshot-loop">The full-fidelity snapshot loop</h1>
+    <main class="doc-body"><!-- retained raw log: record document 01a21c4a-e2f9-72b4-92aa-97da0af7b7c0; sha256 cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804; the public copy is redacted by scripts/private_refs.py -->
+
+<h1 id="the-full-fidelity-snapshot-loop">The full-fidelity snapshot loop</h1>
 <p><strong>Why this exists.</strong> Twice on 2026-11-21 the programme's acceptance evidence was taken against a snapshot the <em>deployed</em> engine built, and that engine's projection is older than the branch's: it omits <code>architecture_contract.requested_by</code>, <code>document.published_at</code> (the <code>outputs.js</code> index) and the demo-credit rows. Three checks per manifest therefore reported failures that were artefacts of the snapshot, not defects in the record — and one closure was paused on them.</p>
 <p>The branch binary carries the newer projection, but it cannot read the live primary directly: the branch is at migration <code>0065</code>, the live database at <code>0061</code>, and (measured 2026-11-22) dev Macs cannot reach <code>postgres.example.com:5432</code> at all — the tailnet ACL permits <code>:22</code> only. Restoring a copy and migrating the copy closes both gaps without touching production and without merging anything.</p>
 <p><strong>What it is not.</strong> Not a second source of truth and not a write path. Records still go through the product's actions (<code>programme-record.py</code>, or the deployed engine). The copy is read-only input to <code>verify-project.py</code> and the strict audit.</p>

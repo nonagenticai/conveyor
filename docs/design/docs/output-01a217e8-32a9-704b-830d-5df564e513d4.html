@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/goal/objective — S02 Skeleton · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="2316afce4f854ab452610e437c289afd836a2c6c8d764bfe4327d0e1f4fd68b6" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>2316afce4f854ab452610e437c289afd836a2c6c8d764bfe4327d0e1f4fd68b6</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Driver/goal/objective — S02 Skeleton</h1>
+<h2>Metadata</h2>
+<p>Retrospective catalog for S02, authored 2026-11-26 from the slice plan and the delivered workspace. Phase a, plateau psa, kind catalog; owner the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; reviewer the Architecture Board; subject project 01a1d039-0d27-7b45-abb5-bf851a4c3d4a.</p>
+<h2>Entries</h2>
+<p>Six drivers anchor the skeleton. Two tenants must share one product without a fork, so isolation is forced in the database rather than remembered in the application. Long agent work must survive a worker death, so the job lease is renewed and reclaimed rather than trusted. The UI must replay what happened, so the event stream is ordered and resumable. A licence must fail closed, and the audit must stay append-only, because both are decision evidence. The sixth driver is the programme's: the boundary must be stable enough that S03, S04 and S06 build on it instead of reopening it.</p>
+<h2>Links</h2>
+<p>The catalog derives from the stakeholder map, because each driver exists to serve a named actor. The requirements catalog derives from this catalog in turn, so the chain stakeholder → driver → requirement → solution is unbroken. The objectives are phrased as testable outcomes, which is why the requirements that follow can each name a gate rather than an intention.</p>
+<h2>Document</h2>
+<p>The document records the drivers as the plan's §1 objective and §3 scope state them, dated to the retrospective. It does not invent a new driver: the six are the plan's own reasons for the eleven tables, the five crates and the two apps. The objectives are the ones the §7 gate can fail, which is the property that makes this catalog useful rather than decorative.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

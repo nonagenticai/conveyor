@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — CI, runners and platform · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--ci-runners-and-platform">Statement Of Architecture Work — CI, runners and platform</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20204-34e9-7eea-87d1-5b8265816c62&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/PLATFORM.toml is green against the live record at the published SHA; the register&#39;s PLATFORM P0s are cleared or owned by a named executable package.&quot;,
+        &quot;assignment&quot;: &quot;Hold the programme&#39;s definition, standards, gates and record; keep every project&#39;s acceptance manifest executable.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The programme capability: the one tenant, the programme definition set, the tranche plan, the artefact standard and the acceptance manifests; the programme record as reworked under #526.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T06:48:35.177183+00:00&quot;,
+      &quot;id&quot;: &quot;01a20203-883b-7231-b0d3-dee948cf90e4&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work - PLATFORM (programme capability, retrospective, 2026-11-22)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20204-34e9-7eea-87d1-5b8265816c62&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/PLATFORM.toml is green against the live record at the published SHA; the register&#39;s PLATFORM P0s are cleared or owned by a named executable package.&quot;,
+        &quot;assignment&quot;: &quot;Hold the programme&#39;s definition, standards, gates and record; keep every project&#39;s acceptance manifest executable.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The programme capability: the one tenant, the programme definition set, the tranche plan, the artefact standard and the acceptance manifests; the programme record as reworked under #526.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T06:48:35.177183+00:00&quot;,
+      &quot;id&quot;: &quot;01a20203-883b-7231-b0d3-dee948cf90e4&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work - PLATFORM (programme capability, retrospective, 2026-11-22)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20204-34e9-7eea-87d1-5b8265816c62&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/PLATFORM.toml is green against the live record at the published SHA; the register&#39;s PLATFORM P0s are cleared or owned by a named executable package.&quot;,
+        &quot;assignment&quot;: &quot;Hold the programme&#39;s definition, standards, gates and record; keep every project&#39;s acceptance manifest executable.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The programme capability: the one tenant, the programme definition set, the tranche plan, the artefact standard and the acceptance manifests; the programme record as reworked under #526.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T06:48:35.177183+00:00&quot;,
+      &quot;id&quot;: &quot;01a20203-883b-7231-b0d3-dee948cf90e4&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work - PLATFORM (programme capability, retrospective, 2026-11-22)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20204-34e9-7eea-87d1-5b8265816c62&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/PLATFORM.toml is green against the live record at the published SHA; the register&#39;s PLATFORM P0s are cleared or owned by a named executable package.&quot;,
+        &quot;assignment&quot;: &quot;Hold the programme&#39;s definition, standards, gates and record; keep every project&#39;s acceptance manifest executable.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The programme capability: the one tenant, the programme definition set, the tranche plan, the artefact standard and the acceptance manifests; the programme record as reworked under #526.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T06:48:35.177183+00:00&quot;,
+      &quot;id&quot;: &quot;01a20203-883b-7231-b0d3-dee948cf90e4&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work - PLATFORM (programme capability, retrospective, 2026-11-22)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a20204-34e9-7eea-87d1-5b8265816c62&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/PLATFORM.toml is green against the live record at the published SHA; the register&#39;s PLATFORM P0s are cleared or owned by a named executable package.&quot;,
+        &quot;assignment&quot;: &quot;Hold the programme&#39;s definition, standards, gates and record; keep every project&#39;s acceptance manifest executable.&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/PLATFORM.toml&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The programme capability: the one tenant, the programme definition set, the tranche plan, the artefact standard and the acceptance manifests; the programme record as reworked under #526.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T06:48:35.177183+00:00&quot;,
+      &quot;id&quot;: &quot;01a20203-883b-7231-b0d3-dee948cf90e4&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d39-79ce-84b6-1173b94bc67f&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work - PLATFORM (programme capability, retrospective, 2026-11-22)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:49:22.301988+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

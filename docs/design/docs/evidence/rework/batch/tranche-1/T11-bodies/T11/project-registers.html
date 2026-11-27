@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Metrics, metering and maturity · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--metrics-metering-and-maturity">Project Registers — Metrics, metering and maturity</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The whole design rests on reading the ledgers at request time: metrics.flow, metrics.job, metrics.usage, metrics.programme and metrics.maturity are aggregates, and migration 0059_metrics.sql adds only metric_threshold and metric_reconciliation. A later change that writes a roll-up or cost row would create a second source that can drift from the ledger it summarises. This retrospective row, recorded 2026-11-26, keeps the invariant visible and ties it to the migration and the tests that prove it today.&quot;,
+      &quot;code&quot;: &quot;R-T11-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:06.793885+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-c80c-7b75-adb6-9b9a4cd157eb&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;migrations/0059_metrics.sql \u2014 no metric table&quot;,
+          &quot;docs/SPEC_V2.md \u00a77.5 (D37)&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A metrics read that starts writing a roll-up row would turn derived figures into a second store&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:02.824706+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;metrics.reconcile compares the derived cost with the total that billing.summary attests for the period. A difference opens an incident, but an unreachable service is recorded as unavailable and an old attested total could in principle coincide with the derived figure. The reconciliation rule reduces the exposure to a coincidence across both figures and the period; this row records it on 2026-11-26 so the incident path is not treated as a licence to ignore the period.&quot;,
+      &quot;code&quot;: &quot;R-T11-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:06.936371+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-c89b-73ab-98f6-7f90af5b032f&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/SPEC_V2.md \u00a77.5 \u2014 billing reconciliation&quot;,
+          &quot;migrations/0059_metrics.sql \u2014 metric_reconciliation&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A stale billing total could match the derived cost by accident&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:02.962977+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The C0\u2013C5 ladder moves only when the recorded evidence crosses the configured minimum, and the nine-name vocabulary includes approvals.decided and approvals.approval_rate. A tenant with five decided approvals can meet a rate threshold on a sample too small to mean much. The mechanism is honest about the numbers it reads and the level names its threshold version; this row records the calibration risk on 2026-11-26 rather than asserting that every tenant&#39;s first threshold row is statistically comfortable.&quot;,
+      &quot;code&quot;: &quot;R-T11-03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.078519+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-c929-78b6-9ae6-4ccf1b233930&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/SPEC_V2.md \u00a77.5 (D50) \u2014 maturity thresholds&quot;,
+          &quot;crates/domain/src/metrics.rs \u2014 current_level&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect under the #526 rework delegation&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-15&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A tenant with few approvals can reach C1 on a very small sample&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.101176+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;T11 closed without a charter, Statement of Architecture Work, delivery contract, Phase-G review, closure review or published output, and with all seven mandatory Phase A\u2013D artefacts absent. The contemporaneous evidence is the merged code, the coverage row, the served-spec lock and the git history. This issue records the gap on 2026-11-26 and points to the retrospective pack that closes it; it does not pretend the record existed before the rework.&quot;,
+      &quot;code&quot;: &quot;I-T11-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.222478+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-c9b9-7361-917e-88138eaca2e5&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/evidence/rework/T11/transcript.jsonl \u2014 acts 1\u201339&quot;,
+          &quot;docs/evidence/rework/T11/acts.md&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The original T11 governance record was never authored&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.239182+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;SPEC_V2 \u00a77.5 names first-pass yield, rework rate, defect escapes, eval score and benchmark delta as quality metrics, but their ledgers are owned by S17\u2013S20. T11 delivers the approval- and run-derived quality figures only, and says so. This issue keeps the boundary explicit on 2026-11-26 so a reader of the T11 quality family does not read an absent eval figure as a zero.&quot;,
+      &quot;code&quot;: &quot;I-T11-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.372466+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-ca4f-7313-96a9-87166518a584&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/SPEC_V2.md \u00a77.5 \u2014 quality sources&quot;,
+          &quot;docs/SPEC_V2.md \u00a712 \u2014 T11 row&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Eval- and benchmark-backed quality metrics sit outside T11&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.375546+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The reconciliation compares the conveyor&#39;s derived cost with the total that billing.summary declares. The assumption is that the declared total is the charging system&#39;s own figure for the same tenant and period, not a cached or adjusted copy, because a difference is raised as an incident rather than absorbed. This retrospective row records the assumption on 2026-11-26; if the declared total is not authoritative, the incident would compare against the wrong number and the reconciliation would be formally exact and substantively wrong.&quot;,
+      &quot;code&quot;: &quot;A-T11-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.516034+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cadf-73bf-a054-f37a9d015a8e&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;billing.summary&#39;s attested total is the charging system&#39;s authoritative figure for the period&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.513189+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The console Metering screen renders the snapshot&#39;s measure.inference totals at 2026-11-21T18:50:29Z: 609 calls, 9,458,468 tokens, 606 cache misses, 0 hits, 3 unknown cache classes and 0 non-ok calls. That is the whole ledger at one instant, not a bounded business period. The assumption is that an all-time figure is honest for a console that labels it as the snapshot&#39;s own aggregate; a windowed figure is an API parameter, not a stored roll-up. Recorded retrospectively on 2026-11-26.&quot;,
+      &quot;code&quot;: &quot;A-T11-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.659412+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cb6e-7303-9650-4b3b150401cc&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The published snapshot&#39;s measure.inference window is representative enough to display&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.647947+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The metric families recompute from inference_call and tool_call for spend, run and run_step for attribution, approval for governance, card, list and event for flow, the organisation join for department attribution, the benefit rows for realisation and commercial_price for the derived cost. If a ledger stops being written, the corresponding figure becomes unavailable or empty rather than wrong; the dependency is on the rows existing at read time. This retrospective row records the dependency on 2026-11-26.&quot;,
+      &quot;code&quot;: &quot;D-T11-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.797967+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cbf8-7a71-91b1-f6e64836fcc6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Every T11 figure depends on the ledgers it reads&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.780312+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The Metering screen reads measure.inference from the published snapshot and renders the snapshot&#39;s own cost note; when the section is absent it says the measurement is not published rather than borrowing a fixture. The dependency runs from the console to the snapshot generator, so a snapshot published without the section is visible as an honest absence instead of a stale number. This row records the dependency on 2026-11-26 and ties it to issue #458 and the console checks 9b\u20139d.&quot;,
+      &quot;code&quot;: &quot;D-T11-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:07.93635+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cc83-7881-b3a5-e9459d02a508&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The console depends on the published snapshot, not on a live metrics call&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:03.9145+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The five read actions are aggregates over the conveyor&#39;s own rows and migration 0059 creates no metric table. The benefit is that a reported flow, quality, cost or governance figure has no second store to fall out of step with the ledger, and a new ledger row changes the figure on the next read. This retrospective row links the benefit to the read-time design on 2026-11-26.&quot;,
+      &quot;code&quot;: &quot;B-T11-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:08.082828+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cd15-7aa5-8cce-513ceb3e69ac&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/SPEC_V2.md \u00a77.5 (D37)&quot;,
+          &quot;migrations/0059_metrics.sql&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Every metric is computed from rows, so a figure cannot drift from the ledger it summarises&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:04.048387+00:00&quot;,
+      &quot;version&quot;: 4
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;metrics.reconcile compares the derived cost with the declared billing.summary total at six decimals; a difference opens an incident carrying both figures, and an unreachable service is unavailable rather than zero. The benefit is that the money question has a named owner and a record instead of an adjustment made after the fact. This retrospective row links the benefit to the reconciliation rule on 2026-11-26.&quot;,
+      &quot;code&quot;: &quot;B-T11-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:08.221427+00:00&quot;,
+      &quot;id&quot;: &quot;01a217e9-cda0-77f7-b9c4-4d937f0d2a4f&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/SPEC_V2.md \u00a77.5 \u2014 billing reconciliation&quot;,
+          &quot;crates/actions/tests/metrics.rs \u2014 reconciliation_is_exact_or_opens_an_incident&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Billing divergence surfaces as an incident rather than a silent adjustment&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:05:04.181509+00:00&quot;,
+      &quot;version&quot;: 4
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff8f-47cb-78cf-9db8-d98d863e7dd0&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild T11&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-T11&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:46:12.810732+00:00&quot;,
+      &quot;id&quot;: &quot;01a20201-5f8c-7e50-aae8-1f3e8544bd72&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of T11 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of T11 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:46:12.810732+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Baseline — Governance, modelling, render and export · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-baseline" data-provenance-version="1" data-provenance-hash="967e56d7e284a7ed9d895477e767676414c57aa5e6dd1fb49baec4c02f422b1d" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-baseline</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>967e56d7e284a7ed9d895477e767676414c57aa5e6dd1fb49baec4c02f422b1d</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Baseline — Governance, modelling, render and export</h1>
+<h2>Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:19:35.502592+00:00",
+      "id": "01a21c16-a3d8-7a45-8038-350b8db5c082",
+      "kind": "scope",
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+        "register": [
+          {
+            "code": "S08-B1",
+            "id": "01a21c16-a33f-726c-b1f8-2660148ffff6",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One model shape and one deterministic renderer replace per-language tables and non-reproducible pictures"
+          },
+          {
+            "code": "S08-D1",
+            "id": "01a21c16-a2af-7d1f-be75-5a65e48412f1",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S08 depends on S03, S04 and S07"
+          },
+          {
+            "code": "S08-A1",
+            "id": "01a21c16-a21f-7d4e-bd7b-074221f00d64",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S08"
+          },
+          {
+            "code": "S08-I1",
+            "id": "01a21c16-a18e-7d1b-a05c-659504458183",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S08-R2",
+            "id": "01a21c16-a0ff-7dd2-ab1f-74ce913e9168",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The profiles were derived from an empty RM dataset, so consumer fit is argued rather than measured live"
+          },
+          {
+            "code": "S08-R1",
+            "id": "01a21c16-a076-711a-815f-7043ab841533",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The Archi 5.10 XMI round-trip is manual, so interoperability is not continuously proven"
+          },
+          {
+            "code": "U3-EXC-S08",
+            "id": "01a1fbad-ebfd-7f4d-9bc2-5e151d3dc040",
+            "impact": null,
+            "kind": "issue",
+            "severity": "P0",
+            "status": "accepted",
+            "title": "Out-of-sequence closure accepted as a retrospective exception (S08)"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c16-a3d5-71cb-9313-a7750b4078d8",
+            "job_size": 7,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S08 governance, modelling, render and export \u2014 the retrospective close"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:19:35.502592+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:19:35.653891+00:00",
+      "id": "01a21c16-a46d-7aee-a206-cb5dc83a2d2d",
+      "kind": "schedule",
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+        "register": [
+          {
+            "code": "S08-B1",
+            "id": "01a21c16-a33f-726c-b1f8-2660148ffff6",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One model shape and one deterministic renderer replace per-language tables and non-reproducible pictures"
+          },
+          {
+            "code": "S08-D1",
+            "id": "01a21c16-a2af-7d1f-be75-5a65e48412f1",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S08 depends on S03, S04 and S07"
+          },
+          {
+            "code": "S08-A1",
+            "id": "01a21c16-a21f-7d4e-bd7b-074221f00d64",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S08"
+          },
+          {
+            "code": "S08-I1",
+            "id": "01a21c16-a18e-7d1b-a05c-659504458183",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S08-R2",
+            "id": "01a21c16-a0ff-7dd2-ab1f-74ce913e9168",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The profiles were derived from an empty RM dataset, so consumer fit is argued rather than measured live"
+          },
+          {
+            "code": "S08-R1",
+            "id": "01a21c16-a076-711a-815f-7043ab841533",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The Archi 5.10 XMI round-trip is manual, so interoperability is not continuously proven"
+          },
+          {
+            "code": "U3-EXC-S08",
+            "id": "01a1fbad-ebfd-7f4d-9bc2-5e151d3dc040",
+            "impact": null,
+            "kind": "issue",
+            "severity": "P0",
+            "status": "accepted",
+            "title": "Out-of-sequence closure accepted as a retrospective exception (S08)"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c16-a3d5-71cb-9313-a7750b4078d8",
+            "job_size": 7,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S08 governance, modelling, render and export \u2014 the retrospective close"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:19:35.653891+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-27T08:19:35.949987+00:00",
+      "id": "01a21c16-a594-7a9e-b8e6-9a6b7c6b9691",
+      "kind": "cost",
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+        "register": [
+          {
+            "code": "S08-B1",
+            "id": "01a21c16-a33f-726c-b1f8-2660148ffff6",
+            "impact": null,
+            "kind": "benefit",
+            "severity": null,
+            "status": "open",
+            "title": "One model shape and one deterministic renderer replace per-language tables and non-reproducible pictures"
+          },
+          {
+            "code": "S08-D1",
+            "id": "01a21c16-a2af-7d1f-be75-5a65e48412f1",
+            "impact": null,
+            "kind": "dependency",
+            "severity": null,
+            "status": "open",
+            "title": "S08 depends on S03, S04 and S07"
+          },
+          {
+            "code": "S08-A1",
+            "id": "01a21c16-a21f-7d4e-bd7b-074221f00d64",
+            "impact": null,
+            "kind": "assumption",
+            "severity": null,
+            "status": "open",
+            "title": "The 2026-11-27 rework snapshot is the authoritative record for S08"
+          },
+          {
+            "code": "S08-I1",
+            "id": "01a21c16-a18e-7d1b-a05c-659504458183",
+            "impact": null,
+            "kind": "issue",
+            "severity": "high",
+            "status": "closed",
+            "title": "The record claimed built but carried no lifecycle set or Phase-G review"
+          },
+          {
+            "code": "S08-R2",
+            "id": "01a21c16-a0ff-7dd2-ab1f-74ce913e9168",
+            "impact": 2,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The profiles were derived from an empty RM dataset, so consumer fit is argued rather than measured live"
+          },
+          {
+            "code": "S08-R1",
+            "id": "01a21c16-a076-711a-815f-7043ab841533",
+            "impact": 3,
+            "kind": "risk",
+            "severity": "medium",
+            "status": "open",
+            "title": "The Archi 5.10 XMI round-trip is manual, so interoperability is not continuously proven"
+          },
+          {
+            "code": "U3-EXC-S08",
+            "id": "01a1fbad-ebfd-7f4d-9bc2-5e151d3dc040",
+            "impact": null,
+            "kind": "issue",
+            "severity": "P0",
+            "status": "accepted",
+            "title": "Out-of-sequence closure accepted as a retrospective exception (S08)"
+          }
+        ],
+        "wbs": [
+          {
+            "business_value": 6,
+            "id": "01a21c16-a3d5-71cb-9313-a7750b4078d8",
+            "job_size": 7,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "S08 governance, modelling, render and export \u2014 the retrospective close"
+          }
+        ]
+      },
+      "taken_at": "2026-11-27T08:19:35.949987+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 3,
+  "rows": [
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:19:35.502592+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c16-a3da-7e91-bbdb-0efd7ce71e31",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c16-a3d8-7a45-8038-350b8db5c082",
+        "description": "Approve the scope baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:19:44.906103+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:19:35.653891+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c16-a470-77a9-9c94-d0225967fd1c",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c16-a46d-7aee-a206-cb5dc83a2d2d",
+        "description": "Approve the schedule baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:19:35.798198+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-27T08:19:35.949987+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a21c16-a596-7b43-83e9-2fbef80eabd0",
+      "kind": "pm",
+      "meta": {
+        "approver_kind": "human",
+        "baseline_id": "01a21c16-a594-7a9e-b8e6-9a6b7c6b9691",
+        "description": "Approve the cost baseline",
+        "gate_policy": {
+          "floor": 1,
+          "source": "default"
+        }
+      },
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-27T08:19:36.089761+00:00",
+      "version": 2
+    }
+  ],
+  "source": "work.json#/approvals"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Governance, modelling, render and export · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

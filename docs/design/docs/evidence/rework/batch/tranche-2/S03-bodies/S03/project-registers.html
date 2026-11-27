@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Domain and schema — aggregates, state machines, baseline domain migration · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--domain-and-schema--aggregates-state-machines-baseline-domain-migration">Project Registers — Domain and schema — aggregates, state machines, baseline domain migration</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;claim_card_tx lets the same assignee re-claim an unexpired lease through its third arm (OR assignee_id = $3), and the 32-racer test shares seed.user and Version::INITIAL, so the version predicate decides the winner and the test would pass with the lease arm deleted. Property (b) is therefore overstated for the lease half.&quot;,
+      &quot;code&quot;: &quot;R-S03-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:23.557945+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-af89-72bc-b545-722a33f7f0de&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [
+          &quot;S3-D5&quot;
+        ],
+        &quot;requirements&quot;: [
+          &quot;R2&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-05&quot;,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;admitted&quot;,
+      &quot;title&quot;: &quot;The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:23.557945+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Only card_board_list_position_idx and card_board_position_idx carry WHERE archived_at IS NULL; card_assignee_lease_idx and card_tsv_idx include stamped cards, and the later card_name_trgm_idx and card_wbs_node_idx add no predicate. A later slice inheriting the schema could read the claim as absolute.&quot;,
+      &quot;code&quot;: &quot;R-S03-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:23.699193+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b016-733d-9a75-14afc9fd14ff&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [
+          &quot;S3-D1&quot;
+        ],
+        &quot;requirements&quot;: [
+          &quot;R10&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: &quot;2026-12-05&quot;,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;admitted&quot;,
+      &quot;title&quot;: &quot;The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:23.699193+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:15:52.1791+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbac-8ec9-717c-be79-6d1b97980743&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S03)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:15:52.1791+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row reached closed at 2026-11-21T01:05:32Z in an unauthorised tranche before the tranche review; the delegate accepted it as a retrospective exception under the standing delegation, and this rework re-closes the project through the one gate.&quot;,
+      &quot;code&quot;: &quot;I-S03-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:23.850033+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b0ad-7317-987c-f82f016bf405&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;S03 closed out of sequence before the tranche-2 review (U3-EXC-S03)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:23.850033+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan requires a second reader over data-arch \u00a72.3/\u00a72.4 and the mandatory artefacts; none existed at the 2026-11-21T19:24:46Z snapshot. This retrospective batch authors the seven artefacts and re-performs the review, admitting two packages.&quot;,
+      &quot;code&quot;: &quot;I-S03-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:23.984758+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b133-7bd4-aaed-e078c1fd9c03&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;closed&quot;,
+      &quot;title&quot;: &quot;No contemporaneous schema review or Phase A-D artefact set existed at the snapshot&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:23.984758+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;0001_platform.sql, begin_scoped, the conveyor_runtime role and domain::{TenantId, Id, Version} are the base the fourteen tables and the tenant_isolation policy stand on; a change to the runtime role or to app_current_tenant() would invalidate the RLS proof.&quot;,
+      &quot;code&quot;: &quot;A-S03-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.122096+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b1bc-7f6a-9a3d-6c65bc101922&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S02&#39;s platform primitives stay stable under the domain&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.122096+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The RLS proof assumes the runtime role is scoped to one tenant per transaction and that ENABLE plus FORCE leaves the table owner with zero rows under the app_current_tenant() policy; rls_domain.rs checks runtime, owner and superuser.&quot;,
+      &quot;code&quot;: &quot;A-S03-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.258277+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b245-759f-b8dd-c5f4a83eb2ac&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Postgres 18 enforces FORCE RLS for the owner and scopes the runtime role&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.258277+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S03 is blocked by S02: migrations/0002_domain.sql builds on 0001_platform.sql, begin_scoped, the conveyor_runtime role and TenantId, Id and Version.&quot;,
+      &quot;code&quot;: &quot;D-S03-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.393809+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b2cc-7b1d-995c-0723649d6202&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S02 platform migration and tenancy primitives land first&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.393809+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S04\u2013S13 register actions, board satellites, channels, outlines and workflow over these fourteen tables and may add tables, but the baseline domain, the may_move matrix and the catalogue vocabulary are inherited, not replaced.&quot;,
+      &quot;code&quot;: &quot;D-S03-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.531897+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b357-7b38-a35b-ebd811104fe6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Later slices add tables and never re-invent one&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.531897+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Fourteen tenant-isolated tables in one baseline migration mean a later slice reaches for an existing table instead of inventing one, and the anti-accretion rule (R10) keeps fr&#39;s 224-migration history out of the baseline.&quot;,
+      &quot;code&quot;: &quot;B-S03-01&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.672301+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b3e3-77af-b2f5-1eaa52ce07ee&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One stored domain behind every later slice&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.672301+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The may_move matrix, the run, approval and asset state machines and the partial uniques give one refusal vocabulary: a terminal run rejects every transition, one pending approval exists per (run, gate), and a claim is granted once per version.&quot;,
+      &quot;code&quot;: &quot;B-S03-02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T13:08:24.812741+00:00&quot;,
+      &quot;id&quot;: &quot;01a217f8-b46f-7f1f-92bd-76adb49fad33&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The database and Rust refuse the same transition&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T13:08:24.812741+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a20063-7af8-727b-b092-24de3821d204&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S03&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S03&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T07:34:36.878165+00:00&quot;,
+      &quot;id&quot;: &quot;01a2022d-b82e-723c-ac03-07afb43890dc&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S03 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; inside the existing tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d28-743b-86c7-0d0698ed69c1&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S03 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T07:34:36.878165+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

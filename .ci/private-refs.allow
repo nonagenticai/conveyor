@@ -19,3 +19,8 @@ docs/design/scripts/check-docs.cjs:\.internal hostname # the assertion label, no
 docs/design/studio.css:agent-avatar\.internal          # CSS class name, not a hostname
 apps/research/src/fetch.rs:\.internal                   # the SSRF guard's own blocklist suffix, not a hostname
 scripts/redact-public-register.py:\.internal           # the public-register redaction rules, not a reference
+scripts/private_refs.py:re\.compile                    # the shared redaction rules, not a reference
+scripts/private_refs.py:->                             # the rule table in the docstring, not a reference
+scripts/fixtures/private-refs.json:"input"             # the shared fixture names the patterns it proves
+crates/pack/src/snapshot.rs:regex::Regex::new          # the renderer's redaction rules, not a reference
+crates/pack/src/snapshot.rs:"(hp1|hp2|mf1|worker3|mini1|mini2)" => # the renderer's replacement table

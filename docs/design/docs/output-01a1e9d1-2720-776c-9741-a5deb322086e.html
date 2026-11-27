@@ -23,98 +23,22 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Artefact standard</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
-programme architect · <strong>Reviewer:</strong> the Architecture Board (charter proposed in PF-1; rows are T9's)
-· <strong>Artefact:</strong> AS-1, the proposed <code>artifact_type</code> standard, Preliminary.</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="artifact-standard" data-provenance-version="4" data-provenance-hash="15879ea655661f3be762b50b0568cd8597d78b7e1c490e65e2556bd90d336add" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>artifact-standard</dd></div><div><dt>Version</dt><dd>4</dd></div><div><dt>SHA-256</dt><dd>15879ea655661f3be762b50b0568cd8597d78b7e1c490e65e2556bd90d336add</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Artefact standard — P0 (retrospective, 2026-11-26)</h1>
 <h2>Common metadata</h2>
-<p>Every architecture artefact — catalogue, matrix or diagram — carries the same metadata before it
-can be approved. An artefact missing any of it is a draft, not an artefact.</p>
-<table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>Title</td><td>The artefact's name, stable across versions</td></tr>
-<tr><td>Status</td><td><code>draft</code>, <code>approved</code>, <code>superseded</code> or <code>retired</code></td></tr>
-<tr><td>Version</td><td>A monotonic version; an approved version's body is immutable</td></tr>
-<tr><td>Author and date</td><td>Who produced it and when</td></tr>
-<tr><td>Reviewer and review date</td><td>Who accepted it and when</td></tr>
-<tr><td>Related initiative / project</td><td>The change initiative or delivery project it serves</td></tr>
-<tr><td>Purpose, stakeholders, scope</td><td>The rationale block: why it exists, for whom, and what it covers</td></tr>
-<tr><td>Published document or contract</td><td>The document that carries the content, or the contract it sits under</td></tr>
-</tbody></table>
-<p>The metadata is rows, not prose (<code>docs/plans/T9-architecture-capability.md</code> §4.1). The document may
-render it; the row is the record.</p>
+<p>The standard published on 2026-11-18 at 08:17:41 (<code>01a1e9d1-2720-776c-9741-a5deb322086e</code>) requires every architecture artefact to carry owner, reviewer and review date, version, purpose, stakeholders and scope, the related project, and its published document or contract. Every artefact also carries at least one link to what it derives from, realises or reuses. That metadata is what makes an artefact a typed record rather than prose.</p>
 <h2>Catalogues</h2>
-<p>A catalogue is a <strong>one-axis</strong> artefact: a unique identifier, the item name, and the description of
-its use or structure. Examples: the principles catalog (each entry statement/rationale/implications),
-the requirements catalog (each entry typed condition/constraint/assumption/delta), the application
-portfolio.</p>
-<ul>
-<li>One row per item; the item's identifier is unique within the catalogue.</li>
-<li>The catalogue's own metadata names the phase and plateau it serves.</li>
-<li>An entry that cannot name its use or structure is not an entry.</li>
-</ul>
+<p>A catalogue records a typed list, such as a driver, goal and objective catalogue, a requirements catalogue, a data entity catalogue or a technology standards catalogue. The standard fixes the type and the required fields so a catalogue can be queried and re-used rather than read as narrative. The definition set contains four catalogue artefacts of that shape.</p>
 <h2>Matrices</h2>
-<p>A matrix is a <strong>two-axis</strong> artefact. It names both axes (usually two) and records the relationship
-between them: for each <code>(axis_a, axis_b)</code> pair, the value that relationship carries. Examples: the
-stakeholder map (stakeholder × concern), the actor/role matrix, the application/function matrix, the
-value-stream/capability matrix.</p>
-<ul>
-<li>Both axes are declared in the metadata; a matrix with an undeclared axis is a draft.</li>
-<li>Every populated cell carries its value; an empty cell is an explicit absence, not a missing row.</li>
-<li>A matrix is joinable: the same rows answer the questions the ADM asks at every phase.</li>
-</ul>
+<p>A matrix records relationships between two typed sets, such as the stakeholder map <code>01a20234-1244-74cd-b0e2-1ef1d8e04021</code>, which the brief records as a matrix in Phase A. The standard requires the matrix's axes and the artefact metadata to be explicit, so the relationship is inspectable. The standard distinguishes a matrix from a link: a matrix records a relationship between typed sets, while a link records derivation, realisation or reuse.</p>
 <h2>Diagrams</h2>
-<p>A diagram is a <strong>typed visual</strong> artefact: it names its building block or metamodel and its viewpoint,
-and its content is a document (an SVG, PNG or PDF) — the row carries the metadata and the viewpoint,
-not the pixels. Examples: the solution concept diagram, the process flow, the platform
-decomposition.</p>
-<ul>
-<li>The viewpoint says who the diagram is for and what question it answers.</li>
-<li>The diagram's content is versioned with the row; a renderer change that alters the drawing is a
-new version.</li>
-<li>A diagram without a viewpoint is a picture, not an artefact.</li>
-</ul>
+<p>A diagram is a document with typed metadata and a viewpoint, not a live metamodel; SPEC_V2 §8.6 rules out an ArchiMate modelling tool. The solution concept <code>01a20231-c661-79d8-9871-23b10eb3a2bb</code> and the business capability map <code>01a2023a-5a2e-799d-8189-37edc4991b8c</code> are the definition set's diagram artefacts. The standard requires the same metadata and links on a diagram as on a catalogue or matrix.</p>
 <h2>Links</h2>
-<p>Every artefact carries at least one typed link to another artefact. The four edge kinds are:</p>
-<table><thead><tr><th>Edge</th><th>Meaning</th></tr></thead><tbody>
-<tr><td><code>derivation</code></td><td>This artefact derives from that one (a solution concept derives from the requirements)</td></tr>
-<tr><td><code>realization</code></td><td>This artefact realizes that one (a service catalogue realizes a business capability)</td></tr>
-<tr><td><code>reuse</code></td><td>This artefact reuses that one (a project reuses the programme's principles)</td></tr>
-<tr><td><code>dependency</code></td><td>This artefact depends on that one without deriving or realizing it</td></tr>
-</tbody></table>
-<p>The links are what make the repository answer <em>what this artefact derives from, what it realizes and
-what it reuses</em> — the trace chain of <code>docs/SPEC_V2.md</code> §8.5. An artefact with no link is refused by
-the phase gate that requires it.</p>
+<p>Links are the trace edges: each artefact records what it derives from, realises or reuses, and architecture-governed work requires the link at creation time under SPEC_V2 §8.5. A link is not decoration; it is how the governance screen answers which requirement a run proves and where the evidence sits. The standard requires at least one such link on every artefact in the pack.</p>
 <h2>Repository</h2>
-<p>The repository is designed as the <code>architecture_artifact</code> parent with its three types and its entry
-rows (<code>architecture_artifact_entry</code>: <code>axis_a</code>, <code>axis_b</code>, <code>value</code>); the tables are T9's. Three things
-make it a repository rather than a file store:</p>
-<ol>
-<li><strong>The type catalogue is seeded</strong> (<code>artifact_type</code>): each type names its phase, plateau and whether
-it is mandatory. The <code>adm_profile</code> filters the catalogue; a young capability carries fewer types.</li>
-<li><strong>Every artefact names its phase and plateau</strong> (<code>psa</code>, <code>hld</code> or <code>sd</code>), so a phase gate can require
-the set the profile names.</li>
-<li><strong>Search will be across projects, phases and plateaus</strong> (<code>architecture.repository.search</code>), so
-reuse is a query, not a memory; the action is T9's.</li>
-</ol>
-<p><strong>Adoption.</strong> This standard is proposed for adoption as the programme's artefact standard: the types
-in the ADM profile (ADM-1) are the mandatory set, the metadata above is required, and every published P0
-artefact carries its type, phase, plateau and at least one link. The repository rows, the
-<code>artifact_type</code> seed and the search action are T9's (#81, proposed). Until they land:</p>
-<ul>
-<li>the artefacts are <code>document</code> rows on P0 with <code>meta.artifact_type</code>, <code>meta.phase</code> and
-<code>meta.plateau</code>;</li>
-<li>their links are recorded in the document body and, where a row exists, in <code>benefit_link</code> or a
-decision;</li>
-<li>a missing metadata field or link is a visible gap in the project's checklist, and the review that
-finds it records a kata candidate.</li>
-</ul>
-<p><strong>What the standard refuses.</strong> An artefact that is a blob with no metadata, a diagram with no
-viewpoint, a matrix with undeclared axes, or a catalogue entry with no use/structure is not adopted,
-whatever its file format. An artefact that has no link derives from nothing and realizes nothing; it
-is a note, not architecture.</p>
+<p>The artefact standard was adopted with its repository and type catalogue as part of the architecture capability baseline. In P0 the repository is the console's document store and the design site, with each artefact published as a document under the project. The typed repository rows behind the standard are T9's (#81), so P0 claims the published standard and its adoption, not the typed store.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T09:12:40.605277+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

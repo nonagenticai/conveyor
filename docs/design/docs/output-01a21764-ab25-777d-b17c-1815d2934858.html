@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="69a44e7f7a1277b1ca1c2cac76f90776fad7dddba0c9ebbdfcc0832b77b3a278" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>69a44e7f7a1277b1ca1c2cac76f90776fad7dddba0c9ebbdfcc0832b77b3a278</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>The concept diagram is the estate the platform owns. Five nodes, each with one job: the control plane and primary, the registry and volumes, the compute pool, the only CI node and the storage plus standby. Nothing crosses the site split invisibly: the datacenter pair and the home pair are named in the programme's infrastructure record.</p>
+<h2>Entries</h2>
+<p>The diagram's rows are the nodes and their roles. The edges the platform cares about are the CI path from ci-1 to the registry, the registry pull on every node, the Postgres path through pgbouncer for pods and postgres.example.com for hosts, the MinIO path for object bytes and the ingress path from the Cloudflare tunnels to istio.</p>
+<h2>Links</h2>
+<p>Every path has an owner and a probe: the runner list for CI, the CA-backed push for the registry, pg_is_in_recovery for the database, the bucket probe for MinIO and the public window probe for ingress. The diagram is the map the requirements catalog's verifications walk.</p>
+<h2>Document</h2>
+<p>The diagram is deliberately small: a platform that needs a second CI node or a second registry is a design change with its own decision, not an extra box. The estate's five-node shape is the current answer and the programme's rules keep it singular where singularity is the requirement.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

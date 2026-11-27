@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Kanban coach · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="5fec80d0c60972565c039a937705a685ca932f6c1fa09074d05ecd61cd80507a" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>5fec80d0c60972565c039a937705a685ca932f6c1fa09074d05ecd61cd80507a</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Kanban coach</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The pack names the twelve tests and the executable instrument scripts/check-t4-coach-gate.py, but the 2026-11-24 snapshot contains no docs/evidence/rework/T4-coach-gate.json run bound to HEAD, and docs/evidence/rework/T4.json is red on T4-charter, T4-review, T4-artefact-standard and T4-rework. Until a sha-bound run is recorded under the repository's CI route, the four SPEC_V2 \u00a712 clauses remain named rather than demonstrated and this retrospective cannot claim acceptance.",
+      "code": "T4-R1",
+      "created_at": "2026-11-26T22:00:30.76776+00:00",
+      "id": "01a219df-db33-702b-a339-41fa3ea6e2c8",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R9 \u2014 the gate is executable and its evidence is sha-bound (Requirements Catalog \u2014 T4 Kanban coach (Phase A))",
+          "acceptance/programme/T4.toml"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": "Run scripts/check-t4-coach-gate.py under the GitHub-hosted preflight at the rework head and publish the resulting docs/evidence/rework/T4-coach-gate.json; keep the project active until the run is green.",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "No sha-bound green run of the coach gate exists, so T4's acceptance is unproven",
+      "updated_at": "2026-11-26T22:00:30.76776+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "docs/evidence/rework/T4.json fails T4-charter because CONVEYOR_SSH_KEY is not set in the 2026-11-24 run environment; the failure is the transport, not a missing charter asset. While the transport is unset no run can evidence the charter, and the manifest gate aggregates the failure on every pass.",
+      "code": "T4-R2",
+      "created_at": "2026-11-26T22:00:30.932548+00:00",
+      "id": "01a219df-dbd8-7f34-8f67-4d67f3f4886c",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "T4-charter check \u2014 docs/evidence/rework/T4.json",
+          "docs/SPEC_V2.md#12"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": "Provide the transport to the acceptance runner and re-run the record; do not paper over the failure by editing the charter the run cannot read.",
+      "review_at": "2026-12-08",
+      "severity": "high",
+      "status": "open",
+      "title": "The acceptance run cannot reach the charter transport, so the governance gate fails at its first check",
+      "updated_at": "2026-11-26T22:00:30.932548+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.",
+      "code": "U3-EXC-T4",
+      "created_at": "2026-11-21T01:17:05.226071+00:00",
+      "id": "01a1fbad-ac1e-709a-8410-9e8553098661",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": "P0",
+      "status": "accepted",
+      "title": "Out-of-sequence closure accepted as a retrospective exception (T4)",
+      "updated_at": "2026-11-21T01:17:05.226071+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The project acceptance record fails T4-charter (CONVEYOR_SSH_KEY unset), T4-review (the live review 01a2028e-a1be-779d-a762-8d118fc2ec0b is non_conformant without a published delegation_ref or waiver), T4-artefact-standard (fifteen mandatory artefact packages open) and T4-rework (the P1 package std-togaf-phase-g-t4-g:T4 unresolved); the manifest gate aggregates all four. The retrospective records this state and leaves the project active rather than waiving it.",
+      "code": "T4-I1",
+      "created_at": "2026-11-26T22:00:31.10124+00:00",
+      "id": "01a219df-dc8a-76a5-b704-ca9594a47142",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": "Keep the project active, publish this retrospective record unwaived, and re-run the acceptance record once the live governance failures are fixed.",
+      "review_at": null,
+      "severity": "high",
+      "status": "open",
+      "title": "docs/evidence/rework/T4.json is red: four governance checks fail at 2026-11-24T21:07:28Z",
+      "updated_at": "2026-11-26T22:00:31.10124+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The delivery contract places observe, analyse, hypothesise, propose, measure and adopt after open with T5 (issue #77), and the project brief repeats that boundary. The coach opens exactly one measured kata for a systemic class and never adopts one; adoption is a human decision carrying evals:approve. If that boundary moved, the coach's systemic-learning obligation would be incomplete, so the pack records the hand-off and claims nothing beyond it.",
+      "code": "T4-A1",
+      "created_at": "2026-11-26T22:00:31.263948+00:00",
+      "id": "01a219df-dd22-7e2b-ad6f-0f76e18551d0",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The kata lifecycle after open stays with T5 (issue #77), so the pack stops at the kata.open hand-off",
+      "updated_at": "2026-11-26T22:00:31.263948+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The project row records meta.depends_on [T3, P0]. T3 supplies the failed-run provenance from which the interruption signature is derived; P0 supplies the board card, the process run, the action registry with HTTP/MCP parity and the approval primitive behind coach.escalation, coach.ask and coach.kata. Neither dependency is owned by this project, and a slip in either changes what the coach can record.",
+      "code": "T4-D1",
+      "created_at": "2026-11-26T22:00:31.404079+00:00",
+      "id": "01a219df-ddaf-70dc-be82-8a9b07598298",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The coach depends on T3's failed-run provenance and on P0's board, process, action and approval primitives",
+      "updated_at": "2026-11-26T22:00:31.404079+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "kata.open is the coach's hand-off; observe, analyse, hypothesise, propose, measure and adopt belong to T5 (issue #77). The coach opens one measured kata per systemic class against a pinned instrument, and the held-out measurement and human adoption that follow are outside this pack, so a systemic class cannot reach adoption on the coach's record alone.",
+      "code": "T4-D2",
+      "created_at": "2026-11-26T22:00:31.551016+00:00",
+      "id": "01a219df-de42-71c9-924f-ffe835793d31",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Systemic-class learning depends on T5 (issue #77) for the kata lifecycle after open",
+      "updated_at": "2026-11-26T22:00:31.551016+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The one-card rule turns an opaque interruption into exactly one coach card carrying one triage from the closed five-term set and at most one remedy from the closed six-term set; a repeat signature inside the coach.window escalates through coach.escalation and an escalated signature is not retried. Board users stop seeing duplicate cards for the same fault, and the remedy that is applied is one the code owns rather than one a model chose.",
+      "code": "T4-B1",
+      "created_at": "2026-11-26T22:00:31.693366+00:00",
+      "id": "01a219df-ded0-79ba-8b56-47d09fda12e8",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "One coach card, one triage and at most one remedy per interruption, with a repeat signature escalating instead of flooding the board",
+      "updated_at": "2026-11-26T22:00:31.693366+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "A systemic class (conveyor_defect by default) opens one kata through kata.open with a pinned instrument, prediction, split and split hash; without a pin the interruption escalates rather than opening an unmeasurable kata, and a transient class opens none. Recurring defects enter the kata family's held-out measurement instead of returning as fresh interruptions, and no coach card is ever raised about a coach card.",
+      "code": "T4-B2",
+      "created_at": "2026-11-26T22:00:31.834683+00:00",
+      "id": "01a219df-df5e-72fa-87da-54776c9c7360",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Systemic classes become one measured kata rather than a recurring fault",
+      "updated_at": "2026-11-26T22:00:31.834683+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a2028d-e17b-793d-9ea2-fe4f7f8e2b72",
+      "body": "The 2026-11-22 Phase-G review recorded T4 non_conformant and named v1-p6-2, v1-p6-4, v1-p6-5 and v1-p6-6. All four are resolved with named commits and tests; delivery contract v2 records the remediated scope and this change authorises the record.",
+      "code": "CH-T4-4fc0c2",
+      "created_at": "2026-11-26T07:45:37.780744+00:00",
+      "id": "01a216d1-2ffc-74e6-ac7e-132b1b4fc0c2",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "baseline": "unchanged",
+          "scope": "no scope change; the coach loop's four findings are remediated and re-reviewed"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Remediate T4's four Phase-G findings",
+      "updated_at": "2026-11-26T22:00:40.96741+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

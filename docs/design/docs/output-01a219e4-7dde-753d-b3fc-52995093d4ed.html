@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — The real V2 UI · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="c2d2889c9516a497f893490f0ceb5bad0e79e74d56c9850229a6c437ac02e871" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>c2d2889c9516a497f893490f0ceb5bad0e79e74d56c9850229a6c437ac02e871</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — The real V2 UI</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "docs/evidence/v2-coverage.json is stale: it reports seven destination rows as exists and four as extend (Architecture, Improve, Operations, Tools) while build-v2-coverage.py --check exits 1. The Phase-G review and the evidence Gap both record the stale record, so no acceptance claim may rest on it until it is regenerated from apps/web/src/app.rs and the present specs.",
+      "code": "T18-R1",
+      "created_at": "2026-11-26T21:59:08.274917+00:00",
+      "id": "01a219de-98f6-704b-8ac8-5d85f2a72871",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R5 The V2 coverage record reports exists only from a real route and a present spec; a *Gate is extend naming its owner."
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": "regenerate the record from the route table and the specs at the next tranche-4 review and record the check result as evidence",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "The stale V2 coverage record cannot be regenerated before the tranche-4 review",
+      "updated_at": "2026-11-26T21:59:08.274917+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "apps/web/src/app.rs registers /tools and /design/adm, but they render ToolsGate and AdmGate; there is no tools.spec.ts and admin.spec.ts covers /settings/admin rather than the ADM rail. R2 says a gate route is not a destination, so the SPEC_V2 section 12 gate cannot pass while those four coverage rows read extend.",
+      "code": "T18-R2",
+      "created_at": "2026-11-26T21:59:08.420835+00:00",
+      "id": "01a219de-9987-7ccd-8e3c-3935e632e1e0",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R2 Every SPEC_V2 \u00a710.5 destination has a real V2 route and screen module; a gate route is not a destination.",
+          "R7 A destination whose owning slice is absent renders not yet live, names the missing action or slice, and keeps its route."
+        ]
+      },
+      "meta": {
+        "owner": "the T18 lane under the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": "deliver the tools and architecture destinations under T18-4 (issue #565) with their own specs, or record the gate and its owning slice as an accepted limit at the review",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "Tools and the architecture destination remain honest gates with no destination spec",
+      "updated_at": "2026-11-26T21:59:08.420835+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The project meta.issues are [559, 562, 563, 564, 565, 566]; issues #559, #562, #563, #564 and #629 are closed, #565 and #566 remain open, and #630 is blocked. The Phase-G review names the two open units as the reason the SPEC_V2 section 12 gate is not met.",
+      "code": "T18-I1",
+      "created_at": "2026-11-26T21:59:08.565686+00:00",
+      "id": "01a219de-9a18-75f9-b035-9995c950b826",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "T18-4 (issue #565) and T18-5 (issue #566) are open and T18-3c (issue #630) is blocked",
+      "updated_at": "2026-11-26T21:59:08.565686+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The snapshot project row at version 1 records status active with meta.measured_status proposed and meta.plan_status draft, although apps/web already carries the destination routes and specs measured in the evidence output. The review records the contradiction rather than smoothing it.",
+      "code": "T18-I2",
+      "created_at": "2026-11-26T21:59:08.708237+00:00",
+      "id": "01a219de-9aa7-77a0-9ba5-0f8899396613",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The project row still records measured_status proposed and plan_status draft while construction has advanced",
+      "updated_at": "2026-11-26T21:59:08.708237+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The evidence output reads apps/web/src/app.rs and apps/web/e2e on 2026-11-24 and counts the twelve registered paths and eleven specs as T18's construction; the pack assumes those merged files are the T18 units' work because issues #559, #562, #563, #564 and #629 are closed against them.",
+      "code": "T18-A1",
+      "created_at": "2026-11-26T21:59:08.855555+00:00",
+      "id": "01a219de-9b43-76e5-81e3-f183ea2f71fa",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "The routes and specs measured in apps/web are T18's delivery",
+      "updated_at": "2026-11-26T21:59:08.855555+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The delivery contract judges acceptance against the retained snapshot /tmp/conv526-r2b-snap/data, and this checker refuses any id that appears nowhere in it; the pack therefore assumes the snapshot is complete and current for the project at 2026-11-24.",
+      "code": "T18-A2",
+      "created_at": "2026-11-26T21:59:09.027574+00:00",
+      "id": "01a219de-9be6-7e25-96c2-8d31bd2fb22c",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "The 2026-11-24 snapshot is the authoritative record for T18",
+      "updated_at": "2026-11-26T21:59:09.027574+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "meta.depends_on names T0, T1, T2, T3 and P0, and the project brief's Dependencies section adds the acceptance-blocked-by set: each destination's live scenarios wait on its owning slice, and the T12 organisation loop is the final spec.",
+      "code": "T18-D1",
+      "created_at": "2026-11-26T21:59:09.169358+00:00",
+      "id": "01a219de-9c74-74e7-88b9-e4ace581591b",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Construction is blocked by T0, T1, T2, T3 and P0; acceptance by the owning slices and T12",
+      "updated_at": "2026-11-26T21:59:09.169358+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "R9 makes the T12 organisation loop the final destination spec, and the Phase-G review records that the loop has no spec and issue #566 is open and blocked. Acceptance therefore depends on T12 and T18-5 before the SPEC_V2 section 12 gate can be judged.",
+      "code": "T18-D2",
+      "created_at": "2026-11-26T21:59:09.312559+00:00",
+      "id": "01a219de-9d03-7e40-ba72-26c3bdb2005e",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The T12 organisation loop gates acceptance through issue #566",
+      "updated_at": "2026-11-26T21:59:09.312559+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The coverage instrument resolves each SPEC_V2 \u00a710.5 destination against a real route in apps/web/src/app.rs and a present Playwright spec, so exists can no longer be credited from docs/design; Phase A driver D1 and goal G1 record the same correction.",
+      "code": "T18-B1",
+      "created_at": "2026-11-26T21:59:09.45825+00:00",
+      "id": "01a219de-9d95-796a-9fdc-6768ec314655",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The programme measures the live application instead of the design mock",
+      "updated_at": "2026-11-26T21:59:09.45825+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "apps/web registers /portfolio, /portfolio/:programme_id, /programme, /organisation, /procedures, /authoring, /plan, /improve, /operations, /execution, /design/adm and /tools behind the single Router, and apps/web/e2e carries the shell plus ten destination specs, so a tenant reaches the destinations from the app rather than a static page.",
+      "code": "T18-B2",
+      "created_at": "2026-11-26T21:59:09.602107+00:00",
+      "id": "01a219de-9e25-72dd-a390-1d3ae0fb84b2",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Every V2 destination is a route behind one shell with its own spec",
+      "updated_at": "2026-11-26T21:59:09.602107+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a219de-9ebf-72e9-a4cf-4631952a79ec",
+      "body": "The retrospective MSP/TOGAF/SAFe rework changed this project's record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.",
+      "code": "CH-T18-9fb206",
+      "created_at": "2026-11-26T21:59:18.866585+00:00",
+      "id": "01a219de-c258-783e-9f7d-a7bbb39fb206",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the retrospective rework's record acts"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework of T18",
+      "updated_at": "2026-11-26T22:05:22.963374+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The real V2 UI · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

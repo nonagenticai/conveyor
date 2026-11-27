@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — P0 programme definition (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="5f94d5ce855fdf0c646561016cc7b5242727ab2314006f6f4055552106648eb7" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>5f94d5ce855fdf0c646561016cc7b5242727ab2314006f6f4055552106648eb7</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Brief — P0 programme definition (retrospective, 2026-11-26)</h1>
+<h2>Outcome</h2>
+<p>After P0, the programme has a published and adopted definition set: the 21 output categories the standard declares, the 15-artefact TOGAF set, the seven measured benefit profiles with their map, the tranche plan and the governance record. Every delivery project then has a governing brief, and every benefit a measured profile, instead of a document library nobody binds to.</p>
+<h2>Boundary</h2>
+<p>Out of scope is the delivery projects' own records and the U6 realization transition: P0 defines the programme, it does not deliver the slices or claim a benefit realised. The project must not fork the programme seed, the blueprint or the benefit profiles; a deviation is a change request, and the definition set is the one input the tranche reviews are held to.</p>
+<h2>Reuse sources</h2>
+<p>The record already carries the SoAW, the delivery contract, the approved scope baseline and a compliant Phase-G review; those rows are verified, not duplicated. The design record docs/SPEC_V2.md supplies the standards, the plan docs/plans/P0-programme-definition.md supplies the definition set, and the existing published outputs supply the bodies the 21 categories must resolve.</p>
+<h2>Inception units</h2>
+<p>The analysis unit inventories the record: the seven approved A–D artefacts, the 21 published output categories, the contracts, the baseline and the review, and states which packages are open. The architecture unit authors the eight E–H artefacts, the four Phase-E category documents and the five register kinds to the adopted standard, and records the artefact links the set is read through.</p>
+<h2>Dependencies</h2>
+<p>The work runs under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code> and the tranche-0 authorisation recorded in the programme plan. The project depends on the closure gate <code>01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda</code> for its re-close, and every delivery project in tranches 1–13 depends on this definition set remaining live; the benefit profiles depend on U6 for their transitions.</p>
+<h2>Acceptance</h2>
+<p>scripts/verify-project.py --project P0 on a fresh snapshot is green with zero failures, and the strict conformance audit carries no P0/P1 entry for P0. The closure gate <code>01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda</code> is decided by an approver distinct from its requester, and the acceptance record is regenerated after the content pack is applied.</p>
+<h2>Capabilities</h2>
+<p>The project exercises architecture, programme management, project management and business analysis. The sponsoring group authorises the mandate and the tranche decisions, the SRO is accountable for the coherent capability and the benefits, the BCM owns each benefit, and the programme architect authors the set under the delegation.</p>
+<h2>Plan</h2>
+<p>The plan is docs/plans/P0-programme-definition.md: the definition set as 21 output categories, the project brief template and the per-project inception standard. The retrospective rework applies it through scripts/rework-batch.py --projects P0, which reopens, authors, reviews and re-closes the project on the record.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T08:41:58.742706+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
