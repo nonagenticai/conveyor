@@ -58,19 +58,19 @@ is a client of the existing contract; a capability the contract does not expose 
 
 **The one architectural decision:** the client is a static sub-site served from the same image and
 origin, with all work in DOM sheets and the world behind a `WorldView` port. That is what makes the
-engine replaceable (canvas-2D now, Bevy 0.18 candidate) without coupling a frame loop to the
-operator bundle.
+*renderer* replaceable (canvas-2D first, WebGL2 measured) while the simulation — `bevy_ecs` in
+`crates/walk-world` (ADR 0022) — stays a pure Rust crate with no DOM coupling.
 
 ## Constraints and licences
 
 - Same image and origin, no new port; the Dockerfile copies the static output and `web.rs` serves it.
 - OIDC: the public client gains a `/walk/` redirect URI (or a dedicated public client); this is an
   external identity-operator change, recorded as `acceptance-blocked-by`.
-- Engine candidates: canvas-2D (no dependency); Bevy 0.18 (Apache-2.0 OR MIT) only if the spike
-  meets the budgets. Any embedded font must carry its licence; the mock's embedded font is not
+- Renderer candidates: canvas-2D (no dependency); WebGL2 if the spike shows the canvas budget
+  fails. The simulation is `bevy_ecs 0.20.1` (Apache-2.0 OR MIT) in its own crate. Any embedded font must carry its licence; the mock's embedded font is not
   carried without its licence.
 - No private host, path, token or credential in any page; `no-private-refs` is a gate.
-- No new Rust dependency for the baseline; the Bevy candidate's build runs on GitHub preflight.
+- The world crate is the only new Rust dependency; its wasm build runs on GitHub preflight.
 
 ## Risks
 
@@ -79,7 +79,7 @@ operator bundle.
 | Scope: 597 actions, 52 routes | measured census | schema-driven action sheet; frozen census; per-destination specs; P6 is the only done |
 | Contract drift between clients | two clients, one registry | one contract; behavioural trace parity on named flows; a contract test per write |
 | Auth duplication | a second PKCE flow | same flow, shared config, one identity provider; the dev cookie for local runs |
-| Engine misses budgets | Bevy wasm bundle/startup unknown | measure in P0; canvas baseline stays; ADR 0022 decides |
+| Renderer misses budgets | WebGL2 startup and frame cost unknown | measure in P0; the canvas baseline stays; ADR 0023 decides |
 | Deep links render the operator app | `web.rs` fallback absent | scoped fallback + Rust test in P1, before any link is published |
 | No local Rust builds | owner rule | wasm compile on GitHub preflight; the baseline needs no Rust |
 | Mock leakage | the mock embeds a snapshot and fixtures | Do-Not list; a test asserts no snapshot URL is fetched |
@@ -89,7 +89,7 @@ operator bundle.
 
 | # | Question | Default |
 |---|---|---|
-| 1 | canvas-2D or Bevy 0.18 for the world? | undecided until the P0 spike; canvas is the baseline and the port keeps both possible |
+| 1 | canvas-2D or WebGL2 for the renderer? | undecided until the P0 spike; the simulation is `bevy_ecs` either way (ADR 0022) |
 | 2 | shared public client with a `/walk/` redirect, or a dedicated public client? | shared unless the identity operator prefers isolation; the spike proves the dev path |
 | 3 | how are the seat presets bound to real job keys? | by the job-key mapping the `GET /api/me` membership already carries; a preset never changes authority |
 | 4 | does the walk ship in the same image as the app? | yes; same image and origin, no new port |

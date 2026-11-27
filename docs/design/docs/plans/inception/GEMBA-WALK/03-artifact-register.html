@@ -294,6 +294,40 @@
 </tbody>
 </table>
 <p>Each row's document is <code>02-architecture-design.md</code> except the register (this file); each derives from A1–A6 and realises into C1/C2/D1. A row is approved only by the Architecture Board after the P0 spike; until then it is <code>draft</code> and is evidence, not a claim.</p>
+<h3 id="v2-rows--the-world-layer-806-adr-0022">v2 rows — the world layer (#806, ADR 0022)</h3>
+<p>Four rows move to version 2 when the <code>bevy_ecs</code> world layer is accepted, because the world changes what they say; the other six are unchanged. The v2 row supersedes the v1 row rather than editing it (<code>architecture.artifacts_supersede</code>), so the v1 text stays readable as history.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>v2 change</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>solution_concept</code></td>
+<td>the world is a <code>bevy_ecs</code> simulation crate behind <code>WorldView</code>, not an undecided renderer</td>
+<td><code>GEMBA-WALK-ECS.md</code> §1–§2</td>
+</tr>
+<tr>
+<td><code>requirements_catalog</code></td>
+<td>adds <code>R-ECS-1..10</code>: state classes, intent-only writes, no persisted programme copy, idempotent projection, determinism, wasm constraints, budgets, adapter boundary, no tokens, extension rules</td>
+<td><code>GEMBA-WALK-ECS.md</code> §1, §8–§16</td>
+</tr>
+<tr>
+<td><code>data_entity_catalog</code></td>
+<td>the entity/component mapping to the existing tables; no new table</td>
+<td><code>GEMBA-WALK-ECS.md</code> §3–§5</td>
+</tr>
+<tr>
+<td><code>technology_standards</code></td>
+<td><code>bevy_ecs</code>/<code>bevy_app</code>/<code>bevy_time</code> <code>=0.20.1</code>, wasm32, cargo-leptos for <code>apps/web</code> only, <code>panic=abort</code></td>
+<td><code>GEMBA-WALK-ECS.md</code> §2, §11</td>
+</tr>
+</tbody>
+</table>
+<p><code>GEMBA-WALK-ECS.md</code> also becomes its own <code>architecture-artifact</code> row (phase D / HLD, owner programme-architect, reviewer Architecture Board), linked <code>realization</code> from <code>solution_concept</code> and <code>derivation</code> into <code>technology_standards</code>.</p>
 <h2 id="contract-kinds">Contract kinds</h2>
 <table>
 <thead>

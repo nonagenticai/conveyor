@@ -192,20 +192,29 @@ The world is replaceable. The contract (JSDoc-typed; the exact names are the imp
 - `on(event, handler)` — `enter-room`, `select`, `hover`, `escape`; returns an unsubscribe.
 - `resize()`, `dispose()`.
 
+The port's producer is the world simulation: `crates/walk-world` (ADR 0022) emits a `FrameView`
+draw list and the adapter draws it. The adapter never mutates the world — it returns input, and
+`setScene` carries the draw list the simulation derived from the records.
+
 Constraints for every implementation: no text input, no tables, no long-form content; all scene text
 is a short label duplicated in the DOM; the canvas is labelled and never traps focus; a pure-DOM
 map/list view exposes the same rooms and records; no network access; no authority.
 
 ### 6.3 Renderer candidates
 
+The **simulation is decided**: `bevy_ecs 0.20.1` in `crates/walk-world` (ADR 0022), compiled to
+`wasm32-unknown-unknown` and loaded behind the port. The **renderer is not**: both adapters consume
+the same `FrameView`.
+
 - **Baseline — canvas 2D pseudo-3D.** The mock's approach: a hand-written projection, painter's
-  depth sort, flat-shaded faces, local textures and procedural figures. It has no engine dependency,
-  no WebGL requirement and a small payload. It is the default until ADR 0022 says otherwise.
-- **Candidate — Bevy 0.18, WASM.** The world as a Rust/WASM module behind the same port, loaded as
-  a static asset. Use Bevy's `2d`/`ui` feature bundles rather than the default set; keep bevy_ui for
-  labels only (DOM remains the work surface). The build runs on GitHub-hosted CI only (the owner's
-  no-local-Rust rule). If selected, ADR 0022 records the measured reason and the bundle/startup
-  budgets; if not, the canvas baseline stays and no Rust enters the client.
+  depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a
+  small payload. It ships first.
+- **Candidate — WebGL2.** The same `FrameView` drawn through a thin WebGL2 layer when the scene's
+  figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR
+  0023 records the winner and the budgets.
+
+No `bevy_render`, `bevy_winit` or `bevy_asset` dependency is admitted: the engine is a simulation
+crate, not a rendering stack.
 
 ### 6.4 State
 
@@ -364,8 +373,8 @@ Slow 4G for load metrics. It records:
 | CI build time and reproducibility | the no-local-Rust rule makes CI the only build |
 | DOM-overlay input/focus and screen-reader path | the engine must not own the work surface |
 
-ADR 0022 records the winner and the budgets. The baseline is not deleted when Bevy wins; it remains
-the fallback behind the port.
+ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2
+wins; it remains the fallback behind the port.
 
 ## 13. Parity gate (before any primacy claim)
 

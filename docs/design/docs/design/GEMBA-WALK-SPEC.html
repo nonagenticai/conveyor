@@ -236,12 +236,15 @@
 <li><code>on(event, handler)</code> — <code>enter-room</code>, <code>select</code>, <code>hover</code>, <code>escape</code>; returns an unsubscribe.</li>
 <li><code>resize()</code>, <code>dispose()</code>.</li>
 </ul>
+<p>The port's producer is the world simulation: <code>crates/walk-world</code> (ADR 0022) emits a <code>FrameView</code> draw list and the adapter draws it. The adapter never mutates the world — it returns input, and <code>setScene</code> carries the draw list the simulation derived from the records.</p>
 <p>Constraints for every implementation: no text input, no tables, no long-form content; all scene text is a short label duplicated in the DOM; the canvas is labelled and never traps focus; a pure-DOM map/list view exposes the same rooms and records; no network access; no authority.</p>
 <h3 id="63-renderer-candidates">6.3 Renderer candidates</h3>
+<p>The <strong>simulation is decided</strong>: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022), compiled to <code>wasm32-unknown-unknown</code> and loaded behind the port. The <strong>renderer is not</strong>: both adapters consume the same <code>FrameView</code>.</p>
 <ul>
-<li><strong>Baseline — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. It has no engine dependency, no WebGL requirement and a small payload. It is the default until ADR 0022 says otherwise.</li>
-<li><strong>Candidate — Bevy 0.18, WASM.</strong> The world as a Rust/WASM module behind the same port, loaded as a static asset. Use Bevy's <code>2d</code>/<code>ui</code> feature bundles rather than the default set; keep bevy_ui for labels only (DOM remains the work surface). The build runs on GitHub-hosted CI only (the owner's no-local-Rust rule). If selected, ADR 0022 records the measured reason and the bundle/startup budgets; if not, the canvas baseline stays and no Rust enters the client.</li>
+<li><strong>Baseline — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a small payload. It ships first.</li>
+<li><strong>Candidate — WebGL2.</strong> The same <code>FrameView</code> drawn through a thin WebGL2 layer when the scene's figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR 0023 records the winner and the budgets.</li>
 </ul>
+<p>No <code>bevy_render</code>, <code>bevy_winit</code> or <code>bevy_asset</code> dependency is admitted: the engine is a simulation crate, not a rendering stack.</p>
 <h3 id="64-state">6.4 State</h3>
 <ul>
 <li><strong>Server state</strong> — fetched per screen, held in memory, refetched after a write; never written to storage.</li>
@@ -398,7 +401,7 @@
 </tr>
 </tbody>
 </table>
-<p>ADR 0022 records the winner and the budgets. The baseline is not deleted when Bevy wins; it remains the fallback behind the port.</p>
+<p>ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2 wins; it remains the fallback behind the port.</p>
 <h2 id="13-parity-gate-before-any-primacy-claim">13. Parity gate (before any primacy claim)</h2>
 <p>The walk reaches parity only when all of these are true and recorded:</p>
 <ol type="1">

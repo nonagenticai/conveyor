@@ -253,9 +253,9 @@
 </tr>
 <tr>
 <td>P9</td>
-<td>The engine is replaceable</td>
-<td>the engine choice is unproven</td>
-<td><code>WorldView</code> is a port; canvas-2D is the baseline; Bevy is a candidate measured in P0</td>
+<td>The renderer is replaceable</td>
+<td>the simulation is decided, the renderer is not</td>
+<td>the simulation is <code>bevy_ecs</code> behind <code>WorldView</code> (ADR 0022); canvas-2D and WebGL2 are measured in P0 and ADR 0023 picks one</td>
 </tr>
 <tr>
 <td>P10</td>
@@ -747,7 +747,7 @@ boards/cards/runs · programme/tranche/benefit · approvals/decisions · documen
                             │
                       destination read model ── SSE topic → resync</code></pre>
 <h3 id="d1--technology-view">D1 — Technology view</h3>
-<p>Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline world is a canvas-2D projection behind <code>WorldView</code>; the candidate is Bevy 0.18 compiled to WASM, measured in P0 against bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input. Browser APIs: fetch, streams, Web Crypto (PKCE), <code>sessionStorage</code> (verifier only), <code>history</code>/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's static assets are copied by the Dockerfile. Tests: Playwright against the dev server; <code>node --test</code> for pure modules. No SSR, no server runtime, no third-party hosted service.</p>
+<p>Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline world simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code>, compiled to wasm32 and loaded behind <code>WorldView</code> (ADR 0022); the renderer is a canvas-2D projection first, with WebGL2 measured against it in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input) and ADR 0023 recording the winner. Browser APIs: fetch, streams, Web Crypto (PKCE), <code>sessionStorage</code> (verifier only), <code>history</code>/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's static assets are copied by the Dockerfile. Tests: Playwright against the dev server; <code>node --test</code> for pure modules. No SSR, no server runtime, no third-party hosted service.</p>
 <h3 id="f1--migration-and-delivery-diagram">F1 — Migration and delivery diagram</h3>
 <pre><code>P0 governance + census/instrument + spike + ADR 0022
  → P1 foundation + Portfolio read/write + fallback
@@ -875,9 +875,9 @@ boards/cards/runs · programme/tranche/benefit · approvals/decisions · documen
 </tr>
 <tr>
 <td>AD7</td>
-<td><code>WorldView</code> port; canvas baseline; Bevy measured in P0</td>
-<td>the engine is unproven; the port keeps both</td>
-<td>R8, D1, ADR 0022</td>
+<td><code>WorldView</code> port; <code>bevy_ecs</code> simulation (ADR 0022); canvas-2D baseline, WebGL2 measured in P0</td>
+<td>the simulation is decided, the renderer is not; the port keeps both renderers</td>
+<td>R8, D1, ADR 0022/0023</td>
 </tr>
 <tr>
 <td>AD8</td>

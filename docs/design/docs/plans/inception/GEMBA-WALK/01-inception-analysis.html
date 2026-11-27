@@ -143,14 +143,14 @@
 <p><strong>Build:</strong> the static sub-site (<code>apps/walk/index.html</code>, <code>src/main.js</code>, auth, api, forms, router registry, shell, world port, state, a11y); the DOM sheet system; the schema-driven action sheet; the seats presets; the canvas world and its <code>WorldView</code> implementation; the parity instrument and the frozen census; the Playwright suite; the serving fallback and Dockerfile copy; the walk CI workflow.</p>
 <p><strong>Reuse, never rebuild:</strong> the action registry, <code>actions.describe</code>, the invocation envelope and headers, the identity provider, the read models, the server's refusals and the design pack. The walk is a client of the existing contract; a capability the contract does not expose is an honest gate.</p>
 <p><strong>Reject:</strong> an iframe or WebView of the mock; a second backend; a second decision store; a <code>localStorage</code> programme state; any fixture or embedded snapshot; a new table, action, event or port.</p>
-<p><strong>The one architectural decision:</strong> the client is a static sub-site served from the same image and origin, with all work in DOM sheets and the world behind a <code>WorldView</code> port. That is what makes the engine replaceable (canvas-2D now, Bevy 0.18 candidate) without coupling a frame loop to the operator bundle.</p>
+<p><strong>The one architectural decision:</strong> the client is a static sub-site served from the same image and origin, with all work in DOM sheets and the world behind a <code>WorldView</code> port. That is what makes the <em>renderer</em> replaceable (canvas-2D first, WebGL2 measured) while the simulation — <code>bevy_ecs</code> in <code>crates/walk-world</code> (ADR 0022) — stays a pure Rust crate with no DOM coupling.</p>
 <h2 id="constraints-and-licences">Constraints and licences</h2>
 <ul>
 <li>Same image and origin, no new port; the Dockerfile copies the static output and <code>web.rs</code> serves it.</li>
 <li>OIDC: the public client gains a <code>/walk/</code> redirect URI (or a dedicated public client); this is an external identity-operator change, recorded as <code>acceptance-blocked-by</code>.</li>
-<li>Engine candidates: canvas-2D (no dependency); Bevy 0.18 (Apache-2.0 OR MIT) only if the spike meets the budgets. Any embedded font must carry its licence; the mock's embedded font is not carried without its licence.</li>
+<li>Renderer candidates: canvas-2D (no dependency); WebGL2 if the spike shows the canvas budget fails. The simulation is <code>bevy_ecs 0.20.1</code> (Apache-2.0 OR MIT) in its own crate. Any embedded font must carry its licence; the mock's embedded font is not carried without its licence.</li>
 <li>No private host, path, token or credential in any page; <code>no-private-refs</code> is a gate.</li>
-<li>No new Rust dependency for the baseline; the Bevy candidate's build runs on GitHub preflight.</li>
+<li>The world crate is the only new Rust dependency; its wasm build runs on GitHub preflight.</li>
 </ul>
 <h2 id="risks">Risks</h2>
 <table>
@@ -178,9 +178,9 @@
 <td>same flow, shared config, one identity provider; the dev cookie for local runs</td>
 </tr>
 <tr>
-<td>Engine misses budgets</td>
-<td>Bevy wasm bundle/startup unknown</td>
-<td>measure in P0; canvas baseline stays; ADR 0022 decides</td>
+<td>Renderer misses budgets</td>
+<td>WebGL2 startup and frame cost unknown</td>
+<td>measure in P0; the canvas baseline stays; ADR 0023 decides</td>
 </tr>
 <tr>
 <td>Deep links render the operator app</td>
@@ -216,8 +216,8 @@
 <tbody>
 <tr>
 <td>1</td>
-<td>canvas-2D or Bevy 0.18 for the world?</td>
-<td>undecided until the P0 spike; canvas is the baseline and the port keeps both possible</td>
+<td>canvas-2D or WebGL2 for the renderer?</td>
+<td>undecided until the P0 spike; the simulation is <code>bevy_ecs</code> either way (ADR 0022)</td>
 </tr>
 <tr>
 <td>2</td>
