@@ -329,6 +329,7 @@ fn unit_ledger_facts(marker: &str) -> Value {
                 "ciRuns": 2,
                 "closesKeyword": true,
                 "verifyParts": true,
+                "unit": true,
             },
             {
                 "key": format!("conveyor#{marker}-b"),
@@ -340,6 +341,7 @@ fn unit_ledger_facts(marker: &str) -> Value {
                 "ciRuns": 1,
                 "closesKeyword": true,
                 "verifyParts": true,
+                "unit": true,
             },
         ],
     })

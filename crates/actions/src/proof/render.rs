@@ -641,6 +641,7 @@ struct UnitEntry {
     ci_runs: Option<u64>,
     closes_keyword: Option<bool>,
     verify_parts: Option<bool>,
+    unit: Option<bool>,
 }
 
 impl UnitEntry {
@@ -673,7 +674,7 @@ impl UnitEntry {
     }
 
     fn parts_verified(&self) -> bool {
-        self.verify_parts == Some(true)
+        self.unit == Some(false) || self.verify_parts == Some(true)
     }
 }
 
@@ -737,6 +738,7 @@ fn unit_entry(item: &Value, index: usize) -> Result<UnitEntry, RenderError> {
         ci_runs: unit_nat(object, index, "ciRuns")?,
         closes_keyword: unit_bool(object, index, "closesKeyword")?,
         verify_parts: unit_bool(object, index, "verifyParts")?,
+        unit: unit_bool(object, index, "unit")?,
     })
 }
 
@@ -814,7 +816,7 @@ fn unit_pull(object: &Map<String, Value>, index: usize) -> Result<Option<PullObs
 fn unit_literal(entry: &UnitEntry) -> String {
     format!(
         "  {{ issue := {}, branches := {}, branchDeleted := {}, pulls := {}, pull := {}, \
-         ciRuns := {}, closesKeyword := {}, verifyParts := {} }}",
+         ciRuns := {}, closesKeyword := {}, verifyParts := {}, unit := {} }}",
         option_lean(entry.issue, |value| value.lean().to_owned()),
         option_lean(entry.branches, |value| value.to_string()),
         option_lean(entry.branch_deleted, |value| value.to_string()),
@@ -823,6 +825,7 @@ fn unit_literal(entry: &UnitEntry) -> String {
         option_lean(entry.ci_runs, |value| value.to_string()),
         option_lean(entry.closes_keyword, |value| value.to_string()),
         option_lean(entry.verify_parts, |value| value.to_string()),
+        option_lean(entry.unit, |value| value.to_string()),
     )
 }
 

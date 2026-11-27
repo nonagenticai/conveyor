@@ -987,8 +987,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "e6ac11ce165535db3d672f72541b9f6f4d50e341b82ca9107758353bf0a22478",
-      "bytes": 28857,
+      "sha256": "b5519547b629566e66441c5cd930f1fc3e68bd84903a11e0fd73a86a251d52a6",
+      "bytes": 31130,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -1737,6 +1737,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "9c20110bf167a374ac66738aec5285f0b65996fa21ad1417c75639d6cf469ae4",
       "bytes": 6935,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/report.md"
+    },
+    {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27-scoped/report.html",
+      "source": "docs/evidence/units/2026-11-27-scoped/report.md",
+      "section": "Evidence",
+      "sha256": "b48667bcd036c8a9e3766964055b919345c336e69fa2e9c6f3f93f3360551593",
+      "bytes": 6148,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-scoped/report.md"
     },
     {
       "title": "report",
