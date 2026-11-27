@@ -12,10 +12,13 @@ Every status is measured from a committed artefact, never guessed:
 * a screen from `docs/design/v2.js` — the page map, the render body's `ribbon`/`wrapLegacy`,
   and every `C.action(...)` call;
 * a tranche from `seed/programme.json` `meta.depends_on` (longest path), with `blocked_by`
-  measured against the dependency's own coverage status.
+  measured against the dependency's own coverage status;
+* a project's units from the frozen seed's `meta.issues` unioned with the open registry issues
+  carrying the project-key label — the freeze means a new unit attaches by label (#782 P4).
 
 The output is deterministic: sorted arrays, no timestamps. `--check` recomputes and compares
-both committed files without writing; a drift is exit 1.
+both committed files without writing; a drift is exit 1. `--self-test` asserts the unit union
+on fixtures and exits.
 
 Regenerate the action dump first, then the coverage:
 
@@ -388,7 +391,21 @@ def screens(root: pathlib.Path) -> tuple[list[dict], list[dict]]:
 
 
 def units(project: dict, registry: dict[int, dict]) -> dict:
-    numbers = sorted(set(project.get("meta", {}).get("issues", []) or []))
+    """A project's units: the frozen seed's issue list plus the live attachments.
+
+    The seed is the bootstrap of record and stops being regenerated (#782 P4), so an issue
+    created after the freeze attaches to its project by carrying the project-key label in
+    the registry. Without the union, a project whose seed issues have all closed while its
+    successor is open reports zero open units, and `check-coverage.cjs` calls it uncovered.
+    """
+    key = project.get("key")
+    numbers = set(project.get("meta", {}).get("issues", []) or [])
+    for number, issue in registry.items():
+        if issue.get("state") != "OPEN":
+            continue
+        if key in {label.get("name") for label in issue.get("labels", [])}:
+            numbers.add(number)
+    numbers = sorted(numbers)
     counts = {"open": 0, "claimed": 0, "blocked": 0, "ready": 0, "unknown": 0}
     for number in numbers:
         issue = registry.get(number)
@@ -748,6 +765,26 @@ def build(root: pathlib.Path) -> dict:
     }
 
 
+def self_test() -> None:
+    """The live-attachment union and its orphan control, on fixtures (no files, no network)."""
+    project = {"key": "T99", "meta": {"issues": [1]}}
+    registry = {
+        1: {"state": "CLOSED", "labels": [{"name": "T99"}]},
+        2: {"state": "OPEN", "labels": [{"name": "T99"}, {"name": "status:claimed"}]},
+        3: {"state": "OPEN", "labels": [{"name": "other"}]},
+        4: {"state": "CLOSED", "labels": [{"name": "T99"}]},
+    }
+    covered = units(project, registry)
+    assert covered["numbers"] == [1, 2], covered["numbers"]
+    assert covered["open"] == 1 and covered["claimed"] == 1, covered
+    assert 3 not in covered["numbers"], "an open issue without the key label must not attach"
+    assert 4 not in covered["numbers"], "a closed labelled issue must not attach"
+
+    orphan = units({"key": "T98", "meta": {"issues": [1]}}, registry)
+    assert orphan["numbers"] == [1] and orphan["open"] == 0, orphan
+    print("build-coverage: self-test OK — the seed+label union, and the orphan control")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", default=pathlib.Path(__file__).resolve().parents[1])
@@ -756,7 +793,15 @@ def main() -> None:
         action="store_true",
         help="recompute and compare both committed files; write nothing",
     )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="assert the seed+label unit union on fixtures and exit",
+    )
     args = parser.parse_args()
+    if args.self_test:
+        self_test()
+        return
     root = pathlib.Path(args.root).resolve()
     document = build(root)
     pretty = json.dumps(document, indent=2, sort_keys=True) + "\n"

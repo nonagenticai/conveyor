@@ -248,6 +248,9 @@ tranche and dependency edges, its units and its gap list; every screen's
 live/mixed/proposed/legacy state; and every action the pack invokes. The data is
 `data/coverage.json`, which `scripts/build-coverage.py` derives from the slice frontmatter, the
 migrations, the compiled action-registry dump and `v2.js` — never a hand-written status.
+A project's units are the frozen seed's `meta.issues` plus the open registry issues carrying the
+project-key label: the seed is the bootstrap of record and no longer moves (#782 P4), so a unit
+created after the freeze attaches by its label rather than by editing the seed.
 `docs/design/scripts/check-coverage.cjs` is the gate, and the `design-pack` CI job runs it with
 the eight pack checks and `build-docs.py --check`.
 
