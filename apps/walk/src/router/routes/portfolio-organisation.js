@@ -23,4 +23,11 @@ export default [
     spec: "e2e/portfolio-organisation/agents.spec.ts",
     load: () => import("../../destinations/agents.js"),
   },
-];
+  {
+    walk: "/jobs",
+    app: "/jobs",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/jobs.spec.ts",
+    load: () => import("../../destinations/jobs.js"),
+  },
+]
