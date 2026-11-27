@@ -23,6 +23,7 @@ use crate::screens::copilot::CopilotScreen;
 use crate::screens::decision_inbox::DecisionInboxScreen;
 use crate::screens::evals::{EvalDetail, Evals};
 use crate::screens::execution::ExecutionScreen;
+use crate::screens::feedback::FeedbackScreen;
 use crate::screens::improve::Improve;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
@@ -212,6 +213,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/knowledge/sources") view=SourcesScreen/>
                             <Route path=path!("/knowledge/memory") view=MemoryScreen/>
                             <Route path=path!("/measure") view=MeasureScreen/>
+                            <Route path=path!("/feedback") view=FeedbackScreen/>
                         </Routes>
                     </main>
                 </div>
@@ -434,6 +436,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.is_super_admin().then(|| view! {
                     <li><A href="/platform"><span class="nav-item">"Platform"</span></A></li>
+                })}
+                {move || ctx.has_action("feedback.list").then(|| view! {
+                    <li><A href="/feedback"><span class="nav-item">"Feedback"</span></A></li>
                 })}
             </ul>
             <div class="rail-foot">

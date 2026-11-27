@@ -4153,6 +4153,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         ),
         plain("events.list", json!({"limit": 10}), None),
         plain("licences.get", json!({}), None),
+        // ── #842: the tenant's feedback about the platform ─────────────────────────────────
+        plain(
+            "feedback.create",
+            json!({"kind": "bug", "title": "parity feedback", "body": "the parity body",
+                   "route": "/parity"}),
+            None,
+        ),
+        plain("feedback.list", json!({}), None),
         plain("fixtures.echo", json!({"message": "hello"}), None),
         plain("fixtures.slow", json!({"delay_ms": 600}), None),
         plain("fixtures.fail", json!({"status": 422}), None),

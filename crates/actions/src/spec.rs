@@ -224,6 +224,12 @@ pub enum Scope {
     DocumentsRead,
     /// Upload, change and delete documents.
     DocumentsWrite,
+    // #842 — the tenant's feedback about the platform. A read is open to every role; a
+    // submission is a member write (a viewer does not create rows).
+    /// Read this tenant's feedback.
+    FeedbackRead,
+    /// Submit feedback about the platform.
+    FeedbackWrite,
     /// Read secret metadata (never a value — there is no reveal action).
     SecretsRead,
     /// Create, rotate and delete secrets.
@@ -331,7 +337,7 @@ impl Scope {
     }
 
     /// Every scope this build knows.
-    pub const ALL: [Scope; 74] = [
+    pub const ALL: [Scope; 76] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -378,6 +384,8 @@ impl Scope {
         Scope::ModelWrite,
         Scope::DocumentsRead,
         Scope::DocumentsWrite,
+        Scope::FeedbackRead,
+        Scope::FeedbackWrite,
         Scope::SecretsRead,
         Scope::SecretsWrite,
         Scope::IntegrationsRead,
@@ -457,6 +465,8 @@ impl Scope {
             Self::ModelWrite => "model:write",
             Self::DocumentsRead => "documents:read",
             Self::DocumentsWrite => "documents:write",
+            Self::FeedbackRead => "feedback:read",
+            Self::FeedbackWrite => "feedback:write",
             Self::SecretsRead => "secrets:read",
             Self::SecretsWrite => "secrets:write",
             Self::IntegrationsRead => "integrations:read",
@@ -533,6 +543,7 @@ impl Scope {
             | Self::PortfolioRead
             | Self::ModelRead
             | Self::DocumentsRead
+            | Self::FeedbackRead
             | Self::SecretsRead
             | Self::ProcessesRead
             | Self::PromptsRead
@@ -554,6 +565,7 @@ impl Scope {
             | Self::PortfolioWrite
             | Self::ModelWrite
             | Self::DocumentsWrite
+            | Self::FeedbackWrite
             | Self::SecretsWrite
             | Self::ProcessesWrite
             | Self::BenchmarksWrite
@@ -1105,7 +1117,9 @@ mod tests {
         assert_eq!(Scope::LessonsWrite.as_str(), "lessons:write");
         assert_eq!(Scope::LessonsReview.as_str(), "lessons:review");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 74);
+        assert_eq!(Scope::FeedbackRead.as_str(), "feedback:read");
+        assert_eq!(Scope::FeedbackWrite.as_str(), "feedback:write");
+        assert_eq!(Scope::ALL.len(), 76);
     }
 
     #[test]

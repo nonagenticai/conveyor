@@ -145,7 +145,7 @@ use serde_json::{Value, json};
 /// 565 → 569, external stays 24.
 /// **Delivery proofs (#744) adds 4 internal**: `proofs.record|reverify|get|list` — 593 →
 /// **597**, internal 569 → 573, external stays 24.
-const EXPECTED: [&str; 599] = [
+const EXPECTED: [&str; 601] = [
     "actions.describe",
     "actions.list",
     "analyse.app",
@@ -369,6 +369,8 @@ const EXPECTED: [&str; 599] = [
     "evals.retire",
     "evals.update",
     "events.list",
+    "feedback.create",
+    "feedback.list",
     "fixtures.echo",
     "fixtures.fail",
     "fixtures.slow",
@@ -886,7 +888,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 573 -> 574; external stays 24.
     // #836 adds one internal read (`proofs.render`): internal 574 -> 575; external stays 24 —
     // it renders the exact source a certificate must carry and writes nothing.
-    assert_eq!((internal, external), (575, 24));
+    // #842 adds two internal actions (`feedback.create|list`, the tenant's platform feedback):
+    // internal 575 -> 577; external stays 24 — a row on this tenant's own database.
+    assert_eq!((internal, external), (577, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
