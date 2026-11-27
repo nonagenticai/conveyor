@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conveyor Walk spike</title>
+    <style>
+      :root {
+        --paper: #f8efd9;
+        --ink: #3b2d1e;
+        --teal: #2f8070;
+        --coral: #d96a5a;
+        --line: #dcc8a1;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font: 15px/1.45 ui-rounded, "SF Pro Rounded", "Trebuchet MS", system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+      }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      #status { color: var(--teal); min-height: 1.4em; }
+      canvas { width: 100%; max-width: 720px; height: auto; border: 2px solid var(--line); border-radius: 12px; background: #fffaf0; }
+      #buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+      button { padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+      button.danger { border-color: var(--coral); color: var(--coral); }
+      #log { white-space: pre-wrap; background: #fffaf0; border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 320px; overflow: auto; }
+      .sheet { border: 2px solid var(--line); border-radius: 12px; padding: 10px; margin: 8px 0; background: #fffaee; }
+      .sheet h2 { font-size: 15px; margin: 0 0 6px; }
+      label { display: block; margin: 4px 0; }
+      input, select, textarea { font: inherit; padding: 4px 6px; }
+    </style>
+  </head>
+  <body>
+    <h1>Conveyor Walk spike</h1>
+    <p id="status">booting…</p>
+    <canvas id="world" width="720" height="405" role="img" aria-label="Reference walk scene"></canvas>
+    <div id="buttons">
+      <button data-proof="read">Read: programmes.list</button>
+      <button data-proof="write">Write: move the card (If-Match)</button>
+      <button class="danger" data-proof="destructive">Destructive: archive (approval)</button>
+      <button data-proof="sse">SSE: board topic</button>
+      <button data-proof="pkce">PKCE URL</button>
+      <button data-proof="forms">Schema forms</button>
+      <button data-proof="measure-canvas">Measure canvas-2D</button>
+      <button data-proof="measure-webgl">Measure WebGL2</button>
+    </div>
+    <div id="forms"></div>
+    <pre id="log"></pre>
+    <script type="module" src="/walk/src/main.js"></script>
+  </body>
+</html>
