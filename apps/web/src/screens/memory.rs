@@ -71,6 +71,9 @@ pub fn MemoryScreen() -> impl IntoView {
             {
                 Ok(invocation) => {
                     set_notice.set(None);
+                    if let Some(id) = invocation.output.get("id").and_then(Value::as_str) {
+                        set_lesson_id.set(id.to_owned());
+                    }
                     set_lesson.set(Some(Ok(invocation.output)));
                 }
                 Err(error) => {
