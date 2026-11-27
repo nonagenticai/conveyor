@@ -442,7 +442,11 @@ mod tests {
                 (106, "project request expired".to_owned()),
                 // #526 (architecture findings): the adoption FK/CHECK and the one-outcome
                 // phase-H index (0107_architecture_integrity.sql).
-                (107, "architecture integrity".to_owned())
+                (107, "architecture integrity".to_owned()),
+                // T4 spot-audit (2026-11-27): the repair for a `continue` review that closed a
+                // tranche without copying its date onto `programme_tranche.review_at`
+                // (0108_tranche_review_at.sql).
+                (108, "tranche review at".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

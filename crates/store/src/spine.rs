@@ -1586,8 +1586,13 @@ pub async fn review_tranche_tx(
             }));
         }
     }
+    // The tranche's `review_at` is the closure date the audit reads (`tranche_plan`: a closed
+    // tranche must carry the review date). It is the review's own `reviewed_at`, never `now()`:
+    // the decision was taken when the review was recorded, and a backfill and a live review must
+    // agree on the same instant.
     let sql = format!(
-        "UPDATE programme_tranche SET state = $3, version = version + 1, updated_at = now()
+        "UPDATE programme_tranche
+            SET state = $3, review_at = $4, version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2
           RETURNING {TRANCHE_COLUMNS}"
     );
@@ -1595,6 +1600,7 @@ pub async fn review_tranche_tx(
         .bind(tenant.as_uuid())
         .bind(id)
         .bind(state)
+        .bind(review.reviewed_at)
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::NotFound { what: "tranche" })

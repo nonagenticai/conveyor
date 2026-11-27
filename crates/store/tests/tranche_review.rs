@@ -10,6 +10,7 @@
 #[path = "support/mod.rs"]
 mod support;
 
+use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::spine::PlanError;
 use conveyor_store::begin_scoped;
@@ -201,6 +202,25 @@ async fn a_review_records_continue_pause_or_stop() {
         review_id.is_none(),
         "the reviewed tranche is not 'authorised'"
     );
+    // The audit reads the closed tranche's `review_at`; it must be the review's own date, not
+    // NULL (the T4 spot-audit defect: tranches 3 and 4 closed with a null date) and not the
+    // wall clock.
+    let (review_at, reviewed_at): (Option<DateTime<Utc>>, DateTime<Utc>) = sqlx::query_as(
+        "SELECT t.review_at, r.reviewed_at
+           FROM programme_tranche t
+           JOIN programme_tranche_review r
+             ON r.tenant_id = t.tenant_id AND r.tranche_id = t.id
+          WHERE t.id = $1 AND r.decision = 'continue'",
+    )
+    .bind(f.tranche0)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("read the recorded review date");
+    assert_eq!(
+        review_at,
+        Some(reviewed_at),
+        "a continue records the review's own date on the tranche"
+    );
     let (next_state, review_id) = tranche_state(&db, f.tenant, f.tranche1).await;
     assert_eq!(
         next_state, "authorised",
@@ -218,6 +238,13 @@ async fn a_review_records_continue_pause_or_stop() {
         tranche_state(&db, paused.tenant, paused.tranche0).await.0,
         "paused"
     );
+    let paused_at: Option<DateTime<Utc>> =
+        sqlx::query_scalar("SELECT review_at FROM programme_tranche WHERE id = $1")
+            .bind(paused.tranche0)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the paused tranche");
+    assert!(paused_at.is_some(), "a pause records its review date too");
     let stopped = fixture(&db).await;
     review(&db, &stopped, stopped.tranche0, "stop")
         .await
