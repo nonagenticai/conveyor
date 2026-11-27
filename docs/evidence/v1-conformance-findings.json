@@ -3511,7 +3511,12 @@
    ],
    "failure_scenario": "Workspace-wide breakage outside the affected binaries is unproven at the slice's close.",
    "acceptance": "Re-run the workspace gate green at the built commit and record it.",
-   "owner_project": "S06"
+   "owner_project": "S06",
+   "resolved_by": {
+    "commit": "ce442a1b0b9a13eb6cd3de7597c8875b85c008c4",
+    "test": "acceptance/programme/S06d.toml",
+    "evidence": "cargo nextest run --workspace at ce442a1b0 (the nextest step inside scripts/ci/gate.sh): 4592 tests run, 4592 passed, 0 failed, 11 skipped; the script's fmt, clippy -D warnings and audit steps also passed. The script's final no-private-refs step remains red on the historical tranche-0 rework evidence (the documented public-tree scrub), not a test."
+   }
   },
   {
    "id": "v1-s07-1",

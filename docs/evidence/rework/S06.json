@@ -43,10 +43,10 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
+      "detail": "review 01a21a3b-e8a9-7ab6-ba8f-227e0edc4ad6 (compliant) of the live contract cites the published delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
       "id": "S06-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -133,29 +133,25 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-s06-4:S06 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "S06-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S06-review' did not pass; the gate check 'S06-rework' did not pass",
+      "detail": "gate discharged by executable checks: S06-project, S06-baseline, S06-charter, S06-contract, S06-review, S06-waivers, S06-pi-cadence, S06-pi-plan, S06-pi-objectives, S06-wsjf, S06-demo-credits, S06-lessons, S06-product, S06-artefact-standard, S06-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S06-review (P0): the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
-    "S06-rework (P0): 1 unresolved P0/P1 package(s): v1-s06-4:S06 (P1)",
-    "gate (P0): the gate check 'S06-review' did not pass; the gate check 'S06-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "S06's gate is the golden card-type\u00d7list path, dual-control approval and retry.",
-  "generated_at": "2026-11-26T23:40:36.522671+00:00",
+  "generated_at": "2026-11-27T07:58:02.068613+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06.toml",
   "name": "Control plane \u2014 claims, runs, approvals, andon, comms and notifications",
@@ -163,9 +159,9 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-26T23:40:31.789194+00:00",
-    "git_sha": "c18c076d4ecbc9a56944759b0d3757e915cd82b1",
-    "path": "retained-snapshot/c18c076d4ecbc9a56944759b0d3757e915cd82b1"
+    "git_sha": "af57764353aa740a0401f161e110bbc1bfb7a0ae",
+    "path": "retained-snapshot/af57764353aa740a0401f161e110bbc1bfb7a0ae"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
