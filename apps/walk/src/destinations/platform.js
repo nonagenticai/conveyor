@@ -155,7 +155,7 @@ export async function render(ctx) {
       block.append(el("p", { class: "field-hint", text: "ops.host_status is not in this role's manifest." }));
       return block;
     }
-    const hostInput = /** @type {HTMLInputElement} */ (el("input", { type: "text", id: "platform-host", "aria-label": "Host", placeholder: "strato-server" }));
+    const hostInput = /** @type {HTMLInputElement} */ (el("input", { type: "text", id: "platform-host", "aria-label": "Host", placeholder: "edge-node-1" }));
     const unitInput = /** @type {HTMLInputElement} */ (el("input", { type: "text", id: "platform-unit", "aria-label": "Unit", placeholder: "k3s" }));
     const result = el("div", {});
     async function readHost() {

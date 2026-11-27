@@ -26,7 +26,7 @@ test("the five status sections render", async ({ page }) => {
   await page.route("**/api/actions/ops.ci_status/invocations", (route: any) => json(route, { status: "ok", items: [{ repo: "conveyor", green: true }] }));
   await page.route("**/api/actions/ops.deployments/invocations", (route: any) => json(route, { items: [{ name: "conveyor", ready: "2/2" }] }));
   await page.route("**/api/actions/ops.pods/invocations", (route: any) => json(route, { items: [{ name: "conveyor-abc", phase: "Running" }] }));
-  await page.route("**/api/actions/ops.host_status/invocations", (route: any) => json(route, { items: [{ host: "strato-server", state: "active" }] }));
+  await page.route("**/api/actions/ops.host_status/invocations", (route: any) => json(route, { items: [{ host: "edge-node-1", state: "active" }] }));
   await page.goto("/platform");
   await expect(page.getByRole("heading", { name: "Platform", level: 1 })).toBeVisible();
   await expect(page.getByTestId("platform-flux")).toBeVisible();
