@@ -1,4 +1,4 @@
--- 0077_process_step_tool_pin.sql — the step's tool pin (issue #778, T13 / v1-p116-1).
+-- 0078_process_step_tool_pin.sql — the step's tool pin (issue #778, T13 / v1-p116-1).
 --
 -- SPEC_V2 §11.6 item 3: a procedure step that needs an operation with no tool opens a
 -- tool-request card; a development job implements it, publishes the version, and the step is

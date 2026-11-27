@@ -348,7 +348,10 @@ mod tests {
                 // (0076_lean_proof.sql, SPEC_V2 §5.3/§5.4).
                 (76, "lean proof".to_owned()),
                 // #779: the issue that carries a delivery unit (0077_development_issue_ref.sql).
-                (77, "development issue ref".to_owned())
+                (77, "development issue ref".to_owned()),
+                // T13 (#778): the published tool a waiting step is rebound onto
+                // (0078_process_step_tool_pin.sql, SPEC_V2 §11.6 item 3).
+                (78, "process step tool pin".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
