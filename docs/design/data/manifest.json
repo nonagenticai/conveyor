@@ -5111,25 +5111,25 @@
       "bytes": 24503,
       "path": "conformance.json",
       "records": 0,
-      "sha256": "345ff71dfae0088f4614e21d5750402a7994e0be12b357c4cc410e01685c5e04"
+      "sha256": "9657be8c9c31ee164da453bf1fbab2037ada37bfe189e91c55d8907be28b2965"
     },
     {
       "bytes": 13417,
       "path": "conformance.md",
       "records": 0,
-      "sha256": "4e97875e85d5d77a0a9c3ad9325038e33ad4aedc5719daa870e4cbb59698ac38"
+      "sha256": "3a10cc1a7417a8a66a2d8914e703e001326c7a3c09c0b83b82a0c924f9fca663"
     },
     {
-      "bytes": 29244,
+      "bytes": 29236,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "ccdf97ee10882cebf2b554b7c6bbc57cea34b172310dca2f3b27cbcf9d336cc2"
+      "sha256": "59fbcda6d36cfa3305fde73655a5630340294ada780e323f7bad5629117a5131"
     },
     {
-      "bytes": 54219,
+      "bytes": 54189,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "dcf49f8de2a40bf8f0938b6a56f0100975b1091a25c878acd22894ef222695b5"
+      "sha256": "335db8af69761b3adb3320d14cfbe7c92dcd6c5fa64a1c2e1f19a6742eee53d5"
     },
     {
       "bytes": 106,
@@ -5138,10 +5138,10 @@
       "sha256": "887e6d3f8e7fac875ffc7bb2e52606db9642a85f4c7d57215a48ba66d3381d61"
     },
     {
-      "bytes": 91049,
+      "bytes": 91419,
       "path": "evidence.json",
-      "records": 492,
-      "sha256": "15f54c5d7415732da06c802efb72e5faa2b4eb6f3869f2d4820b745c13d68bff"
+      "records": 494,
+      "sha256": "dbdb76e85e8aa1def08ddac11f2c4eb1835c51d0b94cd606f3a6e99e23abc2f4"
     },
     {
       "bytes": 107,
@@ -5150,10 +5150,10 @@
       "sha256": "ecdfc187b05c53a3f547cee370dd0aad144e7660857eb38b7febb97f75993b2f"
     },
     {
-      "bytes": 192193,
+      "bytes": 192197,
       "path": "issues.json",
       "records": 387,
-      "sha256": "ae2d1001e0db652c1f36541b1d1e8f86cf50e50f7a3faa7606b327ee1be2850c"
+      "sha256": "cd8aaa6720f6df5ae4b01418338bafe18bbbcadea8d63dd1fc82bdff2c18d6ef"
     },
     {
       "bytes": 5350,
@@ -5186,10 +5186,10 @@
       "sha256": "77578a0803d04720c27c41a6c6ad8faa93df9dff7baff6c7493e24ecf5157a57"
     },
     {
-      "bytes": 297595,
+      "bytes": 297599,
       "path": "programme.json",
       "records": 54,
-      "sha256": "752512282ae62950b0823552167db28328ab945b2aacb766042a118cd385c0e1"
+      "sha256": "cc629193cd232f185141978ebbc087887a3ec6f0099c321e0e81800f54e8701e"
     },
     {
       "bytes": 290844,
@@ -5207,13 +5207,13 @@
       "bytes": 816683,
       "path": "rework.js",
       "records": 0,
-      "sha256": "d4d240b23ace3ae11445c9c08d00074c32a5ac5426b646d791d66c58c61b44a4"
+      "sha256": "14c8b22c06c00f0cbfc9fd1c6953cc067df3a854abe059bd0f777dc40cac7de1"
     },
     {
       "bytes": 816657,
       "path": "rework.json",
       "records": 243,
-      "sha256": "d6fbb0c80b1b0a5528649eb39046d9b95d605de59dcd543552b58dcee15d1620"
+      "sha256": "671043ee0fa4641790d011d2ebd19a5b39aef3fef46ae0c9ac7f578dbc12456f"
     },
     {
       "bytes": 223,
@@ -5222,22 +5222,22 @@
       "sha256": "b84b15e0d6864a7d8ad25860fea05c67b26c46c96fc6a0d46488e27589fd2997"
     },
     {
-      "bytes": 9052041,
+      "bytes": 9052045,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "3d323df86850efe8b76fbea12278e96517d9a6b62336ec0081739e2e11b4ccc9"
+      "sha256": "6420dc1d5de81ca1482d5f919f079a45034e51b54f2d3bdc4db7a65e30a7d2e1"
     },
     {
       "bytes": 6029151,
       "path": "standards.js",
       "records": 0,
-      "sha256": "c35d1de2185a526fc159c2f4a3d6d6573259debd2037373bcecd2e1b87e13548"
+      "sha256": "9c61052c2cd47e234241c0c447b4ccd77d936be399ad494c7db854a6f2dffce6"
     },
     {
       "bytes": 6029122,
       "path": "standards.json",
       "records": 0,
-      "sha256": "d2001decce9b6d6ffa0b4eea21e5abe8a0b353b558e02edd8178875b6e5bf899"
+      "sha256": "72795f143921f21b90c8781b7f3fcd06cb7b274826e9a772ed950f3a2a615e09"
     },
     {
       "bytes": 2650700,
@@ -5247,7 +5247,7 @@
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "d68985fd81a91451cc90dbfec30e95bddefb1e4b",
+  "git_sha": "c928f3b9a1ce53ac47a58a56d4df4bae10a0a73a",
   "migration": {
     "description": "tool verify",
     "version": 110

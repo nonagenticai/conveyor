@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "0651b0ec0966282c9db003f2eb4b27a0ee538d627ba39a1bc48356052a3cc6ad",
-      "bytes": 202073,
+      "sha256": "c256a9f0b8e4f1976d422ed9f2854da61f1b2eb4ac01930aed3ae42b65cc51a2",
+      "bytes": 202078,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -144,6 +144,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "33cd8c2783d3d65b1a4998dcca1866788e1c08c7d7c568ac34d65b3bba42b547",
       "bytes": 6341,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md"
+    },
+    {
+      "title": "0012 — No deferrals; every finding executes",
+      "path": "docs/decisions/0012-no-deferrals.html",
+      "source": "docs/decisions/0012-no-deferrals.md",
+      "section": "Decisions",
+      "sha256": "2b57f4a79a4b4fe3c48d5e9eebadee4ac5453aa1474764bb622a1185ddbfcccc",
+      "bytes": 3961,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0012-no-deferrals.md"
     },
     {
       "title": "0013 — The real V2 UI is the app, not the design pack",
@@ -285,8 +294,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "6afb5fd3f27b9891fc7cfc1ef7d2c8054bacdb75c7a8dbdcaa916459d4bfd973",
-      "bytes": 26911,
+      "sha256": "62840083cbe7a5f9474fe8b8b729b577c50e88e91549a0470d4d86fa652a69e4",
+      "bytes": 29285,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -294,8 +303,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992",
-      "bytes": 80862,
+      "sha256": "ed3ef52ce9ba9cca194d7069693bf11a40fdc573443e92585c82c8117f66af2a",
+      "bytes": 82524,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -303,8 +312,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "a2adb480868e389c1e690a1ef8823f584da3ba547e731f8f168c47bf6efb2232",
-      "bytes": 23410,
+      "sha256": "3a10cc1a7417a8a66a2d8914e703e001326c7a3c09c0b83b82a0c924f9fca663",
+      "bytes": 13417,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -366,8 +375,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-16-w2v-retirement.html",
       "source": "docs/evidence/2026-11-16-w2v-retirement.md",
       "section": "Evidence",
-      "sha256": "73b797dde36368a70b0638521278cc4b1ad79a7ee511a679893307fe789ac026",
-      "bytes": 7049,
+      "sha256": "72f6aa7220617810cec60301a3f883a3cc638bf552258c8e7b9c169b0ccf72f2",
+      "bytes": 7057,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-16-w2v-retirement.md"
     },
     {
@@ -429,8 +438,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S06b-agent-task.html",
       "source": "docs/evidence/S06b-agent-task.md",
       "section": "Evidence",
-      "sha256": "dde40135739a3b106bd8f657b7aa9346f991a09c17601666bd59a774fcf5dae0",
-      "bytes": 7532,
+      "sha256": "7db20ccdabb3c9fd842ff88565eca4e8087ca7806be1e3071372996ae0341e5f",
+      "bytes": 9033,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S06b-agent-task.md"
     },
     {
@@ -483,8 +492,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S17-CORE.html",
       "source": "docs/evidence/S17-CORE.md",
       "section": "Evidence",
-      "sha256": "2966312bda4a98572dd9ca92f791cc7fa1a7c9c44e226c5e9fd6a2a8e60fbad6",
-      "bytes": 21463,
+      "sha256": "d2b9e98388acd3fd5588631575333c0216c322ce2a8a90c395a91e3bb67972f5",
+      "bytes": 21505,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S17-CORE.md"
     },
     {
@@ -510,8 +519,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S18-loop-29cc3820.html",
       "source": "docs/evidence/S18-loop-29cc3820.md",
       "section": "Evidence",
-      "sha256": "38f4ea475bfd481ff05fa76bca25ff3dd1e4d437823575bb3d1d28cb5d2d2427",
-      "bytes": 9299,
+      "sha256": "b68d9ddf93d9397797fcc4d056b721ae80c474f454d6717de0f7636e2bec2ff6",
+      "bytes": 9323,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-29cc3820.md"
     },
     {
@@ -659,6 +668,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T19-plan-audit.md"
     },
     {
+      "title": "T3 — PM job: gate evidence",
+      "path": "docs/evidence/T3-PM.html",
+      "source": "docs/evidence/T3-PM.md",
+      "section": "Evidence",
+      "sha256": "b3469db2c9125296245b9ccdb01db4b9968f42a9353d498603e030d426bf83dc",
+      "bytes": 5379,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T3-PM.md"
+    },
+    {
       "title": "The analysis service — capture and drop table (2026-11-15)",
       "path": "docs/evidence/analysis-capture-2026-11-15.html",
       "source": "docs/evidence/analysis-capture-2026-11-15.md",
@@ -668,12 +686,21 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
+      "title": "Token spend per accepted deliverable — pre-transition baseline",
+      "path": "docs/evidence/benefits/token-spend-baseline.html",
+      "source": "docs/evidence/benefits/token-spend-baseline.md",
+      "section": "Evidence",
+      "sha256": "ab5219fe8f61cc74ed63eff6d44c2ffa0492d6e2ae4cabb898c54614c0198f24",
+      "bytes": 2927,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/benefits/token-spend-baseline.md"
+    },
+    {
       "title": "MSP/TOGAF conformance gap register",
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "a2adb480868e389c1e690a1ef8823f584da3ba547e731f8f168c47bf6efb2232",
-      "bytes": 23410,
+      "sha256": "3a10cc1a7417a8a66a2d8914e703e001326c7a3c09c0b83b82a0c924f9fca663",
+      "bytes": 13417,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -992,13 +1019,1723 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
+      "title": "Retained raw log",
+      "path": "docs/evidence/record-w4/replay.jsonl.summary.html",
+      "source": "docs/evidence/record-w4/replay.jsonl.summary.md",
+      "section": "Evidence",
+      "sha256": "55261117951ddf4c2c62533573e33a4db16f4eb38f30f7840da69c46ecb7d5d2",
+      "bytes": 512,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record-w4/replay.jsonl.summary.md"
+    },
+    {
+      "title": "T4 — Remediation evidence (2026-11-24)",
+      "path": "docs/evidence/record/evidence/T4-remediation.html",
+      "source": "docs/evidence/record/evidence/T4-remediation.md",
+      "section": "Evidence",
+      "sha256": "7e0365128a75e4f6d3bc336ec7433589d7dbb6b57918a037d587c49a8580d0dc",
+      "bytes": 858,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/evidence/T4-remediation.md"
+    },
+    {
+      "title": "T7 — Acceptance evidence (executed 2026-11-24)",
+      "path": "docs/evidence/record/evidence/T7-acceptance.html",
+      "source": "docs/evidence/record/evidence/T7-acceptance.md",
+      "section": "Evidence",
+      "sha256": "ab129bac7602faf1cf74840a53ac2cf396bcbf289113a012332098cec48886e6",
+      "bytes": 5130,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/evidence/T7-acceptance.md"
+    },
+    {
+      "title": "Inspect and Adapt — conveyor buildout, tranche 3",
+      "path": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.html",
+      "source": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.md",
+      "section": "Evidence",
+      "sha256": "886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e",
+      "bytes": 2654,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/inspect-adapt.md"
+    },
+    {
+      "title": "PI Objectives — conveyor buildout, tranche 3",
+      "path": "docs/evidence/record/inputs/safe-tr3/pi-objectives.html",
+      "source": "docs/evidence/record/inputs/safe-tr3/pi-objectives.md",
+      "section": "Evidence",
+      "sha256": "36c63fdec345d49ed4670e7a13ae20b428852b748cd85068a7a4306d16fc7711",
+      "bytes": 2377,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/pi-objectives.md"
+    },
+    {
+      "title": "PI Plan — conveyor buildout, tranche 3",
+      "path": "docs/evidence/record/inputs/safe-tr3/pi-plan.html",
+      "source": "docs/evidence/record/inputs/safe-tr3/pi-plan.md",
+      "section": "Evidence",
+      "sha256": "119b5ddd2d17537a885f81229a0ea430e01eefd873f7544346d9b501ff3edb50",
+      "bytes": 3368,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/pi-plan.md"
+    },
+    {
+      "title": "System Demo — conveyor buildout, tranche 3",
+      "path": "docs/evidence/record/inputs/safe-tr3/system-demo.html",
+      "source": "docs/evidence/record/inputs/safe-tr3/system-demo.md",
+      "section": "Evidence",
+      "sha256": "598e60361b43f5fa0bff696db4ae4c0cbe30a3ab1499bc38ffdc59a21c753eac",
+      "bytes": 1587,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/system-demo.md"
+    },
+    {
+      "title": "DESIGN-PUBLISH — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/DESIGN-PUBLISH.html",
+      "source": "docs/evidence/rework/DESIGN-PUBLISH.md",
+      "section": "Evidence",
+      "sha256": "2a9b17b3ca28bc518dde5f77d2b3cc8bbbcc03a7c2f4eb20188e3c990e15bc6f",
+      "bytes": 1073,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH.md"
+    },
+    {
+      "title": "DESIGN-PUBLISH — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/DESIGN-PUBLISH/acts.html",
+      "source": "docs/evidence/rework/DESIGN-PUBLISH/acts.md",
+      "section": "Evidence",
+      "sha256": "acb3b0d44d46424cb462ed28f6c5e9c87fd00af43289457750a2c01b97bd0dfc",
+      "bytes": 285,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH/acts.md"
+    },
+    {
+      "title": "Retained raw log",
+      "path": "docs/evidence/rework/DESIGN-PUBLISH/transcript.jsonl.summary.html",
+      "source": "docs/evidence/rework/DESIGN-PUBLISH/transcript.jsonl.summary.md",
+      "section": "Evidence",
+      "sha256": "9791f5d230a9a563557eb0bcb567b233a58a4a684adefe410db788f877c03a2e",
+      "bytes": 528,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH/transcript.jsonl.summary.md"
+    },
+    {
+      "title": "P0 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/P0.html",
+      "source": "docs/evidence/rework/P0.md",
+      "section": "Evidence",
+      "sha256": "476617563b448a2e336ca05b8b5b538c822b5728b59a593d954905ebde9d12f1",
+      "bytes": 1109,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/P0.md"
+    },
+    {
+      "title": "P0 — retrospective rework acts (2026-11-26)",
+      "path": "docs/evidence/rework/P0/acts.html",
+      "source": "docs/evidence/rework/P0/acts.md",
+      "section": "Evidence",
+      "sha256": "49b5d3c65e76d4a93cc802d12c0e3690cb5fc02a5f440e00757624b9ffd7dc59",
+      "bytes": 239,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/P0/acts.md"
+    },
+    {
+      "title": "PLATFORM — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/PLATFORM.html",
+      "source": "docs/evidence/rework/PLATFORM.md",
+      "section": "Evidence",
+      "sha256": "47950a2528083fd6740fd8bfd5708abbeb955196872b9f30e5ba4d317738cacc",
+      "bytes": 823,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM.md"
+    },
+    {
+      "title": "PLATFORM — the standing row's retrospective record (2026-11-21)",
+      "path": "docs/evidence/rework/PLATFORM/acts.html",
+      "source": "docs/evidence/rework/PLATFORM/acts.md",
+      "section": "Evidence",
+      "sha256": "bb0808fd04113e8269798ffbf2c39314468cf22a6f1bf932b32e9658f67b7956",
+      "bytes": 836,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM/acts.md"
+    },
+    {
+      "title": "Retained raw log",
+      "path": "docs/evidence/rework/PLATFORM/transcript.jsonl.summary.html",
+      "source": "docs/evidence/rework/PLATFORM/transcript.jsonl.summary.md",
+      "section": "Evidence",
+      "sha256": "49b6bafcee54ba8a8f44bd2fa5788bc1830d16e5295b4c40da0ad276ee6f099d",
+      "bytes": 522,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM/transcript.jsonl.summary.md"
+    },
+    {
+      "title": "S00 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/S00.html",
+      "source": "docs/evidence/rework/S00.md",
+      "section": "Evidence",
+      "sha256": "b2e42b232ae47a156c94a9f9f5ed40a4e8e18c0766b1175e3693236386dd85fd",
+      "bytes": 997,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00.md"
+    },
+    {
+      "title": "S00 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S00/acts.html",
+      "source": "docs/evidence/rework/S00/acts.md",
+      "section": "Evidence",
+      "sha256": "167908da5a363f5e1ed9fefd99974f3cbc91ddc5cea25bbe2cc99238732aa604",
+      "bytes": 327,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00/acts.md"
+    },
+    {
+      "title": "S01 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/S01.html",
+      "source": "docs/evidence/rework/S01.md",
+      "section": "Evidence",
+      "sha256": "5a838cba86e1850befbeb4b913b326f4a9ea061c2c6d6dfa82f5d46cc8529755",
+      "bytes": 1138,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01.md"
+    },
+    {
+      "title": "S01 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S01/acts.html",
+      "source": "docs/evidence/rework/S01/acts.md",
+      "section": "Evidence",
+      "sha256": "39cb6841a6ac7f03fc170a62df162e8ce1b5e3bd05a657b41f239fa428b765be",
+      "bytes": 263,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01/acts.md"
+    },
+    {
+      "title": "S02 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S02/acts.html",
+      "source": "docs/evidence/rework/S02/acts.md",
+      "section": "Evidence",
+      "sha256": "e5a449c9a26ae897c8674dc6bbdd7d2d8bf5c209cefae995a5c0573adb704362",
+      "bytes": 336,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S02/acts.md"
+    },
+    {
+      "title": "S03 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S03/acts.html",
+      "source": "docs/evidence/rework/S03/acts.md",
+      "section": "Evidence",
+      "sha256": "5cc84d5493de961a357578d334829d2f3c31de399c59e592f7c2761580b01a3a",
+      "bytes": 241,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S03/acts.md"
+    },
+    {
+      "title": "S04 — retrospective rework acts (2026-11-26)",
+      "path": "docs/evidence/rework/S04/acts.html",
+      "source": "docs/evidence/rework/S04/acts.md",
+      "section": "Evidence",
+      "sha256": "929a6c55025969a993d73cfec8b0e527cfcabf9a0116fa286475a8878cbf16eb",
+      "bytes": 178,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S04/acts.md"
+    },
+    {
+      "title": "S05 — retrospective rework acts (2026-11-24)",
+      "path": "docs/evidence/rework/S05/acts.html",
+      "source": "docs/evidence/rework/S05/acts.md",
+      "section": "Evidence",
+      "sha256": "3cd2ecc2c89dff677511ea0fdd4c09de72537ecbd09ceb75633495df6b9853d1",
+      "bytes": 685,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S05/acts.md"
+    },
+    {
+      "title": "S06 — retrospective rework acts (2026-11-26)",
+      "path": "docs/evidence/rework/S06/acts.html",
+      "source": "docs/evidence/rework/S06/acts.md",
+      "section": "Evidence",
+      "sha256": "0eecd6aa82ff405f4b1ef6e830c70ec950c49f09ec15111159c2842b9ca4d966",
+      "bytes": 241,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S06/acts.md"
+    },
+    {
+      "title": "S07 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/S07/acts.html",
+      "source": "docs/evidence/rework/S07/acts.md",
+      "section": "Evidence",
+      "sha256": "38d5532aac26b459396ce677e083bad24a6c93e7cf41c970bf569d7df1161b55",
+      "bytes": 434,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S07/acts.md"
+    },
+    {
+      "title": "S08 — retrospective rework acts (2026-11-27)",
+      "path": "docs/evidence/rework/S08/acts.html",
+      "source": "docs/evidence/rework/S08/acts.md",
+      "section": "Evidence",
+      "sha256": "81006b1154fd5c4dac51a1033c70423e66a37fb13014da7e3279df7dbd44879e",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S08/acts.md"
+    },
+    {
+      "title": "S09 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/S09/acts.html",
+      "source": "docs/evidence/rework/S09/acts.md",
+      "section": "Evidence",
+      "sha256": "e0d136e28a50fac4cce07ed9c25dd6d48db5125fc4e8e0ec304fa9e1642c8a6f",
+      "bytes": 434,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S09/acts.md"
+    },
+    {
+      "title": "S17 — retrospective rework acts (2026-11-27)",
+      "path": "docs/evidence/rework/S17/acts.html",
+      "source": "docs/evidence/rework/S17/acts.md",
+      "section": "Evidence",
+      "sha256": "b2e6575a9f2bdbe0ca0f3895d7ab619b90f7655782da90d543e60c6510f92051",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S17/acts.md"
+    },
+    {
+      "title": "Retained raw log",
+      "path": "docs/evidence/rework/S17/transcript.jsonl.summary.html",
+      "source": "docs/evidence/rework/S17/transcript.jsonl.summary.md",
+      "section": "Evidence",
+      "sha256": "97389f51a2f5e9ed002400eea7ee3fb713c61fd87f2a8f3bd32a130127c32b64",
+      "bytes": 517,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S17/transcript.jsonl.summary.md"
+    },
+    {
+      "title": "SPEC-V2 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/SPEC-V2.html",
+      "source": "docs/evidence/rework/SPEC-V2.md",
+      "section": "Evidence",
+      "sha256": "481aaadae294b845de126a4b9ed2a80c7391795ed589b3ad9e7c00aa85704a0b",
+      "bytes": 1059,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2.md"
+    },
+    {
+      "title": "SPEC-V2 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/SPEC-V2/acts.html",
+      "source": "docs/evidence/rework/SPEC-V2/acts.md",
+      "section": "Evidence",
+      "sha256": "697e9d8d2a93710d97c5f5189a989f7485e2de20738213ce5627b11aabfe7682",
+      "bytes": 271,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2/acts.md"
+    },
+    {
+      "title": "T0 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/T0.html",
+      "source": "docs/evidence/rework/T0.md",
+      "section": "Evidence",
+      "sha256": "e74e602354ff0c787034201a7daeaa3b00d2f71049ed03a6d95f609d923864c4",
+      "bytes": 1140,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0.md"
+    },
+    {
+      "title": "T0 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/T0/acts.html",
+      "source": "docs/evidence/rework/T0/acts.md",
+      "section": "Evidence",
+      "sha256": "388b9707e77a50289ff34961bdf3e50406246b7677a0b7616a3ce9e112d75f2c",
+      "bytes": 261,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0/acts.md"
+    },
+    {
+      "title": "T1 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/T1/acts.html",
+      "source": "docs/evidence/rework/T1/acts.md",
+      "section": "Evidence",
+      "sha256": "98456d8af06f8744a88b33cd3e74185129d9f5a3a57d9658b151505de33a2666",
+      "bytes": 332,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T1/acts.md"
+    },
+    {
+      "title": "T10 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T10/acts.html",
+      "source": "docs/evidence/rework/T10/acts.md",
+      "section": "Evidence",
+      "sha256": "6b69cc1ab70208369fbe46933808309ccb92aef27a329d6f4c4bfc11169f9e26",
+      "bytes": 1444,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T10/acts.md"
+    },
+    {
+      "title": "T11 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/T11/acts.html",
+      "source": "docs/evidence/rework/T11/acts.md",
+      "section": "Evidence",
+      "sha256": "4633ba8c8eadb27b36d8ab1b6fc2ac5b355e8bd43ebedf1acf2060703a3d4e9e",
+      "bytes": 336,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T11/acts.md"
+    },
+    {
+      "title": "T13 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T13/acts.html",
+      "source": "docs/evidence/rework/T13/acts.md",
+      "section": "Evidence",
+      "sha256": "96d37e536763e0a5dbe51eabd559bf4cdfba6447a08ae42e67c4fe92ee44fb5f",
+      "bytes": 1579,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T13/acts.md"
+    },
+    {
+      "title": "T14 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/T14/acts.html",
+      "source": "docs/evidence/rework/T14/acts.md",
+      "section": "Evidence",
+      "sha256": "91bf97897d7f2f59ea6c3571832ce1fbe2526f45cc5c8db9f08348079f364833",
+      "bytes": 624,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T14/acts.md"
+    },
+    {
+      "title": "T16 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/T16/acts.html",
+      "source": "docs/evidence/rework/T16/acts.md",
+      "section": "Evidence",
+      "sha256": "7ce9c52b5326c78946f5c22b2d30cee3fb44a8a69c08fa94ffbe54c9d8f55855",
+      "bytes": 623,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T16/acts.md"
+    },
+    {
+      "title": "T17 — retrospective rework acts (2026-11-27)",
+      "path": "docs/evidence/rework/T17/acts.html",
+      "source": "docs/evidence/rework/T17/acts.md",
+      "section": "Evidence",
+      "sha256": "8365af21539e932486f689833810f74532dc3a36e1c4004203947f35845cfd15",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T17/acts.md"
+    },
+    {
+      "title": "T18 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/T18/acts.html",
+      "source": "docs/evidence/rework/T18/acts.md",
+      "section": "Evidence",
+      "sha256": "29f7a81f6a03e125deb677c1d6fbc0a005e3be66207422eaeef5934f89af3f87",
+      "bytes": 433,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T18/acts.md"
+    },
+    {
+      "title": "T19 — retrospective rework acts (2026-11-25)",
+      "path": "docs/evidence/rework/T19/acts.html",
+      "source": "docs/evidence/rework/T19/acts.md",
+      "section": "Evidence",
+      "sha256": "1cc70423430b947dc727fc4600471ac7aeddcae12b8cc3e969da98bcec525ad9",
+      "bytes": 434,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T19/acts.md"
+    },
+    {
+      "title": "T2 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/T2/acts.html",
+      "source": "docs/evidence/rework/T2/acts.md",
+      "section": "Evidence",
+      "sha256": "a9cfdf8f3d569e379c8371a23234faffcab7395198ead02c5af9bb6abcb7e7c3",
+      "bytes": 238,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T2/acts.md"
+    },
+    {
+      "title": "T3 — retrospective rework acts (2026-11-26)",
+      "path": "docs/evidence/rework/T3/acts.html",
+      "source": "docs/evidence/rework/T3/acts.md",
+      "section": "Evidence",
+      "sha256": "dedff28840a5c124cad2adbe5d427458ea35afcb0bc0056a8a5ba866d94976da",
+      "bytes": 177,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T3/acts.md"
+    },
+    {
+      "title": "T4 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T4/acts.html",
+      "source": "docs/evidence/rework/T4/acts.md",
+      "section": "Evidence",
+      "sha256": "7197ce2690544669ad38ed3449d9c487fdcd8902a2592a3405a30d652c2b6c93",
+      "bytes": 1476,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T4/acts.md"
+    },
+    {
+      "title": "T7 — retrospective rework acts (2026-11-27)",
+      "path": "docs/evidence/rework/T7/acts.html",
+      "source": "docs/evidence/rework/T7/acts.md",
+      "section": "Evidence",
+      "sha256": "5e253957e31c564a1d7f348c402adf5da54cc5fa5d68684b375a75a9e4bf7b16",
+      "bytes": 174,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T7/acts.md"
+    },
+    {
+      "title": "T9 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T9/acts.html",
+      "source": "docs/evidence/rework/T9/acts.md",
+      "section": "Evidence",
+      "sha256": "a0a7714c686adea1888131e0094b7d60dec34c352742ef229db0ef117aa30925",
+      "bytes": 1420,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T9/acts.md"
+    },
+    {
+      "title": "Change Control — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/change-control.md",
+      "section": "Evidence",
+      "sha256": "464a770d31d8610bf23ff26a8d15c91ca026365978a27efff243ba7743554d20",
+      "bytes": 12607,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "294f6e86096ea477426b18802d39c5ea9a25dcdd8a4e0a058bf7b61613222ea1",
+      "bytes": 9320,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "88707a97f42e4fde1f5c21715c02eeb1f71496f9473d751ecad6608ffc6ef212",
+      "bytes": 1645,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "f6576daff78d9346f6a6d868da7c39b06b2c8c9964719b4d900fe4a6effaacb7",
+      "bytes": 2492,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-registers.md",
+      "section": "Evidence",
+      "sha256": "85067ff7e2c655e646a2272a57b37739f57391bcd61b568e1a1ea217534cfbc2",
+      "bytes": 11887,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "6252e97c228893a920f9f1474927a0227c20a5fd9ef20d263659513b60a813a5",
+      "bytes": 3011,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Publish the SPECV2 studio design pack, live",
+      "path": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "26242559cdfa8060b92d85a92f5c94286edd81ba55f91f66b9c59ec2a151b450",
+      "bytes": 16258,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/DESIGN-PUBLISH-bodies/DESIGN-PUBLISH/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Programme definition — vision, blueprint, plan and project briefs",
+      "path": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/change-control.md",
+      "section": "Evidence",
+      "sha256": "fd47018c0ef02c2d7c129a25c8f950683d0074bd3615b9f2377d631d87c5fd5b",
+      "bytes": 20286,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/P0-bodies/P0/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — Programme definition — vision, blueprint, plan and project briefs",
+      "path": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "c1b77dabaadec1dfbffa2b820a91550429533aa37ee9f82882090854ec5ac237",
+      "bytes": 3433,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/P0-bodies/P0/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Programme definition — vision, blueprint, plan and project briefs",
+      "path": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "d8527daad5a7abdbbfd34b255fbba71faa478c88066ef6419051739871cfbb0f",
+      "bytes": 14111,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Programme definition — vision, blueprint, plan and project briefs",
+      "path": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-registers.md",
+      "section": "Evidence",
+      "sha256": "94442d4e7cce7829c11551c19613ddfe8e9688bf7f2290b0453712b87fd836a5",
+      "bytes": 15202,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Programme definition — vision, blueprint, plan and project briefs",
+      "path": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "28f6cd35840411a30084d4f21062db6660a87604173937f9c53ddaf2bca9126d",
+      "bytes": 3052,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/P0-bodies/P0/project-wbs.md"
+    },
+    {
+      "title": "Change Control — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/change-control.md",
+      "section": "Evidence",
+      "sha256": "103b904f4bf41829d1bf8bbdef40c396728558e90dc98240a0b4ba6d804f73ea",
+      "bytes": 22189,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/change-control.md"
+    },
+    {
+      "title": "Delivery Contract — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "4423968b5899df1410b8f7bf1e975bdcd99ade4adeb4901d81ee94fb6f4f3ad8",
+      "bytes": 2532,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "62266a335d3ba5870f2c331228ee3578375d8dc6d0f26cc26e174d0412f96857",
+      "bytes": 20020,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-registers.md",
+      "section": "Evidence",
+      "sha256": "1e0b50269f5793501ee896f300fea9a51ef7bebbc1147ea6099d0e70aed297a2",
+      "bytes": 24761,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "ed195b70c1eaf7c3153889e2d9b5832b094995f7f36e50af9303b630400f87a6",
+      "bytes": 14037,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — CI, runners and platform",
+      "path": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "b385e7d374fc2578c907bce43b2a2313b3edd14d4fc0e28feb2a11d41d9bed77",
+      "bytes": 9413,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies/PLATFORM/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/change-control.md",
+      "section": "Evidence",
+      "sha256": "352b7d8119c3422f07a7f0f718257c30cc8a813e14d419a6858cff2634842881",
+      "bytes": 8654,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "02411b9240dfcdfbb3ddcb17a82ce88c933fb9a852e386e60f212b8506a21f54",
+      "bytes": 10124,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "c2547abf7730d1b57c6a14b5052f199c6970be2a53e0280f459bcb7547451a82",
+      "bytes": 3170,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "b9a9562c89008211b0758af886d247b7dbdc61c294f2f506cfe8432de4a9fecf",
+      "bytes": 13931,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-registers.md",
+      "section": "Evidence",
+      "sha256": "1b4cd2d24b5adeee217dd1b543cc6cadf29eb6778e7265d88a425f9c5b6788a7",
+      "bytes": 16966,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "be87342ced6f6ace6df00d72b63bbaf0f0ffabc7d31294d84177d51fb0d4692d",
+      "bytes": 2870,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Usage inventory → parity/parity.yaml",
+      "path": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S00-bodies/S00/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "c3baefa7793a6c8fbd217ef953b13e0ecef41443ddfc3fc39afe01c51f38e167",
+      "bytes": 8942,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S00-bodies/S00/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Project Registers — UI spike — Leptos CSR vs Leptos SSR",
+      "path": "docs/evidence/rework/batch/tranche-0/S01-bodies/S01/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/S01-bodies/S01/project-registers.md",
+      "section": "Evidence",
+      "sha256": "8295a004a8974e054a9aeb7decb9b91d717b83203ee86030bb5f74bbd546d7bd",
+      "bytes": 11791,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/S01-bodies/S01/project-registers.md"
+    },
+    {
+      "title": "Change Control — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/change-control.md",
+      "section": "Evidence",
+      "sha256": "c03527ad4db0c5fb464c1d4db752989d9719a57a2eb28fc3668bd7028e3e51c6",
+      "bytes": 8710,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/change-control.md"
+    },
+    {
+      "title": "Compliance Review — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "cdd40ef1afcd00b8a993dbd5d0dc9acef8d783c7e764e48b4570b39d704489ca",
+      "bytes": 12047,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "b93f7ad3b9c48b63f0a101246cdb5189607a646678943b1d32ea1f76ff059e05",
+      "bytes": 3392,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "76f10298558dbba572700f9a45b666fdf5c6b32cbd281afcd9e5276387acd9e2",
+      "bytes": 14112,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-baseline.md"
+    },
+    {
+      "title": "Project Wbs — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "be0f84fd27335f9790bc7e155c9e64a87a1a502bb7c1839ced047f6f7ffb5994",
+      "bytes": 3085,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — SPEC V2 — the organisational operating model",
+      "path": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "0f1fa5dba9bedaa530757e5ef6c1b2971348e5b98cbc1d137b73acf5a8ae8bcf",
+      "bytes": 15110,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/SPEC-V2-bodies/SPEC-V2/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Project Registers — Model and contracts",
+      "path": "docs/evidence/rework/batch/tranche-0/T0-bodies/T0/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-0/T0-bodies/T0/project-registers.md",
+      "section": "Evidence",
+      "sha256": "a91d382df0a5ec655532dc0043741050c8a0ff43f02afb02b5fac3608ef442c6",
+      "bytes": 17588,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-0/T0-bodies/T0/project-registers.md"
+    },
+    {
+      "title": "Change Control — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/change-control.md",
+      "section": "Evidence",
+      "sha256": "4bf883c53fd1d80d3e806837a229123f07f951affd9ecff256ed38dc5bf95168",
+      "bytes": 8664,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "05490fd80337f3dabb9a8fca33f74ead53f580719e88cb36ae16ef82a9ca51fb",
+      "bytes": 11085,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "2178c12f352bb1081bae6c0a5b25bcde4943155ab136a05df2a88ceecd227c66",
+      "bytes": 2896,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "2c6535df9ed6399660fcc79ec7d914d1b2f69e0fafdde9fee563d4aeb6e7e829",
+      "bytes": 12766,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-registers.md",
+      "section": "Evidence",
+      "sha256": "71223645725286b6915e59709f0a8e19918323c41d48d581e18133528772d9e2",
+      "bytes": 14816,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "5ecb3c9455aff7a23366b4f66d2df40702177da3b7588222b3431994e5723e38",
+      "bytes": 2919,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Skeleton — workspace, tenancy, auth, jobs, SSE",
+      "path": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-1/S02-bodies/S02/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "dd2af4ed36190e87711095bb76766da500451d8564659bbffa68f979882439fc",
+      "bytes": 11662,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/change-control.md",
+      "section": "Evidence",
+      "sha256": "77bca2a4a6205becbf53d420acf0eb3008cb5a5d22dfd46822af98929026cbae",
+      "bytes": 8614,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "c47e94c0781e932796242fa125953a6339470fb69983d0a3fe893e04c8e7f151",
+      "bytes": 12694,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "e44e6092969dcd31b757c8a140ee8fe5703f6f16831e836297e58de29e33287c",
+      "bytes": 4100,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "877375432e79e8dc947e3b234bd5a8f896af4a3bfc368acac7754b688126bbde",
+      "bytes": 15757,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-registers.md",
+      "section": "Evidence",
+      "sha256": "019e199aa05d53ba62aa2811c6af78f45d4a5632ebe3e646164d8b5f1d352797",
+      "bytes": 20193,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "54cd8cc484076a434129291846cb07da1a94bf07ee30575145c7437978228b4e",
+      "bytes": 3043,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Plan spine",
+      "path": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T1-bodies/T1/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "dd657992872dae23918c8a5549749810e3c7e81f53e2855be3be3a877e011af7",
+      "bytes": 15419,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T1-bodies/T1/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/change-control.md",
+      "section": "Evidence",
+      "sha256": "ec278035665d1654599217548b32f3e85bb10464987083bbd197c6be65d98739",
+      "bytes": 8646,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "63f1b180191bd2770e42f6e45962d6bcba396307d20f80846615e86410013dd3",
+      "bytes": 13895,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "fe78e2de048f200e5aad7b15b5d32a3ca1357205b864c4d73079d11adc88c828",
+      "bytes": 3758,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "941df91ae1c14fb2cc1699981da715ddd6d8ca29f48907f50809850c7a91dfea",
+      "bytes": 14204,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-registers.md",
+      "section": "Evidence",
+      "sha256": "4d9232efd2d37e2c6953f55a3bf708ee134906a3a9249e3a2430bccfb71e9180",
+      "bytes": 18519,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "2faad302b11e769a45ae403ffdf72ac8324022001b0d2ff8e393f30128dab476",
+      "bytes": 3126,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Metrics, metering and maturity",
+      "path": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-1/T11-bodies/T11/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "92c7e48adeccf65f6ade53160775d65b30889849ae2964a7c26e8b18bc5b5223",
+      "bytes": 14499,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/change-control.md",
+      "section": "Evidence",
+      "sha256": "232cc1e349648f7bb8a7294bf8e77fe2f7c428290dae87aac52d875b9ea7a2a6",
+      "bytes": 8274,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "5657cd81cbb2362eded9ef80a603a01f46e8ef64cc44ac6a46f6e93c97764833",
+      "bytes": 9395,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "b23eeacfe1e940384806109a23f3bb227b312683ca6fffeaa8dc2cafdc948986",
+      "bytes": 3489,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "10693b6ee0aa9c990b0e2ded47248ee20fafcb71e452fd0d2172cfca2acbdcd1",
+      "bytes": 14443,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-registers.md",
+      "section": "Evidence",
+      "sha256": "de28d26b43e42806855bf884bec165abf25f5b01a158612ef79b786a59ddb434",
+      "bytes": 14926,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "5301916195fc3599448e9d290521eee084dfc21f785029152f1ebdace628ea69",
+      "bytes": 3048,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Domain and schema — aggregates, state machines, baseline domain migration",
+      "path": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-2/S03-bodies/S03/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "06e5d3feec954e229077623635472f269ddecbf36691054f0050013cc5e0bc77",
+      "bytes": 18224,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/S03-bodies/S03/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/change-control.md",
+      "section": "Evidence",
+      "sha256": "9e317e821af7b0e11c95e9c9c799087a8383d97657608713d7ac1cbd5ba848b2",
+      "bytes": 8202,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "af6e4bd7dc7f465e32ff755eb9449afa4219a4c1ce9845fe14c0a12c900263f9",
+      "bytes": 38016,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "def43d367f89d47ebb3a4254b48c0ca91f627e86ea1978e1fd38ac49010334c9",
+      "bytes": 3723,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "c59c44bfe37ddef950436e02a4d324ee681589076fe6b8c59f94212bf623f96f",
+      "bytes": 15194,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-registers.md",
+      "section": "Evidence",
+      "sha256": "d5ce52016eac549152bedb4d38a2b6096d863465001d5d235cd3e83ea35495a8",
+      "bytes": 18437,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "9fd531304f8671ab48e35201e3c52aaba588cf48f846b9f03f0b9016604373a5",
+      "bytes": 2913,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Decision ladder",
+      "path": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-2/T2-bodies/T2/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "f825f904902ecd7429fa85be86deab0fd8b3ae67887eed4678d1d84e9c96150a",
+      "bytes": 31644,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Compliance Review — Tool platform",
+      "path": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "8e8cd8a0e7daa0dca5a41f8c6b350153d3ca7fb90065d45cf844dadafb2e2248",
+      "bytes": 18941,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-3/T13-bodies/T13/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Tool platform",
+      "path": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "e88f350c6182dd93940bbdca4ec69298a195a6d427193fb41c08ba34c9152b09",
+      "bytes": 3615,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-3/T13-bodies/T13/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Tool platform",
+      "path": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-3/T13-bodies/T13/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "5c916385c0ec6c8bcb454714eafd94a69dec130b8fb687fe5de0f12a930b3826",
+      "bytes": 20005,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-3/T13-bodies/T13/project-baseline.md"
+    },
+    {
+      "title": "Change Control — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/change-control.md",
+      "section": "Evidence",
+      "sha256": "908f1168b4874aea868d0d15975777117a06679ec3855f4d8778f396bf00b24a",
+      "bytes": 4342,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "336e632ea0bca16c159eb9827ae5a34483ff05a8ca9ebd4aaf374097dfa0cc44",
+      "bytes": 11386,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "fd863dceddfd3920bae4d0a4640aa38ce58621b8ae7e7f1dd1323c3c7f16a31f",
+      "bytes": 4475,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "e2ab467c02b217bb1f19d44eeddfaca4c7ffd96e3d2a07faed90af5934e9f504",
+      "bytes": 18529,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-registers.md",
+      "section": "Evidence",
+      "sha256": "0a504c774daee2f2100b6d15d9d771cd855ff4a940554c094ed89f3c1a74d4df",
+      "bytes": 17504,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "e2f4100cf990eee308a65a7abb020928bce145b52a8e615e420e3c02ff4115ad",
+      "bytes": 3116,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
+      "path": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S05-bodies/S05/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "48cb055aa0c39acbceea448da6f2e2307505caeb5e9a0d9a5f923182030fc97b",
+      "bytes": 16404,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/change-control.md",
+      "section": "Evidence",
+      "sha256": "9eb113bd9c5c5b8ab0436798b59521d8fb5c3d01b4bdd1a3e6005ed0c0f0684d",
+      "bytes": 4307,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "43594194cda26acc780731f58ec264795001136927387da8eb05de68d84f7cef",
+      "bytes": 9311,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "6c9bf4c72f987bae0353ca57c728ce5e86d383e106c5706b93fceebf7aa4ded8",
+      "bytes": 4814,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "36f4d00193c22405c1998ebae9bd1f36c9ef8adbb8c50e8bd61f2c83ef704030",
+      "bytes": 20219,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-registers.md",
+      "section": "Evidence",
+      "sha256": "0007d8b4ec790d0806433f5a7eb260a6fc733b44c1f67b5f2aff25163323a93f",
+      "bytes": 18187,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "bb89976a7c24e45b15686194ead84e9127b48c9b605a05d2fc7cf07d9c32deb3",
+      "bytes": 3402,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Requirements, catalogues, revisions, quality scoring, search",
+      "path": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S07-bodies/S07/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "0ceecdbf3e989133e5968f8e1049ad8a25dae2f95df476f24f39f6c3108c5b9c",
+      "bytes": 22629,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/change-control.md",
+      "section": "Evidence",
+      "sha256": "5b46e050bdac29cf8b7598c6247788df457011e04776d4dcf61a3aaf633f2296",
+      "bytes": 4322,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "add34d6003d81864d87541b23bec44b3f76ed2a5267cbc4d754ba5a2446356a5",
+      "bytes": 9020,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "9e5427db7593962f59c5d9da57ce59895221bdff552376d479e1f249ed32f7a4",
+      "bytes": 4468,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "9608c5865d2454d4fdb38e882076c8058abf8095215cf5f718d7810943cd7fdc",
+      "bytes": 21500,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-registers.md",
+      "section": "Evidence",
+      "sha256": "adfee5ee20f9f7e00064cad388211db628c8f999ec5d3318dec534e3655b2cc0",
+      "bytes": 21346,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "dd57eed7aa4e285febaf3fd2a49491aedbf0e87c8725ce413fea02e5798e32a1",
+      "bytes": 3060,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Documents, repositories, secrets, workers UI, reports/metrics, billing display",
+      "path": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/S09-bodies/S09/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "873542d048105cb029b11baa269121c8e745c1894783e164f9b0be42b40ec3e4",
+      "bytes": 24267,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S09-bodies/S09/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Trace edge — T10 / delivery-contract",
+      "path": "docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "68d5f566b37c5ded4961ccdaf0a315df0ad92e5e841afa451c7c77817ecbf64a",
+      "bytes": 148,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-delivery-contract.md"
+    },
+    {
+      "title": "Trace edge — T10 / project-baseline",
+      "path": "docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-project-baseline.md",
+      "section": "Evidence",
+      "sha256": "a864cc1c12a3da826e21de15f846aa0a5873bdec453b5cb99d7c505d20feeae2",
+      "bytes": 147,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T10-bodies/_edges/T10-project-baseline.md"
+    },
+    {
+      "title": "Change Control — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/change-control.md",
+      "section": "Evidence",
+      "sha256": "8d7b2cde5d18ba41ec61051939b93b7a5e21331dcb668e33e84659b2a83cf1bb",
+      "bytes": 4262,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "01803d9caab1155ccc3dd6268ba1cb1f5f457b2bd61ab37b1ac267804696df70",
+      "bytes": 11121,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "98fa6622b713d13833166b6d4500f58cf0558d12854b5544c1ca40cc494e07c9",
+      "bytes": 4391,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "cd9265060d5e6d0346e7020ac1fde65dc51da393f4154a2899a1ac44cfda56b6",
+      "bytes": 20249,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-registers.md",
+      "section": "Evidence",
+      "sha256": "36e89a92745b696be489c0d772e51e2a7762493b8a43326f8342d51817ae8214",
+      "bytes": 18263,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "4532563df47de6dd3cb6f1ca345be9d5d2614880dc4b8e424cdd77c2b67d3303",
+      "bytes": 3099,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Estate toolkits",
+      "path": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T14-bodies/T14/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "aae0f586868490884614971f3bbcb750487fae12dcf6cdc1ea9ef176188bf854",
+      "bytes": 19809,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T14-bodies/T14/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Compliance Review — SOP, RDF/OWL and process-document ingestion",
+      "path": "docs/evidence/rework/batch/tranche-4/T16-bodies/T16/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T16-bodies/T16/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "a5af98fd2a89e6389481b63b97271a224eaf744c4d4cd6ebadcf20a1bbe21bc9",
+      "bytes": 12094,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T16-bodies/T16/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — SOP, RDF/OWL and process-document ingestion",
+      "path": "docs/evidence/rework/batch/tranche-4/T16-bodies/T16/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T16-bodies/T16/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "a775c87d0130a53c30bcaa04b990fcffcb6410323ebe465caaa2f4324ffbffaf",
+      "bytes": 3639,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T16-bodies/T16/delivery-contract.md"
+    },
+    {
+      "title": "Change Control — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/change-control.md",
+      "section": "Evidence",
+      "sha256": "9ab1ca6ce5baf9850d7d9184c73c5b62394bd5b9b5a5d5621a94c60c878a0013",
+      "bytes": 4261,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/change-control.md"
+    },
+    {
+      "title": "Compliance Review — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "b666b479f9b5b4e72ff8a0842b532bf180703d97c61a1ae2344709f3bcfea4ac",
+      "bytes": 10351,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "dd22cf972c6a8d69d1fd3de3f2187d109fca786f8ab5f60402cdfaa94e76126f",
+      "bytes": 3844,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "46f89492e617606498e4bad3a0c58529f0b759d0d2ae8ee1f94dccaa66e92c28",
+      "bytes": 16323,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-registers.md",
+      "section": "Evidence",
+      "sha256": "c2d2889c9516a497f893490f0ceb5bad0e79e74d56c9850229a6c437ac02e871",
+      "bytes": 13774,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "0c139a1717f75634c619132ebe6805c70c3693a9c777877147fcbf894d38da9b",
+      "bytes": 2930,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — The real V2 UI",
+      "path": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T18-bodies/T18/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "486770c89af1d777fd54bab22b65229af4c71f34e1da785fcb4d27a66c487c87",
+      "bytes": 21688,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T18-bodies/T18/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Change Control — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/change-control.md",
+      "section": "Evidence",
+      "sha256": "5f948ae98fff7cffeafc399db0a9530262a02e79e1afb249edfca8189984eca2",
+      "bytes": 4273,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "25e5fa162fb1725afc27eb5246ed3b7cf3e5d70da4424b42cd7f16da28220467",
+      "bytes": 15651,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "a5f0d277e5d1fe6a7ca1efb0eb479cda2fcc47ffeea5a010a6887597850edfeb",
+      "bytes": 4430,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "86fca2ce46e111c9776a33b1813a6c732d8b01f9ece5ca32e93e38f58b5e06d3",
+      "bytes": 19354,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-registers.md",
+      "section": "Evidence",
+      "sha256": "05b96fbec9cb270254246604ee3c8fbd973216f3d14fe73fb88a638312f0391b",
+      "bytes": 18166,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "a663c7e0200c47eb1c3ac715a5c17585408fea0a8fa867e9d1cd4dba79ccca92",
+      "bytes": 3065,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Decision forums (meetings)",
+      "path": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T19-bodies/T19/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "42c0bd69f1a72e97ae0f29daf9ec14d937be18ae39e9f39c4ca5f36a42b9a1a5",
+      "bytes": 9790,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T19-bodies/T19/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Compliance Review — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "44f27fd9af300f4bfaa751b8f033de1b916639ead8902c5173894c48245ddad9",
+      "bytes": 17646,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "02772e72747d56281336e26fac6832748fb58ae3175cdac7b643bb2239a50797",
+      "bytes": 3120,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "503085ead979bb07d406745e1485d06a2caef8b4ee8f90fbbbeee8cc8163047c",
+      "bytes": 13463,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-registers.md",
+      "section": "Evidence",
+      "sha256": "5fec80d0c60972565c039a937705a685ca932f6c1fa09074d05ecd61cd80507a",
+      "bytes": 13927,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "5fce6d9540001a8d130e2bcffd23648c4a03b78108aca2a1983d9da9f8b47d94",
+      "bytes": 2979,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Kanban coach",
+      "path": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T4-bodies/T4/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "e50c854867cb0e5ca48740b1fa475e571dd52fa0689ea59ad1d3aed5e94a2adf",
+      "bytes": 15651,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/statement-of-architecture-work.md"
+    },
+    {
+      "title": "Trace edge — T9 / delivery-contract",
+      "path": "docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "807641d37201c7237e30dcf8dcbf75cc7b4cbfe937612b6206d1548598e63456",
+      "bytes": 147,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-delivery-contract.md"
+    },
+    {
+      "title": "Trace edge — T9 / project-baseline",
+      "path": "docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-project-baseline.md",
+      "section": "Evidence",
+      "sha256": "b927fd395ec09bbadbd407af8b2936a1b4ef1f1f5c2728c0d4162c29e1528051",
+      "bytes": 146,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T9-bodies/_edges/T9-project-baseline.md"
+    },
+    {
+      "title": "Change Control — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/change-control.md",
+      "section": "Evidence",
+      "sha256": "ac5864b26d85a85030763df3be8ae98d2adff284a33d5cf58cf5e2520f342c31",
+      "bytes": 4317,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/change-control.md"
+    },
+    {
+      "title": "Compliance Review — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/compliance-review.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/compliance-review.md",
+      "section": "Evidence",
+      "sha256": "7d327d4c3718deee96f22be887ac1853ef06bd3762ae385d01ae550b1eb0f2c2",
+      "bytes": 8053,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/compliance-review.md"
+    },
+    {
+      "title": "Delivery Contract — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/delivery-contract.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/delivery-contract.md",
+      "section": "Evidence",
+      "sha256": "e10558ac876369adc5dd8b5320269d885528d8b924223af9c309694283bb473e",
+      "bytes": 4929,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "fdf25d8157b86aa4c53d74ec568b5b0162a2de8820f04831253d35c246c082be",
+      "bytes": 18348,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-registers.md",
+      "section": "Evidence",
+      "sha256": "ceb7601fd1f4cdf7a9af55e3daa54966a85c4a1b5c078f50e334389674230bce",
+      "bytes": 17803,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "2f543184c8dbc02026c4dfb21b09ddf62272d2915d3f25a1e80388f539652ad9",
+      "bytes": 2998,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/project-wbs.md"
+    },
+    {
+      "title": "Statement Of Architecture Work — Control plane — claims, runs, approvals, andon, comms and notifications",
+      "path": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.html",
+      "source": "docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.md",
+      "section": "Evidence",
+      "sha256": "12d25d571a3881ec05ffe121576f012f6fc9dacea5e94465e91917a647bd67fa",
+      "bytes": 17997,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/statement-of-architecture-work.md"
+    },
+    {
+      "title": "The full-fidelity snapshot loop",
+      "path": "docs/evidence/rework/full-fidelity-snapshot.html",
+      "source": "docs/evidence/rework/full-fidelity-snapshot.md",
+      "section": "Evidence",
+      "sha256": "ac1c33f77b5c2d02ba615015d688047c9cfe7d4eccf255d2f016eba5276d054a",
+      "bytes": 7668,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
+    },
+    {
+      "title": "S04 — the Phase-G compliance review's evidence (2026-11-22)",
+      "path": "docs/evidence/rework/s04-phase-g.html",
+      "source": "docs/evidence/rework/s04-phase-g.md",
+      "section": "Evidence",
+      "sha256": "bcdc051e358717417cba1b679a5eb133f512f75b0b1fe74920509611da0acc2e",
+      "bytes": 2443,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/s04-phase-g.md"
+    },
+    {
+      "title": "Tranche-3 SAFe cadences — evidence",
+      "path": "docs/evidence/rework/tr3-cadences.html",
+      "source": "docs/evidence/rework/tr3-cadences.md",
+      "section": "Evidence",
+      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07",
+      "bytes": 1564,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tr3-cadences.md"
+    },
+    {
+      "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
+      "path": "docs/evidence/rework/tranche-0/acts.html",
+      "source": "docs/evidence/rework/tranche-0/acts.md",
+      "section": "Evidence",
+      "sha256": "ae8185dbafc1c1d273f455622a8972513ac29722f69342c257b4ab7eec01f059",
+      "bytes": 2118,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-0/acts.md"
+    },
+    {
+      "title": "Tranche 1 / PI 1 — the rework record (retrospective, 2026-11-21)",
+      "path": "docs/evidence/rework/tranche-1/acts.html",
+      "source": "docs/evidence/rework/tranche-1/acts.md",
+      "section": "Evidence",
+      "sha256": "6e9d9c19adaf042df7534aa90232d73747763618cddc8d7c3649177dbaecb189",
+      "bytes": 5510,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-1/acts.md"
+    },
+    {
+      "title": "T2 — the superseding delivery contract and its Phase-G re-review",
+      "path": "docs/evidence/rework/tranche-2/T2-recontract.html",
+      "source": "docs/evidence/rework/tranche-2/T2-recontract.md",
+      "section": "Evidence",
+      "sha256": "5379caa7d35127f328266a7f3b53ec08d0a851a27075742891a9a84f1e4ebb69",
+      "bytes": 3663,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/T2-recontract.md"
+    },
+    {
+      "title": "Tranche 2 / PI 2 — the rework record (2026-11-21)",
+      "path": "docs/evidence/rework/tranche-2/acts.html",
+      "source": "docs/evidence/rework/tranche-2/acts.md",
+      "section": "Evidence",
+      "sha256": "004fbf3c23db7b9448068107194445dc0d38e35053379447f1df5246406f3453",
+      "bytes": 7532,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md"
+    },
+    {
+      "title": "Tranche 2 — the retro lessons, one per finding",
+      "path": "docs/evidence/rework/tranche-2/lessons.html",
+      "source": "docs/evidence/rework/tranche-2/lessons.md",
+      "section": "Evidence",
+      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc",
+      "bytes": 4576,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/lessons.md"
+    },
+    {
+      "title": "S05 gate analysis — retrospective (2026-11-24)",
+      "path": "docs/evidence/rework/tranche-4/S05-gate-analysis.html",
+      "source": "docs/evidence/rework/tranche-4/S05-gate-analysis.md",
+      "section": "Evidence",
+      "sha256": "6ae0c5b2c5f6397c508ea36f57e8bd890e1f2f397ed61f51c43baf2f66fb3c40",
+      "bytes": 6277,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-4/S05-gate-analysis.md"
+    },
+    {
+      "title": "Tranche 5 review — evidence",
+      "path": "docs/evidence/rework/tranche-5/tranche-review-evidence.html",
+      "source": "docs/evidence/rework/tranche-5/tranche-review-evidence.md",
+      "section": "Evidence",
+      "sha256": "d40d3d715a11587ab3e1542ca4b359a29eaceb4153f8fad90bec343cb834b742",
+      "bytes": 1167,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-5/tranche-review-evidence.md"
+    },
+    {
       "title": "S04 P4.1 — the live coding, worker and billing receipts",
       "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
       "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",
       "section": "Evidence",
-      "sha256": "7f0cd04a74e69228abc8a717d964ab01a592736af04dc605479af43dcdd4f415",
-      "bytes": 4336,
+      "sha256": "95bd25ddd5c0d42eeb3dd8446f990e5a7f9083be0b6e7efede48806da5a0e74d",
+      "bytes": 4344,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/s04-p41-live/2026-11-27/README.md"
+    },
+    {
+      "title": "T14 live gate — measured 2026-11-25, executed 2026-11-26",
+      "path": "docs/evidence/t14/live-gate.html",
+      "source": "docs/evidence/t14/live-gate.md",
+      "section": "Evidence",
+      "sha256": "92365206a0d9ac082f9059cea3cf8d8e2974028710ca569eb27efb38c424645c",
+      "bytes": 7145,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t14/live-gate.md"
     },
     {
       "title": "T19 — Business capability map — approval",
@@ -1721,6 +3458,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
     },
     {
+      "title": "Tranche-4 review receipt — 2026-11-26",
+      "path": "docs/evidence/tranche-review/tranche-4.html",
+      "source": "docs/evidence/tranche-review/tranche-4.md",
+      "section": "Evidence",
+      "sha256": "e6a79f94afe5ac2fac61251dff837e2cf137267e3b3695c654c44ce656a6f042",
+      "bytes": 2045,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/tranche-4.md"
+    },
+    {
       "title": "findings",
       "path": "docs/evidence/units/2026-11-27-findings/findings.html",
       "source": "docs/evidence/units/2026-11-27-findings/findings.md",
@@ -1752,8 +3498,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "09b44e78ce90a6f800f03b4ee5c8bb28085c83018f4160e85fb9c883dcf05be5",
-      "bytes": 14907,
+      "sha256": "574cbb45df62100bb2ce85730550973e6359c2b7f97cf01503598cb4e62859ab",
+      "bytes": 15072,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -1770,8 +3516,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "36a9ea9baec8251703573a23958fb31c4dcba29afd6722e4ed66a696a3d132d6",
-      "bytes": 262754,
+      "sha256": "0386c356b520534205e13bb4409f13b96f7cfb3ad728efc149aa39cfe0ebf849",
+      "bytes": 263121,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1779,8 +3525,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "e4f413b9b9adfcbab634c8d7fe89420cb4c8663624a40943739b333db082e75c",
-      "bytes": 93787,
+      "sha256": "fa88fff60ac4ce1850206a934ecb66634f56aa13758d6c9e64a3c5097c37dd55",
+      "bytes": 93802,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -2337,8 +4083,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T12/01-inception-analysis.html",
       "source": "docs/plans/inception/T12/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "e8ca1399d3dc1a8429ec88e4b99a20468b0a5bf929d7ecb0f336afa14081cb57",
-      "bytes": 9065,
+      "sha256": "dff731d10db43f15985b5c84db029266b6988433c686f8ca7be259cdbbc1aa55",
+      "bytes": 9507,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T12/01-inception-analysis.md"
     },
     {
@@ -2364,8 +4110,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T15/01-inception-analysis.html",
       "source": "docs/plans/inception/T15/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "c17ca9fc0b22060b1077d7a6e7e0d803ff0e9c07e141c21888be21f9b7bed730",
-      "bytes": 8364,
+      "sha256": "f895c183bb6cb18ae889e4613ca14583cdb9c41da2d8ca6f7a2c229d63a992bc",
+      "bytes": 8542,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T15/01-inception-analysis.md"
     },
     {
@@ -2382,8 +4128,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T17/00-project-brief.html",
       "source": "docs/plans/inception/T17/00-project-brief.md",
       "section": "Plans",
-      "sha256": "d93c168904196ed3533ebfb90b991ec5e45485e9468a867e3ff560a142c040aa",
-      "bytes": 5131,
+      "sha256": "c013331984d8e2a359040bdc5f149bd30b97a287d37eb9cbe093ac0f254139de",
+      "bytes": 5190,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/00-project-brief.md"
     },
     {
@@ -2391,8 +4137,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T17/01-inception-analysis.html",
       "source": "docs/plans/inception/T17/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "ab364e21781bad8ae1c0ef89fd113d0229469ef64fac21acce9825e94c99a5aa",
-      "bytes": 8179,
+      "sha256": "02512b5f6a2bdc20909b59eed606003008ace766d08db03ae0418b3f88b15f59",
+      "bytes": 9040,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/01-inception-analysis.md"
     },
     {
@@ -2400,8 +4146,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T17/02-architecture-design.html",
       "source": "docs/plans/inception/T17/02-architecture-design.md",
       "section": "Plans",
-      "sha256": "0f2df7beb5c520a5f7d65fb4a9369aae9445b1ba7f5c25d61f68dd0d898bd358",
-      "bytes": 12450,
+      "sha256": "a31a0ebc6a268b512fe5ae941e7f3c211f02830e26890f46308c69dd0a8dd388",
+      "bytes": 12578,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/02-architecture-design.md"
     },
     {
@@ -2418,8 +4164,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T5/01-inception-analysis.html",
       "source": "docs/plans/inception/T5/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "41aa3ab11c0019d422f3331d0cc7ae934b96def70b1f0e842aab0616bf814ec9",
-      "bytes": 8283,
+      "sha256": "9f92bd5193def589a00f3db0a8e2b727a411d1eb0395dcd896027941840850f8",
+      "bytes": 8496,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/01-inception-analysis.md"
     },
     {
@@ -2445,8 +4191,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T6/01-inception-analysis.html",
       "source": "docs/plans/inception/T6/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "590d7054a62c3a6d84272eaa80b552225590f3792144f7edbfcdbfcad2eb53a6",
-      "bytes": 8299,
+      "sha256": "0cf51afcbee040facc466f695c57a12f4e166f7ae33058df26e0ea32b56a6646",
+      "bytes": 8816,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/01-inception-analysis.md"
     },
     {
@@ -2508,8 +4254,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S03-domain-schema.html",
       "source": "docs/plans/slices/S03-domain-schema.md",
       "section": "Plans",
-      "sha256": "efb7fdd749ac7b46ab2e6be92ddf53d95c68f24aa2c87bd555137affc2dbf70b",
-      "bytes": 16774,
+      "sha256": "9a2335a54bf8d155f6ccbda7db2471717b497e9f025bbab0b97c8302839d93c6",
+      "bytes": 16946,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S03-domain-schema.md"
     },
     {
@@ -2517,8 +4263,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S04-action-registry.html",
       "source": "docs/plans/slices/S04-action-registry.md",
       "section": "Plans",
-      "sha256": "4721e81552ac49eb099c635c1e3163ccad3ba7d36d35139df75c783494f7d85d",
-      "bytes": 16539,
+      "sha256": "e1f3896cecea77e4238ddddfb91d73829499c9ad358f7fd124699eaed9be6672",
+      "bytes": 17629,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S04-action-registry.md"
     },
     {
@@ -2535,8 +4281,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06-control-plane.html",
       "source": "docs/plans/slices/S06-control-plane.md",
       "section": "Plans",
-      "sha256": "b95b74ba3cb050003b6e7e39dffb814480bac966525660af4482b17803b2b94c",
-      "bytes": 17432,
+      "sha256": "c13315ed10f9e70528377e93c7ffc958edb36129f827b4f904b5100d13d92a32",
+      "bytes": 18362,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06-control-plane.md"
     },
     {
@@ -2562,8 +4308,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06c-mcp-tasks.html",
       "source": "docs/plans/slices/S06c-mcp-tasks.md",
       "section": "Plans",
-      "sha256": "566852202066e8d200246af688c232d4190e7322c681a89edb7b73bbcdeefb1a",
-      "bytes": 15409,
+      "sha256": "bb1b382eb97ef286ffd7deecd948b766c97c59651d625c17b52e9d1af54c71e2",
+      "bytes": 15810,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06c-mcp-tasks.md"
     },
     {
@@ -2571,8 +4317,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06d-connector-standard.html",
       "source": "docs/plans/slices/S06d-connector-standard.md",
       "section": "Plans",
-      "sha256": "525f40e88ca51ace2068e7d32f3241ab0abb3fbf422fd49c9ae1e4c6038174ef",
-      "bytes": 7009,
+      "sha256": "fd5af704226ac75fca1f845e2931bce976c2a1aff7f08a2fc9f55744540fffb4",
+      "bytes": 7402,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06d-connector-standard.md"
     },
     {
@@ -2598,8 +4344,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S09-documents-integrations.html",
       "source": "docs/plans/slices/S09-documents-integrations.md",
       "section": "Plans",
-      "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a",
-      "bytes": 23001,
+      "sha256": "a6416842b921cad7d18801582ebdc15b63f0bc95e760d2f616867a780789acbc",
+      "bytes": 23233,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md"
     },
     {
@@ -2607,8 +4353,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S10-copilot-ag-ui.html",
       "source": "docs/plans/slices/S10-copilot-ag-ui.md",
       "section": "Plans",
-      "sha256": "0c38f565318901ec238886a4a1f5d6dc8981260e20d44daaeb9e28739d3f7dfa",
-      "bytes": 15668,
+      "sha256": "9de8a9da42836e0746e21f974c1a1a01374ebbf7d4dbcaf38ed18cde18c72871",
+      "bytes": 16126,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S10-copilot-ag-ui.md"
     },
     {
@@ -2616,8 +4362,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S11-procedures.html",
       "source": "docs/plans/slices/S11-procedures.md",
       "section": "Plans",
-      "sha256": "36eac8d191f4f88ac2783ab9188e531bf8d9a9302d6252fa22f45ed59a648d7d",
-      "bytes": 27293,
+      "sha256": "b2772c10d7808e7462a3ec25ef2c7f2f0b062db1d9ceb413a576720f422c9d5d",
+      "bytes": 29001,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S11-procedures.md"
     },
     {
@@ -2643,8 +4389,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "58ed33a4f895ab284e17a7d8894f0066012bb6cfb67ff5fe5fa7006406d341c4",
-      "bytes": 23511,
+      "sha256": "7a923f572c995f29cf1a9a6f27721a889cfea273c4786a211e4f8670109aa1df",
+      "bytes": 26519,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {
@@ -2652,8 +4398,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S15-capability-knowledge-memory.html",
       "source": "docs/plans/slices/S15-capability-knowledge-memory.md",
       "section": "Plans",
-      "sha256": "5f7fa98ce36c52f8b31836e9393725dcdb638dc0fddac586be692e6f91e19bed",
-      "bytes": 27130,
+      "sha256": "9067a85b1b1d9537a588c523d3e41d3ec6ffa23aaf0b96b1cc2a4956e30ec3cd",
+      "bytes": 30282,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S15-capability-knowledge-memory.md"
     },
     {
@@ -2661,8 +4407,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S16-inference-audit.html",
       "source": "docs/plans/slices/S16-inference-audit.md",
       "section": "Plans",
-      "sha256": "b5d48d960766805e212a6543cf88539dda6a02ce487e5fcde4269f3f9be28ee5",
-      "bytes": 21382,
+      "sha256": "12069dba85c8f59e3823ffbd23d0cad329ab8c56791a645fd451f8cfd177b695",
+      "bytes": 24524,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S16-inference-audit.md"
     },
     {
@@ -2670,8 +4416,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S17-benchmark-harness.html",
       "source": "docs/plans/slices/S17-benchmark-harness.md",
       "section": "Plans",
-      "sha256": "d65b5338dc303b5f38b2343ff21592f64e454b8d5df73d3504043a94d32cd859",
-      "bytes": 15479,
+      "sha256": "457a40697cf3216490bcf0bf718616cfa94c79105495b127a431bb3a08f8d523",
+      "bytes": 16779,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S17-benchmark-harness.md"
     },
     {
@@ -2688,8 +4434,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S19-eval-builder.html",
       "source": "docs/plans/slices/S19-eval-builder.md",
       "section": "Plans",
-      "sha256": "2f6947dafbc8d9480a7cb908bf4cee1057474922fc10163ee57b74a2c42750f8",
-      "bytes": 21929,
+      "sha256": "bc3ae71d4d2be786a099497e55a6c81cb31c34969f193bcda8a25c3b899510c9",
+      "bytes": 22950,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S19-eval-builder.md"
     },
     {
@@ -2697,8 +4443,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S20-eval-hillclimb.html",
       "source": "docs/plans/slices/S20-eval-hillclimb.md",
       "section": "Plans",
-      "sha256": "b3fa237121c8a38186c333f826f94e8ee9d21b7ac8774a7c5f933b1bb397e038",
-      "bytes": 15685,
+      "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191",
+      "bytes": 16078,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S20-eval-hillclimb.md"
     },
     {
@@ -2706,8 +4452,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163",
-      "bytes": 62935,
+      "sha256": "5ca548a564b535110d1b351e1adcc8538bd03587bd4e184897b50748d7a2f53a",
+      "bytes": 63360,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     },
     {

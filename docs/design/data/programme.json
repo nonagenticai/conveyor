@@ -21,7 +21,7 @@
         "number": 871,
         "state": "OPEN",
         "title": "proof: the live unit-gate refusal on the released engine",
-        "updatedAt": "2026-11-27T17:45:30Z",
+        "updatedAt": "2026-11-27T17:59:12Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/871"
       },
       {
@@ -84,7 +84,7 @@
         "number": 867,
         "state": "OPEN",
         "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
-        "updatedAt": "2026-11-27T17:09:31Z",
+        "updatedAt": "2026-11-27T17:59:18Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/867"
       },
       {
@@ -107,9 +107,9 @@
           }
         ],
         "number": 865,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: the live unit ledger's findings — the real defects and the unfinished queue",
-        "updatedAt": "2026-11-27T17:21:34Z",
+        "updatedAt": "2026-11-27T18:08:20Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/865"
       },
       {
@@ -130,7 +130,7 @@
         "number": 864,
         "state": "CLOSED",
         "title": "coverage: a live unit attaches by its project label, so a frozen seed cannot orphan a project",
-        "updatedAt": "2026-11-27T17:47:54Z",
+        "updatedAt": "2026-11-27T17:59:43Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/864"
       },
       {
@@ -668,8 +668,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "1D76DB",
@@ -679,7 +679,7 @@
         "number": 815,
         "state": "OPEN",
         "title": "S2 — Gemba Walk: Procedures & authoring + Govern & design read/write parity",
-        "updatedAt": "2026-11-27T09:49:06Z",
+        "updatedAt": "2026-11-27T17:59:24Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/815"
       },
       {
@@ -7532,7 +7532,7 @@
       }
     ],
     "provenance": {
-      "sha256": "2034b429799ae1ccb78cd4131e502a8a5ecd42035cd9b6d0f3607f18b27f1b50",
+      "sha256": "41de29677a6a12ea28332a21429261b38281fe1eb13d78bf673e070806d76051",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

@@ -1,6 +1,6 @@
 window.CONVEYOR_REWORK = {
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "d68985fd81a91451cc90dbfec30e95bddefb1e4b",
+  "git_sha": "c928f3b9a1ce53ac47a58a56d4df4bae10a0a73a",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings [redacted-path] --findings docs/evidence/standards-findings.json --deep-review [redacted-path] --deep-review [redacted-path] --deep-review [redacted-path] --rework-check project_in_unauthorised_tranche:S06c",
