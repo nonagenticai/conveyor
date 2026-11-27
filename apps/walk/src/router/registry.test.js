@@ -3,11 +3,13 @@ import test from "node:test";
 
 import { matchPath, resolve, routes } from "./registry.js";
 
-test("core owns the entrance and the two Portfolio rows, host-rooted", () => {
-  assert.deepEqual(
-    routes.map((row) => row.walk),
-    ["/", "/portfolio", "/portfolio/:programme_id"],
-  );
+test("the registry composes core first, then the wings, with unique walk patterns", () => {
+  const walks = routes.map((row) => row.walk);
+  assert.deepEqual(walks.slice(0, 3), ["/", "/portfolio", "/portfolio/:programme_id"]);
+  for (const walk of ["/approvals", "/evals", "/evals/benchmarks", "/evals/benchmarks/run/:run_id", "/evals/improvement", "/evals/:eval_id", "/evals/:eval_id/:tab", "/improve", "/knowledge", "/measure/prompt-audit", "/measure/usage", "/metering", "/operations", "/platform", "/search", "/settings/admin", "/settings/inference", "/settings/members", "/settings/roles"]) {
+    assert.ok(walks.includes(walk), `missing ${walk}`);
+  }
+  assert.equal(new Set(walks).size, walks.length, "duplicate walk pattern");
   for (const row of routes) assert.equal(row.walk, row.app);
 });
 

@@ -17,8 +17,8 @@
   },
   "summary": {
     "routes_total": 52,
-    "routes_absent": 49,
-    "routes_registered": 3,
+    "routes_absent": 30,
+    "routes_registered": 22,
     "routes_verified": 0,
     "actions_total": 598,
     "actions_absent": 0,
@@ -55,9 +55,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/approvals.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/architecture",
@@ -242,9 +242,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/evals.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals/:eval_id",
@@ -253,9 +253,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/evals.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals/:eval_id/:tab",
@@ -264,9 +264,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/evals.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals/benchmarks",
@@ -275,9 +275,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/benchmarks.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals/benchmarks/run/:run_id",
@@ -286,9 +286,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/benchmarks.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals/improvement",
@@ -297,9 +297,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/improve.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/execution",
@@ -319,9 +319,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/improve.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/jobs",
@@ -341,9 +341,9 @@
       "room": "knowledge",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/knowledge.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/measure/prompt-audit",
@@ -352,9 +352,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/prompt-audit.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/measure/usage",
@@ -363,9 +363,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/usage.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/meetings",
@@ -396,9 +396,9 @@
       "room": "measure",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/metering.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/operations",
@@ -407,9 +407,9 @@
       "room": "operations",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/operations.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/organisation",
@@ -440,9 +440,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/platform.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/portfolio",
@@ -528,9 +528,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/search.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/settings/admin",
@@ -539,9 +539,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/settings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/settings/inference",
@@ -550,9 +550,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/settings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/settings/members",
@@ -561,9 +561,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/settings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/settings/roles",
@@ -572,9 +572,9 @@
       "room": "utilities",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/settings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/tools",
@@ -9586,17 +9586,23 @@
     }
   ],
   "drift": {
-    "live_routes": 55,
+    "live_routes": 56,
     "census_routes": 52,
-    "live_actions": 598,
+    "live_actions": 602,
     "census_actions": 598,
     "missing_routes": [
+      "/feedback",
       "/knowledge/memory",
       "/knowledge/sources",
       "/measure"
     ],
     "extra_routes": [],
-    "missing_actions": [],
+    "missing_actions": [
+      "feedback.create",
+      "feedback.list",
+      "proofs.attest",
+      "proofs.render"
+    ],
     "extra_actions": []
   },
   "exemptions": {
