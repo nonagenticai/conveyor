@@ -94,7 +94,7 @@
 <td>P1</td>
 <td>delivery (G0)</td>
 <td>the Rust host matrix; the admin-API read-back</td>
-<td>in progress (#813)</td>
+<td>done 2026-11-27 (#813; live matrix 14/14)</td>
 </tr>
 <tr>
 <td>W2b</td>
@@ -102,7 +102,7 @@
 <td>P1</td>
 <td>delivery (G0)</td>
 <td><code>node --test</code>; <code>tsc</code>; the foundation Playwright spec</td>
-<td>in progress (#813)</td>
+<td>done 2026-11-27 (#813)</td>
 </tr>
 <tr>
 <td>W2c</td>
@@ -110,7 +110,7 @@
 <td>P1</td>
 <td>delivery (G0)</td>
 <td>the walk workflow green; the deployed sign-in</td>
-<td>in progress (#813)</td>
+<td>done 2026-11-27 (#813; engine fix #839)</td>
 </tr>
 <tr>
 <td>W3</td>
@@ -296,21 +296,21 @@
 <td>the inception set is not live until #792 publishes it</td>
 <td>2026-11-26</td>
 <td>programme-manager</td>
-<td>open (#792)</td>
+<td>closed — published 2026-11-27 (#792)</td>
 </tr>
 <tr>
 <td>I-WALK-2</td>
 <td><code>/walk/*</code> deep links currently render the operator app</td>
 <td>2026-11-26</td>
 <td>delivery (G0)</td>
-<td>open (W2)</td>
+<td>closed — the 308 serves the game host (#813 W2a)</td>
 </tr>
 <tr>
 <td>I-WALK-3</td>
 <td>no walk route, app or spec exists</td>
 <td>2026-11-26</td>
 <td>delivery (G0)</td>
-<td>open (W2)</td>
+<td>closed — the client and its suite exist (#813 W2b/W2c)</td>
 </tr>
 </tbody>
 </table>
@@ -332,12 +332,12 @@
 <tr>
 <td>A-WALK-2</td>
 <td>the same image and service can serve a second host and the walk tree at its root</td>
-<td>the host matrix in W2a</td>
+<td>met 2026-11-27: the host matrix in W2a, 14/14 live</td>
 </tr>
 <tr>
 <td>A-WALK-3</td>
 <td>the git-managed realm patch can create <code>conveyor-game</code> idempotently, and the API can accept two first-party <code>azp</code> values</td>
-<td>the realm Job + the admin-API read-back in W2a; the auth tests</td>
+<td>met 2026-11-27: the realm Job's second run read the client back and passed; the auth tests are green</td>
 </tr>
 <tr>
 <td>A-WALK-4</td>
@@ -363,7 +363,7 @@
 <td>#792 inception publication</td>
 <td>blocked-by (build)</td>
 <td>programme-manager</td>
-<td>open</td>
+<td>delivered 2026-11-27</td>
 </tr>
 <tr>
 <td>D-WALK-2</td>
@@ -377,7 +377,7 @@
 <td>the gitops-production change: the realm patch, the tunnel ingress, the VirtualService host and the deployment env</td>
 <td>related (delivery)</td>
 <td>platform lead</td>
-<td>open</td>
+<td>closed — the PR merged and the realm Job ran (2026-11-27)</td>
 </tr>
 <tr>
 <td>D-WALK-3</td>
@@ -417,8 +417,8 @@
 <tr>
 <td>B-WALK-1</td>
 <td>faster, contract-faithful governance tasks in the operator surface</td>
-<td><code>04-msp-profile.md</code> §2</td>
-<td><code>unmeasured</code> until the P0 spike times the same tasks in <code>apps/web</code></td>
+<td><code>04-msp-profile.md</code> §2; live profile B8 <code>01a21af9-cfcd-73ab-8eff-39cab33f7525</code> (read back 2026-11-27)</td>
+<td><code>value: null</code> — unmeasured until the P6 post-measurement; never zero</td>
 <td>draft</td>
 </tr>
 </tbody>
@@ -477,7 +477,7 @@
 <td>G0 (<code>#813</code>)</td>
 <td>P0–P1</td>
 <td>the census reproduction (52/598); the instrument's four failure modes; the spike record; ADR 0022/0023/0024; the host matrix; the client read-back; the foundation Playwright spec; the deployed OIDC sign-in</td>
-<td>the PR body + issue</td>
+<td>recorded 2026-11-27 — see the evidence rows below</td>
 </tr>
 <tr>
 <td>S1–S3 (to create)</td>
@@ -493,6 +493,44 @@
 </tr>
 </tbody>
 </table>
+<h3 id="g0-evidence-recorded-2026-11-27">G0 evidence, recorded 2026-11-27</h3>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Result</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deployed image</td>
+<td><code>sha-5a7d02d</code> = digest <code>sha256:fbdfb090…</code>; Flux <code>ImagePolicy conveyor</code> applied; pods Ready</td>
+<td>#813 and #839 close-outs</td>
+</tr>
+<tr>
+<td>Host matrix (live)</td>
+<td>14/14: game <code>/</code> and <code>/portfolio</code> 200, <code>/config.json</code> <code>conveyor-game</code>, missing asset 404, <code>/mcp</code> 404, <code>/design/*</code> 404; operator unchanged, <code>/walk/portfolio</code> 308 with the query; game legacy <code>/walk</code> 308</td>
+<td><code>bash /tmp/game-live-matrix.sh</code> (recorded on #813)</td>
+</tr>
+<tr>
+<td>Deployed identity</td>
+<td>real <code>conveyor-e2e</code> sign-in on <code>https://game.nonagentic.ai/</code>; <code>/api/me</code> 200; Today rendered</td>
+<td>the deployed OIDC setup, passing on #813</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td><code>#world-canvas</code> <code>data-engine="ecs"</code> after #839/#840; the suite now demands <code>ecs</code></td>
+<td>#839 close-out, live digest <code>sha256:fbdfb090…</code></td>
+</tr>
+<tr>
+<td>Keycloak</td>
+<td>client <code>conveyor-game</code> created, its second Job run's preflight passed; redirects, web origins, PKCE and the audience mapper read back</td>
+<td>#813 close-out</td>
+</tr>
+</tbody>
+</table>
+<p>The live-record read-backs this unit performed are in the register (<code>03-artifact-register.md</code>) and on #847.</p>
 <p>A live or end-to-end part is accepted only by a fresh verifier (<code>validator-deep</code>/<code>aa-pr-auditor</code>), never by the builder. The evidence table names the command and the SHA; a claim without a record is absent.</p>
 <h2 id="closure-review">Closure review</h2>
 <p>The project closes only on the P6 gate, not on "the UI looks finished": the instrument green with no open exemption; every destination <code>verified</code>; the named flows round-trip; a11y and performance met; the owner's primacy decision recorded (or the walk recorded as an alternative client); the delivery contract's compliance review at one level; the benefit profile's post-measurement recorded or <code>unmeasured</code>. A closed project updates the slice's coverage row and the programme register; a retirement of <code>apps/web</code> is a separate, later decision.</p>

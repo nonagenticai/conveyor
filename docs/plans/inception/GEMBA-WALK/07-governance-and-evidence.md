@@ -27,9 +27,9 @@ review_date: 2026-12-03
 | W1b | The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11) | P1 | delivery (G0) | refusal + same-frame ordering tests | done 2026-11-27 (#813) |
 | W1c | The replay/determinism harness and the ambiguity test (§10, §14) | P1 | delivery (G0) | `replay_is_deterministic`, `no_schedule_ambiguity` | done 2026-11-27 (#813) |
 | W1d | The `FrameView` adapter and the canvas-2D renderer (§13) | P1 | delivery (G0) | the world Playwright spec | done 2026-11-27 (#813); the browser golden spec is in the walk workflow |
-| W2a | Serving and identity: the host dispatch, the router-level game-host gate, `/config.json` per host, the `/walk` 308, the `azp` allowlist, the Keycloak client and its read-back | P1 | delivery (G0) | the Rust host matrix; the admin-API read-back | in progress (#813) |
-| W2b | The client: auth, API, forms, router, shell, world entrance, Portfolio read + create/update | P1 | delivery (G0) | `node --test`; `tsc`; the foundation Playwright spec | in progress (#813) |
-| W2c | Tests and CI: the walk workflow, the deployed OIDC spec, the Dockerfile/wasm build, the census re-key | P1 | delivery (G0) | the walk workflow green; the deployed sign-in | in progress (#813) |
+| W2a | Serving and identity: the host dispatch, the router-level game-host gate, `/config.json` per host, the `/walk` 308, the `azp` allowlist, the Keycloak client and its read-back | P1 | delivery (G0) | the Rust host matrix; the admin-API read-back | done 2026-11-27 (#813; live matrix 14/14) |
+| W2b | The client: auth, API, forms, router, shell, world entrance, Portfolio read + create/update | P1 | delivery (G0) | `node --test`; `tsc`; the foundation Playwright spec | done 2026-11-27 (#813) |
+| W2c | Tests and CI: the walk workflow, the deployed OIDC spec, the Dockerfile/wasm build, the census re-key | P1 | delivery (G0) | the walk workflow green; the deployed sign-in | done 2026-11-27 (#813; engine fix #839) |
 | W3 | Read parity across the seven wings | P2 | S1–S3 | per-destination specs | planned |
 | W4 | Write parity and gates | P3 | S1–S3 | contract tests per write | planned |
 | W5 | Retained V1 surfaces | P4 | S4 | every retained route and spec | planned |
@@ -73,26 +73,26 @@ frozen comparator, not a live manifest.
 
 | ID | Issue | Raised | Owner | Status |
 |---|---|---|---|---|
-| I-WALK-1 | the inception set is not live until #792 publishes it | 2026-11-26 | programme-manager | open (#792) |
-| I-WALK-2 | `/walk/*` deep links currently render the operator app | 2026-11-26 | delivery (G0) | open (W2) |
-| I-WALK-3 | no walk route, app or spec exists | 2026-11-26 | delivery (G0) | open (W2) |
+| I-WALK-1 | the inception set is not live until #792 publishes it | 2026-11-26 | programme-manager | closed — published 2026-11-27 (#792) |
+| I-WALK-2 | `/walk/*` deep links currently render the operator app | 2026-11-26 | delivery (G0) | closed — the 308 serves the game host (#813 W2a) |
+| I-WALK-3 | no walk route, app or spec exists | 2026-11-26 | delivery (G0) | closed — the client and its suite exist (#813 W2b/W2c) |
 
 ### Assumptions
 
 | ID | Assumption | Validation |
 |---|---|---|
 | A-WALK-1 | the action registry and `actions.describe` are the sole authority for reachability | census + instrument at P0 |
-| A-WALK-2 | the same image and service can serve a second host and the walk tree at its root | the host matrix in W2a |
-| A-WALK-3 | the git-managed realm patch can create `conveyor-game` idempotently, and the API can accept two first-party `azp` values | the realm Job + the admin-API read-back in W2a; the auth tests |
+| A-WALK-2 | the same image and service can serve a second host and the walk tree at its root | met 2026-11-27: the host matrix in W2a, 14/14 live |
+| A-WALK-3 | the git-managed realm patch can create `conveyor-game` idempotently, and the API can accept two first-party `azp` values | met 2026-11-27: the realm Job's second run read the client back and passed; the auth tests are green |
 | A-WALK-4 | the Playwright harness can time the same scripted task in both clients | the P0 spike's trace |
 
 ### Dependencies
 
 | ID | Dependency | Type | Owner | Status |
 |---|---|---|---|---|
-| D-WALK-1 | #792 inception publication | blocked-by (build) | programme-manager | open |
+| D-WALK-1 | #792 inception publication | blocked-by (build) | programme-manager | delivered 2026-11-27 |
 | D-WALK-2 | the game client and host (`conveyor-game`, `game.nonagentic.ai`) | blocked-by (delivery) | platform lead | delivered in this unit (CR-WALK-001) |
-| D-WALK-6 | the gitops-production change: the realm patch, the tunnel ingress, the VirtualService host and the deployment env | related (delivery) | platform lead | open |
+| D-WALK-6 | the gitops-production change: the realm patch, the tunnel ingress, the VirtualService host and the deployment env | related (delivery) | platform lead | closed — the PR merged and the realm Job ran (2026-11-27) |
 | D-WALK-3 | #395 the live delivery contract for the design gate | related | programme-architect | open |
 | D-WALK-4 | #526 the programme publish transport | related | programme-manager | open |
 | D-WALK-5 | slice-dependent surfaces (T13–T15, T19, T7, T9, T17) | related (W6 audit) | the owning slices | planned |
@@ -101,7 +101,7 @@ frozen comparator, not a live manifest.
 
 | ID | Benefit | Profile | Baseline | Status |
 |---|---|---|---|---|
-| B-WALK-1 | faster, contract-faithful governance tasks in the operator surface | `04-msp-profile.md` §2 | `unmeasured` until the P0 spike times the same tasks in `apps/web` | draft |
+| B-WALK-1 | faster, contract-faithful governance tasks in the operator surface | `04-msp-profile.md` §2; live profile B8 `01a21af9-cfcd-73ab-8eff-39cab33f7525` (read back 2026-11-27) | `value: null` — unmeasured until the P6 post-measurement; never zero | draft |
 
 ### Changes
 
@@ -125,9 +125,22 @@ re-opens the gate.
 | Issue | Stage | Evidence (one row per scenario) | Record |
 |---|---|---|---|
 | #792 | inception | document ids and hash-equal bodies; `contracts_get`; the 10 artefact rows; the benefit profile; the re-audit | this issue's `Evidence at completion` |
-| G0 (`#813`) | P0–P1 | the census reproduction (52/598); the instrument's four failure modes; the spike record; ADR 0022/0023/0024; the host matrix; the client read-back; the foundation Playwright spec; the deployed OIDC sign-in | the PR body + issue |
+| G0 (`#813`) | P0–P1 | the census reproduction (52/598); the instrument's four failure modes; the spike record; ADR 0022/0023/0024; the host matrix; the client read-back; the foundation Playwright spec; the deployed OIDC sign-in | recorded 2026-11-27 — see the evidence rows below |
 | S1–S3 (to create) | P2–P3 | per-destination specs (empty/error/happy/refusal/write); the contract tests; the instrument's rows | each PR body |
 | S4 (to create) | P4–P6 | all 52 routes; the gate audit; the a11y/perf measurements; the P6 runbook; the owner's decision | the PR body + the closure review |
+
+### G0 evidence, recorded 2026-11-27
+
+| Row | Result | Source |
+|---|---|---|
+| Deployed image | `sha-5a7d02d` = digest `sha256:fbdfb090…`; Flux `ImagePolicy conveyor` applied; pods Ready | #813 and #839 close-outs |
+| Host matrix (live) | 14/14: game `/` and `/portfolio` 200, `/config.json` `conveyor-game`, missing asset 404, `/mcp` 404, `/design/*` 404; operator unchanged, `/walk/portfolio` 308 with the query; game legacy `/walk` 308 | `bash /tmp/game-live-matrix.sh` (recorded on #813) |
+| Deployed identity | real `conveyor-e2e` sign-in on `https://game.nonagentic.ai/`; `/api/me` 200; Today rendered | the deployed OIDC setup, passing on #813 |
+| Engine | `#world-canvas` `data-engine="ecs"` after #839/#840; the suite now demands `ecs` | #839 close-out, live digest `sha256:fbdfb090…` |
+| Keycloak | client `conveyor-game` created, its second Job run's preflight passed; redirects, web origins, PKCE and the audience mapper read back | #813 close-out |
+
+The live-record read-backs this unit performed are in the register (`03-artifact-register.md`) and
+on #847.
 
 A live or end-to-end part is accepted only by a fresh verifier (`validator-deep`/`aa-pr-auditor`),
 never by the builder. The evidence table names the command and the SHA; a claim without a record is

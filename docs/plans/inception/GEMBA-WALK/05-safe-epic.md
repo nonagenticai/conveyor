@@ -82,7 +82,7 @@ are created; S1–S3 are parallel and equal-sized by construction, S4 carries th
 | PI-1 | The inception set is published and the project is in the live register | committed | 8 | document ids, contract id, register row |
 | PI-2 | The census and instrument reproduce 52 routes and 598 actions without a server | committed | 8 | `build-walk-coverage.py --check` |
 | PI-3 | The spike proves PKCE, SSE, schema forms and a deep link on the dev origin | committed | 13 | the spike record; ADR 0022 |
-| PI-4 | The foundation serves `https://game.nonagentic.ai/`, signs in through `conveyor-game`, and completes a Portfolio read + one write | committed | 13 | the host matrix, the deployed OIDC spec, the foundation spec |
+| PI-4 | The foundation serves `https://game.nonagentic.ai/`, signs in through `conveyor-game`, and completes a Portfolio read + one write | committed | 13 | delivered 2026-11-27: live host matrix 14/14, the deployed `conveyor-e2e` sign-in, the foundation suite; engine fix #839 |
 | PI-5 | Read parity across the seven wings | uncommitted | 8 | per-destination specs |
 | PI-6 | Write parity with headers, approval and refusals | uncommitted | 13 | contract tests |
 | PI-7 | Retained V1 and the slice-dependent gates | uncommitted | 5 | the V1 specs and the gate audit |
@@ -95,9 +95,9 @@ order; no objective is dropped from the P6 gate.
 
 | Relation | Artefact | Why |
 |---|---|---|
-| blocked-by | #792 | the inception set must be published before G0 is claimed |
-| blocks | G0 (to create) | the build unit's W0–W2 |
-| blocks | S1–S4 (to create), file-disjoint | the wings and the P6 gate |
+| blocked-by | #792 | the inception set must be published before G0 is claimed — delivered 2026-11-27 |
+| blocks | G0 (#813, delivered 2026-11-27) | the build unit's W0–W2 |
+| blocks | S1–S4 (#814–#817), file-disjoint | the wings and the P6 gate |
 | related | #395 | the delivery contract the design gate reads |
 | related | #526 | the programme publish transport this project's artefacts use |
 | blocks | the gitops-production change | the client, host, tunnel ingress and deployment env (CR-WALK-001) |
