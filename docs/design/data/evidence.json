@@ -163,7 +163,7 @@
     {
       "bytes": 13420,
       "path": "docs/design/data/conformance.md",
-      "sha256": "7f7d208bf17f64fb397f5fb009eb4bde0834b568de007b2a53e7d0934682d638"
+      "sha256": "17c963b0284854b17d844580049e36a3c7fd5e7f164b4a75773bf6ca7b02c29b"
     },
     {
       "bytes": 10927,
@@ -508,7 +508,7 @@
     {
       "bytes": 13420,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "7f7d208bf17f64fb397f5fb009eb4bde0834b568de007b2a53e7d0934682d638"
+      "sha256": "17c963b0284854b17d844580049e36a3c7fd5e7f164b4a75773bf6ca7b02c29b"
     },
     {
       "bytes": 33072,
@@ -556,9 +556,9 @@
       "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed"
     },
     {
-      "bytes": 16577,
+      "bytes": 20176,
       "path": "docs/evidence/proof-of-delivery.md",
-      "sha256": "131de4d4384486941b1ad6100c50ac0103a3e705baba4369d976e1e6e81e7134"
+      "sha256": "f19c6dba62c25e8946ca48523d014b0845961d47999cc2e9c9d811409784b328"
     },
     {
       "bytes": 858,
@@ -1506,9 +1506,9 @@
       "sha256": "d40d3d715a11587ab3e1542ca4b359a29eaceb4153f8fad90bec343cb834b742"
     },
     {
-      "bytes": 4336,
+      "bytes": 4344,
       "path": "docs/evidence/s04-p41-live/2026-11-27/README.md",
-      "sha256": "7f0cd04a74e69228abc8a717d964ab01a592736af04dc605479af43dcdd4f415"
+      "sha256": "95bd25ddd5c0d42eeb3dd8446f990e5a7f9083be0b6e7efede48806da5a0e74d"
     },
     {
       "bytes": 7145,
@@ -2326,9 +2326,9 @@
       "sha256": "17d182c6adb7609ad198a356a590787ee7a7737fd5d69f14dbb0202c61b4cfd8"
     },
     {
-      "bytes": 7272,
+      "bytes": 7575,
       "path": "docs/plans/proof-of-delivery.md",
-      "sha256": "1cbf9cc27bff96c04c76b638b54d482b0499a1d415bae8732f6efe3da732d1eb"
+      "sha256": "dcb67aecdca52430a973b5f2acd7be2d5d0e65fe097cb5f9354ee9636d53fe75"
     },
     {
       "bytes": 15740,

@@ -10,6 +10,52 @@
             "name": "unit"
           },
           {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 857,
+        "state": "OPEN",
+        "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
+        "updatedAt": "2026-11-27T15:46:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/857"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 855,
+        "state": "CLOSED",
+        "title": "proof: record the live unit certification and make the collector reach the public engine",
+        "updatedAt": "2026-11-27T16:15:57Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/855"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
             "color": "D93F0B",
             "name": "status:blocked"
           },
@@ -42,7 +88,7 @@
         "number": 853,
         "state": "OPEN",
         "title": "benefits: the complete profiles, the measured baselines and the first transition (U6)",
-        "updatedAt": "2026-11-27T14:24:24Z",
+        "updatedAt": "2026-11-27T15:42:19Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/853"
       },
       {
@@ -84,7 +130,7 @@
         "number": 849,
         "state": "CLOSED",
         "title": "skills: the seven remaining role playbooks act through the session channel",
-        "updatedAt": "2026-11-27T14:48:48Z",
+        "updatedAt": "2026-11-27T15:26:46Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/849"
       },
       {
@@ -94,8 +140,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "5319E7",
@@ -104,16 +150,12 @@
           {
             "color": "6E7781",
             "name": "T18"
-          },
-          {
-            "color": "B60205",
-            "name": "status:not-ready"
           }
         ],
         "number": 848,
         "state": "OPEN",
         "title": "test: T18 — every V2 destination's spec asserts empty, error, happy and one refusal",
-        "updatedAt": "2026-11-27T13:28:36Z",
+        "updatedAt": "2026-11-27T15:51:56Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/848"
       },
       {
@@ -149,9 +191,9 @@
           }
         ],
         "number": 842,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "feedback: in-app bug reports and feature requests for every tenant",
-        "updatedAt": "2026-11-27T13:41:06Z",
+        "updatedAt": "2026-11-27T16:12:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/842"
       },
       {
@@ -203,8 +245,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -218,7 +260,7 @@
         "number": 837,
         "state": "OPEN",
         "title": "proof: engine-derived unit facts and the required DoD gate",
-        "updatedAt": "2026-11-27T14:37:25Z",
+        "updatedAt": "2026-11-27T16:09:48Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/837"
       },
       {
@@ -6727,7 +6769,7 @@
         "number": 31,
         "state": "OPEN",
         "title": "S19: the Tier-3 per-case LLM auditor",
-        "updatedAt": "2026-11-13T06:32:29Z",
+        "updatedAt": "2026-11-27T16:02:00Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/31"
       },
       {
@@ -6769,7 +6811,7 @@
         "number": 29,
         "state": "OPEN",
         "title": "S14: rewrite the cutover plan for independent deployment and coexistence",
-        "updatedAt": "2026-11-18T09:24:14Z",
+        "updatedAt": "2026-11-27T16:01:59Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/29"
       },
       {
@@ -7086,7 +7128,7 @@
         "number": 12,
         "state": "OPEN",
         "title": "S18 — executor-backed producers and the real improvement loop",
-        "updatedAt": "2026-11-25T07:20:18Z",
+        "updatedAt": "2026-11-27T16:01:57Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/12"
       },
       {
@@ -7149,7 +7191,7 @@
         "number": 9,
         "state": "OPEN",
         "title": "S15 — live strata proof and native memory provenance",
-        "updatedAt": "2026-11-13T06:31:54Z",
+        "updatedAt": "2026-11-27T16:01:56Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/9"
       },
       {
@@ -7254,7 +7296,7 @@
         "number": 4,
         "state": "OPEN",
         "title": "S06 — one shared decision boundary; Telegram sender identity",
-        "updatedAt": "2026-11-13T06:31:43Z",
+        "updatedAt": "2026-11-27T16:01:54Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/4"
       },
       {
@@ -7318,7 +7360,7 @@
       }
     ],
     "provenance": {
-      "sha256": "152f583f742de3c1c5f92c13ec41498a18a67806cab32ad9f59030d63dac8c7d",
+      "sha256": "8208a78d1bfa1171a0b4d2af651d7e8b1fc4ea24564e70eaddb41bcd1ad5f5a0",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

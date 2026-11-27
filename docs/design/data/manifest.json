@@ -5084,10 +5084,10 @@
       "sha256": "e6b618551e0b0fedb6bc53804c89d47aa660d16ef81e2ab77fb9cbf3ae68cae0"
     },
     {
-      "bytes": 16002,
+      "bytes": 16046,
       "path": "actions.json",
       "records": 0,
-      "sha256": "4a8cf1e85005ecbc4c9394b07940c5626940ba9606a48633c08167183f5ea001"
+      "sha256": "3e9357f3300fa45bc52c5a7d648aaa934b4356f6487862253353ff6f4a2dd7c4"
     },
     {
       "bytes": 4147877,
@@ -5111,25 +5111,25 @@
       "bytes": 24503,
       "path": "conformance.json",
       "records": 0,
-      "sha256": "3ab3cd67a8edf1356b04e1b2919efa29c8b2e08e982ce100ce5742314fbb5050"
+      "sha256": "a7eba2350e0cb04f7144ee599ddf8888b1535f5089d627c8b6b898a90fd08649"
     },
     {
       "bytes": 13420,
       "path": "conformance.md",
       "records": 0,
-      "sha256": "17c963b0284854b17d844580049e36a3c7fd5e7f164b4a75773bf6ca7b02c29b"
+      "sha256": "8eb58ffb817a54d518e7c8385d13b882a337be132f95c431f9225abee913fd12"
     },
     {
       "bytes": 29215,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "451a958592c2579ac19302eceeddc8ebb1014ae0ccdc1f5fae7ae930b3f02055"
+      "sha256": "a95d055c2d9ae591b82f27d23f0607876a27346536ee716eda8d90f7a5ff8368"
     },
     {
       "bytes": 54113,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "983d4230370a9ce271cc6a4e3b59955b315af90b848c270ad7a1c14683b7bb9a"
+      "sha256": "8b501119e682e2cbe6a2784a25e26678484e94b16a09c9f060dce493609bffe5"
     },
     {
       "bytes": 106,
@@ -5141,7 +5141,7 @@
       "bytes": 91049,
       "path": "evidence.json",
       "records": 492,
-      "sha256": "b557b689a8cec2f3e5af47cda276a6787a65ee1970dde494203012b28051e56f"
+      "sha256": "6ab6df6899ef265709711a10135ffec2123ca432627a155718aa5a05afd33d00"
     },
     {
       "bytes": 107,
@@ -5150,10 +5150,10 @@
       "sha256": "ecdfc187b05c53a3f547cee370dd0aad144e7660857eb38b7febb97f75993b2f"
     },
     {
-      "bytes": 186928,
+      "bytes": 187973,
       "path": "issues.json",
-      "records": 377,
-      "sha256": "edbe49e0f828a2fa45983f509a973a0657ba2d92fcf9a1940b95943e91029d7b"
+      "records": 379,
+      "sha256": "2e6462c185a1f735c4da72315e761eaebb9e99a660c3cc12db6ade125825440e"
     },
     {
       "bytes": 5350,
@@ -5186,10 +5186,10 @@
       "sha256": "77578a0803d04720c27c41a6c6ad8faa93df9dff7baff6c7493e24ecf5157a57"
     },
     {
-      "bytes": 291908,
+      "bytes": 293037,
       "path": "programme.json",
       "records": 54,
-      "sha256": "4e5a7cb23b9199ca0b2953f0e4018beab837a38359f2dd4a880e7a3ffbdd12cf"
+      "sha256": "f6be596a1cef0073d43062f4b5daebd7a4a27eb4cc829359eb34e0258b92ab5a"
     },
     {
       "bytes": 290844,
@@ -5207,13 +5207,13 @@
       "bytes": 844437,
       "path": "rework.js",
       "records": 0,
-      "sha256": "42a1a09f509a1437b285dc5659638751ad6354dfdd4da18ba5d2529d846b6639"
+      "sha256": "96cbefa26c7fecdb7e6b49cb0feb7a81e933aafc85e3ef82f0ddcf03731cc260"
     },
     {
       "bytes": 844411,
       "path": "rework.json",
       "records": 243,
-      "sha256": "622558165e63eefe0616e3cdaaaa2a8aa8d6c19d546e32f571ef18675bec3eae"
+      "sha256": "3c00c737c00bac66d9ea4d72086e5cc71f18e9782d8446cfb0b0b7848a2c1248"
     },
     {
       "bytes": 223,
@@ -5222,22 +5222,22 @@
       "sha256": "b84b15e0d6864a7d8ad25860fea05c67b26c46c96fc6a0d46488e27589fd2997"
     },
     {
-      "bytes": 9076488,
+      "bytes": 9077151,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "927b8279af46e1b1ac02a0ed24c82a8cd081fccc689f155668fade45bfb6d50d"
+      "sha256": "f13aeceaf54ec6991deb24cc5d5431fa100e9ae7b413e0a2d86abd61ccd830d6"
     },
     {
       "bytes": 6029151,
       "path": "standards.js",
       "records": 0,
-      "sha256": "a214a28d46be3f51fa016158c8534686f5aa134b082948f00cb4010ef4cf9df7"
+      "sha256": "3f6bcb40f7afab2b34cef6d9f18ba8cf773dba14f26b070eeb807acc8f92dcf3"
     },
     {
       "bytes": 6029122,
       "path": "standards.json",
       "records": 0,
-      "sha256": "7c7899a3b35bb6f4db464fc9c381b6d1c87d54524043e25907bb8378b01b47c2"
+      "sha256": "240528458adc630771466b619e15e6b6ea5b36ce2a24a41de45dab3e85308724"
     },
     {
       "bytes": 2650700,
@@ -5247,10 +5247,10 @@
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "cd8f7b4c798ffaef86f36d6b4ce6e0c2ac2ef8f8",
+  "git_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
   "migration": {
-    "description": "tranche review at",
-    "version": 108
+    "description": "release layers",
+    "version": 109
   },
   "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
   "schema": "design-snapshot/v1",

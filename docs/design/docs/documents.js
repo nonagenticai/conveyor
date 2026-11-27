@@ -312,7 +312,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "17c963b0284854b17d844580049e36a3c7fd5e7f164b4a75773bf6ca7b02c29b",
+      "sha256": "8eb58ffb817a54d518e7c8385d13b882a337be132f95c431f9225abee913fd12",
       "bytes": 13420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
@@ -699,7 +699,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "17c963b0284854b17d844580049e36a3c7fd5e7f164b4a75773bf6ca7b02c29b",
+      "sha256": "8eb58ffb817a54d518e7c8385d13b882a337be132f95c431f9225abee913fd12",
       "bytes": 13420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },

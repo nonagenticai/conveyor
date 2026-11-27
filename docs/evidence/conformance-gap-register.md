@@ -1,6 +1,6 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `cd8f7b4c798ffaef86f36d6b4ce6e0c2ac2ef8f8` generated `2026-11-27T12:10:18.740973+00:00` from `tmp.Bb8Y4YBxLV/data`.
+Snapshot: `fb9632867f02eb22d4e885493079936fcb0766f4` generated `2026-11-27T12:10:18.740973+00:00` from `tmp.HPqoEswlhy/data`.
 
 | Severity | Count |
 |---|---:|
