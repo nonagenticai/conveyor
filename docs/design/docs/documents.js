@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "599d49d9ffa18388c02feacc2e00f0e2b62a2e9fd7e1dcca5b4d93b1c558ef7e",
-      "bytes": 200300,
+      "sha256": "0651b0ec0966282c9db003f2eb4b27a0ee538d627ba39a1bc48356052a3cc6ad",
+      "bytes": 202073,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -245,6 +245,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0023-gemba-walk-renderer.md"
     },
     {
+      "title": "0024 — The Gemba Walk is served at game.nonagentic.ai with its own public client",
+      "path": "docs/decisions/0024-gemba-walk-host-and-identity.html",
+      "source": "docs/decisions/0024-gemba-walk-host-and-identity.md",
+      "section": "Decisions",
+      "sha256": "a18935c8d89553cec96d7c61aff57b7321aa203466a1db2122b775339e0c1e97",
+      "bytes": 9634,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0024-gemba-walk-host-and-identity.md"
+    },
+    {
       "title": "The Gemba Walk — world-layer architecture (bevyecs)",
       "path": "docs/design/GEMBA-WALK-ECS.html",
       "source": "docs/design/GEMBA-WALK-ECS.md",
@@ -258,8 +267,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/GEMBA-WALK-SPEC.html",
       "source": "docs/design/GEMBA-WALK-SPEC.md",
       "section": "Design",
-      "sha256": "f5bbd35ccd63900210143f3ad93f72c8802eabd88e5cd8df7acd05e8dca31979",
-      "bytes": 30046,
+      "sha256": "b173fad002c5d4ca894f91d5d74c001d150108010f029e9fdf84a47485c60500",
+      "bytes": 32071,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/GEMBA-WALK-SPEC.md"
     },
     {
@@ -276,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "a90dfe817cce54ac6223d6f9a1a9376a672b4b6e4bd737e2b172f280618f327b",
-      "bytes": 26542,
+      "sha256": "853a85f9d01560ca977c4a83aa3cb0fcffd3fb6d1c40b24999d12235ca73f7e0",
+      "bytes": 26633,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -1725,8 +1734,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "93315c800f7304ff0c960136e33d0f26d09c80f82e6bc4122a100893f292578d",
-      "bytes": 262742,
+      "sha256": "06a6e7ab013926867010128384b1e8dea330d0f713634a0cfae2ec7a523f1fbf",
+      "bytes": 262870,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1833,8 +1842,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/GEMBA-WALK.html",
       "source": "docs/plans/GEMBA-WALK.md",
       "section": "Plans",
-      "sha256": "4d3c0f894d727f250f5ef42cbf3a97172a0912abcac373ec5f43cbd0da95ba4b",
-      "bytes": 27434,
+      "sha256": "e81407ac6d41e7add11786b1a6265901e1cc3cc4a18f9e6b9472b56f4a3bcccb",
+      "bytes": 30255,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
@@ -2184,8 +2193,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/00-project-brief.html",
       "source": "docs/plans/inception/GEMBA-WALK/00-project-brief.md",
       "section": "Plans",
-      "sha256": "1e423fcfe5debcf2c8aa5520871f1749dd0c7adf25a6afd757ecc4fcb5e5d91f",
-      "bytes": 7912,
+      "sha256": "fd4469bfe3877c16accacf40ad848414058a988c786d0b03ed1aee25783009f6",
+      "bytes": 8661,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/00-project-brief.md"
     },
     {
@@ -2193,8 +2202,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/01-inception-analysis.html",
       "source": "docs/plans/inception/GEMBA-WALK/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "8e44ce966d8742b48f429d885ebbe1d2c7dad0af752f9e0ec31c8dc1cd7a842a",
-      "bytes": 6793,
+      "sha256": "16acb06bce73b2305395b2e0900337d6c457744b86b69af41cc97e7a47e80faa",
+      "bytes": 7380,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/01-inception-analysis.md"
     },
     {
@@ -2202,8 +2211,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/02-architecture-design.html",
       "source": "docs/plans/inception/GEMBA-WALK/02-architecture-design.md",
       "section": "Plans",
-      "sha256": "a672c01072746225539aaea577dd3b58608de62bd1c5d4df38a9cb20b43cf844",
-      "bytes": 19627,
+      "sha256": "d0112bec464950f6693f10390555b6c969d7569d8abd563aa586ededb790c465",
+      "bytes": 23150,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/02-architecture-design.md"
     },
     {
@@ -2211,8 +2220,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/03-artifact-register.html",
       "source": "docs/plans/inception/GEMBA-WALK/03-artifact-register.md",
       "section": "Plans",
-      "sha256": "2734cfbba65a3230ae3087a4548aa84f02817a9c29fb0a7df8614d01e3dbae96",
-      "bytes": 8440,
+      "sha256": "0ca5464ee0cd1776c67054e8afc3ef05e2f9a72f733daa6b4f03ba2572d00e4e",
+      "bytes": 9630,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/03-artifact-register.md"
     },
     {
@@ -2220,8 +2229,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/04-msp-profile.html",
       "source": "docs/plans/inception/GEMBA-WALK/04-msp-profile.md",
       "section": "Plans",
-      "sha256": "44bc3d0a8cce7f74c77d6c36778c5c3d5875350a91d61b7da2b710c58ba274a7",
-      "bytes": 11139,
+      "sha256": "d47675638fb7ca6bdd9d78bdfbff6af7c5a70a5096fc2ec94e5ebf76d0fef250",
+      "bytes": 14023,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/04-msp-profile.md"
     },
     {
@@ -2229,8 +2238,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/05-safe-epic.html",
       "source": "docs/plans/inception/GEMBA-WALK/05-safe-epic.md",
       "section": "Plans",
-      "sha256": "9b0606d1c63d64b3488305d9ad4328279ef619807ddef04e29703af5b82ed614",
-      "bytes": 6688,
+      "sha256": "8ab2aa7b6ac11d25275cb562b45b009551f10892093e646ac4faccb2fc5471e5",
+      "bytes": 7575,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/05-safe-epic.md"
     },
     {
@@ -2238,8 +2247,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/06-statement-of-architecture-work.html",
       "source": "docs/plans/inception/GEMBA-WALK/06-statement-of-architecture-work.md",
       "section": "Plans",
-      "sha256": "75f779a5e5a27706301516f9049fbdc3bf520d71da1dba6e066da61caaca3c0b",
-      "bytes": 4241,
+      "sha256": "dd1cf8ffac3258fdad3b289eefcc74cc39230f3a1c1ee56ce547af679b81d272",
+      "bytes": 5175,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/06-statement-of-architecture-work.md"
     },
     {
@@ -2247,17 +2256,26 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.html",
       "source": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md",
       "section": "Plans",
-      "sha256": "ac872dd76ab37471d910b33a076b949b9ab4e28b9dd5cd7aa0cbc7435816d411",
-      "bytes": 9047,
+      "sha256": "96e52435b8233c8ee541fe027ad21a90831119955b84b46dfac77e44ce5564c8",
+      "bytes": 11440,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md"
+    },
+    {
+      "title": "GEMBA-WALK — Change request 001: the game host and its own identity",
+      "path": "docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.html",
+      "source": "docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md",
+      "section": "Plans",
+      "sha256": "ec066910b35195ab42f6186401e4397cddf33fac0f643448e2b90fbf84b471b9",
+      "bytes": 10186,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md"
     },
     {
       "title": "GEMBA-WALK — inception record",
       "path": "docs/plans/inception/GEMBA-WALK/README.html",
       "source": "docs/plans/inception/GEMBA-WALK/README.md",
       "section": "Plans",
-      "sha256": "8f0f0b33a55db4844dfd0c17136f1be358b57e2145985550640de62ca00ba72b",
-      "bytes": 3432,
+      "sha256": "62544ed7f1882d1c2f97564c062e7923ef9254fc1f171b995888e803f6c68753",
+      "bytes": 3825,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/README.md"
     },
     {

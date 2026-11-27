@@ -6,8 +6,9 @@ candidate primary UI. It is modelled on the T19 precedent (`docs/plans/T19/`) an
 
 ## Status
 
-Drafted 2026-11-26 under the owner's direction. ADR 0021 is **Accepted** as a delegated rule
-decision (the build's approver under the published delegation, 2026-11-22, expiry 2027-02-18);
+Drafted 2026-11-26 under the owner's direction; amended 2026-11-27 by CR-WALK-001 and ADR 0024
+(the game host and its own public client). ADR 0021 and ADR 0024 are **Accepted** as delegated rule
+decisions (the build's approver under the published delegation, 2026-11-22, expiry 2027-02-18);
 `apps/web` remains normative until the P6 gate. The documents are drafts until the Architecture
 Board reviews them (target 2026-12-03, after the P0 spike) and this unit publishes them on the
 project. The live publication ids are recorded on issue #792.
@@ -22,6 +23,8 @@ project. The live publication ids are recorded on issue #792.
 6. `05-safe-epic.md` — epic, features, enablers, WSJF, PI objectives.
 7. `06-statement-of-architecture-work.md` — the Phase-A contract.
 8. `07-governance-and-evidence.md` — WBS, baseline, registers, change control, evidence, closure.
+9. `08-change-request-001-host-and-identity.md` — CR-WALK-001: the host and identity change, its
+   options, impact, decision and rollback.
 
 Then the plan (`docs/plans/GEMBA-WALK.md`) for stages and the issue split, and
 `docs/design/GEMBA-WALK-SPEC.md` for the client architecture.
@@ -38,6 +41,7 @@ Then the plan (`docs/plans/GEMBA-WALK.md`) for stages and the issue split, and
 | `05-safe-epic.md` | `safe-portfolio`, `safe-art`, `safe-cadence` (epic-level) |
 | `06-statement-of-architecture-work.md` | `statement-of-architecture-work` |
 | `07-governance-and-evidence.md` | `project-wbs`, `project-baseline`, `project-registers`, `change-control`, `evidence`, `closure-review` |
+| `08-change-request-001-host-and-identity.md` | `change-control` (the MSP change request) |
 
 `candidate-solutions`, `gap-analysis` and the migration plan are sections of the phase-E/F views
 inside `02-architecture-design.md`; they are not separate outputs. `statement-of-intent` and
@@ -55,7 +59,7 @@ completion.
 
 ## Links
 
-- Direction: `docs/decisions/0021-gemba-walk-client.md`
+- Direction: `docs/decisions/0021-gemba-walk-client.md`; `docs/decisions/0024-gemba-walk-host-and-identity.md`
 - Spec: `docs/design/GEMBA-WALK-SPEC.md`
 - Plan: `docs/plans/GEMBA-WALK.md`
 - Standard: `docs/plans/P0-programme-definition.md` §4–§6; `.claude/skills/{business-analyst,programme-architect,benefits-manager,quality-manager}`

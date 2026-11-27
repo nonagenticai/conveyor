@@ -24,6 +24,9 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--artefact-register">GEMBA-WALK — Artefact register</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The host and the game's public client change the solution concept, the requirements catalog and the technology view; those typed rows supersede to <strong>v3</strong> (the published v2 rows stay readable), and the GW-A2/A5/A6 documents move to version 2. The data entity catalog is unchanged: no new entity is introduced.</p>
+</blockquote>
 <p>The typed catalogue of the GEMBA-WALK set. Each row carries the T9 standard's common metadata: title, status, version, owner, reviewer, review date, purpose, stakeholders, scope, related project and its published document. Links use <code>derivation | realization | reuse | dependency</code>.</p>
 <h2 id="document-catalogue">Document catalogue</h2>
 <table>
@@ -72,7 +75,7 @@
 <td>architecture-design</td>
 <td>A–F / PSA+HLD</td>
 <td>draft</td>
-<td>1</td>
+<td>2</td>
 <td>programme-architect</td>
 <td>Architecture Board</td>
 <td>2026-12-03</td>
@@ -108,7 +111,7 @@
 <td>statement-of-architecture-work</td>
 <td>A / PSA</td>
 <td>draft</td>
-<td>1</td>
+<td>2</td>
 <td>programme-architect</td>
 <td>SRO</td>
 <td>2026-12-03</td>
@@ -120,7 +123,7 @@
 <td>project-wbs</td>
 <td>E–F / HLD</td>
 <td>draft</td>
-<td>1</td>
+<td>2</td>
 <td>programme-manager</td>
 <td>SRO</td>
 <td>2026-12-03</td>
@@ -132,7 +135,7 @@
 <td>catalog</td>
 <td>A–F / PSA+HLD</td>
 <td>draft</td>
-<td>1</td>
+<td>2</td>
 <td>programme-architect</td>
 <td>Architecture Board</td>
 <td>2026-12-03</td>
@@ -294,6 +297,34 @@
 </tbody>
 </table>
 <p>Each row's document is <code>02-architecture-design.md</code> except the register (this file); each derives from A1–A6 and realises into C1/C2/D1. A row is approved only by the Architecture Board after the P0 spike; until then it is <code>draft</code> and is evidence, not a claim.</p>
+<h3 id="v3-rows--host-and-identity-cr-walk-001-adr-0024-2026-11-27">v3 rows — host and identity (CR-WALK-001, ADR 0024, 2026-11-27)</h3>
+<p>The three rows below change because the client is now served at <code>https://game.nonagentic.ai/</code> with its own public client; the v3 row supersedes v2 (<code>architecture.artifacts_supersede</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>v3 change</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>solution_concept</code></td>
+<td>the game host, the host boundary and the 308 replace the <code>/walk/</code> sub-site in the deployment view</td>
+<td>ADR 0024; <code>02-architecture-design.md</code> D1</td>
+</tr>
+<tr>
+<td><code>requirements_catalog</code></td>
+<td>adds R17 (host boundary), R18 (<code>azp</code> allowlist), R19 (live sign-in)</td>
+<td>ADR 0024</td>
+</tr>
+<tr>
+<td><code>technology_standards</code></td>
+<td><code>conveyor-game</code> (public, PKCE S256, redirect <code>https://game.nonagentic.ai/*</code>, web origin, <code>conveyor</code> audience), Keycloak realm-patch Job, cloudflared/VS host, <code>CONVEYOR_GAME_*</code> env</td>
+<td>ADR 0024; CR-WALK-001</td>
+</tr>
+</tbody>
+</table>
 <h3 id="v2-rows--the-world-layer-806-adr-0022">v2 rows — the world layer (#806, ADR 0022)</h3>
 <p>Four rows move to version 2 when the <code>bevy_ecs</code> world layer is accepted, because the world changes what they say; the other six are unchanged. The v2 row supersedes the v1 row rather than editing it (<code>architecture.artifacts_supersede</code>), so the v1 text stays readable as history.</p>
 <table>
@@ -351,7 +382,7 @@
 <td><code>delivery_contract</code></td>
 <td>F</td>
 <td>Delivery commitments and the compliance method</td>
-<td>to create at P1</td>
+<td>to create in G0 (CR-WALK-001)</td>
 <td>plan §11</td>
 </tr>
 <tr>

@@ -24,6 +24,9 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--msp-profile">GEMBA-WALK — MSP profile</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The client is served at <code>https://game.nonagentic.ai/</code> with its own public client <code>conveyor-game</code>; the identity is owned delivery work, not an external redirect. The business case and the risk profile below are updated: R-WALK-4 (external redirect) is closed, and R-WALK-6..9 carry the host and identity risks.</p>
+</blockquote>
 <h2 id="1-business-case-addendum">1. Business case addendum</h2>
 <p><strong>Why now.</strong> The conveyor has one operator UI, a Leptos console, and one local mock of a different interaction model. The owner is considering the walk as the primary UI, but the mock has no auth, no registry and no live rows: it cannot be measured, and it cannot be promoted. The programme also cannot answer a basic architectural question — is the action contract genuinely UI-independent? — by assertion. A second client built on the same contract answers it, and the parity instrument makes the answer falsifiable.</p>
 <p><strong>Options.</strong></p>
@@ -52,13 +55,13 @@
 <td>a frame loop (and possibly a WASM engine) in the operator bundle; one release cadence for two surfaces; the engine spike unmeasurable</td>
 </tr>
 <tr>
-<td><strong>A separate client at <code>/walk/</code> (GEMBA-WALK)</strong></td>
-<td>a real, measurable second client; a reversible primacy path</td>
+<td><strong>A separate client at <code>game.nonagentic.ai</code> (GEMBA-WALK)</strong></td>
+<td>a real, measurable second client with its own product URL and identity client; a reversible primacy path</td>
 <td>a second shell, auth flow and browser suite; the parity instrument and specs are the control</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Cost and effort.</strong> One static sub-site, one router registry, one sheet/action-sheet system, one world port and canvas baseline, one Playwright suite and one instrument. The work is staged P0–P6 and split across five build issues; no new backend, table, action or port. The recurring cost is the maintenance of two clients, owned by the same contract and the same registry.</p>
+<p><strong>Cost and effort.</strong> One static tree, one router registry, one sheet/action-sheet system, one world port and canvas baseline, one Playwright suite, one instrument, one public Keycloak client and one host route on the existing service. The work is staged P0–P6 and split across five build issues; no new backend, table, action or port. The recurring cost is the maintenance of two clients, owned by the same contract and the same registry.</p>
 <p><strong>Investment appraisal.</strong> The benefit is measured by the decision-task instrument in §2, not by the capability's existence. The case is accepted provisionally: the baseline is <code>unmeasured</code> until the P0 spike measures the same scripted task in <code>apps/web</code>; the P6 review decides whether the instrument shows a real improvement. An unmeasured baseline is reported <code>unmeasured</code>, never zero. No token-spend KPI is used (owner decision 2026-11-25).</p>
 <h2 id="2-benefit-profile-b-walk-1">2. Benefit profile B-WALK-1</h2>
 <table>
@@ -79,7 +82,7 @@
 </tr>
 <tr>
 <td>Cost</td>
-<td>the GEMBA-WALK build (P0–P6) and the business change: seats learn a second surface, the delivery team maintains two clients, the identity operator registers a redirect URI</td>
+<td>the GEMBA-WALK build (P0–P6) and the business change: seats learn a second surface, the delivery team maintains two clients, the team operates one more public client and host route</td>
 </tr>
 <tr>
 <td>Conditions</td>
@@ -87,7 +90,7 @@
 </tr>
 <tr>
 <td>Uncertainty and dependencies</td>
-<td><strong>risks</strong> R-WALK-1 parity theatre, R-WALK-2 maintenance cost, R-WALK-3 engine budgets, R-WALK-4 external redirect; <strong>dependencies outside the programme</strong> the identity operator's redirect-URI registration</td>
+<td><strong>risks</strong> R-WALK-1 parity theatre, R-WALK-2 maintenance cost, R-WALK-3 engine budgets, R-WALK-6 host boundary, R-WALK-7 <code>azp</code> allowlist, R-WALK-8 client drift, R-WALK-9 DNS/tunnel; <strong>dependencies outside the programme</strong> none — the game client and host are delivered in the unit</td>
 </tr>
 <tr>
 <td>Responsibility and attribution</td>
@@ -106,7 +109,7 @@
 <tbody>
 <tr>
 <td>output_ref</td>
-<td>GEMBA-WALK — the <code>/walk/</code> client and its parity instrument</td>
+<td>GEMBA-WALK — the game client at <code>game.nonagentic.ai</code> and its parity instrument</td>
 </tr>
 <tr>
 <td>capability_ref</td>
@@ -245,7 +248,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="r-walk-4--external-redirect">R-WALK-4 — external redirect</h3>
+<h3 id="r-walk-6--the-game-host-leaks-an-operator-surface">R-WALK-6 — the game host leaks an operator surface</h3>
 <table>
 <thead>
 <tr>
@@ -256,31 +259,148 @@
 <tbody>
 <tr>
 <td>Cause</td>
-<td>the <code>/walk/</code> OIDC redirect URI is not registered by the identity operator</td>
+<td>the host boundary is enforced inside the static fallback while <code>/mcp</code> or <code>/design</code> are router-level surfaces</td>
 </tr>
 <tr>
 <td>Event</td>
-<td>production sign-in fails while the dev path works</td>
+<td>the game host answers an operator surface or the operator index</td>
 </tr>
 <tr>
 <td>Effect</td>
-<td>the live scenario is blocked; construction is not</td>
+<td>the client's isolation is false; a user sees the wrong application</td>
 </tr>
 <tr>
 <td>Owner</td>
-<td>owner/ops</td>
+<td>programme architect, platform lead</td>
 </tr>
 <tr>
 <td>Appetite</td>
-<td>medium; an <code>acceptance-blocked-by</code></td>
+<td>low</td>
 </tr>
 <tr>
 <td>Mitigation</td>
-<td>the dev cookie for the spike and local runs; the redirect recorded in the issue; no production sign-in claim until it is registered</td>
+<td>a router-level host gate before <code>mcp_auth</code>, a host-aware static dispatch, <code>app()</code> matrix tests, and live <code>/mcp</code> and <code>/design/*</code> 404 probes</td>
 </tr>
 <tr>
 <td>Review date</td>
-<td>every P-stage gate</td>
+<td>the G0 gate and every serving change</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-7--the-azp-allowlist-widens-the-replay-guard">R-WALK-7 — the <code>azp</code> allowlist widens the replay guard</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>the game client id is defaulted from the audience, or the allowlist accepts more than the two first-party clients</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>an unexpected client's token is accepted, or a correct game token is rejected</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>a security regression or a broken sign-in</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>platform lead</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>low</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>an explicit optional game client id, exactly two accepted <code>azp</code> values, acceptance and rejection tests, the <code>conveyor</code> audience unchanged</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>every auth change</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-8--the-keycloak-client-drifts-or-the-job-is-skipped">R-WALK-8 — the Keycloak client drifts or the Job is skipped</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>the realm is edited outside the git-managed patch, or the manual Job is not run</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>the client's redirect, web origin or audience mapper does not match the declaration</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>the production sign-in fails or the API refuses the token</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>platform lead / identity operator</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>low</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>a create-or-refuse preflight, the manual Job, and an admin-API read-back of the client, redirects, web origins, PKCE and the audience mapper before the live proof</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>the G0 gate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-9--dns-tunnel-or-virtualservice-lag">R-WALK-9 — DNS, tunnel or VirtualService lag</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>the host is merged but the tunnel ConfigMap, VirtualService or dns-ensure has not reconciled</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>the host does not resolve or answers the wrong origin after the merge</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>the live proof cannot run; the game appears down</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>platform lead</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>medium</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>read Flux's applied revision and the changed objects back from the cluster; wait for dns-ensure; probe with <code>getent</code> and <code>curl</code>; no cert change is needed</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>the G0 gate</td>
 </tr>
 </tbody>
 </table>
@@ -361,13 +481,23 @@
 </tr>
 <tr>
 <td>Platform / security</td>
-<td>same origin, headers, identity, no secret leakage</td>
+<td>same origin, host boundary, the game client, no secret leakage</td>
 <td>high</td>
 <td>high</td>
 <td>high</td>
 <td>high</td>
 <td>support</td>
-<td>serving fallback, CSP, auth tests</td>
+<td>host matrix, client read-back, auth tests</td>
+</tr>
+<tr>
+<td>Identity operator (owner/platform)</td>
+<td>the conveyor realm stays the single identity boundary; the game client is git-managed and read back</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>realm patch, Job, admin-API read-back</td>
 </tr>
 <tr>
 <td>Accessibility / UX</td>
@@ -402,7 +532,9 @@
 <li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
 <li>SAFe: <code>05-safe-epic.md</code></li>
 <li>Seed: <code>seed/programme-definition.json</code> (the benefit profile and the cross-cutting project)</li>
-<li>Spec: <code>docs/SPEC_V2.md</code> §8.3, §10.5.11, D67</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §8.3, §10.5.11, D67/D68</li>
+<li>ADR 0024: <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code></li>
+<li>Change request: <code>08-change-request-001-host-and-identity.md</code></li>
 </ul>
 </main>
     <footer class="doc-footer">

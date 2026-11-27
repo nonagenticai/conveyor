@@ -1,6 +1,6 @@
 ---
 document: GEMBA-WALK/artifact-register
-version: 1
+version: 2
 status: draft
 project: GEMBA-WALK
 category: architecture-artifact
@@ -14,6 +14,11 @@ review_date: 2026-12-03
 
 # GEMBA-WALK — Artefact register
 
+> **Amendment 2026-11-27 (CR-WALK-001, ADR 0024).** The host and the game's public client
+> change the solution concept, the requirements catalog and the technology view; those typed rows
+> supersede to **v3** (the published v2 rows stay readable), and the GW-A2/A5/A6 documents move to
+> version 2. The data entity catalog is unchanged: no new entity is introduced.
+
 The typed catalogue of the GEMBA-WALK set. Each row carries the T9 standard's common metadata:
 title, status, version, owner, reviewer, review date, purpose, stakeholders, scope, related project
 and its published document. Links use `derivation | realization | reuse | dependency`.
@@ -24,12 +29,12 @@ and its published document. Links use `derivation | realization | reuse | depend
 |---|---|---|---|---|---|---|---|---|---|
 | GW-A0 | Project brief | project-brief | Preliminary / definition | draft | 1 | business-analyst | SRO | 2026-12-03 | `00-project-brief.md` |
 | GW-A1 | Inception analysis | inception-analysis | Preliminary / definition | draft | 1 | business-analyst | programme-architect | 2026-12-03 | `01-inception-analysis.md` |
-| GW-A2 | Architecture design (PSA + HLD) | architecture-design | A–F / PSA+HLD | draft | 1 | programme-architect | Architecture Board | 2026-12-03 | `02-architecture-design.md` |
+| GW-A2 | Architecture design (PSA + HLD) | architecture-design | A–F / PSA+HLD | draft | 2 | programme-architect | Architecture Board | 2026-12-03 | `02-architecture-design.md` |
 | GW-A3 | MSP profile (business case, benefit, stakeholders, tranche) | benefit-profile | Preliminary / definition | draft | 1 | BCM | SRO | 2026-12-03 | `04-msp-profile.md` |
 | GW-A4 | SAFe epic (features, enablers, WSJF, PI) | epic | F / HLD | draft | 1 | programme-manager | SRO | 2026-12-03 | `05-safe-epic.md` |
-| GW-A5 | Statement of Architecture Work | statement-of-architecture-work | A / PSA | draft | 1 | programme-architect | SRO | 2026-12-03 | `06-statement-of-architecture-work.md` |
-| GW-A6 | WBS, baseline, registers, change control | project-wbs | E–F / HLD | draft | 1 | programme-manager | SRO | 2026-12-03 | `07-governance-and-evidence.md` |
-| GW-A7 | This register | catalog | A–F / PSA+HLD | draft | 1 | programme-architect | Architecture Board | 2026-12-03 | this file |
+| GW-A5 | Statement of Architecture Work | statement-of-architecture-work | A / PSA | draft | 2 | programme-architect | SRO | 2026-12-03 | `06-statement-of-architecture-work.md` |
+| GW-A6 | WBS, baseline, registers, change control | project-wbs | E–F / HLD | draft | 2 | programme-manager | SRO | 2026-12-03 | `07-governance-and-evidence.md` |
+| GW-A7 | This register | catalog | A–F / PSA+HLD | draft | 2 | programme-architect | Architecture Board | 2026-12-03 | this file |
 | GW-A8 | Implementation evidence | evidence | G / capability | draft | 1 | programme-manager | Architecture Board | 2026-12-03 | `07-governance-and-evidence.md` §Evidence |
 | GW-A9 | Closure review | closure-review | G / capability | draft | 1 | programme-manager | Architecture Board | 2026-12-03 | to create at P6 |
 
@@ -55,6 +60,17 @@ Each row's document is `02-architecture-design.md` except the register (this fil
 from A1–A6 and realises into C1/C2/D1. A row is approved only by the Architecture Board after the
 P0 spike; until then it is `draft` and is evidence, not a claim.
 
+### v3 rows — host and identity (CR-WALK-001, ADR 0024, 2026-11-27)
+
+The three rows below change because the client is now served at `https://game.nonagentic.ai/` with
+its own public client; the v3 row supersedes v2 (`architecture.artifacts_supersede`).
+
+| Key | v3 change | Source |
+|---|---|---|
+| `solution_concept` | the game host, the host boundary and the 308 replace the `/walk/` sub-site in the deployment view | ADR 0024; `02-architecture-design.md` D1 |
+| `requirements_catalog` | adds R17 (host boundary), R18 (`azp` allowlist), R19 (live sign-in) | ADR 0024 |
+| `technology_standards` | `conveyor-game` (public, PKCE S256, redirect `https://game.nonagentic.ai/*`, web origin, `conveyor` audience), Keycloak realm-patch Job, cloudflared/VS host, `CONVEYOR_GAME_*` env | ADR 0024; CR-WALK-001 |
+
 ### v2 rows — the world layer (#806, ADR 0022)
 
 Four rows move to version 2 when the `bevy_ecs` world layer is accepted, because the world changes
@@ -77,7 +93,7 @@ programme-architect, reviewer Architecture Board), linked `realization` from `so
 | Kind | Phase | Subject | Status | Document |
 |---|---|---|---|---|
 | `statement_of_architecture_work` | A | Assignment, scope, responsibilities, acceptance | draft | `06-statement-of-architecture-work.md` |
-| `delivery_contract` | F | Delivery commitments and the compliance method | to create at P1 | plan §11 |
+| `delivery_contract` | F | Delivery commitments and the compliance method | to create in G0 (CR-WALK-001) | plan §11 |
 | `statement_of_intent` | G | Intended use, ownership, measures of effectiveness | to create at P6 | plan §7 |
 | `request_for_architecture` | H | The change request that follows the closure | to create if needed | — |
 

@@ -20,13 +20,14 @@ the reviewed design reference: a page here is evidence of intent, never of imple
 V2 coverage record (`docs/evidence/v2-coverage.json`) measures the app's routes and specs.
 
 **A separate client, specified here.** [GEMBA-WALK-SPEC.md](GEMBA-WALK-SPEC.md) specifies the Gemba
-Walk at `/walk/` — a candidate primary UI (ADR 0021, D67) that is **not** a page in this pack and is
-never served at `/design/`. The pack remains the public site; the app remains normative until the
+Walk at `https://game.nonagentic.ai/` — a candidate primary UI (ADR 0021/0024, D67/D68) that is
+**not** a page in this pack and is never served at `/design/`. The pack remains the public site; the app remains normative until the
 walk's measured parity gate. Its world layer is
 [GEMBA-WALK-ECS.md](GEMBA-WALK-ECS.md) — a `bevy_ecs 0.20.1` simulation in `crates/walk-world`
 behind the `WorldView` port (ADR 0022); the renderer is canvas-2D (ADR 0023), with WebGL2 behind the
 port. Its MSP/TOGAF/SAFe inception
-set is [`docs/plans/inception/GEMBA-WALK/`](../plans/inception/GEMBA-WALK/README.md).
+set is [`docs/plans/inception/GEMBA-WALK/`](../plans/inception/GEMBA-WALK/README.md); CR-WALK-001
+records the 2026-11-27 host and identity change.
 
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
 is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,

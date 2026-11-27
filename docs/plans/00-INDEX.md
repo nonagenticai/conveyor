@@ -48,8 +48,9 @@ D64–D65 are the real-UI rulings.
 **GEMBA-WALK added 2026-11-26, accepted 2026-11-26.** The owner has directed that a separate,
 game-style client may become the primary UI. `docs/plans/GEMBA-WALK.md` is its project plan and
 `docs/design/GEMBA-WALK-SPEC.md` its architecture; ADR 0021 — accepted as a delegated rule decision
-— authorises a candidate client at `/walk/` with full read/write parity through the existing
-registry, and §10.5.11 + D67 record the boundary. It is **not** a §12 `T##` slice. Its
+— authorises a candidate client with full read/write parity through the existing
+registry; ADR 0024 and D68 (2026-11-27, CR-WALK-001) move it to `https://game.nonagentic.ai/` at the
+root with its own public client `conveyor-game`; §10.5.11 + D67/D68 record the boundary. It is **not** a §12 `T##` slice. Its
 MSP/TOGAF/SAFe inception set is [`inception/GEMBA-WALK/`](inception/GEMBA-WALK/README.md);
 programme registration and the live publication are the inception unit (#792), and the build issues
 G0/S1–S4 are created after that publication gate. `apps/web` stays normative until the measured P6
