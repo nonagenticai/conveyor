@@ -2,7 +2,7 @@
   "schema": 1,
   "baseline": {
     "date": "2026-11-27",
-    "git_sha": "01544010f9ef4b86fb2d17aa8543e093588c0190",
+    "git_sha": "10e6531582ac698f304aec99b81ec0157caff9b8",
     "prior": {
       "routes": 52,
       "actions": 597,
@@ -69,7 +69,7 @@
       "route": "/architecture",
       "walk": "/architecture",
       "room": "governance",
-      "view": "ArchitectureScreen",
+      "view": "SystemArchitectureScreen",
       "owner": "S2"
     },
     {
@@ -146,7 +146,7 @@
       "route": "/design/adm",
       "walk": "/design/adm",
       "room": "governance",
-      "view": "AdmGate",
+      "view": "ArchitectureScreen",
       "owner": "S2"
     },
     {
@@ -227,6 +227,13 @@
       "owner": "S1"
     },
     {
+      "route": "/feedback",
+      "walk": "/feedback",
+      "room": "utilities",
+      "view": "FeedbackScreen",
+      "owner": "S3"
+    },
+    {
       "route": "/improve",
       "walk": "/improve",
       "room": "measure",
@@ -244,7 +251,28 @@
       "route": "/knowledge",
       "walk": "/knowledge",
       "room": "knowledge",
-      "view": "KnowledgeGate",
+      "view": "KnowledgeScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/knowledge/memory",
+      "walk": "/knowledge/memory",
+      "room": "knowledge",
+      "view": "MemoryScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/knowledge/sources",
+      "walk": "/knowledge/sources",
+      "room": "knowledge",
+      "view": "SourcesScreen",
+      "owner": "S3"
+    },
+    {
+      "route": "/measure",
+      "walk": "/measure",
+      "room": "measure",
+      "view": "MeasureScreen",
       "owner": "S3"
     },
     {

@@ -36,21 +36,21 @@ else
   bad "output is not deterministic"
 fi
 
-# 3. The frozen census reproduces the measured set: 52 routes, 572 attributes + 26 manual = 598.
+# 3. The frozen census reproduces the measured set: 56 routes, 576 attributes + 26 manual = 602.
 if printf '%s' "$a" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
 c = d["counts"]
-assert c["routes"] == 52, c
-assert c["actions"] == 598, c
-assert c["attrs"] == 572, c
+assert c["routes"] == 56, c
+assert c["actions"] == 602, c
+assert c["attrs"] == 576, c
 assert c["manual"] == 26, c
-assert len(d["routes"]) == 52, len(d["routes"])
-assert len(d["actions"]) == 598, len(d["actions"])
+assert len(d["routes"]) == 56, len(d["routes"])
+assert len(d["actions"]) == 602, len(d["actions"])
 '; then
-  ok "counts are 52 routes / 598 actions (572 attrs + 26 manual)"
+  ok "counts are 56 routes / 602 actions (576 attrs + 26 manual)"
 else
-  bad "counts are not 52 / 598 (572 + 26)"
+  bad "counts are not 56 / 602 (576 + 26)"
 fi
 
 # 4. The committed record passes claims integrity. At W0 every row is absent by design;

@@ -101,6 +101,8 @@ ROUTES: dict[str, tuple[str, str, str]] = {
     "/copilot": ("governance", "S2", "e2e/procedures-governance/copilot.spec.ts"),
     # S3 — Knowledge + Measure & improve + Operations + Utilities.
     "/knowledge": ("knowledge", "S3", "e2e/measure-operations-utilities/knowledge.spec.ts"),
+    "/knowledge/memory": ("knowledge", "S3", "e2e/measure-operations-utilities/memory.spec.ts"),
+    "/knowledge/sources": ("knowledge", "S3", "e2e/measure-operations-utilities/sources.spec.ts"),
     "/improve": ("measure", "S3", "e2e/measure-operations-utilities/improve.spec.ts"),
     "/evals": ("measure", "S3", "e2e/measure-operations-utilities/evals.spec.ts"),
     "/evals/:eval_id": ("measure", "S3", "e2e/measure-operations-utilities/evals.spec.ts"),
@@ -108,6 +110,7 @@ ROUTES: dict[str, tuple[str, str, str]] = {
     "/evals/improvement": ("measure", "S3", "e2e/measure-operations-utilities/improve.spec.ts"),
     "/evals/benchmarks": ("measure", "S3", "e2e/measure-operations-utilities/benchmarks.spec.ts"),
     "/evals/benchmarks/run/:run_id": ("measure", "S3", "e2e/measure-operations-utilities/benchmarks.spec.ts"),
+    "/measure": ("measure", "S3", "e2e/measure-operations-utilities/measure.spec.ts"),
     "/measure/usage": ("measure", "S3", "e2e/measure-operations-utilities/usage.spec.ts"),
     "/measure/prompt-audit": ("measure", "S3", "e2e/measure-operations-utilities/prompt-audit.spec.ts"),
     "/metering": ("measure", "S3", "e2e/measure-operations-utilities/metering.spec.ts"),
@@ -119,6 +122,7 @@ ROUTES: dict[str, tuple[str, str, str]] = {
     "/settings/members": ("utilities", "S3", "e2e/measure-operations-utilities/settings.spec.ts"),
     "/settings/roles": ("utilities", "S3", "e2e/measure-operations-utilities/settings.spec.ts"),
     "/approvals": ("utilities", "S3", "e2e/measure-operations-utilities/approvals.spec.ts"),
+    "/feedback": ("utilities", "S3", "e2e/measure-operations-utilities/feedback.spec.ts"),
     # S4 — retained V1 surfaces with no owning destination module.
     "/boards": ("portfolio", "S4", "e2e/v1/board.spec.ts"),
     "/card/:card_id": ("portfolio", "S4", "e2e/v1/cockpit.spec.ts"),
