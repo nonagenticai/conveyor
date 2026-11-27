@@ -133,7 +133,7 @@ use serde_json::{Value, json};
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// Every action the registry serves, in the order `registry().names()` returns it.
 /// Regenerated at the main merge; the per-lane history above is superseded.
-const EXPECTED: [&str; 631] = [
+const EXPECTED: [&str; 632] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -620,6 +620,7 @@ const EXPECTED: [&str; 631] = [
     "proofs.get",
     "proofs.list",
     "proofs.record",
+    "proofs.render",
     "proofs.reverify",
     "providers.list",
     "publish.start",

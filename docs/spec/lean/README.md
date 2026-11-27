@@ -1,15 +1,15 @@
 # Lean delivery certificates
 
-A delivered slice, a delivered work package and the programme release each carry a **certificate**:
-a Lean source that a third party can re-check from the facts alone. The prover is a compute
-backend, not an oracle — it answers "this source is valid", so the value is in *what the source
-says*, and that is a small, hand-written model plus the facts rendered into it.
+A delivered slice, a delivered work package, a delivery unit and the programme release each carry a
+**certificate**: a Lean source that a third party can re-check from the facts alone. The prover is a
+compute backend, not an oracle — it answers "this source is valid", so the value is in *what the
+source says*, and that is a small, hand-written model plus the facts rendered into it.
 
 ## The three grades
 
 | Grade | What is proven | Where it lives |
 |---|---|---|
-| **Instance** | one record's facts satisfy the model (`checkSlice facts = true`, closed `by decide`) | rendered per record by `crates/actions/src/proof/render.rs` |
+| **Instance** | one record's facts satisfy the model (`checkSlice facts = true` / `checkLedger facts = true`, closed `by decide`) | rendered per record by `crates/actions/src/proof/render.rs` |
 | **Universal** | the model's own properties, for every state (`closed_is_terminal`, `no_self_transition`, `accepted_path_carries_evidence`) | `DeliveryModel.lean`, proven once |
 | **Bundle** | a release's leaf certificate digests are exactly the expected set, with no duplicate and none missing | rendered by `crates/actions/src/proof/programme.rs` |
 
@@ -18,9 +18,11 @@ An instance certificate is only worth what the model is worth, which is why the 
 
 ## What is proven, and what is assumed
 
-Proven: the facts, as written, satisfy `checkSlice` / `checkProgramme` / `checkPackage`, and the
-model's universal theorems. The kernel checks this; nothing is trusted from the prover beyond an
-answer of `valid`.
+Proven: the facts, as written, satisfy `checkSlice` / `checkProgramme` / `checkPackage` /
+`checkLedger`, and the model's universal theorems. A unit ledger additionally names its per-rule
+outcomes as a literal (`ruleResults facts = [...]`), so the kernel proves *which* rule a failing
+unit broke, not just that the aggregate is false. The kernel checks all of this; nothing is trusted
+from the prover beyond an answer of `valid`.
 
 Assumed, and stated in every certificate:
 
@@ -51,6 +53,25 @@ Re-verification is the same shape with a **fresh** invocation: `lean4.check` aga
 then `proofs.reverify`, which refuses unless the fresh source, verdict and recomputed certificate
 digest all equal the stored ones. The proof table is append-only, so a successful re-verification
 returns the same row — it is a replay, not a second claim.
+
+## Delivery units
+
+`checkLedger` models one chunk of `docs/plans/03-DELIVERY.md`'s unit contract: one claim branch,
+one linked PR that is non-draft or merged, at most two session CI attempts, a merged unit whose
+issue is closed and whose branch is deleted, the PR body's `Closes #N`, and a `Verify:` line on
+every part of the issue. Each field is an `Option`: an unobserved fact is `none` and fails closed.
+The facts are GitHub observations with provenance (rule id, artifact digest, committed payload),
+collected by `scripts/proof/collect-units.sh` — the kernel never fetches anything, so a certificate
+proves *facts ⇒ verdict*, not that the collector read the truth.
+
+A ledger chunk is at most **200 units** (A0's measurement; the shipped model measures 44 714 bytes
+and ~2 s of kernel work at 200, against the prover's 100 000-character and 120-second caps). A
+larger ledger is the collector's to chunk; the renderer refuses it rather than emitting
+`maxRecDepth`.
+
+This is the **observed** contract. The engine's own rows cannot attest issue state, branch
+liveness, draft flags or run counts, so the future engine-side gate uses a second structure over
+the recorded rows (`checkRecord`) rather than weakening `checkObs` with unknowns.
 
 ## Model drift
 

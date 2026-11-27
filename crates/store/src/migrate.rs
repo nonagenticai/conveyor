@@ -355,6 +355,9 @@ mod tests {
                 // T13 (#778): the published tool a waiting step is rebound onto
                 // (0078_process_step_tool_pin.sql, SPEC_V2 §11.6 item 3).
                 (78, "process step tool pin".to_owned()),
+                // Delivery proofs (#836): the unit-ledger subject type
+                // (0079_lean_proof_unit_ledger.sql).
+                (79, "lean proof unit ledger".to_owned()),
                 // ── The lane's reserved block (0080+), after main's 0066–0078; the block's SQL is unchanged, only its version
                 // moved. The kata union (the lane's candidate/propagation records and
                 // pre-registration fields on main's 0066/0067) sits at 94, after the block,

@@ -1014,8 +1014,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "7e9b40058881ca44088c6795498464c2688871839a234a35e2187e66c8b221d7",
-      "bytes": 8834,
+      "sha256": "131de4d4384486941b1ad6100c50ac0103a3e705baba4369d976e1e6e81e7134",
+      "bytes": 16577,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -3467,6 +3467,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/tranche-4.md"
     },
     {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27/report.html",
+      "source": "docs/evidence/units/2026-11-27/report.md",
+      "section": "Evidence",
+      "sha256": "74e8e8329d73ded3aa4f40013865b32c988e905458f2296d648c9c92ebbb21c0",
+      "bytes": 4677,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27/report.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
@@ -4182,8 +4191,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/proof-of-delivery.html",
       "source": "docs/plans/proof-of-delivery.md",
       "section": "Plans",
-      "sha256": "b4f713a4995489db44271d2fa282a40f573dd0bde53e609c0695eb546ac3a5f8",
-      "bytes": 6140,
+      "sha256": "1cbf9cc27bff96c04c76b638b54d482b0499a1d415bae8732f6efe3da732d1eb",
+      "bytes": 7272,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/proof-of-delivery.md"
     },
     {
@@ -4434,8 +4443,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/spec/lean/README.html",
       "source": "docs/spec/lean/README.md",
       "section": "Spec",
-      "sha256": "ce870a3d2ca1951c572b086750adccbe634e2845f65232205483d4218c28bc6f",
-      "bytes": 4325,
+      "sha256": "693ef0d7c7420df2fea8e2de6726c085b29fed4e112240227295f5d7a9debe4a",
+      "bytes": 5830,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/spec/lean/README.md"
     }
   ]
