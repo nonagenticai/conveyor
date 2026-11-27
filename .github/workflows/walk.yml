@@ -165,20 +165,24 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: the walk Playwright suite
+        # No --reporter override: the config's reporters write both the list log and the JSON
+        # report the instrument reads below. A CLI --reporter would replace them.
         run: |
           set -euo pipefail
           cd apps/walk
           PLAYWRIGHT_CHANNEL=chromium \
             DEV_AUTH_TOKEN=dev:alice \
-            npx playwright test --reporter=list
+            npx playwright test
 
       - name: the instrument reads the suite's report
         # A green suite is the browser proof; feeding its JSON report to the instrument is what
-        # marks the passing specs `verified` — a route with no report entry stays `registered`.
+        # marks the passing specs `verified`. --require-verified makes a registered route whose
+        # spec did not run and pass a failure — a spec that exists but never runs proves nothing.
         run: |
           set -euo pipefail
           cd apps/walk
-          python3 ../../scripts/build-walk-coverage.py --check --report test-results/walk-report.json
+          python3 ../../scripts/build-walk-coverage.py --check --require-verified \
+            --report test-results/walk-report.json
 
       - name: server and dev-server logs on failure
         if: failure()

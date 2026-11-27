@@ -779,6 +779,20 @@ def strict_gaps(coverage: dict[str, Any]) -> list[str]:
     return gaps
 
 
+def unverified_gaps(coverage: dict[str, Any]) -> list[str]:
+    """A registered route whose spec did not run and pass in this run's report.
+
+    Between `--check` (claims integrity) and `--gate=P6` (completeness): once a route has a
+    registry row and a spec, a green suite must actually exercise it — a spec that exists but is
+    skipped or not matched proves nothing.
+    """
+    return [
+        f"route {row['walk']}: registered but not verified by this run's report"
+        for row in coverage["routes"]
+        if row["registered"] and row["status"] != "verified"
+    ]
+
+
 def write_coverage(coverage: dict[str, Any]) -> None:
     COVERAGE.write_text(json.dumps(coverage, indent=2) + "\n")
 
@@ -848,6 +862,17 @@ def self_test() -> int:
     gaps = build_coverage(census, {}, [], committed=action_claim, modules=no_caps)["gaps"]
     ok(any("has no action-sheet module" in g for g in gaps), "failure 2: action claim without a sheet")
 
+    verified_cov = {"routes": [{"walk": "/x", "registered": True, "status": "verified"}],
+                    "actions": []}
+    ok(unverified_gaps(verified_cov) == [], "require-verified accepts a verified run")
+    registered_cov = {"routes": [{"walk": "/x", "registered": True, "status": "registered"}],
+                      "actions": []}
+    ok(any("not verified by this run" in g for g in unverified_gaps(registered_cov)),
+       "require-verified fails a registered but unverified run")
+    absent_cov = {"routes": [{"walk": "/x", "registered": False, "status": "absent"}],
+                  "actions": []}
+    ok(unverified_gaps(absent_cov) == [], "require-verified ignores an absent row")
+
     # Capability detection: the seam's capability, wherever the implementation puts it.
     caps = detect_modules({
         "src/api/client.js": "  async manifest() {\n    return this.request(\"/api/actions\");\n  }",
@@ -903,6 +928,11 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--print", action="store_true", help="print the coverage record")
     mode.add_argument("--self-test", action="store_true", help="run the rule matrix")
     parser.add_argument("--gate", choices=["P6"], help="the strict completeness gate")
+    parser.add_argument(
+        "--require-verified",
+        action="store_true",
+        help="fail when a registered route's spec did not run and pass in the report",
+    )
     parser.add_argument("--baseline", help="the code baseline sha for --freeze")
     parser.add_argument("--report", help="a Playwright JSON report; marks passing specs verified")
     args = parser.parse_args(argv)
@@ -930,6 +960,8 @@ def main(argv: list[str] | None = None) -> int:
     gaps = list(coverage["gaps"])
     if args.gate == "P6":
         gaps += strict_gaps(coverage)
+    if args.require_verified:
+        gaps += unverified_gaps(coverage)
 
     if args.print:
         print(json.dumps({**coverage, "gaps": gaps}, indent=2))
