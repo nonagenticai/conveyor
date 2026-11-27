@@ -10,6 +10,27 @@
             "name": "unit"
           },
           {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          }
+        ],
+        "number": 871,
+        "state": "OPEN",
+        "title": "proof: the live unit-gate refusal on the released engine",
+        "updatedAt": "2026-11-27T17:45:30Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/871"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
             "color": "5319E7",
             "name": "status:needs-human"
           },
@@ -31,8 +52,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -46,7 +67,7 @@
         "number": 868,
         "state": "OPEN",
         "title": "proof: verifyParts must apply only to unit-labeled issues",
-        "updatedAt": "2026-11-27T17:13:01Z",
+        "updatedAt": "2026-11-27T17:39:24Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/868"
       },
       {
@@ -88,7 +109,7 @@
         "number": 865,
         "state": "OPEN",
         "title": "proof: the live unit ledger's findings — the real defects and the unfinished queue",
-        "updatedAt": "2026-11-27T17:09:32Z",
+        "updatedAt": "2026-11-27T17:21:34Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/865"
       },
       {
@@ -107,9 +128,9 @@
           }
         ],
         "number": 864,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "coverage: a live unit attaches by its project label, so a frozen seed cannot orphan a project",
-        "updatedAt": "2026-11-27T16:52:36Z",
+        "updatedAt": "2026-11-27T17:47:54Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/864"
       },
       {
@@ -149,9 +170,9 @@
           }
         ],
         "number": 860,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "fix(walk): the action sheet shows the server's field errors in a refusal",
-        "updatedAt": "2026-11-27T16:43:08Z",
+        "updatedAt": "2026-11-27T17:39:26Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/860"
       },
       {
@@ -306,7 +327,7 @@
         "number": 848,
         "state": "OPEN",
         "title": "test: T18 — every V2 destination's spec asserts empty, error, happy and one refusal",
-        "updatedAt": "2026-11-27T15:51:56Z",
+        "updatedAt": "2026-11-27T17:42:39Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/848"
       },
       {
@@ -7195,7 +7216,7 @@
         "number": 16,
         "state": "OPEN",
         "title": "train — post-#9 queue sweep and merged-branch cleanup",
-        "updatedAt": "2026-11-25T07:20:19Z",
+        "updatedAt": "2026-11-27T17:35:39Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/16"
       },
       {
@@ -7511,7 +7532,7 @@
       }
     ],
     "provenance": {
-      "sha256": "48e03e9b2d427c809a8c746789bbcec11130304d7644dc9ba25baed47a0ba731",
+      "sha256": "2034b429799ae1ccb78cd4131e502a8a5ecd42035cd9b6d0f3607f18b27f1b50",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

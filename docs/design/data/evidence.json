@@ -151,9 +151,9 @@
       "sha256": "40574a0ea224ccc8337f10f6571cd78cc34e11909178f0adca4e8ec75717dfef"
     },
     {
-      "bytes": 29012,
+      "bytes": 29285,
       "path": "docs/design/README.md",
-      "sha256": "71a7bf7b3b04a9e2849417cb1b76480693da0da9bed061e4c7a769ceb4179540"
+      "sha256": "62840083cbe7a5f9474fe8b8b729b577c50e88e91549a0470d4d86fa652a69e4"
     },
     {
       "bytes": 82524,
@@ -163,7 +163,7 @@
     {
       "bytes": 13417,
       "path": "docs/design/data/conformance.md",
-      "sha256": "b0a516cc983a083f26efa4f48d71c871b6f27bafd24590040adebec0c5c9b4ed"
+      "sha256": "2d722df296cb14efd926b1f1aa7ba02a0290f197241a42b7c76fe49fb89d7c70"
     },
     {
       "bytes": 10927,
@@ -508,7 +508,7 @@
     {
       "bytes": 13417,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "b0a516cc983a083f26efa4f48d71c871b6f27bafd24590040adebec0c5c9b4ed"
+      "sha256": "2d722df296cb14efd926b1f1aa7ba02a0290f197241a42b7c76fe49fb89d7c70"
     },
     {
       "bytes": 33072,
