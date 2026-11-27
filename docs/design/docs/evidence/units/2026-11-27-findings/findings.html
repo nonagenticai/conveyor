@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>findings · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/findings.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h3 id="findings--the-live-unit-ledger-corpus-a7cf1a1aa2048be2">Findings — the live unit ledger, corpus <code>a7cf1a1aa2048be2…</code></h3>
+<p>This is the evaluation run of <a href="https://github.com/nonagenticai/conveyor/issues/865">#865</a>: the same collector, model and delivery contract as the 11:00 run (<code>docs/evidence/units/2026-11-27/</code>), collected after the instrument corrections in § The instrument's own findings. The snapshot was collected at <code>2026-11-27T17:00:47Z</code> from the <code>issue/865-proof-findings</code> worktree at <code>bd78baf14</code> (origin/main <code>949e95c8c</code> plus the claim marker); the spec and model are the origin/main bytes the digests name.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Corpus</td>
+<td><code>a7cf1a1aa2048be2b2d9c012becce257d191ac89cb26359756776671fc719c35</code></td>
+</tr>
+<tr>
+<td>Spec</td>
+<td><code>docs/plans/03-DELIVERY.md</code> <code>a15d13a40430a7f58c8b5c66e5deefdd6ff1073be0d283c8a58059abdeaac439</code></td>
+</tr>
+<tr>
+<td>Model</td>
+<td><code>docs/spec/lean/DeliveryModel.lean</code> <code>378a1395310416cd907870874d1c3e55f8d57b44c127018650c5b7fb574ddae7</code></td>
+</tr>
+<tr>
+<td>Collector</td>
+<td><code>scripts/proof/collect_units.py</code> <code>c3c9b55501a9307815d50264f997a4a1f94edb3c8033d8912609f909db10d6b2</code></td>
+</tr>
+<tr>
+<td>Snapshot artifacts</td>
+<td>heads <code>2930cbf4705d…</code> · issues <code>34b7051b980e…</code> · pulls <code>ae8605b5e9b2…</code></td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>deployed <code>conveyor</code> image <code>sha256:cbee6af8a5ce…</code>, two pods Running; <code>lean4.token</code> minted <code>17:02:01Z</code>, expiring <code>18:02:02Z</code></td>
+</tr>
+</tbody>
+</table>
+<p>The kernel certifies <em>facts ⇒ verdict</em> through the deployed engine:</p>
+<table>
+<thead>
+<tr>
+<th>Certificate</th>
+<th>Units</th>
+<th>Verdict</th>
+<th>Kernel</th>
+<th><code>certificate_sha256</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01a21df5-1d01-71f8-a343-1f8a3f40272b</code></td>
+<td>200</td>
+<td><code>unproven</code></td>
+<td><code>valid:false</code>, 2 667.76 ms</td>
+<td><code>2bf062a01ba56504…</code></td>
+</tr>
+<tr>
+<td><code>01a21df5-2d86-7ce1-a406-2a03119cd367</code></td>
+<td>130</td>
+<td><code>unproven</code></td>
+<td><code>valid:false</code>, 2 461.94 ms</td>
+<td><code>d1d179c5e387f0d7…</code></td>
+</tr>
+<tr>
+<td><code>01a21df5-3f9d-7f7a-bf50-55230c686bc3</code></td>
+<td>bundle</td>
+<td><code>proven</code></td>
+<td><code>valid:true</code></td>
+<td><code>9ec7a32a34a51bfb…</code></td>
+</tr>
+</tbody>
+</table>
+<p>Completed <strong>330</strong>; open in flight <strong>24</strong>; closed without a keyword-linked PR <strong>31</strong> (3 paired with an unlinked PR); orphan PRs <strong>11</strong>; automation excluded <strong>129</strong>. <strong>53 completed units fail the model.</strong> The findings below are <strong>55</strong>: one unit can carry several findings, and an orphan PR is one defect, not three rule failures.</p>
+<h4 id="the-findings">The findings</h4>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Count</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unit-dor-verify</code></td>
+<td>28</td>
+<td>#11, #130, #140, #203, #205, #212, #213, #226, #274, #299, #307, #311, #389, #390, #416, #434, #45, #471, #542, #545, #572, #59, #62, #653, #667, #73, #797, #92</td>
+</tr>
+<tr>
+<td><code>non-unit-dor</code></td>
+<td>8</td>
+<td>#167, #184, #196, #235, #323, #601, #669, #803</td>
+</tr>
+<tr>
+<td><code>multi-lane</code></td>
+<td>5</td>
+<td>#81, #185, #190, #212, #319</td>
+</tr>
+<tr>
+<td><code>closure-open</code></td>
+<td>2</td>
+<td>#12, #669</td>
+</tr>
+<tr>
+<td><code>branch-live</code></td>
+<td>1</td>
+<td>#528</td>
+</tr>
+<tr>
+<td><code>orphan-pr</code></td>
+<td>11</td>
+<td><code>unlinked-unit</code>: #pr-493→#470, #pr-495→#26, #pr-578→#577 · <code>no-issue</code>: #pr-64, #pr-96, #pr-335, #pr-465, #pr-591, #pr-597, #pr-613, #pr-774</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><code>unit-dor-verify</code></strong> — a unit issue whose Parts section lacks a <code>Verify:</code> line on a part. All 28 are closed and predate the template settling; they are the record, not work to repair.</li>
+<li><strong><code>non-unit-dor</code></strong> — <code>verifyParts</code> fails but the issue is not a <code>unit</code> deliverable (bug/docs/ci/security/design); the Definition of Ready does not apply. The kernel still evaluates the rule because the model has no <code>unit</code> fact; the scoping fix is <a href="https://github.com/nonagenticai/conveyor/issues/868">#868</a>, blocked-by #837 on the same file.</li>
+<li><strong><code>multi-lane</code></strong> — two live claim branches or two linked PRs for one unit.</li>
+<li><strong><code>closure-open</code></strong> — the PR merged and the issue is still open. #12 and #669 are not stale: the owner reopened them on 2026-11-24 after a closure audit found the live proof missing. They are the ledger's true unfinished deliveries.</li>
+<li><strong><code>branch-live</code></strong> — #528's issue is closed while its merged PR's head ref is live. The live ref is not the merged lineage (§ The live queue).</li>
+<li><strong><code>orphan-pr</code></strong> — a merged PR with no closing issue: three are real deliveries whose PR body carried no closing keyword (each issue was closed by hand with the record), eight are genuine no-issue PRs. Console publish #494 (<code>publish/design-…</code>) is now excluded as automation, and the policy question for the eight is <a href="https://github.com/nonagenticai/conveyor/issues/869">#869</a>.</li>
+</ul>
+<p>Rule totals (the collector's <code>local_rules</code> mirror; the kernel's <code>ruleResults</code> certifies the same seven rules as booleans): <code>closesKeyword</code> 11, <code>mergeComplete</code> 14, <code>oneBranch</code> 4, <code>onePull</code> 5, <code>verifyParts</code> 47; <code>ciBudget</code> and <code>pullUsable</code> 0. One unit carries both a <code>multi-lane</code> and a <code>unit-dor-verify</code> finding (#212); the other four <code>multi-lane</code> units pass <code>verifyParts</code>.</p>
+<h4 id="the-instruments-own-findings-fixed-here">The instrument's own findings (fixed here)</h4>
+<ol type="1">
+<li><strong>"54 in flight" was 23 open plus 31 closed.</strong> <code>build_units</code> did not filter state, so the 11:00 report claimed "the delivery has not happened" for 31 closed issues. The corpus now separates <code>in_flight</code> (open) from <code>closed_unlinked</code>; three pair with an unlinked PR (#26/#470/#577), the rest closed without a keyword-linked conveyor PR (delivery in another repository, or no remaining work).</li>
+<li><strong><code>verifyParts</code> was applied to non-unit issues.</strong> Eight failures are bug/docs/ci/security/design issues, outside the content contract 03-DELIVERY scopes to <code>unit</code> deliverables. They are <code>non-unit-dor</code>, not unit defects.</li>
+<li><strong>Two <code>verifyParts</code> failures were extraction defects.</strong> <code>contract_verify</code> ended the Parts section at any line starting with <code>#</code>, so prose references like <code>#8 · …</code> and <code>#791 hardens …</code> truncated #753's and #781's sections before later parts. A heading is hashes followed by whitespace; with the fix both units pass, and the rule failures drop 49 → 47 (the class 30 → 28).</li>
+<li><strong>A console publish PR was counted as an orphan unit.</strong> #494 is now excluded like <code>automation/*</code>.</li>
+</ol>
+<p>The <code>Verify:</code> cross-check against <code>scripts/ci/board.py</code> after aligning the checker to one <code>Verify:</code> per <code>###</code> part: <strong>313 agree, 0 pass the checker and fail the model, 6 the reverse</strong>. The six are bodies headed <code>## Parts</code> or <code>## Parts and acceptance</code> (#111, #113, #151, #356, #604, #611) rather than the template's exact <code>## Parts and acceptance criteria</code>: the model accepts the looser heading, the checker requires the template's. Both answers are recorded, never reconciled silently.</p>
+<h4 id="the-live-queue-24-open-units">The live queue (24 open units)</h4>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Count</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>claimed</td>
+<td>10</td>
+<td>#865, #864, #862, #860, #853, #848, #837, #814, #755, #526 — each with a live <code>issue/&lt;n&gt;-*</code> branch</td>
+</tr>
+<tr>
+<td>ready</td>
+<td>9</td>
+<td>#838, #816, #815, #783, #31, #29, #16, #9, #4</td>
+</tr>
+<tr>
+<td>blocked</td>
+<td>4</td>
+<td>#854, #852, #830, #817</td>
+</tr>
+<tr>
+<td>needs-human</td>
+<td>1</td>
+<td>#395</td>
+</tr>
+</tbody>
+</table>
+<p>No claim is released here: 03-DELIVERY § Labels and states makes releasing a stale claim a human decision, and the board already reports it. One unit carries two live branches:</p>
+<ul>
+<li><strong>#526</strong> — <code>issue/526-tr2</code> @ <code>4e5d994f2</code> (101 commits ahead of main, no PR) and <code>issue/526-u5a</code> @ <code>f881ffffb</code> (905 ahead, PR #846 open). <code>oneBranch</code> counts distinct claim-branch names; completing with both live fails it. The finding is commented on the issue (comment 7223977805).</li>
+</ul>
+<p><strong>#528's live branch is not a stale merged branch.</strong> <code>issue/528-delivery-view</code> @ <code>e0629400</code> is 22 commits ahead of main and does not contain PR #530's merged head <code>e077f48f</code> — a parallel lineage under a closed issue. It is left in place; adopting or archiving it is the owner's call. Deleting it here would destroy work the record does not account for.</p>
+<h4 id="what-this-proves-and-what-it-does-not">What this proves, and what it does not</h4>
+<p>The kernel certifies that the facts in this corpus do not satisfy <code>checkUnit</code>, and the passing subset's live certification (<code>docs/evidence/units/2026-11-27/control/</code>) proves the same path accepts a real proven set. The class assignment (<code>closure-open</code>, <code>orphan-pr/unlinked-unit</code>, …) is the collector's deterministic classification of those facts, not a Lean theorem; its rules and the snapshot's provenance are what a reviewer re-runs. No unit is attributed to a person, and a certificate says nothing about whether the facts describe what happened — the committed snapshot is the reviewer's lever, as in the method's assumption line.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/units/2026-11-27-findings/findings.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
