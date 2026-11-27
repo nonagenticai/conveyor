@@ -179,23 +179,22 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await expect(card).toBeVisible();
 
   const editedName = `${cardName} edited`;
-  await card.getByRole("button", { name: "Edit" }).click();
-  await card.getByLabel("Card name").fill(editedName);
-  await card.getByLabel("Card description").fill("Edited through the board screen");
-  await card.getByRole("button", { name: "Save" }).click();
+  // The save is the same re-render window as the add: measured in CI 2026-11-27 as the board
+  // still carrying the unedited name after the click, so it is re-driven the same way.
+  await submitUntil(
+    async () => {
+      if ((await card.getByLabel("Card name").count()) === 0) {
+        await card.getByRole("button", { name: "Edit" }).click();
+      }
+      await card.getByLabel("Card name").fill(editedName);
+      await card.getByLabel("Card description").fill("Edited through the board screen");
+      await card.getByRole("button", { name: "Save" }).click();
+    },
+    async () => (await cardNames()).includes(editedName),
+  );
 
   // Same proof-then-read as the add: the save's effect on the board's own rows, then the screen.
-  await expect
-    .poll(
-      async () => {
-        const view = await request
-          .get(`/api/boards/${boardId}/cards?limit=200`)
-          .then((r) => r.json());
-        return (view.items ?? []).map((row: { name: string }) => row.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(editedName);
+  await expect.poll(cardNames, { timeout: 30_000 }).toContain(editedName);
   // The edited row's id is the gate target's subject; the name already proves the row exists.
   const boardCards = await request
     .get(`/api/boards/${boardId}/cards?limit=200`)

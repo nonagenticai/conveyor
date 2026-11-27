@@ -1,6 +1,6 @@
 import { expect, test } from "./fixture";
 
-import { decideAsReviewer, invoke, isDevAuth } from "./helpers";
+import { decideAsReviewer, invoke, isDevAuth, submitUntil } from "./helpers";
 
 // The seeded eval (dev-a, `seed.rs::measure_improve`) has one version, six cases (4 train /
 // 2 test), two metrics (`correct`, `grounded`), a completed baseline run with a result per
@@ -246,10 +246,21 @@ test("the report is the server's; the label and round controls hit their actions
 
   // Recording refreshes the instrument's data, which rebuilds the tab; the read gesture is the
   // climb's own "Rounds" button, and it now carries the round the form just recorded.
-  await costRow.getByRole("button", { name: "Rounds" }).click();
+  // Recording rebuilds the tab, so a click inside that window is delivered to a replaced node and
+  // opens nothing — measured 2026-11-27, the table stayed empty for the whole wait. Re-drive the
+  // gesture until the rounds table is the round the form recorded.
   const roundRows = page.locator("table.wtbl", { hasText: "Variant" }).locator("tbody tr");
-  await expect(roundRows).toHaveCount(1);
-  await expect(roundRows.first()).toContainText("v1");
+  const rounded = async (): Promise<boolean> => {
+    const rows = await roundRows.allTextContents();
+    return rows.length === 1 && rows[0].includes("v1");
+  };
+  await submitUntil(
+    async () => {
+      await costRow.getByRole("button", { name: "Rounds" }).click();
+    },
+    rounded,
+  );
+  await expect.poll(rounded, { timeout: 10_000 }).toBe(true);
 
   const opened = await invoke<{
     rounds: { round: number; change_md: string | null; status: string }[];
