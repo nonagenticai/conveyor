@@ -10,6 +10,90 @@
             "name": "unit"
           },
           {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 854,
+        "state": "OPEN",
+        "title": "programme: the tranche-4 and tranche-5 exits — the residual P2s and the two reviews",
+        "updatedAt": "2026-11-27T14:21:00Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/854"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 853,
+        "state": "OPEN",
+        "title": "benefits: the complete profiles, the measured baselines and the first transition (U6)",
+        "updatedAt": "2026-11-27T14:24:24Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/853"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 852,
+        "state": "OPEN",
+        "title": "programme: promote the reworked record to production and record the tranche-3 review",
+        "updatedAt": "2026-11-27T14:20:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/852"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 849,
+        "state": "CLOSED",
+        "title": "skills: the seven remaining role playbooks act through the session channel",
+        "updatedAt": "2026-11-27T14:48:48Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/849"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
             "color": "0E8A16",
             "name": "status:ready"
           },
@@ -48,9 +132,9 @@
           }
         ],
         "number": 847,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "walk: G0 conformance — the record and the parity instrument tell the truth",
-        "updatedAt": "2026-11-27T13:21:40Z",
+        "updatedAt": "2026-11-27T14:08:40Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/847"
       },
       {
@@ -67,7 +151,7 @@
         "number": 842,
         "state": "OPEN",
         "title": "feedback: in-app bug reports and feature requests for every tenant",
-        "updatedAt": "2026-11-27T12:42:02Z",
+        "updatedAt": "2026-11-27T13:41:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/842"
       },
       {
@@ -119,8 +203,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "6E7781",
@@ -134,7 +218,7 @@
         "number": 837,
         "state": "OPEN",
         "title": "proof: engine-derived unit facts and the required DoD gate",
-        "updatedAt": "2026-11-27T08:45:46Z",
+        "updatedAt": "2026-11-27T14:37:25Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/837"
       },
       {
@@ -157,9 +241,9 @@
           }
         ],
         "number": 836,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: the unit delivery model and the evaluation of the real ledger",
-        "updatedAt": "2026-11-27T13:18:01Z",
+        "updatedAt": "2026-11-27T14:37:12Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/836"
       },
       {
@@ -184,7 +268,7 @@
         "number": 832,
         "state": "CLOSED",
         "title": "T13: the spend budget gate (v1-w4a-1, with v1-p75-1) — carve-out from the #526 lane",
-        "updatedAt": "2026-11-27T13:02:51Z",
+        "updatedAt": "2026-11-27T13:50:47Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/832"
       },
       {
@@ -238,7 +322,7 @@
         "number": 830,
         "state": "OPEN",
         "title": "publish: the strict pack at the tranche-3 close — the blocked documents, the register and the reconciled baseline",
-        "updatedAt": "2026-11-27T07:41:40Z",
+        "updatedAt": "2026-11-27T14:21:48Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/830"
       },
       {
@@ -868,8 +952,8 @@
         ],
         "number": 755,
         "state": "OPEN",
-        "title": "programme: the retrospective tranche reviews — close tranches 3–12 and authorise tranches 4–13",
-        "updatedAt": "2026-11-27T07:10:36Z",
+        "title": "programme: the retrospective tranche reviews — close tranches 7–12 and authorise tranches 8–13",
+        "updatedAt": "2026-11-27T14:21:33Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/755"
       },
       {
@@ -7234,7 +7318,7 @@
       }
     ],
     "provenance": {
-      "sha256": "27bf8b0a2c1f69a74e7c8c6fc96c2d8134b90ab3fc3f5e6019841dc43a6b258d",
+      "sha256": "152f583f742de3c1c5f92c13ec41498a18a67806cab32ad9f59030d63dac8c7d",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },
