@@ -398,6 +398,9 @@ jobs:
       CARGO_PROFILE_DEV_DEBUG: "0"
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
       REDIS_URL: redis://127.0.0.1:6379/
+      # The FLUSHALL rehearsal never shares the server: bus_delivery's private URL is this one,
+      # so the test starts no container of its own inside the shard.
+      TEST_REDIS_PRIVATE_URL: redis://127.0.0.1:6380/
       # Public images, named once. A literal `name:tag` in a `docker` line trips the estate's
       # upstream-ref lint; a variable is the pattern the archetype itself uses.
       PG_IMAGE: postgres:18
@@ -458,6 +461,11 @@ jobs:
           docker run -d --name ci-redis \
             --tmpfs /data -p 127.0.0.1:6379:6379 \
             "$REDIS_IMAGE"
+          # Second server for the FLUSHALL rehearsal (TEST_REDIS_PRIVATE_URL above): the wipe
+          # cannot reach the shared server, and the test starts no container of its own.
+          docker run -d --name ci-redis-private \
+            --tmpfs /data -p 127.0.0.1:6380:6379 \
+            "$REDIS_IMAGE"
           for _ in $(seq 1 60); do
             docker exec ci-pg pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1 && break
             sleep 1
@@ -468,6 +476,11 @@ jobs:
             sleep 1
           done
           docker exec ci-redis redis-cli ping
+          for _ in $(seq 1 60); do
+            docker exec ci-redis-private redis-cli ping >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec ci-redis-private redis-cli ping
 
       - name: disk headroom
         run: df -h /
