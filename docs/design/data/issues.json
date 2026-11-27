@@ -1,11 +1,132 @@
 {
   "issues": [
     {
+      "number": 900,
+      "title": "bug: the benchmark producer's yield caps the improvement loop below the significance bar",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/900",
+      "updatedAt": "2026-11-27T23:01:45Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 897,
+      "title": "unit (adopted #774): docs: specify the Gemba Walk as a candidate primary UI",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/897",
+      "updatedAt": "2026-11-27T22:17:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 896,
+      "title": "unit (adopted #613): fix(actions): refuse truncated model replies and bad tool arguments",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/896",
+      "updatedAt": "2026-11-27T22:17:48Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 895,
+      "title": "unit (adopted #597): feat(inference-router): carry the reasoning channel through a streamed response",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/895",
+      "updatedAt": "2026-11-27T22:17:45Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 894,
+      "title": "unit (adopted #591): feat(inference-router): a per-provider reasoning dialect and a completion floor",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/894",
+      "updatedAt": "2026-11-27T22:17:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 893,
+      "title": "unit (adopted #465): ci: run the coding gate on every PR",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/893",
+      "updatedAt": "2026-11-27T22:17:37Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 892,
+      "title": "unit (adopted #335): chore(deps): cargo update across the graph",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/892",
+      "updatedAt": "2026-11-27T22:17:33Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 891,
+      "title": "unit (adopted #96): docs: document the opt-in licensing posture",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/891",
+      "updatedAt": "2026-11-27T22:17:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 890,
+      "title": "unit (adopted #64): docs: bring the repository to the public standard",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/890",
+      "updatedAt": "2026-11-27T22:17:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 888,
       "title": "walk: the post-freeze destinations \u2014 feedback, knowledge sources/memory, measure \u2014 and the census re-freeze",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/888",
-      "updatedAt": "2026-11-27T22:08:30Z",
+      "updatedAt": "2026-11-27T22:20:49Z",
       "labels": [
         {
           "name": "unit",
@@ -24,9 +145,9 @@
     {
       "number": 886,
       "title": "walk: reconcile the project record to the delivered S1\u2013S3 (WBS, PI, parity matrix)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/886",
-      "updatedAt": "2026-11-27T22:07:54Z",
+      "updatedAt": "2026-11-27T23:06:23Z",
       "labels": [
         {
           "name": "unit",
@@ -131,7 +252,7 @@
       "title": "delivery: the 8 no-issue PRs \u2014 adopt or exempt",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/869",
-      "updatedAt": "2026-11-27T17:03:27Z",
+      "updatedAt": "2026-11-27T22:27:46Z",
       "labels": [
         {
           "name": "unit",
@@ -1432,7 +1553,7 @@
       "title": "ci: the web suite's board and evals specs fail a different test on every run under load",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/733",
-      "updatedAt": "2026-11-25T10:21:35Z",
+      "updatedAt": "2026-11-27T22:58:51Z",
       "labels": [
         {
           "name": "bug",
@@ -1789,7 +1910,7 @@
       "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/669",
-      "updatedAt": "2026-11-25T07:20:23Z",
+      "updatedAt": "2026-11-27T23:04:39Z",
       "labels": [
         {
           "name": "bug",
@@ -2859,7 +2980,7 @@
       "title": "design: the delivery view \u2014 portfolio and programme Gantt, project and work-package kanban",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/528",
-      "updatedAt": "2026-11-21T19:17:07Z",
+      "updatedAt": "2026-11-27T22:13:56Z",
       "labels": [
         {
           "name": "unit",
@@ -7389,7 +7510,7 @@
       "title": "S18 \u2014 executor-backed producers and the real improvement loop",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/12",
-      "updatedAt": "2026-11-27T16:01:57Z",
+      "updatedAt": "2026-11-27T23:02:49Z",
       "labels": [
         {
           "name": "unit",
