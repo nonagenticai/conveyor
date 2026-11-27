@@ -29,8 +29,8 @@ test("the audits and findings render", async ({ page }) => {
   await page.route("**/api/actions/prompt_findings.list/invocations", (route: any) => json(route, { items: [FINDING] }));
   await page.goto("/measure/prompt-audit");
   await expect(page.getByRole("heading", { name: "Prompt audit", level: 1 })).toBeVisible();
-  await expect(page.getByTestId("prompt-audits")).toContainText("audit-1");
-  await expect(page.getByTestId("prompt-findings")).toContainText("finding-1");
+  await expect(page.getByTestId("prompt-audits")).toContainText("succeeded");
+  await expect(page.getByTestId("prompt-findings")).toContainText("open");
   await expect(page.getByRole("button", { name: "Start an audit" })).toBeVisible();
 });
 

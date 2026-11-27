@@ -17,7 +17,7 @@ const EVAL = {
   created_at: "2026-11-01T09:00:00Z",
   updated_at: "2026-11-20T09:00:00Z",
 };
-const CASE = { id: "00000000-0000-4000-8000-000000000c03", name: "the door case", title: "the door case", key: "door-case", status: "active", input: {}, expected: {} };
+const CASE = { id: "00000000-0000-4000-8000-000000000c03", name: "the door case", title: "the door case", key: "door-case", status: "active", input: "the door case", tags: ["door"], split: "test", source: "hand", gold_provenance: "editor" };
 const RUN = { id: "00000000-0000-4000-8000-000000000c04", name: "run-1", status: "succeeded", score: 0.9, eval_id: EVAL.id };
 const AUDIT = { id: "00000000-0000-4000-8000-000000000c05", name: "audit-1", status: "succeeded", eval_id: EVAL.id };
 
@@ -68,7 +68,7 @@ test("the audits tab renders the eval's audits", async ({ page }) => {
   await page.route("**/api/actions/evals.get/invocations", (route: any) => json(route, EVAL));
   await page.route("**/api/actions/eval_audits.list/invocations", (route: any) => json(route, { items: [AUDIT] }));
   await page.goto(`/evals/${EVAL.id}/audits`);
-  await expect(page.getByTestId("eval-audits")).toContainText("audit-1");
+  await expect(page.getByTestId("eval-audits")).toContainText("succeeded");
 });
 
 test("the empty list is the app's own message", async ({ page }) => {
