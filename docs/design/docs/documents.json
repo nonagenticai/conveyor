@@ -987,8 +987,8 @@
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "98d147d16f2745f3e08ca24b31fe13ae51c6b263516dcbd7c0979996445b3ee3",
-      "bytes": 31360,
+      "sha256": "079dd17ba1dc2b2bc483bf610c3818e1aec297d8e4053dd19ec2ba1bc8c54d47",
+      "bytes": 33424,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -1721,6 +1721,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
     },
     {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27-adopted/report.html",
+      "source": "docs/evidence/units/2026-11-27-adopted/report.md",
+      "section": "Evidence",
+      "sha256": "61ed1a4d1f9f423aca1afc6e4bbd0384e8bc9c6f33ae854226510622201f2eb6",
+      "bytes": 5153,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-adopted/report.md"
+    },
+    {
       "title": "findings",
       "path": "docs/evidence/units/2026-11-27-findings/findings.html",
       "source": "docs/evidence/units/2026-11-27-findings/findings.md",
@@ -1878,8 +1887,8 @@
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "a15d13a40430a7f58c8b5c66e5deefdd6ff1073be0d283c8a58059abdeaac439",
-      "bytes": 26115,
+      "sha256": "9a5fa2cedebd6fbbb560a18b18832ec60082f494d9b81e68bde278c7bcb46eab",
+      "bytes": 26678,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {

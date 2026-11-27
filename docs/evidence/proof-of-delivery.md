@@ -465,3 +465,30 @@ the fact in the model, so the rule stops firing outside its contract.
   `01a21ece-bcd4-73e9-ab17-3c8b0158f0d2` `proven` (`valid: true`), which proves the same path
   accepts a passing set. `report.md` carries the certificate table; `certificates.json` is beside
   it.
+
+### The adoption of the eight no-issue PRs (2026-11-27, #869)
+
+Eight merged PRs carried no unit issue: #64, #96, #335 and #774 (docs/deps), #465 (CI), #591 and
+#597 (inference-router), #613 (actions). The owner chose adoption over an exemption class on
+2026-11-27. Each PR now has a closed retro unit record — #890–#897 — and
+`scripts/proof/adopted.json` pairs each PR with its record (map sha256 `b738259b…`). The collector
+reads the map entry as the PR's closing reference (`pull.closing_reference/v1`) and carries the
+map digest in the unit's provenance. The merged PR bodies are not rewritten.
+
+- **The records.** All eight pass the issue-content contract (`board.contract_gaps` → none) and
+  render rule-clean: `oneBranch`, `onePull`, `ciBudget` (one `ci` run each), `mergeComplete`,
+  `closesKeyword` and `verifyParts` all true. The three merged leftover head branches
+  (`lane/ir-reasoning-dialect`, `lane/ir-stream-reasoning`, `lane/pgx-client-fixes`) were deleted
+  so `mergeComplete` is a live fact; the other five heads were already gone. The collector's
+  self-test covers an adopted PR, an unmapped PR, and a map entry naming a missing issue (fail
+  closed as `issue-unreadable`).
+- **The fresh ledger.** Snapshot `2026-11-27T22:25:45Z` from branch head `ef382c8df` off
+  `main@10e653158`, baseline 2026-11-11, model `f6020fae…` unchanged: **345** completed, 17 open
+  in flight, 32 closed without a keyword-linked PR, **3 orphans**, 130 automation excluded —
+  **38 findings**. `orphan-pr` **11 → 3**: `no-issue` **8 → 0**, `unlinked-unit` 3 unchanged.
+  `branch-live` **1 → 0** (#528's branch archived the same day). `non-unit-dor` 0,
+  `unit-dor-verify` 28, `multi-lane` 5 and `closure-open` 2 keep their keys. Rule failures:
+  `verifyParts` 31, `onePull` 5, `mergeComplete` 5, `oneBranch` 4, `closesKeyword` 3. The run is
+  at `docs/evidence/units/2026-11-27-adopted/`.
+- **Not claimed.** The render is offline and deterministic; #869's acceptance is the pairing, not
+  a new model, and no kernel certificate is claimed here.
