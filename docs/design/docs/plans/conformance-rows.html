@@ -977,44 +977,56 @@
 <tr>
 <td>P1.1 file exists</td>
 <td><code>test -f docs/plans/conformance-rows.md</code></td>
-<td>to fill</td>
-<td>to fill</td>
+<td>exit 0</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P1.1 three generators named</td>
 <td><code>grep -c 'audit-programme-conformance|generate-standards|governance-chain' docs/plans/conformance-rows.md</code></td>
-<td>to fill</td>
-<td>to fill</td>
+<td>10 (≥ 3)</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P1.1 cited paths resolve</td>
-<td><code>git cat-file -e &lt;claim-base&gt;:&lt;path&gt;</code> for every path in §1-§2</td>
-<td>to fill</td>
-<td>to fill</td>
+<td><code>git cat-file -e origin/main:&lt;path&gt;</code> for every path in §1-§2</td>
+<td>19 paths checked, 0 missing</td>
+<td>e6f4c3ac9</td>
 </tr>
 <tr>
 <td>P2.1 table count</td>
 <td><code>grep -c '^| ' docs/plans/conformance-rows.md</code> ≥ the invariant count</td>
-<td>to fill</td>
-<td>to fill</td>
+<td>145 table rows; 54 invariants in P1 and 54 owner rows in P2</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P2.2 one owner per row</td>
 <td>the P2 table, reviewed</td>
-<td>to fill</td>
-<td>to fill</td>
+<td>54 rows, one owner each (action, section, standard, keep or gap)</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P3.1 stages</td>
 <td>the P3 table; <code>git diff --check</code>; links resolve</td>
-<td>to fill</td>
-<td>to fill</td>
+<td>the five-stage table with line targets; <code>git diff --check</code> exit 0; 0 Markdown links</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P4.2 counts</td>
 <td><code>grep -n '5,057' docs/plans/conformance-rows.md</code> and <code>grep -n '5,450'</code></td>
-<td>to fill</td>
-<td>to fill</td>
+<td>both present (5,057 at §0 and §4; 5,450 at §0, §4 and the stage table)</td>
+<td>40b2f98b4</td>
+</tr>
+<tr>
+<td>Docs gate</td>
+<td><code>python3 docs/design/scripts/build-docs.py --check</code></td>
+<td>303 sources, 0 failures; the page and index are committed</td>
+<td>40b2f98b4</td>
+</tr>
+<tr>
+<td>Programme gate</td>
+<td><code>python3 scripts/ci/board.py --repo nonagenticai/conveyor --dor 783</code></td>
+<td>exit 0</td>
+<td>40b2f98b4</td>
 </tr>
 <tr>
 <td>P4.1 decision</td>
