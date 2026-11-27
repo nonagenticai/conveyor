@@ -131,14 +131,33 @@ async fn backlog(
     .expect("insert a backlog row")
 }
 
+/// Approve the PI plan: a person's gate on the cadence's materialisation target (v1-p82-1).
+async fn approve_materialisation(db: &support::TestDb, f: &Fixture) {
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, gate, kind, status, required_decisions)
+         VALUES ($1, $2, 'human_approval', 'approved', 1)",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("cadence/{}/materialise", f.cadence))
+    .execute(&db.super_pool)
+    .await
+    .expect("approve the PI plan");
+}
+
 /// Materialise in a scoped transaction as the schema owner; returns the card ids.
-async fn materialise(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
+async fn materialise_unapproved(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
     let outcome = spine::materialise_pi_tx(&mut tx, f.tenant, f.cadence)
         .await
         .expect("materialise the cadence");
     tx.commit().await.expect("commit");
     outcome.cards
+}
+
+/// The approved path: the gate first, then the materialisation.
+async fn materialise(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
+    approve_materialisation(db, f).await;
+    materialise_unapproved(db, f).await
 }
 
 #[tokio::test]
@@ -241,5 +260,33 @@ async fn a_zero_job_size_is_refused() {
     assert!(
         materialise(&db, &f).await.is_empty(),
         "no draft is created from a refused row"
+    );
+}
+
+/// v1-p82-1: the PI plan materialises only after a person approves it; the unattended path
+/// cannot turn the backlog into cards.
+#[tokio::test]
+async fn an_unapproved_pi_plan_does_not_materialise() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db, Some(10)).await;
+    backlog(&db, &f, "high", 0, (8, 1, 1, 1)).await;
+
+    let cards = materialise_unapproved(&db, &f).await;
+    assert!(
+        cards.is_empty(),
+        "no approval, no materialisation: {cards:?}"
+    );
+    let state: String = sqlx::query_scalar("SELECT state FROM programme_cadence WHERE id = $1")
+        .bind(f.cadence)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the cadence state");
+    assert_eq!(state, "planned", "the cadence waits for its approval");
+
+    approve_materialisation(&db, &f).await;
+    assert_eq!(
+        materialise_unapproved(&db, &f).await.len(),
+        1,
+        "the approved plan materialises on the next pass"
     );
 }

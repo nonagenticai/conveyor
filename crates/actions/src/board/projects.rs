@@ -898,25 +898,31 @@ async fn projects_activate(
             })?;
         // Fail closed: a programme project with no tranche row is a data defect, not an
         // ungoverned project. Only an authorised (or already closed) tranche lets it start.
-        let Some((number, state)) = state else {
-            return Err(ActionError::new(
-                409,
-                "tranche_not_authorised",
-                format!(
-                    "project {} belongs to a programme that declares no tranche; it cannot start",
-                    project.id
-                ),
-            ));
-        };
-        if !matches!(state.as_str(), "authorised" | "closed") {
-            return Err(ActionError::new(
-                409,
-                "tranche_not_authorised",
-                format!(
-                    "project {} sits in tranche {number} whose state is '{state}'",
-                    project.id
-                ),
-            ));
+        match state {
+            store::spine::ProjectTrancheState::Missing => {
+                return Err(ActionError::new(
+                    409,
+                    "tranche_not_authorised",
+                    format!(
+                        "project {} belongs to a programme that declares no tranche; it cannot start",
+                        project.id
+                    ),
+                ));
+            }
+            store::spine::ProjectTrancheState::State { number, state } => {
+                if !matches!(state.as_str(), "authorised" | "closed") {
+                    return Err(ActionError::new(
+                        409,
+                        "tranche_not_authorised",
+                        format!(
+                            "project {} sits in tranche {number} whose state is '{state}'",
+                            project.id
+                        ),
+                    ));
+                }
+            }
+            // Unreachable: the branch is guarded by `programme_id.is_some()`.
+            store::spine::ProjectTrancheState::Standalone => {}
         }
     }
     transition_project(
