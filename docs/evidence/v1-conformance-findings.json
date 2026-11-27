@@ -240,7 +240,12 @@
             ],
             "failure_scenario": "An unbudgeted run calls upstream indefinitely; no 429 is ever produced and spend is discovered after the fact.",
             "acceptance": "A binding without a budget refuses run start (409/422 naming the missing budget); with a declared budget call N+1 returns 429 budget_exceeded before dispatch and the provider-call counter is unchanged.",
-            "owner_project": "T11"
+            "owner_project": "T11",
+            "resolved_by": {
+                "commit": "1ba456f7852080c64124cfc81d203f35f7cacf49",
+                "test": "crates/actions/tests/tool_budget.rs::a_spending_binding_without_a_budget_refuses_run_start",
+                "evidence": "tool_budget 14/14: a spending binding with no declared ceiling refuses run start (422 budget_missing); a_spending_binding_with_a_budget_starts_the_run admits the declared one, and a_job_bindings_release_budget_is_the_runs_default proves the release anatomy is the default"
+            }
         },
         {
             "id": "v1-p75-2",
@@ -2335,7 +2340,12 @@
             ],
             "failure_scenario": "A run whose binding permits `spend` calls `image_gen.generate` in a loop (image_gen is a first-wave toolkit). No budget counter is consulted before any of the calls; the destination produces paid renders on every iteration; every ledger row carries cost NULL, so the tenant's spend cannot be attributed and the gate that should have stopped at the first over-budget call never fires.",
             "acceptance": "A spend-class tool call when the job's budget is exhausted returns `429 tool_budget_exceeded` before any network call; a successful spend call writes a non-null `cost` on its single `tool_call` row; a test drives `tools.call` for a spend tool under a zero budget and asserts the destination was never reached.",
-            "owner_project": "T13"
+            "owner_project": "T13",
+            "resolved_by": {
+                "commit": "1ba456f7852080c64124cfc81d203f35f7cacf49",
+                "test": "crates/actions/tests/tool_budget.rs::an_over_budget_tool_is_refused_before_the_backend",
+                "evidence": "tool_budget 14/14: a spend tool with no budget or an exhausted one is refused 429 tool_budget_exceeded with zero upstream calls; a_priced_call_records_its_derived_cost writes the derived tool_call.cost; an_over_budget_inference_call_refuses_the_next_spend_before_the_backend gates the direct model path"
+            }
         },
         {
             "id": "v1-w4a-2",
