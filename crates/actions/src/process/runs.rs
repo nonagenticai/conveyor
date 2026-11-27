@@ -354,6 +354,31 @@ pub(crate) async fn process_runs_start(
     // published, cannot start a ROOT run. A child run is a step already executing inside a
     // started process; re-checking there would break a live run when a status moves.
     if input.parent_run_id.is_none() {
+        // v1-p6-1: the coach's remedy was applied when it was recorded; the dispatch enforces
+        // it. A block and a pending ask refuse the run.
+        let refusal = store::coach::dispatch_refusal_tx(&mut *tx, ctx.tenant, input.card_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(error = %error, action = ACTION, "coach remedy: enforce");
+                ActionError::internal()
+            })?;
+        match refusal {
+            Some(store::coach::RemedyEffect::Blocked) => {
+                return Err(ActionError::new(
+                    409,
+                    "coach_blocked",
+                    "the card's coach remedy blocks the next run; a retry remedy lifts it",
+                ));
+            }
+            Some(store::coach::RemedyEffect::AskPending) => {
+                return Err(ActionError::new(
+                    409,
+                    "coach_ask_pending",
+                    "the card's coach remedy asks a human; the gate must approve before the next run",
+                ));
+            }
+            _ => {}
+        }
         crate::programme::assert_project_can_start(&mut *tx, ctx.tenant, board.project_id).await?;
     }
 

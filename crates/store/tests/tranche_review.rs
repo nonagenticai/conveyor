@@ -391,6 +391,80 @@ async fn a_project_cannot_start_before_its_tranche_is_authorised() {
     let _ = f.programme;
 }
 
+/// v1-w2b-2: a programme-bound project whose programme has no tranche row is refused, not
+/// treated as authorised; a standalone project is unaffected.
+#[tokio::test]
+async fn a_programme_project_with_no_tranche_row_cannot_start() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    // The programme has tranches 0 and 1; this project declares 9, which was never created.
+    let ungoverned: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id, meta)
+         VALUES ($1, $2, 'Ungoverned', $3, '{\"tranche\": 9}'::jsonb) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("PRJ-{}", Uuid::now_v7().simple()))
+    .bind(f.programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the ungoverned project");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, ungoverned).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+        ),
+        "a programme project with no tranche row cannot start: {refused:?}"
+    );
+
+    // A fresh programme (no tranche rows at all) refuses its project the same way.
+    let fresh_programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Fresh') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the fresh programme");
+    let fresh_project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, $2, 'First', $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("PRJ-{}", Uuid::now_v7().simple()))
+    .bind(fresh_programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the fresh project");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused =
+        spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, fresh_project).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+        ),
+        "a fresh programme authorises no project until its first tranche: {refused:?}"
+    );
+
+    // A standalone project is not programme-bound; the tranche rule does not apply.
+    let standalone: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, 'Standalone') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("PRJ-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the standalone project");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let allowed = spine::assert_project_tranche_authorised_tx(&mut tx, f.tenant, standalone).await;
+    tx.commit().await.expect("commit");
+    assert!(allowed.is_ok(), "a standalone project starts: {allowed:?}");
+}
+
 async fn review_count(db: &support::TestDb, tenant: TenantId, tranche: Uuid) -> i64 {
     sqlx::query_scalar(
         "SELECT count(*) FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2",

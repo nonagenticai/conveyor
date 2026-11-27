@@ -28,6 +28,12 @@ struct Fixture {
 
 /// One tenant, programme, project, board (intake + active lanes) and a PI cadence naming it.
 async fn fixture(db: &support::TestDb, wip_limit: Option<i32>) -> Fixture {
+    fixture_with(db, wip_limit, true).await
+}
+
+/// The same fixture with the PI-plan approval under the caller's control: an unapproved plan is
+/// what `materialise_pi_tx` must leave alone.
+async fn fixture_with(db: &support::TestDb, wip_limit: Option<i32>, approve: bool) -> Fixture {
     let slug = format!("cadence-{}", Uuid::now_v7().simple());
     let tenant_id: Uuid =
         sqlx::query_scalar("INSERT INTO tenant (slug, name) VALUES ($1, 'Cadence') RETURNING id")
@@ -107,7 +113,9 @@ async fn fixture(db: &support::TestDb, wip_limit: Option<i32>) -> Fixture {
         project,
     };
     // A PI plan materialises only after a person approves it; the suite is about the plan.
-    approve_plan(db, &fixture).await;
+    if approve {
+        approve_plan(db, &fixture).await;
+    }
     fixture
 }
 
@@ -180,13 +188,19 @@ async fn backlog_on(
 }
 
 /// Materialise in a scoped transaction as the schema owner; returns the card ids.
-async fn materialise(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
+async fn materialise_unapproved(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
     let outcome = spine::materialise_pi_tx(&mut tx, f.tenant, f.cadence)
         .await
         .expect("materialise the cadence");
     tx.commit().await.expect("commit");
     outcome.cards
+}
+
+/// The approved path: the gate first, then the materialisation.
+async fn materialise(db: &support::TestDb, f: &Fixture) -> Vec<Uuid> {
+    approve_plan(db, f).await;
+    materialise_unapproved(db, f).await
 }
 
 #[tokio::test]
@@ -513,5 +527,31 @@ async fn the_cadence_states_move_only_along_the_table() {
                 if from == "closed"
         ),
         "a closed cadence cannot re-open: {refused:?}"
+
+/// v1-p82-1: the PI plan materialises only after a person approves it; the unattended path
+/// cannot turn the backlog into cards.
+#[tokio::test]
+async fn an_unapproved_pi_plan_does_not_materialise() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture_with(&db, Some(10), false).await;
+    backlog(&db, &f, "high", 0, (8, 1, 1, 1)).await;
+
+    let cards = materialise_unapproved(&db, &f).await;
+    assert!(
+        cards.is_empty(),
+        "no approval, no materialisation: {cards:?}"
+    );
+    let state: String = sqlx::query_scalar("SELECT state FROM programme_cadence WHERE id = $1")
+        .bind(f.cadence)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the cadence state");
+    assert_eq!(state, "planned", "the cadence waits for its approval");
+
+    approve_plan(&db, &f).await;
+    assert_eq!(
+        materialise_unapproved(&db, &f).await.len(),
+        1,
+        "the approved plan materialises on the next pass"
     );
 }

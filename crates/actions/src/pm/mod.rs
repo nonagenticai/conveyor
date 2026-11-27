@@ -890,20 +890,18 @@ async fn pm_route_gate(
                     format!("the delivery project's architecture contract is not live: {status}"),
                 ),
                 store::architecture::ArchitectureStoreError::Illegal(
-                    store::architecture::ArchitectureRule::ReviewMissing,
+                    store::architecture::ArchitectureRule::ComplianceReviewMissing,
                 ) => ActionError::new(
                     409,
                     "architecture_review_missing",
                     "the delivery project's live delivery contract has no Phase-G compliance review",
                 ),
                 store::architecture::ArchitectureStoreError::Illegal(
-                    store::architecture::ArchitectureRule::ReviewNonConformant(level),
+                    store::architecture::ArchitectureRule::ComplianceWaiverMissing,
                 ) => ActionError::new(
                     409,
                     "architecture_review_non_conformant",
-                    format!(
-                        "the Phase-G compliance review is {level}; an active waiver is required"
-                    ),
+                    "the Phase-G compliance review is non-conformant; an active waiver is required",
                 ),
                 _ => ActionError::new(
                     409,

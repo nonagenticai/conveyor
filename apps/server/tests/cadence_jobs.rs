@@ -2,7 +2,8 @@
 //!
 //! The first pass materialises the standing backlog into draft cards; the second sees no
 //! planned cadence and creates none. The guard is the cadence's state, moved in the same
-//! transaction as the drafts — not a timer and not a marker on the card.
+//! transaction as the drafts — not a timer and not a marker on the card. The fixture
+//! approves the plan first: an unapproved cadence materialises nothing (#831 P2).
 //!
 //! `cargo test -p conveyor-server --test cadence_jobs`.
 

@@ -139,6 +139,9 @@ pub enum CoachStoreError {
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
+    /// A remedy the consumer cannot apply (a `move` with no lane on the card's board).
+    #[error("the remedy cannot be applied: {0}")]
+    RemedyInvalid(String),
 }
 
 const COLUMNS: &str = "id, coach_card_id, interrupted_card_id, failed_run_id, trigger_kind, \
@@ -402,6 +405,247 @@ pub async fn mark_remedied_tx(
     .execute(&mut *conn)
     .await?;
     Ok(())
+}
+
+/// What applying a recorded remedy did to the interrupted card.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RemedyEffect {
+    /// The card is blocked; the next dispatch must refuse it.
+    Blocked,
+    /// The card was moved to the named lane.
+    Moved {
+        /// The lane the remedy named.
+        list_id: Uuid,
+    },
+    /// The card may run again.
+    Retry,
+    /// The card is re-pullable; its inputs resolve fresh on the next dispatch.
+    Repulled,
+    /// The remedy is `ask` and its human gate is still pending.
+    AskPending,
+    /// The remedy is `note`; it carries information, not an action.
+    Noted,
+}
+
+impl RemedyEffect {
+    /// The stored/wire spelling.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Blocked => "blocked",
+            Self::Moved { .. } => "moved",
+            Self::Retry => "retry",
+            Self::Repulled => "repulled",
+            Self::AskPending => "ask_pending",
+            Self::Noted => "noted",
+        }
+    }
+}
+
+/// A remedy the consumer applied, with the effect it had.
+#[derive(Clone, Debug)]
+pub struct AppliedRemedy {
+    /// The interruption the remedy belongs to.
+    pub interruption_id: Uuid,
+    /// The remedy row.
+    pub remedy_id: Uuid,
+    /// The closed-set class.
+    pub remedy_class: String,
+    /// What it did.
+    pub effect: RemedyEffect,
+}
+
+/// Apply one recorded remedy's bounded effect to the interrupted card (v1-p6-1).
+///
+/// `coach.remedy` calls this in the same transaction that records the remedy, so the effect
+/// commits with the remedy and a later dispatch refusal cannot roll it back. Exactly one
+/// remedy per interruption is written, and the card records the applied remedy id, so a replay
+/// applies nothing twice. The bounded effects are the SPEC's: `block` sets
+/// `meta.coach_blocked`, `move` places the card in the named lane on its own board,
+/// `retry`/`repull` clear a block, and `note` records itself without changing the card. `ask`
+/// is the human gate; the dispatch enforces it (`dispatch_refusal_tx`).
+pub async fn apply_remedy_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    remedy_id: Uuid,
+) -> Result<Option<AppliedRemedy>, CoachStoreError> {
+    let row: Option<(Uuid, Uuid, Uuid, String, serde_json::Value)> = sqlx::query_as(
+        "SELECT i.id, i.interrupted_card_id, r.id, r.remedy_class, r.detail
+           FROM coach_remedy r
+           JOIN coach_interruption i
+             ON i.tenant_id = r.tenant_id AND i.id = r.interruption_id
+          WHERE r.tenant_id = $1 AND r.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(remedy_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let Some((interruption_id, card_id, remedy_id, remedy_class, detail)) = row else {
+        return Ok(None);
+    };
+    // `ask` is a human gate, not a card effect; the dispatch enforces the pending gate.
+    if remedy_class == "ask" {
+        return Ok(None);
+    }
+    let applied: Option<String> = sqlx::query_scalar(
+        "SELECT meta->>'coach_remedy_applied_id' FROM card
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .fetch_optional(&mut *conn)
+    .await?
+    .flatten();
+    if applied.as_deref() == Some(remedy_id.to_string().as_str()) {
+        return Ok(None);
+    }
+
+    let record = |effect: &str| {
+        serde_json::json!({
+            "coach_remedy_applied_id": remedy_id.to_string(),
+            "coach_remedy_effect": effect,
+        })
+    };
+    let effect = match remedy_class.as_str() {
+        "block" => {
+            sqlx::query(
+                "UPDATE card
+                    SET meta = meta || $3::jsonb || jsonb_build_object('coach_blocked', true),
+                        version = version + 1, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(card_id)
+            .bind(record("blocked"))
+            .execute(&mut *conn)
+            .await?;
+            RemedyEffect::Blocked
+        }
+        "move" => {
+            let list_id = detail
+                .get("list_id")
+                .and_then(serde_json::Value::as_str)
+                .and_then(|value| Uuid::parse_str(value).ok())
+                .ok_or_else(|| {
+                    CoachStoreError::RemedyInvalid(
+                        "a move remedy must name the destination lane in detail.list_id".to_owned(),
+                    )
+                })?;
+            let on_board: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM list l
+                      JOIN card c ON c.tenant_id = l.tenant_id AND c.board_id = l.board_id
+                     WHERE l.tenant_id = $1 AND l.id = $2 AND c.id = $3
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(list_id)
+            .bind(card_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if !on_board {
+                return Err(CoachStoreError::RemedyInvalid(
+                    "a move remedy must name a lane on the card's own board".to_owned(),
+                ));
+            }
+            sqlx::query(
+                "UPDATE card
+                    SET list_id = $3, meta = meta || $4::jsonb,
+                        version = version + 1, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(card_id)
+            .bind(list_id)
+            .bind(record("moved"))
+            .execute(&mut *conn)
+            .await?;
+            RemedyEffect::Moved { list_id }
+        }
+        "retry" | "repull" => {
+            sqlx::query(
+                "UPDATE card
+                    SET meta = (meta - 'coach_blocked') || $3::jsonb,
+                        version = version + 1, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(card_id)
+            .bind(record(if remedy_class == "retry" {
+                "retry"
+            } else {
+                "repulled"
+            }))
+            .execute(&mut *conn)
+            .await?;
+            if remedy_class == "retry" {
+                RemedyEffect::Retry
+            } else {
+                RemedyEffect::Repulled
+            }
+        }
+        _ => {
+            sqlx::query(
+                "UPDATE card
+                    SET meta = meta || $3::jsonb, version = version + 1, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(card_id)
+            .bind(record("noted"))
+            .execute(&mut *conn)
+            .await?;
+            RemedyEffect::Noted
+        }
+    };
+    Ok(Some(AppliedRemedy {
+        interruption_id,
+        remedy_id,
+        remedy_class,
+        effect,
+    }))
+}
+
+/// What the next dispatch must refuse for this card (v1-p6-1).
+///
+/// The effect itself was applied when the remedy was recorded (`apply_remedy_tx`); this read
+/// enforces it. A blocked card refuses; an `ask` whose human gate is still pending refuses;
+/// everything else dispatches. No write here, so a refusal never rolls a remedy back.
+pub async fn dispatch_refusal_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+) -> Result<Option<RemedyEffect>, CoachStoreError> {
+    let blocked: Option<bool> = sqlx::query_scalar(
+        "SELECT coalesce(meta->>'coach_blocked' = 'true', false) FROM card
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    if blocked.unwrap_or(false) {
+        return Ok(Some(RemedyEffect::Blocked));
+    }
+    let pending_ask: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM coach_interruption i
+              JOIN coach_remedy r
+                ON r.tenant_id = i.tenant_id AND r.interruption_id = i.id
+              JOIN approval a
+                ON a.tenant_id = i.tenant_id AND a.id = i.approval_id
+             WHERE i.tenant_id = $1 AND i.interrupted_card_id = $2
+               AND r.remedy_class = 'ask' AND a.status = 'pending'
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if pending_ask {
+        return Ok(Some(RemedyEffect::AskPending));
+    }
+    Ok(None)
 }
 
 /// Mark the interruption escalated, naming the approval that carries the decision.

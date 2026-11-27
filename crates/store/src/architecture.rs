@@ -114,11 +114,11 @@ pub enum ArchitectureRule {
     #[error("adoption needs an approved architecture-board decision that names this profile")]
     BoardDecisionRequired,
     /// Phase G's live delivery contract has no compliance review.
-    #[error("the delivery contract has no Phase-G compliance review")]
-    ReviewMissing,
+    #[error("Phase G needs a compliance review of the live delivery contract")]
+    ComplianceReviewMissing,
     /// The Phase-G review is non-conformant and no waiver covers it.
-    #[error("the Phase-G review is {0}; an active waiver is required")]
-    ReviewNonConformant(String),
+    #[error("a non-conformant Phase-G review needs an active, unexpired waiver")]
+    ComplianceWaiverMissing,
     /// A kata outcome names neither a candidate nor an approved deferral.
     #[error("a kata outcome names its kata_candidate_id, or an approved deferral")]
     KataCandidateRequired,
@@ -1161,6 +1161,25 @@ pub async fn get_profile_tx(
         .await?)
 }
 
+/// The tenant's adopted profile, if one exists.
+///
+/// The phase gate reads this, never the newest draft: a draft is a proposal, not an authority
+/// (v1-p81-1).
+pub async fn get_adopted_profile_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<Option<ProfileRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {PROFILE_COLUMNS} FROM adm_profile
+          WHERE tenant_id = $1 AND status = 'adopted'
+          ORDER BY adopted_at DESC NULLS LAST, updated_at DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
 /// Create or replace a DRAFT profile by key.
 ///
 /// An adopted profile is immutable: re-tailoring it would weaken every gate it governs without
@@ -1176,6 +1195,19 @@ pub async fn upsert_profile_tx(
             why: "a key and a name are required",
         });
     }
+    // An adopted profile is the board's authority; it is not rewritten in place (v1-p81-3).
+    let existing: Option<String> =
+        sqlx::query_scalar("SELECT status FROM adm_profile WHERE tenant_id = $1 AND key = $2")
+            .bind(tenant.as_uuid())
+            .bind(new.key.trim())
+            .fetch_optional(&mut *conn)
+            .await?;
+    if existing.as_deref() == Some("adopted") {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "adm profile",
+            why: "an adopted profile is immutable; adopt a new draft version instead",
+        });
+    }
     let sql = format!(
         "INSERT INTO adm_profile
             (tenant_id, key, name, phase_set, artifact_requirements, contract_kinds)
@@ -1187,7 +1219,7 @@ pub async fn upsert_profile_tx(
             contract_kinds = EXCLUDED.contract_kinds,
             version = adm_profile.version + 1,
             updated_at = now()
-          WHERE adm_profile.status NOT IN ('retired', 'adopted')
+          WHERE adm_profile.status = 'draft'
          RETURNING {PROFILE_COLUMNS}"
     );
     let written: Option<ProfileRecord> = sqlx::query_as(AssertSqlSafe(sql))
@@ -2241,16 +2273,21 @@ pub async fn advance_phase_tx(
             "phase {requested}"
         )))
     })?;
-    let profile = get_profile_tx(&mut *conn, tenant, profile_key)
-        .await?
-        .ok_or(ArchitectureStoreError::Illegal(ArchitectureRule::NoProfile))?;
-    // A draft is a proposal, not a governing instrument: only the Board's adoption binds the
-    // gate, and only if the caller named that adopted profile (or left the key absent).
-    if profile.status != "adopted" {
-        return Err(ArchitectureStoreError::Illegal(
-            ArchitectureRule::ProfileNotAdopted,
-        ));
-    }
+    // The gate reads an ADOPTED profile. A caller may not name a draft (v1-p81-1).
+    let profile = match profile_key {
+        Some(key) => {
+            let profile = get_profile_tx(&mut *conn, tenant, Some(key))
+                .await?
+                .ok_or(ArchitectureStoreError::Illegal(ArchitectureRule::NoProfile))?;
+            if profile.status != "adopted" {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::ProfileNotAdopted,
+                ));
+            }
+            Some(profile)
+        }
+        None => get_adopted_profile_tx(&mut *conn, tenant).await?,
+    };
     let nodes: Vec<(Uuid, String, String)> = sqlx::query_as(
         "SELECT id, meta->>'phase_code', status FROM wbs_node
           WHERE tenant_id = $1 AND project_id = $2 AND kind = 'phase'
@@ -2298,16 +2335,42 @@ pub async fn advance_phase_tx(
     // Mandatory artefacts: the profile names one set per phase and plateau, and the phase is
     // satisfied when ONE plateau's set is fully approved. The union was wrong: a phase carrying
     // PSA and HLD sets demanded both, refusing a project for artefacts its phase does not
-    // require — the profile, not the gate, decides which plateaus a phase carries. The
-    // standard's `artifact_type.mandatory` rows join every set: the profile may add work, never
-    // subtract the artefacts the standard marks mandatory.
-    let sets = mandatory_sets_tx(
-        &mut *conn,
-        tenant,
-        requested,
-        &profile.artifact_requirements,
-    )
-    .await?;
+    // require — the profile, not the gate, decides which plateaus a phase carries.
+    //
+    // A phase the adopted profile does not name falls back to the standard's mandatory rows
+    // (v1-p81-1): an absent key is "the standard applies", never "nothing required".
+    let standard = list_standard_tx(&mut *conn, tenant).await?;
+    if profile.is_none() && standard.is_empty() {
+        return Err(ArchitectureStoreError::Illegal(ArchitectureRule::NoProfile));
+    }
+    let profile_requirement = profile
+        .as_ref()
+        .and_then(|profile| profile.artifact_requirements.get(requested).cloned());
+    // A phase the adopted profile names keeps the profile's strict validation (the profile may
+    // add work, never subtract the standard's mandatory rows); a phase it does not name falls
+    // back to the standard's mandatory rows (v1-p81-1).
+    let sets: Vec<Vec<String>> = match profile_requirement {
+        Some(value) if !value.is_null() => {
+            let requirements = profile
+                .as_ref()
+                .map(|profile| profile.artifact_requirements.clone())
+                .unwrap_or(Value::Null);
+            mandatory_sets_tx(&mut *conn, tenant, requested, &requirements).await?
+        }
+        _ => {
+            let mut by_plateau: std::collections::BTreeMap<String, Vec<String>> =
+                std::collections::BTreeMap::new();
+            for row in &standard {
+                if row.phase_code == requested && row.mandatory {
+                    by_plateau
+                        .entry(row.plateau.clone())
+                        .or_default()
+                        .push(row.key.clone());
+                }
+            }
+            by_plateau.into_values().collect()
+        }
+    };
     let mut artifact_ids: Vec<Uuid> = Vec::new();
     // `mandatory_sets_tx` refuses an empty or malformed set, so there is no vacuous satisfaction
     // left to seed: the gate starts unsatisfied and only an approved set flips it.
@@ -2354,27 +2417,15 @@ pub async fn advance_phase_tx(
             ArchitectureRule::MissingMandatory(first_missing.unwrap_or_default()),
         ));
     }
-    // The phase's contract, when the profile names one. An unknown kind is a malformed profile,
-    // not a contract that can never be live.
-    if !matches!(&profile.contract_kinds, Value::Null | Value::Object(_)) {
-        return Err(ArchitectureStoreError::Illegal(
-            ArchitectureRule::ProfileInvalid(
-                "contract_kinds must be an object keyed by phase".to_owned(),
-            ),
-        ));
-    }
-    let required_kind = match profile.contract_kinds.get(requested) {
-        None | Some(Value::Null) => None,
-        Some(Value::String(kind)) if kind == "none" => None,
-        Some(Value::String(kind)) if vocab::is_contract_kind(kind) => Some(kind.clone()),
-        Some(_) => {
-            return Err(ArchitectureStoreError::Illegal(
-                ArchitectureRule::ProfileInvalid(format!(
-                    "phase {requested}'s contract kind must be one of the four kinds or none"
-                )),
-            ));
-        }
-    };
+    // The phase's contract, when the profile names one. An adopted profile's malformed map is
+    // refused by `upsert_profile_tx`; here a key the profile does not name simply carries none.
+    let required_kind = profile
+        .as_ref()
+        .and_then(|profile| profile.contract_kinds.get(requested))
+        .and_then(|value| match value {
+            Value::String(kind) if kind != "none" => Some(kind.clone()),
+            _ => None,
+        });
     let mut contract_id = None;
     if let Some(kind) = required_kind {
         let live: Option<Uuid> = sqlx::query_scalar(
@@ -3039,7 +3090,7 @@ pub async fn assert_phase_g_tx(
     };
     let Some(review) = review_for_contract_tx(&mut *conn, tenant, contract.id).await? else {
         return Err(ArchitectureStoreError::Illegal(
-            ArchitectureRule::ReviewMissing,
+            ArchitectureRule::ComplianceReviewMissing,
         ));
     };
     if matches!(review.level.as_str(), "non_conformant" | "irrelevant")
@@ -3048,7 +3099,7 @@ pub async fn assert_phase_g_tx(
             .is_none()
     {
         return Err(ArchitectureStoreError::Illegal(
-            ArchitectureRule::ReviewNonConformant(review.level),
+            ArchitectureRule::ComplianceWaiverMissing,
         ));
     }
     Ok(contract)

@@ -405,6 +405,13 @@ async fn invoke_call(
         }
     }
 
+    // §11.3 step 2's second half: a spend-class call is refused before the destination when the
+    // run's budget is absent or exhausted. The refusal is typed and, because it happens here,
+    // leaves neither a `tool_call` row nor a charge.
+    if effect == Effect::Spend {
+        check_spend_budget(&mut tx, ctx.tenant, &run).await?;
+    }
+
     // The transaction was read-only; close it before the network call so no lock or connection
     // is held across the destination's latency.
     let _ = tx.rollback().await;
@@ -482,6 +489,26 @@ async fn invoke_call(
     } else {
         call.input.clone()
     };
+    // A spend call must leave a cost-bearing ledger row, and the cost is derived from the
+    // handler's `inference_call`. The row is attributed to the run being budgeted: a caller that
+    // sent no usage context (a direct admin call) gets one, and a mis-named run is overridden.
+    // Non-spend tools keep the caller's own context: they write no priced row.
+    let mut usage = request.usage.clone();
+    if effect == Effect::Spend {
+        let usage = usage.get_or_insert(UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Other,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: None,
+            prompt_ref: None,
+            prompt_version: None,
+            prompt_sha256: None,
+            correlation_id: None,
+        });
+        usage.run_id = Some(run.run_id);
+        usage.run_step_id = run.run_step_id;
+    }
     let target_request = InvokeRequest {
         action: tool.handler_action.clone(),
         input: target_input,
@@ -639,6 +666,10 @@ async fn invoke_call(
         error_message: error_message.as_deref(),
         resume_token: None,
     };
+    let invocation_id = outcome
+        .as_ref()
+        .ok()
+        .and_then(|outcome| outcome.invocation_id);
     match write_ledger(pool, ctx.tenant, &call_id, invocation_id).await {
         Ok(id) => tracing::debug!(
             tool = %call.tool, run = %run.run_id, call = %id, status, latency_ms,

@@ -86,11 +86,11 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                 ArchitectureRule::BoardDecisionRequired => {
                     ActionError::new(409, "architecture_profile_decision_required", detail)
                 }
-                ArchitectureRule::ReviewMissing => {
-                    ActionError::new(409, "architecture_review_missing", detail)
+                ArchitectureRule::ComplianceReviewMissing => {
+                    ActionError::new(409, "architecture_compliance_review_missing", detail)
                 }
-                ArchitectureRule::ReviewNonConformant(_) => {
-                    ActionError::new(409, "architecture_review_non_conformant", detail)
+                ArchitectureRule::ComplianceWaiverMissing => {
+                    ActionError::new(409, "architecture_waiver_missing", detail)
                 }
                 ArchitectureRule::KataCandidateRequired => {
                     ActionError::new(409, "architecture_kata_candidate_required", detail)

@@ -1419,6 +1419,77 @@ async fn coach_remedy(
         .await
         .map_err(|error| store_failure("coach.remedy: mark remedied", error))?;
 
+    // P1.3: the ask parks a human gate on the coach card.
+    if remedy_class == "ask" {
+        let card =
+            store::card::get_card_record_tx(&mut *tx, ctx.tenant, interruption.interrupted_card_id)
+                .await
+                .map_err(|error| store_failure("coach.remedy: read the interrupted card", error))?
+                .ok_or_else(|| ActionError::resource_not_found("card"))?;
+        let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.card.board_id)
+            .await
+            .map_err(|error| store_failure("coach.remedy: read the board", error))?
+            .ok_or_else(|| ActionError::resource_not_found("board"))?;
+        let approval_id = open_gate_tx(
+            &mut *tx,
+            &ctx,
+            ASK_GATE,
+            interruption.interrupted_card_id,
+            board.project_id,
+            json!({
+                "interruption_id": interruption.id,
+                "triage_class": triage_class,
+                "confidence": confidence,
+            }),
+        )
+        .await?;
+        store::coach::set_approval_tx(&mut *tx, ctx.tenant, interruption.id, approval_id)
+            .await
+            .map_err(|error| store_failure("coach.remedy: record the ask gate", error))?;
+    }
+
+    // P4: a systemic class opens exactly one kata; every other class opens none.
+    let mut kata_run_id = None;
+    if policy.systemic.iter().any(|class| class == &triage_class) {
+        let started = crate::process::runs::process_runs_start(
+            &mut *tx,
+            ctx.clone(),
+            ProcessRunStartIn {
+                card_id: interruption.interrupted_card_id,
+                process_id: None,
+                process_key: Some("kata.open".to_owned()),
+                inputs: json!({ "interruption_id": interruption.id }),
+                parent_run_id: None,
+                step_id: None,
+                workflow_step_id: None,
+                job_binding_id: None,
+                release_hash: None,
+            },
+        )
+        .await?;
+        let started = started.value;
+        kata_run_id = Some(started.id.clone());
+        if let Ok(run_id) = Uuid::parse_str(&started.id) {
+            store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)
+                .await
+                .map_err(|error| store_failure("coach.remedy: record the kata candidate", error))?;
+        }
+    }
+
+    // The remedy's bounded effect is applied now, in the same transaction that records it, so
+    // it cannot be rolled back by a later dispatch refusal (v1-p6-1). It is applied AFTER the
+    // systemic kata's run start: the kata is the coach's own escalation of this interruption,
+    // not the interrupted card's next dispatch, and must not be stopped by its own block. `ask`
+    // has no card effect: its human gate is enforced by the dispatch.
+    store::coach::apply_remedy_tx(&mut *tx, ctx.tenant, remedy.id)
+        .await
+        .map_err(|error| match error {
+            store::coach::CoachStoreError::RemedyInvalid(why) => {
+                ActionError::new(422, "coach.remedy_invalid", why)
+            }
+            other => store_failure("coach.remedy: apply", other),
+        })?;
+
     emit(
         &mut *tx,
         &ctx,

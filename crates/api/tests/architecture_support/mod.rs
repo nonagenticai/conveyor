@@ -410,6 +410,78 @@ pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> 
     adopted
 }
 
+/// Tailor the profile and adopt it on a real approved board decision.
+///
+/// The phase gate reads an ADOPTED profile only (v1-p81-1), and adoption cites an approved
+/// architecture-board decision about that profile (v1-p81-3). A test whose tailored set must
+/// govern therefore takes this path; `tailor` alone leaves a draft that never governs.
+pub async fn tailor_adopted(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
+    const PHASES: [&str; 9] = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"];
+    let draft = tailor(&f.running, requirements.clone(), contract_kinds.clone()).await;
+    let profile_id = id_of(&draft);
+    // The decision about the profile, on a board of its own so the fixture does not disturb
+    // board-list assertions.
+    let (status, opened) = f
+        .running
+        .invoke(
+            "architecture.board_open",
+            TOKEN,
+            json!({
+                "kind": "architecture_board",
+                "key": format!("profile-board-{}", Uuid::now_v7().simple()),
+                "name": "Profile board",
+                "charter": "Adopt the tailored ADM profile",
+                "commissioning_authority": "P0 programme board",
+                "decision_limits": {},
+                "members": [],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "architecture.board_open: {opened}");
+    let body_id = id_of(output(&opened));
+    let (status, decided) = f
+        .running
+        .invoke(
+            "architecture.board_decide",
+            TOKEN,
+            json!({
+                "body_id": body_id,
+                "decision": "approved",
+                "evidence": {"delegation_ref": f.delegation},
+                "subject_kind": "adm_profile",
+                "subject_id": profile_id,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "architecture.board_decide: {decided}");
+    let decision = output(&decided)["approval_id"]
+        .as_str()
+        .expect("the adoption decision id")
+        .to_owned();
+    // Re-tailor with the same content: the action adopts in the same write, so the row the
+    // gate reads is `adopted`.
+    ok(
+        &f.running,
+        "architecture.profile_tailor",
+        json!({
+            "key": "adm",
+            "name": "Tailored ADM",
+            "phase_set": PHASES,
+            "artifact_requirements": requirements,
+            "contract_kinds": contract_kinds,
+            "adopt_with_decision_id": decision,
+        }),
+        None,
+    )
+    .await
+}
+
 /// The row id of one seeded `artifact_type` key.
 pub async fn type_id(running: &support::Running, key: &str) -> String {
     let out = ok(running, "architecture.profile_get", json!({}), None).await;

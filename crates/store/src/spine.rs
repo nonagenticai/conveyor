@@ -1677,6 +1677,26 @@ pub async fn authorise_tranche_from_review_tx(
         })
 }
 
+/// The programme tranche that governs a project's start.
+///
+/// `Missing` is a programme-bound project whose programme has no `programme_tranche` row for
+/// the project's number (or none at all). It is not the same fact as `Standalone`: a fresh
+/// programme that has authorised no tranche must not let its projects start (v1-w2b-2).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ProjectTrancheState {
+    /// The project belongs to no programme; the tranche rule does not apply.
+    Standalone,
+    /// The project is programme-bound, but the programme has no row for its tranche.
+    Missing,
+    /// The project's tranche row exists with this state.
+    State {
+        /// The tranche number the project declares (default 1).
+        number: i32,
+        /// `planned | authorised | in_review | closed`.
+        state: String,
+    },
+}
+
 /// The programme tranche that governs a project's start: its number and state, when the
 /// project belongs to a programme with tranche rows.
 ///
@@ -1686,7 +1706,7 @@ pub async fn project_tranche_state_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
-) -> Result<Option<(i32, String)>, PlanStoreError> {
+) -> Result<ProjectTrancheState, PlanStoreError> {
     let project: Option<(Option<Uuid>, Value)> =
         sqlx::query_as("SELECT programme_id, meta FROM project WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
@@ -1695,7 +1715,7 @@ pub async fn project_tranche_state_tx(
             .await?;
     let (programme, meta) = project.ok_or(PlanStoreError::NotFound { what: "project" })?;
     let Some(programme) = programme else {
-        return Ok(None);
+        return Ok(ProjectTrancheState::Standalone);
     };
     let number = meta
         .get("tranche")
@@ -1711,7 +1731,10 @@ pub async fn project_tranche_state_tx(
     .bind(number)
     .fetch_optional(&mut *conn)
     .await?;
-    Ok(state.map(|state| (number, state)))
+    Ok(match state {
+        Some(state) => ProjectTrancheState::State { number, state },
+        None => ProjectTrancheState::Missing,
+    })
 }
 
 /// A recorded tranche review.
@@ -4777,21 +4800,20 @@ pub async fn close_retro_tx(
 /// The rule is the domain's (`PlanError::TrancheNotAuthorised`); the action maps it to
 /// `409 tranche_not_authorised`.
 ///
-/// [`project_tranche_state_tx`] answers `None` for two different facts, and only one of them is
-/// allowed: a project outside a programme keeps its legacy allowance, while a project inside a
-/// programme that HAS a tranche plan but no row for the project's tranche is sitting in an
-/// undeclared tranche and is refused. A programme that has declared no tranche plan at all (the
-/// pre-tranche programmes) also keeps the legacy allowance — the rule binds the first tranche to
-/// a plan that exists, it does not invent one. An authorised-looking state is only an
-/// authorisation when the row names the review that set it and that review is a review of this
-/// tranche — except for `closed`, which is terminal: the engine reaches it only through a
-/// `continue` review of the tranche itself, and the seeded genesis tranche is closed from birth.
+/// A project outside a programme keeps its legacy allowance (`Standalone`). A programme-bound
+/// project whose programme has **no row** for its tranche is an undeclared tranche and is
+/// refused (`Missing`), never treated as authorised (v1-w2b-2). An authorised-looking state is
+/// only an authorisation when the row names the review that set it and that review is a review
+/// of this tranche — except for `closed`, which is terminal: the engine reaches it only through
+/// a `continue` review of the tranche itself, and the seeded genesis tranche is closed from
+/// birth (measured 2026-11-26: requiring the link refused every close in the first tranche).
 pub async fn assert_project_tranche_authorised_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<(), PlanStoreError> {
     match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
+        ProjectTrancheState::Standalone => Ok(()),
         // A closed tranche is past authorisation by construction: the only engine path to
         // `closed` is a review of that tranche whose decision is `continue`
         // (`record_tranche_review_tx`), and the programme's genesis tranche is seeded closed.
@@ -4800,8 +4822,10 @@ pub async fn assert_project_tranche_authorised_tx(
         // programme's first tranche (measured 2026-11-26: DESIGN-PUBLISH's rework halted at act
         // 111, `projects.close` 409 `closure_tranche_not_authorised`, while the seed itself
         // declares tranche 0 closed).
-        Some((_number, state)) if state == "closed" => Ok(()),
-        Some((number, state)) if matches!(state.as_str(), "authorised" | "in_review") => {
+        ProjectTrancheState::State { state, .. } if state == "closed" => Ok(()),
+        ProjectTrancheState::State { number, state }
+            if matches!(state.as_str(), "authorised" | "in_review") =>
+        {
             let row: Option<(Uuid, Option<Uuid>)> = sqlx::query_as(
                 "SELECT t.id, t.authorisation_review_id
                    FROM programme_tranche t
@@ -4846,26 +4870,8 @@ pub async fn assert_project_tranche_authorised_tx(
                 Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
             }
         }
-        Some((_number, _state)) => Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised)),
-        None => {
-            let planned: bool = sqlx::query_scalar(
-                "SELECT EXISTS (
-                    SELECT 1 FROM project p
-                      JOIN programme_tranche t
-                        ON t.tenant_id = p.tenant_id AND t.programme_id = p.programme_id
-                     WHERE p.tenant_id = $1 AND p.id = $2
-                )",
-            )
-            .bind(tenant.as_uuid())
-            .bind(project_id)
-            .fetch_one(&mut *conn)
-            .await?;
-            if planned {
-                // The programme has a tranche plan; the project's tranche number is not in it.
-                Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
-            } else {
-                Ok(())
-            }
+        ProjectTrancheState::State { .. } | ProjectTrancheState::Missing => {
+            Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
         }
     }
 }
