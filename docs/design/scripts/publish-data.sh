@@ -62,8 +62,11 @@ fi
 #     committed-pack derivation then disagree and `publish-standards.sh` cannot write the record
 #     (measured 2026-11-26: status_source_drift:T18, P2). Copy the installed coverage in so both
 #     derivations read the same bytes; the install replaces it and `build-coverage.py` regenerates
-#     it to the same fixpoint below.
-cp "$data/coverage.json" "$tmp/data/coverage.json"
+#     it to the same fixpoint below. A pack that has never been published has none yet: the
+#     snapshot's own coverage (or the generator below) is then the only input, which is correct.
+if [ -f "$data/coverage.json" ]; then
+  cp "$data/coverage.json" "$tmp/data/coverage.json"
+fi
 
 # 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
 #    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
@@ -171,7 +174,7 @@ test -f "$tmp/docs/standards/index.html" || {
 # output: the snapshot never produces it, so `--delete` would destroy the registry the coverage
 # check below reads. It is refreshed by `conveyor admin actions dump`, a separate step, exactly
 # as `issues.json` is the raw GitHub export and is not a snapshot output either.
-rsync -a --delete --exclude 'actions.json' "$tmp/data/" "$data/"
+rsync -a --delete --exclude 'actions.json' --exclude 'output-standard.js' "$tmp/data/" "$data/"
 # The canonical register is an evidence ledger as well as a published row: the committed-pack
 # publish (`publish-standards.sh`) compares its build against this copy. Copy the register the
 # SNAPSHOT embedded (`$tmp/data/rework.json`), not the pre-snapshot file: the snapshot masks
@@ -189,6 +192,23 @@ done
 python3 "$root/scripts/build-coverage.py" --check
 python3 "$root/scripts/build-v2-coverage.py"
 python3 "$root/scripts/build-v2-coverage.py" --check
+# The console reads the output standard as a data file (`window.CONVEYOR_OUTPUT_STANDARD`);
+# it is not a snapshot output, so the rsync above preserves it and this step keeps it
+# byte-identical to the seed the pack was generated from.
+python3 - "$root" <<'PY'
+import json, sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+seed = json.loads((root / "seed/output-standard.json").read_text(encoding="utf-8"))
+target = root / "docs/design/data/output-standard.js"
+target.write_text(
+    "window.CONVEYOR_OUTPUT_STANDARD = "
+    + json.dumps(seed, indent=2, ensure_ascii=False)
+    + ";\n",
+    encoding="utf-8",
+)
+PY
 python3 "$pack/scripts/build-docs.py"
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/docs/" "$pack/docs/"

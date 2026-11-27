@@ -255,6 +255,13 @@ window.CONVEYOR_OUTPUTS = null;
 
 def write_outputs_placeholder(out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
+    # The published index is the live publish's object. A regeneration must never replace it with
+    # the placeholder: #723 left the null placeholder over the published index and redded main's
+    # design-pack (run 45577495051). Write the placeholder only when the installed pack has none,
+    # or still carries the placeholder itself.
+    installed = OUT / "outputs.js"
+    if installed.exists() and installed.read_text(encoding="utf-8") != OUTPUTS_PLACEHOLDER:
+        return
     (out / "outputs.js").write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
 
 
