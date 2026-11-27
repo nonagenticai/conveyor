@@ -5268,6 +5268,27 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             422,
         ),
+        // #836: the renderer's public face. A valid facts document renders to the same source on
+        // both transports; the digests are derived, and the action writes nothing.
+        expecting(
+            plain(
+                "proofs.render",
+                json!({
+                    "facts_canonical": json!({
+                        "kind": "slice",
+                        "spec_sha256": "0".repeat(64),
+                        "model_sha256": conveyor_actions::proof::render::model_sha256(),
+                        "state": "closed",
+                        "required": [],
+                        "present": [],
+                    })
+                    .to_string(),
+                    "theorem": "parity_render",
+                }),
+                None,
+            ),
+            200,
+        ),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(

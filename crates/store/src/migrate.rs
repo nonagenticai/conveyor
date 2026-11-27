@@ -351,7 +351,10 @@ mod tests {
                 (77, "development issue ref".to_owned()),
                 // T13 (#778): the published tool a waiting step is rebound onto
                 // (0078_process_step_tool_pin.sql, SPEC_V2 §11.6 item 3).
-                (78, "process step tool pin".to_owned())
+                (78, "process step tool pin".to_owned()),
+                // Delivery proofs (#836): the unit-ledger subject type
+                // (0079_lean_proof_unit_ledger.sql).
+                (79, "lean proof unit ledger".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
