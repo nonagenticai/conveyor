@@ -1,4 +1,110 @@
-// S1's rows (Portfolio & plan + Organisation). Empty until S1 lands; the parent creates the
-// file so the sibling never edits a shared one.
+// S1's rows (Portfolio & plan + Organisation). Each row is the census's walk/app/room/spec
+// exactly; the destination module is loaded lazily (GEMBA-WALK-SPEC §6.1).
 
-export default [];
+export default [
+  {
+    walk: "/organisation",
+    app: "/organisation",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/organisation.spec.ts",
+    load: () => import("../../destinations/organisation.js"),
+  },
+  {
+    walk: "/project-types",
+    app: "/project-types",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/project-types.spec.ts",
+    load: () => import("../../destinations/project-types.js"),
+  },
+  {
+    walk: "/agents",
+    app: "/agents",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/agents.spec.ts",
+    load: () => import("../../destinations/agents.js"),
+  },
+  {
+    walk: "/jobs",
+    app: "/jobs",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/jobs.spec.ts",
+    load: () => import("../../destinations/jobs.js"),
+  },
+  {
+    walk: "/runs",
+    app: "/runs",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/runs.spec.ts",
+    load: () => import("../../destinations/runs.js"),
+  },
+  {
+    walk: "/runs/:run_id",
+    app: "/runs/:run_id",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/runs.spec.ts",
+    load: () => import("../../destinations/runs.js"),
+  },
+  {
+    walk: "/tools",
+    app: "/tools",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/tools.spec.ts",
+    load: () => import("../../destinations/tools.js"),
+  },
+  {
+    walk: "/programme",
+    app: "/programme",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/programme.spec.ts",
+    load: () => import("../../destinations/programme.js"),
+  },
+  {
+    walk: "/decisions",
+    app: "/decisions",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/decisions.spec.ts",
+    load: () => import("../../destinations/decisions.js"),
+  },
+  {
+    walk: "/validation",
+    app: "/validation",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/validation.spec.ts",
+    load: () => import("../../destinations/validation.js"),
+  },
+  {
+    walk: "/execution",
+    app: "/execution",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/execution.spec.ts",
+    load: () => import("../../destinations/execution.js"),
+  },
+  {
+    walk: "/meetings",
+    app: "/meetings",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/meetings.spec.ts",
+    load: () => import("../../destinations/meetings.js"),
+  },
+  {
+    walk: "/meetings/:id",
+    app: "/meetings/:id",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/meetings.spec.ts",
+    load: () => import("../../destinations/meetings.js"),
+  },
+  {
+    walk: "/plan",
+    app: "/plan",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/plan.spec.ts",
+    load: () => import("../../destinations/plan.js"),
+  },
+  {
+    walk: "/board/:board_id",
+    app: "/board/:board_id",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/plan.spec.ts",
+    load: () => import("../../destinations/plan.js"),
+  },
+];
