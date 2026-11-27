@@ -81,10 +81,14 @@ row).
 | `solution_concept` | `01a21bfa-9e5a-7f80-b0b9-20244317b4c9` | 3 | approved |
 | `technology_standards` | `01a21bfa-a48d-7e4a-a537-acb72da5e609` | 3 | approved |
 
-The superseded rows are `01a21af6-83d5-7763-8cdb-253291aba8a7` (requirements),
-`01a21af6-95ef-75fe-b947-9b12ed9083e9` (solution) and `01a21af6-ac39-7881-b532-07e13e1e6af7`
-(technology), each at version 3 with state `superseded`. The approvals were recorded with the
-inception publication (#792 close-out); the documents' own review date remains 2026-12-03.
+The superseded rows, each at version 3 with state `superseded`:
+
+- `01a21af6-83d5-7763-8cdb-253291aba8a7` — requirements catalog
+- `01a21af6-95ef-75fe-b947-9b12ed9083e9` — solution concept
+- `01a21af6-ac39-7881-b532-07e13e1e6af7` — technology standards
+
+The approvals were recorded with the inception publication (#792 close-out); the documents' own
+review date remains 2026-12-03.
 
 ### Version 2 rows — host and identity (CR-WALK-001, ADR 0024, 2026-11-27)
 
