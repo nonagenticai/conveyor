@@ -11,9 +11,9 @@
       "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a"
     },
     {
-      "bytes": 200305,
+      "bytes": 202078,
       "path": "docs/SPEC_V2.md",
-      "sha256": "531edb3a0bfdee74c317746f9f4e3934f216ace6ebb4199d5387364ef833a265"
+      "sha256": "c256a9f0b8e4f1976d422ed9f2854da61f1b2eb4ac01930aed3ae42b65cc51a2"
     },
     {
       "bytes": 11057,
@@ -116,9 +116,9 @@
       "sha256": "a1d0302527912a04ac95492c7f2685c221ea3d17f2935e2a419bd9108947af93"
     },
     {
-      "bytes": 9097,
+      "bytes": 9152,
       "path": "docs/decisions/0021-gemba-walk-client.md",
-      "sha256": "175a70caf39a165b907ad1fa37861dabaf31182912e46251b33b27f5f1c5fa56"
+      "sha256": "c30853b78d156c18fa7e8fddce8b2d490ea328987f6682d3f6d0049536a472dc"
     },
     {
       "bytes": 6845,
@@ -126,24 +126,34 @@
       "sha256": "cb2b9cb3b0169079b8d491cd48dfdd42a8c3d66c39397e3a1ab1da584c8382aa"
     },
     {
-      "bytes": 22238,
+      "bytes": 5062,
+      "path": "docs/decisions/0023-gemba-walk-renderer.md",
+      "sha256": "da36c6feaf4c3aa9c7081a63fb780a94c30ac566d6df1c3d40d3d863914a524b"
+    },
+    {
+      "bytes": 9634,
+      "path": "docs/decisions/0024-gemba-walk-host-and-identity.md",
+      "sha256": "a18935c8d89553cec96d7c61aff57b7321aa203466a1db2122b775339e0c1e97"
+    },
+    {
+      "bytes": 23544,
       "path": "docs/design/GEMBA-WALK-ECS.md",
-      "sha256": "8bdb6eea5b14567660a087a86a931893f3c98e3e95b3ee423c89b5a79d68c559"
+      "sha256": "1e2d8b46e6f2d0c9e18b96dfe455b91eb7a5d8a0b6066ff424b99a53eb9c3140"
     },
     {
-      "bytes": 29773,
+      "bytes": 32071,
       "path": "docs/design/GEMBA-WALK-SPEC.md",
-      "sha256": "e469284745a443670ce38dbfca6f8172d86cf4be784aabf7db3664a8a1ac8eaf"
+      "sha256": "b173fad002c5d4ca894f91d5d74c001d150108010f029e9fdf84a47485c60500"
     },
     {
-      "bytes": 21163,
+      "bytes": 21107,
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.md",
-      "sha256": "c330a9bf05e64d2c6ae4277dff8e022db29164bd441027440a64abaafc504263"
+      "sha256": "40574a0ea224ccc8337f10f6571cd78cc34e11909178f0adca4e8ec75717dfef"
     },
     {
-      "bytes": 28881,
+      "bytes": 29012,
       "path": "docs/design/README.md",
-      "sha256": "b15c8d277788fef3a6f225e79a1ca413a4d0cf3bbc194306dfa05e681ddf6347"
+      "sha256": "71a7bf7b3b04a9e2849417cb1b76480693da0da9bed061e4c7a769ceb4179540"
     },
     {
       "bytes": 82524,
@@ -1496,6 +1506,11 @@
       "sha256": "d40d3d715a11587ab3e1542ca4b359a29eaceb4153f8fad90bec343cb834b742"
     },
     {
+      "bytes": 4336,
+      "path": "docs/evidence/s04-p41-live/2026-11-27/README.md",
+      "sha256": "7f0cd04a74e69228abc8a717d964ab01a592736af04dc605479af43dcdd4f415"
+    },
+    {
       "bytes": 7145,
       "path": "docs/evidence/t14/live-gate.md",
       "sha256": "92365206a0d9ac082f9059cea3cf8d8e2974028710ca569eb27efb38c424645c"
@@ -1911,9 +1926,14 @@
       "sha256": "574cbb45df62100bb2ce85730550973e6359c2b7f97cf01503598cb4e62859ab"
     },
     {
-      "bytes": 263074,
+      "bytes": 5585,
+      "path": "docs/evidence/walk-spike.md",
+      "sha256": "f36a548ddfe4e190941f535298e855c11a2973b29c5e143813773ed17a75fe76"
+    },
+    {
+      "bytes": 263121,
       "path": "docs/plans/00-INDEX.md",
-      "sha256": "b06b72690e788702376f646273eee8c1b507e404ae236792b7be56784f5e5d7b"
+      "sha256": "0386c356b520534205e13bb4409f13b96f7cfb3ad728efc149aa39cfe0ebf849"
     },
     {
       "bytes": 93802,
@@ -1951,9 +1971,9 @@
       "sha256": "13ff55fd014b32d4f0464e37b3624e2e37883d91450bd6a0cbf9701d9edff76e"
     },
     {
-      "bytes": 26151,
+      "bytes": 26115,
       "path": "docs/plans/03-DELIVERY.md",
-      "sha256": "12514c99588f9b8c02f46592384bd62878cb350d8948fbfa9f9df9987ca26fc0"
+      "sha256": "a15d13a40430a7f58c8b5c66e5deefdd6ff1073be0d283c8a58059abdeaac439"
     },
     {
       "bytes": 10911,
@@ -1971,9 +1991,9 @@
       "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad"
     },
     {
-      "bytes": 27218,
+      "bytes": 30524,
       "path": "docs/plans/GEMBA-WALK.md",
-      "sha256": "d6dfb43cdfe27e44633e73755de6b678f447afb773dc82a14ff142051365dbd1"
+      "sha256": "b7ff16ddfbd87e24a902ccb52fc0ffde7b87fd66b93b2055bb98da9f3503ddc3"
     },
     {
       "bytes": 13658,
@@ -2146,9 +2166,9 @@
       "sha256": "730d496a0daccbfb8db9a74d951dc24e1b70a87874155d5134bdf3b672ca9ba3"
     },
     {
-      "bytes": 18552,
+      "bytes": 18561,
       "path": "docs/plans/T9-architecture-capability.md",
-      "sha256": "ea086f6278a33091a43d09cf46f29491e10a8b9610897a29801d7cacda96bb09"
+      "sha256": "244030e0a23f20220656fa756a439cbdafef8a78df38b8231b534b46ae1739a3"
     },
     {
       "bytes": 3412,
@@ -2166,49 +2186,54 @@
       "sha256": "2d398cbda882ed09ff88ba036d01cf3c011aac24869f9c904a923e2461c50ed7"
     },
     {
-      "bytes": 7912,
+      "bytes": 8661,
       "path": "docs/plans/inception/GEMBA-WALK/00-project-brief.md",
-      "sha256": "1e423fcfe5debcf2c8aa5520871f1749dd0c7adf25a6afd757ecc4fcb5e5d91f"
+      "sha256": "fd4469bfe3877c16accacf40ad848414058a988c786d0b03ed1aee25783009f6"
     },
     {
-      "bytes": 6793,
+      "bytes": 7380,
       "path": "docs/plans/inception/GEMBA-WALK/01-inception-analysis.md",
-      "sha256": "8e44ce966d8742b48f429d885ebbe1d2c7dad0af752f9e0ec31c8dc1cd7a842a"
+      "sha256": "16acb06bce73b2305395b2e0900337d6c457744b86b69af41cc97e7a47e80faa"
     },
     {
-      "bytes": 19544,
+      "bytes": 23150,
       "path": "docs/plans/inception/GEMBA-WALK/02-architecture-design.md",
-      "sha256": "f55685286be55ae90e78de375794a9369b03430b8b644b9d1156447dd6442f89"
+      "sha256": "d0112bec464950f6693f10390555b6c969d7569d8abd563aa586ededb790c465"
     },
     {
-      "bytes": 8440,
+      "bytes": 9736,
       "path": "docs/plans/inception/GEMBA-WALK/03-artifact-register.md",
-      "sha256": "2734cfbba65a3230ae3087a4548aa84f02817a9c29fb0a7df8614d01e3dbae96"
+      "sha256": "41fc81a3a48e03f4eee4f4ac8c46c94c3b8fc25ed6724451573280fa9c08f924"
     },
     {
-      "bytes": 11139,
+      "bytes": 14023,
       "path": "docs/plans/inception/GEMBA-WALK/04-msp-profile.md",
-      "sha256": "44bc3d0a8cce7f74c77d6c36778c5c3d5875350a91d61b7da2b710c58ba274a7"
+      "sha256": "d47675638fb7ca6bdd9d78bdfbff6af7c5a70a5096fc2ec94e5ebf76d0fef250"
     },
     {
-      "bytes": 6688,
+      "bytes": 7575,
       "path": "docs/plans/inception/GEMBA-WALK/05-safe-epic.md",
-      "sha256": "9b0606d1c63d64b3488305d9ad4328279ef619807ddef04e29703af5b82ed614"
+      "sha256": "8ab2aa7b6ac11d25275cb562b45b009551f10892093e646ac4faccb2fc5471e5"
     },
     {
-      "bytes": 4241,
+      "bytes": 5175,
       "path": "docs/plans/inception/GEMBA-WALK/06-statement-of-architecture-work.md",
-      "sha256": "75f779a5e5a27706301516f9049fbdc3bf520d71da1dba6e066da61caaca3c0b"
+      "sha256": "dd1cf8ffac3258fdad3b289eefcc74cc39230f3a1c1ee56ce547af679b81d272"
     },
     {
-      "bytes": 8965,
+      "bytes": 11558,
       "path": "docs/plans/inception/GEMBA-WALK/07-governance-and-evidence.md",
-      "sha256": "023f1b59b22db68e0c6292f98a28aab59b811a03d97b5887d64ce3a21d422344"
+      "sha256": "5847c6ec2ce28c755a94dcd197df97f133807e8d11da59c3691046fd523ddc31"
     },
     {
-      "bytes": 3432,
+      "bytes": 10177,
+      "path": "docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md",
+      "sha256": "d2ff4e28b67e4e509641e167a11ea40f2a19f3d466a932aadb04257276a4a631"
+    },
+    {
+      "bytes": 3825,
       "path": "docs/plans/inception/GEMBA-WALK/README.md",
-      "sha256": "8f0f0b33a55db4844dfd0c17136f1be358b57e2145985550640de62ca00ba72b"
+      "sha256": "62544ed7f1882d1c2f97564c062e7923ef9254fc1f171b995888e803f6c68753"
     },
     {
       "bytes": 4719,
@@ -2431,6 +2456,6 @@
       "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163"
     }
   ],
-  "generated_at": "2026-11-27T08:41:58.742706+00:00",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "schema": "design-snapshot/v1"
 }

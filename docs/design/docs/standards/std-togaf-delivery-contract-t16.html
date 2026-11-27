@@ -37,19 +37,28 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>SPEC_V2 slice T16 (docs/SPEC_V2.md §12)</dd></div>
-        <div><dt>Status</dt><dd>absent</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
-        <div><dt>Gate</dt><dd>approved</dd></div>
-        <div><dt>Package</dt><dd><code>contract_missing:T16</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T09:12:40.605277+00:00 · afe964086712</dd></div>
+        <div><dt>Gate</dt><dd>live</dd></div>
+        <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t16:T16</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · e10ed9d66ddf</dd></div>
       </dl>
       <h2>Commitments</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>contract_missing:T16</code>).</p><h2>Compliance method</h2>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<ul>
+<li>commitments: T16 commits to the procedure-ingestion slice: a real SOP, an RDF/OWL/Turtle knowledge pack and a BPMN diagram ingested end to end through procedures.ingest_sop, procedures.ingest_rdf and procedures.ingest_process; every derived artefact published only as a draft behind a human decision; a re-ingest creating the next draft version while the published row retains source and pack; and a bound job running the PDDL steps, with no runtime RDF store, graph store or reasoner.</li>
+</ul><h2>Compliance method</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s compliance method: a compliance field on the delivery contract body (see <code>contract_missing:T16</code>).</p><h2>Approval</h2>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<ul>
+<li>compliance: T16 complies by realising decision D53: RDF/OWL/Turtle becomes a strata knowledge-pack import bound to the procedure by knowledge_pack_ref, with no runtime RDF store, graph store or reasoner; SOP, BPMN, Visio and draw.io sources enter through procedures.ingest_sop, procedures.ingest_rdf and procedures.ingest_process; every derived artefact is a draft behind a human publication gate (owner 2026-11-11, amended 2026-11-19). HTTP routes stay unversioned (/api/actions/procedures.*), PostgreSQL 18 is the one store, and the stable Rust action registry carries the capability.</li>
+</ul><h2>Approval</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Approval&#x27; (see <code>contract_missing:T16</code>).</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
+<ul>
+<li>approval 01a219de-0ad0-7abc-9464-78549d07c44e — approved <span class="std-state">approved</span></li>
+</ul>
     </main>
   </body>
 </html>

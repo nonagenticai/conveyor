@@ -37,23 +37,44 @@
         <div><dt>Standard</dt><dd>PMP</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>Plan: docs/plans/slices/S00-usage-inventory.md</dd></div>
-        <div><dt>Status</dt><dd>partial</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.4</dd></div>
         <div><dt>Gate</dt><dd>approved</dd></div>
         <div><dt>Package</dt><dd><code>std-pmp-project-registers-s00:S00</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T09:12:40.605277+00:00 · afe964086712</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · e10ed9d66ddf</dd></div>
       </dl>
       <h2>Risks</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Risks&#x27; (see <code>std-pmp-project-registers-s00:S00</code>).</p><h2>Issues</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<ul>
+<li>The dated samples cannot be re-measured, so a later reader cannot reproduce the counts <span class="std-state">open</span></li>
+<li>A used id that no later slice builds would break S14&#x27;s 100 % gate <span class="std-state">open</span></li>
+<li>A surface dropped by decision may still receive live traffic after sign-off <span class="std-state">open</span></li>
+</ul><h2>Issues</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Issues&#x27; (see <code>std-pmp-project-registers-s00:S00</code>).</p><h2>Assumptions</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
+<ul>
+<li>Planka&#x27;s database cannot evidence usage: four boards and five test cards <span class="std-state">open</span></li>
+<li>The execution census covers three days, so it cannot answer quarterly use <span class="std-state">open</span></li>
+</ul><h2>Assumptions</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Assumptions&#x27; (see <code>std-pmp-project-registers-s00:S00</code>).</p><h2>Dependencies</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
+<ul>
+<li>No active caller reaches a decision-dropped surface, so the sign-off carried no contradiction <span class="std-state">open</span></li>
+<li>The two adjacent 24-hour windows represent ordinary traffic <span class="std-state">open</span></li>
+</ul><h2>Dependencies</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Dependencies&#x27; (see <code>std-pmp-project-registers-s00:S00</code>).</p><h2>Benefits</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
+<ul>
+<li>Every later slice depends on parity_ids, and S14 gates on 100 % of used <span class="std-state">open</span></li>
+<li>The measurement depends on read-only access to master Postgres and Loki <span class="std-state">open</span></li>
+</ul><h2>Benefits</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Benefits&#x27; (see <code>std-pmp-project-registers-s00:S00</code>).</p><h2>Changes</h2>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
+<ul>
+<li>Zero-usage surface is dropped rather than ported <span class="std-state">open</span></li>
+<li>Every planned feature enters the rebuild with a stable id and a named acceptance <span class="std-state">open</span></li>
+</ul><h2>Changes</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>msp.json#/register_items</code> — 1 row(s)</p>
 <ul>

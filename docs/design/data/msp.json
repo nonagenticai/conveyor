@@ -1263,6 +1263,21 @@
       "version": 1
     },
     {
+      "created_at": "2026-11-27T09:42:21.672339+00:00",
+      "id": "01a21c62-6aeb-764e-af16-44eefdee7186",
+      "kind": "demo",
+      "meta": {
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+        "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+        "tranche_number": 6
+      },
+      "period": "tranche-6",
+      "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "state": "planned",
+      "updated_at": "2026-11-27T09:42:21.672339+00:00",
+      "version": 1
+    },
+    {
       "created_at": "2026-11-25T03:39:01.064378+00:00",
       "id": "01a210c9-0d47-7473-8339-7ea7648e59e9",
       "kind": "pi",
@@ -1665,6 +1680,120 @@
       "version": 4
     },
     {
+      "created_at": "2026-11-27T09:42:21.314099+00:00",
+      "id": "01a21c62-698d-7a02-b32a-1e3cad0ba69e",
+      "kind": "pi",
+      "meta": {
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+        "documents": {
+          "pi-objectives": "01a21c62-f797-72b6-9c64-28a2038cdeae",
+          "pi-plan": "01a21c62-f6e3-7717-954d-5f608c72c0d4"
+        },
+        "pi_plan": {
+          "capacity": {
+            "build_concurrency": 1,
+            "live_record_writer": 1,
+            "projects": [
+              "S06a",
+              "S06b",
+              "S10",
+              "S11",
+              "T19F"
+            ],
+            "read_agents_max": 6
+          },
+          "dependencies": [
+            {
+              "from": "S10",
+              "note": "the agent interface and control plane S10 reads",
+              "to": "S06b"
+            },
+            {
+              "from": "S11",
+              "note": "the agent interface and control plane S11 reads",
+              "to": "S06b"
+            },
+            {
+              "from": "T19F",
+              "note": "the programme definition and the tranche authorisation",
+              "to": "P0"
+            },
+            {
+              "from": "S06a",
+              "note": "supersession: the HMAC channel is not rebuilt",
+              "to": "S06b"
+            }
+          ],
+          "evidence": [
+            "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+            "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+            "docs/evidence/rework/tranche-6/refinement-wsjf.json",
+            "docs/evidence/rework/retention-2026-11-27.json"
+          ],
+          "objectives": [
+            {
+              "business_value": 5,
+              "committed": true,
+              "id": "O1",
+              "statement": "S06a is retired by recorded supersession, with a green receipt and no build artefacts."
+            },
+            {
+              "business_value": 10,
+              "committed": true,
+              "id": "O2",
+              "statement": "S06b's agent interface is accepted: a real agent task creates, reads, approves and closes a project, decided_by_kind='agent', with no nonagenticai_mcp_server in the path."
+            },
+            {
+              "business_value": 9,
+              "committed": true,
+              "id": "O3",
+              "statement": "S10's copilot/AG-UI surface is accepted."
+            },
+            {
+              "business_value": 8,
+              "committed": true,
+              "id": "O4",
+              "statement": "S11's procedures and SOPs are accepted."
+            },
+            {
+              "business_value": 9,
+              "committed": true,
+              "id": "O5",
+              "statement": "T19F's policy-version pinning, meeting decisions and cadence materialisation gate is accepted."
+            },
+            {
+              "business_value": 8,
+              "committed": false,
+              "id": "O6",
+              "statement": "The tranche review decides continue or pause on the evidence."
+            }
+          ],
+          "period": "tranche-6",
+          "refinement": {
+            "cadence_id": "01a21c62-6a43-7d17-9d5b-836ad1801e45"
+          },
+          "scope": [
+            "S06a",
+            "S06b",
+            "S10",
+            "S11",
+            "T19F"
+          ],
+          "wip_limit": {
+            "open_batches": 2,
+            "open_cards_per_writer": 1
+          }
+        },
+        "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+        "tranche_number": 6
+      },
+      "period": "tranche-6",
+      "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "state": "awaiting_approval",
+      "updated_at": "2026-11-27T09:43:19.641262+00:00",
+      "version": 3
+    },
+    {
       "created_at": "2026-11-21T17:22:16.643975+00:00",
       "id": "01a1ff21-547f-73e8-b256-4bee7fdc9c70",
       "kind": "refinement",
@@ -1906,6 +2035,71 @@
       "version": 2
     },
     {
+      "created_at": "2026-11-27T09:42:21.504084+00:00",
+      "id": "01a21c62-6a43-7d17-9d5b-836ad1801e45",
+      "kind": "refinement",
+      "meta": {
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+        "refinement": {
+          "period": "tranche-6",
+          "reestimate": {
+            "S06a": "0 open packages (record retirement)",
+            "S06b": "8 open packages",
+            "S10": "9 open packages",
+            "S11": "8 open packages",
+            "T19F": "14 open packages (2 P1, 12 P2)"
+          },
+          "reordered": [
+            {
+              "from": "the seed's membership order",
+              "item": "S06a first (retirement), then S06b, S10, S11, T19F",
+              "to": "S06a, S06b, S10, S11, T19F",
+              "why": "S06a is a recorded retirement; S06b is the agent interface and the control plane S10 and S11 read; T19F's live decision-forum gate closes the tranche."
+            }
+          ],
+          "wsjf_inputs": {
+            "S06a": {
+              "business_value": 5,
+              "job_size": 1,
+              "risk_reduction": 5,
+              "time_criticality": 8
+            },
+            "S06b": {
+              "business_value": 10,
+              "job_size": 8,
+              "risk_reduction": 8,
+              "time_criticality": 13
+            },
+            "S10": {
+              "business_value": 9,
+              "job_size": 9,
+              "risk_reduction": 8,
+              "time_criticality": 8
+            },
+            "S11": {
+              "business_value": 8,
+              "job_size": 8,
+              "risk_reduction": 7,
+              "time_criticality": 7
+            },
+            "T19F": {
+              "business_value": 9,
+              "job_size": 14,
+              "risk_reduction": 10,
+              "time_criticality": 6
+            }
+          }
+        },
+        "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+        "tranche_number": 6
+      },
+      "period": "tranche-6",
+      "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "state": "planned",
+      "updated_at": "2026-11-27T09:42:35.60365+00:00",
+      "version": 2
+    },
+    {
       "created_at": "2026-11-21T17:22:30.661556+00:00",
       "id": "01a1ff21-8b3b-7d8c-a94f-7ea0e53dbe66",
       "kind": "retro",
@@ -1999,6 +2193,21 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "state": "planned",
       "updated_at": "2026-11-26T07:45:32.119331+00:00",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-27T09:42:21.833157+00:00",
+      "id": "01a21c62-6b8c-73d2-a4cd-425f244cde36",
+      "kind": "retro",
+      "meta": {
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+        "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+        "tranche_number": 6
+      },
+      "period": "tranche-6",
+      "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "state": "planned",
+      "updated_at": "2026-11-27T09:42:21.833157+00:00",
       "version": 1
     }
   ],
@@ -4220,7 +4429,7 @@
     "unknown_targets": [],
     "untyped": 0
   },
-  "generated_at": "2026-11-27T08:41:58.742706+00:00",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "lessons": [
     {
       "cadence_id": "01a1ff21-8b3b-7d8c-a94f-7ea0e53dbe66",

@@ -37,15 +37,15 @@
         <div><dt>Standard</dt><dd>PMP</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>Programme-level unit (plan: docs/plans/development-process-speed.md)</dd></div>
-        <div><dt>Status</dt><dd>partial</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.4</dd></div>
         <div><dt>Gate</dt><dd>approved</dd></div>
         <div><dt>Package</dt><dd><code>std-pmp-project-registers-platform:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T09:12:40.605277+00:00 · afe964086712</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · e10ed9d66ddf</dd></div>
       </dl>
       <h2>Risks</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 6 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 8 row(s)</p>
 <ul>
 <li>V2 acceptance (#88/T12) remains open <span class="std-state">open</span></li>
 <li>The six benefit baselines are placeholders <span class="std-state">open</span></li>
@@ -53,23 +53,36 @@
 <li>V2 acceptance (#88/T12) remains open <span class="std-state">open</span></li>
 <li>The six benefit baselines are placeholders <span class="std-state">open</span></li>
 <li>Tranches 5 and 10-13 cannot deliver on proposed projects <span class="std-state">open</span></li>
+<li>The platform&#x27;s dependency on a single CI node is a single point of failure for every tranche <span class="std-state">open</span></li>
+<li>The standby has not been promoted in a drill, so the recovery path is documented but unproven <span class="std-state">open</span></li>
 </ul><h2>Issues</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 1 row(s)</p>
-<ul>
-<li>No deferrals — every finding executes by owner decision (2026-11-22) <span class="std-state">accepted</span></li>
-</ul><h2>Assumptions</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Assumptions&#x27; (see <code>std-pmp-project-registers-platform:PLATFORM</code>).</p><h2>Dependencies</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Dependencies&#x27; (see <code>std-pmp-project-registers-platform:PLATFORM</code>).</p><h2>Benefits</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Benefits&#x27; (see <code>std-pmp-project-registers-platform:PLATFORM</code>).</p><h2>Changes</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
 <ul>
+<li>No deferrals — every finding executes by owner decision (2026-11-22) <span class="std-state">accepted</span></li>
+<li>The live public window lags the committed pack until the next publish <span class="std-state">open</span></li>
+</ul><h2>Assumptions</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 1 row(s)</p>
+<ul>
+<li>The replay record is the programme&#x27;s working record until the rework is promoted <span class="std-state">open</span></li>
+</ul><h2>Dependencies</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 1 row(s)</p>
+<ul>
+<li>Every delivery tranche depends on the platform&#x27;s CI, registry and Postgres paths <span class="std-state">open</span></li>
+</ul><h2>Benefits</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 1 row(s)</p>
+<ul>
+<li>B1 Auditable decisions: every choice has a decision row <span class="std-state">open</span></li>
+</ul><h2>Changes</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<ul>
 <li>Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change <span class="std-state">accepted</span></li>
 <li>Change: the enhanced acceptance standard (gates executed, no deferrals) <span class="std-state">open</span></li>
+<li>The retrospective rework&#x27;s record fixes <span class="std-state">approved</span></li>
 </ul>
     </main>
   </body>

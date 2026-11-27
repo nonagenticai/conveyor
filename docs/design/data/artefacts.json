@@ -11010,9 +11010,61 @@
       "title": "Tranche 5 review — 2026-11-27",
       "unit": null,
       "updated_at": "2026-11-27T08:41:58.742706+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "pi-plan",
+      "created_at": "2026-11-27T09:42:57.49801+00:00",
+      "id": "01a21c62-f6e3-7717-954d-5f608c72c0d4",
+      "kind": "document",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "publishable": true,
+      "published_at": "2026-11-27T09:42:57.49801+00:00",
+      "title": "PI plan — tranche 6 (retrospective, 2026-11-27)",
+      "unit": "tranche-6",
+      "updated_at": "2026-11-27T09:42:57.49801+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "pi-objectives",
+      "created_at": "2026-11-27T09:42:57.681024+00:00",
+      "id": "01a21c62-f797-72b6-9c64-28a2038cdeae",
+      "kind": "document",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "publishable": true,
+      "published_at": "2026-11-27T09:42:57.681024+00:00",
+      "title": "PI objectives — tranche 6 (retrospective, 2026-11-27)",
+      "unit": "tranche-6",
+      "updated_at": "2026-11-27T09:42:57.681024+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "decision",
+      "created_at": "2026-11-27T09:44:42.831505+00:00",
+      "id": "01a21c64-9256-762d-a3d1-2d2d0d5a6596",
+      "kind": "document",
+      "project_id": "01a1d039-0d2a-779c-8d89-3bc79003b513",
+      "publishable": true,
+      "published_at": "2026-11-27T09:44:42.831505+00:00",
+      "title": "S06a retirement — superseded by S06b (2026-11-27)",
+      "unit": "S06a",
+      "updated_at": "2026-11-27T09:44:42.831505+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "decision",
+      "created_at": "2026-11-27T12:10:12.480892+00:00",
+      "id": "01a21ce9-c68e-761c-94af-3b0b140ef00c",
+      "kind": "document",
+      "project_id": null,
+      "publishable": true,
+      "published_at": "2026-11-27T12:10:18.740973+00:00",
+      "title": "Owner decision — the conformance ledger shrinks at the merged head (2026-11-27)",
+      "unit": null,
+      "updated_at": "2026-11-27T12:10:18.740973+00:00"
     }
   ],
-  "generated_at": "2026-11-27T08:41:58.742706+00:00",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "governed_assets": [
     {
       "confidence": null,

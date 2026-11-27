@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI plan — tranche 6 (retrospective, 2026-11-27) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="pi-plan" data-provenance-version="1" data-provenance-hash="9265c1edc8c4ac11f135408ea794af8b26610e325bf775728e61c1f63fb16fee" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>pi-plan</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>9265c1edc8c4ac11f135408ea794af8b26610e325bf775728e61c1f63fb16fee</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>PI plan — tranche 6</h1>
+<h2>Objectives</h2>
+<p>O1 S06a is retired by recorded supersession with a green receipt and no build artefacts. O2
+S06b's agent interface is accepted: one real agent task creates a project, reads its progress,
+answers an approval and closes it with <code>decided_by_kind='agent'</code>, and no
+<code>nonagenticai_mcp_server</code> is in the path. O3 S10's copilot/AG-UI surface is accepted. O4 S11's
+procedures and SOPs are accepted. O5 T19F's decision-forum governance gate is accepted: a
+reviewed policy asset publishes a new immutable <code>meeting_type</code> version while an in-flight
+meeting keeps its pinned version; a board subject decision is taken in a sitting whose
+qualifying seats each write one <code>approval_decision</code> with <code>via='meeting'</code>; a cadence row
+materialises exactly one meeting; the direct board path is unchanged. O6 the tranche review
+decides continue or pause on the evidence.</p>
+<h2>Plan</h2>
+<p>S06a is a record retirement, not a build: its plan was superseded by S06b on 2026-11-08 and
+nothing there is to be built. The operative order is S06a, S06b, S10, S11, T19F. S06b is the
+conveyor's own <code>/mcp</code> agent interface and the control plane S10 and S11 read; T19F closes the
+tranche with its live decision-forum gate.</p>
+<h2>WSJF order</h2>
+<p>S06b (10/13/8/8), S10 (9/8/8/9), S11 (8/7/7/8), T19F (9/6/10/14), S06a (5/8/5/1). S06a is
+first as the record retirement; the build work starts at S06b because it is the interface and
+control plane the other members read.</p>
+<h2>Capacity and WIP</h2>
+<p>Six read/audit agents, one build and one live-record writer; two open batches and one open card
+per writer.</p>
+<h2>Evidence</h2>
+<p>Programme <code>01a1d039-0d24-7d16-ae52-4841e96ccfac</code>, tranche <code>01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7</code>, the refinement <code>docs/evidence/rework/tranche-6/refinement-wsjf.json</code>,
+and the public-tree de-identification and retention record at <code>docs/evidence/rework/retention-2026-11-27.json</code>.</p>
+<h2>Dependencies</h2>
+<p>S10 and S11 depend on S06b's agent interface; T19F depends on T19, T17, T9, T10 and P0; S06a is
+superseded by S06b. Every member's receipt is green and fresh at the tranche snapshot before the
+review.</p>
+<h2>Backlog refinement</h2>
+<p>The tranche-6 refinement cadence <code>01a21c62-6a43-7d17-9d5b-836ad1801e45</code> carries the WSJF inputs and the reordered
+backlog; this plan's order follows it.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

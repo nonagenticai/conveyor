@@ -306,7 +306,7 @@
     "source": "docs/evidence/conformance-gap-register.json",
     "total": 179
   },
-  "generated_at": "2026-11-27T08:41:58.742706+00:00",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "projects": [
     {
       "class": "programme",
@@ -1664,6 +1664,24 @@
           "path": "docs/output-01a21a10-da03-717a-82b5-c20f5885dad6.html",
           "status": "active",
           "title": "Tranche review — tranche 4 (2026-11-26)",
+          "version": 1
+        },
+        {
+          "hash": "9265c1edc8c4ac11f135408ea794af8b26610e325bf775728e61c1f63fb16fee",
+          "id": "01a21c62-f6e3-7717-954d-5f608c72c0d4",
+          "kind": "pi-plan",
+          "path": "docs/output-01a21c62-f6e3-7717-954d-5f608c72c0d4.html",
+          "status": "active",
+          "title": "PI plan — tranche 6 (retrospective, 2026-11-27)",
+          "version": 1
+        },
+        {
+          "hash": "255a359947f06b299f34dc7f490b1143610d0983c89227d501332da05e3fb078",
+          "id": "01a21c62-f797-72b6-9c64-28a2038cdeae",
+          "kind": "pi-objectives",
+          "path": "docs/output-01a21c62-f797-72b6-9c64-28a2038cdeae.html",
+          "status": "active",
+          "title": "PI objectives — tranche 6 (retrospective, 2026-11-27)",
           "version": 1
         }
       ],
@@ -3905,8 +3923,20 @@
           "project-brief"
         ]
       },
-      "documents": [],
-      "evidenced": [],
+      "documents": [
+        {
+          "hash": "4d8e63104b506c2025b5927b7b1d36b5b7ded9fe921b7c23673889b166b7ab89",
+          "id": "01a21c64-9256-762d-a3d1-2d2d0d5a6596",
+          "kind": "decision",
+          "path": "docs/output-01a21c64-9256-762d-a3d1-2d2d0d5a6596.html",
+          "status": "active",
+          "title": "S06a retirement — superseded by S06b (2026-11-27)",
+          "version": 1
+        }
+      ],
+      "evidenced": [
+        "decision"
+      ],
       "id": "01a1d039-0d2a-779c-8d89-3bc79003b513",
       "issues": [],
       "key": "S06a",
@@ -9893,8 +9923,8 @@
   "standard_version": 3,
   "totals": {
     "declared": 130,
-    "documents": 842,
-    "evidenced": 489,
+    "documents": 846,
+    "evidenced": 490,
     "missing": 21,
     "projects": 51,
     "projects_without_class": 0
@@ -9907,6 +9937,15 @@
       "path": "docs/output-01a1ffe4-042d-7254-a896-382e79eb35e6.html",
       "status": "active",
       "title": "Conformance baseline v6 — acceptance (2026-11-21)",
+      "version": 1
+    },
+    {
+      "hash": "0a6ee086ee3e179c89be92f230af547b24340d74d597d3c9415ff7d1a343a176",
+      "id": "01a21ce9-c68e-761c-94af-3b0b140ef00c",
+      "kind": "decision",
+      "path": "docs/output-01a21ce9-c68e-761c-94af-3b0b140ef00c.html",
+      "status": "active",
+      "title": "Owner decision — the conformance ledger shrinks at the merged head (2026-11-27)",
       "version": 1
     }
   ]

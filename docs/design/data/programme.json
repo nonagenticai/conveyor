@@ -1,8 +1,67 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-27T08:41:58.742706+00:00",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 842,
+        "state": "OPEN",
+        "title": "feedback: in-app bug reports and feature requests for every tenant",
+        "updatedAt": "2026-11-27T12:42:02Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/842"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 839,
+        "state": "CLOSED",
+        "title": "fix(walk): mount the wasm engine — the config must carry the seed the boundary requires",
+        "updatedAt": "2026-11-27T11:17:05Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/839"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 838,
+        "state": "OPEN",
+        "title": "programme: tranche 6 — S06b, S10, S11, T19F packs + S06a receipt, exit and review",
+        "updatedAt": "2026-11-27T12:15:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/838"
+      },
       {
         "labels": [
           {
@@ -50,7 +109,7 @@
         "number": 836,
         "state": "OPEN",
         "title": "proof: the unit delivery model and the evaluation of the real ledger",
-        "updatedAt": "2026-11-27T09:09:45Z",
+        "updatedAt": "2026-11-27T11:23:57Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/836"
       },
       {
@@ -75,7 +134,7 @@
         "number": 832,
         "state": "OPEN",
         "title": "T13: the spend budget gate (v1-w4a-1, with v1-p75-1) — carve-out from the #526 lane",
-        "updatedAt": "2026-11-27T08:08:39Z",
+        "updatedAt": "2026-11-27T12:15:02Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/832"
       },
       {
@@ -85,8 +144,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -108,7 +167,7 @@
         "number": 831,
         "state": "OPEN",
         "title": "T4/T9/T10: the tranche-4 P0 residuals — six code findings and the two missing reviews",
-        "updatedAt": "2026-11-27T07:41:56Z",
+        "updatedAt": "2026-11-27T12:09:52Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/831"
       },
       {
@@ -207,9 +266,9 @@
           }
         ],
         "number": 819,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "standards: the 14 TOGAF/SAFe output categories the live documents need",
-        "updatedAt": "2026-11-27T08:08:38Z",
+        "updatedAt": "2026-11-27T11:39:11Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/819"
       },
       {
@@ -240,8 +299,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "1D76DB",
@@ -251,7 +310,7 @@
         "number": 816,
         "state": "OPEN",
         "title": "S3 — Gemba Walk: Knowledge, Measure, Operations & Utilities read/write parity",
-        "updatedAt": "2026-11-27T07:33:41Z",
+        "updatedAt": "2026-11-27T09:49:03Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/816"
       },
       {
@@ -261,8 +320,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "1D76DB",
@@ -272,7 +331,7 @@
         "number": 815,
         "state": "OPEN",
         "title": "S2 — Gemba Walk: Procedures & authoring + Govern & design read/write parity",
-        "updatedAt": "2026-11-27T07:33:38Z",
+        "updatedAt": "2026-11-27T09:49:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/815"
       },
       {
@@ -282,8 +341,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "1D76DB",
@@ -293,7 +352,7 @@
         "number": 814,
         "state": "OPEN",
         "title": "S1 — Gemba Walk: Portfolio & plan + Organisation read/write parity",
-        "updatedAt": "2026-11-27T07:33:34Z",
+        "updatedAt": "2026-11-27T09:49:10Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/814"
       },
       {
@@ -312,9 +371,9 @@
           }
         ],
         "number": 813,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "G0 — Gemba Walk foundation: census/instrument, renderer spike, bevy_ecs world, Portfolio end-to-end",
-        "updatedAt": "2026-11-27T08:30:52Z",
+        "updatedAt": "2026-11-27T10:30:29Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/813"
       },
       {
@@ -333,9 +392,9 @@
           }
         ],
         "number": 812,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "S04 P4.1 — the live coding, worker and billing receipts",
-        "updatedAt": "2026-11-27T08:08:37Z",
+        "updatedAt": "2026-11-27T10:52:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/812"
       },
       {
@@ -509,8 +568,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "5319E7",
@@ -520,7 +579,7 @@
         "number": 783,
         "state": "OPEN",
         "title": "design: conformance and standards as row-derived sections",
-        "updatedAt": "2026-11-26T21:38:39Z",
+        "updatedAt": "2026-11-27T11:24:39Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/783"
       },
       {
@@ -539,9 +598,9 @@
           }
         ],
         "number": 782,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "design: the unit record on the public site, and the retirement of the superseded Python",
-        "updatedAt": "2026-11-27T07:47:00Z",
+        "updatedAt": "2026-11-27T11:24:45Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/782"
       },
       {
@@ -2405,7 +2464,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-27T08:42:52Z",
+        "updatedAt": "2026-11-27T12:15:09Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -7125,7 +7184,7 @@
       }
     ],
     "provenance": {
-      "sha256": "8f005574f357fb8186b455ac33d9472fabe74d910820133bf497b3779e5de2ec",
+      "sha256": "94f13f6af11578725741a79fcdec01cfc2fc2133b478f1432ce8f4b4a88678f2",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },
