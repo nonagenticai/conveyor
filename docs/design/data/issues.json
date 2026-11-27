@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 806,
+      "title": "architecture: the Gemba Walk's bevy_ecs world layer \u2014 ADR 0022, the ECS design and its publication",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/806",
+      "updatedAt": "2026-11-27T02:53:57Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 803,
       "title": "prover: the deployed image is hand-built from nonagenticai/lean4-prover \u2014 a merge here never reaches the cluster",
       "state": "OPEN",
@@ -135,7 +156,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/784",
-      "updatedAt": "2026-11-27T01:47:18Z",
+      "updatedAt": "2026-11-27T02:33:29Z",
       "labels": [
         {
           "name": "programme",
@@ -209,17 +230,13 @@
     {
       "number": 780,
       "title": "github: the intent channel \u2014 issue form, DoR on events, sub-issues and tranche milestones",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/780",
-      "updatedAt": "2026-11-27T01:27:51Z",
+      "updatedAt": "2026-11-27T02:35:59Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:claimed",
-          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -379,15 +396,11 @@
       "title": "design: provenance on every output page and a declared-vs-evidenced register",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/756",
-      "updatedAt": "2026-11-27T01:31:16Z",
+      "updatedAt": "2026-11-27T02:35:55Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:claimed",
-          "color": "FBCA04"
         }
       ]
     },
@@ -982,9 +995,9 @@
     {
       "number": 660,
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T15:05:23Z",
+      "updatedAt": "2026-11-27T02:33:37Z",
       "labels": [
         {
           "name": "programme",
@@ -1632,9 +1645,9 @@
     {
       "number": 569,
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-24T04:28:12Z",
+      "updatedAt": "2026-11-27T02:33:34Z",
       "labels": [
         {
           "name": "programme",
@@ -2549,9 +2562,9 @@
     {
       "number": 435,
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-22T07:06:55Z",
+      "updatedAt": "2026-11-27T02:33:31Z",
       "labels": [
         {
           "name": "programme",
