@@ -1,6 +1,16 @@
-import { expect, test } from "./fixture";
+import { expect, test, type Page } from "./fixture";
 
-import { createBoardCard, invoke } from "./helpers";
+import { createBoardCard, invoke, isDevAuth } from "./helpers";
+
+const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
+
+/** Swap the dev cookie. The file's storageState is alice (admin of dev-a). */
+async function as(page: Page, login: string) {
+  const host = new URL(baseURL).hostname;
+  await page.context().addCookies([
+    { name: "conveyor_dev", value: login, domain: host, path: "/" },
+  ]);
+}
 
 // #563 T18-2 — Plan: the WBS, the baseline, the registers, and the change gate's rationale
 // refusal. The refusal is the server's `422 change_rationale_required`, not a client guess.
@@ -12,9 +22,9 @@ function unique(prefix: string): string {
 }
 
 test("a change needs a rationale", async ({ page, request }) => {
-  // The project's title is also the FILTER: a run leaves its project behind for the next one,
-  // the table sorts by key, and a fixed prefix's `.first()` would open an older run's project
-  // and assert its empty WBS (measured on a database with two runs).
+  // The project name must be the FILTER, not just the fixture's name: this spec creates one
+  // project per run, the table sorts by key, and a prefix filter's `.first()` would open an
+  // older run's project and assert its empty WBS. (Measured on a database with two runs.)
   const projectTitle = unique("e2e plan project");
   const project = await createBoardCard(request, projectTitle);
   const wbsTitle = unique("e2e wbs");
@@ -65,4 +75,31 @@ test("a change needs a rationale", async ({ page, request }) => {
 
   const notice = page.locator("p.notice[role=alert]");
   await expect(notice).toContainText("rationale");
+});
+
+// #848 — the empty project list before the populated path, and the read's error panel.
+// `fr-test`'s kata/execution tenants hold no project and stay that way for the whole suite —
+// not dev-b, which processes.spec.ts:138 fills with a board card.
+test("an empty tenant gets the empty project list", async ({ page }) => {
+  test.skip(!isDevAuth(), "the deployed suite has one principal; fr-test is a dev seed");
+  await as(page, "fr-test");
+  await page.goto("/plan");
+  await expect(page.getByRole("heading", { name: "Plan", exact: true })).toBeVisible();
+  await expect(page.getByText("No project in this tenant yet.")).toBeVisible();
+  await expect(page.locator('[data-testid="plan-projects"]')).toHaveCount(0);
+});
+
+test("a failed project read is the error panel, with a retry", async ({ page }) => {
+  await page.route(/\/api\/projects\?limit=200/, (route) =>
+    route.fulfill({
+      status: 500,
+      contentType: "application/problem+json",
+      body: JSON.stringify({ detail: "forced by the spec" }),
+    }),
+  );
+  await page.goto("/plan");
+  const panel = page.locator("div.panel.problem[role=alert]");
+  await expect(panel.getByRole("heading", { name: "That did not load" })).toBeVisible();
+  await expect(panel).toContainText("forced by the spec");
+  await expect(panel.getByRole("button", { name: "Try again" })).toBeVisible();
 });

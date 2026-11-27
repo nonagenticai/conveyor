@@ -1,6 +1,16 @@
 import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { activateJob, createActiveBinding, invoke } from "./helpers";
+import { activateJob, createActiveBinding, invoke, isDevAuth } from "./helpers";
+
+const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
+
+/** Swap the dev cookie. The file's storageState is alice (admin of dev-a). */
+async function as(page: Page, login: string) {
+  const host = new URL(baseURL).hostname;
+  await page.context().addCookies([
+    { name: "conveyor_dev", value: login, domain: host, path: "/" },
+  ]);
+}
 
 // T18-4 (#565) P1 — Tools. The grant can only narrow (a widened ceiling is the server's
 // `403 tool_effect_forbidden`), and a failed probe disables the bindings that would serve new
@@ -140,4 +150,29 @@ test("the tools screen has no horizontal page scroll at 1280 and 390", async ({ 
     );
     expect(overflow, `width ${width}`).toBeLessThanOrEqual(0);
   }
+});
+
+// #848 — `fr-test`'s kata/execution tenant publishes no toolkit and stays that way for the
+// whole suite, so the catalogue's own Empty is asserted without depending on spec order.
+test("an empty tenant gets the empty catalogue", async ({ page }) => {
+  test.skip(!isDevAuth(), "the deployed suite has one principal; fr-test is a dev seed");
+  await as(page, "fr-test");
+  await page.goto("/tools");
+  await expect(page.getByRole("heading", { name: "Tools", exact: true })).toBeVisible();
+  await expect(page.getByText("No published tool in this tenant")).toBeVisible();
+});
+
+test("a failed tools read is the error panel, with a retry", async ({ page }) => {
+  await page.route(/\/api\/actions\/tools\.list\/invocations/, (route) =>
+    route.fulfill({
+      status: 500,
+      contentType: "application/problem+json",
+      body: JSON.stringify({ detail: "forced by the spec" }),
+    }),
+  );
+  await page.goto("/tools");
+  const panel = page.locator("div.panel.problem[role=alert]");
+  await expect(panel.getByRole("heading", { name: "That did not load" })).toBeVisible();
+  await expect(panel).toContainText("forced by the spec");
+  await expect(panel.getByRole("button", { name: "Try again" })).toBeVisible();
 });

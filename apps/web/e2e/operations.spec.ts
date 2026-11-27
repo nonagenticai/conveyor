@@ -1,6 +1,16 @@
 import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { answerWaiverPrompt, FIXTURE_EVIDENCE_WAIVER, invoke } from "./helpers";
+import { answerWaiverPrompt, FIXTURE_EVIDENCE_WAIVER, invoke, isDevAuth } from "./helpers";
+
+const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
+
+/** Swap the dev cookie. The file's storageState is alice (admin of dev-a). */
+async function as(page: Page, login: string) {
+  const host = new URL(baseURL).hostname;
+  await page.context().addCookies([
+    { name: "conveyor_dev", value: login, domain: host, path: "/" },
+  ]);
+}
 
 // T18-4 (#565) P3.1 — Operations. A destructive write without an approved gate must change
 // nothing: the console asks the tenant's policy, requests a gate naming the exact target, and
@@ -127,4 +137,33 @@ test("the operations screen has no horizontal page scroll at 1280 and 390", asyn
     );
     expect(overflow, `width ${width}`).toBeLessThanOrEqual(0);
   }
+});
+
+// #848 — the P1.4 decision: Operations has no incident list by design (the screen "takes the
+// ids it operates on rather than inventing a list"), so the honest empty state is the Andon
+// tab's own Empty. `fr-test`'s tenants stay empty for the whole suite; nothing is inferred
+// from test order.
+test("an empty tenant sees the Andon tab's empty state, never a fixture", async ({ page }) => {
+  test.skip(!isDevAuth(), "the deployed suite has one principal; fr-test is a dev seed");
+  await as(page, "fr-test");
+  await page.goto("/operations");
+  await expect(page.getByRole("heading", { name: "Operations", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Andon" }).click();
+  const andon = page.getByTestId("operations-andon");
+  await expect(andon.locator(".empty")).toContainText("No cord state read in this session");
+});
+
+// The cluster read is a closed operation answered by the estate integration. Nothing is
+// configured in dev, so the server's own 503 is shown unchanged in the panel's problem state —
+// that is Operations' error path, and the error is the server's, not a client guess.
+test("a refused cluster read shows the server's own problem panel", async ({ page }) => {
+  await page.goto("/operations");
+  await page.getByRole("tab", { name: "Cluster & host" }).click();
+  const cluster = page.getByTestId("operations-cluster");
+  await cluster.getByLabel("Namespace").fill("conveyor");
+  await cluster.getByRole("button", { name: "Read pods" }).click();
+  const panel = cluster.locator("div.panel.problem[role=alert]");
+  await expect(panel).toBeVisible();
+  // The server's own sentence, not a loose keyword: ApiError renders `server 503: <detail>`.
+  await expect(panel).toContainText('no base URL is configured for service "ops"');
 });
