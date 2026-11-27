@@ -90,7 +90,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
     && cp -a docs/design/data/. /out/site/design/data/ \
     && cp -a docs/design/docs/. /out/site/design/docs/ \
     && cp docs/design/architecture/diagrams/*.svg /out/site/design/architecture/diagrams/ \
-    && cp docs/design/studio.html /out/site/design/index.html
+    && cp docs/design/studio.html /out/site/design/index.html \
+    # The Gemba Walk demo, served at /game beside /design. One self-contained document; the
+    # build-time rename to `index.html` is what the static handler's directory index resolves
+    # for /game/ (without it the path falls through to the SPA shell).
+    && mkdir -p /out/site/game \
+    && cp docs/game/Conveyor-Gemba-Walk.html /out/site/game/index.html
 
 FROM ${BASE_IMAGE} AS runtime
 # The commit this image was built from; the live design snapshot carries it. The public CI

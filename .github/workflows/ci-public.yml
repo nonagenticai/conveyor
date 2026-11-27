@@ -673,6 +673,11 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm "$IMG" --version
+          # The Gemba Walk demo rides the image at /game (a static sub-site under /srv/site,
+          # resolved by the directory-index branch in crates/api/src/web.rs:serve). Without this
+          # the image can ship green while the URL the unit exists for serves the SPA shell.
+          docker run --rm --entrypoint sh "$IMG" -c \
+            "test -f /srv/site/game/index.html && grep -qi '<!doctype html' /srv/site/game/index.html"
           out="$(docker run --rm "$IMG" --print-openapi)"
           [[ "$out" == *'"openapi"'* ]]
           # The committed lock pins the served contract; a binary that disagrees with it must not
