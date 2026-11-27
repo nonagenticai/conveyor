@@ -1888,15 +1888,16 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           76,
           556,
           557,
           630,
-          778
+          778,
+          797
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2865,8 +2866,8 @@
       },
       "total": 52,
       "uncovered": [],
-      "with_open_units": 10,
-      "without_open_units": 42
+      "with_open_units": 11,
+      "without_open_units": 41
     },
     "screens": {
       "actions_invoked": 39,
