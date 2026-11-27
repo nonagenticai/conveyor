@@ -304,6 +304,38 @@ satisfy `checkUnit` for the 56 units named above, and the control certifies the 
 passing set. The facts' provenance and the committed snapshot remain the reviewer's lever; the
 assumption line in § What the certificate says, and what it does not is unchanged.
 
+### The engine-derived unit record (2026-11-27, #837)
+
+The observed ledger's own note said the engine's rows cannot attest issue state, branch liveness,
+draft flags or run counts, so the unit's Definition of done needed a second structure over the
+rows it does carry. #837 adds it:
+
+- **The model.** `docs/spec/lean/DeliveryModel.lean` at `sha256 bbbc56e1…50a138e57` adds
+  `UnitRecordFacts` and `checkRecord`, every field an `Option` that fails closed, plus the theorem
+  `record_without_merge_is_unproven`. The model alone was streamed into the prover's own project
+  with the runner's command: **exit 0, 4 741 ms**. Rows proven against the older model stay
+  re-verifiable — `proofs.reverify` skips a row whose facts name a different model — and the new
+  digest is pinned by `proof_render.rs::the_model_digest_is_pinned`.
+- **A complete instance closes.** A rendered record with a green CI run, a merge, a deploy and a
+  live check at the deployed digest closes `theorem unit_record_ok : checkRecord facts = true :=
+  by decide` — **exit 0** in the prover's project.
+- **An incomplete one is refused by the kernel.** The same record with `mergeSha := none` renders
+  (the renderer never hides a defect) and the kernel answers **exit 1**: `Tactic 'decide' proved
+  that the proposition checkRecord facts = true is false`.
+- **The engine path, against PostgreSQL 18.** `proofs_attest.rs` (9 pass), `proofs_record.rs`
+  (18 pass, including re-derive / caller-facts / recomputed-tamper) and `pm_gate_unit_proof.rs`
+  (8 pass: advisory, required, and the policy toggle) run the real actions over migration 0081.
+  The refusal for a required unit without a certificate is the same typed
+  `422 gate_evidence_missing` a PM gate returns, produced by the factored `lean_proof` arm.
+
+**The live half is deployment-gated, and is not claimed here.** Measured at
+`2026-11-27T16:28Z`, the live primary is at migration **79** and `proof_policy` does not exist;
+the branch's **0081** reaches it only through the merge → image → runtime migrator. The first
+genuine live refusal — this unit's own chartered record, `required: true`, closed before its
+certificate exists — is recorded when the deployed engine carries 0081, in the same pattern by
+which #844's live certification was carried by #855. Concluding "live" from the branch binary
+against a schema that has not deployed would be exactly the drill this unit exists to replace.
+
 ### The findings run (conveyor#865)
 
 A second live run at 2026-11-27T17:00:47Z (`docs/evidence/units/2026-11-27-findings/`) re-ran this

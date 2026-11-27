@@ -46,7 +46,7 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
 /// acts on the difference between "you named the wrong model" and "your facts are incomplete".
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RenderError {
-    /// `kind` is not `slice`, `programme`, `package` or `unit_ledger`.
+    /// `kind` is not `slice`, `programme`, `package`, `unit_ledger` or `unit_record`.
     UnknownKind(String),
     /// The document is not a JSON object.
     NotAnObject,
@@ -173,6 +173,133 @@ pub fn render(facts: &Value, theorem: &str) -> Result<String, RenderError> {
             push_field(&mut body, "served", &lean_list(&served), true);
             push_field(&mut body, "checks", &lean_checks(&checks), false);
             ("PackageFacts", "checkPackage")
+        }
+        // The engine's own unit record is a single facts structure, like a slice: every field
+        // is an observation and `none` fails closed, so an incomplete record renders and the
+        // kernel refuses it rather than the renderer hiding the defect.
+        "unit_record" => {
+            let issue_ref = optional_text(object, "issue_ref")?;
+            let repo = optional_text(object, "repo")?;
+            let lane = optional_text(object, "lane")?;
+            let pull_number = optional_nat(object, "pull_number")?;
+            let pull_url = optional_text(object, "pull_url")?;
+            let pull_head = optional_text(object, "pull_head")?;
+            let ci_run_id = optional_text(object, "ci_run_id")?;
+            let ci_sha = optional_text(object, "ci_sha")?;
+            let ci_verdict = optional_text(object, "ci_verdict")?;
+            let merge_sha = optional_text(object, "merge_sha")?;
+            let deploy_digest = optional_text(object, "deploy_digest")?;
+            let serving_digest = optional_text(object, "serving_digest")?;
+            let live_health = optional_nat(object, "live_health")?;
+            let live_acceptance_exit = optional_int(object, "live_acceptance_exit")?;
+            let gate_review = optional_bool(object, "gate_review")?;
+            let gate_merge = optional_bool(object, "gate_merge")?;
+            let gate_deploy = optional_bool(object, "gate_deploy")?;
+            push_field(&mut body, "specSha256", &quoted(spec), true);
+            push_field(&mut body, "modelSha256", &quoted(&embedded), true);
+            push_field(
+                &mut body,
+                "issueRef",
+                &option_lean(issue_ref, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "repo",
+                &option_lean(repo, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "lane",
+                &option_lean(lane, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "pullNumber",
+                &option_lean(pull_number, |value| value.to_string()),
+                true,
+            );
+            push_field(
+                &mut body,
+                "pullUrl",
+                &option_lean(pull_url, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "pullHead",
+                &option_lean(pull_head, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "ciRunId",
+                &option_lean(ci_run_id, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "ciSha",
+                &option_lean(ci_sha, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "ciVerdict",
+                &option_lean(ci_verdict, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "mergeSha",
+                &option_lean(merge_sha, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "deployDigest",
+                &option_lean(deploy_digest, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "servingDigest",
+                &option_lean(serving_digest, |value| quoted(&value)),
+                true,
+            );
+            push_field(
+                &mut body,
+                "liveHealth",
+                &option_lean(live_health, |value| value.to_string()),
+                true,
+            );
+            push_field(
+                &mut body,
+                "liveAcceptanceExit",
+                &option_lean(live_acceptance_exit, |value| value.to_string()),
+                true,
+            );
+            push_field(
+                &mut body,
+                "gateReview",
+                &option_lean(gate_review, |value| value.to_string()),
+                true,
+            );
+            push_field(
+                &mut body,
+                "gateMerge",
+                &option_lean(gate_merge, |value| value.to_string()),
+                true,
+            );
+            push_field(
+                &mut body,
+                "gateDeploy",
+                &option_lean(gate_deploy, |value| value.to_string()),
+                false,
+            );
+            ("UnitRecordFacts", "checkRecord")
         }
         // A ledger chunk is a list of observations, not a single facts record: it has its own
         // emitter and its own theorem pair. Failing units are deliberately *not* refused here —
@@ -345,6 +472,54 @@ fn first_duplicate(items: &[String]) -> Option<&str> {
         .windows(2)
         .find(|pair| pair[0] == pair[1])
         .map(|pair| pair[0].as_str())
+}
+
+/// An observation that may be absent: `null` is `none`, a string is `some`, anything else is a
+/// type error. The renderer never defaults an absent observation to a passing value.
+fn optional_text(object: &Map<String, Value>, field: &str) -> Result<Option<String>, RenderError> {
+    match object.get(field) {
+        None => Err(RenderError::Missing(field.to_owned())),
+        Some(Value::Null) => Ok(None),
+        Some(Value::String(value)) => {
+            check_text(field, value)?;
+            Ok(Some(value.clone()))
+        }
+        Some(_) => Err(RenderError::NotA(format!(
+            "{field} is not a string or null"
+        ))),
+    }
+}
+
+fn optional_nat(object: &Map<String, Value>, field: &str) -> Result<Option<u64>, RenderError> {
+    match object.get(field) {
+        None => Err(RenderError::Missing(field.to_owned())),
+        Some(Value::Null) => Ok(None),
+        Some(value) => value.as_u64().map(Some).ok_or_else(|| {
+            RenderError::NotA(format!("{field} is not a non-negative integer or null"))
+        }),
+    }
+}
+
+fn optional_int(object: &Map<String, Value>, field: &str) -> Result<Option<i64>, RenderError> {
+    match object.get(field) {
+        None => Err(RenderError::Missing(field.to_owned())),
+        Some(Value::Null) => Ok(None),
+        Some(value) => value
+            .as_i64()
+            .map(Some)
+            .ok_or_else(|| RenderError::NotA(format!("{field} is not an integer or null"))),
+    }
+}
+
+fn optional_bool(object: &Map<String, Value>, field: &str) -> Result<Option<bool>, RenderError> {
+    match object.get(field) {
+        None => Err(RenderError::Missing(field.to_owned())),
+        Some(Value::Null) => Ok(None),
+        Some(value) => value
+            .as_bool()
+            .map(Some)
+            .ok_or_else(|| RenderError::NotA(format!("{field} is not a boolean or null"))),
+    }
 }
 
 /// The Lean constructor for a slice state.

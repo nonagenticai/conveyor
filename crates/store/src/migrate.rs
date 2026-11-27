@@ -356,7 +356,10 @@ mod tests {
                 // (0079_lean_proof_unit_ledger.sql).
                 (79, "lean proof unit ledger".to_owned()),
                 // #842: the tenant's feedback about the platform (0080_feedback.sql).
-                (80, "feedback".to_owned())
+                (80, "feedback".to_owned()),
+                // Delivery proofs (#837): the engine-derived unit subject and its policy
+                // (0081_unit_proof_policy.sql).
+                (81, "unit proof policy".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

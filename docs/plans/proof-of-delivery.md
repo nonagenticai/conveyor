@@ -111,5 +111,10 @@ typed `422`, so the gate can fail — which §5.4 requires, and a gate that neve
 ## Out of scope
 
 Rust-level verification (Verus/Kani); refinement of the model to the implementation; prover-side
-attestation; and widening the requirement from the programme release gate to every card's
-Definition of Done before one real cycle of refusals exists.
+attestation. The earlier deferral — widening the requirement from the programme release gate to a
+unit's Definition of Done **before one real cycle of refusals exists** — is resolved by #837: the
+engine derives the unit's facts (`UnitRecordFacts` / `checkRecord`, `proofs.attest`), the charter
+pins a `proof_policy`, and `development_projects.close` reports the certificate in advisory mode or
+refuses in required mode. The first live refusal cycle is recorded in
+`docs/evidence/proof-of-delivery.md` once the deployed engine carries migration 0081; the offline
+gate and the kernel runs are recorded there already.
