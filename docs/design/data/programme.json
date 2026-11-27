@@ -21,7 +21,7 @@
         "number": 857,
         "state": "CLOSED",
         "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
-        "updatedAt": "2026-11-27T16:31:13Z",
+        "updatedAt": "2026-11-27T16:32:28Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/857"
       },
       {
@@ -260,7 +260,7 @@
         "number": 837,
         "state": "OPEN",
         "title": "proof: engine-derived unit facts and the required DoD gate",
-        "updatedAt": "2026-11-27T16:09:48Z",
+        "updatedAt": "2026-11-27T16:34:26Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/837"
       },
       {
@@ -517,8 +517,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "1D76DB",
@@ -528,7 +528,7 @@
         "number": 814,
         "state": "OPEN",
         "title": "S1 — Gemba Walk: Portfolio & plan + Organisation read/write parity",
-        "updatedAt": "2026-11-27T09:49:10Z",
+        "updatedAt": "2026-11-27T16:33:04Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/814"
       },
       {
@@ -7360,7 +7360,7 @@
       }
     ],
     "provenance": {
-      "sha256": "ae8c2b94890bfb9681fd67a00a69a5276693b5ba620d834aa163ea07dbfa2e93",
+      "sha256": "cd7684348b1cad962d3438920bfdd886fdce29a4586fa677930acd197689252f",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

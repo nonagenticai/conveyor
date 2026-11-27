@@ -23,6 +23,7 @@ fn request_with(
         precondition: None,
         idempotency_key: idempotency_key.map(str::to_owned),
         approval_id: None,
+        credential_alias: None,
         actor_id: actor,
         actor_kind: "user".to_owned(),
         role,
