@@ -36,6 +36,8 @@ use uuid::Uuid;
 
 const ALICE: &str = "dev:alice";
 const REVIEWER: &str = support::REVIEWER;
+/// The second distinct human a §6.5 dual-control gate needs.
+const REVIEWER_TWO: &str = support::REVIEWER_TWO;
 /// The owner's delegated rule approver: a service principal (`app_user.kind='service'`) that
 /// holds the acting role. Its board decisions are recorded as `decided_by_kind='rule'`.
 const DELEGATE: &str = "dev:delegate";
@@ -137,13 +139,27 @@ async fn approved_gate(h: &Harness, action: &str, input: &Value) -> String {
             "kind": "action",
             "action": action,
             "input": input,
+            // T7 / v1-w1b-4: these are ops-controlled actions, so the gate carries §6.5's
+            // two-decision quorum and two distinct humans decide it.
+            "required_decisions": 2,
             "evidence": [{"kind": "baseline", "id": evidence_id}],
         }),
     )
     .await;
     let id = id_of(&gate, "id");
     let decided = decide(h, &id).await;
-    assert_eq!(decided["status"], "approved", "{decided}");
+    assert_eq!(
+        decided["status"], "pending",
+        "one decision leaves the quorum open: {decided}"
+    );
+    let second = ok(
+        h,
+        REVIEWER_TWO,
+        "approvals.decide",
+        json!({"approval_id": id, "decision": "approve"}),
+    )
+    .await;
+    assert_eq!(second["status"], "approved", "{second}");
     id
 }
 

@@ -15,7 +15,7 @@
 //! whose URL names a non-http(s)/mailto scheme is made inert. The public-page test carries
 //! `<script>`, an `onerror` attribute and a `javascript:` link.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use conveyor_domain::Project;
@@ -264,8 +264,17 @@ pub fn render_outputs(
     generated_at: &str,
     commit: Option<&str>,
 ) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
+    // The programme boundary, by the same predicate `live::site_view` publishes: a record or
+    // attachment whose project is outside the programme is a session fixture and is not public
+    // (no page, no index row). A row with no project is a tenant-level note and stays.
+    let bound: HashSet<Uuid> = projects
+        .iter()
+        .filter(|project| project.programme_id.is_some())
+        .map(|project| project.id)
+        .collect();
     let projects: HashMap<Uuid, (String, String)> = projects
         .iter()
+        .filter(|project| bound.contains(&project.id))
         .map(|project| {
             (
                 project.id,
@@ -275,6 +284,9 @@ pub fn render_outputs(
         .collect();
     let mut by_parent: HashMap<Uuid, Vec<&DocumentRecord>> = HashMap::new();
     for attachment in attachments {
+        if attachment.project_id.is_some_and(|id| !bound.contains(&id)) {
+            continue;
+        }
         if let Some(parent) = attachment.parent_document_id {
             by_parent.entry(parent).or_default().push(attachment);
         }
@@ -283,13 +295,22 @@ pub fn render_outputs(
     let mut entries = Vec::with_capacity(records.len());
     let mut pages = HashMap::with_capacity(records.len());
     for record in records {
+        // ⛔ A published row outside the programme is not public: no page, no index row.
+        if record.project_id.is_some_and(|id| !bound.contains(&id)) {
+            continue;
+        }
         let body = redact_text(record.body.as_deref().unwrap_or_default());
         let (project_key, project_name) = record
             .project_id
             .and_then(|id| projects.get(&id).cloned())
             .map_or((None, None), |(key, name)| (Some(key), Some(name)));
         let project_label = project_name.as_deref().or(project_key.as_deref());
-        let author = record.created_by.and_then(|id| names.get(&id).cloned());
+        // The author display name is free text (an email is a common choice) and leaves the tenant
+        // with the page, so it is redacted exactly like the title and the body.
+        let author = record
+            .created_by
+            .and_then(|id| names.get(&id))
+            .map(|name| redact_text(name));
         let attachment_entries: Vec<AttachmentEntry> = by_parent
             .get(&record.id)
             .map(|rows| {

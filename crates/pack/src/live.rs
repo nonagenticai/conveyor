@@ -256,27 +256,28 @@ pub(crate) fn programme_csv(programme: &Value) -> String {
             }
         }
         let issues: Vec<String> = numbers.iter().map(|number| format!("#{number}")).collect();
+        // The same safety net the JSON download applies: a project key, name, status or plan path
+        // is free text and can carry a pasted credential or email.
         let fields = [
-            key.to_owned(),
-            project
-                .get("name")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
-            meta.get("tranche").map(tranche_text).unwrap_or_default(),
-            project
-                .get("status")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
-            blocked_by.join(";"),
+            redact_text(key),
+            redact_text(
+                project
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            ),
+            redact_text(&meta.get("tranche").map(tranche_text).unwrap_or_default()),
+            redact_text(
+                project
+                    .get("status")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            ),
+            redact_text(&blocked_by.join(";")),
             open.to_string(),
             claimed.to_string(),
             issues.join(";"),
-            meta.get("plan")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
+            redact_text(meta.get("plan").and_then(Value::as_str).unwrap_or_default()),
         ];
         out.push_str(
             &fields

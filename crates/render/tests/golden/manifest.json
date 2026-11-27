@@ -12,16 +12,16 @@
     "byte_len": 4434
   },
   "b/diagram.pdf": {
-    "sha256": "a0699df5b626e4938ae2eb3a6cf8645c607b8bb0f2dfe36420a5f457c013ab23",
-    "byte_len": 14508
+    "sha256": "ba1275d9e6510e2fd2ba59f6e736e7d88cb0083780bd6acb003b65431ad5d58b",
+    "byte_len": 13825
   },
   "b/diagram.png": {
-    "sha256": "09716646a3808fff1720e9bd5364b202f85521422a71fae881f3db081b8ee238",
-    "byte_len": 188815
+    "sha256": "1c8a80c1b4549da42632cac9909cebce3b4f44b2714b93cd14528b669083d808",
+    "byte_len": 188575
   },
   "b/diagram.svg": {
-    "sha256": "39aad1ebb84bea3e419d8fe8b38751a141e059ef6ea62acb3a313ec128a3059f",
-    "byte_len": 3443
+    "sha256": "e631770d187d2a43bd39e090129b531411e6e8e2cbad4ffe5581f3ce1e33245f",
+    "byte_len": 3447
   },
   "c/diagram.pdf": {
     "sha256": "e0f0fe21095669401fc5f2950d3c9f3ae19cd6ccafc52b18e18be8745d300839",
