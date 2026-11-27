@@ -115,6 +115,19 @@ async fn fixture(db: &support::TestDb) -> Fixture {
     .fetch_one(&db.super_pool)
     .await
     .expect("insert the approved change");
+    // #797 (v1-w2c-3): the rebaseline guard reads the change gate's approved row, not the
+    // register row's status. The row above is written `approved` on purpose — that status is
+    // not the authority — so this gate is what authorises the new baseline.
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, project_id, gate, kind, status, required_decisions, meta)
+         VALUES ($1, $2, 'change', 'pm', 'approved', 1, $3)",
+    )
+    .bind(tenant_id)
+    .bind(project)
+    .bind(json!({ "change_id": change }))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the approved change gate");
     Fixture {
         tenant,
         programme,
