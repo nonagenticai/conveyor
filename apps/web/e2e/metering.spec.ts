@@ -29,8 +29,13 @@ function weekWindow() {
 async function usage(
   request: APIRequestContext,
   level: string,
+  id?: string,
 ): Promise<Usage> {
-  return invoke<Usage>(request, "metrics.usage", { level, ...weekWindow() });
+  return invoke<Usage>(request, "metrics.usage", {
+    level,
+    ...(id ? { id } : {}),
+    ...weekWindow(),
+  });
 }
 
 function tile(page: Page, label: string) {
@@ -39,11 +44,35 @@ function tile(page: Page, label: string) {
     .filter({ has: page.locator(".tk", { hasText: new RegExp(`^${label}$`) }) });
 }
 
+/**
+ * The screen's table against the action's own rows, sampled together.
+ *
+ * The ledger is live while this suite runs — `web.yml` starts a worker and the model double, and
+ * both land inference calls — so a row count read before the navigation can be a row stale by
+ * the time the table renders (measured 2026-11-27: 151 read, 152 rendered). Re-read both sides
+ * until they agree; the assertion is still that the screen is the action's own page, never a
+ * client-side approximation.
+ */
+async function expectRowsToMatch(
+  page: Page,
+  request: APIRequestContext,
+  level: string,
+  id?: string,
+): Promise<void> {
+  await expect
+    .poll(
+      async () =>
+        (await usage(request, level, id)).rows.length -
+        (await page.getByTestId("metering-table").locator("tbody tr").count()),
+      { timeout: 10_000 },
+    )
+    .toBe(0);
+}
+
 test("the roll-ups drill to the call", async ({ page, request }) => {
   const tenant = await usage(request, "tenant");
   const calls = tenant.rows.reduce((sum, row) => sum + row.calls, 0);
   const tokens = tenant.rows.reduce((sum, row) => sum + row.tokens, 0);
-  const callLevel = await usage(request, "call");
 
   await page.goto("/metering");
   await expect(page.getByRole("heading", { name: "Metering" })).toBeVisible();
@@ -57,16 +86,14 @@ test("the roll-ups drill to the call", async ({ page, request }) => {
 
   // The drill-down levels render from the same action; the call level is one row per call.
   await page.getByRole("tab", { name: "Call", exact: true }).click();
-  await expect(page.getByTestId("metering-table").locator("tbody tr")).toHaveCount(
-    callLevel.rows.length,
-  );
+  await expectRowsToMatch(page, request, "call");
   await expect(page.getByTestId("metering-table").locator("tbody tr").first()).toContainText("call");
 
   // A selected run scopes steps and calls by run_id — the one parent the action's filter names.
   const run = await usage(request, "run");
   const scoped = run.rows.find((row) => row.key.length === 36);
   await page.getByRole("tab", { name: "Run", exact: true }).click();
-  await expect(page.getByTestId("metering-table").locator("tbody tr")).toHaveCount(run.rows.length);
+  await expectRowsToMatch(page, request, "run");
   if (scoped) {
     // The full key, not eight characters: a UUIDv7's timestamp prefix repeats within a
     // millisecond, so a prefix match is ambiguous when many runs were seeded together.
@@ -75,14 +102,8 @@ test("the roll-ups drill to the call", async ({ page, request }) => {
       .getByRole("button", { name: "Drill to calls" })
       .click();
     await expect(page.getByTestId("metering-scope")).toBeVisible();
-    const runCalls = await invoke<Usage>(request, "metrics.usage", {
-      level: "call",
-      id: scoped.key,
-      ...weekWindow(),
-    });
-    await expect(page.getByTestId("metering-table").locator("tbody tr")).toHaveCount(
-      runCalls.rows.length,
-    );
+    // Same live-ledger sampling, scoped to the one run.
+    await expectRowsToMatch(page, request, "call", scoped.key);
   } else {
     // The dev seed's ledger is unattributed: no run key can scope, so no drill control is
     // offered for it — the screen never invents a parent the action cannot filter by.
