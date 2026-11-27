@@ -16,4 +16,11 @@ export default [
     spec: "e2e/portfolio-organisation/project-types.spec.ts",
     load: () => import("../../destinations/project-types.js"),
   },
+  {
+    walk: "/agents",
+    app: "/agents",
+    room: "organisation",
+    spec: "e2e/portfolio-organisation/agents.spec.ts",
+    load: () => import("../../destinations/agents.js"),
+  },
 ];
