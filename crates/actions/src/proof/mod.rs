@@ -109,6 +109,28 @@ pub struct ProofListIn {
     pub subject_id: Uuid,
 }
 
+/// `proofs.render`'s input.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProofRenderIn {
+    /// The facts, canonically serialised (the same document `proofs.record` will store).
+    pub facts_canonical: String,
+    /// The theorem the source must close.
+    pub theorem: String,
+}
+
+/// `proofs.render`'s output: the exact source `lean4.check` must be given.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProofRenderOut {
+    /// The source the renderer emits for these facts.
+    pub lean_source: String,
+    /// The digest of the canonical facts.
+    pub facts_sha256: String,
+    /// The model digest the facts name; the binary embeds the same model.
+    pub model_sha256: String,
+    /// The specification pin the facts carry.
+    pub spec_sha256: String,
+}
+
 /// One certificate, as an action answer.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProofOut {
@@ -734,6 +756,52 @@ async fn proofs_list(
         .await
         .map_err(|error| store_failure(error, "proofs.list"))?;
     Ok(rows.iter().map(ProofOut::of).collect())
+}
+
+/// `proofs.render` — the renderer's public face.
+///
+/// A certificate is only recordable when the checked source is exactly the renderer's output for
+/// the facts (`proof_source_not_rendered`), so a caller that is not this Rust process needs a way
+/// to obtain those bytes. This action is that way: it derives nothing and writes nothing; it
+/// renders and returns the digest, so a collector can send the source to `lean4.check` and then
+/// record it. Without it every non-Rust caller would re-implement the renderer — a second,
+/// divergent path.
+#[crate::action(
+    name = "proofs.render",
+    version = 1,
+    kind = "internal",
+    scopes = ["approvals:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn proofs_render(
+    _tx: &mut PgConnection,
+    _ctx: HandlerCtx,
+    input: ProofRenderIn,
+) -> Result<HandlerOutput<ProofRenderOut>, ActionError> {
+    let facts_value: Value = serde_json::from_str(&input.facts_canonical).map_err(|_| {
+        refuse(
+            "facts_canonical",
+            "proof_facts_not_json",
+            "the canonical facts must be a JSON document",
+        )
+    })?;
+    let lean_source = render::render(&facts_value, input.theorem.trim()).map_err(render_failure)?;
+    let spec_sha256 = facts_value
+        .get("spec_sha256")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_owned();
+    let facts_sha256 = content_hash(&Value::String(input.facts_canonical));
+    Ok(HandlerOutput::ok(ProofRenderOut {
+        lean_source,
+        facts_sha256,
+        model_sha256: render::model_sha256(),
+        spec_sha256,
+    }))
 }
 
 /// A SHA-256 as the table's CHECK spells it: 64 lower-case hex characters.

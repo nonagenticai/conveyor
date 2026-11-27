@@ -207,3 +207,46 @@ The chunk decision is unchanged: **200 units**. The shipped 200-unit source is 4
 (2× headroom under the 90 000-byte working limit, 2.2× under the prover's 100 000-character cap)
 and the warm kernel path is ≈ 2 s; 400 and 444 still require `maxRecDepth 4000` in the A0
 measurement and are not emitted.
+
+### A2 — the evaluation of the real ledger (offline, 2026-11-27)
+
+The collector (`scripts/proof/collect_units.py`, self-test in the `checks` job) fetched the
+window once and rendered it offline. The raw snapshot is committed at
+`docs/evidence/units/2026-11-27/snapshot.json`: 371 issues, 447 merged PRs (319 non-automation),
+124 live heads and 2 481 workflow runs at 638 shas, collected at `48797526c`. Its digests are in
+`units.json`; two renders of the same snapshot produced the same corpus hash and byte-identical
+facts (`36439d192a460a9e…`).
+
+| Corpus | Count |
+|---|---|
+| Completed units (certified) | 320 |
+| In flight (no merged PR; not certified) | 54 |
+| Orphan merged PRs (no issue) | 12 |
+| Automation PRs excluded (`github-actions[bot]`, `dependabot[bot]`, `automation/*`) | 128 |
+| Chunks at 200 units | 2 (200 + 120) |
+
+The facts documents measure 112 687 and 67 710 bytes (provenance included; the rendered source
+carries only the observations, so the A1 200-unit source measurement is the prover-side budget).
+The model is the A1 model (`378a1395…`); the spec is `docs/plans/03-DELIVERY.md`
+`12514c99588f8b8c…`. The collector's local mirror of the rules reports **56 of 320 completed
+units failing**:
+
+| Rule | Failing units |
+|---|---|
+| `ciBudget` | 0 |
+| `closesKeyword` | 12 (the orphans: a merged PR that names no issue) |
+| `mergeComplete` | 15 (orphans, an issue left open, a branch left live) |
+| `oneBranch` | 4 |
+| `onePull` | 5 |
+| `pullUsable` | 0 |
+| `verifyParts` | 50 |
+
+The `Verify:` cross-check against `scripts/ci/board.py`: 9 units pass the checker and fail the
+model (the checker accepts one `Verify:` in the exact section; the model requires one per part),
+6 the reverse, 293 agree. Both answers are in `units.json`; neither is silently adopted.
+
+**What is not run yet.** The kernel verdict over these chunks is deployment-gated: the collector
+records through `proofs.render`, which is added by #836 and deploys with this PR. The live step
+(two chunk certificates — one proven, one unproven if the findings persist — a `proofs.reverify`,
+and the programme bundle) is run after the rollout and recorded here with its response bodies.
+Until then these are the collector's facts and mirror, not a certificate.

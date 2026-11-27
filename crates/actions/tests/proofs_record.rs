@@ -381,3 +381,67 @@ async fn unit_subject_kind() {
         "the stored source is the ledger's own rendering: {stored}"
     );
 }
+
+/// #836 — `proofs.render` gives a non-Rust collector the exact bytes `record` will require.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn proofs_render_is_the_source_record_requires() {
+    let (pg, seeded) = fixture().await;
+    let facts = proof::facts("render");
+    let rendered = proof::source(&facts);
+
+    let outcome = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.render",
+            seeded.user_id,
+            json!({
+                "facts_canonical": facts.to_string(),
+                "theorem": proof::THEOREM,
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect("proofs.render");
+
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    let output = output(&outcome.body);
+    assert_eq!(
+        output["lean_source"].as_str(),
+        Some(rendered.as_str()),
+        "the action returns the renderer's own bytes, not a second rendering"
+    );
+    assert_eq!(
+        output["model_sha256"],
+        json!(conveyor_actions::proof::render::model_sha256())
+    );
+    assert_eq!(output["spec_sha256"], json!(proof::spec_sha256()));
+    assert_eq!(
+        output["facts_sha256"].as_str().map(str::len),
+        Some(64),
+        "the facts digest is computed here, never supplied"
+    );
+
+    // The renderer's refusals are the action's refusals; a foreign model is not rendered.
+    let mut foreign = proof::facts("render-foreign");
+    foreign["model_sha256"] = json!("b".repeat(64));
+    let error = conveyor_actions::invoke(
+        &pg.runtime,
+        conveyor_actions::registry(),
+        seeded.tenant,
+        proof::request(
+            "proofs.render",
+            seeded.user_id,
+            json!({
+                "facts_canonical": foreign.to_string(),
+                "theorem": proof::THEOREM,
+            }),
+            None,
+        ),
+    )
+    .await
+    .expect_err("a facts document naming another model is refused");
+    assert_eq!(error.code, "proof_model_mismatch", "{error:?}");
+}

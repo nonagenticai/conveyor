@@ -348,6 +348,7 @@ jobs:
           bash scripts/ci/tests/build_docs_preserve.sh
           bash scripts/ci/tests/walk_coverage.sh
           python3 scripts/ci/board.py --self-test
+          python3 scripts/proof/collect_units.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-standards.cjs --self-test

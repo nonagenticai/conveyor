@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "d423afd931265259f92c5d8104ff8909508919ed55af33f75dfd9d6311845355",
+    "GET /api/actions": "d9bc747196942c837fe6af95317c8f6f6c5f909413f89f4997042cb3c8094636",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -484,6 +484,7 @@
     "POST /api/actions/proofs.get/invocations": "e987ef9371c88e1146e6cde290422a227ab8331af426829f7072416bc9858873",
     "POST /api/actions/proofs.list/invocations": "cac3d94b577335983c7f40aa551e317bedb5fac52daa41209e28d59b730cf079",
     "POST /api/actions/proofs.record/invocations": "b21b6e4b24aebfa3ac3197020d08de6ada6f694a887f301f822f0253e33a7ac4",
+    "POST /api/actions/proofs.render/invocations": "983b4ab5cbee4559a81372fecee7673dfa0a31e21fa0e23685ab1efd54a97dcb",
     "POST /api/actions/proofs.reverify/invocations": "fdd915af5fb75d27e9e5a967c79b3d90659b8170f1787d7f7cfca0d0d1cb1de5",
     "POST /api/actions/providers.list/invocations": "913ad26500236ab9fa1906a13e6424cc2769da9029bb90ab5ed9d8964c56ee54",
     "POST /api/actions/publish.start/invocations": "b700da2c80bb3cd31e7bb463f93456b3b3a60d86ce5fec95378f8a2738b6bea0",

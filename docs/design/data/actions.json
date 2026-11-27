@@ -461,6 +461,7 @@
     "proofs.get",
     "proofs.list",
     "proofs.record",
+    "proofs.render",
     "proofs.reverify",
     "providers.list",
     "publish.start",
