@@ -677,6 +677,52 @@ async fn create_derived_drafts(
     Ok((procedure.id, process.id))
 }
 
+/// The operations a draft names that resolve to neither a declared engine action nor a published
+/// tool (§11.6.3).
+///
+/// A name with no dot can never be a canonical `<toolkit>.<tool>` tool name, so it is missing
+/// unless the registry declares it. Repeats collapse: one request per operation, not per mention.
+async fn missing_operations<'a>(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    actions: impl IntoIterator<Item = &'a str>,
+) -> Result<Vec<String>, ActionError> {
+    let mut missing: Vec<String> = Vec::new();
+    for action in actions {
+        let action = action.trim();
+        if action.is_empty() || crate::registry::registry().get(action).is_some() {
+            continue;
+        }
+        // An imported action approved for this tenant resolves like a compiled one (#3).
+        let imported = store::actions::approved_registry_by_name(&mut *tx, action)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, %action, "read the tenant's approved action registry");
+                ActionError::internal()
+            })?
+            .is_some();
+        if imported {
+            continue;
+        }
+        let published = match action.split_once('.') {
+            Some((toolkit_key, tool_key)) => {
+                store::tool::published_tool(&mut *tx, tenant, toolkit_key, tool_key, None)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, %action, "look up the tool a draft names");
+                        ActionError::internal()
+                    })?
+                    .is_some()
+            }
+            None => false,
+        };
+        if !published && !missing.iter().any(|seen| seen == action) {
+            missing.push(action.to_owned());
+        }
+    }
+    Ok(missing)
+}
+
 // ── the actions ──────────────────────────────────────────────────────────────────────────
 
 /// Ingest a prose SOP and convert it into a draft procedure.
@@ -774,6 +820,37 @@ async fn procedures_ingest_sop(
         &steps,
     )
     .await?;
+
+    // §11.6.3: an operation no tool provides is a governed request, not a refusal. One record per
+    // missing operation names the operation, the step (when a step names it) and the procedure;
+    // the request grants nothing, and the step stays retryable until the tool is published.
+    let mut named: Vec<&str> = steps.iter().map(|step| step.action.as_str()).collect();
+    named.extend(draft.requested_tools.iter().map(String::as_str));
+    let missing = missing_operations(&mut *tx, ctx.tenant, named).await?;
+    for operation in &missing {
+        let position = steps
+            .iter()
+            .position(|step| step.action.trim() == operation.as_str())
+            .map(|zero| zero + 1);
+        let key = format!(
+            "{}.{}.{operation}",
+            input.process_key.trim(),
+            position.unwrap_or(0)
+        );
+        let payload = json!({
+            "operation": operation,
+            "procedure_id": procedure_id,
+            "process_key": input.process_key.trim(),
+            "step_position": position,
+            "source_asset_id": source_asset_id,
+        });
+        store::authoring::tool_request_open_tx(&mut *tx, ctx.tenant, ctx.actor_id, &key, &payload)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, %key, "open the tool request");
+                ActionError::internal()
+            })?;
+    }
 
     // The design-reuse drafts (P1.4): capability, agent and job, all unpublished. The agent's
     // allowed_actions is EMPTY — an SOP cannot grant a tool (P5.2).
@@ -1082,8 +1159,13 @@ async fn procedures_validate(
         steps.len()
     ));
 
-    // P5.2: the SOP may ASK for a tool; the request is never granted and the draft is refused
-    // until it is removed. The agent's `allowed_actions` is empty by construction.
+    // §11.6.3: the SOP may ASK for a tool. Intake records the request as a tool request; it is
+    // never a grant, and it is no longer a refusal — the draft stays retryable until the tool is
+    // published and the step is rebound. The agent's `allowed_actions` is empty by construction.
+    let mut named: Vec<String> = steps
+        .iter()
+        .filter_map(|step| step.action.clone())
+        .collect();
     if let Some(source_id) = process.source_asset_id {
         let asset = store::governance::get_asset_record_tx(&mut *tx, ctx.tenant, source_id)
             .await
@@ -1108,24 +1190,28 @@ async fn procedures_validate(
                 .unwrap_or_else(|| json!([])),
         )
         .unwrap_or_default();
-        if !requested.is_empty() {
-            return Err(ActionError::new(
-                422,
-                "sop.cannot_grant_tool",
-                format!(
-                    "the SOP asks for tools ({}) — no SOP can grant a tool; remove the request or approve the tool through T15",
-                    requested.join(", ")
-                ),
-            ));
-        }
-        checks.push("the SOP requests no tool grant".to_owned());
+        named.extend(requested);
+        checks.push("the SOP's tool requests are recorded, never granted".to_owned());
         checks.push(format!("the source {source_id} is {:?}", asset.status));
     }
     if process.source_asset_id.is_none() {
         checks.push("the draft is hand-authored; no source review applies".to_owned());
     }
+    let missing =
+        missing_operations(&mut *tx, ctx.tenant, named.iter().map(String::as_str)).await?;
+    if missing.is_empty() {
+        checks.push(
+            "every named operation resolves to a declared action or a published tool".to_owned(),
+        );
+    } else {
+        checks.push(format!(
+            "{} operations have no tool yet: {}",
+            missing.len(),
+            missing.join(", ")
+        ));
+    }
     Ok(ValidateOut {
-        valid: true,
+        valid: missing.is_empty(),
         checks,
     })
 }

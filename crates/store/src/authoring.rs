@@ -357,6 +357,62 @@ pub async fn asset_draft_tx(
         .await?)
 }
 
+/// Open one tool request: the `authoring_asset` of kind `tool_request` naming the operation, the
+/// step and the procedure (§11.6.3).
+///
+/// Unlike [`asset_draft_tx`] this carries no intake. The request is raised by the engine while a
+/// procedure is ingested, not by a caller drafting from an intake, so `intake_id` stays NULL and
+/// the payload is the whole record. Re-opening the same request returns the open row instead of
+/// drafting a second one, which is what makes a repeated validation idempotent.
+pub async fn tool_request_open_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    actor: Uuid,
+    key: &str,
+    payload: &Value,
+) -> Result<AssetRecord, AuthoringStoreError> {
+    let key = key.trim();
+    if key.is_empty() {
+        return Err(AuthoringError::MissingKey.into());
+    }
+    let Some(payload_object) = payload.as_object() else {
+        return Err(AuthoringError::PayloadNotObject.into());
+    };
+    for forbidden in FORBIDDEN_PAYLOAD_KEYS {
+        if payload_object.contains_key(forbidden) {
+            return Err(AuthoringError::PayloadForbidden { key: forbidden }.into());
+        }
+    }
+    let open_sql = format!(
+        "SELECT {ASSET_COLUMNS} FROM authoring_asset
+          WHERE tenant_id = $1 AND kind = 'tool_request' AND key = $2
+            AND status IN ('draft', 'reviewed')
+          ORDER BY created_at DESC
+          LIMIT 1"
+    );
+    let existing: Option<AssetRecord> = sqlx::query_as(AssertSqlSafe(open_sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_optional(&mut *conn)
+        .await?;
+    if let Some(asset) = existing {
+        return Ok(asset);
+    }
+    let insert_sql = format!(
+        "INSERT INTO authoring_asset
+             (tenant_id, kind, key, payload, depends_on, created_by)
+         VALUES ($1, 'tool_request', $2, $3, '[]'::jsonb, $4)
+         RETURNING {ASSET_COLUMNS}"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(insert_sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .bind(payload)
+        .bind(actor)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
 /// Record the review decision an approval carries for `asset_id`.
 ///
 /// The asset must be a `draft`. The cited approval must exist in the tenant, carry the
