@@ -20,12 +20,13 @@ still fails closed by design — the tolerance is what the test exercises.
 | time | step |
 |---|---|
 | 22:29:59 | image-update automation suspended; `spec.suspend` read back `true` |
-| 22:30:31 | pin pushed (`5b39d1580b`): the five image lines — both Deployments — rewritten to the bare digest, the `$imagepolicy` setter removed so the automation cannot rewrite them |
+| 22:30:18 | pin committed and pushed (`5b39d1580b`): the five image lines — both Deployments — rewritten to the bare digest, the `$imagepolicy` setter removed so the automation cannot rewrite them |
 | 22:30:44 | source and `services` kustomization reconciled to that revision |
 | 22:31:24 | converged: two API pods and the worker Running and Ready on `cbee6af8…` |
 | 22:31:27 | deployments recorded; both binaries report `949e95c8c…`; `/health` 200, `/health/ready` 200 |
 | 22:32:0x | a database-backed action (`benchmark_suites.list`) invoked through the deployed CLI on the old binary returned its rows; `select max(version) from _sqlx_migrations` = 81 |
-| 22:32:15 | revert pushed (`4733e66e39`); the image-update automation resumed (`spec.suspend` unset) |
+| 22:31:42 | revert committed and pushed (`4733e66e39`); the image-update automation resumed (`spec.suspend` unset) |
+| 22:32:15 | source and kustomization reconciled to the revert |
 | 22:32:44 | restored: all three pods on `f13dea55…`; both binaries report `0096cc0da…`; `/health` 200 |
 
 ## What the run proves

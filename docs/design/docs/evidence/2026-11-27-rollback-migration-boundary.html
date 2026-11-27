@@ -75,8 +75,8 @@
 <td>image-update automation suspended; <code>spec.suspend</code> read back <code>true</code></td>
 </tr>
 <tr>
-<td>22:30:31</td>
-<td>pin pushed (<code>5b39d1580b</code>): the five image lines — both Deployments — rewritten to the bare digest, the <code>$imagepolicy</code> setter removed so the automation cannot rewrite them</td>
+<td>22:30:18</td>
+<td>pin committed and pushed (<code>5b39d1580b</code>): the five image lines — both Deployments — rewritten to the bare digest, the <code>$imagepolicy</code> setter removed so the automation cannot rewrite them</td>
 </tr>
 <tr>
 <td>22:30:44</td>
@@ -95,8 +95,12 @@
 <td>a database-backed action (<code>benchmark_suites.list</code>) invoked through the deployed CLI on the old binary returned its rows; <code>select max(version) from _sqlx_migrations</code> = 81</td>
 </tr>
 <tr>
+<td>22:31:42</td>
+<td>revert committed and pushed (<code>4733e66e39</code>); the image-update automation resumed (<code>spec.suspend</code> unset)</td>
+</tr>
+<tr>
 <td>22:32:15</td>
-<td>revert pushed (<code>4733e66e39</code>); the image-update automation resumed (<code>spec.suspend</code> unset)</td>
+<td>source and kustomization reconciled to the revert</td>
 </tr>
 <tr>
 <td>22:32:44</td>

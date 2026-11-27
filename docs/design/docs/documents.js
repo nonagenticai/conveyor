@@ -411,8 +411,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/2026-11-27-rollback-migration-boundary.html",
       "source": "docs/evidence/2026-11-27-rollback-migration-boundary.md",
       "section": "Evidence",
-      "sha256": "88709897872fbc6b3908007cc50be15a82868a771624565a88a3e5129b188f23",
-      "bytes": 3770,
+      "sha256": "b35911e299680d9ca9bb33e608e159f89accb36f7a082ca3f03739dfd23e4ae3",
+      "bytes": 3863,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-27-rollback-migration-boundary.md"
     },
     {
