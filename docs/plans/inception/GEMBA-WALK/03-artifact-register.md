@@ -108,9 +108,11 @@ Four rows move to version 2 when the `bevy_ecs` world layer is accepted, because
 what they say; the other six are unchanged. The v2 row supersedes the v1 row rather than editing it
 (`architecture.artifacts_supersede`), so the v1 text stays readable as history.
 
-Executed 2026-11-27: `data_entity_catalog` is the approved v2 row above; the other three were then
-superseded by the CR-WALK-001 v3 rows, so their world-layer text is readable on the superseded rows,
-not on the current ones.
+Executed 2026-11-27: `data_entity_catalog` is the approved v2 row above; the other three current
+rows are the CR-WALK-001 v3 rows. The rows carry metadata and a document link, not the text: the
+current rows link the published architecture design (`01a21af5-652e-7739-b294-7bb662e13d36`, v2),
+and the superseded originals carry no document link. The world-layer content is in that document
+and in the published ECS document (`01a21afb-16c3-7140-81e4-93ef872ea6fb`).
 
 | Key | v2 change | Source |
 |---|---|---|
@@ -119,9 +121,10 @@ not on the current ones.
 | `data_entity_catalog` | the entity/component mapping to the existing tables; no new table | `GEMBA-WALK-ECS.md` §3–§5 |
 | `technology_standards` | `bevy_ecs`/`bevy_app`/`bevy_time` `=0.20.1`, wasm32, cargo-leptos for `apps/web` only, `panic=abort` | `GEMBA-WALK-ECS.md` §2, §11 |
 
-`GEMBA-WALK-ECS.md` also becomes its own `architecture-artifact` row (phase D / HLD, owner
-programme-architect, reviewer Architecture Board), linked `realization` from `solution_concept` and
-`derivation` into `technology_standards`.
+`GEMBA-WALK-ECS.md` is published as its own `architecture-artifact` **document** (read back
+2026-11-27: `01a21afb-16c3-7140-81e4-93ef872ea6fb`, category `architecture-artifact`, v1, published
+2026-11-27T03:09:57Z, project `01a21af4-…`), linked by the rows' document reference to the
+architecture design rather than by a typed artefact row of its own.
 
 ## Contract kinds
 

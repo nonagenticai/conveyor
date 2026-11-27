@@ -2229,8 +2229,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/GEMBA-WALK/03-artifact-register.html",
       "source": "docs/plans/inception/GEMBA-WALK/03-artifact-register.md",
       "section": "Plans",
-      "sha256": "fd7047817e9e7341273697f73d5669dfa4d2f09f7da7bb4bbfe1191f29cd3c54",
-      "bytes": 12410,
+      "sha256": "61602c178d3ddb188a285a0713e177afaeec68c8e067ec4eed3c2567f29cabf7",
+      "bytes": 12770,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/03-artifact-register.md"
     },
     {

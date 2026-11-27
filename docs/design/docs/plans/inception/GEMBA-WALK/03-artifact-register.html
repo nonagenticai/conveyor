@@ -408,7 +408,7 @@
 </table>
 <h3 id="v2-rows--the-world-layer-806-adr-0022">v2 rows — the world layer (#806, ADR 0022)</h3>
 <p>Four rows move to version 2 when the <code>bevy_ecs</code> world layer is accepted, because the world changes what they say; the other six are unchanged. The v2 row supersedes the v1 row rather than editing it (<code>architecture.artifacts_supersede</code>), so the v1 text stays readable as history.</p>
-<p>Executed 2026-11-27: <code>data_entity_catalog</code> is the approved v2 row above; the other three were then superseded by the CR-WALK-001 v3 rows, so their world-layer text is readable on the superseded rows, not on the current ones.</p>
+<p>Executed 2026-11-27: <code>data_entity_catalog</code> is the approved v2 row above; the other three current rows are the CR-WALK-001 v3 rows. The rows carry metadata and a document link, not the text: the current rows link the published architecture design (<code>01a21af5-652e-7739-b294-7bb662e13d36</code>, v2), and the superseded originals carry no document link. The world-layer content is in that document and in the published ECS document (<code>01a21afb-16c3-7140-81e4-93ef872ea6fb</code>).</p>
 <table>
 <thead>
 <tr>
@@ -440,7 +440,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>GEMBA-WALK-ECS.md</code> also becomes its own <code>architecture-artifact</code> row (phase D / HLD, owner programme-architect, reviewer Architecture Board), linked <code>realization</code> from <code>solution_concept</code> and <code>derivation</code> into <code>technology_standards</code>.</p>
+<p><code>GEMBA-WALK-ECS.md</code> is published as its own <code>architecture-artifact</code> <strong>document</strong> (read back 2026-11-27: <code>01a21afb-16c3-7140-81e4-93ef872ea6fb</code>, category <code>architecture-artifact</code>, v1, published 2026-11-27T03:09:57Z, project <code>01a21af4-…</code>), linked by the rows' document reference to the architecture design rather than by a typed artefact row of its own.</p>
 <h2 id="contract-kinds">Contract kinds</h2>
 <table>
 <thead>
