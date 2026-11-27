@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — MSP profile · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/04-msp-profile.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--msp-profile">GEMBA-WALK — MSP profile</h1>
+<h2 id="1-business-case-addendum">1. Business case addendum</h2>
+<p><strong>Why now.</strong> The conveyor has one operator UI, a Leptos console, and one local mock of a different interaction model. The owner is considering the walk as the primary UI, but the mock has no auth, no registry and no live rows: it cannot be measured, and it cannot be promoted. The programme also cannot answer a basic architectural question — is the action contract genuinely UI-independent? — by assertion. A second client built on the same contract answers it, and the parity instrument makes the answer falsifiable.</p>
+<p><strong>Options.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it buys</th>
+<th>What it costs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Do nothing — the mock stays local</td>
+<td>a design reference</td>
+<td>no evidence, no live client, the primacy question stays open</td>
+</tr>
+<tr>
+<td>Promote the mock</td>
+<td>speed</td>
+<td>no auth, no registry, fixtures — the coverage record would lie; rejected by ADR 0013/D64</td>
+</tr>
+<tr>
+<td>A game mode inside <code>apps/web</code></td>
+<td>one bundle</td>
+<td>a frame loop (and possibly a WASM engine) in the operator bundle; one release cadence for two surfaces; the engine spike unmeasurable</td>
+</tr>
+<tr>
+<td><strong>A separate client at <code>/walk/</code> (GEMBA-WALK)</strong></td>
+<td>a real, measurable second client; a reversible primacy path</td>
+<td>a second shell, auth flow and browser suite; the parity instrument and specs are the control</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cost and effort.</strong> One static sub-site, one router registry, one sheet/action-sheet system, one world port and canvas baseline, one Playwright suite and one instrument. The work is staged P0–P6 and split across five build issues; no new backend, table, action or port. The recurring cost is the maintenance of two clients, owned by the same contract and the same registry.</p>
+<p><strong>Investment appraisal.</strong> The benefit is measured by the decision-task instrument in §2, not by the capability's existence. The case is accepted provisionally: the baseline is <code>unmeasured</code> until the P0 spike measures the same scripted task in <code>apps/web</code>; the P6 review decides whether the instrument shows a real improvement. An unmeasured baseline is reported <code>unmeasured</code>, never zero. No token-spend KPI is used (owner decision 2026-11-25).</p>
+<h2 id="2-benefit-profile-b-walk-1">2. Benefit profile B-WALK-1</h2>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identification and purpose</td>
+<td><strong>reference</strong> B-WALK-1 · <strong>description</strong> Faster, contract-faithful governance tasks in the operator surface · <strong>category</strong> operational · <strong>objectives</strong> G1 every operator task is reachable in the walk; G2 the action contract is proven UI-independent · <strong>observable outcome</strong> a seat completes the named decision tasks (find the item, read its evidence, record the decision) in the walk in the same or less time than in <code>apps/web</code>, with the same refusals, and the owner can choose either client without a backend change</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td><strong>KPIs</strong> scripted-task completion time for the five named decision flows; actions reachable and schema-rendered (census); destinations with a green spec; first-contentful paint and interaction latency per destination · <strong>baseline</strong> <code>unmeasured — the same scripted tasks have not been timed in apps/web; the P0 spike measures them before P1</code> · <strong>target</strong> fixed at the first measured cycle; the P6 gate requires no regression and the owner's primacy decision weighs the delta · <strong>measurement method</strong> the Playwright task harness times the same scripted flow against both clients and records the trace of action invocations; the instrument reads the census, not a live manifest · <strong>financial value</strong> not expressed; the cost side is the maintenance of two clients</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>the GEMBA-WALK build (P0–P6) and the business change: seats learn a second surface, the delivery team maintains two clients, the identity operator registers a redirect URI</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td><strong>capabilities required</strong> the action registry and <code>actions.describe</code>, the PKCE identity flow, the read routes, SSE, the Playwright harness; <strong>outcomes that must already exist</strong> <code>apps/web</code> as the normative client, the design pack's serving model, the frozen census; <strong>changes to operating practice</strong> the owner and seats evaluate a task in both clients before primacy; a contract change is tested in both</td>
+</tr>
+<tr>
+<td>Uncertainty and dependencies</td>
+<td><strong>risks</strong> R-WALK-1 parity theatre, R-WALK-2 maintenance cost, R-WALK-3 engine budgets, R-WALK-4 external redirect; <strong>dependencies outside the programme</strong> the identity operator's redirect-URI registration</td>
+</tr>
+<tr>
+<td>Responsibility and attribution</td>
+<td><strong>who realizes it</strong> the programme architect and the delivery sessions; <strong>benefit owner</strong> BCM; <strong>operational area</strong> programme governance and operator tooling — the areas whose tasks are measured</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-benefits-map">3. Benefits map</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output_ref</td>
+<td>GEMBA-WALK — the <code>/walk/</code> client and its parity instrument</td>
+</tr>
+<tr>
+<td>capability_ref</td>
+<td>any operator task is reachable through a second, contract-faithful client</td>
+</tr>
+<tr>
+<td>operational_outcome</td>
+<td>O-WALK-1 the primary UI can change without a backend change; governance tasks complete in the walk with the same gates</td>
+</tr>
+<tr>
+<td>benefit</td>
+<td>B-WALK-1; disbenefit D-WALK-1 (two clients to maintain)</td>
+</tr>
+<tr>
+<td>strategic_objective</td>
+<td>a contract-faithful, replaceable operator experience</td>
+</tr>
+</tbody>
+</table>
+<p>The edge is one path: the walk's output enables the capability; the capability produces O-WALK-1; O-WALK-1 is valued as B-WALK-1 and carries the disbenefit D-WALK-1. A slip in the walk puts B-WALK-1 at risk; a contract change untested in both clients is an O-WALK-1 risk, not a walk build failure.</p>
+<h2 id="4-risks">4. Risks</h2>
+<h3 id="r-walk-1--parity-theatre">R-WALK-1 — parity theatre</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>a client that looks finished while destinations or actions are omitted; prose credit</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>the walk is promoted while the census still has <code>absent</code> rows or unreachable actions</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>B-WALK-1 is not realized; the owner decides on appearance, not evidence</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>programme architect (design), BCM (benefit)</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>low; the P6 gate is the control</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>the frozen census and <code>build-walk-coverage.py --check</code>; empty/error/happy/refusal/write per destination; an expired exemption fails; no credit without a spec</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>2026-12-03 and every P-stage gate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-2--two-clients-one-contract">R-WALK-2 — two clients, one contract</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>a change lands in one client and not the other; the shell, auth and harness drift</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>a contract change passes one client's specs and breaks the other</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>the parity claim is false; maintenance cost rises</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>programme architect, delivery team</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>medium; the instrument and the trace parity are the control</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>one census; behavioural trace parity on the named flows; a contract test per write; a contract change updates both or is a change request</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>every contract-changing issue</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-3--engine-budgets">R-WALK-3 — engine budgets</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>Bevy's WASM bundle and startup, WebGL requirements, limited text/table widgets</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>the candidate misses the budgets and the spike chooses it anyway</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>the client is slower or less accessible than the baseline</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>programme architect, platform lead</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>low; the canvas baseline stays</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>the P0 spike measures canvas vs Bevy; ADR 0022 records the winner and budgets; the <code>WorldView</code> port keeps the baseline</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>2026-12-03 (ADR 0022)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="r-walk-4--external-redirect">R-WALK-4 — external redirect</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>the <code>/walk/</code> OIDC redirect URI is not registered by the identity operator</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>production sign-in fails while the dev path works</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>the live scenario is blocked; construction is not</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>owner/ops</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>medium; an <code>acceptance-blocked-by</code></td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>the dev cookie for the spike and local runs; the redirect recorded in the issue; no production sign-in claim until it is registered</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>every P-stage gate</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-stakeholder-profiles">5. Stakeholder profiles</h2>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Concerns / sensitivities</th>
+<th>Importance</th>
+<th>Influence</th>
+<th>Interest</th>
+<th>Exposure</th>
+<th>Support</th>
+<th>Engagement target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner / sponsoring group</td>
+<td>the walk may become primary; the parity claim is measurable and reversible</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>P6 decision; reviews the instrument</td>
+</tr>
+<tr>
+<td>Product owner seat</td>
+<td>board and delivery tasks are complete and fast</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>Portfolio/plan wing; write flows</td>
+</tr>
+<tr>
+<td>Programme office seat</td>
+<td>programme, tranche, benefits and ADM tasks are visible</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>Programme/design wings</td>
+</tr>
+<tr>
+<td>Tenant owner seat</td>
+<td>approvals, members and settings are governed; destructive actions refuse</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>approvals/settings; refusal tests</td>
+</tr>
+<tr>
+<td>Reviewer seat</td>
+<td>read-only evidence and decisions are legible</td>
+<td>medium</td>
+<td>medium</td>
+<td>high</td>
+<td>low</td>
+<td>support</td>
+<td>read parity; no write affordance</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td>the walk fits the blueprint and its contract</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>medium</td>
+<td>support</td>
+<td>SoAW, artefact set, compliance review</td>
+</tr>
+<tr>
+<td>Platform / security</td>
+<td>same origin, headers, identity, no secret leakage</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>serving fallback, CSP, auth tests</td>
+</tr>
+<tr>
+<td>Accessibility / UX</td>
+<td>the game UI does not regress keyboard or contrast</td>
+<td>medium</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>a11y budget and keyboard spec</td>
+</tr>
+<tr>
+<td>External stakeholder</td>
+<td>reads the public programme pack, not the walk</td>
+<td>low</td>
+<td>low</td>
+<td>medium</td>
+<td>low</td>
+<td>neutral</td>
+<td><code>/design/</code> remains the public surface</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-tranche-authorisation">6. Tranche authorisation</h2>
+<p>GEMBA-WALK is a <strong>cross-cutting programme unit under tranche 0</strong> (the <code>CROSS_CUTTING</code> convention used by P0, PLATFORM and DESIGN-PUBLISH), not a new tranche. Its entry is the accepted ADR 0021 and the published inception set; its exit is the P6 parity gate and the closure review, not a tranche review. The P6 decision is the owner's primacy decision; a re-baseline of the census is a signed commit that states what changed, and a scope change is a change request (§7).</p>
+<h2 id="7-transition-and-measurement">7. Transition and measurement</h2>
+<p>The old practice is <code>apps/web</code> only; the baseline is measured while it is still the only live client (the P0 spike times the five named decision flows in <code>apps/web</code>, and records the census). GEMBA-WALK enacts the new practice: the walk reaches parity, the seats use it for the named flows, and the same scripted tasks are timed in both clients. Post-transition the BCM measures the five flows and the census, reports the delta against the <code>apps/web</code> baseline, and keeps measuring until the realization plan names who continues after programme closure. The BCM is the benefit owner; the programme manager is accountable for the instrument's operation. Primacy does not retire <code>apps/web</code>: retirement is a separate decision after a stabilisation period.</p>
+<h2 id="8-links">8. Links</h2>
+<ul>
+<li>Brief: <code>00-project-brief.md</code></li>
+<li>Architecture: <code>02-architecture-design.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>SAFe: <code>05-safe-epic.md</code></li>
+<li>Seed: <code>seed/programme-definition.json</code> (the benefit profile and the cross-cutting project)</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §8.3, §10.5.11, D67</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/GEMBA-WALK/04-msp-profile.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

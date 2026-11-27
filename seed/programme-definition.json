@@ -455,6 +455,10 @@
       "adm_phase": "G",
       "plateau": "capability",
       "closure_deferred_to_tranche": 6
+    },
+    "GEMBA-WALK": {
+      "adm_phase": "Preliminary",
+      "plateau": "definition"
     }
   }
 }

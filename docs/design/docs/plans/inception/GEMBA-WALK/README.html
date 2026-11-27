@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>GEMBA-WALK — inception record · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/README.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="gemba-walk--inception-record">GEMBA-WALK — inception record</h1>
+<p>The durable MSP/TOGAF/SAFe set for the Gemba Walk, the separate client authorised by ADR 0021 as a candidate primary UI. It is modelled on the T19 precedent (<code>docs/plans/T19/</code>) and the standard in <code>docs/plans/inception/README.md</code>.</p>
+<h2 id="status">Status</h2>
+<p>Drafted 2026-11-26 under the owner's direction. ADR 0021 is <strong>Accepted</strong> as a delegated rule decision (the build's approver under the published delegation, 2026-11-22, expiry 2027-02-18); <code>apps/web</code> remains normative until the P6 gate. The documents are drafts until the Architecture Board reviews them (target 2026-12-03, after the P0 spike) and this unit publishes them on the project. The live publication ids are recorded on issue #792.</p>
+<h2 id="reading-order">Reading order</h2>
+<ol type="1">
+<li><code>00-project-brief.md</code> — outcome, boundary, reuse, acceptance.</li>
+<li><code>01-inception-analysis.md</code> — the measured current state and the build-vs-reuse decision.</li>
+<li><code>02-architecture-design.md</code> — the PSA and HLD set (A1–A6, B1–B2, C1–C3, D1, F1).</li>
+<li><code>03-artifact-register.md</code> — the typed TOGAF rows and the contract kinds.</li>
+<li><code>04-msp-profile.md</code> — business case, benefit, risks, stakeholders, tranche, transition.</li>
+<li><code>05-safe-epic.md</code> — epic, features, enablers, WSJF, PI objectives.</li>
+<li><code>06-statement-of-architecture-work.md</code> — the Phase-A contract.</li>
+<li><code>07-governance-and-evidence.md</code> — WBS, baseline, registers, change control, evidence, closure.</li>
+</ol>
+<p>Then the plan (<code>docs/plans/GEMBA-WALK.md</code>) for stages and the issue split, and <code>docs/design/GEMBA-WALK-SPEC.md</code> for the client architecture.</p>
+<h2 id="category-map">Category map</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th><code>seed/output-standard.json</code> category(ies)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>00-project-brief.md</code></td>
+<td><code>project-brief</code></td>
+</tr>
+<tr>
+<td><code>01-inception-analysis.md</code></td>
+<td><code>inception-analysis</code></td>
+</tr>
+<tr>
+<td><code>02-architecture-design.md</code></td>
+<td><code>architecture-design</code>; carries the A–D artefact content</td>
+</tr>
+<tr>
+<td><code>03-artifact-register.md</code></td>
+<td><code>artifact-standard</code>, <code>architecture-artifact</code>; the 10 mandatory types</td>
+</tr>
+<tr>
+<td><code>04-msp-profile.md</code></td>
+<td><code>business-case</code>, <code>benefit-profile</code>, <code>benefits-map</code>, <code>stakeholder-profiles</code></td>
+</tr>
+<tr>
+<td><code>05-safe-epic.md</code></td>
+<td><code>safe-portfolio</code>, <code>safe-art</code>, <code>safe-cadence</code> (epic-level)</td>
+</tr>
+<tr>
+<td><code>06-statement-of-architecture-work.md</code></td>
+<td><code>statement-of-architecture-work</code></td>
+</tr>
+<tr>
+<td><code>07-governance-and-evidence.md</code></td>
+<td><code>project-wbs</code>, <code>project-baseline</code>, <code>project-registers</code>, <code>change-control</code>, <code>evidence</code>, <code>closure-review</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>candidate-solutions</code>, <code>gap-analysis</code> and the migration plan are sections of the phase-E/F views inside <code>02-architecture-design.md</code>; they are not separate outputs. <code>statement-of-intent</code> and <code>request-for-architecture-work</code> are Phase-G/H outputs, named in the register and authored at completion.</p>
+<h2 id="rules">Rules</h2>
+<ul>
+<li>A project output is not a benefit. B-WALK-1's baseline is <code>unmeasured</code> until the same scripted tasks are timed in <code>apps/web</code>; never zero, no token-spend KPI.</li>
+<li>A capability the server does not expose is an honest gate; no new table, action, event or port.</li>
+<li>No session writes a human approval, owner or SRO signature. The Board act is a rule decision under the published delegation, with a distinct approver identity.</li>
+<li>The mock (<code>docs/Conveyor-Gemba-Walk.html</code>) is a local reference and is not committed.</li>
+</ul>
+<h2 id="links">Links</h2>
+<ul>
+<li>Direction: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>Standard: <code>docs/plans/P0-programme-definition.md</code> §4–§6; <code>.claude/skills/{business-analyst,programme-architect,benefits-manager,quality-manager}</code></li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/GEMBA-WALK/README.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

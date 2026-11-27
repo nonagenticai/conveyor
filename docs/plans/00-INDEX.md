@@ -45,6 +45,16 @@ authoring route and the T9/T10 binding are the T19F follow-on (below). T19 is in
 (the UI lane); it consumes T1/T2/T3 and the built T9/T10 seams. The meeting ruling is D66 because
 D64–D65 are the real-UI rulings.
 
+**GEMBA-WALK added 2026-11-26, accepted 2026-11-26.** The owner has directed that a separate,
+game-style client may become the primary UI. `docs/plans/GEMBA-WALK.md` is its project plan and
+`docs/design/GEMBA-WALK-SPEC.md` its architecture; ADR 0021 — accepted as a delegated rule decision
+— authorises a candidate client at `/walk/` with full read/write parity through the existing
+registry, and §10.5.11 + D67 record the boundary. It is **not** a §12 `T##` slice. Its
+MSP/TOGAF/SAFe inception set is [`inception/GEMBA-WALK/`](inception/GEMBA-WALK/README.md);
+programme registration and the live publication are the inception unit (#792), and the build issues
+G0/S1–S4 are created after that publication gate. `apps/web` stays normative until the measured P6
+parity gate.
+
 **T19F added 2026-11-24, built 2026-11-25.** Decision-forum governance is the follow-on T19's
 closure review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy
 change is a reviewed authoring asset that publishes the next immutable `meeting_type` version, a
@@ -71,7 +81,7 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
   for forum governance (`docs/plans/T19F-meeting-bindings.md`);
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
   and the gate T1–T19 depend on (issues #120–#122);
-- `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
+- `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM`, `GEMBA-WALK` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a
 one-line `Programme project:` header. Each delivery unit's issue carries the same context in four

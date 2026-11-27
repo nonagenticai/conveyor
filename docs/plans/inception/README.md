@@ -1,8 +1,10 @@
-# Inception record — the five proposed V2 projects
+# Inception record
 
-This folder holds the durable inception artefacts for the five proposed V2 projects: **T5 Kata**,
-**T6 Development project**, **T12 One organisation loop**, **T15 Tool authoring and BYO** and
-**T17 Tenant asset authoring**.
+This folder holds the durable inception artefacts for the proposed projects. The five proposed V2
+projects are **T5 Kata**, **T6 Development project**, **T12 One organisation loop**, **T15 Tool
+authoring and BYO** and **T17 Tenant asset authoring**. The sixth is **GEMBA-WALK**, the separate
+game-style client authorised by ADR 0021 (programme track, cross-cutting); its fuller MSP/TOGAF/SAFe
+set is in [`GEMBA-WALK/`](GEMBA-WALK/README.md).
 
 All fifteen are **published** (2026-11-21) under the owner's direction in #527. The inception gate
 (`crates/actions/src/programme.rs::assert_inception_published`) is met for each project; this record
@@ -23,7 +25,12 @@ Each file opens with the SPEC_V2 §8.1 common metadata (status, version, author/
 reviewer/review date, related project, rationale, published document/contract, phase/plateau,
 entries, links). Current-state rows cite `path:symbol`; every future claim is phrased as plan.
 
-`statement-of-architecture-work` is **not** part of this set: it is a T9-only contract kind.
+`statement-of-architecture-work` is **not** part of the V2 five's set: it is a T9-only contract kind.
+
+**GEMBA-WALK** is the exception to the three-category shape: its `programme` class requires the
+brief and evidence, and ADR 0021's architecture adds the PSA/HLD set, the artefact register, the MSP
+profile, the SAFe epic and the Phase-A statement of architecture work. Its documents are drafts
+until the inception unit (#792) publishes them; the live ids are recorded there.
 
 ## The live record
 

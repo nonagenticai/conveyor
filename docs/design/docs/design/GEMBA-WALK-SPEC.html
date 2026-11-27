@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The Gemba Walk — client and architecture specification · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/GEMBA-WALK-SPEC.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-gemba-walk--client-and-architecture-specification">The Gemba Walk — client and architecture specification</h1>
+<p>Status: Proposed · Date: 2026-11-26 · Owner direction: 2026-11-26 · ADR: 0021 Normative siblings: SPEC_V2 §10.5, §10.5.11, §15.1 D64/D66/D67 · Plan: <code>docs/plans/GEMBA-WALK.md</code></p>
+<p>This document specifies a second client of the conveyor — a game-style, spatial interface — as a candidate primary UI. It is written so a future session can build it without reading the local single-file mock, and so a reviewer can tell a real state from a designed one. It is a specification, not an implementation claim: every destination starts <code>absent</code> and is credited only by a route, a spec and the parity instrument.</p>
+<h2 id="1-status-and-relationship-to-appsweb">1. Status and relationship to <code>apps/web</code></h2>
+<ul>
+<li>The walk is a <strong>separate client</strong> served at <code>/walk/</code> from the same image and origin. It adds no port, no table, no action and no event.</li>
+<li><code>apps/web</code> remains the <strong>normative operator UI</strong> until the parity gate in §13 and the owner's primacy decision. A V2 destination is still measured, for D65, from <code>apps/web</code>'s route table and its Playwright spec; the walk is measured by its own instrument.</li>
+<li>"Primary" means the walk owns the default entry point and the operator redirects; it does <strong>not</strong> mean a second backend, a second decision store or a second set of read models.</li>
+<li>The design pack at <code>/design/</code> keeps its role as the public programme site and reviewed reference. The walk is not a pack page and never ships inside <code>/design/</code>.</li>
+</ul>
+<h2 id="2-experience-model">2. Experience model</h2>
+<p><strong>The world is navigation; the sheets are the work.</strong> The canvas renders rooms, figures and state; every record, table, form, confirmation and decision is a DOM sheet with ordinary HTML semantics. No capability exists only in the world, and no text entry, table or long-form content is rendered inside the canvas or a game engine.</p>
+<ul>
+<li><strong>Entrance</strong> — <code>/walk/</code> is the arrival surface: the map, the current seat, the queues that need a decision, and a fast path into every wing. It is usable with no pointer and no walk.</li>
+<li><strong>Wings</strong> — the seven navigation groups of SPEC_V2 §10.5.1 (Portfolio &amp; plan; Organisation; Procedures &amp; authoring; Govern &amp; design; Knowledge &amp; memory; Measure &amp; improve; Operations) become wings. A wing is a corridor of rooms; a room is a destination; a desk inside a room is a tab or a sub-screen; a sheet is a record or a task.</li>
+<li><strong>The first six rooms</strong> are the mock's validated set, rebuilt on real data: Architecture, Portfolio, Delivery (the board), Project desk, Coach and Kata. They are evidence that the interaction works, not the limit of the map. Every other destination gets a room before P6.</li>
+<li><strong>HUD</strong> — the principal, the active tenant, connection/stream state, the approval and meeting queues, the command palette, the map, the camera control and help. The HUD is always reachable by keyboard; it is the shortest path to any deep link.</li>
+<li><strong>Movement</strong> — pointer-drag or arrow keys to look, <code>WASD</code>/arrows to move, first/third person toggle with a labelled button and <code>V</code>, wheel zoom, and a boom that shortens near walls rather than clipping. The camera is a preference, never a requirement.</li>
+<li><strong>Fast travel</strong> — the map and the palette move focus to any room or record. A user can complete an entire task through links, the palette and sheets without ever moving the avatar.</li>
+</ul>
+<h2 id="3-seats-and-authority">3. Seats and authority</h2>
+<ul>
+<li>The principal and memberships come from <code>GET /api/me</code>; the active tenant is sent as <code>X-Active-Tenant</code> on every call.</li>
+<li><strong>Seats are view presets, not privileges.</strong> Delivery (product owner), Programme (project office), Owner (tenant owner) and Reviewer (observer) select a default landing, queue and room emphasis. Changing a seat never changes a permission: the server's manifest, scopes and refusal are the only authority. A control whose action is absent from the manifest is not rendered.</li>
+<li>The mock's Customer seat is <strong>not</strong> carried over. Customer care is out of conveyor's scope (D48); the external stakeholder reads the public pack at <code>/design/</code>, not a seat in the walk. The Product owner and Owner presets map to real job keys and memberships; the Programme preset is the project office lens.</li>
+<li>The walk never infers a position, signs for a user, or pre-selects an approval. It presents the server's gate and the signed-in principal's own choice, exactly as §10.5.4 requires.</li>
+</ul>
+<h2 id="4-information-architecture-and-routing">4. Information architecture and routing</h2>
+<p><strong>Route parity by construction.</strong> Every <code>apps/web</code> path has a walk path formed by the <code>/walk</code> prefix: <code>/portfolio</code> → <code>/walk/portfolio</code>, <code>/board/:board_id</code> → <code>/walk/board/:board_id</code>, <code>/design/adm</code> → <code>/walk/design/adm</code>. <code>/walk/</code> is the entrance (the app's <code>/</code>). This makes the parity instrument a set comparison and the old-route redirect map mechanical.</p>
+<table>
+<thead>
+<tr>
+<th>Wing</th>
+<th>Rooms (destination routes, walk-prefixed)</th>
+<th>Read path (families)</th>
+<th>Write path (families)</th>
+<th>Spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Portfolio &amp; plan</td>
+<td><code>/walk/portfolio</code>, <code>/walk/portfolio/:programme_id</code>, <code>/walk/programme</code>, <code>/walk/plan</code>, <code>/walk/validation</code>, <code>/walk/execution</code>, <code>/walk/decisions</code>, <code>/walk/runs</code>, <code>/walk/runs/:run_id</code>, <code>/walk/meetings</code>, <code>/walk/meetings/:id</code>, <code>/walk/</code> (Today)</td>
+<td>portfolio read models, <code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code>, <code>meetings.*</code>, <code>approvals.*</code>, <code>runs.*</code>, <code>metrics.programme</code></td>
+<td><code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>wbs.*</code>, <code>baselines.take</code>, <code>registers.*</code>, <code>meetings.*</code>, <code>approvals.decide</code>, <code>runs.cancel</code></td>
+<td><code>portfolio</code>, <code>programme</code>, <code>plan</code>, <code>validation</code>, <code>execution</code>, <code>meetings</code>, <code>run-queue</code>, <code>run-detail</code></td>
+</tr>
+<tr>
+<td>Organisation</td>
+<td><code>/walk/organisation</code>, <code>/walk/jobs</code>, <code>/walk/agents</code>, <code>/walk/tools</code>, <code>/walk/project-types</code></td>
+<td><code>industries.list</code>, <code>departments.list</code>, <code>jobs.*</code>, <code>job_releases.*</code>, <code>job_bindings.*</code>, <code>approval_policies.*</code>, <code>decision_policies.*</code>, <code>refinements.*</code>, <code>laya_configs.*</code>, <code>ladder.list</code>, <code>tools.*</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code>, <code>tool_calls.*</code></td>
+<td>the create/update/release/retire verbs those families expose; `tools.probe</td>
+<td>call</td>
+</tr>
+<tr>
+<td>Procedures &amp; authoring</td>
+<td><code>/walk/procedures</code>, <code>/walk/build/processes</code>, <code>/walk/build/processes/:process_id</code>, <code>/walk/build/process-map</code>, <code>/walk/build/process-map/:map_id</code>, <code>/walk/authoring</code></td>
+<td><code>procedures.*</code>, <code>capabilities.*</code>, <code>processes.*</code>, <code>approvals.list</code>, <code>authoring.assets</code></td>
+<td><code>procedures.*</code>, <code>procedures.ingest_*</code>, <code>authoring.*</code></td>
+<td><code>procedures</code>, <code>processes</code>, <code>process-map</code>, <code>authoring</code></td>
+</tr>
+<tr>
+<td>Govern &amp; design</td>
+<td><code>/walk/design/adm</code>, <code>/walk/architecture</code>, <code>/walk/design/requirements</code>, <code>/walk/design/requirements/:id</code>, <code>/walk/design/models</code>, <code>/walk/design/models/:model_id</code>, <code>/walk/copilot</code></td>
+<td><code>architecture.*</code>, <code>repository_search</code>, <code>contracts_list</code>, <code>profile_get</code>, requirements/models reads</td>
+<td><code>artifacts_*</code>, <code>contracts_*</code>, <code>phases_advance</code>, <code>reviews_*</code>, <code>board_*</code></td>
+<td><code>adm</code>, <code>trace-architecture</code>, <code>requirements</code>, <code>editor</code>, <code>copilot</code></td>
+</tr>
+<tr>
+<td>Knowledge &amp; memory</td>
+<td><code>/walk/knowledge</code></td>
+<td>the knowledge/memory reads of the owning slice; the route renders <strong>not yet live</strong> until they exist</td>
+<td>the owning slice's writes</td>
+<td><code>knowledge</code></td>
+</tr>
+<tr>
+<td>Measure &amp; improve</td>
+<td><code>/walk/improve</code>, <code>/walk/evals</code>, <code>/walk/evals/:eval_id</code>, <code>/walk/evals/benchmarks</code>, <code>/walk/evals/benchmarks/run/:run_id</code>, <code>/walk/measure/usage</code>, <code>/walk/measure/prompt-audit</code>, <code>/walk/metering</code></td>
+<td>coach queue, <code>kata.*</code>, lessons, evals/benchmarks reads, metering reads</td>
+<td><code>coach.*</code>, <code>kata.*</code>, <code>lessons.*</code></td>
+<td><code>improve</code>, <code>evals</code>, <code>benchmarks</code>, <code>inference-usage</code>, <code>prompt-audit</code>, <code>metering</code></td>
+</tr>
+<tr>
+<td>Operations</td>
+<td><code>/walk/operations</code></td>
+<td>incidents, runbooks, on-call reads</td>
+<td><code>ops.*</code> (gated)</td>
+<td><code>operations</code></td>
+</tr>
+<tr>
+<td>Utilities</td>
+<td><code>/walk/search</code>, <code>/walk/platform</code>, <code>/walk/settings/members</code>, <code>/walk/settings/roles</code>, <code>/walk/settings/inference</code>, <code>/walk/settings/admin</code>, <code>/walk/approvals</code></td>
+<td>the corresponding reads</td>
+<td>the corresponding writes</td>
+<td><code>search</code>, <code>platform</code>, <code>members</code>, <code>roles</code>, <code>inference</code>, <code>admin</code>, <code>shell</code></td>
+</tr>
+</tbody>
+</table>
+<p>The table is the map, not a substitute for §10.5's contracts: the read/write families, states and refusals are §10.5.2's and the owning slice's. A destination whose slice is not built renders the same <strong>not yet live</strong> gate as <code>apps/web</code>, naming the missing action or slice, and keeps its route.</p>
+<p><strong>Routing rules</strong></p>
+<ul>
+<li>Clean URLs (<code>/walk/&lt;app path&gt;</code>), HTML5 history. The server must serve <code>/walk/index.html</code> for a non-asset path under <code>/walk/</code> (see §10); without that change a walk deep link falls through to the operator app's <code>index.html</code>.</li>
+<li>Query strings are preserved and are part of the deep link. A sheet that represents a record uses a path or query the server can be linked to; a purely visual camera state is never a URL requirement.</li>
+<li>Back/forward restores the room and the sheet. Closing a sheet returns focus to its opener.</li>
+<li>A signed-out deep link is a sign-in gate that returns to the same path.</li>
+</ul>
+<h2 id="5-data-and-action-contract">5. Data and action contract</h2>
+<p>The walk is a contract-faithful client of the existing server; it invents nothing.</p>
+<ul>
+<li><strong>Manifest.</strong> <code>GET /api/actions</code> returns the role-filtered manifest (<code>name</code>, <code>version</code>, <code>kind</code>, <code>spec_hash</code>, <code>scopes</code>, <code>idempotent</code>, <code>timeout_ms</code>). The walk caches it per session and renders a control only when the action is present. A manifest refresh after a 403 is allowed; a control is never shown on a guess.</li>
+<li><strong>Describe.</strong> <code>actions.describe {name}</code> returns <code>input</code> and <code>output</code> JSON Schema plus <code>effect</code> (<code>read | write | destructive</code>), <code>confirm</code> (<code>none | card | card-typed</code>), <code>tenancy</code>, <code>spec_hash</code> and the scope list. This is what makes a generic action sheet possible: the form is generated from the schema, and the effect/confirm/tenancy drive the confirmation and approval UX.</li>
+<li><strong>Reads.</strong> Literal <code>GET</code> routes only (the §10.5.2 read paths), with <code>next_cursor</code> pagination. No GraphQL, no ad-hoc read endpoint, no published snapshot as the app's source.</li>
+<li><strong>Writes.</strong> <code>POST /api/actions/{name}/invocations</code> with <code>{"input": …}</code> and, for a destructive call, <code>{"input": …, "approval_id": "…"}</code>. Headers: <code>Authorization: Bearer</code>, <code>X-Active-Tenant</code>, <code>If-Match: &lt;version&gt;</code> on an update, <code>Idempotency-Key</code> on a create. No optimistic mutation: after a write the screen refetches its read model.</li>
+<li><strong>Errors.</strong> RFC 9457 <code>application/problem+json</code> mapped by status: 401 sign-in, 403 permission, 404 absent, 409 conflict/gate, 412 precondition (refetch; never guess a new version), 422 invalid (field errors shown verbatim), 5xx with <code>request_id</code>. The server's refusal is shown, not replaced by a client rule.</li>
+<li><strong>Dual control.</strong> A gated decision names its approval; the walk never decides on the principal's behalf and never auto-acquires an approval. The approval and meeting queues are read views; the act is the principal's.</li>
+<li><strong>Live updates.</strong> SSE topics (board, card, run, approval) via <code>fetch</code> + <code>ReadableStream</code> because <code>EventSource</code> cannot carry the bearer. A screen without a topic polls and says so. The stream is cancelled on navigation.</li>
+<li><strong>Cancellation.</strong> Every screen load is abortable; a slow response for a left screen is discarded.</li>
+</ul>
+<h2 id="6-client-architecture">6. Client architecture</h2>
+<h3 id="61-modules">6.1 Modules</h3>
+<pre><code>apps/walk/
+  index.html
+  src/main.js                 bootstrap: config, auth, manifest, router, shell, world
+  src/auth/                   config load, PKCE, dev login, token in memory, /api/me
+  src/api/                    fetch client, problem mapping, manifest cache, describe cache, SSE
+  src/forms/                  JSON Schema -&gt; fields; validation; unsupported schema fallback
+  src/router/registry.js      composes the per-wing route files; holds no destination rows
+  src/router/routes/          one file per delivery sibling:
+    core.js                     shell, entrance, Portfolio (the parent&#39;s exemplar)
+    portfolio-organisation.js   S1&#39;s rows
+    procedures-governance.js    S2&#39;s rows
+    measure-operations-utilities.js  S3&#39;s rows
+    v1.js                       S4&#39;s retained V1 rows
+  src/shell/                  HUD, palette, map, notifications, sheet host, toasts
+  src/world/port.js           the WorldView interface and scene types (JSDoc)
+  src/world/canvas2d/         baseline renderer: projection, depth sort, collision, figures
+  src/world/bevy/             optional candidate: wasm loader + input/overlay bridge
+  src/destinations/           one module per destination; read views + curated flows
+  src/state/                  session store, per-screen stores, per-viewer prefs
+  src/a11y/                   focus management, skip link, shortcuts, announcements
+  e2e/&lt;wing&gt;/                 one Playwright spec per destination + shell/auth/parity
+  dev-server.mjs              static + same-origin proxy to :8930
+  playwright.config.ts</code></pre>
+<p>Each route file exports an array of <code>{walk, app, room, spec, load}</code> rows, where <code>load</code> is a lazy <code>import()</code> of the destination module; <code>registry.js</code> concatenates the rows in a fixed order. The parent creates all five files as empty arrays, so a delivery sibling adds rows to its own file and never edits a shared one.</p>
+<p>Dependency rule: <code>destinations</code> may import <code>api</code>, <code>forms</code>, <code>shell</code> and <code>router</code>; <code>shell</code> may import <code>api</code>, <code>router</code>, <code>world/port</code>; <code>world/*</code> imports only <code>world/port</code> and pure helpers. No destination imports another destination. A route file may lazily load only its own wing's destination modules, never another wing's. No engine module fetches, decides or stores authority.</p>
+<p><strong>Shared seams</strong> (parent-owned; siblings consume, never edit):</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Responsibility</th>
+<th>Minimum API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td>PKCE, dev login, token, <code>/api/me</code></td>
+<td><code>signIn()</code>, <code>signOut()</code>, <code>token()</code>, <code>principal()</code></td>
+</tr>
+<tr>
+<td><code>api</code></td>
+<td>same-origin fetch, headers, problems</td>
+<td><code>request(path, opts)</code>, <code>invoke(name, input, opts)</code></td>
+</tr>
+<tr>
+<td><code>manifest</code></td>
+<td>role-filtered action set</td>
+<td><code>load()</code>, <code>has(name)</code>, <code>scopes(name)</code></td>
+</tr>
+<tr>
+<td><code>forms</code></td>
+<td>JSON Schema → fields</td>
+<td><code>render(schema, value) -&gt; {element, value, errors}</code></td>
+</tr>
+<tr>
+<td><code>router</code></td>
+<td>path ↔︎ room/sheet, history</td>
+<td><code>navigate(path)</code>, <code>current()</code>, <code>onChange(fn)</code></td>
+</tr>
+<tr>
+<td><code>shell/sheet-host</code></td>
+<td>sheet lifecycle, focus</td>
+<td><code>open(spec)</code>, <code>close()</code>, <code>toast(problem)</code></td>
+</tr>
+<tr>
+<td><code>world/port</code></td>
+<td>engine-neutral scene</td>
+<td><code>mount</code>, <code>setScene</code>, <code>setCamera</code>, <code>setHighlight</code>, <code>on</code>, <code>resize</code>, <code>dispose</code></td>
+</tr>
+<tr>
+<td><code>sse</code></td>
+<td>token-bearing stream</td>
+<td><code>subscribe(topic, fn) -&gt; unsubscribe</code></td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>session + per-viewer prefs</td>
+<td><code>session</code>, <code>prefs</code>, <code>subscribe(fn)</code></td>
+</tr>
+</tbody>
+</table>
+<p>The exact parameter objects are the implementation's; the names and the responsibilities are not. <code>src/api</code> owns the header set (<code>Authorization</code>, <code>X-Active-Tenant</code>, <code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code>) and the problem mapping; a destination never constructs them.</p>
+<h3 id="62-the-worldview-port">6.2 The <code>WorldView</code> port</h3>
+<p>The world is replaceable. The contract (JSDoc-typed; the exact names are the implementation's):</p>
+<ul>
+<li><code>mount(container, options): Promise&lt;void&gt;</code></li>
+<li><code>setScene(scene)</code> — rooms, doors, figures, state badges; derived from read models by the shell.</li>
+<li><code>setCamera({mode, focus, zoom})</code> — first/third, room focus, zoom.</li>
+<li><code>setHighlight({roomId, recordId})</code> — selection from a sheet or the palette.</li>
+<li><code>on(event, handler)</code> — <code>enter-room</code>, <code>select</code>, <code>hover</code>, <code>escape</code>; returns an unsubscribe.</li>
+<li><code>resize()</code>, <code>dispose()</code>.</li>
+</ul>
+<p>Constraints for every implementation: no text input, no tables, no long-form content; all scene text is a short label duplicated in the DOM; the canvas is labelled and never traps focus; a pure-DOM map/list view exposes the same rooms and records; no network access; no authority.</p>
+<h3 id="63-renderer-candidates">6.3 Renderer candidates</h3>
+<ul>
+<li><strong>Baseline — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. It has no engine dependency, no WebGL requirement and a small payload. It is the default until ADR 0022 says otherwise.</li>
+<li><strong>Candidate — Bevy 0.18, WASM.</strong> The world as a Rust/WASM module behind the same port, loaded as a static asset. Use Bevy's <code>2d</code>/<code>ui</code> feature bundles rather than the default set; keep bevy_ui for labels only (DOM remains the work surface). The build runs on GitHub-hosted CI only (the owner's no-local-Rust rule). If selected, ADR 0022 records the measured reason and the bundle/startup budgets; if not, the canvas baseline stays and no Rust enters the client.</li>
+</ul>
+<h3 id="64-state">6.4 State</h3>
+<ul>
+<li><strong>Server state</strong> — fetched per screen, held in memory, refetched after a write; never written to storage.</li>
+<li><strong>Session</strong> — token in memory; PKCE verifier in <code>sessionStorage</code>; tenant and membership in memory.</li>
+<li><strong>Per-viewer preferences</strong> — last room, camera mode, seat preset, reduced-motion override and help-dismissed, under a <code>conveyor.walk.*</code> key in <code>localStorage</code>. Preferences are conveniences and the app renders correctly when storage is empty or throws.</li>
+<li><strong>No programme store.</strong> The mock's <code>conveyor.gemba.v1</code> object (walls, cards, issues, decisions, reports) is not carried over. A client-side copy of programme state is a fixture by another name.</li>
+</ul>
+<h3 id="65-sheets-and-forms">6.5 Sheets and forms</h3>
+<ul>
+<li>A sheet is one of: record, list/table, form, confirmation, refusal, history. It has a title, a close control, focus capture and return, and a URL that can be reloaded.</li>
+<li>The schema form renderer maps JSON Schema to labelled fields (string, number, boolean, enum, array, object, date-time), shows required fields and descriptions, validates before sending where the schema allows, and always lets the server be the authority. An unsupported construct falls back to a labelled JSON editor with parse validation, so <strong>no action is unreachable</strong> because of a widget.</li>
+<li>A write shows the effect class: a <code>write</code> confirms once; a <code>destructive</code> action shows the approval requirement and, when the server refuses for a missing approval, the refusal verbatim.</li>
+<li>A 412 refetches the record and shows both versions' <code>version</code>; it never retries with a guessed <code>If-Match</code>.</li>
+</ul>
+<h2 id="7-design-system">7. Design system</h2>
+<p>The walk carries the mock's validated warm palette, embedded as tokens (no external stylesheet):</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Value</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--paper</code> / <code>--paper-2</code> / <code>--paper-3</code></td>
+<td><code>#f8efd9</code> / <code>#fffaee</code> / <code>#efdfc0</code></td>
+<td>sheet grounds, highlights, recesses</td>
+</tr>
+<tr>
+<td><code>--wood</code> / <code>--wood-2</code> / <code>--wood-3</code></td>
+<td><code>#6d4726</code> / <code>#8a5a30</code> / <code>#ab7744</code></td>
+<td>game bar, rails, controls</td>
+</tr>
+<tr>
+<td><code>--teal</code> / <code>--teal-2</code> / <code>--teal-3</code></td>
+<td><code>#2f8070</code> / <code>#1f5e53</code> / <code>#4aa38f</code></td>
+<td>navigation, active states</td>
+</tr>
+<tr>
+<td><code>--plumb</code> / <code>--plumb-2</code></td>
+<td><code>#8fd14f</code> / <code>#c4f07c</code></td>
+<td>the active figure, moodlets</td>
+</tr>
+<tr>
+<td><code>--amber</code> / <code>--amber-2</code></td>
+<td><code>#e9a83f</code> / <code>#f7cd72</code></td>
+<td>focus, warnings</td>
+</tr>
+<tr>
+<td><code>--coral</code></td>
+<td><code>#d96a5a</code></td>
+<td>refusal and destructive accents</td>
+</tr>
+<tr>
+<td><code>--ink</code> / <code>--muted</code> / <code>--line</code></td>
+<td><code>#3b2d1e</code> / <code>#7b6851</code> / <code>#dcc8a1</code></td>
+<td>text and rules</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Type</strong> — Fraunces for display headings (embedded WOFF2, SIL OFL, licence text retained), and a rounded system stack (<code>ui-rounded, "SF Pro Rounded", "Trebuchet MS", system-ui</code>) for UI text.</li>
+<li><strong>Shape</strong> — radii 12–22 px, layered warm shadows with inset highlights, glossy pill buttons, parchment sheets with ribbon headers, stitched document borders, round wooden controls, amber focus rings.</li>
+<li><strong>Components</strong> — game bar, play tabs, tools bar, identity card with moodlets, committee card, map, wall dock, sheet, seat list, agenda, case file, report document, minute, empty/loading/error/ refusal panels, wall desk panels, cards, metric tiles, grid table, world overlays (location, keybar, pad).</li>
+<li><strong>Motion</strong> — short easing, no parallax or spin when <code>prefers-reduced-motion: reduce</code>; the plumbob and camera animations are decorative only.</li>
+<li><strong>Density</strong> — the game chrome yields to the sheet: at a narrow width or 200% zoom, the sheet is full-screen and the world is optional.</li>
+</ul>
+<h2 id="8-accessibility-and-responsive-behaviour">8. Accessibility and responsive behaviour</h2>
+<ul>
+<li>Every destination, record, form and decision is reachable by keyboard alone; the skip link precedes the HUD; the palette is a keyboard path to any route and action.</li>
+<li>The canvas is <code>role="img"</code> with an accessible name and is not focus-trapped; a DOM map/list exposes the same rooms and records. No information exists only in pixels.</li>
+<li>Sheets manage focus (capture, escape, return), have labelled headings and form fields, and announce refusals with a live region. Tables have captions and header scopes.</li>
+<li>Contrast meets WCAG 2.2 AA for ink-on-paper and cream-on-wood; focus is always visible.</li>
+<li>200% zoom and 390 px width: no horizontal page scroll, 16 px gutters, sheets full-screen, controls at least 44 px.</li>
+<li>Reduced motion is honoured; autoplay, audio and timed interactions are absent.</li>
+</ul>
+<h2 id="9-performance-and-security">9. Performance and security</h2>
+<p><strong>Performance budgets</strong> (provisional; ADR 0022 fixes any engine-specific number from the spike):</p>
+<ul>
+<li>First load of the shell + entrance: ≤ 250 KB gzip of JS/HTML/CSS, excluding an optional wasm engine; a destination module lazy-loads on first visit.</li>
+<li>World: 60 fps target on an M-series laptop at the reference scene; no frame over 50 ms after the first two; degrade labels/effects rather than drop input.</li>
+<li>Sheets: virtualise any table above 200 rows; one read per screen plus its stream, not per row.</li>
+<li>Memory: a 5-minute soak with a stream and repeated navigation stays within 1.5× the first-load heap; a leaked interval or subscription is a defect.</li>
+<li>If Bevy is selected, the release wasm and its cold interactive time are measured under the same protocol as the baseline; the engine is a lazy asset, never part of the sign-in path's critical budget.</li>
+</ul>
+<p><strong>Security</strong></p>
+<ul>
+<li>Access token in memory only; PKCE verifier in <code>sessionStorage</code>; never a token in <code>localStorage</code>, a URL or a log. The walk follows <code>apps/web/src/auth.rs</code>'s model.</li>
+<li>Every server string is rendered as text; schema-generated labels and descriptions are escaped. No <code>innerHTML</code> of server data; no <code>eval</code>; no third-party script, font or image origins.</li>
+<li>The client is same-origin with the API; it sends no request to <code>/api</code> when signed out and holds no embedded credentials.</li>
+<li>A refusal is displayed with its action code and the server's message; a toast never claims a success the server did not return.</li>
+<li>The walk adds no CSP weakening. If a strict policy is introduced, it must work under it (no inline script injection, no remote assets).</li>
+</ul>
+<h2 id="10-deployment-and-operational-contract">10. Deployment and operational contract</h2>
+<ul>
+<li><strong>Static sub-site.</strong> <code>apps/walk</code>'s build output is copied to <code>/out/site/walk</code> in the image. The server already serves a directory with its own <code>index.html</code> as a sub-site (the <code>/design/</code> model).</li>
+<li><strong>Deep links.</strong> <code>crates/api/src/web.rs</code> currently falls back to the site-root <code>index.html</code> for a non-asset path that is not a directory index, so <code>/walk/portfolio</code> would render the operator app. Add a scoped rule: for <code>GET</code>/<code>HEAD</code>, a path under <code>/walk/</code> with no file extension serves <code>/walk/index.html</code>. It never applies to <code>/api</code>, <code>/mcp</code>, health or metrics. A Rust test asserts the fallback and the 404 for a missing asset.</li>
+<li><strong>Local development.</strong> <code>apps/walk/dev-server.mjs</code> serves the walk under <code>/walk/</code> on port 8932 and proxies <code>/api</code>, <code>/health</code>, <code>/config.json</code> and <code>/__dev/login</code> to <code>127.0.0.1:8930</code>, preserving the production path shape. Playwright uses <code>http://127.0.0.1:8932</code> as its base URL.</li>
+<li><strong>Identity.</strong> The same issuer and public client; add the walk's redirect URI (<code>https://&lt;host&gt;/walk/</code>, and the dev origin's <code>/walk/</code>) to the client's valid redirect URIs. If the identity operator prefers isolation, register a dedicated public client and serve its id to the walk rather than widening the app's client. This is an external configuration prerequisite, not a repository change.</li>
+<li><strong>Configuration.</strong> <code>/config.json</code> is served at the origin root; the walk fetches it absolutely and uses the same <code>issuer</code>, <code>client_id</code> and <code>dev_auth</code> fields.</li>
+<li><strong>Caching.</strong> The entry document is not cached as a stale build (<code>no-store</code> or the site's existing behaviour); assets may be cached with a content hash or a version query. No new CDN or cache layer.</li>
+<li><strong>No new port in production.</strong> The production entry is the existing origin at <code>/walk/</code>; port 8932 is local development only. Port 8000 is never used.</li>
+<li><strong>If Bevy is selected.</strong> The wasm build (<code>wasm32-unknown-unknown</code> + wasm-bindgen) runs in GitHub-hosted CI, never on a local machine; the output lands in the same static tree. The static contract above does not change.</li>
+</ul>
+<h2 id="11-verification">11. Verification</h2>
+<ul>
+<li><strong>Unit (<code>node:test</code>)</strong> — projection, collision, depth sort, scene derivation, route mapping, schema-to-field mapping, problem mapping. Pure modules only; no DOM.</li>
+<li><strong>Type check</strong> — <code>tsc --noEmit</code> over JSDoc-typed modules; a type error fails the walk workflow.</li>
+<li><strong>Playwright, one spec per destination under <code>e2e/&lt;wing&gt;/</code></strong> — empty, error, happy and one refusal (or one write where the destination owns a write), plus manifest gating (a control absent when its action is absent) and the headers on a write (<code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code> where applicable).</li>
+<li><strong>Auth</strong> — dev login, deep-link gate, sign-out, and a 401 path; the OIDC redirect is exercised in the P0 spike and in a deployed smoke where configured.</li>
+<li><strong>Parity instrument</strong> — <code>scripts/build-walk-coverage.py</code> compares the frozen census, the composed route registry (<code>src/router/registry.js</code> fed by <code>src/router/routes/*.js</code>) and the walk specs; it emits <code>docs/evidence/walk-coverage.json</code> and exits non-zero on a missing destination, an expired exemption or a reachability gap. Exemptions live in <code>docs/evidence/walk-exemptions.json</code>. The census schema and gate are in <code>docs/plans/GEMBA-WALK.md</code> §6.</li>
+<li><strong>Accessibility</strong> — a keyboard-only navigation spec; focus/name assertions; a manual screen-reader pass per wing; contrast checked from computed styles.</li>
+<li><strong>Performance</strong> — the budgets in §9, measured in CI where stable and recorded in the plan's evidence otherwise; the engine protocol in §12 is separate and feeds ADR 0022.</li>
+</ul>
+<h2 id="12-the-engine-decision-protocol-p0">12. The engine decision protocol (P0)</h2>
+<p>The P0 spike runs the same reference scene (six rooms, 12 figures, labels, one moving figure) on the same machine class, cold cache, five runs, median reported with min–max, under 4× CPU throttling and Slow 4G for load metrics. It records:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>release bytes (gzip) and request count</td>
+<td>first-load budget; wasm is lazy but must be bounded</td>
+</tr>
+<tr>
+<td>cold load → first interactive world (ms)</td>
+<td>whether the walk opens like a page or like a game</td>
+</tr>
+<tr>
+<td>steady frame p50/p95 and long tasks</td>
+<td>whether the world is smooth at the reference scene</td>
+</tr>
+<tr>
+<td>heap after 5 minutes and after 20 room changes</td>
+<td>leaks decide long-session viability</td>
+</tr>
+<tr>
+<td>browser requirements (WebGL2/WebGPU, fallback)</td>
+<td>whether low-end and remote users are excluded</td>
+</tr>
+<tr>
+<td>CI build time and reproducibility</td>
+<td>the no-local-Rust rule makes CI the only build</td>
+</tr>
+<tr>
+<td>DOM-overlay input/focus and screen-reader path</td>
+<td>the engine must not own the work surface</td>
+</tr>
+</tbody>
+</table>
+<p>ADR 0022 records the winner and the budgets. The baseline is not deleted when Bevy wins; it remains the fallback behind the port.</p>
+<h2 id="13-parity-gate-before-any-primacy-claim">13. Parity gate (before any primacy claim)</h2>
+<p>The walk reaches parity only when all of these are true and recorded:</p>
+<ol type="1">
+<li>Every §10.5 destination and every retained V1 route in <code>apps/web/src/app.rs</code> has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write.</li>
+<li>Every action in the frozen census is present in the manifest path, describable, and renderable by the schema form (or its JSON fallback); every destination's named write flows round-trip with the correct headers and a refusal path.</li>
+<li>The parity instrument reports no missing row and no expired exemption.</li>
+<li>The accessibility and performance budgets are met and recorded.</li>
+<li>The owner signs the result. Only then may the walk become the default entry point; <code>apps/web</code> is frozen, then retired under the P6 runbook, and the decision is reversible until the deletion.</li>
+</ol>
+<h2 id="14-do-not-list">14. Do-Not list</h2>
+<ul>
+<li>Do not invent a REST endpoint, a read model or an action. Reads are literal <code>GET</code>s; writes are actions.</li>
+<li>Do not hardcode which actions exist. The manifest is the contract.</li>
+<li>Do not use the published snapshot, a seed, a fixture or <code>localStorage</code> as the app's programme state.</li>
+<li>Do not omit <code>Authorization</code>, <code>X-Active-Tenant</code>, <code>If-Match</code> or <code>Idempotency-Key</code>, or send a destructive action without its approval id.</li>
+<li>Do not render text entry, tables or long-form content in the canvas or the game UI.</li>
+<li>Do not make walking mandatory for a capability.</li>
+<li>Do not embed the design pack or copy its 4.7 MB payload; link to <code>/design/</code>.</li>
+<li>Do not add a table, an action, an event, a decision store or a SPEC_V2 §12 T-row for the walk.</li>
+<li>Do not infer, pre-select or auto-approve a position; the server's refusal is the UI's answer.</li>
+<li>Do not put a token in storage or a URL; do not add a third-party origin.</li>
+<li>Do not claim a destination is implemented from its mock page or its route alone.</li>
+</ul>
+<h2 id="15-non-goals-and-revisit-triggers">15. Non-goals and revisit triggers</h2>
+<p><strong>Non-goals</strong> — a second backend; a second decision store; native mobile apps; chat, audio or video; customer care (D48); replacing <code>/design/</code>; SSR; a public unauthenticated mode in v1; pixel parity with the mock.</p>
+<p><strong>Revisit triggers</strong> — the parity gate cannot be met without new backend surface; Bevy on the web misses the budgets and the canvas baseline cannot close the gap; two-client maintenance exceeds the value; the owner declines primacy at P6 (the walk stays an alternative client); the operator app's own architecture changes enough that the shared contract or the census must be re-baselined.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/design/GEMBA-WALK-SPEC.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

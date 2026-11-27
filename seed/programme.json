@@ -1605,6 +1605,34 @@
       }
     },
     {
+      "key": "GEMBA-WALK",
+      "name": "The Gemba Walk — a separate game-style client",
+      "description": "Programme-level unit (plan: docs/plans/GEMBA-WALK.md)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/GEMBA-WALK.md",
+        "track": "programme",
+        "issues": [
+          792
+        ],
+        "depends_on": [],
+        "plan_status": "active",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "planned",
+        "tranche": 0,
+        "expected_outputs": [
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
+        ],
+        "adm_phase": "Preliminary",
+        "plateau": "definition"
+      }
+    },
+    {
       "key": "P0",
       "name": "Programme definition — vision, blueprint, plan and project briefs",
       "description": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
@@ -1691,7 +1719,6 @@
           782,
           783,
           784,
-          792,
           803
         ],
         "depends_on": [],

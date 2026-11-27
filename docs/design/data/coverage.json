@@ -219,6 +219,7 @@
       },
       "name": "Publish the SPEC_V2 studio design pack, live",
       "parallel_with": [
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -251,6 +252,52 @@
     {
       "blocked_by": [],
       "evidence": [
+        "docs/plans/GEMBA-WALK.md"
+      ],
+      "gap": "unknown project shape; add an evidence row",
+      "key": "GEMBA-WALK",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "The Gemba Walk \u2014 a separate game-style client",
+      "parallel_with": [
+        "DESIGN-PUBLISH",
+        "P0",
+        "PLATFORM",
+        "S00",
+        "S01",
+        "SPEC-V2",
+        "T0"
+      ],
+      "plan": "docs/plans/GEMBA-WALK.md",
+      "status": "planned",
+      "track": "programme",
+      "tranche": 0,
+      "units": {
+        "blocked": 0,
+        "claimed": 1,
+        "numbers": [
+          792
+        ],
+        "open": 1,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
         "docs/plans/P0-programme-definition.md",
         "docs/design/docs/plans/P0-programme-definition.html",
         "seed/programme.json"
@@ -274,6 +321,7 @@
       "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "PLATFORM",
         "S00",
         "S01",
@@ -322,6 +370,7 @@
       "name": "CI, runners and platform",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "S00",
         "S01",
@@ -334,7 +383,7 @@
       "tranche": 0,
       "units": {
         "blocked": 3,
-        "claimed": 4,
+        "claimed": 3,
         "numbers": [
           16,
           17,
@@ -366,10 +415,9 @@
           782,
           783,
           784,
-          792,
           803
         ],
-        "open": 20,
+        "open": 19,
         "ready": 6,
         "unknown": 0
       }
@@ -399,6 +447,7 @@
       "name": "Usage inventory \u2192 parity/parity.yaml",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S01",
@@ -442,6 +491,7 @@
       "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -1556,6 +1606,7 @@
       "name": "SPEC V2 \u2014 the organisational operating model",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -1604,6 +1655,7 @@
       "name": "Model and contracts",
       "parallel_with": [
         "DESIGN-PUBLISH",
+        "GEMBA-WALK",
         "P0",
         "PLATFORM",
         "S00",
@@ -2795,13 +2847,13 @@
         "archived": 1,
         "built": 47,
         "partial": 1,
-        "planned": 0,
+        "planned": 1,
         "proposed": 1,
         "standing": 1
       },
-      "total": 51,
+      "total": 52,
       "uncovered": [],
-      "with_open_units": 9,
+      "with_open_units": 10,
       "without_open_units": 42
     },
     "screens": {
