@@ -95,6 +95,9 @@ test("a stale-pin refusal is shown verbatim", async ({ page }) => {
 });
 
 test("the empty catalogue is the app's own message", async ({ page }) => {
+  await page.route("**/api/actions/job_catalogue.list/invocations", (route) =>
+    json(route, []),
+  );
   await page.goto("/jobs");
   await expect(
     page.getByText("No catalogue positions in this tenant yet.", { exact: true }),

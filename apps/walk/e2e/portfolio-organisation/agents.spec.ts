@@ -33,6 +33,13 @@ test("the agents render their key, model and allowed-action count", async ({ pag
 });
 
 test("the empty state is the app's own message", async ({ page }) => {
+  await page.route("**/api/actions/capability_agents.list/invocations", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ output: { items: [] } }),
+    }),
+  );
   await page.goto("/agents");
   await expect(page.getByText("No capability agents in this tenant yet.", { exact: true })).toBeVisible();
 });
