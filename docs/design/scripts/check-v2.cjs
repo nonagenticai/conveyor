@@ -452,6 +452,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
             tenant: "nonagentic",
             generated_at: "2026-11-16T00:00:00Z",
             git_sha: "a".repeat(40),
+            deployed_at: "2026-11-16T06:00:00Z",
             payload_sha256: "b".repeat(64),
             programme: { feedback: [], projects: [] },
             work: { boards: [], lists: [], cards: [] },
@@ -491,6 +492,10 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       await nav(id);
       const text = await content();
       check(text.includes("Live data & feedback"), `${id} carries the live data and feedback panel`);
+      check(
+        text.includes("STALE") && text.includes("2026-11-16T06:00:00Z"),
+        `${id} marks data older than the deployed build STALE`,
+      );
       check(
         (await page
           .locator('#main a[href="https://github.com/nonagenticai/conveyor/discussions"]')
@@ -564,6 +569,42 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     check(
       !unmetered.includes("18.4M") && !unmetered.includes("$412.80"),
       "the no-measure page shows no fixture number",
+    );
+    // #867 / #782 P3.2: a pack from before the deployed-build stamp (or a local build) makes no
+    // staleness claim; the 9d fixture carries no `deployed_at`.
+    check(
+      !unmetered.includes("STALE") && !unmetered.includes("deployed build"),
+      "a pack with no deployed stamp makes no staleness claim",
+    );
+
+    // 9e. The same data served by a build that is older than it: no STALE badge, and the
+    // deployed build is named.
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
+        configurable: true,
+        set() {},
+        get() {
+          return {
+            schema: "design-snapshot/v1",
+            tenant: "nonagentic",
+            generated_at: "2026-11-16T00:00:00Z",
+            git_sha: "a".repeat(40),
+            deployed_at: "2026-11-15T00:00:00Z",
+            payload_sha256: "b".repeat(64),
+            programme: { feedback: [], projects: [] },
+            work: { boards: [], lists: [], cards: [] },
+            organisation: {},
+            measure: {},
+          };
+        },
+      });
+    });
+    await nav("portfolio");
+    const freshRibbon = await page.locator("#main").innerText();
+    check(
+      freshRibbon.includes("deployed build 2026-11-15T00:00:00Z") &&
+        !freshRibbon.includes("STALE"),
+      "data newer than the deployed build is fresh and names the build",
     );
 
     check(errors.length === 0, "no browser runtime errors: " + errors.join(" | "));

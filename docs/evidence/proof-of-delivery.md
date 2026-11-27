@@ -336,6 +336,89 @@ certificate exists — is recorded when the deployed engine carries 0081, in the
 which #844's live certification was carried by #855. Concluding "live" from the branch binary
 against a schema that has not deployed would be exactly the drill this unit exists to replace.
 
+### The unit gate on the released engine (2026-11-27, #871)
+
+The promise above is kept. The deployed engine carries `0081` and refuses a real unit's close on
+its Definition of done; the same unit then closes once its certificate exists. Every body below is
+the deployed engine's answer — none of it is a test double.
+
+**The deployed identity.** `select max(version) from _sqlx_migrations` = **81**; the serving pods
+are `ghcr.io/nonagenticai/conveyor:latest@sha256:dbb665e1…98555d`, the image of the merge
+`322147b9e`; `GET /health/ready` = **200**.
+
+**The record, chartered from #837's real delivery.** `development_projects.charter` wrote
+`development_project` `01a21e1e-857f-…a9143` (repo `nonagenticai/conveyor`, lane
+`issue/837-engine-dod`, issue `nonagenticai/conveyor#837`, implementer `01a21820-3510-…3279e9`)
+with `proof_policy {spec_name: docs/SPEC_V2.md, spec_sha256: 0651b0ec…a3cc6ad, required: true}`.
+The seven required steps were recorded from the delivery's own facts: `branch`; `pull_request`
+#859 head `91a3dea6d`; `ci` run `46035785106` at that head, `green`; `merge` `322147b9e`; a
+**tested** `rollback_plan`; `deploy` digest `sha256:dbb665e1…98555d` at `migration_generation:
+81`; `live_verify` 200, serving digest equal to the deploy's, the acceptance command at exit 0.
+
+The rollback plan was exercised, not asserted. On staging (Docker, PostgreSQL 18) the prior
+release `sha256:cbee6af8…94654` migrated a fresh database to generation 80 and served
+`/health/ready` 200; against the same database after applied version **81** was present, its
+runtime migrator (`ignore_missing`, `crates/store/src/migrate.rs`) exited 0 and `/health/ready`
+again answered 200 — the application-only rollback reaches Ready. The gate therefore records
+`backward_compatible: true` with that evidence, and the plan is the Flux digest pin
+(`scripts/rollback-image.sh --policy conveyor`), not a database restore.
+
+**The three gates.** `review` `01a21e1e-dd58-…d68b`, `merge` `01a21e1f-dde2-…61bd` and `deploy`
+`01a21e21-7e45-…8c41` were each decided `approve` by `01a1e8a7-8b23-…f7a545` (the tenant's
+`conveyor-approver`), a principal distinct from the implementer. The decisions were made through
+the operator path under the owner's explicit authorization of 2026-11-27; the audit rows record
+`decided_by_kind: service`, which is what the operator path attributes, and the closure names the
+same `reviewer_id`.
+
+**The refusal.** Closing before any certificate existed answered, verbatim:
+
+```
+HTTP/1.1 422 Unprocessable Entity
+{"type":"gate_evidence_missing",
+ "title":"Unprocessable Entity","status":422,
+ "detail":"this gate requires a \"lean_proof\" evidence item to open; the request names none",
+ "instance":"/api/actions/development_projects.close/invocations",
+ "request_id":"12d7a3e4-05f5-4570-b70c-ce144d92eb0b"}
+```
+
+The engine recorded the call itself: an `action_invocation` row
+`development_projects.close | refused` at `17:51:53Z` by actor `01a21820…`, and an `audit_event`
+`development_projects.close | refused` at the same instant.
+
+**The path opens.** `proofs.attest` derived the facts from the rows and wrote nothing:
+`facts_sha256 3d390203…451eaa`, model `bbbc56e1…a138e57`, theorem `unit_record_ok`, source
+10 216 characters. `lean4.check` of that source answered `200 {"valid": true,
+"computation_time_ms": 3030.91}`; `proofs.record` naming that invocation stored certificate
+`01a21e24-9de2-…f459` with `verdict: proven`, `certificate_sha256 fd1eda04…9dec52`,
+`facts_sha256 3d390203…451eaa`, `trust: kernel`. The same `development_projects.close` then
+answered **201**, and the closure's `dod` reads:
+
+```
+{"required": true, "lean_proof": "proven",
+ "proof_id": "01a21e24-9de2-7c24-944f-650a081fe459",
+ "facts_sha256": "3d3902037c34587d31740e2a504cd93d3c520659af9fc855782bfa1385451eaa",
+ "evidence": {"kind":"lean_proof","id":"01a21e24-…","certificate_sha256":"fd1eda04…",
+              "spec_sha256":"0651b0ec…"}}
+```
+
+The closure names the reviewer `01a1e8a7…`, the merge `322147b9e`, the deployed digest
+`sha256:dbb665e1…`, the CI run `46035785106` and the live check above. `development_project`
+`01a21e1e-857f-…` is now `closed`.
+
+**One gap this exposed, and its grant.** `proofs.attest` — the action #837 added — was not in the
+`mcp` channel's override set, so the session bearer's first call answered `403 action-forbidden`.
+Measured: 114 grants, `proofs.record`/`reverify`/`get`/`list` present, `proofs.attest` absent. The
+gap was closed with one `channels.policy_set` carrying the complete 115-entry set (the operator's
+act, recorded as `georgiedekker` under the owner's authorization); the same call then answered
+200. The grant is durable and is what lets the next unit, and the verifier role, attest without an
+operator.
+
+**What this proves, and what it does not.** It proves the engine refuses a required DoD without a
+certificate and opens it with one, on the deployed image, from rows the engine wrote. It does not
+prove the certificate's facts describe the world — that assumption is named in § What the
+certificate says, and it does not prove the rollback on the live deployment itself: the staging
+exercise above starts the prior release against the newer schema, while the production pin
+remains the operator's gated act.
 ### The findings run (conveyor#865)
 
 A second live run at 2026-11-27T17:00:47Z (`docs/evidence/units/2026-11-27-findings/`) re-ran this

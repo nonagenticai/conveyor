@@ -285,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "6afb5fd3f27b9891fc7cfc1ef7d2c8054bacdb75c7a8dbdcaa916459d4bfd973",
-      "bytes": 26911,
+      "sha256": "17c7a2f4df091e0e9638c200e70d1868d8d81c40046ca2abff7bf0e144afa516",
+      "bytes": 27179,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -987,8 +987,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "5b06d9f9bc08214495c2d4a052da7a35f882e3f50f281742d696a1ef2d5230db",
-      "bytes": 23541,
+      "sha256": "e6ac11ce165535db3d672f72541b9f6f4d50e341b82ca9107758353bf0a22478",
+      "bytes": 28857,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {

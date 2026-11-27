@@ -80,6 +80,9 @@ pub struct SnapshotArgs {
     /// The commit the published pack describes. Absent means `git rev-parse HEAD` in the
     /// working directory; a pod has no checkout, so a publish passes it explicitly.
     pub git_sha: Option<String>,
+    /// When the image that produced the pack was built (RFC 3339). Absent means `unknown`; the
+    /// live page marks its data stale against this stamp (#867 / #782 P3.2).
+    pub build_time: Option<String>,
 }
 
 /// One written file.
@@ -171,6 +174,7 @@ pub async fn run_with_pool(
         .clone()
         .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
     let git_sha = args.git_sha.clone().unwrap_or_else(git_sha);
+    let deployed_at = args.build_time.as_deref().unwrap_or("unknown");
     let migration_version = store::MIGRATOR
         .iter()
         .last()
@@ -220,10 +224,13 @@ pub async fn run_with_pool(
         &data,
         rework.as_ref(),
         Some(&register),
-        &args.tenant,
-        &args.feedback_url,
-        &generated_at,
-        &git_sha,
+        SnapshotHeader {
+            tenant: &args.tenant,
+            feedback_url: &args.feedback_url,
+            generated_at: &generated_at,
+            git_sha: &git_sha,
+            deployed_at,
+        },
     )?;
 
     let mut files = Vec::new();
@@ -398,21 +405,34 @@ pub(crate) fn with_header(mut value: Value, schema: &str, generated_at: &str) ->
     value
 }
 
+/// The envelope fields every served snapshot carries, so their set grows in one place.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SnapshotHeader<'a> {
+    /// The tenant slug the snapshot is published for.
+    pub tenant: &'a str,
+    /// Linked from every studio page.
+    pub feedback_url: &'a str,
+    /// The newest published document's `updated_at`.
+    pub generated_at: &'a str,
+    /// The commit the serving image was built from.
+    pub git_sha: &'a str,
+    /// When the serving image was built (RFC 3339), or `unknown`.
+    pub deployed_at: &'a str,
+}
+
 pub(crate) fn snapshot_js(
     data: &store::snapshot::SnapshotData,
     rework: Option<&Value>,
     register: Option<&Value>,
-    tenant: &str,
-    feedback_url: &str,
-    generated_at: &str,
-    git_sha: &str,
+    header: SnapshotHeader<'_>,
 ) -> Result<String, SnapshotError> {
     let mut value = json!({
         "schema": SCHEMA,
-        "tenant": tenant,
-        "generated_at": generated_at,
-        "git_sha": git_sha,
-        "feedback_url": feedback_url,
+        "tenant": header.tenant,
+        "generated_at": header.generated_at,
+        "git_sha": header.git_sha,
+        "deployed_at": header.deployed_at,
+        "feedback_url": header.feedback_url,
         "programme": data.programme,
         "organisation": data.organisation,
         "config": data.config,
@@ -716,5 +736,60 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn empty_data() -> store::snapshot::SnapshotData {
+        let empty = serde_json::json!({});
+        store::snapshot::SnapshotData {
+            programme: empty.clone(),
+            organisation: empty.clone(),
+            config: empty.clone(),
+            work: empty.clone(),
+            msp: empty.clone(),
+            artefacts: empty.clone(),
+            architecture: empty.clone(),
+            ops: empty.clone(),
+            measure: empty.clone(),
+            delivery: empty.clone(),
+            programme_health: empty.clone(),
+            secrets: empty.clone(),
+        }
+    }
+
+    /// #867 / #782 P3.2: the served snapshot names the build that produced it; a build with no
+    /// stamp says `unknown`, which the page reads as "make no staleness claim".
+    #[test]
+    fn the_header_carries_the_deployed_build() {
+        let data = empty_data();
+        let header = SnapshotHeader {
+            tenant: "tenant",
+            feedback_url: "https://example.test/feedback",
+            generated_at: "2026-11-27T00:00:00Z",
+            git_sha: "abc123",
+            deployed_at: "2026-11-27T06:00:00Z",
+        };
+        let js = snapshot_js(&data, None, None, header).expect("the snapshot");
+        assert!(
+            js.contains("\"deployed_at\":\"2026-11-27T06:00:00Z\""),
+            "{js}"
+        );
+        assert!(js.contains("\"git_sha\":\"abc123\""), "{js}");
+
+        let unknown = snapshot_js(
+            &data,
+            None,
+            None,
+            SnapshotHeader {
+                deployed_at: "unknown",
+                ..header
+            },
+        )
+        .expect("the snapshot");
+        assert!(unknown.contains("\"deployed_at\":\"unknown\""), "{unknown}");
     }
 }

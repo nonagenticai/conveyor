@@ -112,6 +112,10 @@ FROM ${BASE_IMAGE} AS runtime
 # passes GITHUB_SHA; a local `docker build` gets "unknown" and the snapshot says so.
 ARG GIT_SHA=unknown
 ENV CONVEYOR_GIT_SHA=${GIT_SHA}
+# When this image was built (RFC 3339); the page marks its published data stale when it
+# predates this stamp (#867). Public CI passes BUILD_TIME; a local build gets "unknown".
+ARG BUILD_TIME=unknown
+ENV CONVEYOR_BUILD_TIME=${BUILD_TIME}
 # ca-certificates: outbound https (rustls platform roots, OIDC JWKS). curl: the HEALTHCHECK.
 # openssh-client (#172): the `ops.host_*` family reaches a bare-metal host through its
 # forced-command agent over ssh, and the client spawns the real binary rather than linking a
