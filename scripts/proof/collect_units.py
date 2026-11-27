@@ -1157,7 +1157,13 @@ def report(run_dir: pathlib.Path) -> pathlib.Path:
         )
         lines.append("")
     failing = [unit for unit in corpus["units"] if unit["failed_rules"]]
-    lines.append(f"**{len(failing)} completed unit(s) fail the model.**")
+    if certificates:
+        lines.append(f"**{len(failing)} completed unit(s) fail the model.**")
+    else:
+        lines.append(
+            f"**{len(failing)} completed unit(s) fail the collector's rule mirror; the "
+            "kernel certificate is pending the deployed engine.**"
+        )
     lines.append("")
     lines.append("| Unit | Failed rules |")
     lines.append("|---|---|")

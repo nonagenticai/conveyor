@@ -34,7 +34,7 @@ Orphan sub-kinds: `no-issue` 8, `unlinked-unit` 3.
 | `pullUsable` | 0 |
 | `verifyParts` | 39 |
 
-**46 completed unit(s) fail the model.**
+**46 completed unit(s) fail the collector's rule mirror; the kernel certificate is pending the deployed engine.**
 
 | Unit | Failed rules |
 |---|---|
