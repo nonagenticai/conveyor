@@ -2830,7 +2830,7 @@
       "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
       "standard": "TOGAF",
       "level": "project",
-      "subject_kind": "artifact",
+      "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.1",
       "document_category": "architecture-artifact-instance",
