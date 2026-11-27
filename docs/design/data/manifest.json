@@ -5111,13 +5111,13 @@
       "bytes": 24503,
       "path": "conformance.json",
       "records": 0,
-      "sha256": "f15611b2e564831e57abac6c6f00c5a2506cadff28b3b7a31f09ead2403726b0"
+      "sha256": "9d5234d7f96b8b596570c4300fe3b787cef98943ad3613dad428f0e4cdca494a"
     },
     {
       "bytes": 13420,
       "path": "conformance.md",
       "records": 0,
-      "sha256": "dbd389245a0ecd8c361158516b241f0f5a88d6b2f30aba8a50f2058dd155c89b"
+      "sha256": "c979a8f351ecbf754aaecc431a02e2a5bbc4311b77def9a9a38fc8e5b51f3499"
     },
     {
       "bytes": 29216,
@@ -5141,7 +5141,7 @@
       "bytes": 90872,
       "path": "evidence.json",
       "records": 491,
-      "sha256": "83f0ec218186d067cd999430b919f34145eaab66116df46e30919a1a7a0adeda"
+      "sha256": "acff5b8380bc6c4e287e911be4e3b88866e1d161590f6aff143db83ea894ef93"
     },
     {
       "bytes": 107,
@@ -5153,7 +5153,7 @@
       "bytes": 184086,
       "path": "issues.json",
       "records": 372,
-      "sha256": "7dde1634339b3a7ac70e3531ce6b3a4335610bd8445382680658335eff179e1f"
+      "sha256": "c6adde306e936f5f39fb6e0f0132ba95af69430b41e917a9bd1bf025de42ae12"
     },
     {
       "bytes": 5350,
@@ -5189,7 +5189,7 @@
       "bytes": 288846,
       "path": "programme.json",
       "records": 54,
-      "sha256": "479f32002fd5cbe3b91fd1724991add0d2e7c975b7819833c337f9caf0e8b659"
+      "sha256": "8027d9a9833b091a7bd565f5bfae71f5b7a3f15a0dbff2a7f3f4330b873a93f1"
     },
     {
       "bytes": 290844,
@@ -5204,16 +5204,16 @@
       "sha256": "becb8f4d9f6735ff9664bd61ddbf2aacfad18c54d989bb7c189150b3d098dcc2"
     },
     {
-      "bytes": 847451,
+      "bytes": 844437,
       "path": "rework.js",
       "records": 0,
-      "sha256": "ac3ac4e193ef9f8feb193b4cd03c4a1eeb17ae4058a1d04de6725406fcfb6cd9"
+      "sha256": "91c307218ea3a8b51aea53ed3498f8e22962c0a3f9789e02f9c56b7c607fe62e"
     },
     {
-      "bytes": 847425,
+      "bytes": 844411,
       "path": "rework.json",
-      "records": 244,
-      "sha256": "2e3a9c1ecbd3360e81de1c97f0531e4a19dcd736aaf799a26bb410929546f59f"
+      "records": 243,
+      "sha256": "20d88173a9034b259de35d64391462e00cc28af4dc49d9ca72219efb5909c754"
     },
     {
       "bytes": 223,
@@ -5222,22 +5222,22 @@
       "sha256": "b84b15e0d6864a7d8ad25860fea05c67b26c46c96fc6a0d46488e27589fd2997"
     },
     {
-      "bytes": 9076753,
+      "bytes": 9074691,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "eda75cad576e9ed21ed4bb86822a32f226d7c825b521389f1ce34bd08b9b2a45"
+      "sha256": "04482b5c8f8173a78b9fcf78c42d2d8bce5553edfef5299208d7e9eb6490ca1b"
     },
     {
-      "bytes": 6027590,
+      "bytes": 6029151,
       "path": "standards.js",
       "records": 0,
-      "sha256": "314c3f9a8fdff7223ef2b33a34825fa8d9ae2408f88b3652dad1be1830ec3004"
+      "sha256": "4e3fd4c26266786051597244946abfd844c4f35f8f9289bcd23c2f0a4e96ca68"
     },
     {
-      "bytes": 6027561,
+      "bytes": 6029122,
       "path": "standards.json",
       "records": 0,
-      "sha256": "64352f7abe9675e7701d7f5982c7c81b3ebe05ba0837b73748d8f893c764a728"
+      "sha256": "e74d51124c97a0127e87246055293bb326a27929fd3c2324665174787abca9f2"
     },
     {
       "bytes": 2650700,
@@ -5247,7 +5247,7 @@
     }
   ],
   "generated_at": "2026-11-27T12:10:18.740973+00:00",
-  "git_sha": "9571c03d5e107fc9f13873ad828323ddf9c3dcdb",
+  "git_sha": "7f69723b42694f0c28d36cbd1bdc198fd0634161",
   "migration": {
     "description": "tranche review at",
     "version": 108

@@ -21,7 +21,7 @@
         "number": 847,
         "state": "OPEN",
         "title": "walk: G0 conformance — the record and the parity instrument tell the truth",
-        "updatedAt": "2026-11-27T13:14:04Z",
+        "updatedAt": "2026-11-27T13:21:40Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/847"
       },
       {
@@ -7205,7 +7205,7 @@
       }
     ],
     "provenance": {
-      "sha256": "3c46bb9108aae1971968bf4b06fcabe305b9f6329558d89b0c35afb103f4cd52",
+      "sha256": "65eacad79daf55df4301a4480a08b2875e90251ab4ecabef063ea0991e29f844",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },
