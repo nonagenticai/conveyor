@@ -57,9 +57,10 @@ one defect, not three rule failures.
   no-issue PRs. Console publish #494 (`publish/design-…`) is now excluded as automation, and the
   policy question for the eight is [#869](https://github.com/nonagenticai/conveyor/issues/869).
 
-Rule totals (the kernel's `ruleResults`): `closesKeyword` 11, `mergeComplete` 14, `oneBranch` 4,
-`onePull` 5, `verifyParts` 47; `ciBudget` and `pullUsable` 0. One unit carries both a `multi-lane`
-and a `unit-dor-verify` finding (#212); the other four `multi-lane` units pass `verifyParts`.
+Rule totals (the collector's `local_rules` mirror; the kernel's `ruleResults` certifies the same
+seven rules as booleans): `closesKeyword` 11, `mergeComplete` 14, `oneBranch` 4, `onePull` 5,
+`verifyParts` 47; `ciBudget` and `pullUsable` 0. One unit carries both a `multi-lane` and a
+`unit-dor-verify` finding (#212); the other four `multi-lane` units pass `verifyParts`.
 
 #### The instrument's own findings (fixed here)
 

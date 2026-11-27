@@ -1441,8 +1441,8 @@ def self_test() -> int:
     # the Parts section before the later parts (the #753/#781 false failures).
     assert contract_verify(
         "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n\n"
-        "#8 · a reference line\n\n### P2\nVerify: `true`\n"
-    ) is True, "a `#N` prose line ended the section"
+        "### P2\n#8 · a reference line\nVerify: `true`\n"
+    ) is True, "a `#N` prose line ended the section before a part's Verify"
     assert contract_verify(
         "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n\n### P2\nno verify\n"
     ) is False, "a part without a Verify line passed"

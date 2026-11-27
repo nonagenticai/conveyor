@@ -1725,8 +1725,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/units/2026-11-27-findings/findings.html",
       "source": "docs/evidence/units/2026-11-27-findings/findings.md",
       "section": "Evidence",
-      "sha256": "54e1db5812693d69934edb6ac21b905589279bd70f33d36ebc9e035933b09453",
-      "bytes": 7873,
+      "sha256": "10bf9c6f0e68c0cdf4ad9b6d0a59792f8301838f642861567bcf3362b1c6728f",
+      "bytes": 7954,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/findings.md"
     },
     {
