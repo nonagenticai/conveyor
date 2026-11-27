@@ -44,9 +44,10 @@ decision open until it can be measured.
    client gains a `/walk/` redirect URI (or a dedicated public client if the identity operator
    prefers isolation); no token is ever stored in `localStorage`.
 5. **The world is a renderer behind a port.** Records, tables, forms and decisions are DOM sheets in
-   every case. The world implements a small `WorldView` interface; the engine is not assumed. The
-   baseline is the mock's canvas-2D projection; the owner's candidate is **Bevy 0.18 compiled to
-   WASM**. The P0 spike measures both and records the choice in ADR 0022.
+   every case. The world implements a small `WorldView` interface. The simulation behind it is
+   **`bevy_ecs 0.20.1`** in `crates/walk-world`, decided in **ADR 0022** (accepted 2026-11-26); the
+   *renderer* is still measured — canvas-2D against WebGL2 — in the P0 spike, and ADR 0023 records
+   the winner. No `bevy_render`, `bevy_winit` or `bevy_asset` dependency is admitted.
 6. **The spatial model never gates a capability.** Every room, record, form and decision has a
    deep link and a keyboard path. A user who never walks the world can use every feature.
 7. **Primacy requires a measured parity gate.** The walk reaches parity when every §10.5 destination

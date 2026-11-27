@@ -55,6 +55,23 @@ Each row's document is `02-architecture-design.md` except the register (this fil
 from A1–A6 and realises into C1/C2/D1. A row is approved only by the Architecture Board after the
 P0 spike; until then it is `draft` and is evidence, not a claim.
 
+### v2 rows — the world layer (#806, ADR 0022)
+
+Four rows move to version 2 when the `bevy_ecs` world layer is accepted, because the world changes
+what they say; the other six are unchanged. The v2 row supersedes the v1 row rather than editing it
+(`architecture.artifacts_supersede`), so the v1 text stays readable as history.
+
+| Key | v2 change | Source |
+|---|---|---|
+| `solution_concept` | the world is a `bevy_ecs` simulation crate behind `WorldView`, not an undecided renderer | `GEMBA-WALK-ECS.md` §1–§2 |
+| `requirements_catalog` | adds `R-ECS-1..10`: state classes, intent-only writes, no persisted programme copy, idempotent projection, determinism, wasm constraints, budgets, adapter boundary, no tokens, extension rules | `GEMBA-WALK-ECS.md` §1, §8–§16 |
+| `data_entity_catalog` | the entity/component mapping to the existing tables; no new table | `GEMBA-WALK-ECS.md` §3–§5 |
+| `technology_standards` | `bevy_ecs`/`bevy_app`/`bevy_time` `=0.20.1`, wasm32, cargo-leptos for `apps/web` only, `panic=abort` | `GEMBA-WALK-ECS.md` §2, §11 |
+
+`GEMBA-WALK-ECS.md` also becomes its own `architecture-artifact` row (phase D / HLD, owner
+programme-architect, reviewer Architecture Board), linked `realization` from `solution_concept` and
+`derivation` into `technology_standards`.
+
 ## Contract kinds
 
 | Kind | Phase | Subject | Status | Document |

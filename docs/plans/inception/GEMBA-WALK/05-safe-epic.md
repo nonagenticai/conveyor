@@ -48,7 +48,11 @@ with the mock; retiring `apps/web` before the gate; any new table, action, event
 | E1 | `docs/evidence/walk-census.json` + `scripts/build-walk-coverage.py` + exemptions | F6, F8 |
 | E2 | The PKCE identity flow, the dev cookie and the external `/walk/` redirect URI | F1 |
 | E3 | The schema-driven action sheet over `actions.describe` | F2, F3 |
-| E4 | The `WorldView` port and the canvas-2D baseline | F7 |
+| E4 | The `WorldView` port and the canvas-2D adapter | F7 |
+| E8 | `crates/walk-world` — the `bevy_ecs` simulation core (entities, components, schedules) and its headless tests | F7 |
+| E9 | The transport bridge: the manifest, intents, receipts and SSE deltas at the wasm boundary | F2, F7 |
+| E10 | The replay and determinism harness, including the schedule-ambiguity test | F7, F8 |
+| E11 | The `FrameView` adapter contract shared by canvas-2D and WebGL2 | F7 |
 | E5 | The scoped `/walk/*` fallback in `crates/api/src/web.rs` and its Rust test | F1 |
 | E6 | The Playwright harness and the scripted decision-task traces | F2–F4, F8 |
 | E7 | The walk CI workflow, the Dockerfile copy and the static build | F1, F8 |

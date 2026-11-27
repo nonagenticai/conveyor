@@ -18,7 +18,11 @@ review_date: 2026-12-03
 | ID | Work package | Stage | Owner | Acceptance (the plan's `Verify:`) | Status |
 |---|---|---|---|---|---|
 | W0 | Governance, census and parity instrument | P0 | programme-manager | `python3 scripts/build-walk-coverage.py --check` (to create) | planned |
-| W1 | Spike: auth, SSE, schema forms, deep link, canvas vs Bevy; ADR 0022 | P0 | programme-architect | the spike record; ADR 0022 | planned |
+| W1 | Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023 | P0 | programme-architect | the spike record; ADR 0023 | planned |
+| W1a | `crates/walk-world`: entities, components, resources, schedules, projection (§1–§9 of the ECS design) | P1 | delivery (G0) | the headless tests in `walk-world` | planned |
+| W1b | The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11) | P1 | delivery (G0) | refusal + same-frame ordering tests | planned |
+| W1c | The replay/determinism harness and the ambiguity test (§10, §14) | P1 | delivery (G0) | `replay_is_deterministic`, `no_schedule_ambiguity` | planned |
+| W1d | The `FrameView` adapter and the canvas-2D renderer (§13) | P1 | delivery (G0) | the world Playwright spec | planned |
 | W2 | Foundation + Portfolio end-to-end + serving fallback | P1 | delivery (G0) | Playwright foundation spec; `web.rs` test | planned |
 | W3 | Read parity across the seven wings | P2 | S1–S3 | per-destination specs | planned |
 | W4 | Write parity and gates | P3 | S1–S3 | contract tests per write | planned |

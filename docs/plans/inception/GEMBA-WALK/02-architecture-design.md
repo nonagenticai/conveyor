@@ -68,7 +68,7 @@ No row is approved yet; the review date is the Architecture Board's sitting afte
 | P6 | No fixtures, no client store | a fixture makes the measurement lie | the client renders real rows or the honest gate; no snapshot as the app's source |
 | P7 | Parity is measured | prose cannot prove a UI | the frozen census and per-destination specs are the only credit |
 | P8 | Same identity, same origin | a second identity path doubles the attack surface | auth-code + PKCE, token in memory, tenant header, no `localStorage` token |
-| P9 | The engine is replaceable | the engine choice is unproven | `WorldView` is a port; canvas-2D is the baseline; Bevy is a candidate measured in P0 |
+| P9 | The renderer is replaceable | the simulation is decided, the renderer is not | the simulation is `bevy_ecs` behind `WorldView` (ADR 0022); canvas-2D and WebGL2 are measured in P0 and ADR 0023 picks one |
 | P10 | The walk is reversible | primacy must not be a one-way door | additive surface, redirect map and an `apps/web` retirement as a later decision |
 
 ### A2 — Requirements catalog (typed)
@@ -216,9 +216,10 @@ boards/cards/runs · programme/tranche/benefit · approvals/decisions · documen
 ### D1 — Technology view
 
 Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline
-world is a canvas-2D projection behind `WorldView`; the candidate is Bevy 0.18 compiled to WASM,
-measured in P0 against bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay
-input. Browser APIs: fetch, streams, Web Crypto (PKCE), `sessionStorage` (verifier only),
+world simulation is `bevy_ecs 0.20.1` in `crates/walk-world`, compiled to wasm32 and loaded behind
+`WorldView` (ADR 0022); the renderer is a canvas-2D projection first, with WebGL2 measured against
+it in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input) and ADR
+0023 recording the winner. Browser APIs: fetch, streams, Web Crypto (PKCE), `sessionStorage` (verifier only),
 `history`/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's
 static assets are copied by the Dockerfile. Tests: Playwright against the dev server; `node --test`
 for pure modules. No SSR, no server runtime, no third-party hosted service.
@@ -260,7 +261,7 @@ S1–S3 (W3–W4 by wing), S4 (W5–W8). The P0 spike's throwaway workflow is de
 | AD4 | DOM sheets own all work; the world is navigation/state display | a canvas cannot carry audit-quality forms | P3, A5 |
 | AD5 | Seats are view presets; the manifest and scopes own authority | a preset must never grant a permission | B2, R9 |
 | AD6 | No fixtures, no client programme store | a fixture makes the parity claim false | P6, R12 |
-| AD7 | `WorldView` port; canvas baseline; Bevy measured in P0 | the engine is unproven; the port keeps both | R8, D1, ADR 0022 |
+| AD7 | `WorldView` port; `bevy_ecs` simulation (ADR 0022); canvas-2D baseline, WebGL2 measured in P0 | the simulation is decided, the renderer is not; the port keeps both renderers | R8, D1, ADR 0022/0023 |
 | AD8 | The instrument is a frozen census + per-destination specs | live manifests move; the gate must stay passable | plan §6, R13 |
 | AD9 | Deep links served by a scoped `/walk/*` fallback + Rust test | without it a deep link renders the operator app | R7, W2 |
 

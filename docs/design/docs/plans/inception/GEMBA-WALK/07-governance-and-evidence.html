@@ -47,10 +47,42 @@
 </tr>
 <tr>
 <td>W1</td>
-<td>Spike: auth, SSE, schema forms, deep link, canvas vs Bevy; ADR 0022</td>
+<td>Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023</td>
 <td>P0</td>
 <td>programme-architect</td>
-<td>the spike record; ADR 0022</td>
+<td>the spike record; ADR 0023</td>
+<td>planned</td>
+</tr>
+<tr>
+<td>W1a</td>
+<td><code>crates/walk-world</code>: entities, components, resources, schedules, projection (§1–§9 of the ECS design)</td>
+<td>P1</td>
+<td>delivery (G0)</td>
+<td>the headless tests in <code>walk-world</code></td>
+<td>planned</td>
+</tr>
+<tr>
+<td>W1b</td>
+<td>The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11)</td>
+<td>P1</td>
+<td>delivery (G0)</td>
+<td>refusal + same-frame ordering tests</td>
+<td>planned</td>
+</tr>
+<tr>
+<td>W1c</td>
+<td>The replay/determinism harness and the ambiguity test (§10, §14)</td>
+<td>P1</td>
+<td>delivery (G0)</td>
+<td><code>replay_is_deterministic</code>, <code>no_schedule_ambiguity</code></td>
+<td>planned</td>
+</tr>
+<tr>
+<td>W1d</td>
+<td>The <code>FrameView</code> adapter and the canvas-2D renderer (§13)</td>
+<td>P1</td>
+<td>delivery (G0)</td>
+<td>the world Playwright spec</td>
 <td>planned</td>
 </tr>
 <tr>

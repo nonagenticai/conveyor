@@ -88,7 +88,8 @@ pre-empted. It is not defined as pixel or copy parity with either existing clien
 4. DOM sheets own all work; the world is navigation and state display only.
 5. Seats are view presets; the manifest and server scopes own authority.
 6. No fixtures; no client-side programme store; no published snapshot as the app's source.
-7. `WorldView` port; canvas-2D baseline; Bevy 0.18 WASM candidate; ADR 0022 after the P0 spike.
+7. `WorldView` port; the simulation is `bevy_ecs 0.20.1` in `crates/walk-world` (ADR 0022); the
+   renderer — canvas-2D baseline against WebGL2 — is decided by the P0 spike in ADR 0023.
 8. Clean URLs with a scoped `/walk/*` fallback in `crates/api/src/web.rs` (GET/HEAD, non-asset
    paths) and a Rust test; without it a deep link renders the operator app.
 9. Schema-driven action sheet so no action is unreachable; unsupported schema falls back to a
@@ -163,7 +164,7 @@ successor) once the walk app is on `main`; it needs no server, database or netwo
 
 | Stage | Work | Exit gate |
 |---|---|---|
-| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves PKCE redirect to `/walk/` on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own `/walk/*` fallback, and a static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets. The production `web.rs` fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1 |
+| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves PKCE redirect to `/walk/` on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own `/walk/*` fallback, and a static copy; it measures canvas-2D against WebGL2 for the renderer and ADR 0023 records the winner and budgets (the simulation is `bevy_ecs` in `crates/walk-world`, ADR 0022). The production `web.rs` fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1 |
 | **P1** | Foundation + Portfolio end-to-end | Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room `portfolio` read + **one real write**, deep link and back/forward, dev server, Dockerfile copy, `web.rs` fallback + test, spec green |
 | **P2** | Read parity across §10.5 | Every destination renders its reads with loading/empty/partial/error/denied and the honest gate; each has its spec |
 | **P3** | Write parity + gates | Every destination's writes go through the action sheet with `If-Match`/`Idempotency-Key`/approval, refusals shown verbatim, no optimistic mutation |

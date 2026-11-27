@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0022 — The world layer is a bevyecs simulation in its own crate · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0022-bevy-ecs-world-layer.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0022--the-world-layer-is-a-bevy_ecs-simulation-in-its-own-crate">0022 — The world layer is a <code>bevy_ecs</code> simulation in its own crate</h1>
+<p>Status: Accepted · 2026-11-26 · delegated rule decision under the published delegation (owner direction 2026-11-26; expiry 2027-02-18). Not a human signature.</p>
+<p>Supersedes ADR 0021 decision 5 <strong>in part</strong>: the simulation engine is no longer an open question. It leaves ADR 0021's other decisions untouched, and it does not decide the renderer, which remains ADR 0023's subject.</p>
+<h2 id="context">Context</h2>
+<p>ADR 0021 authorises a second, game-style client at <code>/walk/</code> and left the engine open: canvas-2D was the baseline, Bevy a candidate, and the P0 spike was to choose (<code>docs/design/GEMBA-WALK-SPEC.md</code> §12). The owner has now directed that the Bevy ECS be designed as part of the architecture rather than left to the spike.</p>
+<p>Facts measured for this decision (fetched 2026-11-26, not remembered):</p>
+<ul>
+<li><code>bevy_ecs</code> <strong>0.20.1</strong> (published 2026-10-28), MSRV <strong>1.95.0</strong>; the repository pins Rust <strong>1.100.0</strong> (<code>rust-toolchain.toml</code>), so the toolchain is compatible without a bump.</li>
+<li><code>multi_threaded</code> is <strong>off</strong> by default and <code>std</code> is on: the crate compiles for <code>wasm32-unknown-unknown</code> without a thread pool.</li>
+<li>Since <strong>0.17</strong> the buffered event API is <code>Message</code> (<code>MessageReader</code>/<code>MessageWriter</code>); <code>Event</code> is the observer API. In <strong>0.20</strong> the observer parameter is <code>On&lt;E&gt;</code>. A message reader ordered before its writer sees the message on the next frame — ordering is a scheduling fact.</li>
+<li>Bevy runs systems in parallel by default; order is guaranteed only by <code>.chain()</code> and sets, and <code>ScheduleBuildSettings { ambiguity_detection }</code> (default <code>Ignore</code>) is the available guard.</li>
+<li>The conveyor has <strong>no <code>room</code> or <code>seat</code> tables</strong>: rooms are routes and seats are view presets (<code>docs/design/GEMBA-WALK-SPEC.md</code> §2–§3). The world is therefore client state over a server-owned record set — exactly the shape an ECS models well and a form framework models badly.</li>
+<li>The served action surface is 597 names (<code>docs/design/data/actions.json</code>); the SSE vocabulary is 31 event types (<code>crates/actions/src/board/events.rs</code>).</li>
+</ul>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><strong><code>bevy_ecs 0.20.1</code> is the simulation layer of the world</strong>, exact-pinned. The crate depends on <code>bevy_ecs</code>, <code>bevy_app</code> and <code>bevy_time</code> only, on their defaults, with <code>bevy_app</code>'s <code>web</code> feature enabled for <code>wasm32</code> — <code>bevy_time</code> reads the clock through <code>bevy_platform</code>, whose web backend the wasm build needs. Feature pruning is a <em>measured</em> bundle lever, not an assumption: <code>bevy_app</code>'s default re-enables <code>bevy_ecs</code>'s, so a prune turns both off together and is verified by a preflight compile. The <code>bevy</code> umbrella crate, <code>bevy_render</code>, <code>bevy_winit</code>, <code>bevy_asset</code> and <code>bevy_ui</code> are <strong>not</strong> dependencies.</li>
+<li><strong>The simulation is a crate, not a leaf</strong>: <code>crates/walk-world</code>, an <code>rlib</code> with no DOM, no web-sys, no network and no storage, compiled for host and <code>wasm32-unknown-unknown</code>, so it is tested headlessly by <code>checks-shard</code> rather than only in a browser.</li>
+<li><strong>Three state classes, enforced by module boundary</strong>: server truth is a <em>mirror</em> the ECS may not author; session state is owned; derived state is a pure function of the two. A write leaves as an <code>ActionCall</code> and the mirror changes only on a receipt or a delta.</li>
+<li><strong>The mirror is never persisted.</strong> <code>save()</code> serialises session state only — a stored programme copy is the "programme store" SPEC §6.4 forbids.</li>
+<li><strong>Writes are intents validated against the live manifest</strong> (<code>actions.describe</code>: <code>effect</code>, <code>confirm</code>, scopes). Optimistic UI is presentation-only: no component holds an unconfirmed domain value.</li>
+<li><strong>Determinism is a schedule property</strong>: <code>FixedUpdate</code> at 60 Hz with <code>Time&lt;Fixed&gt;</code>, explicit <code>.chain()</code>/sets, ambiguity detection at <code>LogLevel::Error</code> and a fixed <code>shuffle_seed</code> in tests, a seeded RNG resource, no wall-clock, no threads, ordered iteration.</li>
+<li><strong>Identity is <code>RecordKey { kind, id }</code></strong>; projection is idempotent and despawn waits one snapshot generation (with the open sheet's subject pinned).</li>
+<li><strong>The renderer stays behind the <code>WorldView</code> port.</strong> The ECS produces a <code>FrameView</code>; canvas-2D and WebGL2 both consume it. ADR 0023 picks between them on measured evidence.</li>
+</ol>
+<h2 id="consequences">Consequences</h2>
+<p><strong>Gained.</strong> A deterministic, headless-testable world: every BDD scenario is a Rust test in <code>checks-shard</code>, not a browser run. Real Bevy idioms (<code>Component</code>, <code>Resource</code>, <code>Message</code>, observers, <code>Commands</code>, <code>Query&lt;&amp;mut _&gt;</code>, plugins, fixed schedules) instead of a bespoke loop. The world's state classes become explicit, which is what makes the "no programme store" rule enforceable rather than aspirational.</p>
+<p><strong>Paid.</strong> <code>bevy_ecs</code> joins every workspace build, native and wasm; a cold compile is minutes, and the no-local-Rust rule means CI is the only compile gate. The 0.x API moves fast: the 0.17 Event/Message split and the 0.20 <code>Trigger</code>→<code>On</code> rename are the reason every signature is written against 0.20.1 and pinned to it. The wasm build is single-threaded, has no <code>Instant</code>/<code>SystemTime</code>, and needs <code>panic = "abort"</code>. The crate adds a second build artifact to the Docker web stage.</p>
+<p><strong>Mitigations.</strong> Exact pin plus one dedicated upgrade issue per minor; feature pruning (<code>default-features = false</code>, <code>bevy_reflect</code> off) is the bundle-size lever; the ambiguity test is the determinism guard, not reviewer discipline; the renderer port keeps the one genuinely reversible choice reversible.</p>
+<p><strong>Not decided here.</strong> The renderer (ADR 0023); the shell's language and module layout (SPEC §6.1, JavaScript ESM); the route census, the parity instrument and the primacy decision (plan §6, §13).</p>
+<h2 id="alternatives-considered">Alternatives considered</h2>
+<ul>
+<li><strong>A hand-rolled ECS.</strong> Fewer dependencies, but it would hand-write archetype storage, a schedule, change detection and ambiguity tooling — the parts of <code>bevy_ecs</code> that are hardest to get right and the parts a deterministic test depends on.</li>
+<li><strong>The full <code>bevy</code> umbrella.</strong> It brings the renderer: tens of megabytes of wasm, a GPU-surface contract and a CI build cost, for a client whose only work surface must stay DOM (SPEC §2). The world would gain a renderer it may not be allowed to use.</li>
+<li><strong>No world layer.</strong> Contradicts ADR 0021's product decision and would reduce <code>/walk/</code> to a second operator UI with a different theme.</li>
+<li><strong>Leave it to the spike.</strong> That is what ADR 0021 said, and the owner has overruled it: an architecture the build must implement cannot be a spike output.</li>
+</ul>
+<h2 id="links">Links</h2>
+<ul>
+<li><code>docs/design/GEMBA-WALK-ECS.md</code> — the architecture description this decision authorises.</li>
+<li><code>docs/decisions/0021-gemba-walk-client.md</code> — the client's authorisation; decision 6 amended here.</li>
+<li><code>docs/design/GEMBA-WALK-SPEC.md</code> §6.2, §12 — the port and the (now renderer-only) decision protocol.</li>
+<li><code>docs/plans/GEMBA-WALK.md</code> — W1 (renderer spike) and W2 (foundation) re-scoped accordingly.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0022-bevy-ecs-world-layer.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

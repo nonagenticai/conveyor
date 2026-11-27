@@ -95,7 +95,7 @@
 <li>DOM sheets own all work; the world is navigation and state display only.</li>
 <li>Seats are view presets; the manifest and server scopes own authority.</li>
 <li>No fixtures; no client-side programme store; no published snapshot as the app's source.</li>
-<li><code>WorldView</code> port; canvas-2D baseline; Bevy 0.18 WASM candidate; ADR 0022 after the P0 spike.</li>
+<li><code>WorldView</code> port; the simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022); the renderer — canvas-2D baseline against WebGL2 — is decided by the P0 spike in ADR 0023.</li>
 <li>Clean URLs with a scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> (GET/HEAD, non-asset paths) and a Rust test; without it a deep link renders the operator app.</li>
 <li>Schema-driven action sheet so no action is unreachable; unsupported schema falls back to a labelled JSON editor.</li>
 <li>Parity is measured by a frozen census and per-destination specs, never by prose.</li>
@@ -168,7 +168,7 @@
 <tr>
 <td><strong>P0</strong></td>
 <td>Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike</td>
-<td>The spike proves PKCE redirect to <code>/walk/</code> on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets. The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
+<td>The spike proves PKCE redirect to <code>/walk/</code> on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D against WebGL2 for the renderer and ADR 0023 records the winner and budgets (the simulation is <code>bevy_ecs</code> in <code>crates/walk-world</code>, ADR 0022). The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
 </tr>
 <tr>
 <td><strong>P1</strong></td>
