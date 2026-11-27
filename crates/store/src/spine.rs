@@ -1733,30 +1733,10 @@ pub async fn project_tranche_state_tx(
     .await?;
     Ok(match state {
         Some(state) => ProjectTrancheState::State { number, state },
-        None => {
-            // No row for this tranche. A programme WITH a tranche plan has an undeclared
-            // tranche and is refused (v1-w2b-2), and so is a project that explicitly declares
-            // a tranche its programme never planned. A programme with no plan at all, and a
-            // project that declares no tranche, keeps the legacy allowance: the rule binds
-            // the first tranche to a plan that exists, it does not invent one (measured
-            // 2026-11-26: DESIGN-PUBLISH's first tranche).
-            let planned: bool = sqlx::query_scalar(
-                "SELECT EXISTS (
-                    SELECT 1 FROM programme_tranche
-                     WHERE tenant_id = $1 AND programme_id = $2
-                )",
-            )
-            .bind(tenant.as_uuid())
-            .bind(programme)
-            .fetch_one(&mut *conn)
-            .await?;
-            let declares_tranche = meta.get("tranche").is_some();
-            if planned || declares_tranche {
-                ProjectTrancheState::Missing
-            } else {
-                ProjectTrancheState::Standalone
-            }
-        }
+        // A programme-bound project whose programme has no row for its tranche is refused,
+        // never treated as authorised: a fresh programme that has authorised no tranche cannot
+        // let its projects start (v1-w2b-2).
+        None => ProjectTrancheState::Missing,
     })
 }
 

@@ -773,35 +773,6 @@ async fn a_project_outside_its_programme_tranche_plan_cannot_start() {
     assert_eq!(runs, 0, "the refused start created a run");
 }
 
-/// v1-w2b-2 — a programme with NO tranche plan at all keeps the legacy allowance: the rule binds
-/// the first tranche to a plan that exists, it does not invent one.
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_programme_without_a_tranche_plan_keeps_its_legacy_allowance() {
-    let (pg, seeded) = fixture().await;
-    let programme: Uuid =
-        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, 'P') RETURNING id")
-            .bind(seeded.tenant_id)
-            .fetch_one(&pg.super_pool)
-            .await
-            .expect("insert the programme");
-    let project = project(&pg, seeded.tenant_id, Some(programme), json!({})).await;
-
-    let outcome = invoke(
-        &pg.runtime,
-        registry(),
-        seeded.tenant,
-        request(
-            seeded.user_id,
-            "projects.execute",
-            json!({"project_id": project}),
-        ),
-    )
-    .await
-    .expect("a programme with no tranche plan keeps the legacy allowance");
-
-    assert_eq!(outcome.status, 200, "{}", outcome.body);
-}
-
 // ── v1-tr2-1 — a paused tranche has a resume path ─────────────────────────────────────────
 
 const TOKEN: &str = "dev:alice";
