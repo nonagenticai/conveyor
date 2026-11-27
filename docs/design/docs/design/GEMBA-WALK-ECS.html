@@ -91,11 +91,19 @@
   src/wasm.rs             the wasm-bindgen surface (feature &quot;wasm&quot;)
   tests/                  headless scenarios, properties, replay, ambiguity</code></pre>
 <pre class="toml"><code>[dependencies]
-bevy_ecs   = { version = &quot;=0.20.1&quot;, features = [&quot;serialize&quot;] }
+bevy_ecs   = { version = &quot;=0.20.1&quot;, features = [&quot;serialize&quot;, &quot;bevy_debug_stepping&quot;, &quot;debug&quot;] }
 bevy_app   = &quot;=0.20.1&quot;
 bevy_time  = &quot;=0.20.1&quot;
 serde      = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
 serde_json = &quot;1&quot;
+
+[dependencies.wasm-bindgen]
+version = &quot;=0.2.130&quot;
+optional = true
+
+[dependencies.console_error_panic_hook]
+version = &quot;0.1.7&quot;
+optional = true
 
 # bevy_time reads the platform clock through bevy_platform, which needs its web backend on wasm.
 # Enabled per target so native builds never pull wasm-bindgen or web-sys.
@@ -106,6 +114,7 @@ bevy_app = { version = &quot;=0.20.1&quot;, features = [&quot;web&quot;] }
 default = []
 wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]</code></pre>
 <p>The defaults stay on. <code>bevy_app</code>'s default feature enables <code>bevy_ecs/default</code>, so pruning <code>bevy_ecs</code> in isolation changes nothing; a real prune turns both off together and is verified by a preflight compile, never assumed here.</p>
+<p><code>ScheduleBuildSettings</code>'s <code>ambiguity_detection</code> and <code>shuffle_seed</code> fields are gated by <code>bevy_ecs</code>'s <code>debug</code> and <code>bevy_debug_stepping</code> features in 0.20.1; both are enabled, so the determinism guard is compiled, not assumed.</p>
 <p><strong>Not in the dependency graph, deliberately:</strong> the <code>bevy</code> umbrella crate, <code>bevy_render</code>, <code>bevy_winit</code>, <code>bevy_asset</code>, <code>bevy_ui</code>; <code>web-sys</code>, <code>leptos</code>, <code>gloo</code>. The crate is <code>rlib</code>, compiles for host and <code>wasm32-unknown-unknown</code>, and has no DOM, no network and no storage.</p>
 <p>Costs accepted, stated so a future session does not rediscover them: <code>bevy_ecs</code> joins every workspace build (native and wasm); <code>multi_threaded</code> stays off; the 0.x API is pinned exactly and an upgrade is its own issue.</p>
 <h2 id="3-entities">3. Entities</h2>
@@ -200,7 +209,7 @@ wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]<
 </tr>
 </tbody>
 </table>
-<p><code>InteractableId</code> is the new-type the port exchanges with the renderer: it is either a <code>RecordKey</code> (open the record's sheet) or a <code>WallId</code> (open the destination). The renderer never invents one.</p>
+<p><code>InteractableId</code> is the new-type the port exchanges with the renderer: it is either a <code>RecordKey</code> (open the record's sheet), a <code>WallId</code> (open the destination) or a <code>RoomKey</code> (open the room's sheet). The renderer never invents one.</p>
 <h2 id="4-components">4. Components</h2>
 <table>
 <thead>
@@ -383,6 +392,26 @@ wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]<
 <tr>
 <td><code>WorldConfig { seed, rooms, walls }</code></td>
 <td>construction inputs</td>
+</tr>
+<tr>
+<td><code>RecordIndex { key → Entity }</code></td>
+<td>the projection's forward lookup; the only writer is <code>projection</code></td>
+</tr>
+<tr>
+<td><code>SceneIndex { walls, rooms }</code></td>
+<td>the scene-only reverse lookups the sheet uses for wall/room titles</td>
+</tr>
+<tr>
+<td><code>LastSeq</code></td>
+<td>the delta sequence gap detector; zero means no delta yet</td>
+</tr>
+<tr>
+<td><code>Intent</code> / <code>CallSeq</code></td>
+<td>the movement intent and the monotonic call counter</td>
+</tr>
+<tr>
+<td><code>PromptState</code> / <code>LastProblem</code></td>
+<td>the derived proximity prompt and the last refusal</td>
 </tr>
 </tbody>
 </table>
@@ -661,7 +690,7 @@ wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]<
 </tr>
 <tr>
 <td>No ambiguity</td>
-<td><code>Schedule::set_build_settings(ScheduleBuildSettings { ambiguity_detection: LogLevel::Error, shuffle_seed: Some(0), ..default() })</code> on the test-built schedule, <strong>before</strong> systems are added</td>
+<td><code>ScheduleBuildSettings { ambiguity_detection: LogLevel::Error, shuffle_seed: Some(0), ..default() }</code> on both the <code>FixedUpdate</code> and <code>Update</code> schedules in <code>WalkWorld::new</code></td>
 </tr>
 <tr>
 <td>No ambient time</td>
@@ -681,7 +710,7 @@ wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]<
 <h2 id="11-wasm-constraints-and-the-boundary">11. WASM constraints and the boundary</h2>
 <ul>
 <li><code>multi_threaded</code> off; the executor is single-threaded. No <code>std::thread</code>.</li>
-<li><code>MinimalPlugins</code> only: no window, no renderer, no asset server. <code>ScheduleRunnerPlugin</code> is <strong>not</strong> used; the shell owns the frame loop and calls <code>advance(dt)</code> from <code>requestAnimationFrame</code>.</li>
+<li><code>App::new()</code> + <code>TimePlugin</code> only (<code>MinimalPlugins</code> is a <code>bevy</code> umbrella group, not a <code>bevy_app</code> export): no window, no renderer, no asset server. <code>ScheduleRunnerPlugin</code> is <strong>not</strong> used; the shell owns the frame loop and calls <code>advance(dt)</code> from <code>requestAnimationFrame</code>.</li>
 <li>The host-side surface is JSON at the edge, serde inside:</li>
 </ul>
 <table>
@@ -737,6 +766,16 @@ wasm = [&quot;dep:wasm-bindgen&quot;, &quot;dep:console_error_panic_hook&quot;]<
 <td><code>context</code></td>
 <td><code>(interactable_json: &amp;str) -&gt; String</code></td>
 <td><code>SheetContext</code></td>
+</tr>
+<tr>
+<td><code>set_manifest</code></td>
+<td><code>(json: &amp;str)</code></td>
+<td>the role-filtered <code>actions.describe</code> manifest</td>
+</tr>
+<tr>
+<td><code>view_hash</code></td>
+<td><code>() -&gt; String</code></td>
+<td>the quantized <code>FrameView</code> hash the world spec compares</td>
 </tr>
 <tr>
 <td><code>save</code> / <code>load</code></td>
@@ -810,8 +849,8 @@ InputIn   ◀──push_input──         ◀──on(pointer/key)──</code
 </tr>
 <tr>
 <td><code>sprites</code></td>
-<td><code>[{id: InteractableId, kind, position, size, facing, tint, label}]</code></td>
-<td>depth sort + draw</td>
+<td><code>[{id: Option&lt;InteractableId&gt;, kind, position, size, facing, tint, label}]</code></td>
+<td>depth sort + draw; scene sprites (the avatar) have no interactable id</td>
 </tr>
 <tr>
 <td><code>overlays</code></td>
@@ -833,7 +872,7 @@ InputIn   ◀──push_input──         ◀──on(pointer/key)──</code
 <p>Rules: no draw-list entry carries long text, a table or a form (SPEC §2); the adapter never mutates the world — it returns <code>InputIn</code>; picking is <code>pointer → sprite id</code> in the adapter, resolved against <code>InteractableId</code>, never a second ray-cast implementation in the ECS.</p>
 <p>The renderer is <strong>canvas-2D</strong> (ADR 0023, accepted 2026-11-27), selected by the P0 spike; WebGL2 remains a measured candidate behind this port, not a dependency. This document fixes only what both renderers consume.</p>
 <h2 id="14-testing">14. Testing</h2>
-<p>Headless is the default: <code>App::new().add_plugins(MinimalPlugins).add_plugins(WalkWorldPlugin)</code> and <code>app.update()</code> in a loop; no browser, no canvas, no network.</p>
+<p>Headless is the default: <code>WalkWorld::new</code> builds <code>App::new()</code> + <code>TimePlugin</code> + <code>WalkWorldPlugin</code>; <code>advance(dt)</code> runs <code>First</code>, the clamped <code>FixedUpdate</code> ticks and <code>Update</code>; no browser, no canvas, no network.</p>
 <table>
 <thead>
 <tr>

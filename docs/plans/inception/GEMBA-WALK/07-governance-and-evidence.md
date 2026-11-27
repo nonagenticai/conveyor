@@ -19,10 +19,10 @@ review_date: 2026-12-03
 |---|---|---|---|---|---|
 | W0 | Governance, census and parity instrument | P0 | programme-manager | `python3 scripts/build-walk-coverage.py --check` | in progress (#813) |
 | W1 | Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023 | P0 | programme-architect | `docs/evidence/walk-spike.md`; ADR 0023 | done 2026-11-27 (run 45953201576) |
-| W1a | `crates/walk-world`: entities, components, resources, schedules, projection (§1–§9 of the ECS design) | P1 | delivery (G0) | the headless tests in `walk-world` | planned |
-| W1b | The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11) | P1 | delivery (G0) | refusal + same-frame ordering tests | planned |
-| W1c | The replay/determinism harness and the ambiguity test (§10, §14) | P1 | delivery (G0) | `replay_is_deterministic`, `no_schedule_ambiguity` | planned |
-| W1d | The `FrameView` adapter and the canvas-2D renderer (§13) | P1 | delivery (G0) | the world Playwright spec | planned |
+| W1a | `crates/walk-world`: entities, components, resources, schedules, projection (§1–§9 of the ECS design) | P1 | delivery (G0) | the headless tests in `walk-world` | in progress (#813) |
+| W1b | The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11) | P1 | delivery (G0) | refusal + same-frame ordering tests | in progress (#813) |
+| W1c | The replay/determinism harness and the ambiguity test (§10, §14) | P1 | delivery (G0) | `replay_is_deterministic`, `no_schedule_ambiguity` | in progress (#813) |
+| W1d | The `FrameView` adapter and the canvas-2D renderer (§13) | P1 | delivery (G0) | the world Playwright spec | in progress (#813) |
 | W2 | Foundation + Portfolio end-to-end + serving fallback | P1 | delivery (G0) | Playwright foundation spec; `web.rs` test | planned |
 | W3 | Read parity across the seven wings | P2 | S1–S3 | per-destination specs | planned |
 | W4 | Write parity and gates | P3 | S1–S3 | contract tests per write | planned |

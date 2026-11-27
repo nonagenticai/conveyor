@@ -1,0 +1,27 @@
+{
+  "description": "The reference scenario the native golden and the W2 world spec share: one room, one wall, two records, one move, one stop.",
+  "config": {
+    "seed": 1,
+    "rooms": [{ "id": "room-0", "label": "Room 0" }],
+    "walls": [{ "route": "/route-0", "room": "room-0", "label": "Route 0", "view": "" }]
+  },
+  "log": {
+    "seed": 7,
+    "entries": [
+      {
+        "tick": 0,
+        "entry": {
+          "Snapshot": {
+            "generation": 1,
+            "records": [
+              { "key": { "kind": "card", "id": "a" }, "version": 1, "title": "Card a", "headline": "" },
+              { "key": { "kind": "card", "id": "b" }, "version": 1, "title": "Card b", "headline": "" }
+            ]
+          }
+        }
+      },
+      { "tick": 1, "entry": { "Input": { "kind": "move", "data": { "x": 0.0, "z": -1.0 } } } },
+      { "tick": 20, "entry": { "Input": { "kind": "stop" } } }
+    ]
+  }
+}
