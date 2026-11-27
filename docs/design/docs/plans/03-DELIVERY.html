@@ -44,6 +44,7 @@
 <li>Splitting is the exception, not the default. Split only when a plan contains genuinely independent deliverables that cannot merge together (different acceptance, different deployment gate), and then <strong>at most 5</strong>, with the reason in each issue. Never split "step 1 / step 2" of the same change.</li>
 <li>Prefer file-disjoint issues: <code>block-duplicate-pr.py</code> denies a PR that overlaps ≥2 files with a recent PR. Overlapping issues are sequenced with <code>status:blocked</code>, never run in parallel.</li>
 </ul>
+<p><strong>Adoption — the record for a delivery that merged without an issue</strong> (owner decision, 2026-11-27, #869). A merged delivery is recorded, never exempted. The record is a retro unit issue whose <code>Adopted-from</code> names the merged PR, plus an entry in <code>scripts/proof/adopted.json</code> pairing that PR with the issue; the collector reads the entry as the PR's closing reference (<code>pull.closing_reference/v1</code>). An adoption changes no code and rewrites no history: the merged PR, its body and its checks stay as they were. An exemption class is not a record and is not used.</p>
 <h2 id="issue-content-contract--dor-acceptance-criteria-dod">Issue content contract — DoR, acceptance criteria, DoD</h2>
 <p>Every unit issue is a durable brief: a session that has never seen the plan must be able to decide from the issue alone whether it is ready to claim, what "done" means, and what it waits on. The shape is <code>.github/ISSUE_TEMPLATE/unit.md</code>; the rules are:</p>
 <ul>

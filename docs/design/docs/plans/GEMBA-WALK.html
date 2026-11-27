@@ -275,7 +275,7 @@
 <li><strong>Record the spike and the engine ADR</strong> (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).</li>
 </ol>
 <h2 id="9-parity-matrix-initial-state-at-the-baseline">9. Parity matrix (initial state at the baseline)</h2>
-<p>Every row starts <code>absent</code>. A row reaches <code>verified</code> only through §6.</p>
+<p>Every row started <code>absent</code> at the baseline. A row reaches <code>verified</code> only through §6; the W3/W4 rows were recorded on 2026-11-27 (#814/#877, #815/#874, #816/#880), and S4's two V1 routes remain.</p>
 <table>
 <thead>
 <tr>
@@ -294,7 +294,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>organisation.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Procedures</td>
@@ -302,7 +302,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>procedures.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Authoring</td>
@@ -310,7 +310,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>authoring.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Portfolio</td>
@@ -318,7 +318,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>portfolio.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Meetings</td>
@@ -326,7 +326,7 @@
 <td>T19</td>
 <td>T19</td>
 <td><code>meetings.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Programme</td>
@@ -334,7 +334,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>programme.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Architecture (ADM)</td>
@@ -342,7 +342,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>adm.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Plan</td>
@@ -350,7 +350,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>plan.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Improve</td>
@@ -358,7 +358,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>improve.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Operations</td>
@@ -366,7 +366,7 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>operations.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>Tools</td>
@@ -374,15 +374,15 @@
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>tools.spec.ts</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 <tr>
 <td>V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform)</td>
 <td>the app path</td>
 <td>the app's read contract</td>
 <td>actions</td>
-<td>the matching <code>apps/web</code> spec</td>
-<td>absent</td>
+<td>the matching <code>apps/web</code> spec; S4: <code>e2e/v1/board.spec.ts</code>, <code>e2e/v1/cockpit.spec.ts</code></td>
+<td>verified except <code>/boards</code>, <code>/card/:card_id</code> (S4)</td>
 </tr>
 <tr>
 <td>Utilities (palette, sign-in, tenant switch, theme)</td>
@@ -390,7 +390,7 @@
 <td><code>/api/me</code>, config</td>
 <td>none</td>
 <td><code>shell</code>/<code>shell-login</code></td>
-<td>absent</td>
+<td>verified</td>
 </tr>
 </tbody>
 </table>

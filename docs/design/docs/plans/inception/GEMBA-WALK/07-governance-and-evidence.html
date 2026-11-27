@@ -118,7 +118,7 @@
 <td>P2</td>
 <td>S1–S3</td>
 <td>per-destination specs</td>
-<td>planned</td>
+<td>done 2026-11-27 (#814/#877, #815/#874, #816/#880)</td>
 </tr>
 <tr>
 <td>W4</td>
@@ -126,7 +126,7 @@
 <td>P3</td>
 <td>S1–S3</td>
 <td>contract tests per write</td>
-<td>planned</td>
+<td>done 2026-11-27 (#814/#877, #815/#874, #816/#880)</td>
 </tr>
 <tr>
 <td>W5</td>
@@ -163,6 +163,35 @@
 </tbody>
 </table>
 <p>The WBS is the build order; the issue split is by file ownership: G0 = W0–W2 (with W2a–W2c), S1–S3 = W3–W4 by wing, S4 = W5–W8. The five build issues are created only after the inception set is published (#792); the split is the written exception approved for this plan.</p>
+<h2 id="acceptance">Acceptance</h2>
+<p>A work package is accepted by its named instrument, never by prose: the WBS row's Acceptance column is the plan's <code>Verify:</code> and the evidence is the instrument's output at the delivery head. A row whose instrument fails is not accepted; a row whose evidence is a document is read back through the engine.</p>
+<h2 id="status">Status</h2>
+<table>
+<thead>
+<tr>
+<th>Work package</th>
+<th>State</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W0–W2</td>
+<td>done 2026-11-27</td>
+<td>#813; the G0 evidence table above</td>
+</tr>
+<tr>
+<td>W3–W4</td>
+<td>done 2026-11-27</td>
+<td>#814/#877, #815/#874, #816/#880; the W3/W4 evidence table above</td>
+</tr>
+<tr>
+<td>W5–W8</td>
+<td>planned</td>
+<td>S4 (#817)</td>
+</tr>
+</tbody>
+</table>
 <h2 id="baseline">Baseline</h2>
 <table>
 <thead>
@@ -480,10 +509,10 @@
 <td>recorded 2026-11-27 — see the evidence rows below</td>
 </tr>
 <tr>
-<td>S1–S3 (to create)</td>
+<td>S1–S3 (#814/#877, #815/#874, #816/#880)</td>
 <td>P2–P3</td>
 <td>per-destination specs (empty/error/happy/refusal/write); the contract tests; the instrument's rows</td>
-<td>each PR body</td>
+<td>recorded 2026-11-27 — see the wing evidence below</td>
 </tr>
 <tr>
 <td>S4 (to create)</td>
@@ -527,6 +556,37 @@
 <td>Keycloak</td>
 <td>client <code>conveyor-game</code> created, its second Job run's preflight passed; redirects, web origins, PKCE and the audience mapper read back</td>
 <td>#813 close-out</td>
+</tr>
+</tbody>
+</table>
+<h3 id="w3w4-evidence-recorded-2026-11-27">W3/W4 evidence, recorded 2026-11-27</h3>
+<table>
+<thead>
+<tr>
+<th>Wing</th>
+<th>Delivery</th>
+<th>Specs (the recorded proof)</th>
+<th>Instrument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1 — Portfolio &amp; plan + Organisation</td>
+<td>#814 / PR #877, head <code>873b016fc</code>, merge <code>30b769b28</code>; deployed digest <code>0d4815eb…</code></td>
+<td><code>e2e/portfolio/portfolio.spec.ts</code> and <code>e2e/portfolio-organisation/*.spec.ts</code> (12): programme, plan, validation, execution, decisions, runs, meetings, organisation, jobs, agents, tools, project-types</td>
+<td>15/15 census rows registered; the walk workflow green at the merge head</td>
+</tr>
+<tr>
+<td>S2 — Procedures &amp; authoring + Govern &amp; design</td>
+<td>#815 / PR #874, head <code>2db1bf76f</code>, merge <code>e6f4c3ac9</code></td>
+<td><code>e2e/procedures-governance/*.spec.ts</code> (9): procedures, processes, process-map, authoring, adm, architecture, requirements, models, copilot</td>
+<td>13/13 census rows registered; the walk workflow green at the merge head</td>
+</tr>
+<tr>
+<td>S3 — Knowledge + Measure &amp; improve + Operations + Utilities</td>
+<td>#816 / PR #880, head <code>c21deb4be</code>, merge <code>a92565410</code></td>
+<td><code>e2e/measure-operations-utilities/*.spec.ts</code> (12): knowledge, improve, evals, benchmarks, usage, prompt-audit, metering, operations, search, platform, settings, approvals</td>
+<td>19/19 census rows registered; the committed record reads 50/52, the 2 absent are S4's</td>
 </tr>
 </tbody>
 </table>

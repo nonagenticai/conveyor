@@ -384,6 +384,23 @@ mod tests {
         }
     }
 
+    /// The SAFe epic category (GW-A4, #886) is part of the closed set: the project's epic
+    /// document is published under it. Removing it is a standard change, never a silent rename.
+    #[test]
+    fn the_safe_epic_category_is_in_the_vocabulary() {
+        assert_eq!(canonical_category("epic").expect("epic category"), "epic");
+        let template = template("epic").expect("the epic template");
+        for heading in ["Epic", "Features", "Enablers", "WSJF"] {
+            assert!(
+                template
+                    .required
+                    .iter()
+                    .any(|value| value.as_str() == heading),
+                "the epic template must require {heading}"
+            );
+        }
+    }
+
     /// The standard is the only source: every category it accepts also has a template, and the
     /// required headings are the ones the skeleton seeds.
     #[test]
