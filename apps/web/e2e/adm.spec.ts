@@ -80,7 +80,12 @@ test("a phase cannot close without its mandatory artefact and a live contract", 
   await expect(page.locator('[data-testid="adm-phases"]')).toContainText(
     "Phase A — Architecture vision",
   );
-  await page.getByRole("button", { name: "Advance" }).click();
+  // Scope to the phase panel and match the button exactly: the shell's "Advanced" toggle also
+  // contains the substring "Advance".
+  await page
+    .locator('[data-testid="adm-phases"]')
+    .getByRole("button", { name: "Advance", exact: true })
+    .click();
   await expect(page.locator('[data-testid="adm-notice"]')).toContainText("Refused");
 });
 
