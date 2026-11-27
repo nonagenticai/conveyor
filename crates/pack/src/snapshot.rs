@@ -80,6 +80,9 @@ pub struct SnapshotArgs {
     /// The commit the published pack describes. Absent means `git rev-parse HEAD` in the
     /// working directory; a pod has no checkout, so a publish passes it explicitly.
     pub git_sha: Option<String>,
+    /// When the image that produced the pack was built (RFC 3339). Absent means `unknown`; the
+    /// live page marks its data stale against this stamp (#867 / #782 P3.2).
+    pub build_time: Option<String>,
 }
 
 /// One written file.
@@ -171,6 +174,7 @@ pub async fn run_with_pool(
         .clone()
         .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
     let git_sha = args.git_sha.clone().unwrap_or_else(git_sha);
+    let deployed_at = args.build_time.as_deref().unwrap_or("unknown");
     let migration_version = store::MIGRATOR
         .iter()
         .last()
@@ -224,6 +228,7 @@ pub async fn run_with_pool(
         &args.feedback_url,
         &generated_at,
         &git_sha,
+        deployed_at,
     )?;
 
     let mut files = Vec::new();
@@ -406,12 +411,14 @@ pub(crate) fn snapshot_js(
     feedback_url: &str,
     generated_at: &str,
     git_sha: &str,
+    deployed_at: &str,
 ) -> Result<String, SnapshotError> {
     let mut value = json!({
         "schema": SCHEMA,
         "tenant": tenant,
         "generated_at": generated_at,
         "git_sha": git_sha,
+        "deployed_at": deployed_at,
         "feedback_url": feedback_url,
         "programme": data.programme,
         "organisation": data.organisation,
@@ -716,5 +723,64 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn empty_data() -> store::snapshot::SnapshotData {
+        let empty = serde_json::json!({});
+        store::snapshot::SnapshotData {
+            programme: empty.clone(),
+            organisation: empty.clone(),
+            config: empty.clone(),
+            work: empty.clone(),
+            msp: empty.clone(),
+            artefacts: empty.clone(),
+            architecture: empty.clone(),
+            ops: empty.clone(),
+            measure: empty.clone(),
+            delivery: empty.clone(),
+            programme_health: empty.clone(),
+            secrets: empty.clone(),
+        }
+    }
+
+    /// #867 / #782 P3.2: the served snapshot names the build that produced it; a build with no
+    /// stamp says `unknown`, which the page reads as "make no staleness claim".
+    #[test]
+    fn the_header_carries_the_deployed_build() {
+        let data = empty_data();
+        let js = snapshot_js(
+            &data,
+            None,
+            None,
+            "tenant",
+            "https://example.test/feedback",
+            "2026-11-27T00:00:00Z",
+            "abc123",
+            "2026-11-27T06:00:00Z",
+        )
+        .expect("the snapshot");
+        assert!(
+            js.contains("\"deployed_at\":\"2026-11-27T06:00:00Z\""),
+            "{js}"
+        );
+        assert!(js.contains("\"git_sha\":\"abc123\""), "{js}");
+
+        let unknown = snapshot_js(
+            &data,
+            None,
+            None,
+            "tenant",
+            "https://example.test/feedback",
+            "2026-11-27T00:00:00Z",
+            "abc123",
+            "unknown",
+        )
+        .expect("the snapshot");
+        assert!(unknown.contains("\"deployed_at\":\"unknown\""), "{unknown}");
     }
 }

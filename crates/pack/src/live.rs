@@ -63,6 +63,9 @@ pub struct SiteArgs<'a> {
     pub feedback_url: &'a str,
     /// The commit the served image was built from.
     pub git_sha: &'a str,
+    /// When the served image was built (RFC 3339), or `unknown` when the build carried no stamp.
+    /// The page marks its data stale when `generated_at` predates it (#867 / #782 P3.2).
+    pub build_time: &'a str,
 }
 
 /// Build the live view for one tenant in exactly one read-only transaction.
@@ -125,6 +128,7 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         args.feedback_url,
         &generated_at,
         args.git_sha,
+        args.build_time,
     )?;
     // The downloadable pair, from the same section the page renders — one header, one redaction
     // pass, so the file and the page cannot disagree.

@@ -314,6 +314,7 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        build_time: None,
     };
     let first = run_with_pool(&db.runtime, args.clone())
         .await
@@ -538,6 +539,7 @@ async fn the_rework_register_rides_the_conformance_flag() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        build_time: None,
     };
 
     // (c) Without the flag nothing changes: no file, no key, no manifest entry.
@@ -696,6 +698,7 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        build_time: None,
     };
     conveyor_server::snapshot::run_with_pool(&db.runtime, args)
         .await
@@ -839,6 +842,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     .expect("write the register");
     let feedback = "https://example.test/feedback";
     let git_sha = "0123456789abcdef0123456789abcdef01234567";
+    let build_time = "2026-11-27T12:00:00Z";
 
     let view = conveyor_pack::live::site_view(
         &db.runtime,
@@ -849,6 +853,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             rework: Some(rework),
             feedback_url: feedback,
             git_sha,
+            build_time,
         },
     )
     .await
@@ -866,6 +871,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             feedback_url: feedback.to_owned(),
             database_url: None,
             git_sha: Some(git_sha.to_owned()),
+            build_time: Some(build_time.to_owned()),
         },
     )
     .await
@@ -875,6 +881,11 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
         std::fs::read(dir.join("snapshot.js")).expect("snapshot.js"),
         view.snapshot_js.as_bytes(),
         "the CLI and the live route write one snapshot"
+    );
+    assert!(
+        view.snapshot_js
+            .contains("\"deployed_at\":\"2026-11-27T12:00:00Z\""),
+        "the snapshot header carries the deployed build time"
     );
     assert_eq!(
         std::fs::read(dir.join("docs/outputs.js")).expect("outputs.js"),

@@ -117,6 +117,10 @@ enum Command {
         /// working directory; a pod has no checkout, so a publish passes it explicitly.
         #[arg(long)]
         git_sha: Option<String>,
+        /// When the producing image was built (RFC 3339). Defaults to `CONVEYOR_BUILD_TIME`;
+        /// absent stamps the snapshot `unknown` and the page shows no staleness (#867).
+        #[arg(long)]
+        build_time: Option<String>,
     },
     /// Administrative operations (S14; S04 owns the action-registry commands).
     Admin {
@@ -637,6 +641,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             feedback_url,
             database_url,
             git_sha,
+            build_time,
         } => {
             let report = snapshot::run(snapshot::SnapshotArgs {
                 tenant,
@@ -648,6 +653,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 feedback_url,
                 database_url,
                 git_sha,
+                build_time: build_time.or_else(|| std::env::var("CONVEYOR_BUILD_TIME").ok()),
             })
             .await?;
             tracing::info!(
