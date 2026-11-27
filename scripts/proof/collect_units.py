@@ -67,6 +67,7 @@ RULES = {
     "ciRuns": "ci.pull_request_runs/v1",
     "closesKeyword": "pull.closing_keyword/v1",
     "verifyParts": "issue.contract_verify/v2",
+    "unit": "issue.unit_label/v1",
 }
 
 # Public-repo rule: raw GitHub bodies can quote estate identifiers, and this tree must not carry
@@ -383,7 +384,7 @@ def unit_facts(
     runs: dict[str, list],
     heads: set[str],
 ) -> tuple[dict, dict]:
-    """One unit's eight observations and the artifact they were read from."""
+    """One unit's nine observations and the artifact they were read from."""
     issue_number = issue["number"] if issue else None
     merged = [pull for pull in pulls if pull.get("merged_at")]
     chosen = chosen_pull(pulls)
@@ -437,6 +438,7 @@ def unit_facts(
         "ciRuns": ci_runs,
         "closesKeyword": closes_keyword,
         "verifyParts": verify_parts,
+        "unit": None if issue is None else "unit" in issue.get("labels", []),
     }
     artifact = sha256_text(
         canonical(
@@ -626,7 +628,7 @@ def chunks(units: list[dict], size: int) -> list[list[dict]]:
 def facts_document(snapshot_meta: dict, units: list[dict]) -> dict:
     """The document `proofs.render` and `proofs.record` see, provenance included.
 
-    The renderer reads only `kind`, `model_sha256`, `spec_sha256` and `units[*]`'s eight fields;
+    The renderer reads only `kind`, `model_sha256`, `spec_sha256` and `units[*]`'s nine fields;
     `provenance` is carried verbatim because the certificate stores the facts, and a reviewer
     needs the rule and artefact behind every field. It is deterministic: no clock, no paths.
     """
@@ -668,7 +670,7 @@ def local_rules(facts: dict) -> dict[str, bool]:
         "ciBudget": facts["ciRuns"] is not None and facts["ciRuns"] <= 2,
         "mergeComplete": merge_complete,
         "closesKeyword": facts["closesKeyword"] is True,
-        "verifyParts": facts["verifyParts"] is True,
+        "verifyParts": facts["verifyParts"] is True or facts.get("unit") is False,
     }
 
 
@@ -1391,13 +1393,18 @@ def self_test() -> int:
     assert one["pulls"] == 1 and one["pull"] == "merged"
     assert one["ciRuns"] == 1, "only the pull_request run counts"
     assert one["closesKeyword"] is True and one["verifyParts"] is True
+    assert one["unit"] is True, "the label is the unit fact"
 
     two = units["x/y#2"]["facts"]
     assert two["issue"] == "pending" and two["pull"] == "merged"
 
     three = units["x/y#3"]["facts"]
     assert three["verifyParts"] is False, "the body carries no Verify line"
+    assert three["unit"] is True
     assert three["ciRuns"] == 3
+
+    five = units["x/y#5"]["facts"]
+    assert five["unit"] is False, "a bug issue is not a unit"
 
     seven = units["x/y#7"]["facts"]
     assert seven["branches"] == 2 and seven["pulls"] == 2
@@ -1405,6 +1412,7 @@ def self_test() -> int:
     orphan = units["x/y#pr-12"]["facts"]
     assert orphan["issue"] is None and orphan["pull"] == "merged"
     assert orphan["closesKeyword"] is None and orphan["verifyParts"] is None
+    assert orphan["unit"] is None, "no issue is unknown, not non-unit"
     assert units["x/y#pr-12"]["pull_ref"] == "issue/9-x"
     assert units["x/y#pr-12"]["pull_number"] == 12
 
@@ -1416,7 +1424,6 @@ def self_test() -> int:
         ("x/y#1", "branch-live", ""),
         ("x/y#2", "closure-open", ""),
         ("x/y#3", "unit-dor-verify", ""),
-        ("x/y#5", "non-unit-dor", ""),
         ("x/y#7", "multi-lane", ""),
         ("x/y#pr-12", "orphan-pr", "unlinked-unit"),
     ], got
@@ -1429,7 +1436,6 @@ def self_test() -> int:
         "x/y#1",
         "x/y#2",
         "x/y#3",
-        "x/y#5",
         "x/y#7",
         "x/y#pr-12",
     ]
