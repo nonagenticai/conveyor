@@ -20,7 +20,7 @@ test("the wasm frame-view hash equals the native golden", async ({ page }) => {
     // @ts-expect-error the package is built by the image/CI
     const module = await import("/pkg/walk_world.js");
     await module.default();
-    const world = new module.WasmWalkWorld(scenario.log.seed, JSON.stringify(scenario.config));
+    const world = new module.WasmWalkWorld(BigInt(scenario.log.seed), JSON.stringify(scenario.config));
     const last = Math.max(...scenario.log.entries.map((entry: { tick: number }) => entry.tick));
     for (let tick = 0; tick <= last; tick += 1) {
       for (const timed of scenario.log.entries.filter(

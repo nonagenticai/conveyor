@@ -67,7 +67,7 @@ export class World {
   async startEngine() {
     try {
       const module = await loadEngine();
-      this.engine = new module.WasmWalkWorld(7, JSON.stringify(this.config()));
+      this.engine = new module.WasmWalkWorld(7n, JSON.stringify(this.config()));
       this.canvas.dataset.engine = "ecs";
       this.canvas.setAttribute(
         "aria-label",
