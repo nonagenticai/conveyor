@@ -67,6 +67,13 @@ fi
 if [ -f "$data/coverage.json" ]; then
   cp "$data/coverage.json" "$tmp/data/coverage.json"
 fi
+# The standards generator's computed sources (`blueprint / Action registry and data model`)
+# read the action-registry dump from the snapshot directory. It is not a snapshot output, so
+# without this copy pass 2 counts zero actions and publishes a false `absent` section that
+# `generate-standards --check` (which reads the installed dump) then reports as stale.
+if [ -f "$data/actions.json" ]; then
+  cp "$data/actions.json" "$tmp/data/actions.json"
+fi
 
 # 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
 #    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
