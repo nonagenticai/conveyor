@@ -253,10 +253,17 @@
 <td>rework packages</td>
 </tr>
 <tr>
-<td>A16</td>
-<td>A realised benefit has a measured baseline, post-measurement and evidence; transition order holds</td>
-<td><code>:705-763</code></td>
+<td>A16a</td>
+<td>A realised benefit has a measured baseline, post-measurement and evidence</td>
+<td><code>:705-723</code></td>
 <td><code>msp.benefit_realisation</code> (<code>snapshot.rs:1061-1210</code>); the write is <code>benefits.transition_upsert</code></td>
+<td>rework packages (P0)</td>
+</tr>
+<tr>
+<td>A16b</td>
+<td>A transition's measurements are ordered: baseline before enactment before post</td>
+<td><code>:724-763</code></td>
+<td><code>msp.benefit_realisation</code>; the write is <code>benefits.transition_upsert</code></td>
 <td>rework packages (P0)</td>
 </tr>
 <tr>
@@ -661,7 +668,13 @@
 <td>live</td>
 </tr>
 <tr>
-<td>A16</td>
+<td>A16a</td>
+<td>action</td>
+<td><code>benefits.transition_upsert</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>A16b</td>
 <td>action</td>
 <td><code>benefits.transition_upsert</code></td>
 <td>live</td>
@@ -896,7 +909,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>The one-owner rule in words.</strong> A write-time constraint belongs to the action that refuses it (A14-A16, A21-A22, A24, G1, G3-G5, G7). A completeness or consistency check over rows belongs to the engine's computed section, which reads the sections in §1 and never re-derives them (A1-A5, A7-A13, A17, A19-A20, A23, A25-A26, S1-S3, S5-S11, S13, G2). An external or frozen fact, a renderer or a build-integrity check stays a one-off (A6, A27-A30, A33, S8, S14). A gap names the unit that closes it (A18, A31-A32, S4, S12, G6). No invariant is assigned to a file scheduled for deletion.</p>
+<p><strong>The one-owner rule in words.</strong> A write-time constraint belongs to the action that refuses it (A14, A15, A16a, A16b, A21-A22, A24, G1, G3-G5, G7). A completeness or consistency check over rows belongs to the engine's computed section, which reads the sections in §1 and never re-derives them (A1-A5, A7-A13, A17, A19-A20, A23, A25-A26, S1-S3, S5-S11, S13, G2). An external or frozen fact, a renderer or a build-integrity check stays a one-off (A6, A27-A30, A33, S8, S14). A gap names the unit that closes it (A18, A31-A32, S4, S12, G6). No invariant is assigned to a file scheduled for deletion.</p>
 <h2 id="4-p3--the-staged-replacement">4. P3 — the staged replacement</h2>
 <p>Targets are the measured function spans of the claim baseline; a stage closes when <code>wc -l</code> on the three scripts is at or below its target and every proving test is green at the PR head.</p>
 <table>

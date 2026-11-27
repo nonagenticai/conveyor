@@ -74,7 +74,8 @@ standard, or a one-off repository fact. Lines cite the claim baseline.
 | A13 | Every declared output is published | `:622-641` | the `register` section (`crates/pack/src/register.rs:77`) + `programme_health.provenance` | publish gate |
 | A14 | A benefit profile carries target, method, operational area, owner and a benefits-map edge | `:643-661` | `msp.benefit_profiles` + `msp.benefit_links`; the write is `benefits.create/update/link` | rework packages |
 | A15 | A baseline is a measurement record, not a placeholder | `:662-704` | `msp.benefit_realisation.placeholder` and baseline fields (`snapshot.rs:1088-1123`); the write is `benefits.create/update` | rework packages |
-| A16 | A realised benefit has a measured baseline, post-measurement and evidence; transition order holds | `:705-763` | `msp.benefit_realisation` (`snapshot.rs:1061-1210`); the write is `benefits.transition_upsert` | rework packages (P0) |
+| A16a | A realised benefit has a measured baseline, post-measurement and evidence | `:705-723` | `msp.benefit_realisation` (`snapshot.rs:1061-1210`); the write is `benefits.transition_upsert` | rework packages (P0) |
+| A16b | A transition's measurements are ordered: baseline before enactment before post | `:724-763` | `msp.benefit_realisation`; the write is `benefits.transition_upsert` | rework packages (P0) |
 | A17 | The programme has management, governance and boundary baselines | `:765-778` | `msp.programme_baselines` (`snapshot.rs:983`); the write is `programmes.baseline` / `programmes.baseline_approve` | rework packages |
 | A18 | The ADM profile is adopted and matches the pinned hash | `:782-807` | `architecture.profiles` (`snapshot.rs:995`); the pin is `sources.profile_hash` in `governance/conformance.json`; the write is `architecture.profile_tailor` | rework packages (P0) |
 | A19 | An active architecture board is recorded | `:808-821` | `architecture.board` (`snapshot.rs:1002`); the writes are `architecture.board_open` and the meeting actions | rework packages |
@@ -161,7 +162,8 @@ renderer), **gap** (no owner yet; the unit that closes it).
 | A13 | section | `register` + `programme_health.provenance` | live |
 | A14 | action | `benefits.create`/`benefits.update`; `benefits.link` | live |
 | A15 | action | `benefits.create`/`benefits.update` | live |
-| A16 | action | `benefits.transition_upsert` | live |
+| A16a | action | `benefits.transition_upsert` | live |
+| A16b | action | `benefits.transition_upsert` | live |
 | A17 | section | `conformance` reading `msp.programme_baselines` | gap — Stage 0 |
 | A18 | gap | `architecture.profile_tailor` must compute and pin the profile hash (the standard pin exists; the action does not check it) | gap |
 | A19 | section | `conformance` reading `architecture.board` | gap — Stage 0 |
@@ -202,7 +204,7 @@ renderer), **gap** (no owner yet; the unit that closes it).
 | G7 | action | `architecture.reviews_record` | live |
 
 **The one-owner rule in words.** A write-time constraint belongs to the action that refuses it
-(A14-A16, A21-A22, A24, G1, G3-G5, G7). A completeness or consistency check over rows belongs to
+(A14, A15, A16a, A16b, A21-A22, A24, G1, G3-G5, G7). A completeness or consistency check over rows belongs to
 the engine's computed section, which reads the sections in §1 and never re-derives them (A1-A5,
 A7-A13, A17, A19-A20, A23, A25-A26, S1-S3, S5-S11, S13, G2). An external or frozen fact, a
 renderer or a build-integrity check stays a one-off (A6, A27-A30, A33, S8, S14). A gap names the
