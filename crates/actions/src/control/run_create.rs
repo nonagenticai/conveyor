@@ -50,16 +50,32 @@ pub(crate) async fn ensure_andon_tx(
 /// `job_binding_id` is already resolved by the caller: `runs.create` applies the card-binding
 /// mismatch rule, and `cards.assign` validated the assignment. The store still refuses a retired
 /// binding or a stale pin (`409`) before the INSERT, and `uq_run_live` refuses a second live run.
+/// The run-specific fields the two creation paths (`runs.create`, `cards.assign`) pass to
+/// [`create_bound_run_tx`].
+pub(crate) struct BoundRun {
+    /// The organisation binding the run executes under.
+    pub job_binding_id: Option<Uuid>,
+    /// Links the run to the trigger that created it.
+    pub correlation_id: Option<Uuid>,
+    /// The release pin the caller expects.
+    pub release_hash: Option<String>,
+    /// The run's own inputs; `limits.cost_budget_usd` is the spend ceiling (D45).
+    pub inputs: serde_json::Value,
+}
+
 pub(crate) async fn create_bound_run_tx(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
     card: &Card,
-    job_binding_id: Option<Uuid>,
-    correlation_id: Option<Uuid>,
-    release_hash: Option<String>,
-    inputs: serde_json::Value,
+    run: BoundRun,
     action: &str,
 ) -> Result<(RunRecord, RunOut), ActionError> {
+    let BoundRun {
+        job_binding_id,
+        correlation_id,
+        release_hash,
+        inputs,
+    } = run;
     // An absent `inputs` is an empty object, never a SQL NULL: the column is jsonb and the
     // budget guard reads `inputs.limits`.
     let inputs = if inputs.is_null() {

@@ -30,7 +30,7 @@ use crate::board::cards::{card_json, ensure_card_binding, read_card, stale_card}
 use crate::board::events::{CARD_UPDATED, card_event};
 use crate::board::views::{CardOut, card_out};
 use crate::board::{require_precondition_with, store_error};
-use crate::control::run_create::{create_bound_run_tx, ensure_andon_tx};
+use crate::control::run_create::{BoundRun, create_bound_run_tx, ensure_andon_tx};
 use crate::control::run_error;
 use crate::control::views::RunOut;
 use crate::invoke::{ActionError, HandlerCtx};
@@ -263,10 +263,12 @@ async fn cards_assign(
         &mut *tx,
         &ctx,
         &record.card,
-        Some(job_binding_id),
-        input.correlation_id,
-        None,
-        serde_json::json!({}),
+        BoundRun {
+            job_binding_id: Some(job_binding_id),
+            correlation_id: input.correlation_id,
+            release_hash: None,
+            inputs: serde_json::json!({}),
+        },
         action,
     )
     .await?;
