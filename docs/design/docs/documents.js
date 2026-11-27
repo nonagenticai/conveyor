@@ -2090,6 +2090,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T9-architecture-capability.md"
     },
     {
+      "title": "The delivery system that uses the conveyor",
+      "path": "docs/plans/delivery-system-rework.html",
+      "source": "docs/plans/delivery-system-rework.md",
+      "section": "Plans",
+      "sha256": "96c1973254cac00b6ca53309699619cbdfc8eafd75abb959d808b3c203898fb9",
+      "bytes": 3412,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/delivery-system-rework.md"
+    },
+    {
       "title": "Rust development process: audit and improvement plan",
       "path": "docs/plans/development-process-speed.html",
       "source": "docs/plans/development-process-speed.md",

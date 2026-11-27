@@ -1,5 +1,6 @@
 //! Execute Lean 4 by subprocess: write the source into the pre-built lake
-//! project, run `lake env lean <file>`, parse stderr into diagnostics.
+//! project, run `lake env lean <file>`, parse BOTH captured streams into
+//! diagnostics (this deployment's Lean prints its errors to stdout).
 //!
 //! Three properties are load-bearing and were each a bug once:
 //!
@@ -136,7 +137,7 @@ impl LeanRunner {
     pub async fn check(&self, req: &CheckRequest) -> io::Result<CheckResponse> {
         tracing::info!(source_len = req.source.len(), "checking lean source");
         let run = self.run_lean(&req.source, req.timeout).await?;
-        let diagnostics = parse_diagnostics(&run.stderr);
+        let diagnostics = diagnostics_for(&run);
         let has_errors = diagnostics.iter().any(|d| d.severity == "error");
         Ok(CheckResponse {
             valid: run.code == 0 && !has_errors,
@@ -153,7 +154,7 @@ impl LeanRunner {
         tracing::info!(term_len = req.term.len(), "elaborating lean term");
 
         let run = self.run_lean(&source, req.timeout).await?;
-        let diagnostics = parse_diagnostics(&run.stderr);
+        let diagnostics = diagnostics_for(&run);
         let has_errors = diagnostics.iter().any(|d| d.severity == "error");
 
         let mut elaborated_type = run
@@ -211,7 +212,7 @@ impl LeanRunner {
             let source = format!("{imports_block}{} := by {tactic}\n", req.theorem);
             let run = self.run_lean(&source, req.timeout).await?;
 
-            let mut diagnostics = parse_diagnostics(&run.stderr);
+            let mut diagnostics = diagnostics_for(&run);
             let has_errors = diagnostics.iter().any(|d| d.severity == "error");
 
             if run.code == 0 && !has_errors {
@@ -373,6 +374,30 @@ pub fn parse_diagnostics(stderr: &str) -> Vec<LeanDiagnostic> {
     stderr.lines().filter_map(parse_diagnostic_line).collect()
 }
 
+/// The diagnostics a caller receives: whichever stream Lean printed them on.
+///
+/// Lean writes compile errors to **stdout** in this deployment (observed on the
+/// released engine, conveyor#787: `{"valid": false, "diagnostics": [], "stdout":
+/// "...error text..."}`). Parsing stderr alone threw away the one thing an
+/// operator needs. Both streams are captured already; parse stdout first (it is
+/// where the errors are), then stderr, and drop an exact duplicate so a line
+/// echoed on both streams is reported once.
+fn diagnostics_for(run: &RunOutcome) -> Vec<LeanDiagnostic> {
+    let mut diags = parse_diagnostics(&run.stdout);
+    for d in parse_diagnostics(&run.stderr) {
+        let duplicate = diags.iter().any(|have| {
+            have.severity == d.severity
+                && have.line == d.line
+                && have.column == d.column
+                && have.message == d.message
+        });
+        if !duplicate {
+            diags.push(d);
+        }
+    }
+    diags
+}
+
 fn parse_diagnostic_line(line: &str) -> Option<LeanDiagnostic> {
     for (idx, _) in line.char_indices().filter(|(_, c)| *c == ':') {
         if let Some(d) = parse_at(&line[idx..]) {
@@ -496,5 +521,148 @@ mod tests {
         kill_process_group(Some(1));
         kill_process_group(Some(0));
         kill_process_group(None);
+    }
+
+    /// Lean writes its errors to **stdout** in this deployment; `diagnostics: []` next to a
+    /// non-empty `stdout` is what a caller cannot debug (conveyor#787). The diagnostics must
+    /// carry the error whichever stream carried it.
+    const FAILING_STUB: &str =
+        "#!/bin/sh\necho \"$3:3:2: error: unknown identifier 'foo'\"\nexit 1\n";
+    const CLEAN_STUB: &str = "#!/bin/sh\nexit 0\n";
+
+    fn unique_dir(tag: &str) -> PathBuf {
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+        let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!(
+            "lean4-prover-test-{tag}-{}-{n}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        dir
+    }
+
+    /// A runner whose `lake` is a stub shell script. `run_lean` invokes it as
+    /// `lake env lean <path>` and replaces the child environment wholesale, so a
+    /// script is a complete stand-in for Lean on every path — no toolchain needed.
+    fn stub_runner(dir: &Path, script: &str) -> LeanRunner {
+        let lake = dir.join("lake");
+        std::fs::write(&lake, script).expect("write stub");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&lake).expect("stat stub").permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&lake, perms).expect("chmod stub");
+        }
+        let project = dir.to_path_buf();
+        let cfg = Config::from_lookup(|key| match key {
+            "ENABLE_AUTH" => Some("false".to_string()),
+            "LEAN4_PROVER_LAKE_BINARY" => Some(lake.to_string_lossy().into_owned()),
+            "LEAN4_PROVER_LEAN_BINARY" => Some("lean".to_string()),
+            "LEAN4_PROVER_PROJECT_DIR" => Some(project.to_string_lossy().into_owned()),
+            _ => None,
+        })
+        .expect("config");
+        LeanRunner::new(Arc::new(cfg), Arc::new(Metrics::default()))
+    }
+
+    #[tokio::test]
+    async fn a_failing_check_returns_the_error_it_printed() {
+        let dir = unique_dir("check");
+        let runner = stub_runner(&dir, FAILING_STUB);
+        let req = CheckRequest {
+            source: "def x : Nat := \"oops\"".to_string(),
+            timeout: None,
+        };
+        let resp = runner.check(&req).await.expect("run");
+        assert!(!resp.valid);
+        assert!(
+            !resp.diagnostics.is_empty(),
+            "diagnostics must carry Lean's own error (stdout here): stdout={:?} stderr={:?}",
+            resp.stdout,
+            resp.stderr
+        );
+        assert!(
+            resp.diagnostics
+                .iter()
+                .any(|d| d.severity == "error" && d.message.contains("unknown identifier"))
+        );
+    }
+
+    #[tokio::test]
+    async fn a_failing_elaboration_returns_the_error_it_printed() {
+        let dir = unique_dir("elaborate");
+        let runner = stub_runner(&dir, FAILING_STUB);
+        let req = ElaborateRequest {
+            term: "unknownName".to_string(),
+            context: None,
+            timeout: None,
+        };
+        let resp = runner.elaborate(&req).await.expect("run");
+        assert!(!resp.valid);
+        assert!(
+            !resp.diagnostics.is_empty(),
+            "diagnostics must carry Lean's own error (stdout here)"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_failing_proof_returns_the_error_it_printed() {
+        let dir = unique_dir("prove");
+        let runner = stub_runner(&dir, FAILING_STUB);
+        let req = ProveRequest {
+            theorem: "theorem t : 1 = 1".to_string(),
+            tactics: Some(vec!["simp".to_string()]),
+            imports: None,
+            timeout: None,
+        };
+        let resp = runner.prove(&req).await.expect("run");
+        assert!(!resp.proven);
+        assert!(
+            !resp.diagnostics.is_empty(),
+            "diagnostics must carry Lean's own error (stdout here)"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_clean_run_reports_no_diagnostics() {
+        // P1.2: success must not turn into noise.
+        let dir = unique_dir("clean");
+        let runner = stub_runner(&dir, CLEAN_STUB);
+        let req = CheckRequest {
+            source: "def x : Nat := 1".to_string(),
+            timeout: None,
+        };
+        let resp = runner.check(&req).await.expect("run");
+        assert!(resp.valid);
+        assert!(resp.diagnostics.is_empty(), "got {:?}", resp.diagnostics);
+    }
+
+    #[test]
+    fn diagnostics_are_combined_from_both_streams() {
+        let run = RunOutcome {
+            code: 1,
+            stdout: "a.lean:1:2: error: from stdout".to_string(),
+            stderr: "a.lean:3:4: warning: from stderr".to_string(),
+            elapsed_ms: 1.0,
+        };
+        let diags = diagnostics_for(&run);
+        assert_eq!(diags.len(), 2);
+        assert_eq!(diags[0].severity, "error");
+        assert_eq!(diags[0].message, "from stdout");
+        assert_eq!(diags[1].severity, "warning");
+        assert_eq!(diags[1].message, "from stderr");
+    }
+
+    #[test]
+    fn a_line_printed_on_both_streams_is_reported_once() {
+        let line = "a.lean:1:2: error: same";
+        let run = RunOutcome {
+            code: 1,
+            stdout: line.to_string(),
+            stderr: line.to_string(),
+            elapsed_ms: 1.0,
+        };
+        assert_eq!(diagnostics_for(&run).len(), 1);
     }
 }
