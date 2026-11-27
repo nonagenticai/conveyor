@@ -73,6 +73,15 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                 ArchitectureRule::NoProfile => {
                     ActionError::new(409, "architecture_profile_missing", detail)
                 }
+                ArchitectureRule::ProfileNotAdopted => {
+                    ActionError::new(409, "architecture_profile_not_adopted", detail)
+                }
+                ArchitectureRule::ComplianceReviewMissing => {
+                    ActionError::new(409, "architecture_compliance_review_missing", detail)
+                }
+                ArchitectureRule::ComplianceWaiverMissing => {
+                    ActionError::new(409, "architecture_waiver_missing", detail)
+                }
             }
         }
         ArchitectureStoreError::Meeting(error) => crate::meetings::meeting_error(error, action),
