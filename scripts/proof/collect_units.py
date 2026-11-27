@@ -58,6 +58,34 @@ AUTOMATION_AUTHORS = {"github-actions[bot]", "dependabot[bot]", "renovate[bot]"}
 AUTOMATION_BRANCH_PREFIXES = ("automation/", "publish/")
 CLOSES_RE = re.compile(r"\b(?:closes|fixes|resolves)\s+#(\d+)\b", re.IGNORECASE)
 
+# Adopted deliveries (conveyor#869): merged PRs that carried no closing keyword when they merged.
+# Each entry names the retro unit record created for it. The map is the PR's closing reference;
+# it rewrites neither the merged PR nor its history. It is an input to the facts exactly as the
+# snapshot is, and it is committed so a render is reproducible from the tree alone.
+ADOPTED_PATH = ROOT / "scripts" / "proof" / "adopted.json"
+
+
+def load_adopted(path: pathlib.Path | None = None) -> dict[int, dict]:
+    """The adoption map: pull number → {issue, merged}. Malformed input fails closed.
+
+    An absent file means no adoptions. A malformed entry is an error, never silently dropped:
+    the collector must not render a ledger that quietly forgets a recorded adoption.
+    """
+    path = path if path is not None else ADOPTED_PATH
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text())
+    map_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+    adopted: dict[int, dict] = {}
+    for pull, entry in (data.get("adopted") or {}).items():
+        number = int(pull)
+        issue = int(entry["issue"])
+        merged = entry.get("merged")
+        if not isinstance(merged, str) or len(merged) < 7:
+            raise SystemExit(f"adopted.json: pull {number} has no merge commit")
+        adopted[number] = {"issue": issue, "merged": merged, "map_sha256": map_sha256}
+    return adopted
+
 RULES = {
     "issue": "issue.state/v1",
     "branches": "branch.claim_names/v1",
@@ -65,7 +93,9 @@ RULES = {
     "pulls": "pull.closing_references/v1",
     "pull": "pull.state/v1",
     "ciRuns": "ci.pull_request_runs/v1",
-    "closesKeyword": "pull.closing_keyword/v1",
+    # The closing reference is the PR body's keyword, or the committed adoption map's record
+    # for a delivery that merged without one (#869).
+    "closesKeyword": "pull.closing_reference/v1",
     "verifyParts": "issue.contract_verify/v2",
     "unit": "issue.unit_label/v1",
 }
@@ -383,6 +413,7 @@ def unit_facts(
     pulls: list[dict],
     runs: dict[str, list],
     heads: set[str],
+    adopted: dict[int, dict] | None = None,
 ) -> tuple[dict, dict]:
     """One unit's nine observations and the artifact they were read from."""
     issue_number = issue["number"] if issue else None
@@ -422,7 +453,9 @@ def unit_facts(
     closes_keyword = None
     if issue_number is not None and pulls:
         closes_keyword = any(
-            issue_number in closing_issues(pull) for pull in pulls
+            issue_number in closing_issues(pull)
+            or (adopted or {}).get(pull["number"], {}).get("issue") == issue_number
+            for pull in pulls
         )
 
     verify_parts = contract_verify(issue.get("body") or "") if issue else None
@@ -455,12 +488,24 @@ def unit_facts(
             }
         )
     )
-    return facts, {"artifact": artifact, "rules": dict(RULES)}
+    provenance = {"artifact": artifact, "rules": dict(RULES)}
+    entry = (adopted or {}).get(chosen["number"]) if chosen is not None else None
+    if entry is not None and issue_number is not None and entry.get("issue") == issue_number:
+        # The fact's source for an adopted delivery is the committed map, not the PR body.
+        provenance["adoption"] = {
+            "map": "scripts/proof/adopted.json",
+            "pull": chosen["number"],
+            "merged": entry["merged"],
+        }
+        if entry.get("map_sha256"):
+            provenance["adoption"]["map_sha256"] = entry["map_sha256"]
+    return facts, provenance
 
 
-def build_units(snapshot: dict) -> dict:
+def build_units(snapshot: dict, adopted: dict[int, dict] | None = None) -> dict:
     """Pair the window's issues and merged PRs into completed units, in-flight units and
-    exclusions. Pure: the snapshot is the only input."""
+    exclusions. Pure: the snapshot and the committed adoption map are the only inputs."""
+    adopted = load_adopted() if adopted is None else adopted
     issues = {issue["number"]: issue for issue in snapshot["issues"]}
     heads = set(snapshot["live_heads"])
     runs = snapshot["ci_runs"]
@@ -480,6 +525,9 @@ def build_units(snapshot: dict) -> dict:
             )
             continue
         closing = closing_issues(pull)
+        if not closing and pull["number"] in adopted:
+            # An adopted delivery's closing reference is the map's retro record (#869).
+            closing = [adopted[pull["number"]]["issue"]]
         if closing:
             for number in closing:
                 by_issue.setdefault(number, []).append(pull)
@@ -509,7 +557,7 @@ def build_units(snapshot: dict) -> dict:
         pulls = by_issue[number]
         if not any(pull.get("merged_at") for pull in pulls):
             continue
-        facts, provenance = unit_facts(issue, pulls, runs, heads)
+        facts, provenance = unit_facts(issue, pulls, runs, heads, adopted)
         key = f"{snapshot['repo']}#{number}"
         units.append(
             {
@@ -529,7 +577,7 @@ def build_units(snapshot: dict) -> dict:
         pulls = by_issue[number]
         if not any(pull.get("merged_at") for pull in pulls):
             continue
-        facts, provenance = unit_facts(None, pulls, runs, heads)
+        facts, provenance = unit_facts(None, pulls, runs, heads, adopted)
         key = f"{snapshot['repo']}#{number}"
         units.append(
             {
@@ -1378,7 +1426,7 @@ def self_test() -> int:
         },
         "artifacts": {"issues": "i" * 64, "pulls": "p" * 64, "heads": "h" * 64},
     }
-    corpus = build_units(snapshot)
+    corpus = build_units(snapshot, adopted={})
     units = {unit["key"]: unit for unit in corpus["units"]}
 
     counts = corpus["counts"]
@@ -1448,6 +1496,69 @@ def self_test() -> int:
 
     assert [unit["key"] for unit in corpus["units"]] == sorted(units)
     assert len(chunks(corpus["units"], 2)) == 3, "chunking is by size"
+
+    # Adoption (#869): a merged PR that carried no closing keyword pairs with its committed
+    # retro record, and the map entry is the closing reference the model reads.
+    adoption_snapshot = {
+        "schema": COLLECTOR_VERSION,
+        "repo": "x/y",
+        "baseline": "2026-11-11",
+        "collected_at": "2026-11-27T00:00:00+00:00",
+        "commit": "deadbeef",
+        "spec_sha256": "a" * 64,
+        "model_sha256": "b" * 64,
+        "collector_sha256": "c" * 64,
+        "live_heads": [],
+        "issues": [
+            {
+                "number": 20,
+                "state": "closed",
+                "created_at": "2026-11-27T00:00:00Z",
+                "closed_at": "2026-11-27T00:00:01Z",
+                "labels": ["unit"],
+                "body": "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n",
+                "title": "retro record",
+            }
+        ],
+        "pulls": [
+            {
+                "number": 21,
+                "title": "merged without a closing keyword",
+                "state": "closed",
+                "draft": False,
+                "merged_at": "2026-11-20T00:00:00Z",
+                "merge_commit_sha": "f" * 40,
+                "head": {"ref": "lane/old", "sha": "e" * 40},
+                "base": {"ref": "main"},
+                "user": "someone",
+                "body": "no keyword",
+            }
+        ],
+        "ci_runs": {"e" * 40: [{"name": "ci", "event": "pull_request"}]},
+        "artifacts": {"issues": "a" * 64, "pulls": "b" * 64, "heads": "c" * 64},
+    }
+    adopted_corpus = build_units(
+        adoption_snapshot, adopted={21: {"issue": 20, "merged": "f" * 9}}
+    )
+    adopted_units = {unit["key"]: unit for unit in adopted_corpus["units"]}
+    retro = adopted_units["x/y#20"]["facts"]
+    assert retro["closesKeyword"] is True, "the map is the closing reference"
+    assert retro["branchDeleted"] is True, "the PR head is not live"
+    assert retro["ciRuns"] == 1 and retro["unit"] is True
+    assert adopted_corpus["counts"]["orphans"] == 0, adopted_corpus["counts"]
+    assert classify_findings(adopted_corpus) == [], "an adopted unit is not an orphan finding"
+
+    # A map entry naming an issue outside the fetched set fails closed: the unit exists with an
+    # unreadable issue and the finding says so, rather than becoming an orphan again.
+    missing_snapshot = dict(adoption_snapshot)
+    missing_snapshot["pulls"] = [dict(adoption_snapshot["pulls"][0], number=22)]
+    missing_corpus = build_units(
+        missing_snapshot, adopted={22: {"issue": 99, "merged": "f" * 9}}
+    )
+    missing_units = {unit["key"]: unit for unit in missing_corpus["units"]}
+    assert missing_units["x/y#99"]["facts"]["issue"] is None
+    missing_classes = [(f["key"], f["class"]) for f in classify_findings(missing_corpus)]
+    assert ("x/y#99", "issue-unreadable") in missing_classes, missing_classes
 
     # A prose line that starts with an issue reference is not a heading: it must not truncate
     # the Parts section before the later parts (the #753/#781 false failures).

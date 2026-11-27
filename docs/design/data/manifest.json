@@ -5180,10 +5180,10 @@
       "sha256": "556c47f407561ed5f6d3b0e9f4fb88538d251f860c2721f9cadc39d9dd733c63"
     },
     {
-      "bytes": 161969,
+      "bytes": 175470,
       "path": "output-standard.js",
       "records": 0,
-      "sha256": "77578a0803d04720c27c41a6c6ad8faa93df9dff7baff6c7493e24ecf5157a57"
+      "sha256": "b6b575a2e5668f8f411197009efe581c49a134e3b12d82420a983fff92fd430a"
     },
     {
       "bytes": 298157,
@@ -5204,16 +5204,16 @@
       "sha256": "becb8f4d9f6735ff9664bd61ddbf2aacfad18c54d989bb7c189150b3d098dcc2"
     },
     {
-      "bytes": 555989,
+      "bytes": 968694,
       "path": "rework.js",
       "records": 0,
-      "sha256": "5afdbaaffc8afb3bb3b4bec1a6558b0bb095727f39c09d0458c3bcc98e4bb7c5"
+      "sha256": "d261b6b5d8875eda735c5854ccbba9a27b148a4170ecaaeb9fae58245e73aa74"
     },
     {
       "bytes": 968668,
       "path": "rework.json",
       "records": 243,
-      "sha256": "3ff7d85d8effdabe8493ac4f766d478dcd18335f22734a6bf501539be18f6fa7"
+      "sha256": "5cb179c176e51f9f3103f6b75630eaa5e1535e3b347529fbc8576d44920b52c7"
     },
     {
       "bytes": 223,
@@ -5225,7 +5225,7 @@
       "bytes": 9122759,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "2553a3fb1d3e066d97a6e5a7af519d01a4031276d9ef6779d1478fb4e97da914"
+      "sha256": "be25bbb199bbef26ab22a39537a2c2d1b16818b31e1657fc218e89f7179f1c72"
     },
     {
       "bytes": 411296,

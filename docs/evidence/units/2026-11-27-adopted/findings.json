@@ -1,0 +1,378 @@
+{
+  "corpus_sha256": "f5fc2555eade8e8bc7bf6ca5bdaa01162b82e1f776f196f7a6681dfbc270208b",
+  "counts": {
+    "branch-live": 0,
+    "closure-open": 2,
+    "issue-unreadable": 0,
+    "multi-lane": 5,
+    "non-unit-dor": 0,
+    "orphan-pr": 3,
+    "unit-dor-verify": 28
+  },
+  "findings": [
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 11,
+      "key": "nonagenticai/conveyor#11"
+    },
+    {
+      "class": "closure-open",
+      "detail": "the PR merged but the issue is still open",
+      "failed_rules": [
+        "mergeComplete"
+      ],
+      "issue_number": 12,
+      "key": "nonagenticai/conveyor#12"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 130,
+      "key": "nonagenticai/conveyor#130"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 140,
+      "key": "nonagenticai/conveyor#140"
+    },
+    {
+      "class": "multi-lane",
+      "detail": "1 claim branch(es) and 2 linked PR(s) for one unit",
+      "failed_rules": [
+        "onePull"
+      ],
+      "issue_number": 185,
+      "key": "nonagenticai/conveyor#185"
+    },
+    {
+      "class": "multi-lane",
+      "detail": "2 claim branch(es) and 2 linked PR(s) for one unit",
+      "failed_rules": [
+        "oneBranch",
+        "onePull"
+      ],
+      "issue_number": 190,
+      "key": "nonagenticai/conveyor#190"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 203,
+      "key": "nonagenticai/conveyor#203"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 205,
+      "key": "nonagenticai/conveyor#205"
+    },
+    {
+      "class": "multi-lane",
+      "detail": "2 claim branch(es) and 2 linked PR(s) for one unit",
+      "failed_rules": [
+        "oneBranch",
+        "onePull",
+        "verifyParts"
+      ],
+      "issue_number": 212,
+      "key": "nonagenticai/conveyor#212"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "oneBranch",
+        "onePull",
+        "verifyParts"
+      ],
+      "issue_number": 212,
+      "key": "nonagenticai/conveyor#212"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 213,
+      "key": "nonagenticai/conveyor#213"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 226,
+      "key": "nonagenticai/conveyor#226"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 274,
+      "key": "nonagenticai/conveyor#274"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 299,
+      "key": "nonagenticai/conveyor#299"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 307,
+      "key": "nonagenticai/conveyor#307"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 311,
+      "key": "nonagenticai/conveyor#311"
+    },
+    {
+      "class": "multi-lane",
+      "detail": "2 claim branch(es) and 2 linked PR(s) for one unit",
+      "failed_rules": [
+        "oneBranch",
+        "onePull"
+      ],
+      "issue_number": 319,
+      "key": "nonagenticai/conveyor#319"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 389,
+      "key": "nonagenticai/conveyor#389"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 390,
+      "key": "nonagenticai/conveyor#390"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 416,
+      "key": "nonagenticai/conveyor#416"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 434,
+      "key": "nonagenticai/conveyor#434"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 45,
+      "key": "nonagenticai/conveyor#45"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 471,
+      "key": "nonagenticai/conveyor#471"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 542,
+      "key": "nonagenticai/conveyor#542"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 545,
+      "key": "nonagenticai/conveyor#545"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 572,
+      "key": "nonagenticai/conveyor#572"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 59,
+      "key": "nonagenticai/conveyor#59"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 62,
+      "key": "nonagenticai/conveyor#62"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 653,
+      "key": "nonagenticai/conveyor#653"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 667,
+      "key": "nonagenticai/conveyor#667"
+    },
+    {
+      "class": "closure-open",
+      "detail": "the PR merged but the issue is still open",
+      "failed_rules": [
+        "mergeComplete"
+      ],
+      "issue_number": 669,
+      "key": "nonagenticai/conveyor#669"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 73,
+      "key": "nonagenticai/conveyor#73"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 797,
+      "key": "nonagenticai/conveyor#797"
+    },
+    {
+      "class": "multi-lane",
+      "detail": "2 claim branch(es) and 2 linked PR(s) for one unit",
+      "failed_rules": [
+        "oneBranch",
+        "onePull"
+      ],
+      "issue_number": 81,
+      "key": "nonagenticai/conveyor#81"
+    },
+    {
+      "class": "unit-dor-verify",
+      "detail": "a unit issue whose Parts section lacks a `Verify:` line on a part",
+      "failed_rules": [
+        "verifyParts"
+      ],
+      "issue_number": 92,
+      "key": "nonagenticai/conveyor#92"
+    },
+    {
+      "class": "orphan-pr",
+      "detail": "the merged PR delivered nonagenticai/conveyor#470 but carried no closing keyword; the issue was closed without it",
+      "failed_rules": [
+        "closesKeyword",
+        "mergeComplete",
+        "verifyParts"
+      ],
+      "issue_number": null,
+      "key": "nonagenticai/conveyor#pr-493",
+      "subkind": "unlinked-unit"
+    },
+    {
+      "class": "orphan-pr",
+      "detail": "the merged PR delivered nonagenticai/conveyor#26 but carried no closing keyword; the issue was closed without it",
+      "failed_rules": [
+        "closesKeyword",
+        "mergeComplete",
+        "verifyParts"
+      ],
+      "issue_number": null,
+      "key": "nonagenticai/conveyor#pr-495",
+      "subkind": "unlinked-unit"
+    },
+    {
+      "class": "orphan-pr",
+      "detail": "the merged PR delivered nonagenticai/conveyor#577 but carried no closing keyword; the issue was closed without it",
+      "failed_rules": [
+        "closesKeyword",
+        "mergeComplete",
+        "verifyParts"
+      ],
+      "issue_number": null,
+      "key": "nonagenticai/conveyor#pr-578",
+      "subkind": "unlinked-unit"
+    }
+  ],
+  "kind": "unit_findings",
+  "model_sha256": "f6020faea6420ed1db57f7fc4a367622bb38616b18cda791751df8e709ff5e35",
+  "orphan_subkinds": {
+    "unlinked-unit": 3
+  },
+  "spec_sha256": "9a5fa2cedebd6fbbb560a18b18832ec60082f494d9b81e68bde278c7bcb46eab"
+}

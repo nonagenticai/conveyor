@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>report · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-adopted/report.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h3 id="evaluation--corpus-f5fc2555eade8e8b">Evaluation — corpus <code>f5fc2555eade8e8b…</code></h3>
+<p>Window: nonagenticai/conveyor merged PRs and unit issues from 2026-11-11; collected 2026-11-27T22:25:45.905827+00:00 at <code>ef382c8df22926a2611ef538e9b526eda936185a</code>. Spec <code>docs/plans/03-DELIVERY.md</code> <code>9a5fa2cedebd6fbb…</code>; model <code>f6020faea6420ed1…</code>.</p>
+<p>Completed units <strong>345</strong>; in flight <strong>17</strong> open (no merged PR — the delivery has not happened); closed without a keyword-linked PR 32; orphan PRs 3; automation excluded 130.</p>
+<p><strong>Findings.</strong> One finding per defect; a unit may carry several.</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>branch-live</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>closure-open</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>issue-unreadable</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>multi-lane</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>non-unit-dor</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>orphan-pr</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>unit-dor-verify</code></td>
+<td>28</td>
+</tr>
+</tbody>
+</table>
+<p>Orphan sub-kinds: <code>unlinked-unit</code> 3.</p>
+<ul>
+<li><code>closure-open</code>: <code>nonagenticai/conveyor#12</code>, <code>nonagenticai/conveyor#669</code></li>
+<li><code>multi-lane</code>: <code>nonagenticai/conveyor#185</code>, <code>nonagenticai/conveyor#190</code>, <code>nonagenticai/conveyor#212</code>, <code>nonagenticai/conveyor#319</code>, <code>nonagenticai/conveyor#81</code></li>
+<li><code>orphan-pr</code>: <code>nonagenticai/conveyor#pr-493</code>, <code>nonagenticai/conveyor#pr-495</code>, <code>nonagenticai/conveyor#pr-578</code></li>
+<li><code>unit-dor-verify</code>: <code>nonagenticai/conveyor#11</code>, <code>nonagenticai/conveyor#130</code>, <code>nonagenticai/conveyor#140</code>, <code>nonagenticai/conveyor#203</code>, <code>nonagenticai/conveyor#205</code>, <code>nonagenticai/conveyor#212</code>, <code>nonagenticai/conveyor#213</code>, <code>nonagenticai/conveyor#226</code>, <code>nonagenticai/conveyor#274</code>, <code>nonagenticai/conveyor#299</code>, <code>nonagenticai/conveyor#307</code>, <code>nonagenticai/conveyor#311</code>, <code>nonagenticai/conveyor#389</code>, <code>nonagenticai/conveyor#390</code>, <code>nonagenticai/conveyor#416</code>, <code>nonagenticai/conveyor#434</code>, <code>nonagenticai/conveyor#45</code>, <code>nonagenticai/conveyor#471</code>, <code>nonagenticai/conveyor#542</code>, <code>nonagenticai/conveyor#545</code>, <code>nonagenticai/conveyor#572</code>, <code>nonagenticai/conveyor#59</code>, <code>nonagenticai/conveyor#62</code>, <code>nonagenticai/conveyor#653</code>, <code>nonagenticai/conveyor#667</code>, <code>nonagenticai/conveyor#73</code>, <code>nonagenticai/conveyor#797</code>, <code>nonagenticai/conveyor#92</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Failing units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ciBudget</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>closesKeyword</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>mergeComplete</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>oneBranch</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>onePull</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>pullUsable</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>verifyParts</code></td>
+<td>31</td>
+</tr>
+</tbody>
+</table>
+<p><strong>37 completed unit(s) fail the collector's rule mirror; the kernel certificate is pending the deployed engine.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>Failed rules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nonagenticai/conveyor#11</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#12</code></td>
+<td>mergeComplete</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#130</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#140</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#185</code></td>
+<td>onePull</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#190</code></td>
+<td>oneBranch, onePull</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#203</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#205</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#212</code></td>
+<td>oneBranch, onePull, verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#213</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#226</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#274</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#299</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#307</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#311</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#319</code></td>
+<td>oneBranch, onePull</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#389</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#390</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#416</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#434</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#45</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#471</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#542</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#545</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#572</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#59</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#62</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#653</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#667</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#669</code></td>
+<td>mergeComplete</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#73</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#797</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#81</code></td>
+<td>oneBranch, onePull</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#92</code></td>
+<td>verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#pr-493</code></td>
+<td>closesKeyword, mergeComplete, verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#pr-495</code></td>
+<td>closesKeyword, mergeComplete, verifyParts</td>
+</tr>
+<tr>
+<td><code>nonagenticai/conveyor#pr-578</code></td>
+<td>closesKeyword, mergeComplete, verifyParts</td>
+</tr>
+</tbody>
+</table>
+<p>Rules the snapshot cannot reconstruct are named, not dropped: claim timing/comments (the four pre-branch checks are not a property of the finished unit) and <code>Blocker:</code> iff <code>status:blocked</code> (label state is not historical).</p>
+<p><strong><code>Verify:</code> cross-check.</strong> The fact reuses <code>scripts/ci/board.py</code>'s <code>VERIFY_RE</code> (the line rule <code>issue-dor</code> runs) and requires one per <code>###</code> part, which is what 03-DELIVERY's DoR says. The checker now enforces the same per-part rule, so a disagreement here means a pre-2026-11-18 body or a heading the model accepts loosely (for example <code>## Parts</code>). Disagreements: 0 pass the checker but fail the model, 6 the reverse, 336 agree. Both answers are recorded; neither is silently adopted.</p>
+<p>The kernel certifies <em>facts ⇒ verdict</em>; the collector's snapshot, rule ids and artefact digests are what a reviewer checks against GitHub. The snapshot is redacted per <code>scripts/ci/no-private-refs.sh</code> (public GitHub quotations of estate identifiers become placeholders; the facts need none of them). No unit is attributed to a person.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/units/2026-11-27-adopted/report.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
