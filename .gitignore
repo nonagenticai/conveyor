@@ -30,3 +30,9 @@ playwright-report/
 # (!.claude/hooks/**) would otherwise re-include it — gitignore's last match wins.
 __pycache__/
 *.pyc
+
+# The Gemba Walk's wasm package and its browser test artefacts are built, never committed
+# (ADR 0022/0023: the image stage and CI own the build).
+apps/walk/pkg/
+apps/walk/node_modules/
+apps/walk/test-results/

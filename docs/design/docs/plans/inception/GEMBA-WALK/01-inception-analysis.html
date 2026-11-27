@@ -24,6 +24,9 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--inception-analysis">GEMBA-WALK — Inception analysis</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> This analysis records the state at <code>main@cedd84980</code> and is kept as history. The delivery architecture has since changed: the walk is served at <code>https://game.nonagentic.ai/</code> at the root with its own public client <code>conveyor-game</code>, not as a <code>/walk/</code> sub-site on the operator origin. The action count at the 2026-11-27 re-baseline is 598 (572 attributes + 26 manual registrations).</p>
+</blockquote>
 <h2 id="current-state">Current state</h2>
 <p>Measured at <code>main@cedd84980</code> on 2026-11-26; the walk has no code in the tree.</p>
 <table>
@@ -48,7 +51,7 @@
 <tr>
 <td>Action registry</td>
 <td>DONE</td>
-<td><code>docs/design/data/actions.json</code>: 597 actions; <code>actions.describe</code> carries input/output JSON Schema, effect, confirm, tenancy, spec hash</td>
+<td><code>docs/design/data/actions.json</code>: 597 actions at this measurement (598 at the 2026-11-27 re-baseline); <code>actions.describe</code> carries input/output JSON Schema, effect, confirm, tenancy, spec hash</td>
 </tr>
 <tr>
 <td>Auth</td>
@@ -63,7 +66,7 @@
 <tr>
 <td>Static serving</td>
 <td>PARTIAL</td>
-<td><code>crates/api/src/web.rs</code>: a directory with <code>index.html</code> is a sub-site; <code>/walk/&lt;deep-path&gt;</code> falls through to the operator <code>index.html</code> — no scoped fallback</td>
+<td><code>crates/api/src/web.rs</code>: a directory with <code>index.html</code> is a sub-site; <code>/walk/&lt;deep-path&gt;</code> falls through to the operator <code>index.html</code> — no scoped fallback (W2 later added the sub-site fallback; CR-WALK-001 replaces it with the game-host dispatch)</td>
 </tr>
 <tr>
 <td><code>/walk</code> client</td>
@@ -163,7 +166,7 @@
 </thead>
 <tbody>
 <tr>
-<td>Scope: 597 actions, 52 routes</td>
+<td>Scope: 598 actions, 52 routes</td>
 <td>measured census</td>
 <td>schema-driven action sheet; frozen census; per-destination specs; P6 is the only done</td>
 </tr>

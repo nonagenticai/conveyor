@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conveyor · Gemba Walk</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#screen">Skip to content</a>
+    <div id="app" class="app">
+      <header id="hud" class="hud" aria-label="Session"></header>
+      <main id="main" class="main">
+        <section id="world" class="world" aria-label="The walk">
+          <canvas id="world-canvas" role="img" aria-label="Walk world"></canvas>
+        </section>
+        <section id="screen" class="screen" tabindex="-1"></section>
+        <nav id="map" class="map" aria-label="Rooms"></nav>
+      </main>
+      <div id="sheet-host" class="sheet-host"></div>
+      <div id="toasts" class="toasts" aria-live="polite"></div>
+      <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    </div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

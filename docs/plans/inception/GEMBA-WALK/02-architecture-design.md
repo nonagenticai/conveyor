@@ -1,6 +1,6 @@
 ---
 document: GEMBA-WALK/architecture-design
-version: 1
+version: 2
 status: draft
 project: GEMBA-WALK
 category: architecture-design
@@ -13,12 +13,18 @@ plateau: PSA + HLD
 
 # GEMBA-WALK — Architecture design (PSA and HLD)
 
+> **Amendment 2026-11-27 (CR-WALK-001, ADR 0024).** The client is served at
+> `https://game.nonagentic.ai/` at the root from the same image and service, with its own public
+> client `conveyor-game` in the `conveyor` realm; the operator origin's `/walk/*` 308s to it. The
+> host boundary, the `azp` allowlist and the live sign-in are added below (R17–R19, AD10, D1). The
+> earlier `/walk/` sub-site is retained only as the no-host dev/CI shape.
+
 ## Context and boundary
 
-GEMBA-WALK adds a **second client**, not a second system. It is a static sub-site at `/walk/`,
-served from the same image and origin as the API, with its own router, sheets, world and Playwright
-suite. It adds no table, action, event, port, decision store or read model. Every read is a literal
-`GET` route or a read action; every write is `POST /api/actions/{name}/invocations` with the
+GEMBA-WALK adds a **second client**, not a second system. It is a static client at `https://game.nonagentic.ai/`, served at the
+root from the same image and service as the API (so the API is same-origin), with its own router,
+sheets, world, identity client and Playwright suite. It adds no table, action, event, port, decision store or read model. Every read is a literal
+`GET` route where one exists, or the owning read action (`programmes.list` is one); every write is `POST /api/actions/{name}/invocations` with the
 standard envelope and headers; a capability the server does not expose is an honest gate.
 
 The design covers the client architecture, the route/action parity model, the `WorldView` port, the
@@ -46,7 +52,7 @@ stakeholders, scope, related project and its published document; links use
 | C1 | Data entity catalog | catalog | C / HLD | 1 | programme-architect | Architecture Board | 2026-12-03 | draft |
 | C2 | Application / function matrix | matrix | C / HLD | 1 | programme-architect | Architecture Board | 2026-12-03 | draft |
 | C3 | Conceptual data diagram | diagram | C / HLD | 1 | programme-architect | Architecture Board | 2026-12-03 | draft |
-| D1 | Technology view | catalog | D / HLD | 1 | platform lead | Architecture Board | 2026-12-03 | draft |
+| D1 | Technology view | catalog | D / HLD | 2 | platform lead | Architecture Board | 2026-12-03 | draft |
 | F1 | Migration and delivery diagram | diagram | F / HLD | 1 | programme-manager | SRO | 2026-12-03 | draft |
 
 The published document is this file for every row; the future typed repository rows derive from it.
@@ -68,20 +74,20 @@ No row is approved yet; the review date is the Architecture Board's sitting afte
 | P6 | No fixtures, no client store | a fixture makes the measurement lie | the client renders real rows or the honest gate; no snapshot as the app's source |
 | P7 | Parity is measured | prose cannot prove a UI | the frozen census and per-destination specs are the only credit |
 | P8 | Same identity, same origin | a second identity path doubles the attack surface | auth-code + PKCE, token in memory, tenant header, no `localStorage` token |
-| P9 | The renderer is replaceable | the simulation is decided, the renderer is not | the simulation is `bevy_ecs` behind `WorldView` (ADR 0022); canvas-2D and WebGL2 are measured in P0 and ADR 0023 picks one |
+| P9 | The renderer is replaceable | a rendering choice must not trap the client | the simulation is `bevy_ecs` behind `WorldView` (ADR 0022); the P0 spike measured canvas-2D against WebGL2 and ADR 0023 selects canvas-2D, with WebGL2 behind the port |
 | P10 | The walk is reversible | primacy must not be a one-way door | additive surface, redirect map and an `apps/web` retirement as a later decision |
 
 ### A2 — Requirements catalog (typed)
 
 | ID | Type | Requirement | Source |
 |---|---|---|---|
-| R1 | condition | Every §10.5 destination and every retained V1 route has a walk route `/walk` + the app path | spec §4, plan §7 |
+| R1 | condition | Every §10.5 destination and every retained V1 route has a walk route equal to the app path on the game host | spec §4, plan §7, ADR 0024 |
 | R2 | condition | Every action in the frozen census is reachable and schema-rendered, with a labelled JSON fallback | spec §6.5, plan §6 |
 | R3 | constraint | Every write uses the standard envelope, `If-Match`/`Idempotency-Key`, approval and the server's refusal verbatim | spec §5, §9 |
 | R4 | constraint | No new table, action, event, port or decision store | ADR 0021 decision 3 |
 | R5 | condition | Auth-code + PKCE S256, token in memory, tenant header, dev cookie locally | spec §9, ADR 0021 decision 4 |
 | R6 | condition | SSE via fetch stream, `Last-Event-ID`, `resync`; a subscribed screen reflects its topic | spec §6.4 |
-| R7 | constraint | Deep links are served by a scoped `/walk/*` fallback (GET/HEAD, non-asset) and tested | plan §5.8 |
+| R7 | constraint | On the game host a deep link serves the walk entry; the operator origin 308s `/walk/*`; both tested | spec §10, ADR 0024 |
 | R8 | condition | The world is a `WorldView` port; the canvas baseline is always available | spec §6.2–§6.3 |
 | R9 | constraint | Seats never change authority; a control absent from the manifest is not rendered | spec §3 |
 | R10 | condition | Accessibility: keyboard path for every capability, focus return, contrast, 200 % zoom, 390 px | spec §8 |
@@ -89,8 +95,11 @@ No row is approved yet; the review date is the Architecture Board's sitting afte
 | R12 | constraint | No fixture, no snapshot URL fetched by a signed-in walk, no `localStorage` programme state | spec §14 |
 | R13 | condition | The parity instrument runs with no server, no database and no network; an expired exemption fails | plan §6 |
 | R14 | assumption | The action registry, read routes and identity provider remain the sole authority | spec §5 |
-| R15 | delta | The `/walk/` OIDC redirect URI must be registered; the dev cookie covers construction | ADR 0021 consequences |
-| R16 | condition | The walk adds no port, image or origin; the static output is copied into the existing image | spec §10 |
+| R15 | delta | The game has its own public client `conveyor-game` (PKCE S256, redirect `https://game.nonagentic.ai/*`, web origin, `conveyor` audience); it is delivered and read back, not deferred | CR-WALK-001, ADR 0024 |
+| R16 | condition | The walk adds no port, image or service; it is a second host on the same image; the static tree is copied into the image | spec §10 |
+| R17 | constraint | On the game host the server serves only the walk tree, `/config.json` and the API; `/mcp` and `/design` are refused before their routes run; the operator index is never served | ADR 0024, spec §10 |
+| R18 | constraint | The API accepts exactly the two first-party `azp` values (`conveyor-web`, `conveyor-game`) against the `conveyor` audience; an unknown or missing `azp` is rejected | ADR 0024 |
+| R19 | condition | The production sign-in is proven by a real `conveyor-e2e` PKCE sign-in on the game host, not a redirect | ADR 0024, spec §11 |
 
 ### A3 — Stakeholder map (matrix)
 
@@ -114,21 +123,21 @@ No row is approved yet; the review date is the Architecture Board's sitting afte
 | DR2 | The owner is considering the walk as the primary UI; a decision needs evidence |
 | G1 | Every operator task is reachable in the walk through the existing contract |
 | G2 | The contract's UI-independence is proven by a second client, not asserted |
-| O1 | The P6 gate passes: 52 routes, 597 actions reachable, named flows round-trip, a11y/perf met |
+| O1 | The P6 gate passes: 52 routes, 598 actions reachable, named flows round-trip, a11y/perf met |
 | O2 | A contract change that breaks one client is caught by the parity instrument or a spec |
 | O3 | The walk can be retired or promoted without a backend change |
 
 ### A5 — Solution concept (diagram)
 
 ```
-browser (/walk/)
+browser (game.nonagentic.ai)
   shell ── seats (view presets) ── HUD (principal, tenant, queues, palette)
     └── router registry ── route row: walk path + app path + room + spec
-          └── destination module ── read model ── GET /api/... | read action
+          └── destination module ── read model ── GET /api/... | read action (e.g. programmes.list)
                                  └── sheet host ── action sheet ── actions.describe
                                                           └── POST /api/actions/{name}/invocations
                                                                (envelope, If-Match, Idempotency-Key, approval)
-          └── world (WorldView port) ── canvas-2D baseline | Bevy candidate
+          └── world (WorldView port) ── canvas-2D (ADR 0023) · WebGL2 candidate
                                  └── rooms/figures/state; never a work surface
   events: GET /api/events?topics= (SSE) ── subscribed destination resync
 ```
@@ -136,10 +145,11 @@ browser (/walk/)
 ### A6 — Statement of Architecture Work (draft)
 
 Assignment: build the Gemba Walk to the P6 parity gate. Scope: the seven wings, the seven
-destinations families, the retained V1 surfaces, the serving fallback and the instrument.
+destinations families, the retained V1 surfaces, the host dispatch and boundary, its own public
+client, the instrument and the live sign-in proof.
 Responsibilities: the programme architect owns the set; the Architecture Board reviews; the SRO
 accepts the benefit and tranche evidence; the delivery sessions own their files. Acceptance: the P6
-gate (52 routes, 597 actions, named flows, a11y/perf, owner sign-off). The contract is a document
+gate (52 routes, 598 actions, named flows, a11y/perf, owner sign-off). The contract is a document
 now; `architecture.contracts_approve` makes it live. The full text is
 `06-statement-of-architecture-work.md`.
 
@@ -217,9 +227,9 @@ boards/cards/runs · programme/tranche/benefit · approvals/decisions · documen
 
 Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline
 world simulation is `bevy_ecs 0.20.1` in `crates/walk-world`, compiled to wasm32 and loaded behind
-`WorldView` (ADR 0022); the renderer is a canvas-2D projection first, with WebGL2 measured against
-it in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input) and ADR
-0023 recording the winner. Browser APIs: fetch, streams, Web Crypto (PKCE), `sessionStorage` (verifier only),
+`WorldView` (ADR 0022); the renderer is the canvas-2D projection (ADR 0023), measured against
+WebGL2 in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input);
+WebGL2 remains a candidate behind the port. Browser APIs: fetch, streams, Web Crypto (PKCE), `sessionStorage` (verifier only),
 `history`/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's
 static assets are copied by the Dockerfile. Tests: Playwright against the dev server; `node --test`
 for pure modules. No SSR, no server runtime, no third-party hosted service.
@@ -255,15 +265,28 @@ S1–S3 (W3–W4 by wing), S4 (W5–W8). The P0 spike's throwaway workflow is de
 
 | ID | Decision | Rationale | Where it shows |
 |---|---|---|---|
-| AD1 | A static sub-site at `/walk/`, same image and origin | no new port, image or deploy path | D1, serving fallback |
-| AD2 | Route parity by construction (`/walk` + app path) | a missing route is visible, not invented | router registry, census |
+| AD1 | A static client at `https://game.nonagentic.ai/`, at the root, same image and service | the owner's product URL and a first-class client with no new runtime; the operator origin 308s `/walk/*` | D1, R17, ADR 0024 |
+| AD2 | Route parity by construction (the walk path is the app path on the game host) | a missing route is visible, not invented; parity is an equality | router registry, census |
 | AD3 | Full functionality through the existing contract | a second backend would fork the record | C1/C2, R3/R4 |
 | AD4 | DOM sheets own all work; the world is navigation/state display | a canvas cannot carry audit-quality forms | P3, A5 |
 | AD5 | Seats are view presets; the manifest and scopes own authority | a preset must never grant a permission | B2, R9 |
 | AD6 | No fixtures, no client programme store | a fixture makes the parity claim false | P6, R12 |
-| AD7 | `WorldView` port; `bevy_ecs` simulation (ADR 0022); canvas-2D baseline, WebGL2 measured in P0 | the simulation is decided, the renderer is not; the port keeps both renderers | R8, D1, ADR 0022/0023 |
+| AD7 | `WorldView` port; `bevy_ecs` simulation (ADR 0022); canvas-2D renderer (ADR 0023), WebGL2 measured behind the port | the simulation and the renderer are decided; the port keeps the renderer replaceable | R8, D1, ADR 0022/0023 |
 | AD8 | The instrument is a frozen census + per-destination specs | live manifests move; the gate must stay passable | plan §6, R13 |
-| AD9 | Deep links served by a scoped `/walk/*` fallback + Rust test | without it a deep link renders the operator app | R7, W2 |
+| AD9 | Deep links served by the game-host dispatch + Rust matrix; the operator `/walk/*` 308s | without it a deep link renders the operator app or an operator surface leaks on the game host | R7, R17, W2 |
+| AD10 | The game has its own public client `conveyor-game` in the `conveyor` realm; the API accepts the two-client `azp` allowlist | isolation without duplicating users; the replay guard stays first-party | R15, R18, D1 |
+
+### D1 — Deployment and identity view (v2, 2026-11-27)
+
+| Element | Design | Source |
+|---|---|---|
+| Edge | Cloudflare → `cloudflared-apps` tunnel → istio `n8n-gateway` → `conveyor-public-vs`; `game.nonagentic.ai` is a second host on the same VirtualService; TLS uses the wildcard edge and the origin's `noTLSVerify`; DNS is derived by the `dns-ensure` CronJob | gitops `clusters/strato/**` |
+| Service | one `conveyor` Deployment and Service on 8930; no second image, port or runtime | `crates/api`, gitops `services/conveyor` |
+| Host boundary | normalise `Host`; on a game host serve only the walk tree (`/srv/site/walk` at the root), `/config.json` and the API; a router-level gate refuses `/mcp` and `/design` before their routes; the operator index is never served; the operator host keeps its behaviour and 308s `/walk/*` to `CONVEYOR_GAME_PUBLIC_URL` | `crates/api/src/{lib,web}.rs`, ADR 0024 |
+| Interface: browser ↔ API | same origin on both hosts; bearer access token, `X-Active-Tenant`, `If-Match`, `Idempotency-Key`; no CORS | spec §5, §10 |
+| Interface: browser ↔ Keycloak | public client `conveyor-game`, standard flow + PKCE S256, redirect `https://game.nonagentic.ai/*`, web origin `https://game.nonagentic.ai`, audience mapper `conveyor`; the API accepts `azp ∈ {conveyor-web, conveyor-game}` | realm patch, ADR 0024 |
+| Configuration | `/config.json` per host: game client id on the game host, operator client id elsewhere; same issuer and `dev_auth` | `crates/api/src/web.rs` |
+| Rollback | remove the host from the VirtualService/tunnel, drop the two env values; the client is inert; no data migrated | CR-WALK-001 §8 |
 
 ## Acceptance
 

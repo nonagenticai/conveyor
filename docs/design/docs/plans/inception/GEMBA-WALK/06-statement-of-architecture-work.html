@@ -24,11 +24,14 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--statement-of-architecture-work">GEMBA-WALK — Statement of Architecture Work</h1>
+<blockquote>
+<p><strong>Version 2 — 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The assignment is amended: the client is served at <code>https://game.nonagentic.ai/</code> at the root with its own public client <code>conveyor-game</code>, and the production sign-in is part of the delivery. The v1 contract is superseded, not edited in place; the change re-opens the Phase-A gate.</p>
+</blockquote>
 <h2 id="assignment">Assignment</h2>
-<p>The Architecture Board assigns the GEMBA-WALK project to design and build a second, game-style client at <code>/walk/</code> as a <strong>candidate</strong> primary UI, under ADR 0021 and the owner's 2026-11-26 direction. The assignment is the Phase-A contract: it authorises the architecture work; it does not authorise primacy, a backend change or the retirement of <code>apps/web</code>.</p>
+<p>The Architecture Board assigns the GEMBA-WALK project to design and build a second, game-style client at <code>https://game.nonagentic.ai/</code> as a <strong>candidate</strong> primary UI, under ADR 0021, ADR 0024 and the owner's directions of 2026-11-26 and 2026-11-27. The assignment is the Phase-A contract: it authorises the architecture work; it does not authorise primacy, a backend change or the retirement of <code>apps/web</code>.</p>
 <h2 id="scope">Scope</h2>
-<p><strong>In:</strong> the static sub-site and its serving fallback; route parity with the 52 <code>apps/web</code> patterns; reachability and schema-rendering of the 597 registered actions; the seven wings and their rooms; seats as view presets; DOM sheets; the <code>WorldView</code> port and canvas-2D baseline; the frozen census and parity instrument; per-destination Playwright specs; accessibility and performance budgets; deployment in the existing image.</p>
-<p><strong>Out:</strong> any new table, action, event, port or decision store; a second backend or read model; SSR; native mobile; chat/audio/video; a fixture or embedded snapshot; <code>/design/</code> changes; <code>apps/web</code> retirement before the P6 gate.</p>
+<p><strong>In:</strong> the game host and its boundary (one image and service); route parity with the 52 <code>apps/web</code> patterns at the host root; the operator <code>/walk/*</code> 308; reachability and schema-rendering of the 598 registered actions; the seven wings and their rooms; seats as view presets; DOM sheets; the <code>WorldView</code> port and canvas-2D baseline; the frozen census and parity instrument; per-destination Playwright specs; accessibility and performance budgets; deployment in the existing image; the dedicated public client <code>conveyor-game</code>, its realm-patch Job and read-back; the live sign-in proof.</p>
+<p><strong>Out:</strong> any new table, action, event, port or decision store; a second backend, read model, realm, deployment or image; SSR; native mobile; chat/audio/video; a fixture or embedded snapshot; <code>/design/</code> changes; <code>apps/web</code> retirement before the P6 gate.</p>
 <p><strong>Boundary rule:</strong> a capability the server does not expose is an honest gate. A need for new backend surface stops the work and escalates; it is never added by this project.</p>
 <h2 id="responsibilities">Responsibilities</h2>
 <table>
@@ -79,20 +82,21 @@
 <li>Every action in the frozen census is reachable and schema-rendered; an expired exemption fails.</li>
 <li>The named write flows round-trip with the standard envelope, <code>If-Match</code>, <code>Idempotency-Key</code> and approval; a refusal is shown verbatim with no optimistic mutation.</li>
 <li>Accessibility: keyboard path for every capability, focus return, contrast, 200 % zoom and 390 px with no horizontal scroll.</li>
-<li>Performance: the budgets in the spec §9, with a 5-minute soak; the engine protocol recorded for ADR 0022.</li>
+<li>Performance: the budgets in the spec §9, with a 5-minute soak; the engine protocol recorded for ADR 0022. 5a. Host and identity: the game host serves only the walk and the API, the operator origin is unchanged and 308s <code>/walk/*</code>, the client <code>conveyor-game</code> is read back from the admin API, and a real <code>conveyor-e2e</code> sign-in lands on the Portfolio read.</li>
 <li>The owner's primacy decision is recorded; without it <code>apps/web</code> remains the default entry.</li>
 <li>The closure review records the outcome against this assignment; a deviation is a change request.</li>
 </ol>
 <h2 id="contract">Contract</h2>
 <p>This document is the <strong>Phase-A Statement of Architecture Work</strong>. When the T9 repository is used, <code>architecture.contracts_request</code> records it, <code>architecture.board_decide</code> records the Board's decision with a published <code>delegation_ref</code>, and <code>architecture.contracts_approve</code> is performed by a <strong>distinct approver</strong> — never the requester, never a claimed human. The approved body is immutable; a change is a new version and re-opens the gate.</p>
-<p>The design gate and the Phase-G compliance review use a live <strong>delivery contract</strong>, not this SoAW (programme-architect, #395). The delivery contract is created after Phase F, when the migration and delivery plan is accepted.</p>
+<p>The design gate and the Phase-G compliance review use a live <strong>delivery contract</strong>, not this SoAW (programme-architect, #395). The delivery contract is created in G0 under this amended assignment (CR-WALK-001).</p>
 <h2 id="links">Links</h2>
 <ul>
 <li>Brief: <code>00-project-brief.md</code></li>
 <li>Architecture: <code>02-architecture-design.md</code></li>
 <li>Register: <code>03-artifact-register.md</code></li>
 <li>Plan: <code>docs/plans/GEMBA-WALK.md</code> §7, §11</li>
-<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code>; <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code></li>
+<li>Change request: <code>08-change-request-001-host-and-identity.md</code></li>
 <li>Standard: <code>docs/plans/T9-architecture-capability.md</code> §4.3–§4.5; <code>#395</code></li>
 </ul>
 </main>
