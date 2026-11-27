@@ -190,6 +190,27 @@ async fn approve_standard_artifact(
     .expect("insert the approved artefact")
 }
 
+/// The lane's standard carries a Phase-G `compliance_review` artefact row, so a G advance
+/// needs that approved artefact before the design gate itself is evaluated.
+async fn approve_compliance_review_artifact(db: &support::TestDb, f: &Fixture) {
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, artifact_type_id, phase_code, plateau, artifact_kind,
+              title, status, author_id)
+         SELECT $1, $2, t.id, 'g', t.plateau, 'catalog',
+                'Phase G compliance review', 'approved', $3
+           FROM artifact_type t
+          WHERE t.tenant_id = $1 AND t.key = 'compliance_review'
+          LIMIT 1",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.project)
+    .bind(f.reviewer)
+    .execute(&db.super_pool)
+    .await
+    .expect("approve the Phase-G compliance-review artefact");
+}
+
 async fn live_contract(db: &support::TestDb, f: &Fixture) -> Uuid {
     sqlx::query_scalar(
         "INSERT INTO architecture_contract (tenant_id, project_id, kind, phase_code, title, status)
@@ -303,6 +324,7 @@ async fn a_phase_closes_on_the_adopted_profile_or_the_standard() {
 async fn phase_g_needs_the_contract_the_review_and_a_waiver() {
     let db = support::TestDb::fresh().await;
     let f = fixture(&db, &[("g", 7)]).await;
+    approve_compliance_review_artifact(&db, &f).await;
 
     let refused = advance(&db, &f, "g", None).await;
     assert!(

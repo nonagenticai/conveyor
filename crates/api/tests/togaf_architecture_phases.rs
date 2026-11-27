@@ -36,7 +36,7 @@ async fn approved(
 #[tokio::test]
 async fn phases_a_to_f_pass_in_order() {
     let f = arch::fixture().await;
-    arch::tailor_adopted(
+    arch::tailor(
         &f,
         json!({
             "preliminary": { "psa": ["principles_catalog"] },
@@ -44,10 +44,12 @@ async fn phases_a_to_f_pass_in_order() {
             "b": { "hld": ["business_capability_map"] },
             "c": { "hld": ["data_entity_catalog"] },
             "d": { "hld": ["technology_standards"] },
-            // Explicit empty sets: the adopted profile states that E and F carry no artefacts.
-            // An absent key would fall back to the standard's mandatory rows (v1-p81-1).
-            "e": [],
-            "f": [],
+            // A phase kept in the set keeps its mandatory rows (0102).
+            "e": {
+                "sd": ["solution_concept"],
+                "hld": ["gap_analysis", "candidate_solutions", "project_context_diagram", "benefits_diagram"],
+            },
+            "f": { "sd": ["business_capability_map"], "hld": ["implementation_migration_plan"] },
         }),
         json!({
             "a": "statement_of_architecture_work",
@@ -197,9 +199,9 @@ async fn phases_a_to_f_pass_in_order() {
 #[tokio::test]
 async fn a_draft_artefact_refuses_the_contract() {
     let f = arch::fixture().await;
-    arch::tailor_adopted(
+    arch::tailor(
         &f,
-        json!({ "preliminary": [], "a": { "psa": ["stakeholder_map"] } }),
+        json!({ "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;
@@ -259,9 +261,9 @@ async fn a_draft_artefact_refuses_the_contract() {
 #[tokio::test]
 async fn a_contract_change_reopens_the_gate() {
     let f = arch::fixture().await;
-    arch::tailor_adopted(
+    arch::tailor(
         &f,
-        json!({ "preliminary": [], "a": { "psa": ["stakeholder_map"] } }),
+        json!({ "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;

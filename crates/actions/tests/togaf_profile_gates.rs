@@ -199,8 +199,8 @@ async fn an_absent_or_partial_profile_set_does_not_satisfy_the_gate() {
         refused["detail"]
             .as_str()
             .unwrap_or_default()
-            .contains("no requirement set"),
-        "{refused}"
+            .contains("driver_goal_objective"),
+        "an absent phase entry falls back to the standard's mandatory rows: {refused}"
     );
 
     let (status, refused) = arch::call(
@@ -252,14 +252,13 @@ async fn a_draft_profile_cannot_govern_the_gate() {
         approved(&f, &project, key, "preliminary", "psa", kind).await;
     }
 
-    let (status, refused) = arch::advance(&f.running, &project, "preliminary").await;
+    // With only a draft in the tenant, the gate falls back to the standard (v1-p81-1); the
+    // draft's own set never governs. The standard's preliminary artefacts are approved above,
+    // so the phase closes on the standard — and the draft is still refused when named.
+    let (status, governed) = arch::advance(&f.running, &project, "preliminary").await;
     assert_eq!(
-        status, 409,
-        "a draft governed the default profile: {refused}"
-    );
-    assert_eq!(
-        refused["type"], "architecture_profile_not_adopted",
-        "{refused}"
+        status, 200,
+        "the standard governs when only a draft exists: {governed}"
     );
 
     let (status, refused) = arch::call(

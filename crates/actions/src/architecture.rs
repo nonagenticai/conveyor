@@ -36,7 +36,19 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
             ActionError::new(412, "stale", format!("the {what} moved; re-read it"))
         }
         ArchitectureStoreError::Conflict { what, why } => {
-            ActionError::new(409, "conflict", format!("the {what}: {why}"))
+            // The adoption refusal keeps its typed code for callers: a decision that is not an
+            // approved architecture-board decision about this profile is its own error.
+            if what == "adm profile"
+                && why.starts_with("adoption needs an approved architecture-board decision")
+            {
+                ActionError::new(
+                    409,
+                    "architecture_profile_decision_required",
+                    format!("the {what}: {why}"),
+                )
+            } else {
+                ActionError::new(409, "conflict", format!("the {what}: {why}"))
+            }
         }
         ArchitectureStoreError::Illegal(rule) => {
             let detail = rule.to_string();
@@ -87,10 +99,10 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                     ActionError::new(409, "architecture_profile_decision_required", detail)
                 }
                 ArchitectureRule::ComplianceReviewMissing => {
-                    ActionError::new(409, "architecture_compliance_review_missing", detail)
+                    ActionError::new(409, "architecture_review_missing", detail)
                 }
                 ArchitectureRule::ComplianceWaiverMissing => {
-                    ActionError::new(409, "architecture_waiver_missing", detail)
+                    ActionError::new(409, "architecture_review_non_conformant", detail)
                 }
                 ArchitectureRule::KataCandidateRequired => {
                     ActionError::new(409, "architecture_kata_candidate_required", detail)

@@ -538,10 +538,15 @@ async fn an_unapproved_pi_plan_does_not_materialise() {
     let f = fixture_with(&db, Some(10), false).await;
     backlog(&db, &f, "high", 0, (8, 1, 1, 1)).await;
 
-    let cards = materialise_unapproved(&db, &f).await;
+    // The gate refuses the materialisation outright, and the refusal writes nothing.
+    let mut tx = begin_scoped(&db.owner, f.tenant)
+        .await
+        .expect("scope the refused materialisation");
+    let refused = spine::materialise_pi_tx(&mut tx, f.tenant, f.cadence).await;
+    tx.rollback().await.expect("roll back the refusal");
     assert!(
-        cards.is_empty(),
-        "no approval, no materialisation: {cards:?}"
+        matches!(refused, Err(PlanStoreError::PiPlanNotApproved)),
+        "no approval, no materialisation: {refused:?}"
     );
     let state: String = sqlx::query_scalar("SELECT state FROM programme_cadence WHERE id = $1")
         .bind(f.cadence)

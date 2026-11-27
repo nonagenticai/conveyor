@@ -416,70 +416,11 @@ pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> 
 /// architecture-board decision about that profile (v1-p81-3). A test whose tailored set must
 /// govern therefore takes this path; `tailor` alone leaves a draft that never governs.
 pub async fn tailor_adopted(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
-    const PHASES: [&str; 9] = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"];
-    let draft = tailor(f, requirements.clone(), contract_kinds.clone()).await;
-    let profile_id = id_of(&draft);
-    // The decision about the profile, on a board of its own so the fixture does not disturb
-    // board-list assertions.
-    let (status, opened) = f
-        .running
-        .invoke(
-            "architecture.board_open",
-            TOKEN,
-            json!({
-                "kind": "architecture_board",
-                "key": format!("profile-board-{}", Uuid::now_v7().simple()),
-                "name": "Profile board",
-                "charter": "Adopt the tailored ADM profile",
-                "commissioning_authority": "P0 programme board",
-                "decision_limits": {},
-                "members": [],
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "architecture.board_open: {opened}");
-    let body_id = id_of(output(&opened));
-    let (status, decided) = f
-        .running
-        .invoke(
-            "architecture.board_decide",
-            TOKEN,
-            json!({
-                "body_id": body_id,
-                "decision": "approved",
-                "evidence": {"delegation_ref": f.delegation},
-                "subject_kind": "adm_profile",
-                "subject_id": profile_id,
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "architecture.board_decide: {decided}");
-    let decision = output(&decided)["approval_id"]
-        .as_str()
-        .expect("the adoption decision id")
-        .to_owned();
-    // Re-tailor with the same content: the action adopts in the same write, so the row the
-    // gate reads is `adopted`.
-    ok(
-        &f.running,
-        "architecture.profile_tailor",
-        json!({
-            "key": "adm",
-            "name": "Tailored ADM",
-            "phase_set": PHASES,
-            "artifact_requirements": requirements,
-            "contract_kinds": contract_kinds,
-            "adopt_with_decision_id": decision,
-        }),
-        None,
-    )
-    .await
+    // The lane's `tailor` already adopts through the Board: its profile_tailor write carries the
+    // board decision and the row the gate reads is `adopted`. #843's separate path re-adopted
+    // (and its fresh board was still a draft, which `board_decide` refuses), so this is an alias
+    // that keeps #843's callers working on one adoption.
+    tailor(f, requirements, contract_kinds).await
 }
 
 /// The row id of one seeded `artifact_type` key.

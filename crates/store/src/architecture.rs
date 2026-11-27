@@ -1261,31 +1261,28 @@ pub async fn adopt_profile_tx(
     expected: i64,
     board_decision_id: Uuid,
 ) -> Result<ProfileRecord, ArchitectureStoreError> {
-    // An adoption is a board act, not a citation: the id must be an APPROVED
-    // `architecture_board` decision whose meta names this profile and a board body.
-    let approved: bool = sqlx::query_scalar(
+    // The adoption cites a real board decision about THIS profile: approved, recorded under
+    // the architecture board gate, and naming this profile as its subject (v1-p81-3).
+    let valid: bool = sqlx::query_scalar(
         "SELECT EXISTS (
-            SELECT 1
-              FROM approval a
-              JOIN governance_body g
-                ON g.tenant_id = a.tenant_id AND g.id::text = a.meta->>'body_id'
-             WHERE a.tenant_id = $1 AND a.id = $2
-               AND a.gate = 'architecture_board' AND a.kind = 'architecture_board'
-               AND a.status = 'approved'
-               AND a.meta->>'subject_kind' = 'adm_profile'
-               AND a.meta->>'subject_id' = $3
-               AND g.kind = 'architecture_board'
+            SELECT 1 FROM approval
+             WHERE tenant_id = $1 AND id = $3
+               AND gate = 'architecture_board' AND kind = 'architecture_board'
+               AND status = 'approved'
+               AND meta->>'subject_kind' = 'adm_profile'
+               AND meta->>'subject_id' = $2
         )",
     )
     .bind(tenant.as_uuid())
-    .bind(board_decision_id)
     .bind(id.to_string())
+    .bind(board_decision_id)
     .fetch_one(&mut *conn)
     .await?;
-    if !approved {
-        return Err(ArchitectureStoreError::Illegal(
-            ArchitectureRule::BoardDecisionRequired,
-        ));
+    if !valid {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "adm profile",
+            why: "adoption needs an approved architecture-board decision about this profile",
+        });
     }
     let sql = format!(
         "UPDATE adm_profile
