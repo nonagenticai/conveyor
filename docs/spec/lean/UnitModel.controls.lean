@@ -13,7 +13,8 @@ This file is never embedded in a certificate.
 /-- The one unit every bad case is derived from: all eight rules hold. -/
 def goodUnit : UnitObs :=
   { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1,
-    pull := some .merged, ciRuns := some 2, closesKeyword := some true, verifyParts := some true }
+    pull := some .merged, ciRuns := some 2, closesKeyword := some true, verifyParts := some true,
+    unit := some true }
 
 theorem positive_control : checkUnit goodUnit = true := by decide
 
@@ -43,6 +44,16 @@ theorem control_no_closes : checkUnit noCloses = true := by decide
 
 def missingVerify : UnitObs := { goodUnit with verifyParts := none }
 theorem control_missing_verify : checkUnit missingVerify = true := by decide
+
+/-- A non-unit issue is outside the issue-content contract: `verifyParts` is vacuous there, so
+a missing `Verify:` line cannot fail it. This theorem must COMPILE — it is the positive case. -/
+def nonUnitNoParts : UnitObs := { goodUnit with unit := some false, verifyParts := none }
+theorem positive_non_unit_parts_are_vacuous : checkUnit nonUnitNoParts = true := by decide
+
+/-- An unreadable issue still fails closed: `none` is not `some false`, so it cannot take the
+vacuous route and must satisfy `verifyParts` itself. -/
+def unknownUnitNoParts : UnitObs := { goodUnit with unit := none, verifyParts := none }
+theorem control_unknown_unit : checkUnit unknownUnitNoParts = true := by decide
 
 /-- The empty ledger is refused by the aggregate, even though every rule of every unit is vacuous. -/
 theorem control_empty_ledger : checkLedger [] = true := by decide
