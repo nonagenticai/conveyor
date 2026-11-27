@@ -302,6 +302,7 @@ async fn pages_csv_and_manifest_share_the_json_redaction_and_programme_filter() 
             database_url: None,
             git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
             manifest_only: false,
+            build_time: None,
         },
     )
     .await
@@ -351,6 +352,7 @@ async fn pages_csv_and_manifest_share_the_json_redaction_and_programme_filter() 
             rework: None,
             feedback_url: "https://example.test/feedback",
             git_sha: "0123456789abcdef0123456789abcdef01234567",
+            build_time: "unknown",
         },
     )
     .await

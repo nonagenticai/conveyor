@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1728,
+      "line": 1808,
       "name": "approvals.decide"
     },
     {
-      "line": 6510,
+      "line": 6848,
       "name": "approvals.decide"
     },
     {
-      "line": 6297,
+      "line": 6635,
       "name": "approvals.list"
     },
     {
-      "line": 6298,
+      "line": 6636,
       "name": "approvals.list"
     },
     {
-      "line": 6470,
+      "line": 6808,
       "name": "approvals.request"
     },
     {
-      "line": 1628,
+      "line": 1708,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1629,
+      "line": 1709,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2965,
+      "line": 3045,
       "name": "documents.compose"
     },
     {
-      "line": 3452,
+      "line": 3532,
       "name": "documents.compose"
     },
     {
-      "line": 3247,
+      "line": 3327,
       "name": "documents.create"
     },
     {
-      "line": 3318,
+      "line": 3398,
       "name": "documents.delete"
     },
     {
-      "line": 3264,
+      "line": 3344,
       "name": "documents.download"
     },
     {
-      "line": 3297,
+      "line": 3377,
       "name": "documents.download"
     },
     {
-      "line": 2987,
+      "line": 3067,
       "name": "documents.get"
     },
     {
-      "line": 3282,
+      "line": 3362,
       "name": "documents.get"
     },
     {
-      "line": 1487,
+      "line": 1567,
       "name": "documents.list"
     },
     {
-      "line": 1510,
+      "line": 1590,
       "name": "documents.list"
     },
     {
-      "line": 1537,
+      "line": 1617,
       "name": "documents.list"
     },
     {
-      "line": 3215,
+      "line": 3295,
       "name": "documents.list"
     },
     {
-      "line": 3349,
+      "line": 3429,
       "name": "documents.preview"
     },
     {
-      "line": 3395,
+      "line": 3475,
       "name": "documents.return"
     },
     {
-      "line": 3136,
+      "line": 3216,
       "name": "documents.revision_get"
     },
     {
-      "line": 3097,
+      "line": 3177,
       "name": "documents.revision_list"
     },
     {
-      "line": 6378,
+      "line": 6716,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6370,
+      "line": 6708,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6386,
+      "line": 6724,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6254,
+      "line": 6592,
       "name": "procedures.list"
     },
     {
-      "line": 6583,
+      "line": 6921,
       "name": "procedures.publish"
     },
     {
-      "line": 6431,
+      "line": 6769,
       "name": "procedures.review_source"
     },
     {
-      "line": 6413,
+      "line": 6751,
       "name": "procedures.validate"
     },
     {
-      "line": 1751,
+      "line": 1831,
       "name": "process_runs.start"
     },
     {
-      "line": 6277,
+      "line": 6615,
       "name": "processes.get"
     },
     {
-      "line": 6257,
+      "line": 6595,
       "name": "processes.list"
     },
     {
-      "line": 6585,
+      "line": 6923,
       "name": "processes.publish"
     },
     {
@@ -173,23 +173,23 @@
       "name": "programmes.refresh"
     },
     {
-      "line": 2896,
+      "line": 2976,
       "name": "projects.close"
     },
     {
-      "line": 2757,
+      "line": 2837,
       "name": "projects.create"
     },
     {
-      "line": 1701,
+      "line": 1781,
       "name": "runs.cancel"
     },
     {
-      "line": 1679,
+      "line": 1759,
       "name": "runs.get"
     },
     {
-      "line": 1656,
+      "line": 1736,
       "name": "runs.list"
     }
   ],
@@ -285,8 +285,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 4,
         "numbers": [
           792,
           806,
@@ -294,7 +294,8 @@
           814,
           815,
           816,
-          817
+          817,
+          878
         ],
         "open": 5,
         "ready": 0,
@@ -388,8 +389,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 2,
-        "claimed": 3,
+        "blocked": 0,
+        "claimed": 2,
         "numbers": [
           16,
           17,
@@ -419,8 +420,8 @@
           803,
           819
         ],
-        "open": 15,
-        "ready": 6,
+        "open": 12,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -629,12 +630,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           3,
           812
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1261,13 +1262,13 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           8,
           29
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1712,14 +1713,16 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 2,
         "numbers": [
           72,
           744,
           746,
-          762
+          762,
+          868,
+          871
         ],
-        "open": 0,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -1888,16 +1891,15 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           76,
           556,
           557,
           630,
-          778,
-          797
+          778
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1941,16 +1943,18 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           83,
           558,
           560,
           561,
           688,
-          776
+          776,
+          868,
+          869
         ],
-        "open": 0,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -2138,7 +2142,8 @@
           563,
           564,
           565,
-          566
+          566,
+          848
         ],
         "open": 1,
         "ready": 0,
@@ -2293,8 +2298,8 @@
       "key": "T3",
       "measured": {
         "actions": [
-          6,
-          6
+          7,
+          7
         ],
         "modules": [
           0,
@@ -2316,12 +2321,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           74,
           797
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2866,8 +2871,8 @@
       },
       "total": 52,
       "uncovered": [],
-      "with_open_units": 11,
-      "without_open_units": 41
+      "with_open_units": 10,
+      "without_open_units": 42
     },
     "screens": {
       "actions_invoked": 39,

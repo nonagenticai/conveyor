@@ -14,6 +14,27 @@
             "name": "status:claimed"
           },
           {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 878,
+        "state": "OPEN",
+        "title": "fix(walk): the registry test must allow a wing's rows",
+        "updatedAt": "2026-11-27T18:39:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/878"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
             "color": "6E7781",
             "name": "T1"
           }
@@ -21,7 +42,7 @@
         "number": 871,
         "state": "OPEN",
         "title": "proof: the live unit-gate refusal on the released engine",
-        "updatedAt": "2026-11-27T17:59:12Z",
+        "updatedAt": "2026-11-27T18:23:22Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/871"
       },
       {
@@ -67,7 +88,7 @@
         "number": 868,
         "state": "OPEN",
         "title": "proof: verifyParts must apply only to unit-labeled issues",
-        "updatedAt": "2026-11-27T17:39:24Z",
+        "updatedAt": "2026-11-27T18:29:10Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/868"
       },
       {
@@ -82,9 +103,9 @@
           }
         ],
         "number": 867,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
-        "updatedAt": "2026-11-27T17:59:18Z",
+        "updatedAt": "2026-11-27T18:58:21Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/867"
       },
       {
@@ -149,9 +170,9 @@
           }
         ],
         "number": 862,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "fix(walk): a multi-segment deep link loads the app without its assets",
-        "updatedAt": "2026-11-27T16:48:44Z",
+        "updatedAt": "2026-11-27T18:26:03Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/862"
       },
       {
@@ -172,7 +193,7 @@
         "number": 860,
         "state": "CLOSED",
         "title": "fix(walk): the action sheet shows the server's field errors in a refusal",
-        "updatedAt": "2026-11-27T17:39:26Z",
+        "updatedAt": "2026-11-27T18:26:01Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/860"
       },
       {
@@ -327,7 +348,7 @@
         "number": 848,
         "state": "OPEN",
         "title": "test: T18 — every V2 destination's spec asserts empty, error, happy and one refusal",
-        "updatedAt": "2026-11-27T17:42:39Z",
+        "updatedAt": "2026-11-27T18:12:34Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/848"
       },
       {
@@ -647,8 +668,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "1D76DB",
@@ -658,7 +679,7 @@
         "number": 816,
         "state": "OPEN",
         "title": "S3 — Gemba Walk: Knowledge, Measure, Operations & Utilities read/write parity",
-        "updatedAt": "2026-11-27T09:49:03Z",
+        "updatedAt": "2026-11-27T18:52:19Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/816"
       },
       {
@@ -679,7 +700,7 @@
         "number": 815,
         "state": "OPEN",
         "title": "S2 — Gemba Walk: Procedures & authoring + Govern & design read/write parity",
-        "updatedAt": "2026-11-27T17:59:24Z",
+        "updatedAt": "2026-11-27T18:23:27Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/815"
       },
       {
@@ -700,7 +721,7 @@
         "number": 814,
         "state": "OPEN",
         "title": "S1 — Gemba Walk: Portfolio & plan + Organisation read/write parity",
-        "updatedAt": "2026-11-27T17:06:35Z",
+        "updatedAt": "2026-11-27T18:27:20Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/814"
       },
       {
@@ -6972,8 +6993,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -6983,7 +7004,7 @@
         "number": 29,
         "state": "OPEN",
         "title": "S14: rewrite the cutover plan for independent deployment and coexistence",
-        "updatedAt": "2026-11-27T16:01:59Z",
+        "updatedAt": "2026-11-27T18:51:18Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/29"
       },
       {
@@ -7532,7 +7553,7 @@
       }
     ],
     "provenance": {
-      "sha256": "41de29677a6a12ea28332a21429261b38281fe1eb13d78bf673e070806d76051",
+      "sha256": "320b661b985196d169ce1fc957cb0b2f59fa170757337f2938884c5205d1803e",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

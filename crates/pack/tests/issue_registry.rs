@@ -38,6 +38,7 @@ fn args(out: &Path, issues: PathBuf, tenant: &str) -> SnapshotArgs {
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+        build_time: None,
         manifest_only: false,
     }
 }
