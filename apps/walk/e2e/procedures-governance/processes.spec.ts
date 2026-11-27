@@ -48,7 +48,7 @@ test("the detail renders the process and its outputs", async ({ page }) => {
   await page.route("**/api/actions/process_runs.start/invocations", (route: any) => json(route, {}));
   await page.goto(`/build/processes/${PROCESS.id}`);
   await expect(page.getByRole("heading", { name: "Intake to clear" })).toBeVisible();
-  await expect(page.getByText("cleared")).toBeVisible();
+  await expect(page.locator("pre.code")).toContainText("cleared");
   await expect(page.getByRole("button", { name: "Start a run" })).toBeVisible();
 });
 

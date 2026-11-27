@@ -62,14 +62,14 @@ async function detail(ctx, id) {
     const result = await ctx.api.invoke("models.get", { id });
     const model = result.output ?? {};
     const actions = el("div", { class: "destination-actions" });
-    const open = (name, label, initial, ifMatch) =>
+    const open = (name, label, initial, ifMatch, title = label) =>
       el("button", {
         class: "button",
         type: "button",
         text: label,
-        onClick: () => ctx.shell.openAction(name, { title: label, initial, ifMatch, onDone: () => detail(ctx, id) }),
+        onClick: () => ctx.shell.openAction(name, { title, initial, ifMatch, onDone: () => detail(ctx, id) }),
       });
-    if (ctx.hasAction("models.update")) actions.append(open("models.update", "Edit", { id }, model.version));
+    if (ctx.hasAction("models.update")) actions.append(open("models.update", "Edit", { id }, model.version, `Edit ${text(model, "title")}`));
     if (ctx.hasAction("models.validate")) actions.append(open("models.validate", "Validate", { id }));
     if (ctx.hasAction("models.publish")) actions.append(open("models.publish", "Publish", { id }));
     if (ctx.hasAction("model_views.generate")) actions.append(open("model_views.generate", "Generate a view", { model_id: id }));
