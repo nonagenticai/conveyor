@@ -17,8 +17,8 @@
   },
   "summary": {
     "routes_total": 52,
-    "routes_absent": 49,
-    "routes_registered": 3,
+    "routes_absent": 36,
+    "routes_registered": 16,
     "routes_verified": 0,
     "actions_total": 598,
     "actions_absent": 0,
@@ -66,9 +66,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/architecture.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/authoring",
@@ -77,9 +77,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/authoring.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/board/:board_id",
@@ -110,9 +110,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/process-map.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/build/process-map/:map_id",
@@ -121,9 +121,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/process-map.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/build/processes",
@@ -132,9 +132,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/processes.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/build/processes/:process_id",
@@ -143,9 +143,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/processes.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/card/:card_id",
@@ -165,9 +165,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/copilot.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/decisions",
@@ -187,9 +187,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/adm.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/design/models",
@@ -198,9 +198,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/models.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/design/models/:model_id",
@@ -209,9 +209,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/models.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/design/requirements",
@@ -220,9 +220,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/requirements.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/design/requirements/:id",
@@ -231,9 +231,9 @@
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/requirements.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/evals",
@@ -473,9 +473,9 @@
       "room": "procedures",
       "owner": "S2",
       "spec": "e2e/procedures-governance/procedures.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/programme",
@@ -9586,17 +9586,23 @@
     }
   ],
   "drift": {
-    "live_routes": 55,
+    "live_routes": 56,
     "census_routes": 52,
-    "live_actions": 598,
+    "live_actions": 602,
     "census_actions": 598,
     "missing_routes": [
+      "/feedback",
       "/knowledge/memory",
       "/knowledge/sources",
       "/measure"
     ],
     "extra_routes": [],
-    "missing_actions": [],
+    "missing_actions": [
+      "feedback.create",
+      "feedback.list",
+      "proofs.attest",
+      "proofs.render"
+    ],
     "extra_actions": []
   },
   "exemptions": {
