@@ -39,7 +39,7 @@ const STATUSES = new Set(["evidenced", "partial", "absent"]);
 const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]);
 const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
 const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"]);
-const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register"]);
+const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register", "absence"]);
 
 function validate(record, documentsRoot, registerKeys) {
   const errors = [];
@@ -98,6 +98,9 @@ function validate(record, documentsRoot, registerKeys) {
         }
         if ((source.kind === "rows" || source.kind === "documents") && !String(source.pointer || "").startsWith("/")) {
           errors.push(`${id}: section ${section.heading} has no JSON pointer`);
+        }
+        if (source.kind === "absence" && !String(source.record || "").trim()) {
+          errors.push(`${id}: section ${section.heading} has an absence source with no record`);
         }
       }
     }
@@ -185,6 +188,14 @@ function selfTest() {
   const badSource = base();
   badSource.artefacts[0].sections[0].sources = [{ kind: "not-a-kind", pointer: "/x", count: 0 }];
   cases.push(["an unknown source kind", badSource, false]);
+  const absenceSource = base();
+  absenceSource.artefacts[0].sections[0].sources = [
+    { kind: "absence", record: "docs/evidence/example.md", count: 0 },
+  ];
+  cases.push(["a declared absence source", absenceSource, true]);
+  const absenceNoRecord = base();
+  absenceNoRecord.artefacts[0].sections[0].sources = [{ kind: "absence", count: 0 }];
+  cases.push(["an absence source with no record", absenceNoRecord, false]);
   let failures = 0;
   for (const [label, candidate, expectValid] of cases) {
     const errors = validate(candidate, tmp);

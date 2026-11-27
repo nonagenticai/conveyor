@@ -243,6 +243,10 @@ def validate(std: dict) -> list[str]:
         if not isinstance(template, dict):
             errors.append(f"category {category!r} has no template")
             continue
+        # The document category the generator falls back to when a template's rows are empty.
+        # Bind it before the source checks: a mandatory template without it can never be
+        # satisfied, and a self-document heading check reads it below.
+        document_category = template.get("document_category")
         required = template.get("required")
         optional = template.get("optional", [])
         if not isinstance(required, list) or not required:
@@ -441,11 +445,11 @@ def self_test(std: dict) -> int:
     bad = copy.deepcopy(std)
     first_heading = bad["templates"]["vision"]["required"][0]
     bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "absence"}]}
-    cases.append(("an absence source without a record", bad, seed, console))
+    cases.append(("an absence source without a record", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["vision"].pop("document_authored", None)
-    cases.append(("a self-document template without document_authored", bad, seed, console))
+    cases.append(("a self-document template without document_authored", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)
@@ -453,19 +457,19 @@ def self_test(std: dict) -> int:
 
     bad = copy.deepcopy(std)
     bad["templates"]["tranche-review"].pop("sources", None)
-    cases.append(("a mandatory template without sources", bad, seed, console))
+    cases.append(("a mandatory template without sources", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"]["tranche-review"].pop("document_category", None)
-    cases.append(("a mandatory template without a document category", bad, seed, console))
+    cases.append(("a mandatory template without a document category", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"].pop("programme-risk-register", None)
-    cases.append(("a new category without a template", bad, seed, console))
+    cases.append(("a new category without a template", bad))
 
     bad = copy.deepcopy(std)
     bad["templates"].pop("safe-portfolio", None)
-    cases.append(("a SPEC_V2 named artefact without a template", bad, seed, console))
+    cases.append(("a SPEC_V2 named artefact without a template", bad))
 
     failures = 0
     for label, case_std in cases:
