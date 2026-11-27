@@ -49,15 +49,39 @@ pub(crate) async fn ensure_andon_tx(
 /// `job_binding_id` is already resolved by the caller: `runs.create` applies the card-binding
 /// mismatch rule, and `cards.assign` validated the assignment. The store still refuses a retired
 /// binding or a stale pin (`409`) before the INSERT, and `uq_run_live` refuses a second live run.
+/// The run-specific fields the two creation paths (`runs.create`, `cards.assign`) pass to
+/// [`create_bound_run_tx`].
+pub(crate) struct BoundRun {
+    /// The organisation binding the run executes under.
+    pub job_binding_id: Option<Uuid>,
+    /// Links the run to the trigger that created it.
+    pub correlation_id: Option<Uuid>,
+    /// The release pin the caller expects.
+    pub release_hash: Option<String>,
+    /// The run's own inputs; `limits.cost_budget_usd` is the spend ceiling (D45).
+    pub inputs: serde_json::Value,
+}
+
 pub(crate) async fn create_bound_run_tx(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
     card: &Card,
-    job_binding_id: Option<Uuid>,
-    correlation_id: Option<Uuid>,
-    release_hash: Option<String>,
+    run: BoundRun,
     action: &str,
 ) -> Result<(RunRecord, RunOut), ActionError> {
+    let BoundRun {
+        job_binding_id,
+        correlation_id,
+        release_hash,
+        inputs,
+    } = run;
+    // An absent `inputs` is an empty object, never a SQL NULL: the column is jsonb and the
+    // budget guard reads `inputs.limits`.
+    let inputs = if inputs.is_null() {
+        serde_json::json!({})
+    } else {
+        inputs
+    };
     let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
         .await
         .map_err(|error| store_error(error, action))?
@@ -71,13 +95,9 @@ pub(crate) async fn create_bound_run_tx(
 
     // #526: an internal-agent binding must declare its spend ceiling before any run starts.
     if let Some(binding_id) = job_binding_id {
-        crate::invoke::ensure_binding_budget(
-            &mut *tx,
-            ctx.tenant,
-            binding_id,
-            &serde_json::Value::Null,
-        )
-        .await?;
+        // The run's declaration is the `inputs` this caller passed, never `Null` (which made
+        // every run look undeclared).
+        crate::invoke::ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
     }
 
     let run = store::run::insert_run_tx(
@@ -89,7 +109,7 @@ pub(crate) async fn create_bound_run_tx(
             attempt,
             correlation_id,
             process_id: None,
-            inputs: serde_json::Value::Object(serde_json::Map::new()),
+            inputs,
             capability_id: None,
             capability_agent_id: None,
             // A root run has no parent, no step and pins no process.

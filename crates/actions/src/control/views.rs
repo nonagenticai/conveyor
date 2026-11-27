@@ -85,6 +85,10 @@ pub struct RunCreateIn {
     /// accept the binding's own.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub release_hash: Option<String>,
+    /// The run's own inputs. `limits.cost_budget_usd` is the spend ceiling an internal-agent run
+    /// must declare when its binding declares none (D45); the store and the executor read it.
+    #[serde(default)]
+    pub inputs: serde_json::Value,
 }
 
 /// `runs.finish` — how the run ended.
