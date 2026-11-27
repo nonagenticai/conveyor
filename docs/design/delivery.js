@@ -1993,6 +1993,85 @@ window.CONVEYOR_DELIVERY = (function () {
     } absent</span><div class="std-groups">${body}</div></div>`;
   }
 
+  /* ------------------------------------------------------------ delivery unit
+     SPEC_V2 §10.5.9 (#782 P2): one unit's real evidence, read from the snapshot's `delivery`
+     section — the charter, the immutable steps, the three development gates and the closure.
+     Every value is the row's own; a unit with no issue reference or no closure says
+     "not recorded" rather than rendering a guess. The route id is user input, matched against
+     the rows, never used as a selector. */
+  function unitRepo(unit) {
+    return typeof unit.repo === "string" && /^[^/\s]+\/[^/\s]+$/.test(unit.repo)
+      ? unit.repo
+      : null;
+  }
+
+  function unitIssueUrl(unit) {
+    const ref = typeof unit.issue_ref === "string" ? unit.issue_ref : "";
+    const hash = ref.lastIndexOf("#");
+    const number = hash >= 0 ? ref.slice(hash + 1) : "";
+    const repo = unitRepo(unit);
+    return repo && /^\d+$/.test(number) ? `https://github.com/${repo}/issues/${number}` : null;
+  }
+
+  function unitClosure(closure, repo) {
+    if (!closure || typeof closure !== "object") {
+      return `<div class="empty">Closure: not recorded.</div>`;
+    }
+    const cell = (value) => (value == null || value === "" ? "—" : esc(value));
+    const pr = closure.pr_url
+      ? `<a href="${esc(closure.pr_url)}">${esc(closure.pr_url)}</a>`
+      : "—";
+    const ciHref =
+      repo && closure.ci_run_id ? `https://github.com/${repo}/actions/runs/${closure.ci_run_id}` : null;
+    const ci = ciHref
+      ? `<a class="mono" href="${esc(ciHref)}">${esc(closure.ci_run_id)}</a>`
+      : cell(closure.ci_run_id);
+    return `<table class="matrix"><thead><tr><th>PR</th><th>CI</th><th>Merge</th><th>Digest</th><th>Live check</th><th>Reviewer</th></tr></thead><tbody><tr>
+      <td>${pr}</td>
+      <td>${ci} ${cell(closure.ci_verdict)}</td>
+      <td class="mono">${cell(closure.merge_sha)}</td>
+      <td class="mono">${cell(closure.deployed_digest)}</td>
+      <td>${closure.live_check ? esc(JSON.stringify(closure.live_check)) : "—"}</td>
+      <td>${cell(closure.reviewer)}</td></tr></tbody></table>`;
+  }
+
+  function unitDetail(data, issue) {
+    const units = list(data && data.delivery && data.delivery.units);
+    const wanted = String(issue == null ? "" : issue).trim();
+    const unit = units.find((row) => {
+      const ref = typeof row.issue_ref === "string" ? row.issue_ref : "";
+      return ref !== "" && (ref === wanted || ref.endsWith("#" + wanted));
+    });
+    if (!unit) {
+      return `<div class="page"><h2>Delivery unit</h2><div class="empty">Delivery unit: not recorded for <span class="mono">${esc(wanted || "—")}</span>. The snapshot carries ${units.length} unit${units.length === 1 ? "" : "s"}.</div></div>`;
+    }
+    const steps = list(unit.steps)
+      .map((step) => {
+        const evidence = step.evidence && typeof step.evidence === "object" ? step.evidence : {};
+        const links = [];
+        if (evidence.pr_url) links.push(`<a href="${esc(evidence.pr_url)}">PR</a>`);
+        if (evidence.ci_run_id)
+          links.push(`<span class="mono">CI ${esc(evidence.ci_run_id)}</span>`);
+        if (evidence.merge_sha) links.push(`<span class="mono">${esc(evidence.merge_sha)}</span>`);
+        return `<tr><td class="mono">${esc(step.step)}</td><td>${day(parse(step.recorded_at))}</td><td>${links.join(" ") || "—"}</td></tr>`;
+      })
+      .join("");
+    const gates = list(unit.gates)
+      .map(
+        (gate) =>
+          `<tr><td class="mono">${esc(gate.gate)}</td><td>${esc(gate.status)}</td><td>${day(parse(gate.decided_at))}</td></tr>`,
+      )
+      .join("");
+    const url = unitIssueUrl(unit);
+    const ref = typeof unit.issue_ref === "string" ? unit.issue_ref : "not recorded";
+    const title = url ? `<a href="${esc(url)}" class="mono">${esc(ref)}</a>` : esc(ref);
+    return `<div class="page"><h2>Delivery unit ${title}</h2>
+      <div class="row"><span class="mono">${esc(unit.repo)}</span><span class="mono">${esc(unit.lane)}</span><span>${esc(unit.status)}</span></div>
+      <h3>Steps</h3>${steps ? `<table class="matrix"><thead><tr><th>Step</th><th>Recorded</th><th>Evidence</th></tr></thead><tbody>${steps}</tbody></table>` : `<div class="empty">No steps recorded.</div>`}
+      <h3>Gates</h3>${gates ? `<table class="matrix"><thead><tr><th>Gate</th><th>Status</th><th>Decided</th></tr></thead><tbody>${gates}</tbody></table>` : `<div class="empty">No gates recorded.</div>`}
+      <h3>Closure</h3>${unitClosure(unit.closure, unitRepo(unit))}</div>`;
+  }
+
   return {
     activityIndex,
     portfolioRows,
@@ -2022,6 +2101,7 @@ window.CONVEYOR_DELIVERY = (function () {
     kanban,
     packageModel,
     packageBoard,
+    unitDetail,
     tenantSpend,
     spendText,
     tokens,

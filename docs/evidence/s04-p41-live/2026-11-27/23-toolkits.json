@@ -1,0 +1,124 @@
+{
+  "items": [
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf35-7928-92b4-2ff80265bf1e",
+      "key": "worker_management",
+      "meta": {
+        "content_hash": "7d53b70ead10fb48af120462d1c26bfc5264ecc1bb8f2f0cbb94818b7805d832",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "worker_management",
+      "status": "draft",
+      "title": "Worker and provider inventory (retired upstream)",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf34-7b15-9c27-f868615af66b",
+      "key": "billing",
+      "meta": {
+        "content_hash": "ff4aa0634e62ed648a919fe954b997c8dc0a4b5eaaeca79e5ad861af339758e5",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "billing_service",
+      "status": "draft",
+      "title": "Usage and billing facts",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf33-7cab-bd6f-d24c1e510625",
+      "key": "artifacts",
+      "meta": {
+        "content_hash": "7cbf2bfc1ffa94c6b9d9afa5bba559fa180e93b616d90009e2b82ba89dd5e5a9",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "artifacts",
+      "status": "draft",
+      "title": "Artifact registry",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf32-7977-9467-5161f5c9ab2e",
+      "key": "retrieval",
+      "meta": {
+        "content_hash": "44dcd99172527b290cb7db3e8a04e8cd585019043c50a8b10eb2cf1a28d46305",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "strata_rag",
+      "status": "draft",
+      "title": "Pinned-leaf retrieval",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf31-7896-a125-3038f02d3322",
+      "key": "image_gen",
+      "meta": {
+        "content_hash": "67673f6ec51d226bc3c091944d6e939c439ff162d7c2e60947ec9c07a094fcba",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "image_gen",
+      "status": "published",
+      "title": "Image generation",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf30-787b-9e73-1c4c37adb2f8",
+      "key": "transcription",
+      "meta": {
+        "content_hash": "8a7612b0608db15c9f9babac00d80313123966db824e54fdfbc28b0895de4f86",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "asr",
+      "status": "published",
+      "title": "Speech transcription",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf2f-7685-80f4-0cc7b576cda3",
+      "key": "speech",
+      "meta": {
+        "content_hash": "6cfdb67cf79f90ffad4905d23d1a725f16f17f3a7686d2c68a968f805638e8ce",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "tts",
+      "status": "published",
+      "title": "Speech synthesis",
+      "toolkit_version": 1
+    },
+    {
+      "auth_adapter": "none",
+      "created_at": "2026-11-19T10:21:58.441158Z",
+      "id": "01a1f353-cf2b-7ed5-b470-2290ef635b0e",
+      "key": "coding",
+      "meta": {
+        "content_hash": "5ec07fe18377d898e6e7ba2edeb26e1b6e4887f158ef595cbe2b2e6811e800ea",
+        "health_path": "/health"
+      },
+      "owner": "platform",
+      "service": "coding",
+      "status": "published",
+      "title": "Coding fleet",
+      "toolkit_version": 1
+    }
+  ]
+}

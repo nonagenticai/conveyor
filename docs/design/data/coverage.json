@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1784,
+      "line": 1708,
       "name": "approvals.decide"
     },
     {
-      "line": 6823,
+      "line": 6490,
       "name": "approvals.decide"
     },
     {
-      "line": 6610,
+      "line": 6277,
       "name": "approvals.list"
     },
     {
-      "line": 6611,
+      "line": 6278,
       "name": "approvals.list"
     },
     {
-      "line": 6783,
+      "line": 6450,
       "name": "approvals.request"
     },
     {
-      "line": 1684,
+      "line": 1608,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1685,
+      "line": 1609,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 3021,
+      "line": 2945,
       "name": "documents.compose"
     },
     {
-      "line": 3508,
+      "line": 3432,
       "name": "documents.compose"
     },
     {
-      "line": 3303,
+      "line": 3227,
       "name": "documents.create"
     },
     {
-      "line": 3374,
+      "line": 3298,
       "name": "documents.delete"
     },
     {
-      "line": 3320,
+      "line": 3244,
       "name": "documents.download"
     },
     {
-      "line": 3353,
+      "line": 3277,
       "name": "documents.download"
     },
     {
-      "line": 3043,
+      "line": 2967,
       "name": "documents.get"
     },
     {
-      "line": 3338,
+      "line": 3262,
       "name": "documents.get"
     },
     {
-      "line": 1543,
+      "line": 1467,
       "name": "documents.list"
     },
     {
-      "line": 1566,
+      "line": 1490,
       "name": "documents.list"
     },
     {
-      "line": 1593,
+      "line": 1517,
       "name": "documents.list"
     },
     {
-      "line": 3271,
+      "line": 3195,
       "name": "documents.list"
     },
     {
-      "line": 3405,
+      "line": 3329,
       "name": "documents.preview"
     },
     {
-      "line": 3451,
+      "line": 3375,
       "name": "documents.return"
     },
     {
-      "line": 3192,
+      "line": 3116,
       "name": "documents.revision_get"
     },
     {
-      "line": 3153,
+      "line": 3077,
       "name": "documents.revision_list"
     },
     {
-      "line": 6691,
+      "line": 6358,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6683,
+      "line": 6350,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6699,
+      "line": 6366,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6567,
+      "line": 6234,
       "name": "procedures.list"
     },
     {
-      "line": 6896,
+      "line": 6563,
       "name": "procedures.publish"
     },
     {
-      "line": 6744,
+      "line": 6411,
       "name": "procedures.review_source"
     },
     {
-      "line": 6726,
+      "line": 6393,
       "name": "procedures.validate"
     },
     {
-      "line": 1807,
+      "line": 1731,
       "name": "process_runs.start"
     },
     {
-      "line": 6590,
+      "line": 6257,
       "name": "processes.get"
     },
     {
-      "line": 6570,
+      "line": 6237,
       "name": "processes.list"
     },
     {
-      "line": 6898,
+      "line": 6565,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1020,
+      "line": 1024,
       "name": "programmes.list"
     },
     {
-      "line": 1088,
+      "line": 1092,
       "name": "programmes.refresh"
     },
     {
-      "line": 2952,
+      "line": 2876,
       "name": "projects.close"
     },
     {
-      "line": 2813,
+      "line": 2737,
       "name": "projects.create"
     },
     {
-      "line": 1757,
+      "line": 1681,
       "name": "runs.cancel"
     },
     {
-      "line": 1735,
+      "line": 1659,
       "name": "runs.get"
     },
     {
-      "line": 1712,
+      "line": 1636,
       "name": "runs.list"
     }
   ],
@@ -388,8 +388,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 1,
-        "claimed": 4,
+        "blocked": 2,
+        "claimed": 3,
         "numbers": [
           16,
           17,
@@ -419,7 +419,7 @@
           803,
           819
         ],
-        "open": 14,
+        "open": 15,
         "ready": 6,
         "unknown": 0
       }
@@ -1540,11 +1540,11 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0071_ladder_option_sets.sql"
       ],
-      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
+      "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          8,
+          12,
           12
         ],
         "modules": [
@@ -1562,7 +1562,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "partial",
+      "status": "built",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -2130,7 +2130,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           559,
           562,
@@ -2139,7 +2139,7 @@
           565,
           566
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2292,8 +2292,8 @@
       "key": "T3",
       "measured": {
         "actions": [
-          7,
-          7
+          6,
+          6
         ],
         "modules": [
           0,
@@ -2315,12 +2315,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           74,
           797
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2655,6 +2655,15 @@
     },
     {
       "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
+      "key": "delivery",
+      "status": "live",
+      "title": "Delivery unit"
+    },
+    {
+      "evidence": [
         "docs/design/docs.js"
       ],
       "gap": "Markdown rendered at build time",
@@ -2848,29 +2857,26 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 46,
-        "partial": 2,
+        "built": 47,
+        "partial": 1,
         "planned": 1,
         "proposed": 1,
         "standing": 1
       },
       "total": 52,
-      "uncovered": [
-        "S21",
-        "T18"
-      ],
-      "with_open_units": 8,
-      "without_open_units": 44
+      "uncovered": [],
+      "with_open_units": 10,
+      "without_open_units": 42
     },
     "screens": {
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 15,
+        "live": 16,
         "mixed": 0,
         "proposed": 5
       },
-      "total": 27
+      "total": 28
     }
   },
   "version": 1

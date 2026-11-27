@@ -400,9 +400,8 @@ issue flips it to `status:ready`.
 every project — status, tranche, what blocks it, its units — refreshed from this queue by
 `.github/workflows/issue-registry.yml`. The same rows download as
 `https://conveyor.nonagentic.ai/design/data/programme.json` and `…/programme.csv`. Status there is
-derived once (`scripts/programme_state.py`: issue state, then coverage, then plan frontmatter), so
-a row that disagrees with the labels is a generator defect to report, never a second truth to
-maintain by hand.
+the delivery unit rows (`development_project`), so a row that disagrees with the labels is a
+recorded fact to reconcile from GitHub, never a second truth to maintain by hand.
 
 For the whole-queue truth report — ready-with-branch, claimed-without-branch, abandoned-claim,
 PR-without-`Closes`, open-issue-with-merged-PR, and the branch-to-issue map — run the

@@ -350,6 +350,40 @@ mod tests {
         }
     }
 
+    /// The TOGAF/SAFe artefact vocabulary the live document set uses (#819) is part of the closed
+    /// set: a phase template may require it and a document may carry it. Removing one is a
+    /// standard change, never a silent rename.
+    #[test]
+    fn the_togaf_artefact_categories_are_in_the_vocabulary() {
+        let vocabulary = categories();
+        for category in [
+            "candidate-solutions",
+            "gap-analysis",
+            "project-context-diagram",
+            "benefits-diagram",
+            "mandate",
+            "pi-plan",
+            "pi-objectives",
+            "adr-register",
+            "architecture-artifact-instance",
+            "benefit-evaluation",
+            "benefits-registry",
+            "inspect-adapt",
+            "programme-risk-register",
+            "system-demo",
+        ] {
+            assert!(
+                vocabulary.iter().any(|value| value == category),
+                "{category} is missing from seed/output-standard.json"
+            );
+            assert_eq!(
+                canonical_category(category).expect("TOGAF/SAFe category"),
+                category,
+                "a TOGAF/SAFe category canonicalises to itself"
+            );
+        }
+    }
+
     /// The standard is the only source: every category it accepts also has a template, and the
     /// required headings are the ones the skeleton seeds.
     #[test]

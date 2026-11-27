@@ -18,8 +18,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "spec",
     "benefit-profile",
     "benefits-map",
-    "benefits-registry",
-    "benefit-evaluation",
     "projects-dossier",
     "tranche-plan",
     "tranche-review",
@@ -30,24 +28,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "adm-profile",
     "artifact-standard",
     "architecture-artifact",
-    "architecture-artifact-instance",
     "statement-of-architecture-work",
     "compliance-review",
     "waiver",
     "maturity-assessment",
     "skills-assessment",
     "programme-brief",
-    "mandate",
     "refined-vision",
     "programme-baselines",
     "programme-strategies",
-    "programme-risk-register",
     "benefit-transition",
     "programme-report",
     "requirements-catalog",
     "architecture-capability",
     "architecture-governance-log",
-    "adr-register",
     "delivery-contract",
     "statement-of-intent",
     "request-for-architecture-work",
@@ -63,14 +57,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-b",
     "phase-c",
     "phase-d",
-    "candidate-solutions",
-    "project-context-diagram",
-    "benefits-diagram",
-    "gap-analysis",
     "phase-e",
     "phase-f",
     "phase-g",
     "phase-h",
+    "benefits-registry",
+    "benefit-evaluation",
+    "architecture-artifact-instance",
+    "mandate",
+    "programme-risk-register",
+    "adr-register",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis",
     "pi-plan",
     "pi-objectives",
     "system-demo",
@@ -246,99 +246,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
-      "document_category": "project-brief",
-      "sources": {
-        "Outcome": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Boundary": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Reuse sources": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Inception units": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Dependencies": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Acceptance": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Capabilities": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Plan": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "project-brief",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category project-brief",
-      "document_authored": true
+      "document_category": "project-brief"
     },
     "inception-analysis": {
       "required": [
@@ -357,55 +265,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.4",
-      "document_category": "inception-analysis",
-      "sources": {
-        "Current state": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "inception-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Reuse sources": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "inception-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Build vs reuse": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "inception-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Risks": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "inception-analysis",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category inception-analysis",
-      "document_authored": true
+      "document_category": "inception-analysis"
     },
     "architecture-design": {
       "required": [
@@ -425,66 +285,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "architecture-design",
-      "sources": {
-        "Context and boundary": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-design",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Aggregates, tables and actions": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-design",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Decisions": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-design",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Acceptance": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-design",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Architecture artefacts": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-design",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-design",
-      "document_authored": true
+      "document_category": "architecture-design"
     },
     "decision": {
       "required": [
@@ -501,57 +302,9 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "standard": "SPEC",
       "level": "work_package",
       "subject_kind": "card",
-      "mandatory": true,
+      "mandatory": false,
       "spec": "§10.4",
-      "document_category": "decision",
-      "sources": {
-        "Context": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "decision",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Decision": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "decision",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Consequences": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "decision",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "decision",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category decision",
-      "document_authored": true
+      "document_category": "decision"
     },
     "evidence": {
       "required": [
@@ -568,66 +321,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "card",
       "mandatory": true,
       "spec": "§8.5",
-      "document_category": "evidence",
-      "sources": {
-        "Claim": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "evidence",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "evidence",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Verification": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "evidence",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Links": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "evidence",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Gap": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "evidence",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category evidence",
-      "document_authored": true
+      "document_category": "evidence"
     },
     "closure-review": {
       "required": [
@@ -643,55 +337,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
-      "document_category": "closure-review",
-      "sources": {
-        "Outcome vs acceptance": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "closure-review",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "closure-review",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Open items": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "closure-review",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Decision": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "closure-review",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category closure-review",
-      "document_authored": true
+      "document_category": "closure-review"
     },
     "vision": {
       "required": [
@@ -710,239 +356,45 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "vision",
-      "sources": {
-        "Purpose": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "vision",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Outcomes": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "vision",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Boundary": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "vision",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Who it serves": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "vision",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category vision",
-      "document_authored": true
+      "document_category": "vision"
     },
     "blueprint": {
       "required": [
         "Aggregates and services",
         "Action registry and data model",
         "Deployment estate",
-        "The to-be the projects deliver",
-        "Organisation and skills",
-        "Current, intermediate and target states"
+        "The to-be the projects deliver"
       ],
       "optional": [
         "Decisions",
         "Links"
       ],
-      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Organisation and skills\n\nThe organisation, roles and skills the target state requires.\n\n## Current, intermediate and target states\n\nThe current, intermediate and target states and what separates them.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
+      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "blueprint",
-      "sources": {
-        "Aggregates and services": [
-          {
-            "kind": "rows",
-            "file": "config.json",
-            "pointer": "/capabilities"
-          }
-        ],
-        "Action registry and data model": [
-          {
-            "kind": "computed",
-            "name": "action_registry"
-          }
-        ],
-        "Deployment estate": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "organisation.json",
-            "pointer": "/jobs"
-          }
-        ],
-        "The to-be the projects deliver": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Organisation and skills": [
-          {
-            "kind": "rows",
-            "file": "organisation.json",
-            "pointer": "/jobs"
-          },
-          {
-            "kind": "rows",
-            "file": "organisation.json",
-            "pointer": "/departments"
-          }
-        ],
-        "Current, intermediate and target states": [
-          {
-            "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
-            "match": {
-              "kind": "blueprint-states"
-            }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the blueprint's current, intermediate and target states: a governed asset of kind blueprint-states"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category blueprint"
+      "document_category": "blueprint"
     },
     "business-case": {
       "required": [
         "Why now",
         "Benefit map",
         "Cost and risk posture",
-        "Licensing frame",
-        "Options, including doing nothing",
-        "Investment appraisal and cash flow",
-        "Capabilities the benefits depend on"
+        "Licensing frame"
       ],
       "optional": [
+        "Options",
         "Decision"
       ],
-      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options, including doing nothing\n\nThe options considered including doing nothing.\n\n## Investment appraisal and cash flow\n\nThe appraisal, the cash flow and the basis of both.\n\n## Capabilities the benefits depend on\n\nThe capabilities and business changes the benefits require, and who delivers them.\n\n## Decision\n\nThe investment decision and its authority.\n",
+      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options\n\nThe options considered including doing nothing.\n\n## Decision\n\nThe investment decision and its authority.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "business-case",
-      "sources": {
-        "Why now": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "issue"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/programme"
-          }
-        ],
-        "Benefit map": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_links"
-          },
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Cost and risk posture": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "risk"
-            }
-          }
-        ],
-        "Licensing frame": [
-          {
-            "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
-            "match": {
-              "kind": "licensing_frame"
-            }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the programme's licensing frame: a governed asset of kind licensing_frame stating the public, opt-in and tenant boundary"
-          }
-        ],
-        "Options, including doing nothing": [
-          {
-            "kind": "absence",
-            "record": "the options appraisal: a decision with its options, including doing nothing, and their appraisal"
-          }
-        ],
-        "Investment appraisal and cash flow": [
-          {
-            "kind": "absence",
-            "record": "the programme cost model: the investment appraisal and cash-flow schedule with its basis"
-          }
-        ],
-        "Capabilities the benefits depend on": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_links"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category business-case"
+      "document_category": "business-case"
     },
     "programme-plan": {
       "required": [
@@ -961,71 +413,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "programme-plan",
-      "sources": {
-        "Tranches": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "programme-plan",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Projects and sequencing": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_dependencies"
-          }
-        ],
-        "Gates": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews"
-          },
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals"
-          }
-        ],
-        "First three months": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "number": 0
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "number": 1
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category programme-plan"
+      "document_category": "programme-plan"
     },
     "governance": {
       "required": [
@@ -1044,65 +432,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "governance",
-      "sources": {
-        "Roles": [
-          {
-            "kind": "rows",
-            "file": "organisation.json",
-            "pointer": "/jobs"
-          },
-          {
-            "kind": "rows",
-            "file": "organisation.json",
-            "pointer": "/bindings"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "governance",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Decision ladder": [
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "status": "approved"
-            }
-          }
-        ],
-        "Assurance": [
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals"
-          },
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews"
-          }
-        ],
-        "The unit protocol": [
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/card_types"
-          },
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/lists"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category governance"
+      "document_category": "governance"
     },
     "reuse-map": {
       "required": [
@@ -1119,44 +449,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "reuse-map",
-      "sources": {
-        "Reuse candidates": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "reuse-map",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Boundary": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "reuse-map",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Licence and contract constraints": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "reuse-map",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category reuse-map",
-      "document_authored": true
+      "document_category": "reuse-map"
     },
     "brief-template": {
       "required": [
@@ -1171,44 +464,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§8.3",
-      "document_category": "brief-template",
-      "sources": {
-        "Mandatory fields": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "brief-template",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Inception units": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "brief-template",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Plan": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "brief-template",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category brief-template",
-      "document_authored": true
+      "document_category": "brief-template"
     },
     "architecture-analysis": {
       "required": [
@@ -1227,55 +483,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "architecture-analysis",
-      "sources": {
-        "Current state": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Options considered": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Risks": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Dependency map": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-analysis",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-analysis",
-      "document_authored": true
+      "document_category": "architecture-analysis"
     },
     "spec": {
       "required": [
@@ -1291,55 +499,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§5",
-      "document_category": "spec",
-      "sources": {
-        "Context": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "spec",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Requirements": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "spec",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Design": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "spec",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Acceptance": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "spec",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category spec",
-      "document_authored": true
+      "document_category": "spec"
     },
     "benefit-profile": {
       "required": [
@@ -1357,7 +517,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "benefit",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "benefit-profile",
       "sources": {
         "Identification and purpose": [
           {
@@ -1419,8 +578,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      },
-      "verifier": "generate-standards.py --check-category benefit-profile"
+      }
     },
     "benefits-map": {
       "required": [
@@ -1435,7 +593,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "benefits-map",
       "sources": {
         "Benefit paths": [
           {
@@ -1456,8 +613,2111 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "benefit_map"
           }
         ]
-      },
-      "verifier": "generate-standards.py --check-category benefits-map"
+      }
+    },
+    "projects-dossier": {
+      "required": [
+        "Projects",
+        "Tranches and dependencies",
+        "Resources and budget",
+        "Delivery risks"
+      ],
+      "optional": [],
+      "skeleton": "# Projects dossier\n\nEvery project, its outputs, resources, dependencies and contribution to the blueprint.\n\n## Projects\n\nOne row per project: key, output, tranche, status and plan.\n\n## Tranches and dependencies\n\nThe tranche each project sits in and its typed dependencies.\n\n## Resources and budget\n\nThe resource assumption and the budget posture; an unknown is stated as unknown.\n\n## Delivery risks\n\nThe risks affecting delivery and the first check for each.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Projects": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ],
+        "Tranches and dependencies": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_dependencies"
+          }
+        ],
+        "Resources and budget": [
+          {
+            "kind": "computed",
+            "name": "programme_summary"
+          }
+        ],
+        "Delivery risks": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ]
+      }
+    },
+    "tranche-plan": {
+      "required": [
+        "Tranches",
+        "Entry and exit criteria",
+        "Review dates",
+        "Sequencing"
+      ],
+      "optional": [],
+      "skeleton": "# Tranche plan\n\nThe tranche sequence, its criteria and its review dates. It adopts the programme seed; it never invents a parallel list.\n\n## Tranches\n\nNumber, theme and the projects each contains.\n\n## Entry and exit criteria\n\nWhat must be true to start and to close each tranche.\n\n## Review dates\n\nThe end-of-tranche review date and the evidence it will judge.\n\n## Sequencing\n\nWhy this order, and which dependency forces it.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Tranches": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ],
+        "Entry and exit criteria": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ],
+        "Review dates": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ],
+        "Sequencing": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ]
+      }
+    },
+    "tranche-review": {
+      "required": [
+        "Evidence",
+        "Benefit status",
+        "Risk and issue register",
+        "Decision"
+      ],
+      "optional": [],
+      "skeleton": "# Tranche review\n\nThe end-of-tranche approval: continue, pause or stop, on evidence. A review with no evidence is refused.\n\n## Evidence\n\nThe baselines, the benefit status and the risk and issue register the review judged.\n\n## Benefit status\n\nEach benefit against its profile: measured, on track, at risk or unmeasured.\n\n## Risk and issue register\n\nThe open risks and issues, with owners.\n\n## Decision\n\nContinue, pause or stop, with the reason and the conditions.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "tranche",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "tranche-review",
+      "sources": {
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews",
+            "match": {
+              "tranche_id": "$subject_id"
+            }
+          }
+        ],
+        "Benefit status": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Risk and issue register": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews",
+            "match": {
+              "tranche_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "benefits-strategy": {
+      "required": [
+        "Measurement methods",
+        "Review cycle",
+        "Roles and assessment",
+        "Realization process"
+      ],
+      "optional": [],
+      "skeleton": "# Benefits management strategy\n\nHow benefits are measured, reviewed and judged, and who owns each step.\n\n## Measurement methods\n\nThe method and source for each KPI; a method that does not exist yet is named as a gap.\n\n## Review cycle\n\nWhen benefits are reviewed, at which gate, and against which baseline.\n\n## Roles and assessment\n\nThe BCM, the SRO and the assessor for each review.\n\n## Realization process\n\nBaseline, monitor, transition, readiness, enact, measure, retire and keep measuring.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "benefits-strategy"
+    },
+    "realization-plan": {
+      "required": [
+        "Transition",
+        "Embedding",
+        "Post-closure measurement",
+        "Ownership"
+      ],
+      "optional": [],
+      "skeleton": "# Benefits realization plan\n\nThe transition, the embedding, and who keeps measuring after the programme closes.\n\n## Transition\n\nEach benefit's transition entry, its readiness check and its handover.\n\n## Embedding\n\nThe operating-practice changes and the activities that embed them.\n\n## Post-closure measurement\n\nWho measures after closure, with which method and which cadence.\n\n## Ownership\n\nThe benefit owner, the operational owner and the date each takes over.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "realization-plan"
+    },
+    "stakeholder-profiles": {
+      "required": [
+        "Stakeholders",
+        "Concerns and sensitivities",
+        "Influence and interest",
+        "Support and engagement",
+        "Benefits and disbenefits"
+      ],
+      "optional": [],
+      "skeleton": "# Stakeholder profiles\n\nWho the programme serves, what they care about, and how each group is engaged.\n\n## Stakeholders\n\nEach group or position with its role in the programme.\n\n## Concerns and sensitivities\n\nWhat each group cares about and what would lose its support.\n\n## Influence and interest\n\nImportance, influence, interest and exposure, each rated.\n\n## Support and engagement\n\nSupport level and trend, the engagement target, and the engagement action.\n\n## Benefits and disbenefits\n\nThe benefits and disbenefits distributed to each group.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Stakeholders": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
+          }
+        ],
+        "Concerns and sensitivities": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
+          }
+        ],
+        "Influence and interest": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
+          }
+        ],
+        "Support and engagement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
+          }
+        ],
+        "Benefits and disbenefits": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
+          }
+        ]
+      }
+    },
+    "architecture-principles": {
+      "required": [
+        "Principles",
+        "Approval",
+        "Application"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture principles\n\nThe principles the Architecture Board applies, each with its rationale and implications.\n\n## Principles\n\nEach principle: statement, rationale and implications; a principle without implications is a slogan.\n\n## Approval\n\nThe board, the date and the decision that adopted the catalogue.\n\n## Application\n\nHow a deviation is detected, and the waiver or decision that handles it.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "architecture-principles",
+      "sources": {
+        "Principles": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ]
+      }
+    },
+    "adm-profile": {
+      "required": [
+        "Phases",
+        "Artefacts by phase and plateau",
+        "Contracts",
+        "Adoption"
+      ],
+      "optional": [],
+      "skeleton": "# Tailored ADM profile\n\nWhich ADM phases run, which artefacts each phase and plateau requires, and which contract closes it.\n\n## Phases\n\nThe phases that run for this organisation and the order they run in.\n\n## Artefacts by phase and plateau\n\nThe mandatory artefacts per phase and per plateau: project start, high-level design and solution design.\n\n## Contracts\n\nThe contract kind that closes each phase and who approves it.\n\n## Adoption\n\nThe board decision that adopted this profile and the review date.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Phases": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Artefacts by phase and plateau": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Contracts": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Adoption": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ]
+      }
+    },
+    "artifact-standard": {
+      "required": [
+        "Common metadata",
+        "Catalogues",
+        "Matrices",
+        "Diagrams",
+        "Links",
+        "Repository"
+      ],
+      "optional": [],
+      "skeleton": "# Artefact standard\n\nThe typed artefact standard the programme adopts: metadata, the three types, the plateaus and the links.\n\n## Common metadata\n\nTitle, status, version, author and date, reviewer and review date, related initiative, rationale and the document or contract it sits under.\n\n## Catalogues\n\nThe unique identifier, item name and description of use or structure.\n\n## Matrices\n\nThe two axes and the relationship the matrix records.\n\n## Diagrams\n\nThe building block or metamodel and the viewpoint.\n\n## Links\n\nDerivation, realization, reuse and dependency edges between artefacts.\n\n## Repository\n\nWhere artefacts live and how the standard is adopted and versioned.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Common metadata": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Catalogues": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Matrices": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Diagrams": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Links": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/links"
+          }
+        ],
+        "Repository": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts"
+          }
+        ]
+      }
+    },
+    "architecture-artifact": {
+      "required": [
+        "Metadata",
+        "Entries",
+        "Links",
+        "Document"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture artefact\n\nOne typed artefact: a catalogue, a matrix or a diagram, with its metadata, entries and links.\n\n## Metadata\n\nType, title, version, owner, reviewer and review date, phase, plateau and the related project.\n\n## Entries\n\nThe rows: the item and its description, the two axes and their value, or the element and its viewpoint.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on.\n\n## Document\n\nThe published document or contract this artefact sits under.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Metadata": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Entries": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Links": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/links"
+          }
+        ],
+        "Document": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "statement-of-architecture-work": {
+      "required": [
+        "Assignment",
+        "Scope",
+        "Responsibilities",
+        "Acceptance criteria",
+        "Contract"
+      ],
+      "optional": [],
+      "skeleton": "# Statement of Architecture Work\n\nThe Phase A contract: the assignment, its scope and the criteria by which the architecture is accepted.\n\n## Assignment\n\nWhat the architecture work is asked to deliver and for whom.\n\n## Scope\n\nThe boundaries, the artefacts expected and the phase set.\n\n## Responsibilities\n\nWho does the work and who accepts it.\n\n## Acceptance criteria\n\nThe conditions the architecture must meet to close Phase A.\n\n## Contract\n\nThe contract record, its version and its approval.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "statement-of-architecture-work",
+      "sources": {
+        "Assignment": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
+          }
+        ],
+        "Scope": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
+          }
+        ],
+        "Responsibilities": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
+          }
+        ],
+        "Acceptance criteria": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
+          }
+        ],
+        "Contract": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_architecture_work",
+              "phase_code": "a"
+            }
+          }
+        ]
+      }
+    },
+    "compliance-review": {
+      "required": [
+        "Relationship",
+        "Findings",
+        "Waivers",
+        "Decision"
+      ],
+      "optional": [],
+      "skeleton": "# Compliance review\n\nThe Phase G review of one delivery against its governing architecture contract.\n\n## Relationship\n\nExactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.\n\n## Findings\n\nThe evidence for each finding, against the contract.\n\n## Waivers\n\nEach accepted deviation with its owner, reason, cost, risk and reassessment date.\n\n## Decision\n\nThe outcome and the conditions that attach to it.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "compliance-review",
+      "sources": {
+        "Relationship": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Findings": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Waivers": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "waiver": {
+      "required": [
+        "Deviation",
+        "Accepting owner",
+        "Reason and impact",
+        "Reassessment"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture waiver\n\nAn accepted deviation from the architecture contract, with an owner and a date to revisit it.\n\n## Deviation\n\nWhat deviates from which contract clause.\n\n## Accepting owner\n\nThe asset owner who accepts the deviation and the scope of their authority.\n\n## Reason and impact\n\nWhy the deviation is needed, the additional cost and the risk.\n\n## Reassessment\n\nThe reassessment date and the condition that ends the waiver.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": false,
+      "spec": "§8.1",
+      "sources": {
+        "Deviation": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Accepting owner": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Reason and impact": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Reassessment": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "maturity-assessment": {
+      "required": [
+        "Dimensions",
+        "Scores",
+        "Baseline",
+        "Milestones"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture maturity assessment\n\nThe nine-dimension maturity baseline, scored 0–5 with evidence and a development plan.\n\n## Dimensions\n\nArchitecture process, architecture development, business linkage, senior-management involvement, operating-unit participation, architecture communication, IT security, architecture governance, and IT investment and acquisition strategy.\n\n## Scores\n\nEach dimension's score from 0 (none) to 5 (measured), with the evidence for the rating.\n\n## Baseline\n\nThe dated baseline the next assessment is compared with.\n\n## Milestones\n\nThe development milestones a tranche review can hold the capability to.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Dimensions": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/maturity"
+          }
+        ],
+        "Scores": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/maturity"
+          }
+        ],
+        "Baseline": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/maturity"
+          }
+        ],
+        "Milestones": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/maturity"
+          }
+        ]
+      }
+    },
+    "skills-assessment": {
+      "required": [
+        "Categories",
+        "Proficiency by role",
+        "Baseline",
+        "Development milestones"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture skills assessment\n\nThe seven-category skills baseline per role, with proficiency and development milestones.\n\n## Categories\n\nGeneral; business skills and methods; architecture skills; programme and project management; general IT knowledge; technical IT skills; legal environment.\n\n## Proficiency by role\n\nEach role's proficiency per category, with the evidence.\n\n## Baseline\n\nThe dated baseline and its scope.\n\n## Development milestones\n\nThe development plan and the milestones a review can measure.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Categories": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/skills"
+          }
+        ],
+        "Proficiency by role": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/skills"
+          }
+        ],
+        "Baseline": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/skills"
+          }
+        ],
+        "Development milestones": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/skills"
+          }
+        ]
+      }
+    },
+    "programme-brief": {
+      "required": [
+        "Vision and outcomes",
+        "Benefit categories",
+        "Cost, timescale and effort",
+        "Risks and support",
+        "Delivery options",
+        "Candidate projects and timing"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Programme Brief\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Vision and outcomes\n\nThe record the section derives from, or an explicit absence.\n\n## Benefit categories\n\nThe record the section derives from, or an explicit absence.\n\n## Cost, timescale and effort\n\nThe record the section derives from, or an explicit absence.\n\n## Risks and support\n\nThe record the section derives from, or an explicit absence.\n\n## Delivery options\n\nThe record the section derives from, or an explicit absence.\n\n## Candidate projects and timing\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "programme-brief",
+      "sources": {
+        "Candidate projects and timing": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ]
+      }
+    },
+    "refined-vision": {
+      "required": [
+        "Refined vision",
+        "Changes from the mandate"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Refined Vision\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Refined vision\n\nThe record the section derives from, or an explicit absence.\n\n## Changes from the mandate\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "refined-vision"
+    },
+    "programme-baselines": {
+      "required": [
+        "Management baseline",
+        "Governance baseline",
+        "Boundary baseline"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Programme Baselines\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Management baseline\n\nThe record the section derives from, or an explicit absence.\n\n## Governance baseline\n\nThe record the section derives from, or an explicit absence.\n\n## Boundary baseline\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Management baseline": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "management"
+            }
+          }
+        ],
+        "Governance baseline": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "governance"
+            }
+          }
+        ],
+        "Boundary baseline": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "boundary"
+            }
+          }
+        ]
+      }
+    },
+    "programme-strategies": {
+      "required": [
+        "Information strategy",
+        "Risk strategy",
+        "Issue strategy",
+        "Monitoring strategy",
+        "Communications strategy",
+        "Quality strategy",
+        "Resource strategy"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Programme Strategies\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Information strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Risk strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Issue strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Monitoring strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Communications strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Quality strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Resource strategy\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Risk strategy": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Issue strategy": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "issue"
+            }
+          }
+        ]
+      }
+    },
+    "benefit-transition": {
+      "required": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "optional": [
+        "Owner after programme closure"
+      ],
+      "skeleton": "# Benefit Transition\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Baseline measurement\n\nThe record the section derives from, or an explicit absence.\n\n## Readiness\n\nThe record the section derives from, or an explicit absence.\n\n## Transition\n\nThe record the section derives from, or an explicit absence.\n\n## Post-transition measurement\n\nThe record the section derives from, or an explicit absence.\n\n## Legacy retirement\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "benefit",
+      "mandatory": true,
+      "spec": "§8.3",
+      "sources": {
+        "Baseline measurement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
+          }
+        ],
+        "Readiness": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
+          }
+        ],
+        "Transition": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
+          }
+        ],
+        "Post-transition measurement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
+          }
+        ],
+        "Legacy retirement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_profile_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "programme-report": {
+      "required": [
+        "Status",
+        "Tranche decisions",
+        "Benefits",
+        "Cost"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Programme Report\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Status\n\nThe record the section derives from, or an explicit absence.\n\n## Tranche decisions\n\nThe record the section derives from, or an explicit absence.\n\n## Benefits\n\nThe record the section derives from, or an explicit absence.\n\n## Cost\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": false,
+      "spec": "§8.3",
+      "sources": {
+        "Status": [
+          {
+            "kind": "computed",
+            "name": "programme_summary"
+          }
+        ],
+        "Tranche decisions": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews"
+          }
+        ],
+        "Benefits": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Cost": [
+          {
+            "kind": "computed",
+            "name": "programme_summary"
+          }
+        ]
+      }
+    },
+    "requirements-catalog": {
+      "required": [
+        "Requirements",
+        "Types",
+        "Trace links"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Requirements Catalog\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Requirements\n\nThe record the section derives from, or an explicit absence.\n\n## Types\n\nThe record the section derives from, or an explicit absence.\n\n## Trace links\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Requirements": [
+          {
+            "kind": "computed",
+            "name": "requirements_catalog"
+          }
+        ],
+        "Types": [
+          {
+            "kind": "computed",
+            "name": "requirements_catalog"
+          }
+        ],
+        "Trace links": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/links"
+          }
+        ]
+      }
+    },
+    "architecture-capability": {
+      "required": [
+        "Principles",
+        "Tailored ADM",
+        "Artefact standard",
+        "Architecture Board",
+        "Governance and contracts",
+        "Maturity and skills"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Architecture Capability\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Principles\n\nThe record the section derives from, or an explicit absence.\n\n## Tailored ADM\n\nThe record the section derives from, or an explicit absence.\n\n## Artefact standard\n\nThe record the section derives from, or an explicit absence.\n\n## Architecture Board\n\nThe record the section derives from, or an explicit absence.\n\n## Governance and contracts\n\nThe record the section derives from, or an explicit absence.\n\n## Maturity and skills\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Principles": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Tailored ADM": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Artefact standard": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Architecture Board": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Governance and contracts": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Maturity and skills": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ]
+      }
+    },
+    "architecture-governance-log": {
+      "required": [
+        "Decisions",
+        "Reviews",
+        "Waivers"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Architecture Governance Log\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Decisions\n\nThe record the section derives from, or an explicit absence.\n\n## Reviews\n\nThe record the section derives from, or an explicit absence.\n\n## Waivers\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": false,
+      "spec": "§8.1",
+      "sources": {
+        "Decisions": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/board"
+          }
+        ],
+        "Reviews": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews"
+          }
+        ],
+        "Waivers": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/waivers"
+          }
+        ]
+      }
+    },
+    "delivery-contract": {
+      "required": [
+        "Commitments",
+        "Compliance method",
+        "Approval"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Delivery Contract\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Commitments\n\nThe record the section derives from, or an explicit absence.\n\n## Compliance method\n\nThe record the section derives from, or an explicit absence.\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Commitments": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Compliance method": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Approval": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "delivery_contract",
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "statement-of-intent": {
+      "required": [
+        "Intended use",
+        "Ownership",
+        "Measures of effectiveness"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Statement Of Intent\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Intended use\n\nThe record the section derives from, or an explicit absence.\n\n## Ownership\n\nThe record the section derives from, or an explicit absence.\n\n## Measures of effectiveness\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": false,
+      "spec": "§8.1",
+      "sources": {
+        "Intended use": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_intent",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Ownership": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_intent",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Measures of effectiveness": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "statement_of_intent",
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "request-for-architecture-work": {
+      "required": [
+        "Purpose",
+        "Scope",
+        "Decision"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Request For Architecture Work\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Purpose\n\nThe record the section derives from, or an explicit absence.\n\n## Scope\n\nThe record the section derives from, or an explicit absence.\n\n## Decision\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": false,
+      "spec": "§8.1",
+      "sources": {
+        "Purpose": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "request_for_architecture",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Scope": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "request_for_architecture",
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "kind": "request_for_architecture",
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "safe-portfolio": {
+      "required": [
+        "Portfolio canvas",
+        "Strategic themes",
+        "Value streams"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Safe Portfolio\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Portfolio canvas\n\nThe record the section derives from, or an explicit absence.\n\n## Strategic themes\n\nThe record the section derives from, or an explicit absence.\n\n## Value streams\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "sources": {
+        "Portfolio canvas": [
+          {
+            "kind": "computed",
+            "name": "programme_summary"
+          }
+        ],
+        "Strategic themes": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Value streams": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          }
+        ]
+      }
+    },
+    "safe-art": {
+      "required": [
+        "ART charter",
+        "Solution intent",
+        "Backlog with WSJF"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "sources": {
+        "ART charter": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
+          }
+        ],
+        "Solution intent": [
+          {
+            "kind": "computed",
+            "name": "programme_summary"
+          }
+        ],
+        "Backlog with WSJF": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
+          }
+        ]
+      }
+    },
+    "safe-cadence": {
+      "required": [
+        "PI plan",
+        "System demo",
+        "Inspect and adapt",
+        "Lean governance"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Safe Cadence\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## PI plan\n\nThe record the section derives from, or an explicit absence.\n\n## System demo\n\nThe record the section derives from, or an explicit absence.\n\n## Inspect and adapt\n\nThe record the section derives from, or an explicit absence.\n\n## Lean governance\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "sources": {
+        "PI plan": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences",
+            "match": {
+              "kind": "pi"
+            }
+          }
+        ],
+        "System demo": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences",
+            "match": {
+              "kind": "demo"
+            }
+          }
+        ],
+        "Inspect and adapt": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences",
+            "match": {
+              "kind": "retro"
+            }
+          }
+        ],
+        "Lean governance": [
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals"
+          }
+        ]
+      }
+    },
+    "project-wbs": {
+      "required": [
+        "Work packages",
+        "Acceptance",
+        "Status"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Project Wbs\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Work packages\n\nThe record the section derives from, or an explicit absence.\n\n## Acceptance\n\nThe record the section derives from, or an explicit absence.\n\n## Status\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "PMP",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.4",
+      "sources": {
+        "Work packages": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Acceptance": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Status": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "project-baseline": {
+      "required": [
+        "Scope",
+        "Schedule",
+        "Cost",
+        "Approval"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Project Baseline\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Scope\n\nThe record the section derives from, or an explicit absence.\n\n## Schedule\n\nThe record the section derives from, or an explicit absence.\n\n## Cost\n\nThe record the section derives from, or an explicit absence.\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "PMP",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.4",
+      "sources": {
+        "Scope": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Schedule": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Cost": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ],
+        "Approval": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines",
+            "match": {
+              "project_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
+    "project-registers": {
+      "required": [
+        "Risks",
+        "Issues",
+        "Assumptions",
+        "Dependencies",
+        "Benefits",
+        "Changes"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Project Registers\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Risks\n\nThe record the section derives from, or an explicit absence.\n\n## Issues\n\nThe record the section derives from, or an explicit absence.\n\n## Assumptions\n\nThe record the section derives from, or an explicit absence.\n\n## Dependencies\n\nThe record the section derives from, or an explicit absence.\n\n## Benefits\n\nThe record the section derives from, or an explicit absence.\n\n## Changes\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "PMP",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.4",
+      "sources": {
+        "Risks": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "risk"
+            }
+          }
+        ],
+        "Issues": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "issue"
+            }
+          }
+        ],
+        "Assumptions": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "assumption"
+            }
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "dependency"
+            }
+          }
+        ],
+        "Benefits": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "benefit"
+            }
+          }
+        ],
+        "Changes": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "change"
+            }
+          }
+        ]
+      }
+    },
+    "change-control": {
+      "required": [
+        "Change requests",
+        "Impact",
+        "Decisions"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Change Control\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Change requests\n\nThe record the section derives from, or an explicit absence.\n\n## Impact\n\nThe record the section derives from, or an explicit absence.\n\n## Decisions\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "PMP",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.4",
+      "sources": {
+        "Change requests": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "change"
+            }
+          }
+        ],
+        "Impact": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "change"
+            }
+          }
+        ],
+        "Decisions": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "project_id": "$subject_id",
+              "kind": "change"
+            }
+          }
+        ]
+      }
+    },
+    "phase-preliminary": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase Preliminary\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "capability",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "architecture_capability"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/board"
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "preliminary"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/profiles"
+          }
+        ]
+      }
+    },
+    "phase-a": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase A\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "a"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "a"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "a"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-b": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase B\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "b"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "b"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "b"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-c": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase C\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "c"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "c"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "c"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-d": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase D\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "d"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "d"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "d"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-e": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase E\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "e"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "e"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "e"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-f": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase F\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "f"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "f"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "f"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-g": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase G\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "g"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "g"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "g"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "phase-h": {
+      "required": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "optional": [
+        "Findings"
+      ],
+      "skeleton": "# Phase H\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "phase",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Mandatory artefacts": [
+          {
+            "kind": "computed",
+            "name": "phase_artefacts",
+            "phase": "h"
+          }
+        ],
+        "Contract and gate": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/contracts",
+            "match": {
+              "phase_code": "h"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/artifacts",
+            "match": {
+              "phase_code": "h"
+            }
+          },
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-artifact",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "benefits-registry": {
       "required": [
@@ -1559,570 +2819,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       },
       "verifier": "generate-standards.py --check-category benefit-evaluation"
     },
-    "projects-dossier": {
-      "required": [
-        "Projects",
-        "Tranches and dependencies",
-        "Resources and budget",
-        "Delivery risks"
-      ],
-      "optional": [],
-      "skeleton": "# Projects dossier\n\nEvery project, its outputs, resources, dependencies and contribution to the blueprint.\n\n## Projects\n\nOne row per project: key, output, tranche, status and plan.\n\n## Tranches and dependencies\n\nThe tranche each project sits in and its typed dependencies.\n\n## Resources and budget\n\nThe resource assumption and the budget posture; an unknown is stated as unknown.\n\n## Delivery risks\n\nThe risks affecting delivery and the first check for each.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "projects-dossier",
-      "sources": {
-        "Projects": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Tranches and dependencies": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_dependencies"
-          }
-        ],
-        "Resources and budget": [
-          {
-            "kind": "computed",
-            "name": "programme_summary"
-          }
-        ],
-        "Delivery risks": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "risk"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category projects-dossier"
-    },
-    "tranche-plan": {
-      "required": [
-        "Tranches",
-        "Entry and exit criteria",
-        "Review dates",
-        "Sequencing"
-      ],
-      "optional": [],
-      "skeleton": "# Tranche plan\n\nThe tranche sequence, its criteria and its review dates. It adopts the programme seed; it never invents a parallel list.\n\n## Tranches\n\nNumber, theme and the projects each contains.\n\n## Entry and exit criteria\n\nWhat must be true to start and to close each tranche.\n\n## Review dates\n\nThe end-of-tranche review date and the evidence it will judge.\n\n## Sequencing\n\nWhy this order, and which dependency forces it.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "tranche-plan",
-      "sources": {
-        "Tranches": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Entry and exit criteria": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Review dates": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Sequencing": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category tranche-plan"
-    },
-    "tranche-review": {
-      "required": [
-        "Evidence",
-        "Benefit status",
-        "Risk and issue register",
-        "Decision"
-      ],
-      "optional": [],
-      "skeleton": "# Tranche review\n\nThe end-of-tranche approval: continue, pause or stop, on evidence. A review with no evidence is refused.\n\n## Evidence\n\nThe baselines, the benefit status and the risk and issue register the review judged.\n\n## Benefit status\n\nEach benefit against its profile: measured, on track, at risk or unmeasured.\n\n## Risk and issue register\n\nThe open risks and issues, with owners.\n\n## Decision\n\nContinue, pause or stop, with the reason and the conditions.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "tranche",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "tranche-review",
-      "sources": {
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews",
-            "match": {
-              "tranche_id": "$subject_id"
-            }
-          }
-        ],
-        "Benefit status": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Risk and issue register": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "risk"
-            }
-          }
-        ],
-        "Decision": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews",
-            "match": {
-              "tranche_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category tranche-review"
-    },
-    "benefits-strategy": {
-      "required": [
-        "Measurement methods",
-        "Review cycle",
-        "Roles and assessment",
-        "Realization process"
-      ],
-      "optional": [],
-      "skeleton": "# Benefits management strategy\n\nHow benefits are measured, reviewed and judged, and who owns each step.\n\n## Measurement methods\n\nThe method and source for each KPI; a method that does not exist yet is named as a gap.\n\n## Review cycle\n\nWhen benefits are reviewed, at which gate, and against which baseline.\n\n## Roles and assessment\n\nThe BCM, the SRO and the assessor for each review.\n\n## Realization process\n\nBaseline, monitor, transition, readiness, enact, measure, retire and keep measuring.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "benefits-strategy",
-      "sources": {
-        "Measurement methods": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "benefits-strategy",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Review cycle": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "benefits-strategy",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Roles and assessment": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "benefits-strategy",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Realization process": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "benefits-strategy",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category benefits-strategy",
-      "document_authored": true
-    },
-    "realization-plan": {
-      "required": [
-        "Transition",
-        "Embedding",
-        "Post-closure measurement",
-        "Ownership"
-      ],
-      "optional": [],
-      "skeleton": "# Benefits realization plan\n\nThe transition, the embedding, and who keeps measuring after the programme closes.\n\n## Transition\n\nEach benefit's transition entry, its readiness check and its handover.\n\n## Embedding\n\nThe operating-practice changes and the activities that embed them.\n\n## Post-closure measurement\n\nWho measures after closure, with which method and which cadence.\n\n## Ownership\n\nThe benefit owner, the operational owner and the date each takes over.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "realization-plan",
-      "sources": {
-        "Transition": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "realization-plan",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Embedding": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "realization-plan",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Post-closure measurement": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "realization-plan",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Ownership": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "realization-plan",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category realization-plan",
-      "document_authored": true
-    },
-    "stakeholder-profiles": {
-      "required": [
-        "Stakeholders",
-        "Concerns and sensitivities",
-        "Influence and interest",
-        "Support and engagement",
-        "Benefits and disbenefits"
-      ],
-      "optional": [],
-      "skeleton": "# Stakeholder profiles\n\nWho the programme serves, what they care about, and how each group is engaged.\n\n## Stakeholders\n\nEach group or position with its role in the programme.\n\n## Concerns and sensitivities\n\nWhat each group cares about and what would lose its support.\n\n## Influence and interest\n\nImportance, influence, interest and exposure, each rated.\n\n## Support and engagement\n\nSupport level and trend, the engagement target, and the engagement action.\n\n## Benefits and disbenefits\n\nThe benefits and disbenefits distributed to each group.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "stakeholder-profiles",
-      "sources": {
-        "Stakeholders": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ],
-        "Concerns and sensitivities": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ],
-        "Influence and interest": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ],
-        "Support and engagement": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ],
-        "Benefits and disbenefits": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category stakeholder-profiles"
-    },
-    "architecture-principles": {
-      "required": [
-        "Principles",
-        "Approval",
-        "Application"
-      ],
-      "optional": [],
-      "skeleton": "# Architecture principles\n\nThe principles the Architecture Board applies, each with its rationale and implications.\n\n## Principles\n\nEach principle: statement, rationale and implications; a principle without implications is a slogan.\n\n## Approval\n\nThe board, the date and the decision that adopted the catalogue.\n\n## Application\n\nHow a deviation is detected, and the waiver or decision that handles it.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "architecture-principles",
-      "sources": {
-        "Principles": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Approval": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-principles",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Application": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-principles",
-              "scope": "programme"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-principles",
-      "document_authored": true
-    },
-    "adm-profile": {
-      "required": [
-        "Phases",
-        "Artefacts by phase and plateau",
-        "Contracts",
-        "Adoption"
-      ],
-      "optional": [],
-      "skeleton": "# Tailored ADM profile\n\nWhich ADM phases run, which artefacts each phase and plateau requires, and which contract closes it.\n\n## Phases\n\nThe phases that run for this organisation and the order they run in.\n\n## Artefacts by phase and plateau\n\nThe mandatory artefacts per phase and per plateau: project start, high-level design and solution design.\n\n## Contracts\n\nThe contract kind that closes each phase and who approves it.\n\n## Adoption\n\nThe board decision that adopted this profile and the review date.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "adm-profile",
-      "sources": {
-        "Phases": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Artefacts by phase and plateau": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Contracts": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Adoption": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category adm-profile"
-    },
-    "artifact-standard": {
-      "required": [
-        "Common metadata",
-        "Catalogues",
-        "Matrices",
-        "Diagrams",
-        "Links",
-        "Repository"
-      ],
-      "optional": [],
-      "skeleton": "# Artefact standard\n\nThe typed artefact standard the programme adopts: metadata, the three types, the plateaus and the links.\n\n## Common metadata\n\nTitle, status, version, author and date, reviewer and review date, related initiative, rationale and the document or contract it sits under.\n\n## Catalogues\n\nThe unique identifier, item name and description of use or structure.\n\n## Matrices\n\nThe two axes and the relationship the matrix records.\n\n## Diagrams\n\nThe building block or metamodel and the viewpoint.\n\n## Links\n\nDerivation, realization, reuse and dependency edges between artefacts.\n\n## Repository\n\nWhere artefacts live and how the standard is adopted and versioned.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "artifact-standard",
-      "sources": {
-        "Common metadata": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Catalogues": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Matrices": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Diagrams": [
-          {
-            "kind": "computed",
-            "name": "architecture_capability"
-          }
-        ],
-        "Links": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/links"
-          }
-        ],
-        "Repository": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category artifact-standard"
-    },
-    "architecture-artifact": {
-      "required": [
-        "Metadata",
-        "Entries",
-        "Links",
-        "Document"
-      ],
-      "optional": [],
-      "skeleton": "# Architecture artefact\n\nOne typed artefact: a catalogue, a matrix or a diagram, with its metadata, entries and links.\n\n## Metadata\n\nType, title, version, owner, reviewer and review date, phase, plateau and the related project.\n\n## Entries\n\nThe rows: the item and its description, the two axes and their value, or the element and its viewpoint.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on.\n\n## Document\n\nThe published document or contract this artefact sits under.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "architecture-artifact",
-      "sources": {
-        "Metadata": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Entries": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Links": [
-          {
-            "kind": "computed",
-            "name": "project_artifact_links"
-          }
-        ],
-        "Document": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-artifact",
-      "document_authored": true
-    },
     "architecture-artifact-instance": {
       "required": [
         "Metadata",
@@ -2134,7 +2830,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
       "standard": "TOGAF",
       "level": "project",
-      "subject_kind": "artifact",
+      "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.1",
       "document_category": "architecture-artifact-instance",
@@ -2165,370 +2861,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ]
       },
       "verifier": "generate-standards.py --check-category architecture-artifact-instance"
-    },
-    "statement-of-architecture-work": {
-      "required": [
-        "Assignment",
-        "Scope",
-        "Responsibilities",
-        "Acceptance criteria",
-        "Contract"
-      ],
-      "optional": [],
-      "skeleton": "# Statement of Architecture Work\n\nThe Phase A contract: the assignment, its scope and the criteria by which the architecture is accepted.\n\n## Assignment\n\nWhat the architecture work is asked to deliver and for whom.\n\n## Scope\n\nThe boundaries, the artefacts expected and the phase set.\n\n## Responsibilities\n\nWho does the work and who accepts it.\n\n## Acceptance criteria\n\nThe conditions the architecture must meet to close Phase A.\n\n## Contract\n\nThe contract record, its version and its approval.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "statement-of-architecture-work",
-      "sources": {
-        "Assignment": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_architecture_work",
-              "phase_code": "a",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Scope": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_architecture_work",
-              "phase_code": "a",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Responsibilities": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_architecture_work",
-              "phase_code": "a",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Acceptance criteria": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_architecture_work",
-              "phase_code": "a",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Contract": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_architecture_work",
-              "phase_code": "a",
-              "project_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category statement-of-architecture-work"
-    },
-    "compliance-review": {
-      "required": [
-        "Relationship",
-        "Findings",
-        "Waivers",
-        "Decision"
-      ],
-      "optional": [],
-      "skeleton": "# Compliance review\n\nThe Phase G review of one delivery against its governing architecture contract.\n\n## Relationship\n\nExactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.\n\n## Findings\n\nThe evidence for each finding, against the contract.\n\n## Waivers\n\nEach accepted deviation with its owner, reason, cost, risk and reassessment date.\n\n## Decision\n\nThe outcome and the conditions that attach to it.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "compliance-review",
-      "sources": {
-        "Relationship": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Findings": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Waivers": [
-          {
-            "kind": "computed",
-            "name": "waiver_status"
-          }
-        ],
-        "Decision": [
-          {
-            "kind": "computed",
-            "name": "governing_review"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category compliance-review"
-    },
-    "waiver": {
-      "required": [
-        "Deviation",
-        "Accepting owner",
-        "Reason and impact",
-        "Reassessment"
-      ],
-      "optional": [],
-      "skeleton": "# Architecture waiver\n\nAn accepted deviation from the architecture contract, with an owner and a date to revisit it.\n\n## Deviation\n\nWhat deviates from which contract clause.\n\n## Accepting owner\n\nThe asset owner who accepts the deviation and the scope of their authority.\n\n## Reason and impact\n\nWhy the deviation is needed, the additional cost and the risk.\n\n## Reassessment\n\nThe reassessment date and the condition that ends the waiver.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": false,
-      "spec": "§8.1",
-      "sources": {
-        "Deviation": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Accepting owner": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Reason and impact": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Reassessment": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category waiver"
-    },
-    "maturity-assessment": {
-      "required": [
-        "Dimensions",
-        "Scores",
-        "Baseline",
-        "Milestones"
-      ],
-      "optional": [],
-      "skeleton": "# Architecture maturity assessment\n\nThe nine-dimension maturity baseline, scored 0–5 with evidence and a development plan.\n\n## Dimensions\n\nArchitecture process, architecture development, business linkage, senior-management involvement, operating-unit participation, architecture communication, IT security, architecture governance, and IT investment and acquisition strategy.\n\n## Scores\n\nEach dimension's score from 0 (none) to 5 (measured), with the evidence for the rating.\n\n## Baseline\n\nThe dated baseline the next assessment is compared with.\n\n## Milestones\n\nThe development milestones a tranche review can hold the capability to.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "maturity-assessment",
-      "sources": {
-        "Dimensions": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/maturity"
-          }
-        ],
-        "Scores": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/maturity"
-          }
-        ],
-        "Baseline": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/maturity"
-          }
-        ],
-        "Milestones": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/maturity"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category maturity-assessment"
-    },
-    "skills-assessment": {
-      "required": [
-        "Categories",
-        "Proficiency by role",
-        "Baseline",
-        "Development milestones"
-      ],
-      "optional": [],
-      "skeleton": "# Architecture skills assessment\n\nThe seven-category skills baseline per role, with proficiency and development milestones.\n\n## Categories\n\nGeneral; business skills and methods; architecture skills; programme and project management; general IT knowledge; technical IT skills; legal environment.\n\n## Proficiency by role\n\nEach role's proficiency per category, with the evidence.\n\n## Baseline\n\nThe dated baseline and its scope.\n\n## Development milestones\n\nThe development plan and the milestones a review can measure.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "skills-assessment",
-      "sources": {
-        "Categories": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/skills"
-          }
-        ],
-        "Proficiency by role": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/skills"
-          }
-        ],
-        "Baseline": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/skills"
-          }
-        ],
-        "Development milestones": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/skills"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category skills-assessment"
-    },
-    "programme-brief": {
-      "required": [
-        "Vision and outcomes",
-        "Benefit categories",
-        "Cost, timescale and effort",
-        "Risks and support",
-        "Delivery options",
-        "Candidate projects and timing"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Programme Brief\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Vision and outcomes\n\nThe record the section derives from, or an explicit absence.\n\n## Benefit categories\n\nThe record the section derives from, or an explicit absence.\n\n## Cost, timescale and effort\n\nThe record the section derives from, or an explicit absence.\n\n## Risks and support\n\nThe record the section derives from, or an explicit absence.\n\n## Delivery options\n\nThe record the section derives from, or an explicit absence.\n\n## Candidate projects and timing\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "programme-brief",
-      "sources": {
-        "Candidate projects and timing": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          }
-        ],
-        "Vision and outcomes": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/programme"
-          },
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Benefit categories": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Cost, timescale and effort": [
-          {
-            "kind": "absence",
-            "record": "the programme cost, effort and timescale model: its estimate, basis and cash flow"
-          }
-        ],
-        "Risks and support": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "risk"
-            }
-          }
-        ],
-        "Delivery options": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranches"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category programme-brief"
     },
     "mandate": {
       "required": [
@@ -2652,195 +2984,14 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       },
       "verifier": "generate-standards.py --check-category mandate"
     },
-    "refined-vision": {
-      "required": [
-        "Refined vision",
-        "Changes from the mandate"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Refined Vision\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Refined vision\n\nThe record the section derives from, or an explicit absence.\n\n## Changes from the mandate\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "refined-vision",
-      "sources": {
-        "Refined vision": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews"
-          }
-        ],
-        "Changes from the mandate": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "change"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category refined-vision"
-    },
-    "programme-baselines": {
-      "required": [
-        "Management baseline",
-        "Governance baseline",
-        "Boundary baseline"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Programme Baselines\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Management baseline\n\nThe record the section derives from, or an explicit absence.\n\n## Governance baseline\n\nThe record the section derives from, or an explicit absence.\n\n## Boundary baseline\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "programme-baselines",
-      "sources": {
-        "Management baseline": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/programme_baselines",
-            "match": {
-              "kind": "management"
-            }
-          }
-        ],
-        "Governance baseline": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/programme_baselines",
-            "match": {
-              "kind": "governance"
-            }
-          }
-        ],
-        "Boundary baseline": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/programme_baselines",
-            "match": {
-              "kind": "boundary"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category programme-baselines"
-    },
-    "programme-strategies": {
-      "required": [
-        "Information strategy",
-        "Risk strategy",
-        "Issue strategy",
-        "Monitoring strategy",
-        "Communications strategy",
-        "Quality strategy",
-        "Resource strategy"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Programme Strategies\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Information strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Risk strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Issue strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Monitoring strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Communications strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Quality strategy\n\nThe record the section derives from, or an explicit absence.\n\n## Resource strategy\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "programme-strategies",
-      "sources": {
-        "Information strategy": [
-          {
-            "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/documents"
-          }
-        ],
-        "Risk strategy": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "risk"
-            }
-          }
-        ],
-        "Issue strategy": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "kind": "issue"
-            }
-          }
-        ],
-        "Monitoring strategy": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/cadences"
-          }
-        ],
-        "Communications strategy": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/stakeholder_profiles"
-          }
-        ],
-        "Quality strategy": [
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "status": "approved"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews"
-          }
-        ],
-        "Resource strategy": [
-          {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_project"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category programme-strategies"
-    },
     "programme-risk-register": {
       "required": [
         "Register",
-        "Categories",
-        "Owners and review dates",
-        "Escalations"
+        "Owners and review dates"
       ],
       "optional": [
+        "Categories",
+        "Escalations",
         "Links"
       ],
       "skeleton": "# Programme Risk Register\n\nThe programme's risks, categorized and owned, with the dates they are reviewed and the escalations they forced.\n\n## Register\n\nEvery open and closed risk, with its impact, probability, status and mitigation.\n\n## Categories\n\nThe categories the risks are grouped by, and the category each risk belongs to.\n\n## Owners and review dates\n\nWho owns each risk and the date it is next reviewed; a risk with no owner or review date is refused.\n\n## Escalations\n\nThe risks escalated to the programme board, the sponsoring group or the SRO, with the decision each escalation seeks.\n\n## Links\n\nThe artefacts and issues the register informs.\n",
@@ -2894,271 +3045,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       },
       "verifier": "generate-standards.py --check-category programme-risk-register"
     },
-    "benefit-transition": {
-      "required": [
-        "Baseline measurement",
-        "Readiness",
-        "Transition",
-        "Post-transition measurement",
-        "Legacy retirement"
-      ],
-      "optional": [
-        "Owner after programme closure"
-      ],
-      "skeleton": "# Benefit Transition\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Baseline measurement\n\nThe record the section derives from, or an explicit absence.\n\n## Readiness\n\nThe record the section derives from, or an explicit absence.\n\n## Transition\n\nThe record the section derives from, or an explicit absence.\n\n## Post-transition measurement\n\nThe record the section derives from, or an explicit absence.\n\n## Legacy retirement\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "benefit",
-      "mandatory": true,
-      "spec": "§8.3",
-      "document_category": "benefit-transition",
-      "sources": {
-        "Baseline measurement": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_transitions",
-            "match": {
-              "benefit_profile_id": "$subject_id"
-            }
-          }
-        ],
-        "Readiness": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_transitions",
-            "match": {
-              "benefit_profile_id": "$subject_id"
-            }
-          }
-        ],
-        "Transition": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_transitions",
-            "match": {
-              "benefit_profile_id": "$subject_id"
-            }
-          }
-        ],
-        "Post-transition measurement": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_transitions",
-            "match": {
-              "benefit_profile_id": "$subject_id"
-            }
-          }
-        ],
-        "Legacy retirement": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_transitions",
-            "match": {
-              "benefit_profile_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category benefit-transition"
-    },
-    "programme-report": {
-      "required": [
-        "Status",
-        "Tranche decisions",
-        "Benefits",
-        "Cost"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Programme Report\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Status\n\nThe record the section derives from, or an explicit absence.\n\n## Tranche decisions\n\nThe record the section derives from, or an explicit absence.\n\n## Benefits\n\nThe record the section derives from, or an explicit absence.\n\n## Cost\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "MSP",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": false,
-      "spec": "§8.3",
-      "sources": {
-        "Status": [
-          {
-            "kind": "computed",
-            "name": "programme_summary"
-          }
-        ],
-        "Tranche decisions": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews"
-          }
-        ],
-        "Benefits": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Cost": [
-          {
-            "kind": "computed",
-            "name": "programme_summary"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category programme-report"
-    },
-    "requirements-catalog": {
-      "required": [
-        "Requirements",
-        "Types",
-        "Trace links"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Requirements Catalog\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Requirements\n\nThe record the section derives from, or an explicit absence.\n\n## Types\n\nThe record the section derives from, or an explicit absence.\n\n## Trace links\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "requirements-catalog",
-      "sources": {
-        "Requirements": [
-          {
-            "kind": "computed",
-            "name": "requirements_catalog"
-          }
-        ],
-        "Types": [
-          {
-            "kind": "computed",
-            "name": "requirements_catalog"
-          }
-        ],
-        "Trace links": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/links",
-            "match": {
-              "kind": [
-                "derivation",
-                "realization"
-              ]
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category requirements-catalog"
-    },
-    "architecture-capability": {
-      "required": [
-        "Principles",
-        "Tailored ADM",
-        "Artefact standard",
-        "Architecture Board",
-        "Governance and contracts",
-        "Maturity and skills"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Architecture capability\n\nThe Preliminary phase is a capability before it is a project: the principles, the tailored ADM, the artefact standard, the Architecture Board, the governance and contracts, and the maturity and skills baseline. Each is a row, and each is approved by the body that owns it.\n\n## Principles\n\nThe architecture principles catalogue, each with its statement, rationale and implications. The Board approves the catalogue; a principle without a rationale or its implications is not a principle.\n\n## Tailored ADM\n\nThe adopted `adm_profile`: which phases this organisation runs, which artefacts are mandatory per phase and plateau, and which contract closes each phase. A profile that cannot be adopted is a draft, not the capability.\n\n## Artefact standard\n\nThe `artifact_type` catalogue the repository is seeded from: each type's phase, plateau and mandatory flag. The standard is adopted once and grows with the assessed maturity.\n\n## Architecture Board\n\nThe `governance_body` of kind architecture board: membership, charter, commissioning authority and decision limits. A draft board cannot govern.\n\n## Governance and contracts\n\nThe architecture contracts (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work) and the waivers that accept a deviation for a period. A waiver names its accepting owner and reassessment date.\n\n## Maturity and skills\n\nThe nine-dimension maturity assessment (0–5) and the seven-category skills assessment, each a dated row with evidence. The development plan is a set of milestones a tranche review can hold the capability to.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "architecture-capability",
-      "sources": {
-        "Principles": [
-          {
-            "kind": "computed",
-            "name": "architecture_principles"
-          }
-        ],
-        "Tailored ADM": [
-          {
-            "kind": "computed",
-            "name": "architecture_profile"
-          }
-        ],
-        "Artefact standard": [
-          {
-            "kind": "computed",
-            "name": "artifact_standard"
-          }
-        ],
-        "Architecture Board": [
-          {
-            "kind": "computed",
-            "name": "architecture_board"
-          }
-        ],
-        "Governance and contracts": [
-          {
-            "kind": "computed",
-            "name": "architecture_governance"
-          }
-        ],
-        "Maturity and skills": [
-          {
-            "kind": "computed",
-            "name": "architecture_maturity_skills"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-capability"
-    },
-    "architecture-governance-log": {
-      "required": [
-        "Decisions",
-        "Reviews",
-        "Waivers"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Architecture Governance Log\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Decisions\n\nThe record the section derives from, or an explicit absence.\n\n## Reviews\n\nThe record the section derives from, or an explicit absence.\n\n## Waivers\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "architecture-governance-log",
-      "sources": {
-        "Decisions": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/board"
-          }
-        ],
-        "Reviews": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "optional": true
-          }
-        ],
-        "Waivers": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category architecture-governance-log"
-    },
     "adr-register": {
       "required": [
         "Register",
@@ -3208,866 +3094,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ]
       },
       "verifier": "generate-standards.py --check-category adr-register"
-    },
-    "delivery-contract": {
-      "required": [
-        "Commitments",
-        "Compliance method",
-        "Approval"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Delivery Contract\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Commitments\n\nThe record the section derives from, or an explicit absence.\n\n## Compliance method\n\nThe record the section derives from, or an explicit absence.\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "delivery-contract",
-      "sources": {
-        "Commitments": [
-          {
-            "kind": "computed",
-            "name": "contract_field",
-            "field": "commitments"
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the contract's commitment list: a commitments field on the delivery contract body"
-          }
-        ],
-        "Compliance method": [
-          {
-            "kind": "computed",
-            "name": "contract_field",
-            "field": "compliance"
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the contract's compliance method: a compliance field on the delivery contract body"
-          }
-        ],
-        "Approval": [
-          {
-            "kind": "computed",
-            "name": "contract_approval"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category delivery-contract"
-    },
-    "statement-of-intent": {
-      "required": [
-        "Intended use",
-        "Ownership",
-        "Measures of effectiveness"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Statement Of Intent\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Intended use\n\nThe record the section derives from, or an explicit absence.\n\n## Ownership\n\nThe record the section derives from, or an explicit absence.\n\n## Measures of effectiveness\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": false,
-      "spec": "§8.1",
-      "sources": {
-        "Intended use": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_intent",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Ownership": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_intent",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Measures of effectiveness": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "statement_of_intent",
-              "project_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category statement-of-intent"
-    },
-    "request-for-architecture-work": {
-      "required": [
-        "Purpose",
-        "Scope",
-        "Decision"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Request For Architecture Work\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Purpose\n\nThe record the section derives from, or an explicit absence.\n\n## Scope\n\nThe record the section derives from, or an explicit absence.\n\n## Decision\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": false,
-      "spec": "§8.1",
-      "sources": {
-        "Purpose": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "request_for_architecture",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Scope": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "request_for_architecture",
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Decision": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "request_for_architecture",
-              "project_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category request-for-architecture-work"
-    },
-    "safe-portfolio": {
-      "required": [
-        "Portfolio canvas",
-        "Strategic themes",
-        "Value streams"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Safe Portfolio\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Portfolio canvas\n\nThe record the section derives from, or an explicit absence.\n\n## Strategic themes\n\nThe record the section derives from, or an explicit absence.\n\n## Value streams\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "SAFe",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.2",
-      "document_category": "safe-portfolio",
-      "sources": {
-        "Portfolio canvas": [
-          {
-            "kind": "computed",
-            "name": "programme_summary"
-          }
-        ],
-        "Strategic themes": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_profiles"
-          }
-        ],
-        "Value streams": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/benefit_links"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category safe-portfolio"
-    },
-    "safe-art": {
-      "required": [
-        "ART charter",
-        "Solution intent",
-        "Backlog with WSJF",
-        "Shared configuration"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n\n## Shared configuration\n\nThe programme values every project inherits and the keys it locks against override.\n",
-      "standard": "SAFe",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.2",
-      "document_category": "safe-art",
-      "sources": {
-        "ART charter": [
-          {
-            "kind": "computed",
-            "name": "programme_charter"
-          }
-        ],
-        "Solution intent": [
-          {
-            "kind": "absence",
-            "record": "the solution-intent record: the ART's intended outcomes, measures and constraints"
-          }
-        ],
-        "Backlog with WSJF": [
-          {
-            "kind": "computed",
-            "name": "wsjf_order",
-            "severity": "P1",
-            "match": {
-              "status": "accepted"
-            }
-          }
-        ],
-        "Shared configuration": [
-          {
-            "kind": "computed",
-            "name": "shared_config",
-            "severity": "P1"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category safe-art"
-    },
-    "safe-cadence": {
-      "required": [
-        "PI plan",
-        "System demo",
-        "Inspect and adapt",
-        "Lean governance"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Safe Cadence\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## PI plan\n\nThe record the section derives from, or an explicit absence.\n\n## System demo\n\nThe record the section derives from, or an explicit absence.\n\n## Inspect and adapt\n\nThe record the section derives from, or an explicit absence.\n\n## Lean governance\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "SAFe",
-      "level": "programme",
-      "subject_kind": "programme",
-      "mandatory": true,
-      "spec": "§8.2",
-      "document_category": "safe-cadence",
-      "sources": {
-        "PI plan": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/cadences",
-            "match": {
-              "kind": "pi"
-            }
-          }
-        ],
-        "System demo": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/cadences",
-            "match": {
-              "kind": "demo"
-            }
-          }
-        ],
-        "Inspect and adapt": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/cadences",
-            "match": {
-              "kind": "retro"
-            }
-          }
-        ],
-        "Lean governance": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/tranche_reviews"
-          },
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "gate": "tranche_review"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "gate": "tranche_review"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category safe-cadence"
-    },
-    "project-wbs": {
-      "required": [
-        "Work packages",
-        "Acceptance",
-        "Status"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Project Wbs\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Work packages\n\nThe record the section derives from, or an explicit absence.\n\n## Acceptance\n\nThe record the section derives from, or an explicit absence.\n\n## Status\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "PMP",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.4",
-      "document_category": "project-wbs",
-      "sources": {
-        "Work packages": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes",
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Acceptance": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes",
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ],
-        "Status": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes",
-            "match": {
-              "project_id": "$subject_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category project-wbs"
-    },
-    "project-baseline": {
-      "required": [
-        "Scope",
-        "Schedule",
-        "Cost",
-        "Approval"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Project Baseline\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Scope\n\nThe record the section derives from, or an explicit absence.\n\n## Schedule\n\nThe record the section derives from, or an explicit absence.\n\n## Cost\n\nThe record the section derives from, or an explicit absence.\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "PMP",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.4",
-      "document_category": "project-baseline",
-      "sources": {
-        "Scope": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "scope"
-            }
-          }
-        ],
-        "Schedule": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "schedule"
-            }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the project schedule baseline: a project_baseline row of kind schedule"
-          }
-        ],
-        "Cost": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "cost"
-            }
-          },
-          {
-            "kind": "absence",
-            "fallback": true,
-            "record": "the project cost baseline: a project_baseline row of kind cost"
-          }
-        ],
-        "Approval": [
-          {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "project_id": "$subject_id",
-              "gate": "baseline"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category project-baseline"
-    },
-    "project-registers": {
-      "required": [
-        "Risks",
-        "Issues",
-        "Assumptions",
-        "Dependencies",
-        "Benefits",
-        "Changes"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Project Registers\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Risks\n\nThe record the section derives from, or an explicit absence.\n\n## Issues\n\nThe record the section derives from, or an explicit absence.\n\n## Assumptions\n\nThe record the section derives from, or an explicit absence.\n\n## Dependencies\n\nThe record the section derives from, or an explicit absence.\n\n## Benefits\n\nThe record the section derives from, or an explicit absence.\n\n## Changes\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "PMP",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.4",
-      "document_category": "project-registers",
-      "sources": {
-        "Risks": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "risk"
-            }
-          }
-        ],
-        "Issues": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "issue"
-            }
-          }
-        ],
-        "Assumptions": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "assumption"
-            }
-          }
-        ],
-        "Dependencies": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "dependency"
-            }
-          }
-        ],
-        "Benefits": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "benefit"
-            }
-          }
-        ],
-        "Changes": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "change"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category project-registers"
-    },
-    "change-control": {
-      "required": [
-        "Change requests",
-        "Impact",
-        "Decisions"
-      ],
-      "optional": [
-        "Links"
-      ],
-      "skeleton": "# Change Control\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Change requests\n\nThe record the section derives from, or an explicit absence.\n\n## Impact\n\nThe record the section derives from, or an explicit absence.\n\n## Decisions\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "PMP",
-      "level": "project",
-      "subject_kind": "project",
-      "mandatory": true,
-      "spec": "§8.4",
-      "document_category": "change-control",
-      "sources": {
-        "Change requests": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "change"
-            }
-          }
-        ],
-        "Impact": [
-          {
-            "kind": "computed",
-            "name": "change_impact",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "change"
-            }
-          }
-        ],
-        "Decisions": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
-            "match": {
-              "project_id": "$subject_id",
-              "kind": "change"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category change-control"
-    },
-    "phase-preliminary": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase Preliminary\n\nThe capability that makes architecture work possible: the principles, the tailored ADM, the artefact standard, the Board, governance and the maturity and skills baseline. Preliminary closes when the capability is adopted, not when a document is filed.\n\n## Mandatory artefacts\n\nThe preliminary artefact types the adopted profile requires, each evidenced by an artefact of that type in this phase. A required type with no artefact is missing; the package names it.\n\n## Contract and gate\n\nThe Board and the adopted profile are the gate objects: the Board's charter is approved and the profile is adopted. A draft board or an unadopted profile is not a gate.\n\n## Evidence\n\nThe preliminary artifacts and the adopted profile, with their status. This is what the Board approved.\n",
-      "standard": "TOGAF",
-      "level": "programme",
-      "subject_kind": "capability",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-preliminary",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "preliminary"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/board"
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "preliminary"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/profiles"
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-preliminary"
-    },
-    "phase-a": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase A\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-a",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "a"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "phase_code": "a"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "a"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-a"
-    },
-    "phase-b": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase B\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-b",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "b"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "b"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-b"
-    },
-    "phase-c": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase C\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-c",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "c"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "c"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-c"
-    },
-    "phase-d": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase D\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-d",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "d"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "d"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-d"
     },
     "candidate-solutions": {
       "required": [
@@ -4274,304 +3300,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       },
       "verifier": "generate-standards.py --check-category gap-analysis",
       "document_authored": true
-    },
-    "phase-e": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence",
-        "Gap analysis",
-        "Candidate solutions",
-        "Project context diagram",
-        "Benefits diagram",
-        "Work packages"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase E\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n\n## Gap analysis\n\nThe baseline, the target and the gaps the work packages close.\n\n## Candidate solutions\n\nThe options evaluated, the criteria they were judged on and the options rejected.\n\n## Project context diagram\n\nThe work package against the affected organisation and systems.\n\n## Benefits diagram\n\nThe goals, outcomes, measures and benefits the solution serves.\n\n## Work packages\n\nThe work packages that close the gaps, with their WBS rows and owners.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-e",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "e"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "e"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Gap analysis": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "require_heading": false,
-            "match": {
-              "category": "gap-analysis",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Candidate solutions": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "require_heading": false,
-            "match": {
-              "category": "candidate-solutions",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Project context diagram": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "require_heading": false,
-            "match": {
-              "category": "project-context-diagram",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Benefits diagram": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "require_heading": false,
-            "match": {
-              "category": "benefits-diagram",
-              "scope": "subject"
-            }
-          }
-        ],
-        "Work packages": [
-          {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes",
-            "match": {
-              "project_id": "$project_id"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-e"
-    },
-    "phase-f": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase F\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-f",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "f"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "phase_code": "f"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "f"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-f"
-    },
-    "phase-g": {
-      "required": [
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Mandatory artefacts",
-        "Findings"
-      ],
-      "skeleton": "# Phase G\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-g",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "g"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "match": {
-              "project_id": "$project_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "g"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-g"
-    },
-    "phase-h": {
-      "required": [
-        "Mandatory artefacts",
-        "Contract and gate",
-        "Evidence"
-      ],
-      "optional": [
-        "Findings"
-      ],
-      "skeleton": "# Phase H\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
-      "standard": "TOGAF",
-      "level": "project",
-      "subject_kind": "phase",
-      "mandatory": true,
-      "spec": "§8.1",
-      "document_category": "phase-h",
-      "sources": {
-        "Mandatory artefacts": [
-          {
-            "kind": "computed",
-            "name": "phase_artefacts",
-            "phase": "h"
-          }
-        ],
-        "Contract and gate": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$project_id"
-            }
-          }
-        ],
-        "Evidence": [
-          {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/artifacts",
-            "match": {
-              "phase_code": "h"
-            }
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "architecture-artifact-instance",
-              "scope": "subject"
-            }
-          }
-        ]
-      },
-      "verifier": "generate-standards.py --check-category phase-h"
     },
     "pi-plan": {
       "required": [
@@ -4867,7 +3595,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     }
   },
   "on_demand": [
-    "architecture-artifact-instance",
     "decision",
     "programme-brief",
     "refined-vision",
@@ -4897,6 +3624,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-f",
     "phase-g",
     "phase-h",
+    "architecture-artifact-instance",
     "pi-plan",
     "pi-objectives",
     "system-demo",

@@ -24,7 +24,7 @@ re-measured at `main@01544010f` on 2026-11-27; the earlier baselines were `d9588
 
 This plan is deliberately **not** a SPEC_V2 §12 `T##` slice. The programme-seed generator parses
 only `docs/plans/slices/S*.md` and `**(T##)**` rows in §12, so a T-row would silently change
-`seed/programme.json` and fail `build-programme-seed.py --check`. The walk is registered as a
+`seed/programme.json`; the frozen seed moves only by a reviewed data PR. The walk is registered as a
 cross-cutting project in `docs/plans/00-INDEX.md`; the inception unit (#792) publishes the
 MSP/TOGAF/SAFe set and registers the project, and the build issues G0/S1–S4 are created after the
 publication gate.
@@ -82,9 +82,9 @@ pre-empted. It is not defined as pixel or copy parity with either existing clien
 ## 4. Relationship to the programme
 
 - Not a §12 `T##` slice. The inception unit (#792) registers the project and publishes the
-  inception set before any build issue is created; the registration is a reviewable data change
-  through `scripts/build-programme-seed.py` and `seed/programme-definition.json`, never a
-  hand-edit of `seed/programme.json` or `docs/design/data/issues.json` (see §8.1).
+  inception set before any build issue is created; the registration is a reviewable data PR to
+  `seed/programme.json` and `seed/programme-definition.json`, applied by `programmes.refresh` —
+  never a hand edit of the live rows or of `docs/design/data/issues.json` (see §8.1).
 - The V2 coverage instrument (D65, `scripts/build-v2-coverage.py`) continues to measure `apps/web`
   and is not touched. The walk's evidence is `docs/evidence/walk-coverage.json`.
 - The design pack (`/design/`) keeps its public role and is not rebuilt or embedded.
@@ -255,24 +255,27 @@ plan states both paths so no session has to improvise.
 1. **Precondition — done.** ADR 0021 is Accepted (2026-11-26, delegated rule decision) and this
    docs unit (#792) carries the inception set. The set is published on the project by #792 before
    any build issue is claimed: P0 §5 makes an unpublished inception a hard gate, not a waiver.
-2. **The inception unit (#792) registers the project** (a reviewable data change, not prose):
-   - add `GEMBA-WALK` to `CROSS_CUTTING` in `scripts/build-programme-seed.py` (name, plan path,
-     `track: "programme"`, the inception issue number) and to `seed/programme-definition.json`
-     under `projects` with `{"adm_phase": "Preliminary", "plateau": "definition"}`;
-   - run `python3 scripts/build-programme-seed.py`, `scripts/build-coverage.py`,
-     `scripts/check-programme-definition.py`, `scripts/programme_state.py --check`; fetch the
-     issue registry in-branch and run `node docs/design/scripts/check-coverage.cjs` — an unknown
-     unit here is the early failure. Never hand-edit `docs/design/data/issues.json` —
-     `.github/workflows/issue-registry.yml` owns it.
-   - the `CROSS_CUTTING` convention puts the project in tranche 0; the issue's Programme field says
-     `Tranche 0 (cross-cutting)`.
+2. **The inception unit (#792) registers the project** (a reviewable data PR, not prose):
+   - add `GEMBA-WALK` to `seed/programme.json` as a programme project (name, plan path,
+     `track: "programme"`, tranche 0, the inception issue number in `meta.issues`) and to
+     `seed/programme-definition.json` under `projects` with
+     `{"adm_phase": "Preliminary", "plateau": "definition"}`;
+   - apply it with the `programmes.refresh` action (or a deploy, which seeds the same file), then
+     run `python3 scripts/build-coverage.py --check` and
+     `node docs/design/scripts/check-coverage.cjs` — an unknown unit is the early failure; update
+     the seed-count assertions in the Rust tests that pin the project count. Never hand-edit
+     `docs/design/data/issues.json` — `.github/workflows/issue-registry.yml` owns it;
+   - the seed is frozen: the tranche-0 row is the registration of record, and the project's
+     `meta.issues` is the link the design site shows. A later unit is added to that list by a
+     follow-up data PR (the frozen seed never follows a label on its own).
 3. **Publish the inception set** on the project (`documents.compose` → `documents.publish`), verify
    the bodies hash-equal to `docs/plans/inception/GEMBA-WALK/`, create the 10 typed artefact rows,
    and record the Phase-A SoAW through the Board with a distinct approver. Publish the benefit
    profile with the baseline `unmeasured`. This is the gate before step 4.
 4. **Create G0 and S1–S4 after publication.** Create them from `.github/ISSUE_TEMPLATE/unit.md` with
-   the `GEMBA-WALK` label; do not create them before `CROSS_CUTTING` is on `main` (the registry
-   would map them to PLATFORM). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the
+   the `GEMBA-WALK` label; do not create them before the project's seed row is on `main`, and add
+   their numbers to that row's `meta.issues` in a follow-up data PR (the frozen seed does not
+   follow labels). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the
    published `project-brief` + ADR 0021 + this plan; ADM `Preliminary`/`definition`; Benefits
    B-WALK-1 (enabling). Parts W0/W1/W2, each with a BDD `Verify:`; dependencies as in §8; the game client and host as owned delivery work (CR-WALK-001).
 5. **G0's W0 freezes the census and builds the instrument** exactly as §6. Commit

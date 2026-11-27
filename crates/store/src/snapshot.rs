@@ -50,6 +50,12 @@ pub struct SnapshotData {
     /// `measure.json` data: inference aggregates (no prompt or response bodies exist), including
     /// the per-project and per-card spend the delivery view reads.
     pub measure: Value,
+    /// `delivery.json` data: each delivery unit's charter, immutable steps, the three gates and
+    /// its closure (#782 P1). A unit with no issue reference or closure says `not recorded`.
+    pub delivery: Value,
+    /// The programme's health: tranche reconciliation, benefit transitions, unit counts and the
+    /// published documents' provenance coverage (#782 P1).
+    pub programme_health: Value,
     /// Secret **metadata** — never a value, never a key id.
     pub secrets: Value,
 }
@@ -947,6 +953,120 @@ pub async fn snapshot_tx(
         &architecture_reviews,
     );
 
+    // The delivery record (SPEC_V2 §10.1, §10.5.9; #782 P1). A unit follows the same portfolio
+    // boundary as every other section; its steps, gates and closure are read from their own
+    // tables, never derived. A missing issue reference or closure is `not recorded`, never a
+    // guessed value (P1.2).
+    let mut delivery_units = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_key, t.id), '[]'::jsonb) FROM (
+             SELECT d.id, d.project_id, p.key AS project_key, d.repo, d.lane, d.issue_ref,
+                    d.status, d.gate_set, d.acceptance_command, d.version,
+                    d.created_at, d.updated_at,
+                    COALESCE((SELECT jsonb_agg(jsonb_build_object(
+                         'step', s.step, 'evidence', s.evidence,
+                         'recorded_by', s.recorded_by, 'recorded_at', s.created_at
+                       ) ORDER BY s.created_at, s.id)
+                       FROM development_step s
+                      WHERE s.tenant_id = d.tenant_id AND s.development_project_id = d.id),
+                     '[]'::jsonb) AS steps,
+                    COALESCE((SELECT jsonb_agg(jsonb_build_object(
+                         'gate', a.gate, 'status', a.status, 'requested_by', a.requested_by,
+                         'expires_at', a.expires_at, 'created_at', a.created_at,
+                         'decided_at', (SELECT max(ad.created_at) FROM approval_decision ad
+                                         WHERE ad.tenant_id = a.tenant_id
+                                           AND ad.approval_id = a.id)
+                       ) ORDER BY a.gate)
+                       FROM approval a
+                      WHERE a.tenant_id = d.tenant_id AND a.project_id = d.project_id
+                        AND a.kind = 'development'
+                        AND a.gate IN ('review', 'merge', 'deploy')), '[]'::jsonb) AS gates,
+                    (SELECT jsonb_build_object(
+                         'lane', c.lane, 'pr_url', c.pr_url, 'ci_run_id', c.ci_run_id,
+                         'ci_verdict', c.ci_verdict, 'merge_sha', c.merge_sha,
+                         'deployed_digest', c.deployed_digest, 'live_check', c.live_check,
+                         'closure', c.closure, 'closed_at', c.created_at,
+                         'reviewer', (SELECT u.display_name FROM app_user u
+                                       WHERE u.id = c.reviewer_id)
+                       )
+                       FROM development_closure c
+                      WHERE c.tenant_id = d.tenant_id
+                        AND c.development_project_id = d.id) AS closure
+               FROM development_project d
+               JOIN project p ON p.id = d.project_id AND p.tenant_id = d.tenant_id
+              WHERE d.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    retain_ids(&mut delivery_units, "project_id", &bound_projects);
+    if let Some(units) = delivery_units.as_array_mut() {
+        for unit in units {
+            if unit.get("issue_ref").is_none_or(Value::is_null) {
+                unit["issue_ref"] = Value::String("not recorded".to_owned());
+            }
+            if unit.get("closure").is_none_or(Value::is_null) {
+                unit["closure"] = Value::String("not recorded".to_owned());
+            }
+        }
+    }
+
+    // Provenance coverage over the published documents the pack actually carries (the same
+    // publication filter as `documents`, plus the portfolio boundary). Only counts are published;
+    // a document's meta never leaves the tenant.
+    let bound_project_ids: Vec<uuid::Uuid> = bound_projects
+        .iter()
+        .filter_map(|id| uuid::Uuid::parse_str(id).ok())
+        .collect();
+    let provenance: Value = sqlx::query_scalar(
+        "SELECT jsonb_build_object(
+             'documents', count(*),
+             'with_source_commit', count(*) FILTER (
+                 WHERE COALESCE(meta->>'source_commit', '') <> ''),
+             'unrecorded', count(*) FILTER (
+                 WHERE COALESCE(meta->>'source_commit', '') = '')
+         ) FROM document
+         WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active'
+           AND (project_id IS NULL OR project_id = ANY($2::uuid[]))",
+    )
+    .bind(tenant_id)
+    .bind(&bound_project_ids)
+    .fetch_one(&mut *conn)
+    .await?;
+
+    let mut units_by_status: BTreeMap<String, u64> = BTreeMap::new();
+    let mut unit_total = 0u64;
+    for unit in delivery_units
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default()
+    {
+        unit_total += 1;
+        let status = unit
+            .get("status")
+            .and_then(Value::as_str)
+            .unwrap_or("unknown")
+            .to_owned();
+        *units_by_status.entry(status).or_default() += 1;
+    }
+    let realised_benefits = benefit_realisation_section
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default()
+        .iter()
+        .filter(|row| row.get("state").and_then(Value::as_str) == Some("realised"))
+        .count();
+    let programme_health = json!({
+        "tranches": tranche_reconciliation_section.clone(),
+        "benefits": {
+            "profiles": benefit_profiles.as_array().map(Vec::len).unwrap_or(0),
+            "transitions": benefit_transitions.as_array().map(Vec::len).unwrap_or(0),
+            "realised": realised_benefits,
+        },
+        "units": {"total": unit_total, "by_status": units_by_status},
+        "provenance": provenance,
+    });
+
     Ok(SnapshotData {
         programme: json!({
             "programme": programme,
@@ -1031,6 +1151,8 @@ pub async fn snapshot_tx(
                      tenant-wide; `by_project` and `by_card` cover only the rows this snapshot \
                      publishes, so the differences are the boundary, not a missing call"
         }),
+        delivery: json!({"units": delivery_units}),
+        programme_health,
         secrets: json!({"secrets": secrets}),
     })
 }

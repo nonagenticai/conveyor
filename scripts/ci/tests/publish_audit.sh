@@ -19,9 +19,8 @@ mkdir -p "$tmp/docs/design/scripts" "$tmp/docs/design/docs" "$tmp/docs/design/da
 
 cp "$repo/docs/design/scripts/publish-data.sh" "$tmp/docs/design/scripts/publish-data.sh"
 # Order-proving stand-ins: the real generators read the whole tree, so the test proves the
-# ORDER — the docs index hashes the INSTALLED conformance.md, and the seed follows the INSTALLED
-# registry — with stubs that record the hashes they see. A stub that cannot find its input fails
-# the publish, which is the assertion.
+# ORDER — the docs index hashes the INSTALLED conformance.md — with a stub that records the
+# hash it sees. A stub that cannot find its input fails the publish, which is the assertion.
 cat > "$tmp/docs/design/scripts/build-docs.py" <<'PY'
 #!/usr/bin/env python3
 import hashlib, json, pathlib
@@ -35,14 +34,6 @@ document = {"conformance_sha256": digest}
 (out / "documents.js").write_text(
     "window.CONVEYOR_DOCUMENTS = " + json.dumps(document, sort_keys=True) + ";\n"
 )
-PY
-cat > "$tmp/scripts/build-programme-seed.py" <<'PY'
-#!/usr/bin/env python3
-import hashlib, json, pathlib
-root = pathlib.Path(__file__).resolve().parents[1]
-registry = (root / "docs/design/data/issues.json").read_bytes()
-document = {"projects": [], "registry_sha256": hashlib.sha256(registry).hexdigest()}
-(root / "seed/programme.json").write_text(json.dumps(document, sort_keys=True) + "\n")
 PY
 cat > "$tmp/scripts/build-coverage.py" <<'PY'
 #!/usr/bin/env python3
@@ -226,19 +217,6 @@ installed = (root / "docs/design/data/conformance.md").read_bytes()
 assert index.get("conformance_sha256") == hashlib.sha256(installed).hexdigest(), index
 PY
   echo "FAIL: the docs index did not hash the installed conformance.md" >&2
-  exit 1
-}
-# P2 — the programme seed is derived from the INSTALLED (fetched) registry, not the committed
-# fixture: the stub records the hash of the registry it saw, and the fetched one is distinctive.
-python3 - "$tmp" <<'PY' || {
-import hashlib, json, pathlib, sys
-root = pathlib.Path(sys.argv[1])
-installed = (root / "docs/design/data/issues.json").read_bytes()
-assert b"9001" in installed, installed[:120]
-seed = json.loads((root / "seed/programme.json").read_text(encoding="utf-8"))
-assert seed.get("registry_sha256") == hashlib.sha256(installed).hexdigest(), seed
-PY
-  echo "FAIL: the programme seed was not derived from the installed registry" >&2
   exit 1
 }
 echo "publish_audit: OK"

@@ -131,14 +131,14 @@
 <p>The Architecture destination (four tabs); the artefact inspector; the phase-advance refusal; the seed's T9 gate and the T9/P0 expected-output categories.</p>
 <ul>
 <li>Given the console, when the Architecture destination opens, then the four tabs render and each interaction changes its recorded state. <code>Verify:</code> <code>node docs/design/scripts/check-v2.cjs</code></li>
-<li>Given the seed, when it is regenerated, then T9's gate text is the §12 row's. <code>Verify:</code> <code>python3 scripts/build-programme-seed.py --check</code> (The architecture expected-output categories are #221's; this unit consumes them once they land.)</li>
+<li>Given the frozen seed, then T9's gate text is the §12 row's. <code>Verify:</code> <code>cargo test -p conveyor-store --test seed_programme</code> (the seed/row parity gate) (The architecture expected-output categories are #221's; this unit consumes them once they land.)</li>
 </ul>
 <h2 id="6-data-model">6. Data model</h2>
 <p>The eleven tables are in SPEC_V2 §10.3. New columns only where unavoidable: <code>project.project_type_code</code> already exists; <code>governed_asset.kind</code> is extended where a definition artefact is generic (charter, closure, mandate, brief, blueprint, business case, refined vision, benefits strategy, realization plan, projects dossier), never for an architecture artefact or contract, which have their own tables. All tables are tenant-scoped and <code>ENABLE</code>+<code>FORCE RLS</code>.</p>
 <h2 id="7-actions-and-events">7. Actions and events</h2>
 <p>The <code>architecture.*</code> family is declared in SPEC_V2 §10.4. Every action is an <code>ActionSpec</code> with one declaration → HTTP + MCP + OpenAPI + generated client. The events are one subject and one verb (<code>architecture_artifact.changed</code>, <code>architecture_phase.closed</code>, <code>compliance_review.recorded</code>, <code>architecture_waiver.granted</code>). A phase advance and its contract approval commit in one transaction with their event.</p>
 <h2 id="8-the-programme">8. The programme</h2>
-<p><code>seed/programme.json</code> T9 carries the §12 gate text; its expected outputs come from the output standard. P0's class carries the definition categories; T9's class carries the architecture categories. The seed is generated (<code>scripts/build-programme-seed.py</code>), never hand-edited, and <code>--check</code> is the gate.</p>
+<p><code>seed/programme.json</code> T9 carries the §12 gate text; its expected outputs come from the output standard. P0's class carries the definition categories; T9's class carries the architecture categories. The seed is frozen: a change is a reviewed data PR and the <code>seed_programme</code> parity test is the gate.</p>
 <h2 id="9-dependencies">9. Dependencies</h2>
 <table>
 <thead>

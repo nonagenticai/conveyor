@@ -228,8 +228,8 @@ seed's T9 gate and the T9/P0 expected-output categories.
 - Given the console, when the Architecture destination opens, then the four tabs render and each
   interaction changes its recorded state.
   `Verify:` `node docs/design/scripts/check-v2.cjs`
-- Given the seed, when it is regenerated, then T9's gate text is the §12 row's.
-  `Verify:` `python3 scripts/build-programme-seed.py --check`
+- Given the frozen seed, then T9's gate text is the §12 row's.
+  `Verify:` `cargo test -p conveyor-store --test seed_programme` (the seed/row parity gate)
   (The architecture expected-output categories are #221's; this unit consumes them once they land.)
 
 ## 6. Data model
@@ -252,8 +252,8 @@ transaction with their event.
 
 `seed/programme.json` T9 carries the §12 gate text; its expected outputs come from the output
 standard. P0's class carries the definition categories; T9's class carries the architecture
-categories. The seed is generated (`scripts/build-programme-seed.py`), never hand-edited, and
-`--check` is the gate.
+categories. The seed is frozen: a change is a reviewed data PR and the `seed_programme` parity
+test is the gate.
 
 ## 9. Dependencies
 

@@ -1665,7 +1665,7 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       "hillclimb",
       "benchmarks",
       "portfolio",
-      "programme",
+      "delivery",
       "plan",
       "contribute",
       "organisation",

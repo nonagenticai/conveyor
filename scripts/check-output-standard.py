@@ -2,7 +2,7 @@
 """Validate the programme output standard's own shape.
 
 `seed/output-standard.json` is the one vocabulary and the per-project-class required sets.
-`scripts/build-programme-seed.py` reads it and emits `meta.expected_outputs` /
+The frozen `seed/programme.json` carries each project's `meta.expected_outputs` /
 `meta.closure_outputs`; this gate refuses a standard that is internally inconsistent:
 
   * an unknown category, alias target or matching fact;

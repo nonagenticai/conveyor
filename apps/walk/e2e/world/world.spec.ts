@@ -7,7 +7,9 @@ test("the world mounts and the room map is the keyboard path", async ({ page }) 
   await page.goto("/");
   const canvas = page.locator("#world-canvas");
   await expect(canvas).toBeVisible();
-  await expect(canvas).toHaveAttribute("data-engine", /ecs|fallback/, { timeout: 20_000 });
+  // Strict: the suite builds the wasm, so a silent fallback is a defect, not an environment
+  // (#839 — the config omitted the required `seed` and `ecs|fallback` hid it everywhere).
+  await expect(canvas).toHaveAttribute("data-engine", "ecs", { timeout: 20_000 });
 
   const map = page.getByRole("navigation", { name: "Rooms" });
   await map.getByRole("button", { name: "Portfolio & plan" }).click();
