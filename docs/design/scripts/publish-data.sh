@@ -78,7 +78,10 @@ fi
 # 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
 #    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
 #    same defect never becomes a second card.
-audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
+# The register's acceptance commands and the page name the checked-in pack, not this run's temp
+# copy: a random /var/folders path would change every run and leak into the public tree.
+audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance" --snapshot-label docs/design/data)
+audit_args+=(--path-label "$tmp/conformance/standards-findings.json=docs/evidence/standards-findings.json")
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" --report
 test -f "$tmp/conformance/conformance-gap-register.json" || {
   echo "publish-data: the audit produced no gap register" >&2

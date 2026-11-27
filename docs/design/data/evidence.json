@@ -161,9 +161,9 @@
       "sha256": "ed3ef52ce9ba9cca194d7069693bf11a40fdc573443e92585c82c8117f66af2a"
     },
     {
-      "bytes": 13420,
+      "bytes": 13417,
       "path": "docs/design/data/conformance.md",
-      "sha256": "8eb58ffb817a54d518e7c8385d13b882a337be132f95c431f9225abee913fd12"
+      "sha256": "b6862ef67f7cc766df1ce9be9a272259a44b8ab8a9bb71fceb3e7b302d96559c"
     },
     {
       "bytes": 10927,
@@ -506,9 +506,9 @@
       "sha256": "8bf08b389880b52a141cf642b7ed3b34cdb7b7e27ade654a131fb7d9af0b3971"
     },
     {
-      "bytes": 13420,
+      "bytes": 13417,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "8eb58ffb817a54d518e7c8385d13b882a337be132f95c431f9225abee913fd12"
+      "sha256": "b6862ef67f7cc766df1ce9be9a272259a44b8ab8a9bb71fceb3e7b302d96559c"
     },
     {
       "bytes": 33072,

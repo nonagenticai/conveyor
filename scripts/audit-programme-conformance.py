@@ -1576,16 +1576,12 @@ def load_dataset(
 
 
 def render_markdown(
-    gaps: list[dict[str, Any]], dataset: Dataset, snapshot: Path
+    gaps: list[dict[str, Any]], dataset: Dataset, snapshot_label: str
 ) -> str:
     counts = {severity: 0 for severity in SEVERITY_ORDER}
     for gap in gaps:
         counts[gap["severity"]] = counts.get(gap["severity"], 0) + 1
     manifest = dataset.manifest
-    # The published page must not carry the operator's home directory: name the retained snapshot
-    # by its last two path components (`issue-526-2a1ff31d/data`), which identifies it without a
-    # machine-specific absolute path.
-    snapshot_label = "/".join(Path(snapshot).parts[-2:])
     lines = [
         "# MSP/TOGAF conformance gap register",
         "",
@@ -3514,6 +3510,20 @@ def self_test() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot", type=Path, default=DEFAULT_SNAPSHOT)
+    parser.add_argument(
+        "--path-label",
+        action="append",
+        default=[],
+        metavar="OLD=NEW",
+        help="name a working copy's file by its installed path inside the register's "
+        "acceptance commands; repeatable",
+    )
+    parser.add_argument(
+        "--snapshot-label",
+        default=None,
+        help="the path the register's acceptance commands and the page name, so a "
+        "temp working copy does not leak into the public pack; defaults to --snapshot",
+    )
     parser.add_argument("--outputs", type=Path, default=None)
     parser.add_argument("--seed-dir", type=Path, default=ROOT / "seed")
     parser.add_argument("--standard", type=Path, default=DEFAULT_STANDARD)
@@ -3574,6 +3584,19 @@ def main() -> None:
     parser.add_argument("--check-standard", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
+    # One label for the register's acceptance commands and the page: the publish runs against a
+    # temp copy, and that path must not leak into the committed pack.
+    snapshot_label = args.snapshot_label or str(args.snapshot)
+    path_labels: dict[str, str] = {}
+    for item in args.path_label:
+        old, sep, new = item.partition("=")
+        if not sep or not old or not new:
+            parser.error(f"--path-label wants OLD=NEW, got {item!r}")
+        path_labels[old] = new
+
+    def labelled(path: object) -> str:
+        raw = str(path)
+        return path_labels.get(raw, raw)
     # The two findings ledgers are the register's default provenance. An explicit --findings
     # list replaces them; omission must not silently drop the standards findings, or a
     # --rework-check built from this command proves nothing about the standards packages.
@@ -3617,9 +3640,9 @@ def main() -> None:
             findings_doc,
             standard,
             dataset,
-            str(args.snapshot),
-            [str(path) for path in findings_paths],
-            [str(path) for path in (args.deep_review or [])],
+            snapshot_label,
+            [labelled(path) for path in findings_paths],
+            [labelled(path) for path in (args.deep_review or [])],
         )
     if args.rework_out and register is not None:
         args.rework_out.parent.mkdir(parents=True, exist_ok=True)
@@ -3693,7 +3716,7 @@ def main() -> None:
             json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
         (args.out / "conformance-gap-register.md").write_text(
-            render_markdown(gaps, dataset, args.snapshot), encoding="utf-8"
+            render_markdown(gaps, dataset, snapshot_label), encoding="utf-8"
         )
         # A report is evidence, not an acceptance: it must never write the accepted ledger.
         # The accepted file is produced only by --accept-baseline, which names the decision.

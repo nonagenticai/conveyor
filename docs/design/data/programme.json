@@ -19,9 +19,9 @@
           }
         ],
         "number": 857,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
-        "updatedAt": "2026-11-27T15:46:20Z",
+        "updatedAt": "2026-11-27T16:31:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/857"
       },
       {
@@ -7360,7 +7360,7 @@
       }
     ],
     "provenance": {
-      "sha256": "8208a78d1bfa1171a0b4d2af651d7e8b1fc4ea24564e70eaddb41bcd1ad5f5a0",
+      "sha256": "ae8c2b94890bfb9681fd67a00a69a5276693b5ba620d834aa163ea07dbfa2e93",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },

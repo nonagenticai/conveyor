@@ -8,9 +8,9 @@
     {
       "number": 857,
       "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/857",
-      "updatedAt": "2026-11-27T15:46:20Z",
+      "updatedAt": "2026-11-27T16:31:13Z",
       "labels": [
         {
           "name": "unit",
