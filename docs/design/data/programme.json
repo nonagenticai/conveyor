@@ -40,9 +40,9 @@
           }
         ],
         "number": 871,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: the live unit-gate refusal on the released engine",
-        "updatedAt": "2026-11-27T18:23:22Z",
+        "updatedAt": "2026-11-27T19:17:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/871"
       },
       {
@@ -88,7 +88,7 @@
         "number": 868,
         "state": "OPEN",
         "title": "proof: verifyParts must apply only to unit-labeled issues",
-        "updatedAt": "2026-11-27T18:29:10Z",
+        "updatedAt": "2026-11-27T19:25:22Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/868"
       },
       {
@@ -7553,7 +7553,7 @@
       }
     ],
     "provenance": {
-      "sha256": "320b661b985196d169ce1fc957cb0b2f59fa170757337f2938884c5205d1803e",
+      "sha256": "0a2752ada6b60e14510c28a91fe60219b35b7ee4f8a770c2f9dbcf1200898081",
       "source": "github:nonagenticai/conveyor",
       "tenant": "nonagentic"
     },
