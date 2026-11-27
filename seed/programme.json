@@ -1614,7 +1614,8 @@
         "plan": "docs/plans/GEMBA-WALK.md",
         "track": "programme",
         "issues": [
-          792
+          792,
+          806
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1706,15 +1707,11 @@
           223,
           225,
           395,
-          435,
           476,
           526,
-          569,
-          660,
           669,
           733,
           755,
-          780,
           781,
           782,
           783,
