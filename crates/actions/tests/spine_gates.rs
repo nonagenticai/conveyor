@@ -273,7 +273,7 @@ async fn an_approved_change_gate_advances_the_baseline() {
     let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
         .await
         .expect("scope the gate");
-    let gate = conveyor_store::approval::insert_approval_tx(&mut *tx, seeded.tenant, &new_gate)
+    let gate = conveyor_store::approval::insert_approval_tx(&mut tx, seeded.tenant, &new_gate)
         .await
         .expect("open the change gate");
     tx.commit().await.expect("commit the gate");
