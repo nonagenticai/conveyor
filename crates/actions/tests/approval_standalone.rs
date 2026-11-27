@@ -92,6 +92,9 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
                 "kind": "action",
                 "action": "ops.scale",
                 "input": scale_input(),
+                // T7 / v1-w1b-4: ops.scale is in the §6.5 dual-control set, so the gate opens
+                // with a two-decision quorum and two distinct humans have to decide it.
+                "required_decisions": 2,
                 "description": "scale conveyor to 3",
                 // This test is about the computed target and the requester, not evidence;
                 // a destructive gate now requires evidence or an explicit waiver.
@@ -157,6 +160,27 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
     )
     .await
     .expect("the reviewer decides the gate");
+
+    // 3b. The second distinct human meets the §6.5 dual-control floor; the gate approves.
+    let second = support::reviewer_two_id(&pg).await;
+    let approved = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            second,
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+        ),
+    )
+    .await
+    .expect("the second approver decides the gate");
+    assert_eq!(
+        approved.body["output"]["status"],
+        json!("approved"),
+        "two distinct human decisions meet the quorum"
+    );
 
     // 4. The same call, now naming the gate, passes — and does what it says.
     let outcome = invoke(

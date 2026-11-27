@@ -5096,16 +5096,16 @@
       "sha256": "0a67f541770d26dd44ba02685c7bdb8688260f9f443829d6041abbc049f65103"
     },
     {
-      "bytes": 29109,
+      "bytes": 29226,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "4dde6ed10f9fad51a6399fed82a740b4fe2a06f1da5aa6b11e4e0f700a18796d"
+      "sha256": "4bd28a7ca3359c263724459ea239a464fd5c3d80056a41935a592d8614bfc874"
     },
     {
-      "bytes": 53930,
+      "bytes": 54072,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "9d6187fba2a409aa712f1b16fe75fad4f41fe1c9bc040ffa571b4108fcda0bca"
+      "sha256": "d7b345f65db30571e396ddcf8c271056101a608bd907d310b64f94d84496e238"
     },
     {
       "bytes": 89954,

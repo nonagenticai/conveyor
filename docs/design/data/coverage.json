@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1704,
+      "line": 1784,
       "name": "approvals.decide"
     },
     {
-      "line": 6485,
+      "line": 6823,
       "name": "approvals.decide"
     },
     {
-      "line": 6272,
+      "line": 6610,
       "name": "approvals.list"
     },
     {
-      "line": 6273,
+      "line": 6611,
       "name": "approvals.list"
     },
     {
-      "line": 6445,
+      "line": 6783,
       "name": "approvals.request"
     },
     {
-      "line": 1604,
+      "line": 1684,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1605,
+      "line": 1685,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2941,
+      "line": 3021,
       "name": "documents.compose"
     },
     {
-      "line": 3428,
+      "line": 3508,
       "name": "documents.compose"
     },
     {
-      "line": 3223,
+      "line": 3303,
       "name": "documents.create"
     },
     {
-      "line": 3294,
+      "line": 3374,
       "name": "documents.delete"
     },
     {
-      "line": 3240,
+      "line": 3320,
       "name": "documents.download"
     },
     {
-      "line": 3273,
+      "line": 3353,
       "name": "documents.download"
     },
     {
-      "line": 2963,
+      "line": 3043,
       "name": "documents.get"
     },
     {
-      "line": 3258,
+      "line": 3338,
       "name": "documents.get"
     },
     {
-      "line": 1463,
+      "line": 1543,
       "name": "documents.list"
     },
     {
-      "line": 1486,
+      "line": 1566,
       "name": "documents.list"
     },
     {
-      "line": 1513,
+      "line": 1593,
       "name": "documents.list"
     },
     {
-      "line": 3191,
+      "line": 3271,
       "name": "documents.list"
     },
     {
-      "line": 3325,
+      "line": 3405,
       "name": "documents.preview"
     },
     {
-      "line": 3371,
+      "line": 3451,
       "name": "documents.return"
     },
     {
-      "line": 3112,
+      "line": 3192,
       "name": "documents.revision_get"
     },
     {
-      "line": 3073,
+      "line": 3153,
       "name": "documents.revision_list"
     },
     {
-      "line": 6353,
+      "line": 6691,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6345,
+      "line": 6683,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6361,
+      "line": 6699,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6229,
+      "line": 6567,
       "name": "procedures.list"
     },
     {
-      "line": 6558,
+      "line": 6896,
       "name": "procedures.publish"
     },
     {
-      "line": 6406,
+      "line": 6744,
       "name": "procedures.review_source"
     },
     {
-      "line": 6388,
+      "line": 6726,
       "name": "procedures.validate"
     },
     {
-      "line": 1727,
+      "line": 1807,
       "name": "process_runs.start"
     },
     {
-      "line": 6252,
+      "line": 6590,
       "name": "processes.get"
     },
     {
-      "line": 6232,
+      "line": 6570,
       "name": "processes.list"
     },
     {
-      "line": 6560,
+      "line": 6898,
       "name": "processes.publish"
     },
     {
@@ -173,23 +173,23 @@
       "name": "programmes.refresh"
     },
     {
-      "line": 2872,
+      "line": 2952,
       "name": "projects.close"
     },
     {
-      "line": 2733,
+      "line": 2813,
       "name": "projects.create"
     },
     {
-      "line": 1677,
+      "line": 1757,
       "name": "runs.cancel"
     },
     {
-      "line": 1655,
+      "line": 1735,
       "name": "runs.get"
     },
     {
-      "line": 1632,
+      "line": 1712,
       "name": "runs.list"
     }
   ],
@@ -388,8 +388,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 2,
-        "claimed": 3,
+        "blocked": 1,
+        "claimed": 4,
         "numbers": [
           16,
           17,
@@ -419,7 +419,7 @@
           803,
           819
         ],
-        "open": 15,
+        "open": 14,
         "ready": 6,
         "unknown": 0
       }
@@ -1540,11 +1540,11 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0071_ladder_option_sets.sql"
       ],
-      "gap": null,
+      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
       "key": "S21",
       "measured": {
         "actions": [
-          12,
+          8,
           12
         ],
         "modules": [
@@ -1562,7 +1562,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "built",
+      "status": "partial",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -2130,7 +2130,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           559,
           562,
@@ -2139,7 +2139,7 @@
           565,
           566
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2292,8 +2292,8 @@
       "key": "T3",
       "measured": {
         "actions": [
-          6,
-          6
+          7,
+          7
         ],
         "modules": [
           0,
@@ -2315,12 +2315,12 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           74,
           797
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2848,16 +2848,19 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 47,
-        "partial": 1,
+        "built": 46,
+        "partial": 2,
         "planned": 1,
         "proposed": 1,
         "standing": 1
       },
       "total": 52,
-      "uncovered": [],
-      "with_open_units": 10,
-      "without_open_units": 42
+      "uncovered": [
+        "S21",
+        "T18"
+      ],
+      "with_open_units": 8,
+      "without_open_units": 44
     },
     "screens": {
       "actions_invoked": 39,

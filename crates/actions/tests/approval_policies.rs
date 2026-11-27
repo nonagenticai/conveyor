@@ -12,6 +12,7 @@ mod support;
 use conveyor_actions::{InvokeRequest, invoke, registry};
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
+use conveyor_domain::{DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
 use serde_json::{Value, json};
 use uuid::Uuid;
@@ -71,6 +72,56 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
         .await
         .expect("approve the gate");
     tx.commit().await.expect("commit the gate");
+    approval.id
+}
+
+/// T7 / v1-w1b-4 — an approved gate for an ops-controlled action. `require_approval_tx` refuses
+/// the call unless the row's quorum is two and two distinct humans approved it, so this helper
+/// writes the quorum and both decisions. The single-decision `approved` stays for the gates whose
+/// floor is one (the policy writes, which are not in the ops-controlled set).
+async fn approved_dual(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) -> Uuid {
+    let mut tx = store::scope::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the approval insert");
+    let new = store::approval::NewApproval {
+        run_id: None,
+        card_id: None,
+        project_id: None,
+        eval_id: None,
+        gate: gate.to_owned(),
+        kind: "gate".to_owned(),
+        required_decisions: 2,
+        requested_by: None,
+        expires_at: None,
+        callback_url: None,
+        correlation_id: None,
+        meta: json!({"target": target}),
+    };
+    let approval = store::approval::insert_approval_tx(&mut tx, tenant, &new)
+        .await
+        .expect("insert the dual-control gate");
+    for approver in [
+        support::reviewer_id(pg).await,
+        support::reviewer_two_id(pg).await,
+    ] {
+        store::approval::record_decision_tx(
+            &mut tx,
+            tenant,
+            approval.id,
+            &Decision {
+                approver_id: approver,
+                kind: DecisionKind::Approve,
+                note: "dual control under SPEC_V2 §6.5".to_owned(),
+                decided_by_kind: DeciderKind::Human,
+                via: None,
+                item_decisions: None,
+            },
+            false,
+        )
+        .await
+        .expect("a human decision counts towards the quorum");
+    }
+    tx.commit().await.expect("commit the dual-control gate");
     approval.id
 }
 
@@ -320,7 +371,7 @@ async fn the_default_policy_is_required() {
     assert_eq!(refused.status, 403, "{}", refused.detail);
     assert_eq!(refused.code, "approval_required");
 
-    let approval_id = approved(
+    let approval_id = approved_dual(
         &pg,
         seeded.tenant,
         "ops.scale",
