@@ -11,6 +11,7 @@ pub mod copilot;
 pub mod decision_inbox;
 pub mod evals;
 pub mod execution;
+pub mod feedback;
 pub mod improve;
 pub mod improvement;
 pub mod inference;
