@@ -51,12 +51,12 @@
 <li>The walk never infers a position, signs for a user, or pre-selects an approval. It presents the server's gate and the signed-in principal's own choice, exactly as §10.5.4 requires.</li>
 </ul>
 <h2 id="4-information-architecture-and-routing">4. Information architecture and routing</h2>
-<p><strong>Route parity by construction.</strong> Every <code>apps/web</code> path has a walk path formed by the <code>/walk</code> prefix: <code>/portfolio</code> → <code>/walk/portfolio</code>, <code>/board/:board_id</code> → <code>/walk/board/:board_id</code>, <code>/design/adm</code> → <code>/walk/design/adm</code>. <code>/walk/</code> is the entrance (the app's <code>/</code>). This makes the parity instrument a set comparison and the old-route redirect map mechanical.</p>
+<p><strong>Route parity by construction.</strong> Every <code>apps/web</code> path is the walk's path on the game host: <code>/portfolio</code> → <code>/portfolio</code>, <code>/board/:board_id</code> → <code>/board/:board_id</code>, <code>/design/adm</code> → <code>/design/adm</code>. <code>/</code> is the entrance (the app's <code>/</code>). The parity instrument is therefore a set equality. <code>conveyor.nonagentic.ai/walk/*</code> returns a 308 to the game host with the <code>/walk</code> prefix stripped; the <code>/walk/</code> sub-site remains only as the no-host dev/CI shape (ADR 0024).</p>
 <table>
 <thead>
 <tr>
 <th>Wing</th>
-<th>Rooms (destination routes, walk-prefixed)</th>
+<th>Rooms (destination routes on the game host)</th>
 <th>Read path (families)</th>
 <th>Write path (families)</th>
 <th>Spec</th>
@@ -65,56 +65,56 @@
 <tbody>
 <tr>
 <td>Portfolio &amp; plan</td>
-<td><code>/walk/portfolio</code>, <code>/walk/portfolio/:programme_id</code>, <code>/walk/programme</code>, <code>/walk/plan</code>, <code>/walk/validation</code>, <code>/walk/execution</code>, <code>/walk/decisions</code>, <code>/walk/runs</code>, <code>/walk/runs/:run_id</code>, <code>/walk/meetings</code>, <code>/walk/meetings/:id</code>, <code>/walk/</code> (Today)</td>
+<td><code>/portfolio</code>, <code>/portfolio/:programme_id</code>, <code>/programme</code>, <code>/plan</code>, <code>/validation</code>, <code>/execution</code>, <code>/decisions</code>, <code>/runs</code>, <code>/runs/:run_id</code>, <code>/meetings</code>, <code>/meetings/:id</code>, <code>/</code> (Today)</td>
 <td>portfolio read models, <code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code>, <code>meetings.*</code>, <code>approvals.*</code>, <code>runs.*</code>, <code>metrics.programme</code></td>
 <td><code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>wbs.*</code>, <code>baselines.take</code>, <code>registers.*</code>, <code>meetings.*</code>, <code>approvals.decide</code>, <code>runs.cancel</code></td>
 <td><code>portfolio</code>, <code>programme</code>, <code>plan</code>, <code>validation</code>, <code>execution</code>, <code>meetings</code>, <code>run-queue</code>, <code>run-detail</code></td>
 </tr>
 <tr>
 <td>Organisation</td>
-<td><code>/walk/organisation</code>, <code>/walk/jobs</code>, <code>/walk/agents</code>, <code>/walk/tools</code>, <code>/walk/project-types</code></td>
+<td><code>/organisation</code>, <code>/jobs</code>, <code>/agents</code>, <code>/tools</code>, <code>/project-types</code></td>
 <td><code>industries.list</code>, <code>departments.list</code>, <code>jobs.*</code>, <code>job_releases.*</code>, <code>job_bindings.*</code>, <code>approval_policies.*</code>, <code>decision_policies.*</code>, <code>refinements.*</code>, <code>laya_configs.*</code>, <code>ladder.list</code>, <code>tools.*</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code>, <code>tool_calls.*</code></td>
 <td>the create/update/release/retire verbs those families expose; `tools.probe</td>
 <td>call</td>
 </tr>
 <tr>
 <td>Procedures &amp; authoring</td>
-<td><code>/walk/procedures</code>, <code>/walk/build/processes</code>, <code>/walk/build/processes/:process_id</code>, <code>/walk/build/process-map</code>, <code>/walk/build/process-map/:map_id</code>, <code>/walk/authoring</code></td>
+<td><code>/procedures</code>, <code>/build/processes</code>, <code>/build/processes/:process_id</code>, <code>/build/process-map</code>, <code>/build/process-map/:map_id</code>, <code>/authoring</code></td>
 <td><code>procedures.*</code>, <code>capabilities.*</code>, <code>processes.*</code>, <code>approvals.list</code>, <code>authoring.assets</code></td>
 <td><code>procedures.*</code>, <code>procedures.ingest_*</code>, <code>authoring.*</code></td>
 <td><code>procedures</code>, <code>processes</code>, <code>process-map</code>, <code>authoring</code></td>
 </tr>
 <tr>
 <td>Govern &amp; design</td>
-<td><code>/walk/design/adm</code>, <code>/walk/architecture</code>, <code>/walk/design/requirements</code>, <code>/walk/design/requirements/:id</code>, <code>/walk/design/models</code>, <code>/walk/design/models/:model_id</code>, <code>/walk/copilot</code></td>
+<td><code>/design/adm</code>, <code>/architecture</code>, <code>/design/requirements</code>, <code>/design/requirements/:id</code>, <code>/design/models</code>, <code>/design/models/:model_id</code>, <code>/copilot</code></td>
 <td><code>architecture.*</code>, <code>repository_search</code>, <code>contracts_list</code>, <code>profile_get</code>, requirements/models reads</td>
 <td><code>artifacts_*</code>, <code>contracts_*</code>, <code>phases_advance</code>, <code>reviews_*</code>, <code>board_*</code></td>
 <td><code>adm</code>, <code>trace-architecture</code>, <code>requirements</code>, <code>editor</code>, <code>copilot</code></td>
 </tr>
 <tr>
 <td>Knowledge &amp; memory</td>
-<td><code>/walk/knowledge</code></td>
+<td><code>/knowledge</code></td>
 <td>the knowledge/memory reads of the owning slice; the route renders <strong>not yet live</strong> until they exist</td>
 <td>the owning slice's writes</td>
 <td><code>knowledge</code></td>
 </tr>
 <tr>
 <td>Measure &amp; improve</td>
-<td><code>/walk/improve</code>, <code>/walk/evals</code>, <code>/walk/evals/:eval_id</code>, <code>/walk/evals/benchmarks</code>, <code>/walk/evals/benchmarks/run/:run_id</code>, <code>/walk/measure/usage</code>, <code>/walk/measure/prompt-audit</code>, <code>/walk/metering</code></td>
+<td><code>/improve</code>, <code>/evals</code>, <code>/evals/:eval_id</code>, <code>/evals/benchmarks</code>, <code>/evals/benchmarks/run/:run_id</code>, <code>/measure/usage</code>, <code>/measure/prompt-audit</code>, <code>/metering</code></td>
 <td>coach queue, <code>kata.*</code>, lessons, evals/benchmarks reads, metering reads</td>
 <td><code>coach.*</code>, <code>kata.*</code>, <code>lessons.*</code></td>
 <td><code>improve</code>, <code>evals</code>, <code>benchmarks</code>, <code>inference-usage</code>, <code>prompt-audit</code>, <code>metering</code></td>
 </tr>
 <tr>
 <td>Operations</td>
-<td><code>/walk/operations</code></td>
+<td><code>/operations</code></td>
 <td>incidents, runbooks, on-call reads</td>
 <td><code>ops.*</code> (gated)</td>
 <td><code>operations</code></td>
 </tr>
 <tr>
 <td>Utilities</td>
-<td><code>/walk/search</code>, <code>/walk/platform</code>, <code>/walk/settings/members</code>, <code>/walk/settings/roles</code>, <code>/walk/settings/inference</code>, <code>/walk/settings/admin</code>, <code>/walk/approvals</code></td>
+<td><code>/search</code>, <code>/platform</code>, <code>/settings/members</code>, <code>/settings/roles</code>, <code>/settings/inference</code>, <code>/settings/admin</code>, <code>/approvals</code></td>
 <td>the corresponding reads</td>
 <td>the corresponding writes</td>
 <td><code>search</code>, <code>platform</code>, <code>members</code>, <code>roles</code>, <code>inference</code>, <code>admin</code>, <code>shell</code></td>
@@ -124,7 +124,7 @@
 <p>The table is the map, not a substitute for §10.5's contracts: the read/write families, states and refusals are §10.5.2's and the owning slice's. A destination whose slice is not built renders the same <strong>not yet live</strong> gate as <code>apps/web</code>, naming the missing action or slice, and keeps its route.</p>
 <p><strong>Routing rules</strong></p>
 <ul>
-<li>Clean URLs (<code>/walk/&lt;app path&gt;</code>), HTML5 history. The server must serve <code>/walk/index.html</code> for a non-asset path under <code>/walk/</code> (see §10); without that change a walk deep link falls through to the operator app's <code>index.html</code>.</li>
+<li>Clean URLs (the app path, e.g. <code>/portfolio</code>), HTML5 history. On the game host the server serves <code>walk/index.html</code> for a non-asset path (see §10); on a no-host dev origin it serves the same tree under <code>/walk/</code>. Without the host rule a walk deep link would fall through to the operator app.</li>
 <li>Query strings are preserved and are part of the deep link. A sheet that represents a record uses a path or query the server can be linked to; a purely visual camera state is never a URL requirement.</li>
 <li>Back/forward restores the room and the sheet. Closing a sheet returns focus to its opener.</li>
 <li>A signed-out deep link is a sign-in gate that returns to the same path.</li>
@@ -134,7 +134,7 @@
 <ul>
 <li><strong>Manifest.</strong> <code>GET /api/actions</code> returns the role-filtered manifest (<code>name</code>, <code>version</code>, <code>kind</code>, <code>spec_hash</code>, <code>scopes</code>, <code>idempotent</code>, <code>timeout_ms</code>). The walk caches it per session and renders a control only when the action is present. A manifest refresh after a 403 is allowed; a control is never shown on a guess.</li>
 <li><strong>Describe.</strong> <code>actions.describe {name}</code> returns <code>input</code> and <code>output</code> JSON Schema plus <code>effect</code> (<code>read | write | destructive</code>), <code>confirm</code> (<code>none | card | card-typed</code>), <code>tenancy</code>, <code>spec_hash</code> and the scope list. This is what makes a generic action sheet possible: the form is generated from the schema, and the effect/confirm/tenancy drive the confirmation and approval UX.</li>
-<li><strong>Reads.</strong> Literal <code>GET</code> routes only (the §10.5.2 read paths), with <code>next_cursor</code> pagination. No GraphQL, no ad-hoc read endpoint, no published snapshot as the app's source.</li>
+<li><strong>Reads.</strong> The same read contract as <code>apps/web</code>: a literal <code>GET</code> where one exists (§10.5.2), and otherwise the owning read action invoked with the standard envelope — <code>programmes.list</code> is one (<code>apps/web/src/screens/v2.rs:161-175</code>). <code>next_cursor</code> pagination. No GraphQL, no ad-hoc read endpoint, no published snapshot as the app's source.</li>
 <li><strong>Writes.</strong> <code>POST /api/actions/{name}/invocations</code> with <code>{"input": …}</code> and, for a destructive call, <code>{"input": …, "approval_id": "…"}</code>. Headers: <code>Authorization: Bearer</code>, <code>X-Active-Tenant</code>, <code>If-Match: &lt;version&gt;</code> on an update, <code>Idempotency-Key</code> on a create. No optimistic mutation: after a write the screen refetches its read model.</li>
 <li><strong>Errors.</strong> RFC 9457 <code>application/problem+json</code> mapped by status: 401 sign-in, 403 permission, 404 absent, 409 conflict/gate, 412 precondition (refetch; never guess a new version), 422 invalid (field errors shown verbatim), 5xx with <code>request_id</code>. The server's refusal is shown, not replaced by a client rule.</li>
 <li><strong>Dual control.</strong> A gated decision names its approval; the walk never decides on the principal's behalf and never auto-acquires an approval. The approval and meeting queues are read views; the act is the principal's.</li>
@@ -239,10 +239,10 @@
 <p>The port's producer is the world simulation: <code>crates/walk-world</code> (ADR 0022) emits a <code>FrameView</code> draw list and the adapter draws it. The adapter never mutates the world — it returns input, and <code>setScene</code> carries the draw list the simulation derived from the records.</p>
 <p>Constraints for every implementation: no text input, no tables, no long-form content; all scene text is a short label duplicated in the DOM; the canvas is labelled and never traps focus; a pure-DOM map/list view exposes the same rooms and records; no network access; no authority.</p>
 <h3 id="63-renderer-candidates">6.3 Renderer candidates</h3>
-<p>The <strong>simulation is decided</strong>: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022), compiled to <code>wasm32-unknown-unknown</code> and loaded behind the port. The <strong>renderer is not</strong>: both adapters consume the same <code>FrameView</code>.</p>
+<p>The <strong>simulation is decided</strong>: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022), compiled to <code>wasm32-unknown-unknown</code> and loaded behind the port. The <strong>renderer is decided</strong>: canvas-2D (ADR 0023, accepted 2026-11-27). Both adapters consume the same <code>FrameView</code>; the port keeps the choice reversible.</p>
 <ul>
-<li><strong>Baseline — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a small payload. It ships first.</li>
-<li><strong>Candidate — WebGL2.</strong> The same <code>FrameView</code> drawn through a thin WebGL2 layer when the scene's figures and depth sorting exceed the canvas budget. Measured head-to-head with the baseline; ADR 0023 records the winner and the budgets.</li>
+<li><strong>Selected — canvas 2D pseudo-3D.</strong> The mock's approach: a hand-written projection, painter's depth sort, flat-shaded faces, local textures and procedural figures. No WebGL requirement and a small payload. It ships first and is the W2 renderer.</li>
+<li><strong>Candidate — WebGL2.</strong> The same <code>FrameView</code> drawn through a thin WebGL2 layer. Measured head-to-head with the baseline in the P0 spike: it tied at the 60 fps cap with a larger heap and a GPU requirement, so it remains a measured candidate behind the port, not a dependency. ADR 0023 records the numbers and the budgets.</li>
 </ul>
 <p>No <code>bevy_render</code>, <code>bevy_winit</code> or <code>bevy_asset</code> dependency is admitted: the engine is a simulation crate, not a rendering stack.</p>
 <h3 id="64-state">6.4 State</h3>
@@ -337,26 +337,30 @@
 <li>Access token in memory only; PKCE verifier in <code>sessionStorage</code>; never a token in <code>localStorage</code>, a URL or a log. The walk follows <code>apps/web/src/auth.rs</code>'s model.</li>
 <li>Every server string is rendered as text; schema-generated labels and descriptions are escaped. No <code>innerHTML</code> of server data; no <code>eval</code>; no third-party script, font or image origins.</li>
 <li>The client is same-origin with the API; it sends no request to <code>/api</code> when signed out and holds no embedded credentials.</li>
+<li>The game has its own public client <code>conveyor-game</code> in the <code>conveyor</code> realm. The API accepts exactly the two first-party <code>azp</code> values (<code>conveyor-web</code>, <code>conveyor-game</code>) against the <code>conveyor</code> audience; an unknown or missing <code>azp</code> is rejected (ADR 0024).</li>
 <li>A refusal is displayed with its action code and the server's message; a toast never claims a success the server did not return.</li>
 <li>The walk adds no CSP weakening. If a strict policy is introduced, it must work under it (no inline script injection, no remote assets).</li>
 </ul>
 <h2 id="10-deployment-and-operational-contract">10. Deployment and operational contract</h2>
 <ul>
-<li><strong>Static sub-site.</strong> <code>apps/walk</code>'s build output is copied to <code>/out/site/walk</code> in the image. The server already serves a directory with its own <code>index.html</code> as a sub-site (the <code>/design/</code> model).</li>
-<li><strong>Deep links.</strong> <code>crates/api/src/web.rs</code> currently falls back to the site-root <code>index.html</code> for a non-asset path that is not a directory index, so <code>/walk/portfolio</code> would render the operator app. Add a scoped rule: for <code>GET</code>/<code>HEAD</code>, a path under <code>/walk/</code> with no file extension serves <code>/walk/index.html</code>. It never applies to <code>/api</code>, <code>/mcp</code>, health or metrics. A Rust test asserts the fallback and the 404 for a missing asset.</li>
-<li><strong>Local development.</strong> <code>apps/walk/dev-server.mjs</code> serves the walk under <code>/walk/</code> on port 8932 and proxies <code>/api</code>, <code>/health</code>, <code>/config.json</code> and <code>/__dev/login</code> to <code>127.0.0.1:8930</code>, preserving the production path shape. Playwright uses <code>http://127.0.0.1:8932</code> as its base URL.</li>
-<li><strong>Identity.</strong> The same issuer and public client; add the walk's redirect URI (<code>https://&lt;host&gt;/walk/</code>, and the dev origin's <code>/walk/</code>) to the client's valid redirect URIs. If the identity operator prefers isolation, register a dedicated public client and serve its id to the walk rather than widening the app's client. This is an external configuration prerequisite, not a repository change.</li>
-<li><strong>Configuration.</strong> <code>/config.json</code> is served at the origin root; the walk fetches it absolutely and uses the same <code>issuer</code>, <code>client_id</code> and <code>dev_auth</code> fields.</li>
+<li><strong>Host.</strong> The game is served at <code>https://game.nonagentic.ai/</code>, at the root; the same image and service as the API. <code>conveyor.nonagentic.ai/walk</code> and <code>/walk/*</code> return a 308 to the game host with the prefix stripped. The <code>/walk/</code> sub-site remains only as the no-host dev/CI shape.</li>
+<li><strong>Static tree.</strong> <code>apps/walk</code>'s files (the entry, <code>src/</code>, <code>data/</code>, the wasm <code>pkg/</code>) are copied to <code>/out/site/walk</code> in the image. On the game host the static handler maps a request path into that tree at the root; a missing asset is a 404, never the SPA entry. The same tree is base-relative, so it also works under <code>/walk/</code> on a no-host dev origin.</li>
+<li><strong>Host boundary.</strong> The server normalises the <code>Host</code> (lowercase, port stripped) and dispatches before any operator surface. On a game host it serves only the walk tree, <code>/config.json</code> and the API; a router-level middleware refuses <code>/mcp</code> and <code>/design</code> (404) before those routes run, and the static handler never serves the operator index. <code>/api</code>, <code>/health</code> and <code>/metrics</code> are unaffected.</li>
+<li><strong>Deep links.</strong> On the game host a non-asset path serves <code>walk/index.html</code>; on the operator host <code>/walk</code> and <code>/walk/*</code> 308 to <code>CONVEYOR_GAME_PUBLIC_URL</code> (configuration, never the request <code>Host</code>) preserving the remainder and query. The redirect is evaluated before the directory-index branch. Rust tests assert the host matrix, the 404 for a missing asset, the operator surfaces' 404 on the game host, and the operator origin's unchanged behaviour.</li>
+<li><strong>Local development.</strong> <code>apps/walk/dev-server.mjs</code> serves the walk at the root on port 8932 and proxies <code>/api</code>, <code>/health</code>, <code>/config.json</code> and <code>/__dev/login</code> to <code>127.0.0.1:8930</code> with <code>Host: game.nonagentic.ai</code> so the server answers with the game client id. Playwright uses <code>http://127.0.0.1:8932</code> as its base URL.</li>
+<li><strong>Identity.</strong> A dedicated <strong>public client <code>conveyor-game</code></strong> in the existing realm <code>conveyor</code>: standard flow, PKCE S256, redirect <code>https://game.nonagentic.ai/*</code>, web origin <code>https://game.nonagentic.ai</code>, the <code>conveyor</code> audience mapper, and the same default/optional scopes as <code>conveyor-web</code>. The API accepts the two-client <code>azp</code> allowlist and keeps the <code>conveyor</code> audience. The client is managed by the git-driven realm-patch ConfigMap and its manual Job; the live proof is a real sign-in as <code>conveyor-e2e</code>, never a redirect-only claim.</li>
+<li><strong>Configuration.</strong> <code>/config.json</code> is served per host: the game client id on the game host, the operator client id elsewhere; the same <code>issuer</code>, <code>client_id</code> and <code>dev_auth</code> fields.</li>
 <li><strong>Caching.</strong> The entry document is not cached as a stale build (<code>no-store</code> or the site's existing behaviour); assets may be cached with a content hash or a version query. No new CDN or cache layer.</li>
-<li><strong>No new port in production.</strong> The production entry is the existing origin at <code>/walk/</code>; port 8932 is local development only. Port 8000 is never used.</li>
-<li><strong>If Bevy is selected.</strong> The wasm build (<code>wasm32-unknown-unknown</code> + wasm-bindgen) runs in GitHub-hosted CI, never on a local machine; the output lands in the same static tree. The static contract above does not change.</li>
+<li><strong>No new port in production.</strong> The production entry is the game host on the existing service; port 8932 is local development only. Port 8000 is never used.</li>
+<li><strong>The wasm build.</strong> <code>crates/walk-world</code> is built for <code>wasm32-unknown-unknown</code> with the pinned wasm-bindgen in the image stage and in CI, never on a local machine; the output lands in the same static tree and is a lazy asset, not part of the sign-in critical path.</li>
 </ul>
 <h2 id="11-verification">11. Verification</h2>
 <ul>
 <li><strong>Unit (<code>node:test</code>)</strong> — projection, collision, depth sort, scene derivation, route mapping, schema-to-field mapping, problem mapping. Pure modules only; no DOM.</li>
 <li><strong>Type check</strong> — <code>tsc --noEmit</code> over JSDoc-typed modules; a type error fails the walk workflow.</li>
 <li><strong>Playwright, one spec per destination under <code>e2e/&lt;wing&gt;/</code></strong> — empty, error, happy and one refusal (or one write where the destination owns a write), plus manifest gating (a control absent when its action is absent) and the headers on a write (<code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code> where applicable).</li>
-<li><strong>Auth</strong> — dev login, deep-link gate, sign-out, and a 401 path; the OIDC redirect is exercised in the P0 spike and in a deployed smoke where configured.</li>
+<li><strong>Auth</strong> — dev login, deep-link gate, sign-out, and a 401 path; the deployed OIDC project performs one real PKCE sign-in as <code>conveyor-e2e</code>, captures the memory-only token from the first <code>/api</code> request and asserts the Portfolio read. A redirect that only reaches Keycloak is not acceptance.</li>
+<li><strong>Host matrix (Rust)</strong> — game entry, deep link, asset, missing asset 404, per-host <code>/config.json</code>, no operator index, <code>/mcp</code> and <code>/design</code> 404 on the game host, the operator origin unchanged, the <code>/walk</code> 308 with the query preserved, and a hostile <code>Host</code> cannot change the redirect target.</li>
 <li><strong>Parity instrument</strong> — <code>scripts/build-walk-coverage.py</code> compares the frozen census, the composed route registry (<code>src/router/registry.js</code> fed by <code>src/router/routes/*.js</code>) and the walk specs; it emits <code>docs/evidence/walk-coverage.json</code> and exits non-zero on a missing destination, an expired exemption or a reachability gap. Exemptions live in <code>docs/evidence/walk-exemptions.json</code>. The census schema and gate are in <code>docs/plans/GEMBA-WALK.md</code> §6.</li>
 <li><strong>Accessibility</strong> — a keyboard-only navigation spec; focus/name assertions; a manual screen-reader pass per wing; contrast checked from computed styles.</li>
 <li><strong>Performance</strong> — the budgets in §9, measured in CI where stable and recorded in the plan's evidence otherwise; the engine protocol in §12 is separate and feeds ADR 0022.</li>
@@ -401,7 +405,7 @@
 </tr>
 </tbody>
 </table>
-<p>ADR 0023 records the renderer's winner and the budgets. The baseline is not deleted when WebGL2 wins; it remains the fallback behind the port.</p>
+<p>ADR 0023 records the measured budgets and selects canvas-2D; WebGL2 tied on the reference scene but carries a larger heap and a GPU requirement, so it remains a candidate behind the port. The baseline is never deleted.</p>
 <h2 id="13-parity-gate-before-any-primacy-claim">13. Parity gate (before any primacy claim)</h2>
 <p>The walk reaches parity only when all of these are true and recorded:</p>
 <ol type="1">
@@ -413,7 +417,7 @@
 </ol>
 <h2 id="14-do-not-list">14. Do-Not list</h2>
 <ul>
-<li>Do not invent a REST endpoint, a read model or an action. Reads are literal <code>GET</code>s; writes are actions.</li>
+<li>Do not invent a REST endpoint, a read model or an action. Reads use the app's read contract — a literal <code>GET</code> where one exists, otherwise the owning read action (e.g. <code>programmes.list</code>); writes are actions.</li>
 <li>Do not hardcode which actions exist. The manifest is the contract.</li>
 <li>Do not use the published snapshot, a seed, a fixture or <code>localStorage</code> as the app's programme state.</li>
 <li>Do not omit <code>Authorization</code>, <code>X-Active-Tenant</code>, <code>If-Match</code> or <code>Idempotency-Key</code>, or send a destructive action without its approval id.</li>

@@ -33,3 +33,9 @@ __pycache__/
 
 # The rework batch holds a transient flock on its journal; never commit it.
 docs/evidence/rework/batch/*.jsonl.lock
+
+# The Gemba Walk's wasm package and its browser test artefacts are built, never committed
+# (ADR 0022/0023: the image stage and CI own the build).
+apps/walk/pkg/
+apps/walk/node_modules/
+apps/walk/test-results/

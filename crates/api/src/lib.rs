@@ -191,6 +191,13 @@ pub fn app(state: AppState) -> Router {
         // Inner of the request-id layer, so the problem body it builds is completed with
         // `instance` and `request_id` on the way out.
         .layer(middleware::from_fn(framework_problems))
+        // The game host's hard boundary, applied outside the routes: axum routes pre-empt the
+        // fallback, so `/mcp` (a real route) and the live design window could not otherwise be
+        // refused on the game host. It runs before mcp_auth; the operator host is untouched.
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            web::game_host_gate,
+        ))
         .layer(middleware::from_fn(request_id::layer))
         .layer(TraceLayer::new_for_http())
         .with_state(state)

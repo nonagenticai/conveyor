@@ -28,7 +28,13 @@ use super::render;
 ///
 /// Pinned so a certificate says which spec it was proven against; the test
 /// `the_pinned_spec_digest_matches_the_spec` is what keeps it true.
-pub const SPEC_V2_SHA256: &str = "531edb3a0bfdee74c317746f9f4e3934f216ace6ebb4199d5387364ef833a265";
+///
+/// Drift record: re-pinned for D68 (the Gemba Walk host and its own keycloak client,
+/// CR-WALK-001 / ADR 0024) and again at the #526 merge, where the lane's SPEC V2 edits and
+/// D68's met in `docs/SPEC_V2.md`. The Lean model (`DeliveryModel.lean`) is unchanged, so this
+/// is a spec re-pin, not a model edit: certificates stored under the previous digest remain
+/// valid against the model they were proven on and are never re-rendered.
+pub const SPEC_V2_SHA256: &str = "c256a9f0b8e4f1976d422ed9f2854da61f1b2eb4ac01930aed3ae42b65cc51a2";
 
 /// The slices the programme is delivered as, per `docs/SPEC_V2.md` §12.
 ///

@@ -242,3 +242,14 @@ regexes = [
 description = "n8n flow fixtures: 'key' is a process key with an s13. prefix, not a credential"
 paths = ['''^fixtures/[abc]\.flow\.json$''']
 regexes = ['''"key"\s*:\s*"s13\.[^"]*"''']
+
+# Repo-specific: the PKCE unit test uses the public RFC 7636 appendix-B vector. Both values are
+# published constants from the specification, not credentials; the path and the exact values
+# keep the suppression narrow.
+[[allowlists]]
+description = "RFC 7636 appendix-B PKCE test vector (public constants)"
+paths = ['''^apps/walk/src/auth/pkce\.test\.js$''']
+regexes = [
+  '''dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk''',
+  '''E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM''',
+]

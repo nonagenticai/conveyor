@@ -1,6 +1,6 @@
 ---
 document: GEMBA-WALK/inception-analysis
-version: 1
+version: 2
 status: draft
 project: GEMBA-WALK
 category: inception-analysis
@@ -11,6 +11,12 @@ review_date: 2026-12-03
 
 # GEMBA-WALK — Inception analysis
 
+> **Amendment 2026-11-27 (CR-WALK-001, ADR 0024).** This analysis records the state at
+> `main@cedd84980` and is kept as history. The delivery architecture has since changed: the walk
+> is served at `https://game.nonagentic.ai/` at the root with its own public client
+> `conveyor-game`, not as a `/walk/` sub-site on the operator origin. The action count at the
+> 2026-11-27 re-baseline is 598 (572 attributes + 26 manual registrations).
+
 ## Current state
 
 Measured at `main@cedd84980` on 2026-11-26; the walk has no code in the tree.
@@ -19,10 +25,10 @@ Measured at `main@cedd84980` on 2026-11-26; the walk has no code in the tree.
 |---|---|---|
 | Operator UI | DONE (normative) | `apps/web/src/app.rs` Leptos `<Router>`: 52 route patterns, 43 screen modules |
 | Browser specs | DONE (normative) | `apps/web/e2e/**`: 46 Playwright specs |
-| Action registry | DONE | `docs/design/data/actions.json`: 597 actions; `actions.describe` carries input/output JSON Schema, effect, confirm, tenancy, spec hash |
+| Action registry | DONE | `docs/design/data/actions.json`: 597 actions at this measurement (598 at the 2026-11-27 re-baseline); `actions.describe` carries input/output JSON Schema, effect, confirm, tenancy, spec hash |
 | Auth | DONE | `apps/web/src/auth.rs`: auth-code + PKCE S256, token in memory, verifier in `sessionStorage`, dev cookie |
 | Events | DONE | `apps/web/src/sse.rs`: fetch stream, bearer header, `Last-Event-ID`, `resync` |
-| Static serving | PARTIAL | `crates/api/src/web.rs`: a directory with `index.html` is a sub-site; `/walk/<deep-path>` falls through to the operator `index.html` — no scoped fallback |
+| Static serving | PARTIAL | `crates/api/src/web.rs`: a directory with `index.html` is a sub-site; `/walk/<deep-path>` falls through to the operator `index.html` — no scoped fallback (W2 later added the sub-site fallback; CR-WALK-001 replaces it with the game-host dispatch) |
 | `/walk` client | ABSENT | `grep -rni 'gemba\|/walk' apps crates` → no hit; no `apps/walk` |
 | Programme row | ABSENT | `seed/programme.json` has 50 projects, none GEMBA-WALK |
 | Inception set | ABSENT | `docs/plans/inception/GEMBA-WALK/` did not exist before this unit |
@@ -76,7 +82,7 @@ origin, with all work in DOM sheets and the world behind a `WorldView` port. Tha
 
 | Risk | Evidence it is real | Mitigation |
 |---|---|---|
-| Scope: 597 actions, 52 routes | measured census | schema-driven action sheet; frozen census; per-destination specs; P6 is the only done |
+| Scope: 598 actions, 52 routes | measured census | schema-driven action sheet; frozen census; per-destination specs; P6 is the only done |
 | Contract drift between clients | two clients, one registry | one contract; behavioural trace parity on named flows; a contract test per write |
 | Auth duplication | a second PKCE flow | same flow, shared config, one identity provider; the dev cookie for local runs |
 | Renderer misses budgets | WebGL2 startup and frame cost unknown | measure in P0; the canvas baseline stays; ADR 0023 decides |

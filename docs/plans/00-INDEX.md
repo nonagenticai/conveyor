@@ -53,8 +53,9 @@ D64–D65 are the real-UI rulings.
 **GEMBA-WALK added 2026-11-26, accepted 2026-11-26.** The owner has directed that a separate,
 game-style client may become the primary UI. `docs/plans/GEMBA-WALK.md` is its project plan and
 `docs/design/GEMBA-WALK-SPEC.md` its architecture; ADR 0021 — accepted as a delegated rule decision
-— authorises a candidate client at `/walk/` with full read/write parity through the existing
-registry, and §10.5.11 + D67 record the boundary. It is **not** a §12 `T##` slice. Its
+— authorises a candidate client with full read/write parity through the existing
+registry; ADR 0024 and D68 (2026-11-27, CR-WALK-001) move it to `https://game.nonagentic.ai/` at the
+root with its own public client `conveyor-game`; §10.5.11 + D67/D68 record the boundary. It is **not** a §12 `T##` slice. Its
 MSP/TOGAF/SAFe inception set is [`inception/GEMBA-WALK/`](inception/GEMBA-WALK/README.md);
 programme registration and the live publication are the inception unit (#792), and the build issues
 G0/S1–S4 are created after that publication gate. `apps/web` stays normative until the measured P6
@@ -62,9 +63,9 @@ parity gate.
 
 **The walk's world layer, added 2026-11-27.** `docs/design/GEMBA-WALK-ECS.md` is the architecture of
 the simulation: `bevy_ecs 0.20.1` in `crates/walk-world`, compiled to wasm, behind the `WorldView`
-port. ADR 0022 accepts it as a delegated rule decision; the *renderer* (canvas-2D against WebGL2) is
-still the P0 spike's, recorded in ADR 0023. The unit is #806; the four affected typed artefact rows
-move to v2.
+port. ADR 0022 accepts it as a delegated rule decision; the renderer is canvas-2D (ADR 0023),
+measured against WebGL2 in the P0 spike; the record is
+`docs/evidence/walk-spike.md`. The unit is #806; the four affected typed artefact rows move to v2.
 
 **T19F added 2026-11-24, built 2026-11-25.** Decision-forum governance is the follow-on T19's
 closure review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy

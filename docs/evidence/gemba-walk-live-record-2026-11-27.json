@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "date": "2026-11-27",
+  "project": "01a21af4-f064-79b3-b302-7d9d81f9d072",
+  "change_control": {
+    "change": "01a21bf7-d0a1-7a30-a17b-bd0e4809b9df",
+    "code": "CR-WALK-001",
+    "status": "approved",
+    "baseline": "01a21bf7-b7b2-7480-99ea-438e630f4a9c",
+    "board_approval": "01a21bf8-0bd5-779e-9a2d-9824bb1e2b41",
+    "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+    "note": "changes.request is unavailable: the only PM job_binding is retired and the PM release declares procedure_ref proc-pm, which is not a published process. The gap is recorded as a project register issue (01a21bf8-ca68-776a-85f3-a78494434210). The change row was created against the scope baseline and approved by the recorded Architecture Board decision."
+  },
+  "baseline": {
+    "id": "01a21bf7-b7b2-7480-99ea-438e630f4a9c",
+    "kind": "scope",
+    "wbs_items": 14,
+    "taken_at": "2026-11-27T07:45:48.357890Z"
+  },
+  "contracts": {
+    "soaw_v2": {
+      "id": "01a21bf7-f6f5-7a41-a88e-12389b89b42d",
+      "status": "live",
+      "version": 2,
+      "supersedes": "01a21af7-fb85-7945-bd5e-8dcb6da0113f",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approval_id": "01a21bf8-0bd5-779e-9a2d-9824bb1e2b41"
+    },
+    "delivery_contract": {
+      "id": "01a21bfb-1241-7db1-9874-eacca12914b4",
+      "status": "live",
+      "version": 2,
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approval_id": "01a21bfb-2710-7e9c-b872-90ccac7f68ec"
+    }
+  },
+  "artefacts_v2": {
+    "requirements_catalog": "01a21bfa-9804-7a50-bbea-d6f669c7a9a0",
+    "solution_concept": "01a21bfa-9e5a-7f80-b0b9-20244317b4c9",
+    "technology_standards": "01a21bfa-a48d-7e4a-a537-acb72da5e609",
+    "status": "approved",
+    "document": "01a21af5-652e-7739-b294-7bb662e13d36",
+    "contract": "01a21bf7-f6f5-7a41-a88e-12389b89b42d",
+    "supersedes": [
+      "01a21af6-83d5-7763-8cdb-253291aba8a7",
+      "01a21af6-95ef-75fe-b947-9b12ed9083e9",
+      "01a21af6-ac39-7881-b532-07e13e1e6af7"
+    ]
+  },
+  "documents": {
+    "project_brief": {"id": "01a21af5-3413-736b-935b-fdfff5968e78", "version": 2, "published_at": "2026-11-27T07:47:56.371074Z"},
+    "inception_analysis": {"id": "01a21af5-53ff-70b5-a706-686a3cd4ba9c", "version": 2, "published_at": "2026-11-27T07:48:03.248971Z"},
+    "architecture_design": {"id": "01a21af5-652e-7739-b294-7bb662e13d36", "version": 2, "published_at": "2026-11-27T07:48:05.121910Z"},
+    "adr_0024": {"id": "01a21bf9-e2d7-735d-9780-ea3529249c9c", "category": "decision", "published_at": "2026-11-27T07:48:18.274628Z"},
+    "change_request_001": {"id": "01a21bf9-ea76-7286-9cd8-e3127df29d09", "category": "change-control", "version": 2, "published_at": "2026-11-27T07:48:37.836426Z"}
+  },
+  "pm_gate_gap": "01a21bf8-ca68-776a-85f3-a78494434210",
+  "read_back": [
+    "registers.get returned CR-WALK-001 approved at version 2 with the board decision in meta",
+    "architecture.contracts_get returned SoAW v2 live, approved by the distinct approver",
+    "architecture.contracts_get returned the delivery contract live",
+    "the three v2 artefact rows are approved and linked to the architecture design document and the SoAW v2 contract",
+    "documents.publish returned the five documents with their published_at timestamps"
+  ]
+}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0023 — The Gemba Walk's renderer is canvas-2D · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0023-gemba-walk-renderer.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0023--the-gemba-walks-renderer-is-canvas-2d">0023 — The Gemba Walk's renderer is canvas-2D</h1>
+<p><strong>Status:</strong> Accepted · 2026-11-27 · <strong>Approved:</strong> delegated rule decision under the published delegation of 2026-11-22 (expiry 2027-02-18) — not a human signature · <strong>Owner direction:</strong> 2026-11-26 · <strong>Evidence:</strong> walk-spike run <a href="https://github.com/nonagenticai/conveyor/actions/runs/45953201576">45953201576</a> at <code>ce63d718f</code>, recorded in <a href="../evidence/walk-spike.html"><code>docs/evidence/walk-spike.md</code></a> and <a href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-spike-results.json"><code>walk-spike-results.json</code></a>.</p>
+<h2 id="context">Context</h2>
+<p>ADR 0022 decided the simulation: <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code>, behind the <code>WorldView</code> port. The renderer was left open: SPEC §6.3 names a canvas-2D baseline and a WebGL2 candidate, both consuming the same <code>FrameView</code>; the P0 spike was to measure them and this ADR was to record the winner and the budgets. The baseline ships first; the port is the reversibility.</p>
+<p>The spike measured the reference scene — six rooms, twelve figures, labels, one moving figure — in Chromium 158 on a GitHub Actions runner, with 4× CPU throttling and Slow 4G emulation, five cold runs per renderer.</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><strong>canvas-2D is the renderer.</strong> It is implemented as <code>apps/walk/src/world/canvas2d/</code> behind the <code>WorldView</code> port; it is the only renderer wired in W2.</li>
+<li><strong>WebGL2 remains a candidate behind the port, not a dependency.</strong> No <code>bevy_render</code>, <code>bevy_winit</code>, <code>bevy_asset</code>, <code>bevy_ui</code>, no WebGL context in the default path, no GPU requirement for a user to use the walk. The port keeps the swap mechanical.</li>
+<li><strong>The measured budgets are release criteria.</strong> At the reference scene: 60 fps target (p50 ≤ 16.7 ms, p95 ≤ 20 ms; no frame &gt; 50 ms after the first two), zero long tasks, cold load ≤ 1.5 s under the spike protocol (4× CPU, Slow 4G), initial JS ≤ 250 KB gzip, and a 5-minute soak within 1.5× the first-load heap with no upward trend. The measured values are in the record and well inside these.</li>
+<li><strong>The simulation budgets stay ADR 0022's.</strong> This ADR does not decide the wasm size (≤ 600 KB gzip), the fixed tick (≤ 1 ms p50 at 500 entities) or the entity ceiling (≤ 5 000); the <code>walk-world</code> crate and its world spec own them.</li>
+<li><strong>The renderer never owns a capability.</strong> Sheets, forms, tables and decisions are DOM; the canvas carries short labels duplicated in the DOM; the canvas is labelled and never traps focus (SPEC §6.2, §8).</li>
+</ol>
+<h2 id="measured">Measured</h2>
+<p>Five cold runs each; median (min–max). Both renderers drew the same reference scene.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>canvas-2D</th>
+<th>WebGL2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame p50</td>
+<td>16.7 ms (16.7–16.7)</td>
+<td>16.7 ms (16.7–16.7)</td>
+</tr>
+<tr>
+<td>Frame p95</td>
+<td>16.8 ms (16.7–16.8)</td>
+<td>16.7–16.8 ms (16.7–16.8)</td>
+</tr>
+<tr>
+<td>Long tasks</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Cold load (median)</td>
+<td>1 269 ms (1 261–1 282)</td>
+<td>1 267 ms (1 264–1 281)</td>
+</tr>
+<tr>
+<td>JS transfer</td>
+<td>24 388 B / 9 requests</td>
+<td>24 388 B / 9 requests</td>
+</tr>
+<tr>
+<td>Heap after 5 s (median)</td>
+<td>6.0 MB (3.1–8.9)</td>
+<td>8.9 MB (4.2–13.8)</td>
+</tr>
+<tr>
+<td>5-minute soak</td>
+<td>2.54 MB → 2.71 MB (20 changes) → 1.93 MB</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The frame metric is a tie: both are vsync-capped at 60 fps. The tie is broken by what the renderers cost to carry: canvas-2D needs no GPU/WebGL2 path, has the smaller heap, and is the smaller implementation. The soak shows no growth.</p>
+<h2 id="alternatives-considered">Alternatives considered</h2>
+<ul>
+<li><strong>WebGL2 as the renderer.</strong> Rejected: it ties canvas-2D on every measured frame/load metric at the reference scene, adds a GPU/WebGL2 requirement and a larger heap, and buys nothing the scene needs today. It remains available behind the port for the revisit trigger.</li>
+<li><strong><code>bevy_render</code> / the Bevy render stack.</strong> Rejected in ADR 0022 and here: tens of MB and a GPU-surface contract for a client whose only work surface is DOM.</li>
+<li><strong>A third renderer.</strong> Not measured; the port makes one a future experiment, not a decision now.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>Positive: the smallest runtime, no GPU requirement, no second rendering stack; the frame loop is a pure function of <code>FrameView</code>, so the world remains testable headlessly and the renderer replaceable.</li>
+<li>Cost: a hand-written projection, depth sort and figures; dense scenes will eventually need more than canvas-2D can carry. That is the revisit trigger, not a present failure.</li>
+<li>The engine decision remains two-layered and explicit: the simulation is decided (ADR 0022), the renderer is decided (this ADR), and the port is the seam between them.</li>
+</ul>
+<h2 id="revisit-triggers">Revisit triggers</h2>
+<ul>
+<li>The reference scene or a real destination scene misses the frame budget on the canvas: p95
+<blockquote>
+<p>20 ms, a frame &gt; 50 ms after the first two, or &gt; 5 000 visible entities.</p>
+</blockquote></li>
+<li>A measured WebGL2 win of more than 20% on frame p95 with no heap/requirement cost the owner accepts.</li>
+<li>The browser/accessibility requirements change such that WebGL2 is no longer the broader fallback.</li>
+<li>The P6 primacy decision; the renderer choice is not a reason to change primacy.</li>
+</ul>
+<h2 id="links">Links</h2>
+<p>ADR 0022 (the simulation) · ADR 0021 (the client) · SPEC §6.3, §9, §12 · ECS §12–§13 · <a href="../evidence/walk-spike.html"><code>docs/evidence/walk-spike.md</code></a> · the run <code>45953201576</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0023-gemba-walk-renderer.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

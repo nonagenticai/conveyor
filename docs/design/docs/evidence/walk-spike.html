@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>W1 — the Gemba Walk client and renderer spike · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-spike.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="w1--the-gemba-walk-client-and-renderer-spike">W1 — the Gemba Walk client and renderer spike</h1>
+<p><strong>Run:</strong> <a href="https://github.com/nonagenticai/conveyor/actions/runs/45953201576">45953201576</a> · <code>issue/813-walk-g0</code> at <code>ce63d718f</code> · 2026-11-27 · <strong>conclusion: success</strong> (5/5 tests, 6.1 min)</p>
+<p><strong>Environment:</strong> GitHub Actions <code>ubuntu-latest</code>, Chromium <code>158.0.8127.18</code>, 4× CPU throttling, Slow 4G emulation (1.5 Mbps down / 750 kbps up / 150 ms), the real <code>conveyor</code> server with Postgres 18 and Redis, the <code>--dev-seed</code> tenant <code>dev-a</code> as <code>dev:alice</code> (admin). The reference scene is SPEC §12's: six rooms, twelve figures, labels, one moving figure.</p>
+<p><strong>Artifacts:</strong> the run's <code>walk-spike</code> artifact (<code>results.json</code> + logs), copied here as <a href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-spike-results.json"><code>walk-spike-results.json</code></a>. The spike code and its workflow were deleted after this run; this record and the results are what survive.</p>
+<h2 id="what-the-spike-proved">What the spike proved</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Contract</th>
+<th>Observation</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Dev session</td>
+<td><code>/api/me</code> returned Alice, active tenant <code>dev-a</code>, role <code>admin</code></td>
+<td><code>proofs.me</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Auth-code + PKCE S256</td>
+<td>A 43-char verifier, a 43-char S256 challenge, <code>state</code>, and a <code>redirect_uri</code> of <code>http://127.0.0.1:8932/walk/</code>; the authorize URL is <code>&lt;issuer&gt;/protocol/openid-connect/auth</code> with <code>response_type=code</code></td>
+<td><code>proofs.pkce</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>The identity limit</td>
+<td>The CI <code>/config.json</code> has <code>issuer: ""</code> and <code>dev_auth: true</code>, so the <strong>real</strong> issuer redirect was not exercised; the <code>/walk/</code> redirect URI remains the external prerequisite</td>
+<td><code>proofs.config</code>; ADR 0021 consequences</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Schema sheet</td>
+<td><code>actions.describe</code> rendered forms for <code>programmes.list</code> (read; <code>cursor, limit</code>), <code>programmes.update</code> (write; <code>id, name, owner_user_id, status</code>) and <code>cards.archive</code> (destructive; <code>id</code>), with the effect/confirm/tenancy shown</td>
+<td><code>proofs.forms</code>; the form DOM</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Read</td>
+<td><code>programmes.list {limit: 200}</code> answered <code>{items: []}</code> — the empty state is a valid read; the dev seed has no programmes</td>
+<td><code>proofs.readItems</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Write + <code>Idempotency-Key</code></td>
+<td><code>cards.create</code> carried a UUID <code>Idempotency-Key</code> and created the card seen in the refusal target</td>
+<td><code>proofs.createHeaders</code>, <code>proofs.createdCard</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Write + <code>If-Match</code></td>
+<td><code>cards.move</code> carried <code>If-Match: 1</code> from the card's version and moved it from intake to active</td>
+<td><code>proofs.moveHeaders</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>The destructive gate</td>
+<td><code>cards.archive</code> with no approval was refused <code>403 approval_required</code>, naming the target <code>card/&lt;id&gt;/archive</code> in <code>approval_id</code>; no optimistic mutation</td>
+<td><code>proofs.refusal</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>SSE over fetch</td>
+<td>A <code>fetch</code> + <code>ReadableStream</code> subscription on <code>board:&lt;id&gt;</code> received four frames: three <code>card.created</code> replays and the <code>card.moved</code> caused by the write</td>
+<td><code>proofs.sseFrames</code>, <code>proofs.sseTypes</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>The scoped deep link</td>
+<td><code>/walk/portfolio/deep-link</code> returned the spike's own entry, not another app; the dev server's <code>GET /walk</code> 308, asset 200 and missing-asset 404 were also exercised locally</td>
+<td><code>proofs.deepLink</code>; <code>spike/walk/dev-server.mjs</code> (deleted)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Static copy</td>
+<td>The suite ran from the static <code>spike/walk</code> tree with no server-side rendering and no build step</td>
+<td>the workflow's static dev server</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-renderer-measurement-adr-0023">The renderer measurement (ADR 0023)</h2>
+<p>Five cold runs per renderer; the median with min–max. Both renderers draw the same scene, so the comparison is the delivery, not the picture.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>canvas-2D</th>
+<th>WebGL2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Available</td>
+<td>yes</td>
+<td>yes (SwiftShader on the runner)</td>
+</tr>
+<tr>
+<td>Frame p50</td>
+<td><strong>16.7 ms</strong> (16.7–16.7)</td>
+<td><strong>16.7 ms</strong> (16.7–16.7)</td>
+</tr>
+<tr>
+<td>Frame p95</td>
+<td><strong>16.8 ms</strong> (16.7–16.8)</td>
+<td><strong>16.7–16.8 ms</strong> (16.7–16.8)</td>
+</tr>
+<tr>
+<td>Long tasks</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Cold load (median)</td>
+<td><strong>1 269 ms</strong> (1 261–1 282)</td>
+<td><strong>1 267 ms</strong> (1 264–1 281)</td>
+</tr>
+<tr>
+<td>JS transfer</td>
+<td><strong>24 388 B</strong>, 9 requests</td>
+<td>the same (no extra asset)</td>
+</tr>
+<tr>
+<td>Heap after 5 s (median)</td>
+<td><strong>6.0 MB</strong> (3.1–8.9)</td>
+<td><strong>8.9 MB</strong> (4.2–13.8)</td>
+</tr>
+<tr>
+<td>5-minute soak (canvas-2D)</td>
+<td>start 2.54 MB → after 20 room changes 2.71 MB → after the hold <strong>1.93 MB</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading:</strong> both renderers are vsync-capped at 60 fps on the reference scene, so the frame metric is a tie; canvas-2D has the smaller heap, needs no WebGL2/GPU, and is the smaller implementation. The soak shows no growth (the final heap is below the start). The wasm/ECS budgets — ≤ 600 KB gzip, ≤ 1 ms fixed tick, ≤ 5 000 entities — are <strong>not</strong> measured here; they belong to <code>crates/walk-world</code> and its W1d world spec. The runner is a Linux GitHub runner, not the M-series reference laptop; the protocol and machine class are recorded so a repeat is comparable.</p>
+<h2 id="what-this-closes-and-what-it-does-not">What this closes, and what it does not</h2>
+<ul>
+<li>Closes the P0 client-contract gate: no unproven assumption (dev session, PKCE construction, schema forms, headers, refusal, SSE, deep link) enters P1.</li>
+<li>Closes the renderer question: <strong>ADR 0023 selects canvas-2D</strong>; WebGL2 remains a candidate behind the <code>WorldView</code> port, not a dependency.</li>
+<li>Does <strong>not</strong> prove production sign-in: the issuer is empty in the dev environment and the <code>/walk/</code> redirect URI is an external registration. That scenario stays <code>acceptance-blocked-by</code>.</li>
+<li>Does <strong>not</strong> prove the wasm/ECS budgets; W1a–W1d and the walk workflow will.</li>
+<li>Does <strong>not</strong> replace the W2 foundation's real Portfolio write: the dev seed's programmes are empty, so the write proof here is the card create/move. The foundation creates or picks a Portfolio row and records its action.</li>
+</ul>
+<h2 id="links">Links</h2>
+<ul>
+<li>ADR 0023 — <a href="../decisions/0023-gemba-walk-renderer.html"><code>docs/decisions/0023-gemba-walk-renderer.md</code></a></li>
+<li>SPEC §6.3, §9, §12 · ECS §12–§13 · Plan §7 P0, §8 W1 · WBS W1</li>
+<li>Issue #813 · ADR 0022 (the simulation) · ADR 0021 (the client)</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/walk-spike.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

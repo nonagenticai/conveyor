@@ -55,11 +55,19 @@ crates/walk-world/
 
 ```toml
 [dependencies]
-bevy_ecs   = { version = "=0.20.1", features = ["serialize"] }
+bevy_ecs   = { version = "=0.20.1", features = ["serialize", "bevy_debug_stepping", "debug"] }
 bevy_app   = "=0.20.1"
 bevy_time  = "=0.20.1"
 serde      = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[dependencies.wasm-bindgen]
+version = "=0.2.130"
+optional = true
+
+[dependencies.console_error_panic_hook]
+version = "0.1.7"
+optional = true
 
 # bevy_time reads the platform clock through bevy_platform, which needs its web backend on wasm.
 # Enabled per target so native builds never pull wasm-bindgen or web-sys.
@@ -74,6 +82,10 @@ wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
 The defaults stay on. `bevy_app`'s default feature enables `bevy_ecs/default`, so pruning
 `bevy_ecs` in isolation changes nothing; a real prune turns both off together and is verified by a
 preflight compile, never assumed here.
+
+`ScheduleBuildSettings`'s `ambiguity_detection` and `shuffle_seed` fields are gated by `bevy_ecs`'s
+`debug` and `bevy_debug_stepping` features in 0.20.1; both are enabled, so the determinism guard is
+compiled, not assumed.
 
 **Not in the dependency graph, deliberately:** the `bevy` umbrella crate, `bevy_render`,
 `bevy_winit`, `bevy_asset`, `bevy_ui`; `web-sys`, `leptos`, `gloo`. The crate is `rlib`, compiles
@@ -106,7 +118,7 @@ key first, spawns only when absent.
 | Prop, badge, moodlet | `Scene(_, n)` | derived | bounded by the draw budget |
 
 `InteractableId` is the new-type the port exchanges with the renderer: it is either a `RecordKey`
-(open the record's sheet) or a `WallId` (open the destination). The renderer never invents one.
+(open the record's sheet), a `WallId` (open the destination) or a `RoomKey` (open the room's sheet). The renderer never invents one.
 
 ## 4. Components
 
@@ -150,6 +162,11 @@ path needs to build a request; the sheet fetches the record itself.
 | `FrameView` | the last `render_prepare` output |
 | `Rand64 { state }` | seeded; cosmetic jitter only |
 | `WorldConfig { seed, rooms, walls }` | construction inputs |
+| `RecordIndex { key → Entity }` | the projection's forward lookup; the only writer is `projection` |
+| `SceneIndex { walls, rooms }` | the scene-only reverse lookups the sheet uses for wall/room titles |
+| `LastSeq` | the delta sequence gap detector; zero means no delta yet |
+| `Intent` / `CallSeq` | the movement intent and the monotonic call counter |
+| `PromptState` / `LastProblem` | the derived proximity prompt and the last refusal |
 
 ## 6. Schedules, sets and ordering
 
@@ -268,7 +285,7 @@ Properties the tests assert:
 |---|---|
 | One clock | `Time<Fixed>` at 60 Hz; `WorldClock.tick` is the only tick a system may read |
 | Explicit order | `.chain()` within a set, sets ordered in `configure_sets` |
-| No ambiguity | `Schedule::set_build_settings(ScheduleBuildSettings { ambiguity_detection: LogLevel::Error, shuffle_seed: Some(0), ..default() })` on the test-built schedule, **before** systems are added |
+| No ambiguity | `ScheduleBuildSettings { ambiguity_detection: LogLevel::Error, shuffle_seed: Some(0), ..default() }` on both the `FixedUpdate` and `Update` schedules in `WalkWorld::new` |
 | No ambient time | no `Instant`, `SystemTime`, `std::thread`, no `rand::thread_rng` |
 | No iteration-order dependence | `BTreeMap`/`Vec` anywhere order affects state |
 | Reproducible RNG | `Rand64` seeded from `WorldConfig.seed`; cosmetic only |
@@ -280,8 +297,9 @@ final `FrameView` hash. Equality across two runs and across native/wasm is the t
 ## 11. WASM constraints and the boundary
 
 - `multi_threaded` off; the executor is single-threaded. No `std::thread`.
-- `MinimalPlugins` only: no window, no renderer, no asset server. `ScheduleRunnerPlugin` is **not**
-  used; the shell owns the frame loop and calls `advance(dt)` from `requestAnimationFrame`.
+- `App::new()` + `TimePlugin` only (`MinimalPlugins` is a `bevy` umbrella group, not a `bevy_app`
+  export): no window, no renderer, no asset server. `ScheduleRunnerPlugin` is **not** used; the shell
+  owns the frame loop and calls `advance(dt)` from `requestAnimationFrame`.
 - The host-side surface is JSON at the edge, serde inside:
 
 | Export | Signature | Notes |
@@ -295,6 +313,8 @@ final `FrameView` hash. Equality across two runs and across native/wasm is the t
 | `drain_calls` | `() -> String` | `Vec<ActionCall>`, emptied |
 | `view` | `() -> String` | `FrameView` |
 | `context` | `(interactable_json: &str) -> String` | `SheetContext` |
+| `set_manifest` | `(json: &str)` | the role-filtered `actions.describe` manifest |
+| `view_hash` | `() -> String` | the quantized `FrameView` hash the world spec compares |
 | `save` / `load` | `() -> String` / `(&str)` | session only |
 
 - `panic = "abort"` in the wasm profile; `console_error_panic_hook` installed in `new`.
@@ -332,7 +352,7 @@ InputIn   ◀──push_input──         ◀──on(pointer/key)──
 | Field | Shape | Consumer |
 |---|---|---|
 | `camera` | `{mode, position, target, fov}` | the projection |
-| `sprites` | `[{id: InteractableId, kind, position, size, facing, tint, label}]` | depth sort + draw |
+| `sprites` | `[{id: Option<InteractableId>, kind, position, size, facing, tint, label}]` | depth sort + draw; scene sprites (the avatar) have no interactable id |
 | `overlays` | `[{id, kind, anchor, text}]` | prompts, badges, moodlets — short labels only |
 | `highlight` | `Option<InteractableId>` | selection from a sheet or the palette |
 | `room` | `RoomKey` | the HUD's location line |
@@ -341,13 +361,15 @@ Rules: no draw-list entry carries long text, a table or a form (SPEC §2); the a
 the world — it returns `InputIn`; picking is `pointer → sprite id` in the adapter, resolved against
 `InteractableId`, never a second ray-cast implementation in the ECS.
 
-The renderer remains undecided (canvas-2D vs WebGL2) and is ADR 0023's subject. This document fixes
-only what both renderers consume.
+The renderer is **canvas-2D** (ADR 0023, accepted 2026-11-27), selected by the P0 spike; WebGL2
+remains a measured candidate behind this port, not a dependency. This document fixes only what both
+renderers consume.
 
 ## 14. Testing
 
-Headless is the default: `App::new().add_plugins(MinimalPlugins).add_plugins(WalkWorldPlugin)` and
-`app.update()` in a loop; no browser, no canvas, no network.
+Headless is the default: `WalkWorld::new` builds `App::new()` + `TimePlugin` + `WalkWorldPlugin`;
+`advance(dt)` runs `First`, the clamped `FixedUpdate` ticks and `Update`; no browser, no canvas, no
+network.
 
 | Scenario (BDD) | Test |
 |---|---|

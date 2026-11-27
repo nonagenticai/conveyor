@@ -24,10 +24,10 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--the-gemba-walk-client">GEMBA-WALK — the Gemba Walk client</h1>
-<p>Owner direction: 2026-11-26 · ADR: <code>docs/decisions/0021-gemba-walk-client.md</code> (<strong>Accepted</strong> 2026-11-26 as a delegated rule decision) · Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> · Procedural set: <code>docs/plans/inception/GEMBA-WALK/</code> · Baseline measured at <code>main@d958824f8</code> and re-verified at <code>main@0d6db794b</code> (counts unchanged) and <code>main@cedd84980</code> on 2026-11-26.</p>
+<p>Owner direction: 2026-11-26; amended 2026-11-27 (the game host and its own identity) · ADR: <code>docs/decisions/0021-gemba-walk-client.md</code> (<strong>Accepted</strong> 2026-11-26 as a delegated rule decision) and <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code> (<strong>Accepted</strong> 2026-11-27; supersedes 0021 decisions 1 and 4 in part) · Change request: <code>docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md</code> · Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> · Procedural set: <code>docs/plans/inception/GEMBA-WALK/</code> · Baseline re-measured at <code>main@01544010f</code> on 2026-11-27; the earlier baselines were <code>d958824f8</code>, <code>0d6db794b</code>, <code>cedd84980</code> and <code>e2507c860</code>.</p>
 <p>This plan is deliberately <strong>not</strong> a SPEC_V2 §12 <code>T##</code> slice. The programme-seed generator parses only <code>docs/plans/slices/S*.md</code> and <code>**(T##)**</code> rows in §12, so a T-row would silently change <code>seed/programme.json</code> and fail <code>build-programme-seed.py --check</code>. The walk is registered as a cross-cutting project in <code>docs/plans/00-INDEX.md</code>; the inception unit (#792) publishes the MSP/TOGAF/SAFe set and registers the project, and the build issues G0/S1–S4 are created after the publication gate.</p>
 <h2 id="1-objective-and-gate">1. Objective and gate</h2>
-<p>Build a second, game-style client of the conveyor at <code>/walk/</code> with <strong>all features and all functionality</strong> — every read and every write through the existing registry — and measure it well enough that the owner can decide whether it becomes the primary UI.</p>
+<p>Build a second, game-style client of the conveyor at <strong><code>https://game.nonagentic.ai/</code></strong>, at the host root, with <strong>all features and all functionality</strong> — every read and every write through the existing registry — and measure it well enough that the owner can decide whether it becomes the primary UI. The client has its own public Keycloak client, <code>conveyor-game</code>, and the operator origin's <code>/walk/*</code> redirects to the game host (ADR 0024).</p>
 <p><strong>Gate (P6):</strong> every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip with the correct headers; the parity instrument is green with no expired exemption; accessibility and performance budgets are met; the owner signs the primacy decision. Until then <code>apps/web</code> is normative.</p>
 <h2 id="2-starting-state-measured-not-assumed">2. Starting state (measured, not assumed)</h2>
 <table>
@@ -46,23 +46,28 @@
 </tr>
 <tr>
 <td>Backend contract</td>
-<td><strong>597</strong> registered actions; manifest, <code>actions.describe</code> (input/output JSON Schema, effect, confirm, tenancy, spec_hash), invocation envelope, RFC 9457 problems, <code>next_cursor</code>, SSE</td>
+<td><strong>598</strong> registered actions (572 attributes + 26 manual registrations); manifest, <code>actions.describe</code> (input/output JSON Schema, effect, confirm, tenancy, spec_hash), invocation envelope, RFC 9457 problems, <code>next_cursor</code>, SSE</td>
 <td><code>docs/design/data/actions.json</code>, <code>apps/web/src/api.rs</code>, <code>crates/actions/src/views.rs</code></td>
 </tr>
 <tr>
 <td>Auth</td>
-<td>auth-code + PKCE S256, token in memory, verifier in <code>sessionStorage</code>; dev cookie; <code>/config.json</code></td>
-<td><code>apps/web/src/auth.rs</code>, <code>apps/web/public/config.json</code></td>
+<td>auth-code + PKCE S256, token in memory, verifier in <code>sessionStorage</code>; dev cookie; <code>/config.json</code>; realm <code>conveyor</code>, public client <code>conveyor-web</code>, <code>aud</code>/<code>azp</code> pinned</td>
+<td><code>apps/web/src/auth.rs</code>, <code>crates/auth/src/{config,jwks}.rs</code>, <code>crates/api/src/web.rs</code></td>
 </tr>
 <tr>
 <td>Serving</td>
-<td>any directory with <code>index.html</code> is a static sub-site; design pack copied to <code>/out/site/design</code>; <code>/walk/&lt;deep-path&gt;</code> currently falls through to the operator <code>index.html</code></td>
-<td><code>crates/api/src/web.rs</code>, <code>Dockerfile:86-93</code></td>
+<td>the same image serves a static tree and a directory sub-site; the design pack is copied to <code>/out/site/design</code>; host dispatch does not exist yet, so a game host would serve the operator app</td>
+<td><code>crates/api/src/web.rs</code>, <code>Dockerfile:79-93</code></td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>Cloudflare → <code>cloudflared-apps</code> → istio gateway → <code>conveyor-public-vs</code> → <code>conveyor:8930</code>; DNS by the <code>dns-ensure</code> CronJob; <code>game.nonagentic.ai</code> exists nowhere</td>
+<td>gitops-production <code>clusters/strato/**</code></td>
 </tr>
 <tr>
 <td>Walk client</td>
-<td><strong>absent</strong>: no <code>/walk</code>, no <code>apps/walk</code>, zero mentions of gemba or walk in the tree</td>
-<td><code>grep -rni 'gemba|/walk'</code> at the baseline</td>
+<td><strong>absent</strong>: <code>apps/walk</code> carries only <code>data/world.json</code>; no index, modules, specs, dev server, workflow or Dockerfile copy</td>
+<td><code>git ls-files apps/walk</code> at the branch</td>
 </tr>
 <tr>
 <td>The mock</td>
@@ -78,7 +83,7 @@
 </table>
 <p>The baseline counts are frozen by W0 into <code>docs/evidence/walk-census.json</code>. The gate is compared to that census, not to a live manifest, so a later slice adding actions cannot make it unpassable; a re-baseline is a signed commit that states what changed.</p>
 <h2 id="3-scope">3. Scope</h2>
-<p><strong>IN</strong> — a static client at <code>/walk/</code>; route parity with every <code>apps/web</code> path; the seven wings and the destination rooms; the full read and write contract; seats as view presets; the DOM sheet system; the schema-driven action sheet; the world port and the engine decision; the parity instrument and its evidence; per-destination Playwright specs; accessibility and performance budgets; deployment and the scoped deep-link fallback; the primacy runbook.</p>
+<p><strong>IN</strong> — a static client at <code>https://game.nonagentic.ai/</code> (one image, one service, a second host); route parity with every <code>apps/web</code> path at the host root; the seven wings and the destination rooms; the full read and write contract; seats as view presets; the DOM sheet system; the schema-driven action sheet; the world port and the engine decision; the parity instrument and its evidence; per-destination Playwright specs; accessibility and performance budgets; the host dispatch, the <code>/walk</code> 308 and the game host's boundary; its own public Keycloak client <code>conveyor-game</code>; the live sign-in proof; the primacy runbook.</p>
 <p><strong>OUT</strong> — any new table, action, event, port or backend read model; a second decision store; a replacement for <code>/design/</code>; native mobile; chat/audio/video; customer care (D48); SSR; a public unauthenticated mode in v1; pixel parity with the mock; deleting <code>apps/web</code> before the gate.</p>
 <p><strong>"All functionality" is defined as</strong>: every §10.5 destination and every retained V1 route has a walk route and a spec; every manifest action is reachable and form-renderable; every destination's primary write flow is exercised end to end; every gate the server enforces is surfaced, never pre-empted. It is not defined as pixel or copy parity with either existing client.</p>
 <h2 id="4-relationship-to-the-programme">4. Relationship to the programme</h2>
@@ -89,16 +94,17 @@
 </ul>
 <h2 id="5-architecture-decisions-normative-detail-in-the-spec">5. Architecture decisions (normative; detail in the spec)</h2>
 <ol type="1">
-<li>Static sub-site at <code>/walk/</code>, same image and origin, no new port.</li>
-<li>Route parity by construction: walk path = <code>/walk</code> + app path; <code>/walk/</code> is the entrance.</li>
+<li>Served at <code>https://game.nonagentic.ai/</code>, at the root, from the same image and service as the API; the operator origin's <code>/walk/*</code> returns a 308 to the game host (ADR 0024, CR-WALK-001).</li>
+<li>Route parity by construction: the walk path <strong>is</strong> the app path on the game host; <code>/</code> is the entrance. <code>/walk/*</code> remains only as the no-host dev/CI shape.</li>
 <li>Full functionality through the existing contract; no backend surface.</li>
 <li>DOM sheets own all work; the world is navigation and state display only.</li>
 <li>Seats are view presets; the manifest and server scopes own authority.</li>
 <li>No fixtures; no client-side programme store; no published snapshot as the app's source.</li>
-<li><code>WorldView</code> port; the simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022); the renderer — canvas-2D baseline against WebGL2 — is decided by the P0 spike in ADR 0023.</li>
-<li>Clean URLs with a scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> (GET/HEAD, non-asset paths) and a Rust test; without it a deep link renders the operator app.</li>
+<li><code>WorldView</code> port; the simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code> (ADR 0022); the renderer is canvas-2D (ADR 0023, after the P0 spike measured it against WebGL2; WebGL2 remains a candidate behind the port).</li>
+<li>Host dispatch in <code>crates/api/src/web.rs</code> and a router-level gate in <code>crates/api/src/lib.rs</code>: the game host serves the walk tree, <code>/config.json</code> and the API, refuses <code>/mcp</code> and <code>/design</code>, and never serves the operator index; the operator host keeps its behaviour and 308s <code>/walk/*</code>. Rust tests cover the matrix; the redirect target is <code>CONVEYOR_GAME_PUBLIC_URL</code>, never the request <code>Host</code>.</li>
 <li>Schema-driven action sheet so no action is unreachable; unsupported schema falls back to a labelled JSON editor.</li>
 <li>Parity is measured by a frozen census and per-destination specs, never by prose.</li>
+<li>The game has its own public client <code>conveyor-game</code> in the <code>conveyor</code> realm (not a new realm); the API accepts the two-client <code>azp</code> allowlist against the <code>conveyor</code> audience, and the live proof is a real <code>conveyor-e2e</code> sign-in. <code>apps/web</code> remains normative until P6.</li>
 </ol>
 <h2 id="6-the-parity-model-and-instrument">6. The parity model and instrument</h2>
 <p><code>scripts/build-walk-coverage.py</code> (W0) is the only measure of walk parity. It must be able to run in CI with no server and no database.</p>
@@ -110,12 +116,12 @@
   &quot;actions&quot;: [{&quot;name&quot;: &quot;cards.move&quot;, &quot;kind&quot;: &quot;internal&quot;, &quot;scopes&quot;: [&quot;cards:write&quot;],
                &quot;effect&quot;: &quot;write&quot;, &quot;confirm&quot;: &quot;none&quot;, &quot;tenancy&quot;: &quot;tenant&quot;,
                &quot;idempotent&quot;: true}],
-  &quot;counts&quot;: {&quot;routes&quot;: 52, &quot;actions&quot;: 597}
+  &quot;counts&quot;: {&quot;routes&quot;: 52, &quot;actions&quot;: 598}
 }</code></pre>
 <p>The census is built from:</p>
 <ul>
 <li>route patterns and views — <code>scripts/build-v2-coverage.py:app_routes()</code> and <code>app_route_views()</code> (its <code>ROUTE</code> regex, line 42), the same parser the V2 record uses;</li>
-<li>action names, scopes, kind, effect, confirm, tenancy and idempotence — parsed from the <code>#[action(...)]</code> attributes under <code>crates/actions/src/**/*.rs</code>; the parsed names are cross-checked against the 597 names in <code>docs/design/data/actions.json</code>, so a parse miss fails the build instead of shrinking the census;</li>
+<li>action names, scopes, kind, effect, confirm, tenancy and idempotence — parsed from the <code>#[action(...)]</code> attributes under <code>crates/actions/src/**/*.rs</code>; the parsed names are cross-checked against the 598 names in <code>docs/design/data/actions.json</code>, so a parse miss fails the build instead of shrinking the census;</li>
 <li><code>apps/walk/src/router/routes/{core,portfolio-organisation,procedures-governance,measure-operations-utilities,v1}.js</code> — one row per surface (walk path, app path, room, spec file), composed by <code>apps/walk/src/router/registry.js</code>. One route file per delivery sibling; a sibling never edits another's file;</li>
 <li><code>apps/walk/e2e/&lt;wing&gt;/*.spec.ts</code>.</li>
 </ul>
@@ -152,7 +158,7 @@
 </tbody>
 </table>
 <p><strong>Per-destination states</strong> — <code>absent</code>, <code>read</code>, <code>write</code>, <code>verified</code>, with the spec path and the last green run. <code>verified</code> requires all four states plus the Playwright spec.</p>
-<p><strong>Behavioural parity</strong> — for each named flow, the same scripted task runs against <code>apps/web</code> and <code>/walk/</code> in dev; the harness captures the <code>POST /api/actions/{name}/invocations</code> trace (names, status, order) and compares it. Pixels are not compared.</p>
+<p><strong>Behavioural parity</strong> — for each named flow, the same scripted task runs against <code>apps/web</code> and the walk on the dev origin (the game-host shape); the harness captures the <code>POST /api/actions/{name}/invocations</code> trace (names, status, order) and compares it. Pixels are not compared.</p>
 <p><strong>Exemptions</strong> — a separate signed record, <code>docs/evidence/walk-exemptions.json</code>, holding <code>{surface, reason, signer, expires}</code>; an expired exemption fails the gate. The owner or the plan's named maintainer signs; the default expiry is 30 days.</p>
 <p><strong>Output and check</strong> — <code>docs/evidence/walk-coverage.json</code>, emitted by <code>python3 scripts/build-walk-coverage.py</code>; <code>--check</code> exits non-zero when a census route has no registry row, a census action lacks <code>reachable</code> or <code>schema-rendered</code>, a destination lacks its spec, or an exemption is expired. The check runs in the walk workflow and in <code>web.yml</code> (or its successor) once the walk app is on <code>main</code>; it needs no server, database or network.</p>
 <h2 id="7-stages-and-exit-gates">7. Stages and exit gates</h2>
@@ -168,12 +174,12 @@
 <tr>
 <td><strong>P0</strong></td>
 <td>Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike</td>
-<td>The spike proves PKCE redirect to <code>/walk/</code> on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D against WebGL2 for the renderer and ADR 0023 records the winner and budgets (the simulation is <code>bevy_ecs</code> in <code>crates/walk-world</code>, ADR 0022). The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
+<td>The spike proves the PKCE S256 construction and records the exact dev issuer/redirect state (the game client and host are delivered by this unit under CR-WALK-001; the production proof is the deployed OIDC spec), SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D against WebGL2 and ADR 0023 records the measured budgets and selects canvas-2D (the simulation is <code>bevy_ecs</code> in <code>crates/walk-world</code>, ADR 0022). The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
 </tr>
 <tr>
 <td><strong>P1</strong></td>
 <td>Foundation + Portfolio end-to-end</td>
-<td>Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room <code>portfolio</code> read + <strong>one real write</strong>, deep link and back/forward, dev server, Dockerfile copy, <code>web.rs</code> fallback + test, spec green</td>
+<td>Sign-in (dev cookie in CI; the real <code>conveyor-game</code> PKCE sign-in in the deployed proof), tenant switch, manifest-driven nav, world entrance, Room <code>portfolio</code> read + <strong>one real write</strong>, deep link and back/forward, dev server, Dockerfile copy, the host dispatch + router gate + Rust host matrix, the Keycloak client and its read-back, spec green</td>
 </tr>
 <tr>
 <td><strong>P2</strong></td>
@@ -202,11 +208,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>External prerequisites.</strong> The <code>/walk/</code> OIDC redirect-URI registration is an external change: the parent issue records it in Dependencies as an external <code>acceptance-blocked-by</code> with the owner as the actor, not as a <code>status:needs-human</code> label (that label would freeze all construction). The dev cookie (<code>/__dev/login</code>) and the dev origin's redirect URI unblock the spike; the walk never waits on the registration to build.</p>
+<p><strong>Identity is owned work, not an external prerequisite (2026-11-27).</strong> CR-WALK-001 moves the game client <code>conveyor-game</code> and the host into the unit: the realm-patch ConfigMap, the manual Job and the admin-API read-back are delivery steps. The dev cookie still unblocks construction in CI; the production sign-in is proven by the deployed OIDC spec as <code>conveyor-e2e</code>, never claimed from a redirect.</p>
 <p><strong>Rust builds.</strong> No local cargo: the wasm compile, lint and tests run on GitHub-hosted preflight/CI, and the issue records the run id; the PR opens only after that verdict, per the repository's <code>CLAUDE.md</code>. The spike's throwaway workflow is deleted with the spike.</p>
 <h2 id="8-delivery-model-and-the-issue-split">8. Delivery model and the issue split</h2>
 <p><strong>The repository rule.</strong> <code>docs/plans/03-DELIVERY.md</code> is the authority: one plan = one issue = one branch = exactly one PR by default; a plan may be split into at most <strong>five</strong> file-disjoint siblings only with the written exception, and <code>lane/</code> branches are retired. The exception below is approved.</p>
-<p><strong>Approved exception (2026-11-26) — one parent + four siblings (5 total).</strong> Approved as the written exception by the build's rule approver under the published delegation; the inception unit (#792) is the P0 §5 definition step, not a sixth split. The walk is multi-session by shape (43 screens, 597 actions), so the parent keeps the dependency-bearing foundation and the siblings own disjoint destination wings:</p>
+<p><strong>Approved exception (2026-11-26) — one parent + four siblings (5 total).</strong> Approved as the written exception by the build's rule approver under the published delegation; the inception unit (#792) is the P0 §5 definition step, not a sixth split. The walk is multi-session by shape (43 screens, 598 actions), so the parent keeps the dependency-bearing foundation and the siblings own disjoint destination wings:</p>
 <table>
 <thead>
 <tr>
@@ -220,8 +226,8 @@
 <tr>
 <td><strong>Parent G0</strong></td>
 <td>W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue</td>
-<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code>, the initial <code>docs/evidence/walk-coverage.json</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/api/src/web.rs</code>, <code>Dockerfile</code>, the walk workflow</td>
-<td>P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs</td>
+<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code>, the initial <code>docs/evidence/walk-coverage.json</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/auth/src/{config,jwks}.rs</code>, <code>crates/api/src/{config,lib,web}.rs</code>, <code>crates/api/tests/web_hosts.rs</code>, <code>Dockerfile</code>, the walk workflow, the gitops client/host change (separate PR)</td>
+<td>P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs; the host matrix and the live <code>conveyor-game</code> sign-in green</td>
 </tr>
 <tr>
 <td><strong>S1</strong></td>
@@ -264,8 +270,8 @@
 <li>the <code>CROSS_CUTTING</code> convention puts the project in tranche 0; the issue's Programme field says <code>Tranche 0 (cross-cutting)</code>.</li>
 </ul></li>
 <li><strong>Publish the inception set</strong> on the project (<code>documents.compose</code> → <code>documents.publish</code>), verify the bodies hash-equal to <code>docs/plans/inception/GEMBA-WALK/</code>, create the 10 typed artefact rows, and record the Phase-A SoAW through the Board with a distinct approver. Publish the benefit profile with the baseline <code>unmeasured</code>. This is the gate before step 4.</li>
-<li><strong>Create G0 and S1–S4 after publication.</strong> Create them from <code>.github/ISSUE_TEMPLATE/unit.md</code> with the <code>GEMBA-WALK</code> label; do not create them before <code>CROSS_CUTTING</code> is on <code>main</code> (the registry would map them to PLATFORM). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the published <code>project-brief</code> + ADR 0021 + this plan; ADM <code>Preliminary</code>/<code>definition</code>; Benefits B-WALK-1 (enabling). Parts W0/W1/W2, each with a BDD <code>Verify:</code>; dependencies as in §8; the OIDC registration as an external <code>acceptance-blocked-by</code>.</li>
-<li><strong>G0's W0 freezes the census and builds the instrument</strong> exactly as §6. Commit <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code> and <code>scripts/build-walk-coverage.py</code>. Acceptance: the script reproduces 52 routes and 597 actions; <code>--check</code> returns non-zero for a missing registry row, an unreachable action, a missing spec and an expired exemption; it runs with no server or database.</li>
+<li><strong>Create G0 and S1–S4 after publication.</strong> Create them from <code>.github/ISSUE_TEMPLATE/unit.md</code> with the <code>GEMBA-WALK</code> label; do not create them before <code>CROSS_CUTTING</code> is on <code>main</code> (the registry would map them to PLATFORM). G0's Programme fields: Tranche 0 (cross-cutting); Brief = the published <code>project-brief</code> + ADR 0021 + this plan; ADM <code>Preliminary</code>/<code>definition</code>; Benefits B-WALK-1 (enabling). Parts W0/W1/W2, each with a BDD <code>Verify:</code>; dependencies as in §8; the game client and host as owned delivery work (CR-WALK-001).</li>
+<li><strong>G0's W0 freezes the census and builds the instrument</strong> exactly as §6. Commit <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code> and <code>scripts/build-walk-coverage.py</code>. Acceptance: the script reproduces 52 routes and 598 actions; <code>--check</code> returns non-zero for a missing registry row, an unreachable action, a missing spec and an expired exemption; it runs with no server or database.</li>
 <li><strong>Record the spike and the engine ADR</strong> (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).</li>
 </ol>
 <h2 id="9-parity-matrix-initial-state-at-the-baseline">9. Parity matrix (initial state at the baseline)</h2>
@@ -284,7 +290,7 @@
 <tbody>
 <tr>
 <td>Organisation</td>
-<td><code>/walk/organisation</code> (+ <code>/walk/jobs</code>, <code>/walk/agents</code>, <code>/walk/tools</code>, <code>/walk/project-types</code>)</td>
+<td><code>/organisation</code> (+ <code>/jobs</code>, <code>/agents</code>, <code>/tools</code>, <code>/project-types</code>)</td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>organisation.spec.ts</code></td>
@@ -292,7 +298,7 @@
 </tr>
 <tr>
 <td>Procedures</td>
-<td><code>/walk/procedures</code> (+ <code>/walk/build/processes</code>, <code>/walk/build/process-map</code>)</td>
+<td><code>/procedures</code> (+ <code>/build/processes</code>, <code>/build/process-map</code>)</td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>procedures.spec.ts</code></td>
@@ -300,7 +306,7 @@
 </tr>
 <tr>
 <td>Authoring</td>
-<td><code>/walk/authoring</code></td>
+<td><code>/authoring</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>authoring.spec.ts</code></td>
@@ -308,7 +314,7 @@
 </tr>
 <tr>
 <td>Portfolio</td>
-<td><code>/walk/portfolio</code>, <code>/walk/portfolio/:programme_id</code></td>
+<td><code>/portfolio</code>, <code>/portfolio/:programme_id</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>portfolio.spec.ts</code></td>
@@ -316,7 +322,7 @@
 </tr>
 <tr>
 <td>Meetings</td>
-<td><code>/walk/meetings</code>, <code>/walk/meetings/:id</code></td>
+<td><code>/meetings</code>, <code>/meetings/:id</code></td>
 <td>T19</td>
 <td>T19</td>
 <td><code>meetings.spec.ts</code></td>
@@ -324,7 +330,7 @@
 </tr>
 <tr>
 <td>Programme</td>
-<td><code>/walk/programme</code></td>
+<td><code>/programme</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>programme.spec.ts</code></td>
@@ -332,7 +338,7 @@
 </tr>
 <tr>
 <td>Architecture (ADM)</td>
-<td><code>/walk/design/adm</code></td>
+<td><code>/design/adm</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>adm.spec.ts</code></td>
@@ -340,7 +346,7 @@
 </tr>
 <tr>
 <td>Plan</td>
-<td><code>/walk/plan</code> (+ <code>/walk/board/:board_id</code>)</td>
+<td><code>/plan</code> (+ <code>/board/:board_id</code>)</td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>plan.spec.ts</code></td>
@@ -348,7 +354,7 @@
 </tr>
 <tr>
 <td>Improve</td>
-<td><code>/walk/improve</code>, <code>/walk/evals/*</code></td>
+<td><code>/improve</code>, <code>/evals/*</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>improve.spec.ts</code></td>
@@ -356,7 +362,7 @@
 </tr>
 <tr>
 <td>Operations</td>
-<td><code>/walk/operations</code></td>
+<td><code>/operations</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>operations.spec.ts</code></td>
@@ -364,7 +370,7 @@
 </tr>
 <tr>
 <td>Tools</td>
-<td><code>/walk/tools</code></td>
+<td><code>/tools</code></td>
 <td>§10.5</td>
 <td>§10.5</td>
 <td><code>tools.spec.ts</code></td>
@@ -372,15 +378,15 @@
 </tr>
 <tr>
 <td>V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform)</td>
-<td><code>/walk</code> + app path</td>
-<td>literal GETs</td>
+<td>the app path</td>
+<td>the app's read contract</td>
 <td>actions</td>
 <td>the matching <code>apps/web</code> spec</td>
 <td>absent</td>
 </tr>
 <tr>
 <td>Utilities (palette, sign-in, tenant switch, theme)</td>
-<td><code>/walk/</code></td>
+<td><code>/</code></td>
 <td><code>/api/me</code>, config</td>
 <td>none</td>
 <td><code>shell</code>/<code>shell-login</code></td>
@@ -398,7 +404,7 @@
 </thead>
 <tbody>
 <tr>
-<td>597 actions and 52 routes is a multi-tranche build</td>
+<td>598 actions and 52 routes is a multi-tranche build</td>
 <td>schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible</td>
 </tr>
 <tr>
@@ -406,20 +412,28 @@
 <td>one contract, one census, behavioural trace parity on named flows, per-destination specs; a change to a contract updates both</td>
 </tr>
 <tr>
-<td>Bevy on the web: bundle, startup, WebGL2/WebGPU, limited text/table widgets</td>
-<td>P0 measures against the canvas baseline; the port keeps the engine replaceable; the baseline is never deleted</td>
+<td>The world engine: wasm bundle and startup; the canvas renderer's density limit</td>
+<td>the P0 spike measured canvas-2D (60 fps, 24 KB, 1.27 s cold load, stable heap); ADR 0023 selects it; the port keeps WebGL2 and the engine replaceable; the baseline is never deleted</td>
 </tr>
 <tr>
 <td>No local Rust builds (owner rule) slows the Bevy loop</td>
 <td>all wasm builds on GitHub-hosted CI; the baseline needs no Rust; the spike is CI-first</td>
 </tr>
 <tr>
-<td>Deep links today fall through to the operator app</td>
-<td>the scoped <code>web.rs</code> fallback plus a Rust test lands in P1, before any link is published</td>
+<td>The game host leaks an operator surface</td>
+<td>a router-level host gate before <code>mcp_auth</code>, a host-aware static dispatch, <code>app()</code> matrix tests, and live <code>/mcp</code> and <code>/design/*</code> 404 probes</td>
 </tr>
 <tr>
-<td>OIDC redirect URI is an external change</td>
-<td>P0 proves it; if the operator refuses, register a dedicated public client and serve its id to the walk</td>
+<td>The <code>azp</code> allowlist widens the replay guard</td>
+<td>exactly two first-party ids, an optional game id never defaulted from the audience, and rejection tests</td>
+</tr>
+<tr>
+<td>The Keycloak client drifts or the Job is skipped</td>
+<td>a git-managed rep with a create-or-refuse preflight; the client, redirects, web origins, PKCE and audience mapper read back from the admin API</td>
+</tr>
+<tr>
+<td>The live sign-in fails because the client or host is incomplete</td>
+<td>the deployment order (image first, host second, Job third) and the deployed OIDC spec as the acceptance</td>
 </tr>
 <tr>
 <td>Two clients make the coverage record ambiguous</td>
@@ -442,14 +456,15 @@
 <h2 id="11-verification-and-definition-of-done">11. Verification and definition of done</h2>
 <p><strong>Per issue</strong> — the issue's own parts and acceptance criteria, its Playwright spec(s), the parity instrument's rows, and a contract test for each write (headers, refusal, refetch). An issue is not done because the screen renders; it is done when the state, the write and the refusal are proven.</p>
 <p><strong>Unit and type</strong> — <code>node --test apps/walk/src</code> and <code>tsc --noEmit</code> (JSDoc) pass; pure modules only.</p>
-<p><strong>Browser</strong> — <code>npx playwright test -c apps/walk/playwright.config.ts</code> with the dev server; every spec asserts empty, error, happy and one refusal or write; auth and deep-link gates included.</p>
+<p><strong>Browser</strong> — <code>npx playwright test -c apps/walk/playwright.config.ts</code> with the dev server; every spec asserts empty, error, happy and one refusal or write; auth and deep-link gates included. The deployed <code>oidc</code> project additionally performs one real PKCE sign-in as <code>conveyor-e2e</code> against <code>https://game.nonagentic.ai/</code> and asserts the Portfolio read.</p>
+<p><strong>Host matrix</strong> — Rust tests through <code>app()</code> cover the game entry and deep link, assets and the missing-asset 404, the per-host <code>/config.json</code>, the refusal of <code>/mcp</code> and <code>/design</code>, the operator origin unchanged, the <code>/walk</code> 308 with the query, and the hostile-<code>Host</code> redirect guard.</p>
 <p><strong>Parity</strong> — <code>python3 scripts/build-walk-coverage.py --check</code> exits 0; the record is committed; an expired exemption fails.</p>
 <p><strong>Accessibility</strong> — keyboard-only navigation of every wing; focus return; contrast from computed styles; 200% zoom and 390 px width with no horizontal scroll.</p>
 <p><strong>Performance</strong> — the §9 budgets; a 5-minute soak; the engine protocol recorded for ADR 0022.</p>
 <p><strong>Docs</strong> — <code>python3 docs/design/scripts/build-docs.py</code> and <code>node docs/design/scripts/check-docs.cjs</code> pass whenever a Markdown file changes.</p>
 <p><strong>DoD for the project</strong> — the P6 gate, not "the UI looks finished". Until P6 the plan's matrix is the truth and <code>apps/web</code> remains normative.</p>
 <h2 id="12-session-guide">12. Session guide</h2>
-<p><strong>Read order</strong> — <code>CLAUDE.md</code> → <code>docs/SPEC.md</code> → <code>docs/plans/00-INDEX.md</code> → <code>docs/plans/03-DELIVERY.md</code> → <code>docs/decisions/0021-gemba-walk-client.md</code> → <code>docs/plans/inception/GEMBA-WALK/README.md</code> (the MSP/TOGAF/SAFe set) → <code>docs/design/GEMBA-WALK-SPEC.md</code> → this plan → SPEC_V2 §10.5 (the destination contracts) → <code>apps/web/src/api.rs</code> and <code>apps/web/src/auth.rs</code> (the client contract) → the owning slice's plan for the destination.</p>
+<p><strong>Read order</strong> — <code>CLAUDE.md</code> → <code>docs/SPEC.md</code> → <code>docs/plans/00-INDEX.md</code> → <code>docs/plans/03-DELIVERY.md</code> → <code>docs/decisions/0021-gemba-walk-client.md</code> → <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code> → <code>docs/plans/inception/GEMBA-WALK/README.md</code> (the MSP/TOGAF/SAFe set) → <code>docs/design/GEMBA-WALK-SPEC.md</code> → this plan → SPEC_V2 §10.5 (the destination contracts) → <code>apps/web/src/api.rs</code> and <code>apps/web/src/auth.rs</code> (the client contract) → the owning slice's plan for the destination.</p>
 <p><strong>Commands</strong> (available once W2 lands) —</p>
 <pre><code>node apps/walk/dev-server.mjs                       # :8932, proxies /api to :8930
 npx playwright test -c apps/walk/playwright.config.ts
