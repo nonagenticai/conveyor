@@ -45,23 +45,27 @@ test("the list renders each eval", async ({ page }) => {
   await expect(page.getByRole("button", { name: "New eval" })).toBeVisible();
 });
 
-test("the detail's cases tab renders and the run write opens its sheet", async ({ page }) => {
+test("the detail's cases tab renders and a case write opens its sheet", async ({ page }) => {
   await page.route("**/api/actions/evals.get/invocations", (route: any) => json(route, EVAL));
   await page.route("**/api/actions/eval_cases.list/invocations", (route: any) => json(route, { items: [CASE] }));
   await page.goto(`/evals/${EVAL.id}`);
   await expect(page.getByRole("heading", { name: "Door decisions" })).toBeVisible();
   await expect(page.getByTestId("eval-cases")).toContainText("the door case");
-  await page.getByRole("button", { name: "Start a run" }).click();
-  const dialog = page.getByRole("dialog", { name: "Start a run" });
+  await page.getByRole("button", { name: "New case" }).click();
+  const dialog = page.getByRole("dialog", { name: "New case" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Submit" })).toBeVisible();
 });
 
-test("the runs tab renders the eval's runs", async ({ page }) => {
+test("the runs tab renders the eval's runs and the run write opens its sheet", async ({ page }) => {
   await page.route("**/api/actions/evals.get/invocations", (route: any) => json(route, EVAL));
   await page.route("**/api/actions/eval_runs.list/invocations", (route: any) => json(route, { items: [RUN] }));
   await page.goto(`/evals/${EVAL.id}/runs`);
   await expect(page.getByTestId("eval-runs")).toContainText("succeeded");
+  await page.getByRole("button", { name: "Start a run" }).click();
+  const dialog = page.getByRole("dialog", { name: "Start a run" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Submit" })).toBeVisible();
 });
 
 test("the audits tab renders the eval's audits", async ({ page }) => {

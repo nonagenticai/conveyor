@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-const SUITE = { id: "00000000-0000-4000-8000-000000000d01", name: "verified50-v1", title: "verified50-v1", version: "1", status: "active" };
+const SUITE = { id: "00000000-0000-4000-8000-000000000d01", slug: "verified50-v1", name: "verified50-v1", title: "verified50-v1", swebench_version: "1", version: "1", status: "active" };
 const RUN = {
   id: "00000000-0000-4000-8000-000000000d02",
   suite_id: SUITE.id,

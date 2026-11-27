@@ -37,7 +37,7 @@ test("the kata acts open their sheets", async ({ page }) => {
   await page.goto("/improve");
   await page.getByLabel("Improvement id").fill("00000000-0000-4000-8000-000000000f01");
   await page.getByRole("button", { name: "Look up" }).click();
-  await page.getByRole("button", { name: "Measure" }).click();
+  await page.getByRole("button", { name: "Measure", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Measure" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Submit" })).toBeVisible();
