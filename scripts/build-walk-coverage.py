@@ -604,6 +604,24 @@ def modules_present() -> dict[str, bool]:
     return detect_modules(walk_sources(WALK))
 
 
+def normalize_spec(file: str) -> str:
+    """A Playwright report file as a walk-relative spec path.
+
+    Measured on Playwright 1.65.0: the JSON report's `file` is relative to the config's
+    `testDir` (`shell/entrance.spec.ts`), while the census holds the walk-relative path
+    (`e2e/shell/entrance.spec.ts`); a report may also carry an absolute path. Normalise both.
+    """
+    path = file.replace("\\", "/")
+    marker = "apps/walk/"
+    if marker in path:
+        path = path.split(marker, 1)[1]
+    while path.startswith("./"):
+        path = path[2:]
+    if not path.startswith(SPEC_DIR.relative_to(WALK).as_posix() + "/"):
+        path = f"{SPEC_DIR.relative_to(WALK).as_posix()}/{path}"
+    return path
+
+
 def load_report(path: str | None) -> set[str]:
     """The Playwright JSON report's passing spec files, relative to apps/walk."""
     if not path:
@@ -618,7 +636,7 @@ def load_report(path: str | None) -> set[str]:
         file = suite.get("file") or inherited
         for spec in suite.get("specs", []):
             if spec.get("ok") and file:
-                passed.add(file)
+                passed.add(normalize_spec(file))
         for child in suite.get("suites", []):
             walk(child, file)
 
@@ -884,6 +902,14 @@ def self_test() -> int:
        "capability: a renamed module is not a false negative")
     ok(not detect_modules({"src/api/client.js": "function manifestThing() {"})["manifest"],
        "capability: a lookalike token is not a false positive")
+
+    # The measured report shape (Playwright 1.65.0): relative to testDir, not to the config.
+    ok(normalize_spec("shell/entrance.spec.ts") == "e2e/shell/entrance.spec.ts",
+       "report: a testDir-relative file gains the e2e prefix")
+    ok(normalize_spec("e2e/shell/entrance.spec.ts") == "e2e/shell/entrance.spec.ts",
+       "report: an already walk-relative file is unchanged")
+    ok(normalize_spec("/home/runner/work/conveyor/conveyor/apps/walk/e2e/x/x.spec.ts")
+       == "e2e/x/x.spec.ts", "report: an absolute file is made walk-relative")
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
