@@ -266,6 +266,7 @@ async fn cards_assign(
         Some(job_binding_id),
         input.correlation_id,
         None,
+        serde_json::json!({}),
         action,
     )
     .await?;

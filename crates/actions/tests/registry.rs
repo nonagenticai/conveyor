@@ -857,8 +857,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    // The merged registry: 602 internal + 28 external.
-    assert_eq!((internal, external), (602, 28));
+    // Measured at the merged head (61c9392d0): 630 actions, 605 internal + 25 external. The
+    // total is unchanged from the 602/28 the merge note recorded; the action spec's kind is
+    // what moved, for the three tool-hosted reads T14 serves through the tool platform rather
+    // than a direct external call. The action dump was regenerated from this same registry.
+    assert_eq!((internal, external), (605, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

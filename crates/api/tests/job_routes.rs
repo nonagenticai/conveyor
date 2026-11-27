@@ -346,9 +346,11 @@ async fn an_output_is_stored_under_its_computed_hash() {
     assert_eq!(artefacts.len(), 1);
     assert_eq!(artefacts[0].sha256, hex(&body));
     assert!(
-        artefacts[0]
-            .object_key
-            .starts_with(&format!("t/{}/jobs/", harness.tenant.as_uuid())),
+        artefacts[0].object_key.starts_with(&format!(
+            "{}/{}/jobs/",
+            conveyor_actions::storage::TENANT_PREFIX,
+            harness.tenant.as_uuid()
+        )),
         "the key is tenant-prefixed: {}",
         artefacts[0].object_key
     );

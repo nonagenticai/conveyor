@@ -44,10 +44,12 @@ fn every_seeded_limit_is_the_budget_the_resolver_reads() {
             cost.is_some_and(|cost| cost >= 0.0),
             "cost_budget_usd must be a non-negative number: {limit}"
         );
-        let display = limit.get("display").and_then(serde_json::Value::as_str);
+        // `display` was removed on purpose (cae69dc32: no consumer reads it). A reappearing
+        // field is fixture drift, not a budget limit.
+        let display = limit.get("display");
         assert!(
-            display.is_some_and(|text| !text.trim().is_empty()),
-            "the display string is preserved: {limit}"
+            display.is_none(),
+            "display is not part of an organisation limit: {limit}"
         );
     }
 }

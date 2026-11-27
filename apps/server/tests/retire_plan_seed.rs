@@ -216,7 +216,7 @@ async fn seeded_cards_are_archived_through_the_action_and_the_rest_are_left_alon
     let report = run(&db.super_pool, tenant, "conveyor")
         .await
         .expect("retire");
-    assert_eq!(report.archived, 2, "the two live seeded cards");
+    assert_eq!(report.archived, 2, "the two live seeded cards: {report:?}");
     assert_eq!(report.already_archived, 0);
     assert_eq!(report.skipped_live, 2, "the leased card and the live run");
     assert!(report.ok(), "{:?}", report.failed);

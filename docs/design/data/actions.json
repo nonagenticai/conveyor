@@ -584,6 +584,7 @@
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "trace_links.view",
     "tranches.authorise",
     "tranches.create",
     "tranches.delete",

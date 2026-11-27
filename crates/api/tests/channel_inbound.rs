@@ -166,6 +166,22 @@ async fn fixture(pg: &support::Pg) -> Fixture {
     .await
     .expect("seed a pending approval");
 
+    // The connector identity is a service principal; §5.4's human-only default applies unless
+    // the tenant's policy declares this gate service-decidable (migration 0093).
+    sqlx::query(
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions,
+              required_decisions, updated_by)
+         VALUES ($1, 'manual', 'required', 'forbidden', 'service', '{}'::jsonb, 1, $2)
+         ON CONFLICT (tenant_id, action) DO UPDATE
+            SET approver_kind = 'service', updated_by = excluded.updated_by",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("declare the manual gate service-decidable");
+
     Fixture {
         tenant: seeded.tenant,
         tenant_id: seeded.tenant_id,
@@ -437,6 +453,22 @@ async fn a_webhook_gateway_uses_the_shared_grammar_and_the_same_identity_model()
     .fetch_one(&pg.super_pool)
     .await
     .expect("approval");
+
+    // The webhook identity is a service principal; declare this gate service-decidable
+    // (SPEC_V2 §5.4 / migration 0093), as the fixture-based channel test does.
+    sqlx::query(
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions,
+              required_decisions, updated_by)
+         VALUES ($1, 'manual', 'required', 'forbidden', 'service', '{}'::jsonb, 1, $2)
+         ON CONFLICT (tenant_id, action) DO UPDATE
+            SET approver_kind = 'service', updated_by = excluded.updated_by",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("declare the manual gate service-decidable");
 
     let served = serve(&pg).await;
     let client = reqwest::Client::new();

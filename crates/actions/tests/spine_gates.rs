@@ -1508,31 +1508,46 @@ async fn charter(running: &support::Running, project: &str) {
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
+/// The three baselines the closure completeness gate reads (v1-p83-6): the scope baseline
+/// carries the WBS node; the schedule and cost baselines freeze the same project with no new
+/// nodes. A close without all three is `closure_schedule_baseline_missing` /
+/// `closure_cost_baseline_missing`, so a "compliant" fixture must create all three.
 async fn baseline(running: &support::Running, project: &str) {
+    baseline_kind(running, project, "scope", true).await;
+    baseline_kind(running, project, "schedule", false).await;
+    baseline_kind(running, project, "cost", false).await;
+}
+
+async fn baseline_kind(running: &support::Running, project: &str, kind: &str, with_wbs: bool) {
+    let wbs = if with_wbs {
+        json!([{
+            // The baseline is fixture for the gate tests; the kind is not what they read,
+            // and a `work_package` would owe a card (v1-p5-5).
+            "kind": "deliverable",
+            "title": "Deliver the project",
+            "business_value": 1,
+            "time_criticality": 1,
+            "risk_reduction": 1,
+            "job_size": 1,
+        }])
+    } else {
+        json!([])
+    };
     let (status, body) = running
         .invoke(
             "projects.baseline",
             TOKEN,
             json!({
                 "project_id": project,
-                "baseline_kind": "scope",
-                "wbs": [{
-                    // The baseline is fixture for the gate tests; the kind is not what they read,
-                    // and a `work_package` would owe a card (v1-p5-5).
-                    "kind": "deliverable",
-                    "title": "Deliver the project",
-                    "business_value": 1,
-                    "time_criticality": 1,
-                    "risk_reduction": 1,
-                    "job_size": 1,
-                }],
+                "baseline_kind": kind,
+                "wbs": wbs,
             }),
             None,
             None,
             None,
         )
         .await;
-    assert_eq!(status, 201, "{body}");
+    assert_eq!(status, 201, "{kind}: {body}");
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
@@ -1616,6 +1631,42 @@ async fn satisfy_mandatory_set(
     .execute(&pg.super_pool)
     .await
     .expect("insert the change register row");
+}
+
+/// PMP §8.4's closure-completeness rows: one accepted deliverable and the four running
+/// registers (risk, issue, assumption, dependency) — what `projects.close` reads after the
+/// baselines and the mandatory artefacts.
+async fn satisfy_closure_completeness(pg: &support::Pg, seeded: &support::Seeded, project: &str) {
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "UPDATE wbs_node
+            SET status = 'accepted',
+                evidence = '[{\"kind\": \"document\", \"id\": \"acceptance\"}]'::jsonb,
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("accept the deliverable");
+    for (index, kind) in ["risk", "issue", "assumption", "dependency"]
+        .into_iter()
+        .enumerate()
+    {
+        sqlx::query(
+            "INSERT INTO project_register_item (tenant_id, project_id, kind, code, title, body)
+             VALUES ($1, $2, $3, $4, $5, '')",
+        )
+        .bind(seeded.tenant_id)
+        .bind(project_id)
+        .bind(kind)
+        .bind(format!("REG-{index}"))
+        .bind(format!("A {kind} entry"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("insert a running register row");
+    }
 }
 
 async fn board(pg: &support::Pg, tenant: Uuid) -> Uuid {
@@ -1805,6 +1856,7 @@ async fn a_compliant_project_closes_in_a_resumed_tranche() {
     let contract_id = contract(&pg, &running, &seeded, &project, &delegation).await;
     let _review = review(&running, &project, &contract_id, &delegation).await;
     satisfy_mandatory_set(&pg, &running, &seeded, &project).await;
+    satisfy_closure_completeness(&pg, &seeded, &project).await;
     let gate = close_request(&running, &project, &delegation).await;
     approve(&running, &gate).await;
 

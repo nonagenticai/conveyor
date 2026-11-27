@@ -946,6 +946,24 @@ pub async fn record_decision_tx(
     if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
         return Err(ApprovalStoreError::ExecutorGateHumanOnly);
     }
+    // The gate's own state is the primary conflict. A decision on a non-pending gate is
+    // `NotPending` — for a human or a machine — before the approver-kind policy is consulted: a
+    // caller told "already decided" has nothing to fix, while a policy refusal would send it to
+    // a gate that cannot accept any decision. Validated before the insert, so a refused attempt
+    // leaves no `approval_decision` row.
+    let prior: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let prior = u16::try_from(prior).unwrap_or(u16::MAX);
+    let gate = row.gate.clone();
+    let approval = row.into_approval(prior)?;
+    let required = approval.required_decisions;
+    let next = approval.decide(decision.clone(), required)?;
     // SPEC_V2 §5.4: a human approver is the DEFAULT for every gate, not only an eval gate. A
     // tenant may authorise a non-human approver (job/agent/service/rule) only for a gate it
     // explicitly declares non-governance — by naming that approver kind in its gate-policy row.
@@ -986,7 +1004,7 @@ pub async fn record_decision_tx(
             || match approval_policy::allows_approver_kind(
                 &mut *conn,
                 tenant,
-                &row.gate,
+                &gate,
                 decision.decided_by_kind,
             )
             .await
@@ -998,9 +1016,7 @@ pub async fn record_decision_tx(
                 Err(_) => false,
             };
         if !allowed {
-            return Err(ApprovalStoreError::HumanOnlyGate {
-                gate: row.gate.clone(),
-            });
+            return Err(ApprovalStoreError::HumanOnlyGate { gate: gate.clone() });
         }
     }
     // An eval sign-off additionally needs the caller to hold `evals:approve` (S06d / W1). The
@@ -1015,21 +1031,6 @@ pub async fn record_decision_tx(
     if eval_gate.is_some() && !eval_authorized {
         return Err(ApprovalStoreError::EvalScopeRequired);
     }
-
-    let prior: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM approval_decision
-          WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'",
-    )
-    .bind(tenant.as_uuid())
-    .bind(approval_id)
-    .fetch_one(&mut *conn)
-    .await?;
-    let prior = u16::try_from(prior).unwrap_or(u16::MAX);
-    let approval = row.into_approval(prior)?;
-    let required = approval.required_decisions;
-    // Validate BEFORE the insert. A gate that is not pending (or a zero quorum) is refused
-    // here, so a refused decision leaves no `approval_decision` row for the caller to undo.
-    let next = approval.decide(decision.clone(), required)?;
 
     sqlx::query(
         "INSERT INTO approval_decision (tenant_id, approval_id, approver_id, decision, note,

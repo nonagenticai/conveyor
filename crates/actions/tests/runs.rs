@@ -105,6 +105,7 @@ async fn the_run_carries_its_executor_and_binding_pin() {
                 "card_id": card_id,
                 "job_binding_id": anchor.binding_id,
                 "release_hash": anchor.release_hash,
+                "inputs": {"limits": {"cost_budget_usd": 5.0}},
             }),
             None,
             None,

@@ -221,7 +221,9 @@ async fn a_risk_without_review_at_is_refused() {
 /// decision: backfill and keep the risk managed, never a bare risk).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_risk_owner_may_be_a_named_role_without_a_job() {
-    let (_, running, _) = fixture().await;
+    // Keep the Pg and Seeded handles alive: a bare `_` drops them at once, and the server then
+    // has no database to write the programme to (the 500 these tests carried).
+    let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Role-owned risk programme").await;
 
     let (status, body) = running
@@ -261,7 +263,9 @@ async fn a_risk_owner_may_be_a_named_role_without_a_job() {
 /// owner. The role path is an owner, not a waiver of the rule.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_risk_without_any_owner_is_refused() {
-    let (_, running, _) = fixture().await;
+    // Keep the Pg and Seeded handles alive: a bare `_` drops them at once, and the server then
+    // has no database to write the programme to (the 500 these tests carried).
+    let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Ownerless risk programme").await;
 
     let (status, body) = running

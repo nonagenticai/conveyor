@@ -24,6 +24,8 @@ static SERIAL: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 /// The destination the coding toolkit dispatches to.
 const CODING_URL: &str = "CONVEYOR_EXTERNAL_CODING_URL";
+/// The tenant secret the scientific toolkit's `sealed-profile` auth adapter reads.
+const SCIENTIFIC_CREDENTIAL: &str = "scientific-credential";
 
 /// A destination stub whose health answer and latency the test controls.
 struct Stub {
@@ -119,6 +121,21 @@ impl Fixture {
         let stub = Stub::start().await;
         support::set_env(CODING_URL, &stub.base);
         let run_id = seed_run(&pg, seeded.tenant).await;
+        // The scientific toolkit's destination authenticates through a sealed-profile tenant
+        // secret; its tool_binding names this one.
+        let mut tx = begin_scoped(&pg.owner, seeded.tenant)
+            .await
+            .expect("scope the scientific credential");
+        conveyor_store::secret::create_secret_tx(
+            &mut tx,
+            seeded.tenant,
+            SCIENTIFIC_CREDENTIAL,
+            b"sealed-profile-token",
+            "tenant",
+        )
+        .await
+        .expect("scientific credential secret");
+        tx.commit().await.expect("commit the scientific credential");
         let running = support::Running::start(&pg).await;
         Fixture {
             pg,
@@ -169,6 +186,35 @@ impl Fixture {
         .bind(self.run_id)
         .bind(toolkit_id)
         .bind(ceiling)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the binding");
+        tx.commit().await.expect("commit the binding");
+    }
+
+    /// Bind the run to one published toolkit, naming the tenant secret a sealed-profile
+    /// destination authenticates with.
+    async fn bind_with_credential(&self, toolkit_key: &str, ceiling: &str, alias: &str) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        let toolkit_id: Uuid =
+            sqlx::query_scalar("SELECT id FROM toolkit WHERE tenant_id = $1 AND key = $2")
+                .bind(self.tenant.as_uuid())
+                .bind(toolkit_key)
+                .fetch_one(&mut *tx)
+                .await
+                .expect("the published toolkit");
+        sqlx::query(
+            "INSERT INTO tool_binding
+                 (tenant_id, run_id, toolkit_id, effect_ceiling, enabled, credential_alias)
+             VALUES ($1, $2, $3, $4, true, $5)",
+        )
+        .bind(self.tenant.as_uuid())
+        .bind(self.run_id)
+        .bind(toolkit_id)
+        .bind(ceiling)
+        .bind(alias)
         .execute(&mut *tx)
         .await
         .expect("insert the binding");
@@ -292,10 +338,10 @@ async fn a_publish_is_idempotent_and_a_change_bumps_the_version() {
 // ── P1.3 / P2.1 ─────────────────────────────────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn the_scientific_toolkit_publishes_as_a_draft() {
+async fn the_scientific_toolkit_publishes_published_and_calls() {
     let _serial = SERIAL.lock().await;
     let fixture = Fixture::new().await;
-    // The service's address is configured: the draft is the manifest's declared status, not an
+    // The service's address is configured: the declared status is the manifest's, not an
     // unconfigured-host accident (#560 P5.2).
     support::set_env("CONVEYOR_EXTERNAL_SCIENTIFIC_URL", &fixture.stub.base);
 
@@ -310,7 +356,9 @@ async fn the_scientific_toolkit_publishes_as_a_draft() {
         "{first}"
     );
     let (status, version) = fixture.toolkit_status("scientific").await;
-    assert_eq!((status.as_str(), version), ("draft", 1));
+    // T14's live gate published the seed toolkit deliberately (676f79824): the manifest's
+    // declared status is `published`, so the first publish is a published version.
+    assert_eq!((status.as_str(), version), ("published", 1));
 
     // A second publish of the same manifest is unchanged — one immutable version.
     let second = fixture.publish().await;
@@ -321,15 +369,20 @@ async fn the_scientific_toolkit_publishes_as_a_draft() {
     assert_eq!(scientific.1, "unchanged");
     assert_eq!(scientific.2, 1);
 
-    // A draft resolves no binding: the broker answers `409 tool_not_ready` before the destination.
-    fixture.bind("scientific", "read").await;
+    // A published toolkit resolves its binding and reaches the destination (the stub).
+    fixture
+        .bind_with_credential("scientific", "read", SCIENTIFIC_CREDENTIAL)
+        .await;
     let hits = fixture.stub.hits();
     let (code, body) = fixture
-        .call("scientific_stats.meta_analysis", json!({"studies": []}))
+        .call("scientific.meta_analysis", json!({"studies": []}))
         .await;
-    assert_eq!(code, 409, "{body}");
-    assert_eq!(body["type"], "tool_not_ready", "{body}");
-    assert_eq!(fixture.stub.hits(), hits, "no network call was made");
+    assert_eq!(code, 200, "{body}");
+    assert_eq!(
+        fixture.stub.hits(),
+        hits + 1,
+        "the published toolkit's call reached the destination"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -338,16 +391,21 @@ async fn an_unconfigured_toolkit_is_draft_and_uncallable() {
     let fixture = Fixture::new().await;
     fixture.publish().await;
 
-    let (status, version) = fixture.toolkit_status("retrieval").await;
+    // The retrieval toolkit was published by T14's live gate, so this test uses `lean4`: its
+    // seed manifest is still a draft and its host variable is unset here.
+    let (status, version) = fixture.toolkit_status("lean4").await;
     assert_eq!((status.as_str(), version), ("draft", 1));
 
     // A binding to a draft toolkit is a row the broker will not resolve: `resolve` requires a
     // published toolkit, which is what makes a draft unbound and uncallable rather than merely
     // unadvertised.
-    fixture.bind("retrieval", "read").await;
+    fixture.bind("lean4", "read").await;
     let hits = fixture.stub.hits();
     let (code, body) = fixture
-        .call("retrieval.query", json!({"query": "anything"}))
+        .call(
+            "lean4.check",
+            json!({"source": "theorem t : True := trivial"}),
+        )
         .await;
     assert_eq!(code, 409, "{body}");
     assert_eq!(body["type"], "tool_not_ready", "{body}");
@@ -359,7 +417,7 @@ async fn an_unconfigured_toolkit_is_draft_and_uncallable() {
 
     // And the probe reports the reason rather than inventing a destination.
     let (code, probe) = fixture
-        .invoke("tools.probe", json!({"toolkit": "retrieval"}))
+        .invoke("tools.probe", json!({"toolkit": "lean4"}))
         .await;
     assert_eq!(code, 200, "{probe}");
     assert_eq!(

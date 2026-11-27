@@ -67,11 +67,14 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
     .await
     .expect("tranches");
     assert_eq!(tranches.len(), 14);
-    assert_eq!(tranches[0], (0, "closed".to_owned()));
+    // The seed never authorises a tranche on its own: every row starts `planned`, and a
+    // continue review is what closes a tranche and authorises its successor (see
+    // `a_seeded_tranche_one_project_starts_after_the_continue_review`).
+    assert_eq!(tranches[0], (0, "planned".to_owned()));
     assert_eq!(
         tranches[1],
-        (1, "authorised".to_owned()),
-        "the tranche-0 continue review authorises tranche 1: {tranches:?}"
+        (1, "planned".to_owned()),
+        "the seed asserts no authorisation: {tranches:?}"
     );
     assert!(
         tranches[2..].iter().all(|(_, state)| state == "planned"),
@@ -194,12 +197,8 @@ async fn a_seeded_tranche_one_project_starts_after_the_continue_review() {
     // The continue review's effect: a review row of the tranche, named by
     // authorisation_review_id, is what authorises the start. The review's own evidence
     // resolution is proved in tranche_review.rs.
-    let reviewer: uuid::Uuid =
-        sqlx::query_scalar("SELECT id FROM app_user WHERE tenant_id = $1 ORDER BY id LIMIT 1")
-            .bind(seeded.tenant)
-            .fetch_one(&db.super_pool)
-            .await
-            .expect("a seeded app_user");
+    // The review's reviewer is the seeded tenant member.
+    let reviewer: uuid::Uuid = seeded.user;
     let review: uuid::Uuid = sqlx::query_scalar(
         "INSERT INTO programme_tranche_review
              (tenant_id, tranche_id, decision, evidence, reviewed_by)
@@ -256,8 +255,8 @@ async fn every_seeded_benefit_resolves_both_job_owners() {
     .expect("every benefit joins both owner jobs");
     assert_eq!(
         owners.len(),
-        6,
-        "all six benefits have both owners: {owners:?}"
+        7,
+        "all seven benefits have both owners: {owners:?}"
     );
     for (reference, owner, benefit_owner, same) in owners {
         assert_eq!(owner, "bcm", "{reference} owner is the BCM job");

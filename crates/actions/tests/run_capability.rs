@@ -240,8 +240,9 @@ async fn a_generic_run_resolves_its_capability_or_refuses() {
     .expect("seed capability");
     let agent: Uuid = sqlx::query_scalar(
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, status, model_ref, allowed_actions)
-         VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', ARRAY['cards.claim'])
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, allowed_actions)
+         VALUES ($1, $2, $3, 'tool_agent', 'active', 'local-llm', 'agent@1',
+                 ARRAY['cards.claim'])
          RETURNING id",
     )
     .bind(seeded.tenant_id)

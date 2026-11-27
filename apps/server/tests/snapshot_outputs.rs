@@ -285,7 +285,7 @@ async fn pages_csv_and_manifest_share_the_json_redaction_and_programme_filter() 
     let issues = data.join("issues.json");
     std::fs::write(
         &issues,
-        "{\"issues\": [{\"number\": 700, \"title\": \"A public issue\", \"state\": \"OPEN\", \"labels\": []}]}\n",
+        "{\"issues\": [{\"number\": 700, \"title\": \"A public issue\", \"state\": \"OPEN\", \"labels\": []}], \"provenance\": {\"tenant\": \"publication\", \"source\": \"test fixture\"}}\n",
     )
     .expect("issues");
     let report = run_with_pool(

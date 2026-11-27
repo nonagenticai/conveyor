@@ -8802,6 +8802,7 @@ fn spine_samples() -> Vec<Sample> {
                     "unit": "hours",
                     "method": "parity baseline reading",
                     "measured_at": "2026-11-01T00:00:00Z",
+                    "evidence": {"ref": "parity-baseline-reading"},
                 })
             });
             expecting(sample, 201)

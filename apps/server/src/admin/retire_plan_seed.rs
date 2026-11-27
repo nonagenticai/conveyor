@@ -71,7 +71,7 @@ pub async fn run(
     let approver_id = store::identity::tenant_actor_excluding(pool, tenant, caller.actor_id())
         .await?
         .ok_or(RetireError::NoDistinctApprover(tenant))?;
-    let approver = ActionCaller::new_as(pool, tenant, app_key, Some(approver_id)).await?;
+    let approver = ActionCaller::human_as(pool, tenant, app_key, Some(approver_id)).await?;
     for card in scan.candidates {
         match archive_one(&caller, &approver, card.id, card.version).await {
             Ok(()) => report.archived += 1,

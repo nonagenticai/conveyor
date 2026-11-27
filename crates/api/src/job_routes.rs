@@ -303,8 +303,11 @@ pub async fn job_output(
         })?;
     let tenant = fenced.claims.tenant;
     let sha256 = hex(&Sha256::digest(&body));
+    // The object adapter serves only keys under `tenant/<tenant>/` (§11.10); a short `t/`
+    // prefix is refused before the store is reached.
     let key = format!(
-        "t/{}/jobs/{}/{}/{}",
+        "{}/{}/jobs/{}/{}/{}",
+        conveyor_actions::storage::TENANT_PREFIX,
         tenant.as_uuid(),
         id,
         fenced.claims.attempt,

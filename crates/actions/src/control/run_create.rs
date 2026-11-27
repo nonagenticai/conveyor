@@ -57,8 +57,16 @@ pub(crate) async fn create_bound_run_tx(
     job_binding_id: Option<Uuid>,
     correlation_id: Option<Uuid>,
     release_hash: Option<String>,
+    inputs: serde_json::Value,
     action: &str,
 ) -> Result<(RunRecord, RunOut), ActionError> {
+    // An absent `inputs` is an empty object, never a SQL NULL: the column is jsonb and the
+    // budget guard reads `inputs.limits`.
+    let inputs = if inputs.is_null() {
+        serde_json::json!({})
+    } else {
+        inputs
+    };
     let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
         .await
         .map_err(|error| store_error(error, action))?
@@ -118,8 +126,10 @@ pub(crate) async fn create_bound_run_tx(
             .await
             .map_err(|error| run_error(store::RunStoreError::from(error), action))?;
         capability_agent_id = binding.capability_agent_id;
-        // #526 / D45: an internal-agent binding must itself declare the ceiling.
-        ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &serde_json::Value::Null).await?;
+        // #526 / D45: an internal-agent binding must itself declare the ceiling, or the run
+        // must declare one; the run's declaration is the `inputs` this caller passed, never
+        // `Null` (which made every run look undeclared).
+        ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
     }
 
     let run = store::run::insert_run_tx(
@@ -131,7 +141,7 @@ pub(crate) async fn create_bound_run_tx(
             attempt,
             correlation_id,
             process_id: None,
-            inputs: serde_json::Value::Object(serde_json::Map::new()),
+            inputs,
             capability_id,
             capability_agent_id,
             // A root run has no parent, no step and pins no process.

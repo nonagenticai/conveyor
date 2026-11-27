@@ -131,13 +131,21 @@ async fn measure(
         .await
 }
 
-async fn realise(running: &support::Running, benefit: &str) -> (u16, Value) {
+async fn realise(pg: &support::Pg, running: &support::Running, benefit: &str) -> (u16, Value) {
+    // `benefits.measure` bumps the profile's version; a hardcoded `"1"` makes every update
+    // after a measurement a 412 version_mismatch. Send the version that is actually current.
+    let version: i64 = sqlx::query_scalar("SELECT version FROM benefit_profile WHERE id = $1")
+        .bind(uuid::Uuid::parse_str(benefit).expect("the benefit id"))
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("read the benefit version");
+    let if_match = format!("\"{version}\"");
     running
         .invoke(
             "benefits.update",
             TOKEN,
             json!({"id": benefit, "status": "realized"}),
-            Some("\"1\""),
+            Some(&if_match),
             None,
             None,
         )
@@ -172,7 +180,7 @@ async fn a_benefit_with_no_baseline_measurement_is_not_realisable() {
         measure(&running, &benefit, "post", 8.0, 9.0, "2026-11-21T00:00:00Z").await;
     assert_eq!(status, 201, "{body}");
 
-    let (status, body) = realise(&running, &benefit).await;
+    let (status, body) = realise(&pg, &running, &benefit).await;
     assert_eq!(status, 422, "{body}");
     assert_eq!(
         body["errors"][0]["code"], "benefit_baseline_missing",
@@ -214,7 +222,7 @@ async fn a_post_measurement_after_enactment_realises_the_benefit() {
     .await;
     assert_eq!(status, 201, "{body}");
 
-    let (status, body) = realise(&running, &benefit).await;
+    let (status, body) = realise(&pg, &running, &benefit).await;
     assert_eq!(status, 422, "{body}");
     assert_eq!(
         body["errors"][0]["code"], "benefit_post_measurement_missing",
@@ -232,7 +240,7 @@ async fn a_post_measurement_after_enactment_realises_the_benefit() {
     )
     .await;
     assert_eq!(status, 201, "{body}");
-    let (status, body) = realise(&running, &benefit).await;
+    let (status, body) = realise(&pg, &running, &benefit).await;
     assert_eq!(status, 422, "{body}");
     assert_eq!(
         body["errors"][0]["code"], "benefit_post_measurement_missing",
@@ -242,7 +250,7 @@ async fn a_post_measurement_after_enactment_realises_the_benefit() {
     let (status, body) =
         measure(&running, &benefit, "post", 8.0, 9.0, "2026-11-21T00:00:00Z").await;
     assert_eq!(status, 201, "{body}");
-    let (status, body) = realise(&running, &benefit).await;
+    let (status, body) = realise(&pg, &running, &benefit).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "realized", "{body}");
 }
@@ -348,7 +356,7 @@ async fn metrics_programme_reports_variance_and_evaluation() {
     )
     .await;
     assert_eq!(status, 201, "{body}");
-    let (status, body) = realise(&running, &realised).await;
+    let (status, body) = realise(&pg, &running, &realised).await;
     assert_eq!(status, 200, "{body}");
 
     // Reduced below target: baseline 14 → interim 7 against target 8, on track.

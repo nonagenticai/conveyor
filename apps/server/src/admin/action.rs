@@ -24,6 +24,9 @@ pub struct ActionCaller<'a> {
     tenant: TenantId,
     actor: Uuid,
     app_key: &'a str,
+    /// How the engine records this caller's acts: `service` for the CLI's own principal, or
+    /// `human` for a named tenant member acting in the machine's place.
+    kind: &'static str,
 }
 
 impl<'a> ActionCaller<'a> {
@@ -65,7 +68,24 @@ impl<'a> ActionCaller<'a> {
             tenant,
             actor,
             app_key,
+            kind: "service",
         })
+    }
+
+    /// As [`new_as`], but the engine records the named member's acts as a HUMAN's.
+    ///
+    /// A destructive command may need a distinct tenant member to decide its gate (§5.4). The
+    /// member is a person, so the decision must carry `actor_kind = "human"`; the caller's own
+    /// service principal cannot stand in for the approver. The identity rules are `new_as`'s.
+    pub async fn human_as(
+        pool: &'a PgPool,
+        tenant: TenantId,
+        app_key: &'a str,
+        actor_id: Option<Uuid>,
+    ) -> Result<Self, CallError> {
+        let mut caller = Self::new_as(pool, tenant, app_key, actor_id).await?;
+        caller.kind = "human";
+        Ok(caller)
     }
 
     /// The member this caller acts as.
@@ -115,7 +135,7 @@ impl<'a> ActionCaller<'a> {
                 idempotency_key,
                 approval_id,
                 actor_id: self.actor,
-                actor_kind: "service".to_owned(),
+                actor_kind: self.kind.to_owned(),
                 role: Role::KataExecutor,
                 policy: Default::default(),
                 authority: Authority::Internal,

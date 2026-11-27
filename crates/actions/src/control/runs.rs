@@ -248,6 +248,7 @@ async fn runs_create(
         job_binding_id,
         input.correlation_id,
         input.release_hash.clone(),
+        input.inputs,
         action,
     )
     .await?;

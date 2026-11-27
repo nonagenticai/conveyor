@@ -30,9 +30,9 @@ async fn the_catalogue_seed_imports_every_exported_row_and_is_idempotent() {
     // improvement, development, operations, setup and media: 40 -> 46.
     // T4 (#75) adds the `coach` card type: 74 -> 75. T11 (#84) adds `incident`: 75 -> 76.
     // S18 P3a (#12) adds `benchmark`: 76 -> 77. T19 (#606) adds `meeting` and
-    // `meeting_action`: 77 -> 79.
+    // `meeting_action`: 77 -> 79. T13 (#778) adds `tool_request`: 79 -> 80.
     assert_eq!(export.entries.len(), 46, "the export's catalogue entries");
-    assert_eq!(export.card_types.len(), 79, "the export's card types");
+    assert_eq!(export.card_types.len(), 80, "the export's card types");
     assert_eq!(
         capabilities.capabilities.len(),
         18,

@@ -61,13 +61,16 @@ async fn the_database_refuses_a_job_row_with_no_binding() {
     let seed = support::seed_tenant(&db.super_pool, "run-binding-check").await;
 
     // The store refusal is bypassed on purpose: the CHECK is the second door, and a raw writer
-    // (a migration, an operator) must not be able to create the row either.
-    let refused =
-        sqlx::query("INSERT INTO run (tenant_id, project_id, kind) VALUES ($1, $2, 'job')")
-            .bind(seed.tenant)
-            .bind(seed.project)
-            .execute(&db.super_pool)
-            .await;
+    // (a migration, an operator) must not be able to create the row either. The card is present
+    // so 0097's card door passes and the binding door (0096) is the one this test exercises.
+    let refused = sqlx::query(
+        "INSERT INTO run (tenant_id, project_id, kind, card_id) VALUES ($1, $2, 'job', $3)",
+    )
+    .bind(seed.tenant)
+    .bind(seed.project)
+    .bind(seed.card)
+    .execute(&db.super_pool)
+    .await;
     let error = refused.expect_err("a job row cannot exist without its binding");
     let detail = error.to_string();
     assert!(
@@ -194,13 +197,26 @@ async fn the_database_refuses_a_job_row_with_no_card() {
         "the CHECK that refused the row is not the card door: {detail}"
     );
 
-    // The same job row with its card is accepted: the CHECK forbids only cardless job work.
+    // The same job row with its card is accepted: the CHECK forbids only cardless job work. The
+    // fixture's own card already carries a live run (`uq_run_live` permits one), so this uses a
+    // fresh card copied from it.
+    let card: Uuid = sqlx::query_scalar(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, position, created_by)
+         SELECT tenant_id, board_id, list_id, card_type_id, 'run-binding-card', 1, created_by
+           FROM card WHERE tenant_id = $1 AND id = $2
+         RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(seed.card)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("a fresh card");
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO run (tenant_id, card_id, project_id, kind, job_binding_id)
          VALUES ($1, $2, $3, 'job', $4) RETURNING id",
     )
     .bind(seed.tenant)
-    .bind(seed.card)
+    .bind(card)
     .bind(seed.project)
     .bind(binding)
     .fetch_one(&db.super_pool)
