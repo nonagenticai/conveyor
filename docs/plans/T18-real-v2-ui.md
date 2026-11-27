@@ -1,7 +1,7 @@
 ---
 slice: T18
 title: The real V2 UI — shell, routes, destinations and the delivery view
-status: proposed
+status: built
 depends_on: [T0, T1, T2, T3, P0]
 spec_sections: ["§10.5", "§12 T18", "D64", "D65"]
 adds_tables: []

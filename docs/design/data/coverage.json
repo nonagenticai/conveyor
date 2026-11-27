@@ -2098,9 +2098,19 @@
       "evidence": [
         "docs/plans/T18-real-v2-ui.md",
         "docs/SPEC_V2.md",
-        "apps/web/src/app.rs"
+        "apps/web/src/app.rs",
+        "apps/web/e2e/portfolio.spec.ts",
+        "apps/web/e2e/programme.spec.ts",
+        "apps/web/e2e/organisation.spec.ts",
+        "apps/web/e2e/procedures.spec.ts",
+        "apps/web/e2e/authoring.spec.ts",
+        "apps/web/e2e/plan.spec.ts",
+        "apps/web/e2e/improve.spec.ts",
+        "apps/web/e2e/operations.spec.ts",
+        "apps/web/e2e/tools.spec.ts",
+        "apps/web/e2e/adm.spec.ts"
       ],
-      "gap": "no V2 route exists in apps/web; the destinations are mock pages only",
+      "gap": null,
       "key": "T18",
       "measured": {
         "actions": [
@@ -2129,7 +2139,7 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
@@ -2862,10 +2872,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 47,
+        "built": 48,
         "partial": 1,
         "planned": 1,
-        "proposed": 1,
+        "proposed": 0,
         "standing": 1
       },
       "total": 52,

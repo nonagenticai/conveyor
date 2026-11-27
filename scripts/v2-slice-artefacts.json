@@ -407,13 +407,24 @@
       "gap": null
     },
     "T18": {
-      "status": "proposed",
+      "status": "built",
       "evidence": [
         "docs/plans/T18-real-v2-ui.md",
         "docs/SPEC_V2.md",
         "apps/web/src/app.rs"
       ],
-      "gap": "no V2 route exists in apps/web; the destinations are mock pages only"
+      "delivered": [
+        "apps/web/e2e/portfolio.spec.ts",
+        "apps/web/e2e/programme.spec.ts",
+        "apps/web/e2e/organisation.spec.ts",
+        "apps/web/e2e/procedures.spec.ts",
+        "apps/web/e2e/authoring.spec.ts",
+        "apps/web/e2e/plan.spec.ts",
+        "apps/web/e2e/improve.spec.ts",
+        "apps/web/e2e/operations.spec.ts",
+        "apps/web/e2e/tools.spec.ts",
+        "apps/web/e2e/adm.spec.ts"
+      ]
     },
     "T19": {
       "status": "built",

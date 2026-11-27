@@ -34,7 +34,14 @@ Orphan sub-kinds: `no-issue` 8, `unlinked-unit` 3.
 | `pullUsable` | 0 |
 | `verifyParts` | 39 |
 
-**46 completed unit(s) fail the collector's rule mirror; the kernel certificate is pending the deployed engine.**
+| Chunk | Units | Verdict | Certificate |
+|---|---|---|---|
+| `chunk-000` | 200 | unproven | `01a21ece-82d8-708b-851c-1e994a203e8d` |
+| `chunk-001` | 134 | unproven | `01a21ece-a1d6-7ca6-9826-0d73c2808460` |
+
+Programme bundle `01a21ece-bcd4-73e9-ab17-3c8b0158f0d2` (proven).
+
+**46 completed unit(s) fail the model.**
 
 | Unit | Failed rules |
 |---|---|

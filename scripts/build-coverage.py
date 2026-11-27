@@ -9,6 +9,8 @@ Every status is measured from a committed artefact, never guessed:
   the tree (with an explicit, evidenced alias table for a module absorbed under another name);
 * a V2 slice (`T##`) from `scripts/v2-slice-artefacts.json` — the same table/action/module
   measurement as V1, with an explicit curated row for a slice whose deliverable is behaviour;
+  a curated row claims `built` only through a non-empty `delivered` path list (its routes and
+  specs), which `check-coverage.cjs` resolves;
 * a screen from `docs/design/v2.js` — the page map, the render body's `ribbon`/`wrapLegacy`,
   and every `C.action(...)` call;
 * a tranche from `seed/programme.json` `meta.depends_on` (longest path), with `blocked_by`
@@ -586,11 +588,22 @@ def measure_v2(
         empty_status="proposed",
     )
     if result["total"] == 0:
+        # A behavioural slice declares paths instead of rows. `delivered` proves the behaviour
+        # (routes and specs); the checker resolves every path, so a bare status flip cannot
+        # claim `built`. A non-built curated row still owes a gap to name what is missing.
+        status = declaration.get("status", "proposed")
+        evidence = list(declaration.get("evidence") or [])
+        for path in declaration.get("delivered") or []:
+            if path not in evidence:
+                evidence.append(path)
+        gap = declaration.get("gap")
+        if gap is None and status not in ("built", "archived", "standing"):
+            gap = "no declared artefacts and no evidence row; add one"
         return {
-            "status": declaration.get("status", "proposed"),
+            "status": status,
             "measured": {"tables": [0, 0], "actions": [0, 0], "modules": [0, 0]},
-            "evidence": list(declaration.get("evidence", []) or ["docs/SPEC_V2.md"]),
-            "gap": declaration.get("gap") or "no declared artefacts and no evidence row; add one",
+            "evidence": evidence or ["docs/SPEC_V2.md"],
+            "gap": gap,
         }
     return {
         "status": result["status"],

@@ -136,11 +136,28 @@ function validate(document, context) {
         Array.isArray(declaration.evidence) && declaration.evidence.length > 0,
         `${project.key} declares no artefacts and no evidence row`,
       );
-      assert(declaration.gap, `${project.key} declares no artefacts and no gap`);
-      assert(
-        project.status === "proposed" || project.status === "planned",
-        `${project.key} is curated but its measured status is ${project.status}`,
-      );
+      const delivered = Array.isArray(declaration.delivered) ? declaration.delivered : [];
+      if (UNBUILT.has(project.status)) {
+        assert(declaration.gap, `${project.key} declares no artefacts and no gap`);
+        assert(
+          project.status === "proposed" || project.status === "planned",
+          `${project.key} is curated but its measured status is ${project.status}`,
+        );
+      } else {
+        // #882: a behavioural slice may be built, but only from a delivered proof — the routes
+        // and specs that carry the behaviour. Every path must resolve, so a bare status flip
+        // does not pass.
+        assert(
+          delivered.length > 0,
+          `${project.key} is curated ${project.status} without a delivered proof`,
+        );
+        for (const path of delivered) {
+          assert(
+            exists(path),
+            `${project.key} delivered path does not resolve: ${path}`,
+          );
+        }
+      }
       continue;
     }
     const measured = [
@@ -281,7 +298,23 @@ function main() {
       assert(row, "self-test: T0 is not in coverage.json");
       row.measured.tables = [0, row.measured.tables[1]];
     });
-    console.log("check-coverage: self-test 5/5 refusals");
+    // #882: a curated behavioural slice cannot claim built without a delivered proof that the
+    // filesystem resolves.
+    {
+      const ctx = { ...context, v2art: structuredClone(context.v2art) };
+      const copy = structuredClone(context.coverage);
+      copy.projects.find((project) => project.key === "T18").status = "built";
+      delete ctx.v2art.T18.delivered;
+      assert.throws(
+        () => validate(copy, ctx),
+        undefined,
+        "a curated built slice without a delivered proof",
+      );
+      console.log(
+        "check-coverage: self-test refused a curated built slice without a delivered proof",
+      );
+    }
+    console.log("check-coverage: self-test 6/6 refusals");
   }
 }
 
