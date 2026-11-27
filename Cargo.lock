@@ -958,26 +958,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "conveyor-lean4-prover"
-version = "0.1.0"
-dependencies = [
- "axum",
- "clap",
- "http-body-util",
- "libc",
- "reqwest",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "tokio",
- "tower",
- "tower-http 0.7.1",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "conveyor-licenses"
 version = "0.1.0"
 dependencies = [

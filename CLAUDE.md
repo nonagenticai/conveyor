@@ -21,6 +21,13 @@ Read, in order: `docs/SPEC.md` → `docs/plans/00-INDEX.md` → `docs/plans/03-D
 - Stopping before merge? Write the `<!-- handoff -->` comment from `03-DELIVERY.md`. Never end
   on a verbal status.
 
+## Services outside this repository
+
+`lean4-prover` is **not** a crate here: its source of record is `nonagenticai/lean4-prover`
+(public), and the deployed image is built by that repository's CI and published to ghcr. The
+`scientific` app is an HTTP client only. Do not re-add a copy of the prover crate — a merge in
+this repository does not reach the cluster (conveyor#803).
+
 ## Roles — load the skill for the work
 
 | Work | Skill |
