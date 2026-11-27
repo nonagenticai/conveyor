@@ -3904,7 +3904,12 @@
    ],
    "failure_scenario": "An operator runs the documented ignored command; cargo exits target-not-found, indistinguishable from an unproven sandbox.",
    "acceptance": "sandbox_live.rs exists with the named ignored test and its result is recorded.",
-   "owner_project": "S17"
+   "owner_project": "S17",
+   "resolved_by": {
+    "commit": "bf2bb4c6ec8a013dbc7027a992cb7a5e90aa7d74",
+    "test": "apps/server/tests/sandbox_live.rs",
+    "evidence": "The merged #584 ignored test ran against the live hp1 grading node on 2026-11-22: Job swb-7fa599e09fc0-conveyor-live-proof was scheduled to hp1, reached terminal Succeeded, its log carried the apply marker and 'conveyor sandbox live proof', and the Job and its pod were deleted; docs/evidence/S17-CORE.md 'Live run — hp1' records the whole lifecycle. The test file exists at the 2026-11-27 lane head, so the documented command no longer exits target-not-found."
+   }
   },
   {
    "id": "v1-s18-1",
