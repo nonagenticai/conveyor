@@ -199,6 +199,35 @@ export async function createActiveBinding<T>(
 }
 
 /**
+ * Drive a UI write and prove it landed, re-driving it while it has not.
+ *
+ * The board screen recreates its forms on every refetch — an SSE resync does it right after a
+ * board loads, and a fixture's own start run lands a coach card seconds later — and a click
+ * dispatched inside that window is delivered to a node that no longer carries the handler, so
+ * no request is posted. Measured 2026-11-27: `projects.create` answered 201 while no
+ * `cards.create` ever reached the wire, and the same again on the label form. `settled` is a
+ * read of the SERVER, never the DOM, so the caller keeps its own assertion; this only decides
+ * whether to press the control again. It gives up after `attempts`, leaving the caller's
+ * assertion to fail with its own evidence.
+ */
+export async function submitUntil(
+  act: () => Promise<void>,
+  settled: () => Promise<boolean>,
+  attempts = 4,
+  perAttemptMs = 8_000,
+): Promise<void> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (await settled()) return;
+    await act();
+    const deadline = Date.now() + perAttemptMs;
+    while (Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      if (await settled()) return;
+    }
+  }
+}
+
+/**
  * Fixture path: request a gate for `action`, have a distinct approver decide it, then invoke
  * with its id.
  *

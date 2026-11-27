@@ -10,6 +10,7 @@ import {
   isDevAuth,
   pendingGateFor,
   setApprovalPolicy,
+  submitUntil,
 } from "./helpers";
 
 // The board is the first screen where a write matters: `cards.move` carries the card's
@@ -149,23 +150,29 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
 
   const intake = page.locator(".lane", { hasText: "Intake" });
   await expect(intake).toBeVisible();
-  await intake.getByLabel("Card name").fill(cardName);
-  await intake.getByRole("button", { name: "Add card" }).click();
 
   // The action's effect is proved on the board's own rows before the screen read: under the
   // full suite the screen's refetch can be delayed past a DOM wait (measured in CI 2026-11-20).
   const boardId = page.url().split("/").pop();
-  await expect
-    .poll(
-      async () => {
-        const view = await request
-          .get(`/api/boards/${boardId}/cards?limit=200`)
-          .then((r) => r.json());
-        return (view.items ?? []).map((row: { name: string }) => row.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(cardName);
+  const cardNames = async (): Promise<string[]> => {
+    const view = await request
+      .get(`/api/boards/${boardId}/cards?limit=200`)
+      .then((r) => r.json());
+    return (view.items ?? []).map((row: { name: string }) => row.name);
+  };
+
+  // The board re-renders whenever its own refetch lands, and the form is recreated with it —
+  // so a click dispatched in that window posts nothing (measured 2026-11-27: `projects.create`
+  // 201, no `cards.create` on the wire). The start run's coach card arrives seconds later, so
+  // the window is real here. The assertion below is still the board's own rows.
+  await submitUntil(
+    async () => {
+      await intake.getByLabel("Card name").fill(cardName);
+      await intake.getByRole("button", { name: "Add card" }).click();
+    },
+    async () => (await cardNames()).includes(cardName),
+  );
+  await expect.poll(cardNames, { timeout: 30_000 }).toContain(cardName);
   await page.reload();
 
   const card = page.locator(".card", { hasText: cardName });
@@ -297,24 +304,25 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   // The screen's heading is the board's name, not the project's; the fixture's card is the mark.
   await expect(page.locator(".card", { hasText: title })).toBeVisible();
 
-  // A label: created through the panel's form, then attached to the start card's row.
+  // A label: created through the panel's form, then attached to the start card's row. The same
+  // re-render window applies to this form, so the click is re-driven while the board's own read
+  // carries no such label.
   const label = `e2e-label-${stamp}`;
-  await page.getByLabel("Label name").fill(label);
-  await page.getByLabel("Label color").fill("teal");
-  await page.getByRole("button", { name: "Create label" }).click();
+  const labelNames = async (): Promise<string[]> => {
+    const board = await request.get(`/api/boards/${fixture.boardId}`).then((r) => r.json());
+    return (board.labels ?? []).map((entry: { name: string }) => entry.name);
+  };
+  await submitUntil(
+    async () => {
+      await page.getByLabel("Label name").fill(label);
+      await page.getByLabel("Label color").fill("teal");
+      await page.getByRole("button", { name: "Create label" }).click();
+    },
+    async () => (await labelNames()).includes(label),
+  );
   // Prove the label on the board's own read before waiting on the screen; the refetch can be
   // delayed past the default DOM wait under the full suite.
-  await expect
-    .poll(
-      async () => {
-        const board = await request
-          .get(`/api/boards/${fixture.boardId}`)
-          .then((r) => r.json());
-        return (board.labels ?? []).map((entry: { name: string }) => entry.name);
-      },
-      { timeout: 30_000 },
-    )
-    .toContain(label);
+  await expect.poll(labelNames, { timeout: 30_000 }).toContain(label);
   await expect(page.locator(".label", { hasText: label })).toBeVisible({ timeout: 30_000 });
 
   // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
