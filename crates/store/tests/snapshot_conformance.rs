@@ -452,7 +452,13 @@ async fn the_snapshot_projects_published_documents_with_their_publish_state() {
         .find(|row| row["id"] == published.to_string())
         .expect("the published document is projected");
     assert!(row["published_at"].is_string(), "{row}");
-    assert_eq!(row["status"], "active", "{row}");
+    assert_eq!(row["publishable"], true, "{row}");
+    // The public projection is a white-list: the internal `status` is not published. Every
+    // projected row is published (the filter above), so `published_at` is the publish state.
+    assert!(
+        row.get("status").is_none(),
+        "the internal document status is not public: {row}"
+    );
     assert!(
         documents.iter().all(|row| row["id"] != draft.to_string()),
         "a draft is never projected"
