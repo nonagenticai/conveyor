@@ -373,28 +373,33 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1999,
+                    "line": 2098,
                     "quote": "    let mut satisfied = sets.is_empty();"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1996,
-                    "quote": "        _ => Vec::new(),"
+                    "line": 2056,
+                    "quote": "    let standard = list_standard_tx(&mut *conn, tenant).await?;"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1058,
+                    "line": 1067,
                     "quote": "            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)"
                 },
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 1214,
+                    "line": 1223,
                     "quote": "    pub profile_key: Option<String>,"
                 }
             ],
             "failure_scenario": "An actor creates profile x with artifact_requirements {} and contract_kinds {}, then calls architecture.phases_advance with profile_key x; every phase from preliminary through h closes with no artefacts, no SAW and no contract.",
             "acceptance": "phases_advance returns 409 missing_mandatory when the phase set is absent/empty/malformed; profile keys and values must validate against artifact_type keys and the four contract kinds; a profile_key that is not board-adopted is refused; add a test closing phase A with an empty profile and expect 409.",
-            "owner_project": "T9"
+            "owner_project": "T9",
+            "resolved_by": {
+                "commit": "6b7971b25f6fbc2e737e1f49f285cdfae1bc1d9b",
+                "test": "crates/store/tests/architecture_gates.rs::a_phase_closes_on_the_adopted_profile_or_the_standard",
+                "evidence": "architecture_gates 3/3: a caller-named draft is refused ProfileNotAdopted; an absent phase key falls back to the standard mandatory rows and refuses until they are approved."
+            }
         },
         {
             "id": "v1-p81-2",
@@ -407,7 +412,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 2073,
+                    "line": 2198,
                     "quote": "    if requested == \"h\" {"
                 },
                 {
@@ -423,7 +428,12 @@
             ],
             "failure_scenario": "A delivery project of track programme (or any delivery before closure) advances phase g and passes design with neither a live delivery contract nor a compliance review; a non_conformant review without waiver is likewise never blocking until close.",
             "acceptance": "phases_advance(g) returns 409 unless a review exists on a live delivery contract for the project and, when level is non_conformant, an active unexpired waiver exists; the design gate action performs the same checks without the track exemption; tests cover programme track.",
-            "owner_project": "T9"
+            "owner_project": "T9",
+            "resolved_by": {
+                "commit": "6b7971b25f6fbc2e737e1f49f285cdfae1bc1d9b",
+                "test": "crates/store/tests/architecture_gates.rs::phase_g_needs_the_contract_the_review_and_a_waiver",
+                "evidence": "architecture_gates: phase G refuses without a live delivery contract, without its compliance review, and without an active waiver for a non_conformant review."
+            }
         },
         {
             "id": "v1-p81-3",
@@ -436,22 +446,22 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1084,
+                    "line": 1125,
                     "quote": "         ON CONFLICT (tenant_id, key) DO UPDATE SET"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1087,
+                    "line": 1128,
                     "quote": "            artifact_requirements = EXCLUDED.artifact_requirements,"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1091,
-                    "quote": "          WHERE adm_profile.status <> 'retired'"
+                    "line": 1132,
+                    "quote": "          WHERE adm_profile.status = 'draft'"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1119,
+                    "line": 1183,
                     "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
                 },
                 {
@@ -461,13 +471,18 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1091,
-                    "quote": "          WHERE adm_profile.status <> 'retired'"
+                    "line": 1132,
+                    "quote": "          WHERE adm_profile.status = 'draft'"
                 }
             ],
             "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
             "acceptance": "Tailoring an adopted profile either returns 409 or resets status to draft requiring re-adoption; adopt_profile_tx requires an approved architecture_board approval whose meta identifies this profile; FK or EXISTS check added, with tests.",
-            "owner_project": "T9"
+            "owner_project": "T9",
+            "resolved_by": {
+                "commit": "6b7971b25f6fbc2e737e1f49f285cdfae1bc1d9b",
+                "test": "crates/store/tests/architecture_gates.rs::an_adopted_profile_is_immutable_and_adoption_needs_its_decision",
+                "evidence": "architecture_gates: a random approval id cannot adopt; a real approved board decision about the profile adopts it; an adopted profile cannot be rewritten."
+            }
         },
         {
             "id": "v1-p81-4",
@@ -480,12 +495,12 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1547,
+                    "line": 1611,
                     "quote": "    get_body_tx(&mut *conn, tenant, body_id)"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1616,
+                    "line": 1680,
                     "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {"
                 },
                 {
@@ -514,12 +529,12 @@
             "evidence": [
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 255,
+                    "line": 264,
                     "quote": "    pub project_id: Option<Uuid>,"
                 },
                 {
                     "path": "crates/actions/src/architecture.rs",
-                    "line": 258,
+                    "line": 267,
                     "quote": "    pub artifact_type_id: Option<Uuid>,"
                 },
                 {
@@ -548,12 +563,12 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 2077,
+                    "line": 2202,
                     "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 2192,
+                    "line": 2317,
                     "quote": "         ON CONFLICT (tenant_id, project_id, contract_id) DO NOTHING"
                 },
                 {
@@ -563,7 +578,7 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 2077,
+                    "line": 2202,
                     "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
                 }
             ],
@@ -587,7 +602,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3212,
+                    "line": 3254,
                     "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
                 },
                 {
@@ -641,7 +656,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2006,
+                    "line": 2029,
                     "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
                 },
                 {
@@ -651,12 +666,12 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2006,
+                    "line": 2029,
                     "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2494,
+                    "line": 2517,
                     "quote": "    if post.is_some() && baseline.is_none() {"
                 }
             ],
@@ -709,7 +724,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 1461,
+                    "line": 1484,
                     "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
                 }
             ],
@@ -733,12 +748,12 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3371,
+                    "line": 3415,
                     "quote": "            AND a.kind = 'benefits_realization_plan'"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3381,
+                    "line": 3425,
                     "quote": "    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {"
                 },
                 {
@@ -748,22 +763,22 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3351,
+                    "line": 3395,
                     "quote": "pub async fn close_programme_tx("
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3378,
+                    "line": 3422,
                     "quote": "    let Some(owner) = plans.first() else {"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3367,
+                    "line": 3411,
                     "quote": "        \"SELECT a.meta->>'post_closure_owner'"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3371,
+                    "line": 3415,
                     "quote": "            AND a.kind = 'benefits_realization_plan'"
                 },
                 {
@@ -847,7 +862,12 @@
             ],
             "failure_scenario": "A transient failure is triaged 'retry'; the card sits in the waiting lane, the failed run never reruns, yet the interruption reads 'remedied' and the board shows the block as handled.",
             "acceptance": "coach.remedy dispatches the derived remedy through real actions (process_runs.start for retry, cards.move, repull trigger, block) and stores the resulting run/effect id; a test asserts the run or card actually changed.",
-            "owner_project": "T4"
+            "owner_project": "T4",
+            "resolved_by": {
+                "commit": "26b47b61cfe735b5b891afb4dd0d5ea6e63434e0",
+                "test": "crates/actions/tests/coach.rs::a_block_remedy_stops_the_next_dispatch",
+                "evidence": "coach 17/17: block, retry and move are applied when the remedy is recorded and enforced at the next dispatch (409 coach_blocked; the card moves to the named lane)."
+            }
         },
         {
             "id": "v1-p6-2",
@@ -1015,13 +1035,18 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2901,
+                    "line": 2941,
                     "quote": "            SET state = 'materialised', version = version + 1, updated_at = now(),"
                 }
             ],
             "failure_scenario": "An unattended tick commits an unapproved plan, with unvalidated WSJF inputs, as materialised work.",
             "acceptance": "Materialisation stops at awaiting_approval; a named human approval is required before cards count as planned and the tick cannot bypass it.",
-            "owner_project": "T10"
+            "owner_project": "T10",
+            "resolved_by": {
+                "commit": "d1216a4fdf46b8e1e118823a9ea2e30c9ce2551a",
+                "test": "crates/store/tests/programme_cadence.rs::an_unapproved_pi_plan_does_not_materialise",
+                "evidence": "programme_cadence 4/4: no approved cadence gate creates no cards and leaves the cadence planned; the approved gate materialises on the next pass."
+            }
         },
         {
             "id": "v1-p82-2",
@@ -1101,7 +1126,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2835,
+                    "line": 2875,
                     "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
                 }
             ],
@@ -1851,17 +1876,17 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1977,
-                    "quote": "    let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {"
+                    "line": 2060,
+                    "quote": "    let profile_requirement = profile"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1996,
-                    "quote": "        _ => Vec::new(),"
+                    "line": 2056,
+                    "quote": "    let standard = list_standard_tx(&mut *conn, tenant).await?;"
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1999,
+                    "line": 2098,
                     "quote": "    let mut satisfied = sets.is_empty();"
                 }
             ],
@@ -1885,7 +1910,7 @@
                 },
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1119,
+                    "line": 1183,
                     "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
                 }
             ],
@@ -1904,7 +1929,7 @@
             "evidence": [
                 {
                     "path": "crates/store/src/architecture.rs",
-                    "line": 1671,
+                    "line": 1735,
                     "quote": "              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')\","
                 }
             ],
@@ -1947,18 +1972,23 @@
             "evidence": [
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3210,
-                    "quote": "        None => Ok(()),"
+                    "line": 3258,
+                    "quote": "        ProjectTrancheState::State { .. } | ProjectTrancheState::Missing => {"
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 1375,
+                    "line": 1395,
                     "quote": "        .unwrap_or(1);"
                 }
             ],
             "failure_scenario": "A programme is created with programmes.create; nobody has created tranche 1 yet. A delivery project is created with programme_id set and meta.tranche=1. projects.create calls assert_project_tranche_authorised_tx, the tranche lookup returns no row, and the gate returns Ok. The project starts work, spends budget and produces outputs before any sponsoring-group tranche review, so the first-tranche authorisation requirement is skipped entirely.",
             "acceptance": "For a project whose programme_id is set, a missing tranche row returns 409 tranche_not_authorised (only programme_id NULL may pass); an integration test creates a programme with zero tranches and asserts project start is refused.",
-            "owner_project": "T10"
+            "owner_project": "T10",
+            "resolved_by": {
+                "commit": "d1216a4fdf46b8e1e118823a9ea2e30c9ce2551a",
+                "test": "crates/store/tests/tranche_review.rs::a_programme_project_with_no_tranche_row_cannot_start",
+                "evidence": "tranche_review 10/10: a programme-bound project with no tranche row and a fresh programme both refuse TrancheNotAuthorised; a standalone project starts."
+            }
         },
         {
             "id": "v1-w2b-3",
@@ -1981,7 +2011,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 2030,
+                    "line": 2053,
                     "quote": "    let fields = BenefitProfileFields {"
                 }
             ],
@@ -2010,7 +2040,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 3223,
+                    "line": 3267,
                     "quote": "/// The benefits come from the map's edges — `benefit_link.output_ref` names a `wbs_node` id —"
                 }
             ],
@@ -2058,7 +2088,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 1923,
+                    "line": 1951,
                     "quote": "/// gate is approved. The approval is the second principal's decision, not the row's status."
                 }
             ],
@@ -3046,7 +3076,7 @@
                 },
                 {
                     "path": "crates/store/src/spine.rs",
-                    "line": 1962,
+                    "line": 1985,
                     "quote": "    let link = serde_json::json!([{ \"kind\": \"benefit\", \"id\": benefit_id.to_string() }]);"
                 }
             ],
