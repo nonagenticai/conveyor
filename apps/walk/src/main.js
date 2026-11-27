@@ -13,7 +13,7 @@ async function main() {
   const auth = new Auth(config);
   await auth.boot();
   const api = new Api(auth);
-  const worldData = await fetch("./data/world.json", { cache: "no-store" }).then((response) => {
+  const worldData = await fetch("/data/world.json", { cache: "no-store" }).then((response) => {
     if (!response.ok) throw new Error(`world.json answered ${response.status}`);
     return response.json();
   });
