@@ -52,7 +52,10 @@ CHUNK_SIZE = 200
 COLLECTOR_VERSION = "collect-units/v1"
 
 AUTOMATION_AUTHORS = {"github-actions[bot]", "dependabot[bot]", "renovate[bot]"}
-AUTOMATION_BRANCH_PREFIX = "automation/"
+# `automation/*` is the bots' branch convention; `publish/*` is the console's generated publish
+# PR (measured #494, "Automated publish from the conveyor console"). Neither is a delivery unit,
+# and both are excluded before units are built.
+AUTOMATION_BRANCH_PREFIXES = ("automation/", "publish/")
 CLOSES_RE = re.compile(r"\b(?:closes|fixes|resolves)\s+#(\d+)\b", re.IGNORECASE)
 
 RULES = {
@@ -313,7 +316,7 @@ def fetch(repo: str, baseline: str, repo_dir: pathlib.Path, out: pathlib.Path) -
 def is_automation(pull: dict) -> bool:
     login = pull.get("user") or ""
     ref = (pull.get("head") or {}).get("ref") or ""
-    return login in AUTOMATION_AUTHORS or ref.startswith(AUTOMATION_BRANCH_PREFIX)
+    return login in AUTOMATION_AUTHORS or ref.startswith(AUTOMATION_BRANCH_PREFIXES)
 
 
 def closing_issues(pull: dict) -> list[int]:
@@ -339,11 +342,12 @@ def contract_verify(body: str) -> bool:
     level = len(heading) - len(heading.lstrip("#"))
     scoped = [heading]
     for line in body[match.start() :].splitlines()[1:]:
-        trimmed = line.lstrip()
-        if trimmed.startswith("#"):
-            depth = len(trimmed) - len(trimmed.lstrip("#"))
-            if depth <= level:
-                break
+        # A Markdown heading is hashes followed by whitespace. A prose line that starts with a
+        # reference like `#8 · …` or `#791 hardens …` is not a heading and must not end the
+        # section (measured on #753/#781: two false `verifyParts` failures).
+        nested = re.match(r"(#{1,6})\s", line.lstrip())
+        if nested and len(nested.group(1)) <= level:
+            break
         scoped.append(line)
     section = "\n".join(scoped)
     parts = re.split(r"(?m)^###\s+", section)[1:]
@@ -352,6 +356,25 @@ def contract_verify(body: str) -> bool:
     return all(
         any(board.VERIFY_RE.match(line) for line in part.splitlines()) for part in parts
     )
+
+
+def chosen_pull(pulls: list[dict]) -> dict | None:
+    """The PR a unit is judged by: the lowest-numbered merged one, else the lowest open one."""
+    merged = [pull for pull in pulls if pull.get("merged_at")]
+    candidates = merged or pulls
+    return min(candidates, key=lambda pull: pull["number"]) if candidates else None
+
+
+def unit_meta(pulls: list[dict]) -> dict:
+    """The PR identity a finding needs; facts stay the eight observations the model consumes."""
+    chosen = chosen_pull(pulls)
+    if chosen is None:
+        return {"pull_number": None, "pull_ref": None, "pull_title": None}
+    return {
+        "pull_number": chosen["number"],
+        "pull_ref": (chosen.get("head") or {}).get("ref"),
+        "pull_title": chosen.get("title"),
+    }
 
 
 def unit_facts(
@@ -363,9 +386,7 @@ def unit_facts(
     """One unit's eight observations and the artifact they were read from."""
     issue_number = issue["number"] if issue else None
     merged = [pull for pull in pulls if pull.get("merged_at")]
-    chosen = min(merged, key=lambda pull: pull["number"]) if merged else (
-        min(pulls, key=lambda pull: pull["number"]) if pulls else None
-    )
+    chosen = chosen_pull(pulls)
 
     claim_branches: set[str] = set()
     if issue_number is not None:
@@ -463,6 +484,17 @@ def build_units(snapshot: dict) -> dict:
         else:
             orphans.append(pull)
 
+    # A closed issue whose merged PR never named it is not in flight: the PR is an orphan and the
+    # issue was closed by hand or outside this repository. Pair them by the PR's head ref
+    # (`issue/<n>-*`) or a title that starts `#<n>`, so the finding names the delivery instead of
+    # losing it. The pairing is evidence; it rewrites neither record.
+    pairs: dict[int, int] = {}
+    for pull in orphans:
+        ref = (pull.get("head") or {}).get("ref") or ""
+        match = re.match(r"issue/(\d+)-", ref) or re.match(r"#(\d+)\b", pull.get("title") or "")
+        if match:
+            pairs.setdefault(int(match.group(1)), pull["number"])
+
     units: list[dict] = []
     linked_issues: set[int] = set()
 
@@ -482,6 +514,7 @@ def build_units(snapshot: dict) -> dict:
                 "key": key,
                 "issue_number": number,
                 "unit_label": bool(issue and "unit" in issue.get("labels", [])),
+                **unit_meta(pulls),
                 "facts": facts,
                 "provenance": provenance,
             }
@@ -501,6 +534,7 @@ def build_units(snapshot: dict) -> dict:
                 "key": key,
                 "issue_number": number,
                 "unit_label": False,
+                **unit_meta(pulls),
                 "facts": facts,
                 "provenance": provenance,
             }
@@ -517,12 +551,14 @@ def build_units(snapshot: dict) -> dict:
                 "key": key,
                 "issue_number": None,
                 "unit_label": False,
+                **unit_meta([pull]),
                 "facts": facts,
                 "provenance": provenance,
             }
         )
 
     in_flight: list[dict] = []
+    closed_unlinked: list[dict] = []
     for issue in snapshot["issues"]:
         number = issue["number"]
         if "unit" not in issue.get("labels", []):
@@ -531,14 +567,22 @@ def build_units(snapshot: dict) -> dict:
             continue
         if number in by_issue or number in linked_issues:
             continue
-        in_flight.append(
-            {
-                "key": f"{snapshot['repo']}#{number}",
-                "issue_number": number,
-                "state": issue.get("state"),
-                "reason": "no merged pull request in the window",
-            }
-        )
+        entry = {
+            "key": f"{snapshot['repo']}#{number}",
+            "issue_number": number,
+            "state": issue.get("state"),
+            "reason": "no keyword-linked merged pull request",
+        }
+        if issue.get("state") == "closed":
+            # Closed without a keyword-linked PR: delivered through an unlinked PR (paired) or
+            # outside this repository's PR set. It is not in flight; the delivery already
+            # happened, and the report must not say otherwise.
+            entry["closed_at"] = issue.get("closed_at")
+            entry["paired_pull"] = pairs.get(number)
+            closed_unlinked.append(entry)
+        else:
+            entry["reason"] = "no merged pull request in the window"
+            in_flight.append(entry)
 
     units.sort(key=lambda unit: unit["key"])
     corpus = {
@@ -561,11 +605,13 @@ def build_units(snapshot: dict) -> dict:
         "counts": {
             "completed": len(units),
             "in_flight": len(in_flight),
+            "closed_unlinked": len(closed_unlinked),
             "orphans": len(orphans),
             "excluded_automation": len(exclusions),
         },
         "exclusions": exclusions,
         "in_flight": in_flight,
+        "closed_unlinked": closed_unlinked,
         "units": units,
     }
 
@@ -606,7 +652,7 @@ def board_verify(body: str) -> bool:
     import board  # noqa: PLC0415
 
     gaps = board.contract_gaps(body)
-    return "a `Verify:` line in `Parts and acceptance criteria`" not in gaps
+    return not any("Verify:" in gap for gap in gaps)
 
 
 def local_rules(facts: dict) -> dict[str, bool]:
@@ -623,6 +669,155 @@ def local_rules(facts: dict) -> dict[str, bool]:
         "mergeComplete": merge_complete,
         "closesKeyword": facts["closesKeyword"] is True,
         "verifyParts": facts["verifyParts"] is True,
+    }
+
+
+# ── findings ──────────────────────────────────────────────────────────────────────────
+
+
+FINDING_CLASSES = (
+    "closure-open",
+    "branch-live",
+    "multi-lane",
+    "unit-dor-verify",
+    "non-unit-dor",
+    "orphan-pr",
+    "issue-unreadable",
+)
+
+
+def _finding(unit: dict, klass: str, detail: str, subkind: str | None = None) -> dict:
+    finding = {
+        "key": unit["key"],
+        "issue_number": unit.get("issue_number"),
+        "class": klass,
+        "failed_rules": unit.get("failed_rules") or [],
+        "detail": detail,
+    }
+    if subkind is not None:
+        finding["subkind"] = subkind
+    return finding
+
+
+def classify_findings(corpus: dict) -> list[dict]:
+    """One finding per nonconformance, from the facts the corpus already carries.
+
+    A unit can hold several findings (a two-PR unit that also lacks `Verify:` lines), but a
+    finding is one defect: the 12 orphan PRs are 12 findings, not 36 rule failures. The classes
+    separate the contract's scope (`non-unit-dor` is not a unit defect) from its violations.
+    Deterministic: no clock, no network, sorted by key then class.
+    """
+    paired = {
+        entry["paired_pull"]: entry["key"]
+        for entry in corpus.get("closed_unlinked", [])
+        if entry.get("paired_pull")
+    }
+    findings: list[dict] = []
+    for unit in corpus["units"]:
+        facts = unit["facts"]
+        rules = unit.get("rules") or local_rules(facts)
+        failed = set(unit.get("failed_rules") or [name for name, ok in rules.items() if not ok])
+        if unit.get("issue_number") is None:
+            ref = unit.get("pull_ref") or ""
+            if unit.get("pull_number") in paired:
+                findings.append(
+                    _finding(
+                        unit,
+                        "orphan-pr",
+                        f"the merged PR delivered {paired[unit['pull_number']]} but carried no "
+                        "closing keyword; the issue was closed without it",
+                        "unlinked-unit",
+                    )
+                )
+            elif ref.startswith("publish/"):
+                findings.append(
+                    _finding(
+                        unit,
+                        "orphan-pr",
+                        "a console publish PR, not a delivery unit",
+                        "automated-publish",
+                    )
+                )
+            else:
+                findings.append(
+                    _finding(unit, "orphan-pr", "a merged PR with no closing issue", "no-issue")
+                )
+            continue
+        if facts.get("issue") is None:
+            findings.append(
+                _finding(
+                    unit,
+                    "issue-unreadable",
+                    "the closed issue was not in the fetched set; the facts fail closed",
+                )
+            )
+            continue
+        if (
+            facts.get("pull") == "merged"
+            and facts.get("issue") == "pending"
+        ):
+            findings.append(
+                _finding(unit, "closure-open", "the PR merged but the issue is still open")
+            )
+        if (
+            facts.get("issue") == "closed"
+            and facts.get("pull") == "merged"
+            and facts.get("branchDeleted") is not True
+        ):
+            findings.append(
+                _finding(
+                    unit,
+                    "branch-live",
+                    "the issue is closed but the merged PR's head ref is still live",
+                )
+            )
+        if (facts.get("branches") or 0) > 1 or (facts.get("pulls") or 0) > 1:
+            findings.append(
+                _finding(
+                    unit,
+                    "multi-lane",
+                    f"{facts.get('branches')} claim branch(es) and "
+                    f"{facts.get('pulls')} linked PR(s) for one unit",
+                )
+            )
+        if "verifyParts" in failed:
+            if unit.get("unit_label"):
+                findings.append(
+                    _finding(
+                        unit,
+                        "unit-dor-verify",
+                        "a unit issue whose Parts section lacks a `Verify:` line on a part",
+                    )
+                )
+            else:
+                findings.append(
+                    _finding(
+                        unit,
+                        "non-unit-dor",
+                        "`verifyParts` fails but the issue is not a `unit` deliverable, "
+                        "so the DoR does not apply",
+                    )
+                )
+    findings.sort(key=lambda item: (item["key"], item["class"], item.get("subkind", "")))
+    return findings
+
+
+def findings_document(corpus: dict) -> dict:
+    findings = classify_findings(corpus)
+    counts = {name: 0 for name in FINDING_CLASSES}
+    orphans: dict[str, int] = {}
+    for finding in findings:
+        counts[finding["class"]] += 1
+        if finding["class"] == "orphan-pr":
+            orphans[finding["subkind"]] = orphans.get(finding["subkind"], 0) + 1
+    return {
+        "kind": "unit_findings",
+        "corpus_sha256": corpus["corpus_sha256"],
+        "model_sha256": corpus["model_sha256"],
+        "spec_sha256": corpus["spec_sha256"],
+        "counts": counts,
+        "orphan_subkinds": dict(sorted(orphans.items())),
+        "findings": findings,
     }
 
 
@@ -697,10 +892,14 @@ def render(snapshot_path: pathlib.Path, out: pathlib.Path) -> dict:
         }
         for unit in corpus["units"]
     ]
+    findings = findings_document(corpus)
 
     out.mkdir(parents=True, exist_ok=True)
     (out / "units.json").write_text(
         json.dumps(corpus, indent=2, sort_keys=True) + "\n"
+    )
+    (out / "findings.json").write_text(
+        json.dumps(findings, indent=2, sort_keys=True) + "\n"
     )
     facts_dir = out / "facts"
     facts_dir.mkdir(exist_ok=True)
@@ -710,10 +909,11 @@ def render(snapshot_path: pathlib.Path, out: pathlib.Path) -> dict:
         )
     print(
         f"corpus {corpus['corpus_sha256'][:16]}…: {corpus['counts']['completed']} completed, "
-        f"{corpus['counts']['in_flight']} in flight, "
+        f"{corpus['counts']['in_flight']} in flight (open), "
+        f"{corpus['counts']['closed_unlinked']} closed without a linked PR, "
         f"{corpus['counts']['orphans']} orphan, "
         f"{corpus['counts']['excluded_automation']} automation excluded; "
-        f"{len(documents)} chunk(s)"
+        f"{len(documents)} chunk(s); {len(findings['findings'])} finding(s)"
     )
     for document in documents:
         print(f"  {document['name']}: {document['units']} units, {document['bytes']} bytes")
@@ -890,6 +1090,8 @@ def report(run_dir: pathlib.Path) -> pathlib.Path:
     certificates = (
         json.loads(certificates_path.read_text()) if certificates_path.exists() else None
     )
+    findings_path = run_dir / "findings.json"
+    findings = json.loads(findings_path.read_text()) if findings_path.exists() else None
     lines: list[str] = []
     lines.append(f"### Evaluation — corpus `{corpus['corpus_sha256'][:16]}…`")
     lines.append("")
@@ -902,11 +1104,38 @@ def report(run_dir: pathlib.Path) -> pathlib.Path:
     lines.append("")
     counts = corpus["counts"]
     lines.append(
-        f"Completed units **{counts['completed']}**; in flight {counts['in_flight']} "
-        f"(not certified — the delivery has not happened); orphan PRs {counts['orphans']}; "
+        f"Completed units **{counts['completed']}**; in flight **{counts['in_flight']}** open "
+        f"(no merged PR — the delivery has not happened); closed without a keyword-linked PR "
+        f"{counts.get('closed_unlinked', 0)}; orphan PRs {counts['orphans']}; "
         f"automation excluded {counts['excluded_automation']}."
     )
     lines.append("")
+    if findings:
+        lines.append("**Findings.** One finding per defect; a unit may carry several.")
+        lines.append("")
+        lines.append("| Class | Count |")
+        lines.append("|---|---|")
+        for name, count in findings["counts"].items():
+            lines.append(f"| `{name}` | {count} |")
+        if findings.get("orphan_subkinds"):
+            lines.append("")
+            lines.append(
+                "Orphan sub-kinds: "
+                + ", ".join(
+                    f"`{name}` {count}"
+                    for name, count in findings["orphan_subkinds"].items()
+                )
+                + "."
+            )
+        lines.append("")
+        by_class: dict[str, list[str]] = {}
+        for finding in findings["findings"]:
+            by_class.setdefault(finding["class"], []).append(finding["key"])
+        for name in findings["counts"]:
+            keys = by_class.get(name, [])
+            if keys:
+                lines.append(f"- `{name}`: {', '.join(f'`{key}`' for key in keys)}")
+        lines.append("")
     lines.append("| Rule | Failing units |")
     lines.append("|---|---|")
     for name, count in corpus["rule_failures"].items():
@@ -945,8 +1174,9 @@ def report(run_dir: pathlib.Path) -> pathlib.Path:
     lines.append(
         "**`Verify:` cross-check.** The fact reuses `scripts/ci/board.py`'s `VERIFY_RE` (the line "
         "rule `issue-dor` runs) and requires one per `###` part, which is what 03-DELIVERY's DoR "
-        "says; the CI checker requires only one in the exact `Parts and acceptance criteria` "
-        "section. Disagreements: "
+        "says. The checker now enforces the same per-part rule, so a disagreement here means a "
+        "pre-2026-11-18 body or a heading the model accepts loosely (for example `## Parts`). "
+        "Disagreements: "
         f"{cross.get('board_pass_model_fail', 0)} pass the checker but fail the model, "
         f"{cross.get('model_pass_board_fail', 0)} the reverse, "
         f"{cross.get('agree', 0)} agree. Both answers are recorded; neither is silently adopted."
@@ -1003,6 +1233,46 @@ def self_test() -> int:
                 "body": "## Parts and acceptance criteria\n\n### P1\nno acceptance\n",
                 "title": "unit three",
             },
+            {
+                "number": 4,
+                "state": "closed",
+                "created_at": "2026-11-14T00:00:00Z",
+                "labels": ["unit"],
+                "body": "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n",
+                "title": "closed with no pull",
+            },
+            {
+                "number": 5,
+                "state": "closed",
+                "created_at": "2026-11-14T00:00:00Z",
+                "labels": ["bug"],
+                "body": "no parts section",
+                "title": "not a unit",
+            },
+            {
+                "number": 6,
+                "state": "open",
+                "created_at": "2026-11-14T00:00:00Z",
+                "labels": ["unit"],
+                "body": "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n",
+                "title": "open, no pull",
+            },
+            {
+                "number": 7,
+                "state": "closed",
+                "created_at": "2026-11-14T00:00:00Z",
+                "labels": ["unit"],
+                "body": "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n",
+                "title": "two lanes",
+            },
+            {
+                "number": 9,
+                "state": "closed",
+                "created_at": "2026-11-14T00:00:00Z",
+                "labels": ["unit"],
+                "body": "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n",
+                "title": "delivered without a closing keyword",
+            },
         ],
         "pulls": [
             {
@@ -1041,6 +1311,51 @@ def self_test() -> int:
                 "user": "agent[bot]",
                 "body": "Closes #3",
             },
+            {
+                "number": 14,
+                "merged_at": "2026-11-17T00:00:00Z",
+                "merge_commit_sha": "m14",
+                "draft": False,
+                "head": {"ref": "issue/5-x", "sha": "s14"},
+                "user": "agent[bot]",
+                "body": "Closes #5",
+            },
+            {
+                "number": 15,
+                "merged_at": "2026-11-18T00:00:00Z",
+                "merge_commit_sha": "m15",
+                "draft": False,
+                "head": {"ref": "publish/design-1", "sha": "s15"},
+                "user": "george",
+                "body": "",
+            },
+            {
+                "number": 16,
+                "merged_at": "2026-11-18T00:00:00Z",
+                "merge_commit_sha": "m16",
+                "draft": False,
+                "head": {"ref": "issue/2-x", "sha": "s16"},
+                "user": "agent[bot]",
+                "body": "Closes #2",
+            },
+            {
+                "number": 17,
+                "merged_at": "2026-11-19T00:00:00Z",
+                "merge_commit_sha": "m17",
+                "draft": False,
+                "head": {"ref": "lane/7-a", "sha": "s17"},
+                "user": "agent[bot]",
+                "body": "Closes #7",
+            },
+            {
+                "number": 18,
+                "merged_at": "2026-11-19T00:00:00Z",
+                "merge_commit_sha": "m18",
+                "draft": False,
+                "head": {"ref": "lane/7-b", "sha": "s18"},
+                "user": "agent[bot]",
+                "body": "Closes #7",
+            },
         ],
         "ci_runs": {
             "s10": [
@@ -1058,10 +1373,17 @@ def self_test() -> int:
     corpus = build_units(snapshot)
     units = {unit["key"]: unit for unit in corpus["units"]}
 
-    assert corpus["counts"]["completed"] == 3, corpus["counts"]
-    assert corpus["counts"]["in_flight"] == 1, corpus["counts"]
-    assert corpus["counts"]["excluded_automation"] == 1, corpus["counts"]
-    assert corpus["counts"]["orphans"] == 1, corpus["counts"]
+    counts = corpus["counts"]
+    assert counts["completed"] == 6, counts
+    assert counts["in_flight"] == 1, counts
+    assert counts["closed_unlinked"] == 2, counts
+    assert counts["orphans"] == 1, counts
+    assert counts["excluded_automation"] == 2, counts
+    assert [entry["issue_number"] for entry in corpus["in_flight"]] == [6]
+    closed = {entry["issue_number"]: entry for entry in corpus["closed_unlinked"]}
+    assert closed[4]["paired_pull"] is None, closed[4]
+    assert closed[9]["paired_pull"] == 12, closed[9]
+    assert {entry["pull"] for entry in corpus["exclusions"]} == {11, 15}, corpus["exclusions"]
 
     one = units["x/y#1"]["facts"]
     assert one["issue"] == "closed" and one["branches"] == 1
@@ -1070,16 +1392,60 @@ def self_test() -> int:
     assert one["ciRuns"] == 1, "only the pull_request run counts"
     assert one["closesKeyword"] is True and one["verifyParts"] is True
 
+    two = units["x/y#2"]["facts"]
+    assert two["issue"] == "pending" and two["pull"] == "merged"
+
     three = units["x/y#3"]["facts"]
     assert three["verifyParts"] is False, "the body carries no Verify line"
     assert three["ciRuns"] == 3
 
+    seven = units["x/y#7"]["facts"]
+    assert seven["branches"] == 2 and seven["pulls"] == 2
+
     orphan = units["x/y#pr-12"]["facts"]
     assert orphan["issue"] is None and orphan["pull"] == "merged"
     assert orphan["closesKeyword"] is None and orphan["verifyParts"] is None
+    assert units["x/y#pr-12"]["pull_ref"] == "issue/9-x"
+    assert units["x/y#pr-12"]["pull_number"] == 12
+
+    got = sorted(
+        (finding["key"], finding["class"], finding.get("subkind", ""))
+        for finding in classify_findings(corpus)
+    )
+    assert got == [
+        ("x/y#1", "branch-live", ""),
+        ("x/y#2", "closure-open", ""),
+        ("x/y#3", "unit-dor-verify", ""),
+        ("x/y#5", "non-unit-dor", ""),
+        ("x/y#7", "multi-lane", ""),
+        ("x/y#pr-12", "orphan-pr", "unlinked-unit"),
+    ], got
+    document = findings_document(corpus)
+    assert document["counts"]["orphan-pr"] == 1
+    assert document["orphan_subkinds"] == {"unlinked-unit": 1}
+    assert document["counts"]["closure-open"] == 1
+    assert document["counts"]["issue-unreadable"] == 0
+    assert [finding["key"] for finding in document["findings"]] == [
+        "x/y#1",
+        "x/y#2",
+        "x/y#3",
+        "x/y#5",
+        "x/y#7",
+        "x/y#pr-12",
+    ]
 
     assert [unit["key"] for unit in corpus["units"]] == sorted(units)
-    assert len(chunks(corpus["units"], 2)) == 2, "chunking is by size"
+    assert len(chunks(corpus["units"], 2)) == 3, "chunking is by size"
+
+    # A prose line that starts with an issue reference is not a heading: it must not truncate
+    # the Parts section before the later parts (the #753/#781 false failures).
+    assert contract_verify(
+        "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n\n"
+        "#8 · a reference line\n\n### P2\nVerify: `true`\n"
+    ) is True, "a `#N` prose line ended the section"
+    assert contract_verify(
+        "## Parts and acceptance criteria\n\n### P1\nVerify: `true`\n\n### P2\nno verify\n"
+    ) is False, "a part without a Verify line passed"
 
     # The public host answers 403 `error code: 1010` to the default Python-urllib
     # signature; the client must send a named one (measured 2026-11-27).
