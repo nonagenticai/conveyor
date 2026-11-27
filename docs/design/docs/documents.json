@@ -992,6 +992,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
+      "title": "S04 P4.1 — the live coding, worker and billing receipts",
+      "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
+      "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",
+      "section": "Evidence",
+      "sha256": "7f0cd04a74e69228abc8a717d964ab01a592736af04dc605479af43dcdd4f415",
+      "bytes": 4336,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/s04-p41-live/2026-11-27/README.md"
+    },
+    {
       "title": "T19 — Business capability map — approval",
       "path": "docs/evidence/t19/gov/approve-business_capability_map.html",
       "source": "docs/evidence/t19/gov/approve-business_capability_map.md",

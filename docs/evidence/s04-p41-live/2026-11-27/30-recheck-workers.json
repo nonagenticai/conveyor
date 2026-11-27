@@ -1,0 +1,263 @@
+{
+  "hosts": [
+    {
+      "enabled": true,
+      "mechanism": "launchctl",
+      "name": "mini1",
+      "role": "image, OCR and speech host",
+      "units": [
+        "com.nonagentic.conveyor-probe",
+        "com.nonagentic.mlx-inference-image",
+        "com.nonagentic.mlx-inference-ocr",
+        "com.nonagentic.mlx-inference-tts",
+        "com.nonagentic.node-metrics-push"
+      ]
+    },
+    {
+      "enabled": true,
+      "mechanism": "launchctl",
+      "name": "mini2",
+      "role": "audio, text and vision model host (launchd)",
+      "units": [
+        "com.nonagentic.conveyor-probe"
+      ]
+    }
+  ],
+  "queue": [
+    {
+      "count": 15,
+      "kind": "action_invocation.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 20973,
+      "kind": "approval.closed.emit",
+      "status": "succeeded"
+    },
+    {
+      "count": 20748,
+      "kind": "approval.expire",
+      "status": "succeeded"
+    },
+    {
+      "count": 1,
+      "kind": "benchmark.case.produce",
+      "status": "dead"
+    },
+    {
+      "count": 31,
+      "kind": "benchmark.case.produce",
+      "status": "succeeded"
+    },
+    {
+      "count": 10,
+      "kind": "benchmark.improvement.run",
+      "status": "succeeded"
+    },
+    {
+      "count": 4176,
+      "kind": "benchmark.reap",
+      "status": "succeeded"
+    },
+    {
+      "count": 1,
+      "kind": "benchmark.run.poll",
+      "status": "dead"
+    },
+    {
+      "count": 461,
+      "kind": "benchmark.run.poll",
+      "status": "succeeded"
+    },
+    {
+      "count": 20748,
+      "kind": "card.lease_sweep",
+      "status": "succeeded"
+    },
+    {
+      "count": 20742,
+      "kind": "copilot.proposal.sweep",
+      "status": "succeeded"
+    },
+    {
+      "count": 20744,
+      "kind": "copilot.turn.reap",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "delivery.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 302,
+      "kind": "delivery.send",
+      "status": "succeeded"
+    },
+    {
+      "count": 9,
+      "kind": "document.purge",
+      "status": "succeeded"
+    },
+    {
+      "count": 3,
+      "kind": "err.card",
+      "status": "dead"
+    },
+    {
+      "count": 630,
+      "kind": "err.card",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "eval.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 4176,
+      "kind": "eval.reap",
+      "status": "succeeded"
+    },
+    {
+      "count": 20747,
+      "kind": "eval.run.tick",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "event.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 352,
+      "kind": "idempotency.sweep",
+      "status": "succeeded"
+    },
+    {
+      "count": 9,
+      "kind": "inference_call.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 20972,
+      "kind": "interaction.close",
+      "status": "succeeded"
+    },
+    {
+      "count": 20969,
+      "kind": "interaction.dispatch",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "job.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 896,
+      "kind": "licence.sync",
+      "status": "dead"
+    },
+    {
+      "count": 3279,
+      "kind": "licence.sync",
+      "status": "succeeded"
+    },
+    {
+      "count": 2,
+      "kind": "media.probe_video",
+      "status": "dead"
+    },
+    {
+      "count": 1,
+      "kind": "media.probe_video",
+      "status": "succeeded"
+    },
+    {
+      "count": 2,
+      "kind": "media.render_html",
+      "status": "dead"
+    },
+    {
+      "count": 1,
+      "kind": "media.render_html",
+      "status": "succeeded"
+    },
+    {
+      "count": 656,
+      "kind": "memory.consolidate",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "model.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 1,
+      "kind": "model.validate",
+      "status": "succeeded"
+    },
+    {
+      "count": 5,
+      "kind": "process.step",
+      "status": "dead"
+    },
+    {
+      "count": 783,
+      "kind": "process.step",
+      "status": "succeeded"
+    },
+    {
+      "count": 9,
+      "kind": "prompt_audit.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 2,
+      "kind": "prompt_audit.run",
+      "status": "succeeded"
+    },
+    {
+      "count": 3,
+      "kind": "publish.design",
+      "status": "dead"
+    },
+    {
+      "count": 5,
+      "kind": "publish.design",
+      "status": "succeeded"
+    },
+    {
+      "count": 2,
+      "kind": "run.execute",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "run.prune",
+      "status": "succeeded"
+    },
+    {
+      "count": 20747,
+      "kind": "run.reap",
+      "status": "succeeded"
+    },
+    {
+      "count": 46,
+      "kind": "runner.reap",
+      "status": "dead"
+    },
+    {
+      "count": 1051,
+      "kind": "runner.reap",
+      "status": "succeeded"
+    },
+    {
+      "count": 15,
+      "kind": "validation.prune",
+      "status": "succeeded"
+    }
+  ]
+}
