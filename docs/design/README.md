@@ -225,6 +225,9 @@ migrations, the compiled action-registry dump and `v2.js` — never a hand-writt
 A project's units are the frozen seed's `meta.issues` plus the open registry issues carrying the
 project-key label: the seed is the bootstrap of record and no longer moves (#782 P4), so a unit
 created after the freeze attaches by its label rather than by editing the seed.
+A V2 slice whose deliverable is behaviour (T18's routes and their specs) is a curated row; it may
+claim `built` only with a non-empty `delivered` path list, which `check-coverage.cjs` resolves, so a
+bare status flip cannot pass.
 `docs/design/scripts/check-coverage.cjs` is the gate, and the `design-pack` CI job runs it with
 the eight pack checks and `build-docs.py --check`.
 

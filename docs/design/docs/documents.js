@@ -285,8 +285,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "17c7a2f4df091e0e9638c200e70d1868d8d81c40046ca2abff7bf0e144afa516",
-      "bytes": 27179,
+      "sha256": "7ebdad581392ffc7c03486526ff187801ce8e30f1be3eec9b546cb811114b1a7",
+      "bytes": 27408,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -1950,8 +1950,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T18-real-v2-ui.html",
       "source": "docs/plans/T18-real-v2-ui.md",
       "section": "Plans",
-      "sha256": "d8fd549f7f47dc9fdd510575d957bedf84b942d8bcafeb0b61ee93441e3d1b23",
-      "bytes": 17688,
+      "sha256": "198b6497f7353009edb0d8d084d16b0ac6f3d5d43061dde55c0ab45aacd66b9e",
+      "bytes": 17685,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18-real-v2-ui.md"
     },
     {
