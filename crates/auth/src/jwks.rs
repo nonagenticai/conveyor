@@ -187,9 +187,13 @@ pub struct VerifiedClaims {
 
 /// OIDC verifier. One realm (CONTRACT §9); the list exists so the pin is explicit, not so
 /// extra realms can be trusted casually.
+///
+/// `client_ids` is the **azp allowlist**: exactly the first-party browser clients of this
+/// application (`conveyor-web`, and `conveyor-game` when the Gemba Walk is configured). The
+/// audience stays one value; a token from a realm client that is not on this list is refused.
 pub struct Verifier {
     audience: String,
-    client_id: String,
+    client_ids: std::collections::BTreeSet<String>,
     issuers: Vec<TrustedIssuer>,
     cache: JwksCache,
 }
@@ -208,16 +212,30 @@ struct RawClaims {
 }
 
 impl Verifier {
-    /// Build from parts (tests inject a [`JwksCache`] over a fake source).
+    /// Build from parts with one accepted client (tests inject a [`JwksCache`] over a fake
+    /// source). Production uses [`Verifier::with_client_ids`].
     pub fn new(
         audience: impl Into<String>,
         client_id: impl Into<String>,
         issuers: Vec<TrustedIssuer>,
         cache: JwksCache,
     ) -> Self {
+        Self::with_client_ids(audience, [client_id.into()], issuers, cache)
+    }
+
+    /// Build from parts with an explicit `azp` allowlist.
+    ///
+    /// An empty iterator is a configuration error at the caller, not a verifier that accepts
+    /// nothing silently; `from_config` never passes one.
+    pub fn with_client_ids(
+        audience: impl Into<String>,
+        client_ids: impl IntoIterator<Item = String>,
+        issuers: Vec<TrustedIssuer>,
+        cache: JwksCache,
+    ) -> Self {
         Self {
             audience: audience.into(),
-            client_id: client_id.into(),
+            client_ids: client_ids.into_iter().collect(),
             issuers,
             cache,
         }
@@ -233,16 +251,20 @@ impl Verifier {
             .jwks_url()
             .ok_or_else(|| AuthError::Config("no JWKS URL for the configured issuer".into()))?;
         let source: Arc<dyn JwksSource> = Arc::new(HttpJwks::new()?);
-        Ok(Self::new(
+        let mut client_ids = vec![cfg.oidc_client_id.clone()];
+        if let Some(game) = &cfg.oidc_game_client_id {
+            client_ids.push(game.clone());
+        }
+        Ok(Self::with_client_ids(
             cfg.oidc_audience.clone(),
-            cfg.oidc_client_id.clone(),
+            client_ids,
             vec![TrustedIssuer { issuer, jwks_url }],
             JwksCache::new(source),
         ))
     }
 
     /// Verify a person token: signature, expiry, pinned `iss`, required `aud`, and
-    /// `azp == client_id`.
+    /// `azp` in the configured first-party client allowlist.
     pub async fn verify(&self, token: &str) -> Result<VerifiedClaims, AuthError> {
         let header = decode_header(token).map_err(|_| AuthError::InvalidToken)?;
         // Only asymmetric algorithms. Accepting an HS* token lets an attacker sign with the
@@ -275,7 +297,12 @@ impl Verifier {
         }
         // `azp` is the only cross-app replay guard: realm clients commonly carry every
         // client's audience, so only the authorised party says who the token was issued to.
-        if claims.azp.as_deref() != Some(self.client_id.as_str()) {
+        // The allowlist is exactly this application's first-party browser clients.
+        if !claims
+            .azp
+            .as_deref()
+            .is_some_and(|azp| self.client_ids.contains(azp))
+        {
             return Err(AuthError::InvalidToken);
         }
         Ok(VerifiedClaims {

@@ -32,6 +32,10 @@ pub struct AuthConfig {
     pub oidc_issuer: Option<String>,
     pub oidc_audience: String,
     pub oidc_client_id: String,
+    /// `CONVEYOR_GAME_OIDC_CLIENT_ID` — the Gemba Walk's own public client
+    /// (`conveyor-game`), accepted as a second `azp` alongside `oidc_client_id`.
+    /// Unset means the API trusts only the operator client.
+    pub oidc_game_client_id: Option<String>,
     /// `CONVEYOR_OIDC_JWKS_URL`; defaults to `<issuer>/protocol/openid-connect/certs`
     /// (Keycloak's shape).
     pub oidc_jwks_url: Option<String>,
@@ -45,6 +49,7 @@ impl AuthConfig {
             oidc_issuer: None,
             oidc_audience: DEFAULT_AUDIENCE.to_owned(),
             oidc_client_id: DEFAULT_AUDIENCE.to_owned(),
+            oidc_game_client_id: None,
             oidc_jwks_url: None,
         }
     }
@@ -62,11 +67,15 @@ impl AuthConfig {
         // names it (the template's and agent's default).
         let oidc_client_id =
             get("CONVEYOR_OIDC_CLIENT_ID").unwrap_or_else(|| oidc_audience.clone());
+        // No default: the game client is a second, explicit first-party id. Defaulting it
+        // from the audience would widen the azp allowlist silently.
+        let oidc_game_client_id = get("CONVEYOR_GAME_OIDC_CLIENT_ID");
         Ok(Self {
             dev_auth,
             oidc_issuer: get("CONVEYOR_OIDC_ISSUER"),
             oidc_audience,
             oidc_client_id,
+            oidc_game_client_id,
             oidc_jwks_url: get("CONVEYOR_OIDC_JWKS_URL"),
         })
     }
@@ -133,8 +142,12 @@ impl fmt::Display for AuthConfig {
         // Never prints a secret: there is none here, but the shape stays greppable.
         write!(
             f,
-            "AuthConfig {{ dev_auth: {}, issuer: {:?}, audience: {:?}, client_id: {:?} }}",
-            self.dev_auth, self.oidc_issuer, self.oidc_audience, self.oidc_client_id
+            "AuthConfig {{ dev_auth: {}, issuer: {:?}, audience: {:?}, client_id: {:?}, game_client_id: {:?} }}",
+            self.dev_auth,
+            self.oidc_issuer,
+            self.oidc_audience,
+            self.oidc_client_id,
+            self.oidc_game_client_id
         )
     }
 }

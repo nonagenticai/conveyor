@@ -11,11 +11,13 @@
 use std::path::{Component, Path, PathBuf};
 
 use axum::body::Body;
-use axum::extract::{Query, State};
+use axum::extract::{Query, Request, State};
 use axum::http::{HeaderMap, HeaderValue, Method, StatusCode, Uri, header};
+use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use serde_json::json;
 
+use crate::config::normalize_host;
 use crate::state::AppState;
 
 /// `POST /__dev/login?login=<name>` — the local dev cookie, the same contract `dev-server.mjs`
@@ -72,14 +74,77 @@ pub(crate) struct SiteConfig {
     pub dev_auth: bool,
 }
 
-/// The UI's `/config.json` view of the effective server configuration.
-pub(crate) fn site_config(state: &AppState) -> SiteConfig {
+/// The UI's `/config.json` view of the effective server configuration, for one host.
+///
+/// The game host answers its own public client; every other host keeps the operator client.
+pub(crate) fn site_config(state: &AppState, host: &str) -> SiteConfig {
     let auth = &state.config.auth;
+    let client_id = if state.config.is_game_host(host) {
+        state
+            .config
+            .game_client_id()
+            .unwrap_or(auth.oidc_client_id.as_str())
+            .to_owned()
+    } else {
+        auth.oidc_client_id.clone()
+    };
     SiteConfig {
         issuer: auth.oidc_issuer.clone().unwrap_or_default(),
-        client_id: auth.oidc_client_id.clone(),
+        client_id,
         dev_auth: auth.dev_auth && conveyor_auth::is_development_env(&state.config.app_env),
     }
+}
+
+/// Which static tree a request is dispatched to, and the configured game origin.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct HostDispatch<'a> {
+    pub game: bool,
+    pub game_public_url: Option<&'a str>,
+}
+
+impl HostDispatch<'_> {
+    #[cfg(test)]
+    fn operator() -> Self {
+        Self {
+            game: false,
+            game_public_url: None,
+        }
+    }
+}
+
+/// The request's normalised `Host`. Empty when the header is absent or not UTF-8.
+fn request_host(headers: &HeaderMap) -> String {
+    headers
+        .get(header::HOST)
+        .and_then(|value| value.to_str().ok())
+        .map(normalize_host)
+        .unwrap_or_default()
+}
+
+/// The game host's hard boundary, applied **outside** the router.
+///
+/// Axum routes pre-empt the fallback, so a check inside `not_found_or_web` could never stop
+/// `/mcp` (a real route) or the live design window. This middleware runs before both: on a
+/// configured game host, the operator-only surfaces are a 404.
+pub(crate) async fn game_host_gate(
+    State(state): State<AppState>,
+    request: Request,
+    next: Next,
+) -> Response {
+    if state.config.is_game_host(&request_host(request.headers()))
+        && is_operator_surface(request.uri().path())
+    {
+        let method = request.method().clone();
+        let uri = request.uri().clone();
+        return crate::not_found(method, uri).await.into_response();
+    }
+    next.run(request).await
+}
+
+/// The surfaces that exist only on the operator origin: the MCP transport and the live
+/// design window. Everything else is judged by `serve_host` (walk tree vs operator tree).
+fn is_operator_surface(path: &str) -> bool {
+    path == "/mcp" || path.starts_with("/mcp/") || path == "/design" || path.starts_with("/design/")
 }
 
 /// The router fallback: the live design window, then the static UI, then the API's 404.
@@ -89,13 +154,28 @@ pub(crate) async fn not_found_or_web(
     uri: Uri,
     headers: HeaderMap,
 ) -> Response {
-    // The live window answers first: these paths must come from Postgres, never from a stale
-    // file baked into the image.
-    if let Some(response) = crate::design::serve(&state, &method, &uri, &headers).await {
+    let host = request_host(&headers);
+    let game = state.config.is_game_host(&host);
+    // The live window answers first on the operator origin: these paths must come from
+    // Postgres, never from a stale file baked into the image. It has no business on the game
+    // host (the middleware refuses it there too; this is the belt-and-braces).
+    if !game && let Some(response) = crate::design::serve(&state, &method, &uri, &headers).await {
         return response;
     }
     let root = web_root();
-    if let Some(response) = serve(&site_config(&state), root.as_deref(), &method, &uri).await {
+    let dispatch = HostDispatch {
+        game,
+        game_public_url: state.config.game_public_url.as_deref(),
+    };
+    if let Some(response) = serve_host(
+        &site_config(&state, &host),
+        dispatch,
+        root.as_deref(),
+        &method,
+        &uri,
+    )
+    .await
+    {
         return response;
     }
     crate::not_found(method, uri).await.into_response()
@@ -106,8 +186,31 @@ pub(crate) async fn not_found_or_web(
 /// `/api`, `/mcp`, the health probes and `/metrics` never reach the static path, so an unknown
 /// API route stays a JSON problem instead of a 200 `index.html` — the failure a SPA fallback
 /// normally hides.
+/// The pre-host test entry point: the operator shape with no game redirect configured.
+#[cfg(test)]
 async fn serve(
     config: &SiteConfig,
+    root: Option<&Path>,
+    method: &Method,
+    uri: &Uri,
+) -> Option<Response> {
+    serve_host(config, HostDispatch::operator(), root, method, uri).await
+}
+
+/// A permanent redirect to `location` (a path or an absolute URL), preserving the query.
+fn redirect_to(location: &str, query: Option<&str>) -> Option<Response> {
+    let location = match query {
+        Some(query) => format!("{location}?{query}"),
+        None => location.to_owned(),
+    };
+    let mut headers = HeaderMap::new();
+    headers.insert(header::LOCATION, HeaderValue::from_str(&location).ok()?);
+    Some((StatusCode::PERMANENT_REDIRECT, headers).into_response())
+}
+
+async fn serve_host(
+    config: &SiteConfig,
+    dispatch: HostDispatch<'_>,
     root: Option<&Path>,
     method: &Method,
     uri: &Uri,
@@ -122,7 +225,49 @@ async fn serve(
     if path == "/config.json" {
         return Some(config_response(config));
     }
+
+    // A legacy /walk path on the game host goes to the same host's root remainder. This needs
+    // no web root, so it answers in an API-only build too.
+    if dispatch.game && (path == "/walk" || path.starts_with("/walk/")) {
+        let rest = &path["/walk".len()..];
+        let rest = if rest.is_empty() { "/" } else { rest };
+        return redirect_to(rest, uri.query());
+    }
+
+    // The operator origin: the old /walk prefix is a 308 to the configured game origin. It
+    // is checked before any static lookup so `/walk` (no slash) does not 308 to `/walk/`
+    // first. The target is configuration, never the request Host.
+    if !dispatch.game
+        && let Some(base) = dispatch.game_public_url
+        && (path == "/walk" || path.starts_with("/walk/"))
+    {
+        let rest = &path["/walk".len()..];
+        let rest = if rest.is_empty() { "/" } else { rest };
+        return redirect_to(&format!("{base}{rest}"), uri.query());
+    }
+
     let root = root?;
+
+    // The game host is a separate application: the walk tree at the root, `/config.json`
+    // and the API. It never serves the operator index, a directory index or the design pack.
+    if dispatch.game {
+        let relative = sanitize(path)?;
+        if relative.extension().is_some() {
+            let file = root.join("walk").join(&relative);
+            if let Ok(bytes) = tokio::fs::read(&file).await {
+                return Some(file_response(
+                    file.extension().and_then(|ext| ext.to_str()).unwrap_or(""),
+                    bytes,
+                    method,
+                ));
+            }
+            // A missing walk asset is a 404, never the SPA entry.
+            return None;
+        }
+        let bytes = tokio::fs::read(root.join("walk/index.html")).await.ok()?;
+        return Some(file_response("html", bytes, method));
+    }
+
     let relative = sanitize(path)?;
     if relative.extension().is_some() {
         let file = root.join(&relative);
@@ -158,8 +303,8 @@ async fn serve(
         let bytes = tokio::fs::read(directory.join("index.html")).await.ok()?;
         return Some(file_response("html", bytes, method));
     }
-    // The walk is a scoped SPA: a deep link under /walk/ serves its own entry, never the
-    // operator app's. Assets keep the 404 rule above; /api never reaches here.
+    // The no-host dev/CI shape: the walk remains a scoped sub-site under /walk/. On a
+    // deployment with a game host configured the 308 above has already answered.
     if path.starts_with("/walk/") {
         let bytes = tokio::fs::read(root.join("walk/index.html")).await.ok()?;
         return Some(file_response("html", bytes, method));
@@ -612,6 +757,169 @@ mod tests {
         let body = body_text(response).await;
         assert!(body.contains("\"dev_auth\":false"), "{body}");
         assert!(body.contains("conveyor-web"), "{body}");
+    }
+
+    fn game_config() -> SiteConfig {
+        SiteConfig {
+            issuer: "https://auth.example/realms/conveyor".to_owned(),
+            client_id: "conveyor-game".to_owned(),
+            dev_auth: false,
+        }
+    }
+
+    fn game_dispatch() -> HostDispatch<'static> {
+        HostDispatch {
+            game: true,
+            game_public_url: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn the_game_host_serves_the_walk_tree_at_the_root() {
+        let root =
+            std::env::temp_dir().join(format!("conveyor-web-unit-game-{}", std::process::id()));
+        tokio::fs::create_dir_all(root.join("walk/src"))
+            .await
+            .expect("the walk tree");
+        tokio::fs::write(
+            root.join("index.html"),
+            "<!doctype html><title>operator</title>",
+        )
+        .await
+        .expect("the operator index");
+        tokio::fs::write(
+            root.join("walk/index.html"),
+            "<!doctype html><title>walk</title>",
+        )
+        .await
+        .expect("the walk index");
+        tokio::fs::write(root.join("walk/src/main.js"), "console.log('walk')")
+            .await
+            .expect("the walk asset");
+
+        // Every non-asset path is the walk entry, never the operator index.
+        for path in ["/", "/portfolio", "/board/01a1"] {
+            let response = serve_host(
+                &game_config(),
+                game_dispatch(),
+                Some(&root),
+                &Method::GET,
+                &Uri::from_static(path),
+            )
+            .await
+            .unwrap_or_else(|| panic!("{path} is a walk path"));
+            assert_eq!(response.status(), StatusCode::OK, "{path}");
+            let body = body_text(response).await;
+            assert!(body.contains("<title>walk</title>"), "{path}: {body}");
+        }
+
+        let asset = serve_host(
+            &game_config(),
+            game_dispatch(),
+            Some(&root),
+            &Method::GET,
+            &Uri::from_static("/src/main.js"),
+        )
+        .await
+        .expect("the walk asset");
+        assert_eq!(
+            asset.headers().get(header::CONTENT_TYPE).unwrap(),
+            "text/javascript; charset=utf-8"
+        );
+
+        assert!(
+            serve_host(
+                &game_config(),
+                game_dispatch(),
+                Some(&root),
+                &Method::GET,
+                &Uri::from_static("/src/missing.js"),
+            )
+            .await
+            .is_none(),
+            "a missing walk asset is a 404, never the entry"
+        );
+
+        // `/config.json` answers the game client, without needing a web root.
+        let response = serve_host(
+            &game_config(),
+            game_dispatch(),
+            None,
+            &Method::GET,
+            &Uri::from_static("/config.json"),
+        )
+        .await
+        .expect("the config");
+        let body = body_text(response).await;
+        assert!(body.contains("conveyor-game"), "{body}");
+
+        // A legacy /walk path on the game host goes to the same host's root remainder.
+        let legacy = serve_host(
+            &game_config(),
+            game_dispatch(),
+            None,
+            &Method::GET,
+            &Uri::from_static("/walk/portfolio?x=1"),
+        )
+        .await
+        .expect("the legacy redirect");
+        assert_eq!(legacy.status(), StatusCode::PERMANENT_REDIRECT);
+        assert_eq!(
+            legacy.headers().get(header::LOCATION).unwrap(),
+            "/portfolio?x=1"
+        );
+
+        let _ = tokio::fs::remove_dir_all(&root).await;
+    }
+
+    #[tokio::test]
+    async fn the_operator_host_redirects_walk_to_the_configured_game_origin() {
+        let dispatch = HostDispatch {
+            game: false,
+            game_public_url: Some("https://game.nonagentic.ai"),
+        };
+        for (path, want) in [
+            ("/walk", "https://game.nonagentic.ai/"),
+            ("/walk/", "https://game.nonagentic.ai/"),
+            ("/walk/portfolio", "https://game.nonagentic.ai/portfolio"),
+            (
+                "/walk/portfolio?x=1",
+                "https://game.nonagentic.ai/portfolio?x=1",
+            ),
+            (
+                "/walk/src/main.js",
+                "https://game.nonagentic.ai/src/main.js",
+            ),
+        ] {
+            let response = serve_host(
+                &config(),
+                dispatch,
+                None,
+                &Method::GET,
+                &Uri::from_static(path),
+            )
+            .await
+            .unwrap_or_else(|| panic!("{path} is a redirect"));
+            assert_eq!(response.status(), StatusCode::PERMANENT_REDIRECT, "{path}");
+            assert_eq!(
+                response.headers().get(header::LOCATION).unwrap(),
+                want,
+                "{path}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_game_host_gate_refuses_only_operator_surfaces() {
+        assert!(is_operator_surface("/mcp"));
+        assert!(is_operator_surface("/mcp/"));
+        assert!(is_operator_surface("/design"));
+        assert!(is_operator_surface("/design/data/snapshot.js"));
+        assert!(!is_operator_surface("/"));
+        assert!(!is_operator_surface("/portfolio"));
+        assert!(!is_operator_surface("/api/actions"));
+        assert!(!is_operator_surface("/config.json"));
+        assert!(!is_operator_surface("/health/ready"));
     }
 
     #[test]
