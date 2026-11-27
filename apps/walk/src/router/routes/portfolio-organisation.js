@@ -51,4 +51,11 @@ export default [
     spec: "e2e/portfolio-organisation/tools.spec.ts",
     load: () => import("../../destinations/tools.js"),
   },
+  {
+    walk: "/programme",
+    app: "/programme",
+    room: "portfolio",
+    spec: "e2e/portfolio-organisation/programme.spec.ts",
+    load: () => import("../../destinations/programme.js"),
+  },
 ];
