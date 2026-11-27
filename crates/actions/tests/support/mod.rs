@@ -415,6 +415,27 @@ pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
         .execute(&mut *tx)
         .await
         .expect("insert reviewer membership");
+        // T7 / v1-w1b-4: an ops destructive gate needs two DISTINCT approvers. The second one
+        // is another admin, never a job participant (the rule is human dual control).
+        let reviewer_two_id: Uuid = sqlx::query_scalar(
+            "INSERT INTO app_user (oidc_subject, email, display_name)
+         VALUES ('dev:reviewer2', 'reviewer2@dev.invalid', 'Reviewer Two')
+         ON CONFLICT (oidc_subject) WHERE oidc_subject IS NOT NULL
+         DO UPDATE SET display_name = excluded.display_name
+         RETURNING id",
+        )
+        .fetch_one(&pg.owner)
+        .await
+        .expect("insert the second reviewer");
+        sqlx::query(
+            "INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')
+         ON CONFLICT (tenant_id, user_id) DO NOTHING",
+        )
+        .bind(tenant_id)
+        .bind(reviewer_two_id)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the second reviewer membership");
     }
     sqlx::query(
         "INSERT INTO app_licence (tenant_id, app_key, status, checked_at)
@@ -448,6 +469,44 @@ pub async fn reviewer_id(pg: &Pg) -> Uuid {
         .expect("the reviewer principal is seeded")
 }
 
+/// The second distinct human [`seed`] provisions for the ops dual-control rule.
+pub async fn reviewer_two_id(pg: &Pg) -> Uuid {
+    sqlx::query_scalar("SELECT id FROM app_user WHERE oidc_subject = 'dev:reviewer2'")
+        .fetch_one(&pg.owner)
+        .await
+        .expect("the second reviewer principal is seeded")
+}
+
+/// The same input with `dry_run: true` — the body a dry run records.
+fn with_dry_run(mut input: Value) -> Value {
+    if let Some(map) = input.as_object_mut() {
+        map.insert("dry_run".to_owned(), Value::Bool(true));
+    }
+    input
+}
+
+/// Record the dry run a later destructive ops call must follow (T7 / v1-w1b-4).
+pub async fn record_dry_run(pg: &Pg, tenant: TenantId, action: &str, input: &Value) {
+    let hash = conveyor_store::request_hash(&with_dry_run(input.clone()));
+    let mut tx = begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the dry run");
+    let record = conveyor_store::InvocationRecord {
+        actor_id: None,
+        action,
+        action_version: 1,
+        input_hash: &hash,
+        idempotency_key: None,
+        outcome: "ok",
+        duration_ms: 0,
+        trace_id: None,
+    };
+    conveyor_store::actions::record_invocation(&mut *tx, tenant, &record)
+        .await
+        .expect("record the dry run");
+    tx.commit().await.expect("commit the dry run");
+}
+
 /// An APPROVED gate for `action` with exactly this input, for a test that has to get past the
 /// destructive gate (#282, #285).
 ///
@@ -472,6 +531,9 @@ pub async fn approved_gate(
                 "kind": "action",
                 "action": action,
                 "input": input,
+                // T7 / v1-w1b-4: the §6.5 dual control. Two distinct human decisions are
+                // inserted below; the request names the floor.
+                "required_decisions": 2,
                 // The fixture's subject is the target, not a document; a destructive gate now
                 // requires evidence or an explicit waiver (v1-u5a-approvals-1).
                 "evidence_waiver_reason": "test fixture: the gate's subject is the target",
@@ -494,6 +556,52 @@ pub async fn approved_gate(
         .execute(&mut *tx)
         .await
         .expect("approve the gate");
+    for approver in [reviewer_id(pg).await, reviewer_two_id(pg).await] {
+        sqlx::query(
+            "INSERT INTO approval_decision (approval_id, approver_id, decision, decided_by_kind)
+             VALUES ($1, $2, 'approve', 'human')
+             ON CONFLICT (approval_id, approver_id) DO NOTHING",
+        )
+        .bind(id)
+        .bind(approver)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the gate decision");
+    }
+    // T7 / v1-w1b-4: the real ops call must follow a recorded dry run of the same action and
+    // target. The dry run itself needs no predecessor; a no-action mitigation performs no write
+    // and needs none.
+    if input.get("dry_run").and_then(Value::as_bool) != Some(true)
+        && input.get("no_action_required").and_then(Value::as_bool) != Some(true)
+    {
+        let (dry_action, dry_input) = if action == "ops.mitigate" {
+            let inner_action = input
+                .get("action")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            (
+                inner_action,
+                with_dry_run(input.get("input").cloned().unwrap_or(Value::Null)),
+            )
+        } else {
+            (action.to_owned(), with_dry_run(input.clone()))
+        };
+        let hash = conveyor_store::request_hash(&dry_input);
+        let record = conveyor_store::InvocationRecord {
+            actor_id: None,
+            action: &dry_action,
+            action_version: 1,
+            input_hash: &hash,
+            idempotency_key: None,
+            outcome: "ok",
+            duration_ms: 0,
+            trace_id: None,
+        };
+        conveyor_store::actions::record_invocation(&mut *tx, tenant, &record)
+            .await
+            .expect("record the dry run");
+    }
     tx.commit().await.expect("commit the gate");
     id
 }

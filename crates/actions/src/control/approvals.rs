@@ -706,7 +706,117 @@ pub async fn require_approval_tx(
             format!("approval {id} authorises {approved_target:?}, not {target:?}"),
         ));
     }
+    // T7 / v1-w1b-4: the four cluster writes and the incident mitigation carry SPEC_V2 §6.5's
+    // human dual control. The tenant policy may raise the floor; it may never lower this one.
+    // The dry-run half of the rule is checked at the invoke boundary, where the input is known.
+    if OPS_CONTROLLED.contains(&action) {
+        if record.approval.required_decisions < 2 {
+            return Err(ActionError::new(
+                403,
+                "dual_control_required",
+                format!(
+                    "{action} needs an approval with at least two decisions; approval {id} has {}",
+                    record.approval.required_decisions
+                ),
+            ));
+        }
+        let decisions =
+            store::approval::list_decisions_for_approvals_tx(&mut *tx, ctx.tenant, &[id])
+                .await
+                .map_err(|error| approval_error(error, action))?;
+        let approvers: std::collections::BTreeSet<_> = decisions
+            .iter()
+            .filter(|decision| decision.decision == "approve")
+            .map(|decision| decision.approver_id)
+            .collect();
+        if approvers.len() < 2 {
+            return Err(ActionError::new(
+                403,
+                "dual_control_not_met",
+                format!(
+                    "{action} needs two distinct approvers; approval {id} has {}",
+                    approvers.len()
+                ),
+            ));
+        }
+    }
     Ok(id)
+}
+
+/// The destructive ops actions that carry §6.5's dual control and dry-run rule.
+///
+/// The four cluster writes and the incident mitigation wrapper. `ops.host_restart_unit` is a
+/// host-unit verb outside §6.5's four; it keeps the single-approval `require_approval_tx` path.
+const OPS_CONTROLLED: &[&str] = &[
+    "ops.restart",
+    "ops.scale",
+    "ops.rollback",
+    "ops.flag_flip",
+    "ops.mitigate",
+];
+
+/// The dry-run half of §6.5: the real call must follow a recorded dry run of the same action
+/// and input.
+///
+/// The dry run is an `action_invocation` row with `outcome = 'ok'` whose `input_hash` is the
+/// engine's canonical hash of the same input with `dry_run: true`. A dry run needs no
+/// predecessor; `ops.mitigate` proves its inner verb (the write it executes), and a no-action
+/// mitigation performs no write and needs no dry run.
+async fn require_ops_dry_run_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    action: &str,
+    input: &Value,
+) -> Result<(), ActionError> {
+    if input.get("dry_run").and_then(Value::as_bool) == Some(true) {
+        return Ok(());
+    }
+    let (dry_action, dry_input) = if action == "ops.mitigate" {
+        if input.get("no_action_required").and_then(Value::as_bool) == Some(true) {
+            return Ok(());
+        }
+        let inner_action = input
+            .get("action")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if !inner_action.starts_with("ops.") {
+            return Err(ActionError::new(
+                403,
+                "dry_run_required",
+                "the mitigation's inner action is not an ops write, so no dry run can authorise it",
+            ));
+        }
+        let inner = input.get("input").cloned().unwrap_or(Value::Null);
+        (inner_action.to_owned(), with_dry_run(inner))
+    } else {
+        (action.to_owned(), with_dry_run(input.clone()))
+    };
+    let hash = conveyor_store::idempotency::request_hash(&dry_input);
+    let found =
+        store::actions::has_ok_invocation_with_hash_tx(&mut *tx, ctx.tenant, &dry_action, &hash)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the dry-run invocation");
+                ActionError::internal()
+            })?;
+    if !found {
+        return Err(ActionError::new(
+            403,
+            "dry_run_required",
+            format!(
+                "{dry_action} has no recorded dry run for this target; dry-run it before the real call"
+            ),
+        ));
+    }
+    Ok(())
+}
+
+/// The same input with `dry_run: true`, the body a dry run records.
+fn with_dry_run(mut input: Value) -> Value {
+    if let Some(map) = input.as_object_mut() {
+        map.insert("dry_run".to_owned(), Value::Bool(true));
+    }
+    input
 }
 
 /// The target a gate will authorise, computed the way the invoke boundary will compute it.
@@ -805,9 +915,11 @@ pub async fn enforce_destructive_gate(
     if waived {
         return Ok(());
     }
-    require_approval_tx(tx, ctx, spec.static_name(), &target, ctx.approval_id)
-        .await
-        .map(|_| ())
+    require_approval_tx(tx, ctx, spec.static_name(), &target, ctx.approval_id).await?;
+    if OPS_CONTROLLED.contains(&spec.static_name()) {
+        require_ops_dry_run_tx(tx, ctx, spec.static_name(), input).await?;
+    }
+    Ok(())
 }
 
 fn parse_decision(raw: &str) -> Result<DecisionKind, ActionError> {

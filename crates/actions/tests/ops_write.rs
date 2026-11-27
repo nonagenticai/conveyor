@@ -53,7 +53,7 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
         eval_id: None,
         gate: gate.to_owned(),
         kind: "gate".to_owned(),
-        required_decisions: 1,
+        required_decisions: 2,
         requested_by: None,
         expires_at: None,
         callback_url: None,
@@ -68,6 +68,21 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
         .execute(&mut *tx)
         .await
         .expect("approve the gate");
+    for approver in [
+        support::reviewer_id(pg).await,
+        support::reviewer_two_id(pg).await,
+    ] {
+        sqlx::query(
+            "INSERT INTO approval_decision (approval_id, approver_id, decision, decided_by_kind)
+             VALUES ($1, $2, 'approve', 'human')
+             ON CONFLICT (approval_id, approver_id) DO NOTHING",
+        )
+        .bind(approval.id)
+        .bind(approver)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the gate decision");
+    }
     tx.commit().await.expect("commit the gate");
     approval.id
 }
@@ -221,6 +236,13 @@ async fn the_write_reads_back() {
         seeded.tenant,
         "ops.scale",
         "conveyor/deployment/conveyor/scale/3",
+    )
+    .await;
+    support::record_dry_run(
+        &pg,
+        seeded.tenant,
+        "ops.scale",
+        &json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3}),
     )
     .await;
 

@@ -25,6 +25,7 @@ use uuid::Uuid;
 
 const TOKEN: &str = "dev:alice";
 const REVIEWER: &str = "dev:reviewer";
+const REVIEWER_TWO: &str = "dev:reviewer2";
 const KATA_KEY: &str = "kata.open";
 const DEPLOYMENT_PATH: &str = "/apis/apps/v1/namespaces/conveyor/deployments/conveyor";
 
@@ -376,6 +377,7 @@ async fn an_approved_mitigation_sets_mitigated_at_with_a_read_back() {
             TOKEN,
             json!({"gate": "ops.mitigate", "kind": "action", "action": "ops.mitigate",
                    "input": input.clone(),
+                   "required_decisions": 2,
                    // The fixture is about the incident record, not evidence; a destructive
                    // gate now requires evidence or an explicit waiver.
                    "evidence_waiver_reason": "test fixture: the gate's subject is the incident"}),
@@ -397,6 +399,18 @@ async fn an_approved_mitigation_sets_mitigated_at_with_a_read_back() {
         )
         .await;
     assert_eq!(status, 200, "{body}");
+    let (status, body) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER_TWO,
+            json!({"approval_id": gate, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    support::record_dry_run(&pg, seeded.tenant, "ops.scale", &scale_input()).await;
     let (status, body) = running
         .invoke_approved(
             "ops.mitigate",
@@ -611,6 +625,79 @@ async fn a_systemic_finding_opens_exactly_one_kata() {
         )
         .await;
     assert_eq!(status, 200, "{body}");
+}
+
+/// v1-w3a-5 — an incident whose fix happened outside conveyor can still be postmortemed and
+/// resolved. The mitigation records that no write was required, and the systemic finding opens
+/// exactly one kata.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_zero_write_incident_resolves_with_a_postmortem_and_one_kata() {
+    let _env = env_lock().await;
+    let (pg, running, seeded, board, lane) = fixture().await;
+    let (base, patches) = stub_api().await;
+    support::set_env("OPS_API_URL", &base);
+    support::set_env("OPS_TOKEN", "test-token");
+    publish_kata(&running).await;
+    let runbook = publish_runbook(&running, "ops.test.crash_loop").await;
+    let incident = open_incident(&running, &board, &lane, "sev2").await;
+    let (status, body) = triage(&running, &incident, &runbook).await;
+    assert_eq!(status, 200, "{body}");
+
+    // The certificate was renewed with the provider's own tooling: no cluster write exists to
+    // run, and running one would be a false record.
+    let input = json!({
+        "incident_id": incident,
+        "action": "none",
+        "input": null,
+        "no_action_required": true,
+        "reason": "the certificate was renewed with the provider's own tooling",
+    });
+    let (status, body) = running
+        .invoke_gated(&pg, seeded.tenant, "ops.mitigate", TOKEN, input, None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["state"], "mitigated");
+    assert!(output(&body)["mitigated_at"].is_string());
+    assert_eq!(
+        patches.load(Ordering::SeqCst),
+        0,
+        "a no-action mitigation makes no cluster write"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "ops.postmortem",
+            TOKEN,
+            json!({
+                "incident_id": incident,
+                "evidence": {"source": "the provider's certificate console"},
+                "postmortem": {"title": "Certificate renewed outside conveyor",
+                               "body": "Blameless body: no automated rotation exists.",
+                               "systemic": true},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        output(&body)["kata_candidate_id"].is_string(),
+        "the systemic finding opens exactly one kata: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "ops.resolve",
+            TOKEN,
+            json!({"incident_id": incident}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["state"], "resolved");
 }
 
 // ── P2.2 — the tenant's quorum decides ───────────────────────────────────────────────────

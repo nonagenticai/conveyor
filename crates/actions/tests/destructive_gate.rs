@@ -54,6 +54,52 @@ async fn approved(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) 
         eval_id: None,
         gate: gate.to_owned(),
         kind: "gate".to_owned(),
+        required_decisions: 2,
+        requested_by: None,
+        expires_at: None,
+        callback_url: None,
+        correlation_id: None,
+        meta: json!({"target": target}),
+    };
+    let approval = store::approval::insert_approval_tx(&mut tx, tenant, &new)
+        .await
+        .expect("insert the gate");
+    sqlx::query("UPDATE approval SET status = 'approved' WHERE id = $1")
+        .bind(approval.id)
+        .execute(&mut *tx)
+        .await
+        .expect("approve the gate");
+    for approver in [
+        support::reviewer_id(pg).await,
+        support::reviewer_two_id(pg).await,
+    ] {
+        sqlx::query(
+            "INSERT INTO approval_decision (approval_id, approver_id, decision, decided_by_kind)
+             VALUES ($1, $2, 'approve', 'human')
+             ON CONFLICT (approval_id, approver_id) DO NOTHING",
+        )
+        .bind(approval.id)
+        .bind(approver)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the gate decision");
+    }
+    tx.commit().await.expect("commit the gate");
+    approval.id
+}
+
+/// An APPROVED gate with ONE decision — the shape v1-w1b-4 says must not admit an ops write.
+async fn single_approval(pg: &support::Pg, tenant: TenantId, gate: &str, target: &str) -> Uuid {
+    let mut tx = store::scope::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the approval insert");
+    let new = store::approval::NewApproval {
+        run_id: None,
+        card_id: None,
+        project_id: None,
+        eval_id: None,
+        gate: gate.to_owned(),
+        kind: "gate".to_owned(),
         required_decisions: 1,
         requested_by: None,
         expires_at: None,
@@ -378,4 +424,55 @@ fn the_target_is_deterministic() {
         assert_eq!(first, second, "{action} produced two targets for one input");
         assert!(!first.is_empty(), "{action} produced an empty target");
     }
+}
+
+/// T7 / v1-w1b-4 — an ops destructive call needs human dual control AND a recorded dry run.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_ops_destructive_call_needs_dual_control_and_a_dry_run() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    support::set_env("OPS_API_URL", "http://127.0.0.1:1");
+    support::set_env("OPS_TOKEN", "");
+    let input = json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3});
+    let target = "conveyor/deployment/conveyor/scale/3";
+
+    // 1. One decision is not dual control.
+    let single = single_approval(&pg, seeded.tenant, "ops.scale", target).await;
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request("ops.scale", input.clone(), Some(single)),
+    )
+    .await
+    .expect_err("a single-decision approval must not admit an ops write");
+    assert_eq!(error.status, 403, "{}", error.detail);
+    assert_eq!(error.code, "dual_control_required");
+
+    // 2. Two decisions without a recorded dry run is still refused.
+    let dual = approved(&pg, seeded.tenant, "ops.scale", target).await;
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request("ops.scale", input.clone(), Some(dual)),
+    )
+    .await
+    .expect_err("a call without a recorded dry run must be refused");
+    assert_eq!(error.status, 403, "{}", error.detail);
+    assert_eq!(error.code, "dry_run_required");
+
+    // 3. A recorded dry run satisfies the predecessor check; the call reaches the backend (and
+    // fails there, because the fixture points at a closed port — never at the gate).
+    support::record_dry_run(&pg, seeded.tenant, "ops.scale", &input).await;
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request("ops.scale", input, Some(dual)),
+    )
+    .await
+    .expect_err("the unreachable backend still fails the real call");
+    assert_ne!(error.code, "dry_run_required", "{}", error.detail);
+    assert_ne!(error.code, "dual_control_required", "{}", error.detail);
 }

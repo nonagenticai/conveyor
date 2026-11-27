@@ -274,6 +274,30 @@ pub async fn find_invocation_by_key(
     .await
 }
 
+/// Whether an `ok` invocation of `action` with exactly this input hash exists.
+///
+/// The dry-run proof: a destructive ops write must follow a recorded dry run of the same
+/// action and input. The hash is the engine's [`crate::idempotency::request_hash`] of the
+/// dry-run input, so a dry run of a different target cannot satisfy it.
+pub async fn has_ok_invocation_with_hash_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    input_hash: &str,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS(
+             SELECT 1 FROM action_invocation
+              WHERE tenant_id = $1 AND action = $2 AND input_hash = $3 AND outcome = 'ok'
+         )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(input_hash)
+    .fetch_one(conn)
+    .await
+}
+
 /// One successful invocation, as a provenance check reads it.
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct SuccessfulInvocation {
