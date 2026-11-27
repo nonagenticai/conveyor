@@ -17,8 +17,8 @@
   },
   "summary": {
     "routes_total": 52,
-    "routes_absent": 36,
-    "routes_registered": 16,
+    "routes_absent": 21,
+    "routes_registered": 31,
     "routes_verified": 0,
     "actions_total": 598,
     "actions_absent": 0,
@@ -44,9 +44,9 @@
       "room": "organisation",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/agents.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/approvals",
@@ -88,9 +88,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/plan.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/boards",
@@ -176,9 +176,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/decisions.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/design/adm",
@@ -308,9 +308,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/execution.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/improve",
@@ -330,9 +330,9 @@
       "room": "organisation",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/jobs.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/knowledge",
@@ -374,9 +374,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/meetings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/meetings/:id",
@@ -385,9 +385,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/meetings.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/metering",
@@ -418,9 +418,9 @@
       "room": "organisation",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/organisation.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/plan",
@@ -429,9 +429,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/plan.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/platform",
@@ -484,9 +484,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/programme.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/project-types",
@@ -495,9 +495,9 @@
       "room": "organisation",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/project-types.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/runs",
@@ -506,9 +506,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/runs.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/runs/:run_id",
@@ -517,9 +517,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/runs.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/search",
@@ -583,9 +583,9 @@
       "room": "organisation",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/tools.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/validation",
@@ -594,9 +594,9 @@
       "room": "portfolio",
       "owner": "S1",
       "spec": "e2e/portfolio-organisation/validation.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     }
   ],
   "actions": [
