@@ -1,11 +1,11 @@
 {
   "audited_at": "2026-11-27",
-  "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+  "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
   "findings": [
     {
       "acceptance": "std-pmp-change-control-s06b: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S06b-agent-direct-interface.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -73,7 +73,7 @@
     {
       "acceptance": "std-pmp-change-control-s10: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S10-copilot-ag-ui.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -141,7 +141,7 @@
     {
       "acceptance": "std-pmp-change-control-s11: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S11-procedures.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -209,7 +209,7 @@
     {
       "acceptance": "std-pmp-change-control-t19f: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Follow-on: docs/plans/T19F-meeting-bindings.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -277,7 +277,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s06b: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S06b-agent-direct-interface.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -368,7 +368,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s10: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S10-copilot-ag-ui.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -459,7 +459,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s11: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S11-procedures.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -550,7 +550,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t19f: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Follow-on: docs/plans/T19F-meeting-bindings.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -641,7 +641,7 @@
     {
       "acceptance": "std-pmp-project-registers-t19f: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Follow-on: docs/plans/T19F-meeting-bindings.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -748,7 +748,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s06b: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S06b-agent-direct-interface.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -816,7 +816,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s10: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S10-copilot-ag-ui.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -884,7 +884,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s11: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S11-procedures.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -952,7 +952,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s06b: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06b-agent-direct-interface.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -1030,7 +1030,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s10: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S10-copilot-ag-ui.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -1108,7 +1108,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s11: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S11-procedures.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -1186,7 +1186,7 @@
     {
       "acceptance": "std-pmp-change-control-s06c: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S06c-mcp-tasks.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1254,7 +1254,7 @@
     {
       "acceptance": "std-pmp-change-control-s06d: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S06d-connector-standard.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1322,7 +1322,7 @@
     {
       "acceptance": "std-pmp-change-control-s12: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S12-ui-buildout.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1390,7 +1390,7 @@
     {
       "acceptance": "std-pmp-change-control-s13: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S13-n8n-engine.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1458,7 +1458,7 @@
     {
       "acceptance": "std-pmp-change-control-s14: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S14-cutover.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1526,7 +1526,7 @@
     {
       "acceptance": "std-pmp-change-control-s15: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1594,7 +1594,7 @@
     {
       "acceptance": "std-pmp-change-control-s16: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S16-inference-audit.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1662,7 +1662,7 @@
     {
       "acceptance": "std-pmp-change-control-s18: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S18-kata-improvement.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1730,7 +1730,7 @@
     {
       "acceptance": "std-pmp-change-control-s19: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S19-eval-builder.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1798,7 +1798,7 @@
     {
       "acceptance": "std-pmp-change-control-s20: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S20-eval-hillclimb.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1866,7 +1866,7 @@
     {
       "acceptance": "std-pmp-change-control-s21: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S21-message-construction.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -1934,7 +1934,7 @@
     {
       "acceptance": "std-pmp-change-control-t12: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -2002,7 +2002,7 @@
     {
       "acceptance": "std-pmp-change-control-t15: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -2070,7 +2070,7 @@
     {
       "acceptance": "std-pmp-change-control-t5: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -2138,7 +2138,7 @@
     {
       "acceptance": "std-pmp-change-control-t6: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -2206,7 +2206,7 @@
     {
       "acceptance": "std-pmp-change-control-t8: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "change-control",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "change-control",
       "evidence": [
         {
@@ -2274,7 +2274,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s06c: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S06c-mcp-tasks.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2365,7 +2365,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s06d: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S06d-connector-standard.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2456,7 +2456,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s12: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S12-ui-buildout.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2547,7 +2547,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s13: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S13-n8n-engine.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2638,7 +2638,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s14: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S14-cutover.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2729,7 +2729,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s15: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2820,7 +2820,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s16: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S16-inference-audit.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -2911,7 +2911,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s18: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S18-kata-improvement.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3002,7 +3002,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s19: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S19-eval-builder.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3093,7 +3093,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s20: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S20-eval-hillclimb.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3184,7 +3184,7 @@
     {
       "acceptance": "std-pmp-project-baseline-s21: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — Plan: docs/plans/slices/S21-message-construction.md from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3275,7 +3275,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t12: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3366,7 +3366,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t15: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3457,7 +3457,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t5: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3548,7 +3548,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t6: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3639,7 +3639,7 @@
     {
       "acceptance": "std-pmp-project-baseline-t8: evidence the missing section(s) Scope, Schedule, Cost, Approval of Project Baseline — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from msp.json#/project_baselines, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-baseline",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-baseline",
       "evidence": [
         {
@@ -3730,7 +3730,7 @@
     {
       "acceptance": "std-pmp-project-registers-s06b: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S06b-agent-direct-interface.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -3824,7 +3824,7 @@
     {
       "acceptance": "std-pmp-project-registers-s06c: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S06c-mcp-tasks.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -3918,7 +3918,7 @@
     {
       "acceptance": "std-pmp-project-registers-s06d: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S06d-connector-standard.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4012,7 +4012,7 @@
     {
       "acceptance": "std-pmp-project-registers-s10: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S10-copilot-ag-ui.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4106,7 +4106,7 @@
     {
       "acceptance": "std-pmp-project-registers-s11: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S11-procedures.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4200,7 +4200,7 @@
     {
       "acceptance": "std-pmp-project-registers-s12: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S12-ui-buildout.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4307,7 +4307,7 @@
     {
       "acceptance": "std-pmp-project-registers-s13: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S13-n8n-engine.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4414,7 +4414,7 @@
     {
       "acceptance": "std-pmp-project-registers-s14: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S14-cutover.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4508,7 +4508,7 @@
     {
       "acceptance": "std-pmp-project-registers-s15: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4615,7 +4615,7 @@
     {
       "acceptance": "std-pmp-project-registers-s16: evidence the missing section(s) Risks, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S16-inference-audit.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4709,7 +4709,7 @@
     {
       "acceptance": "std-pmp-project-registers-s18: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S18-kata-improvement.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4816,7 +4816,7 @@
     {
       "acceptance": "std-pmp-project-registers-s19: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S19-eval-builder.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -4923,7 +4923,7 @@
     {
       "acceptance": "std-pmp-project-registers-s20: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S20-eval-hillclimb.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5030,7 +5030,7 @@
     {
       "acceptance": "std-pmp-project-registers-s21: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — Plan: docs/plans/slices/S21-message-construction.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5137,7 +5137,7 @@
     {
       "acceptance": "std-pmp-project-registers-t12: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5244,7 +5244,7 @@
     {
       "acceptance": "std-pmp-project-registers-t15: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5351,7 +5351,7 @@
     {
       "acceptance": "std-pmp-project-registers-t5: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5458,7 +5458,7 @@
     {
       "acceptance": "std-pmp-project-registers-t6: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5565,7 +5565,7 @@
     {
       "acceptance": "std-pmp-project-registers-t8: evidence the missing section(s) Risks, Issues, Assumptions, Dependencies, Benefits, Changes of Project Registers — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-registers",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-registers",
       "evidence": [
         {
@@ -5672,7 +5672,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s06c: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S06c-mcp-tasks.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -5740,7 +5740,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s06d: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S06d-connector-standard.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -5808,7 +5808,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s12: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S12-ui-buildout.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -5876,7 +5876,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s13: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S13-n8n-engine.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -5944,7 +5944,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s16: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S16-inference-audit.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6012,7 +6012,7 @@
     {
       "acceptance": "std-pmp-project-wbs-s20: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — Plan: docs/plans/slices/S20-eval-hillclimb.md from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6080,7 +6080,7 @@
     {
       "acceptance": "std-pmp-project-wbs-t15: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6148,7 +6148,7 @@
     {
       "acceptance": "std-pmp-project-wbs-t5: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6216,7 +6216,7 @@
     {
       "acceptance": "std-pmp-project-wbs-t6: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6284,7 +6284,7 @@
     {
       "acceptance": "std-pmp-project-wbs-t8: evidence the missing section(s) Work packages, Acceptance, Status of Project Wbs — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "project-wbs",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "project-wbs",
       "evidence": [
         {
@@ -6352,7 +6352,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bb-cfc9-72ec-85f5-619bf730fff9: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Stakeholder map from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6394,7 +6394,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bb-f6ea-7d99-b23f-4dc3dace459c: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Drivers, goals and objectives from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6436,7 +6436,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bc-1f7b-7703-bb2d-a0d8695d12bd: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Requirements catalog from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6478,7 +6478,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bc-465a-7d83-b9c6-7c7b089d8b02: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Solution concept from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6520,7 +6520,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bc-6b09-7785-ab85-5e72fc64997a: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Business capability map from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6562,7 +6562,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bc-92bd-71d7-964f-8d9761e78baa: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Data entity catalog from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6604,7 +6604,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-instance-01a210bc-b7e1-7a83-b322-81d74e0a903a: evidence the missing section(s) Document of Architecture Artifact Instance — T19F — Technology standards from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact-instance",
       "evidence": [
         {
@@ -6646,7 +6646,7 @@
     {
       "acceptance": "std-togaf-architecture-artifact-t19f: evidence the missing section(s) Document of Architecture Artifact — Follow-on: docs/plans/T19F-meeting-bindings.md from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6688,7 +6688,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s06b: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06b-agent-direct-interface.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -6754,7 +6754,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s06c: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06c-mcp-tasks.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -6820,7 +6820,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s06d: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S06d-connector-standard.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -6886,7 +6886,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s10: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S10-copilot-ag-ui.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -6952,7 +6952,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s11: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S11-procedures.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7018,7 +7018,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s12: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S12-ui-buildout.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7084,7 +7084,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s13: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S13-n8n-engine.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7150,7 +7150,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s14: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S14-cutover.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7216,7 +7216,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s15: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7282,7 +7282,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s16: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S16-inference-audit.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7348,7 +7348,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s18: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S18-kata-improvement.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7414,7 +7414,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s19: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S19-eval-builder.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7480,7 +7480,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s20: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S20-eval-hillclimb.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7546,7 +7546,7 @@
     {
       "acceptance": "std-togaf-compliance-review-s21: evidence the missing section(s) Decision of Compliance Review — Plan: docs/plans/slices/S21-message-construction.md from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7612,7 +7612,7 @@
     {
       "acceptance": "std-togaf-compliance-review-t12: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T12 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7678,7 +7678,7 @@
     {
       "acceptance": "std-togaf-compliance-review-t15: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T15 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7744,7 +7744,7 @@
     {
       "acceptance": "std-togaf-compliance-review-t5: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T5 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7810,7 +7810,7 @@
     {
       "acceptance": "std-togaf-compliance-review-t6: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T6 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7876,7 +7876,7 @@
     {
       "acceptance": "std-togaf-compliance-review-t8: evidence the missing section(s) Decision of Compliance Review — SPEC_V2 slice T8 (docs/SPEC_V2.md §12) from seed/output-standard.json#compliance-review, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "compliance-review",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "compliance-review",
       "evidence": [
         {
@@ -7942,7 +7942,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s06c: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06c-mcp-tasks.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8020,7 +8020,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s06d: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S06d-connector-standard.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8098,7 +8098,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s12: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S12-ui-buildout.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8176,7 +8176,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s13: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S13-n8n-engine.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8254,7 +8254,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s14: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S14-cutover.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8332,7 +8332,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s15: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S15-capability-knowledge-memory.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8410,7 +8410,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s16: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S16-inference-audit.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8488,7 +8488,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s18: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S18-kata-improvement.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8566,7 +8566,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s19: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S19-eval-builder.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8644,7 +8644,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s20: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S20-eval-hillclimb.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8722,7 +8722,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-s21: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Plan: docs/plans/slices/S21-message-construction.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8800,7 +8800,7 @@
     {
       "acceptance": "std-togaf-delivery-contract-t19f: evidence the missing section(s) Compliance method of Delivery Contract — Follow-on: docs/plans/T19F-meeting-bindings.md from seed/output-standard.json#delivery-contract, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "delivery-contract",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -8847,7 +8847,7 @@
     {
       "acceptance": "std-togaf-phase-g-s06b-g: evidence the missing section(s) Contract and gate of Phase G — S06b — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -8889,7 +8889,7 @@
     {
       "acceptance": "std-togaf-phase-g-s06c-g: evidence the missing section(s) Contract and gate of Phase G — S06c — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -8931,7 +8931,7 @@
     {
       "acceptance": "std-togaf-phase-g-s06d-g: evidence the missing section(s) Contract and gate of Phase G — S06d — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -8973,7 +8973,7 @@
     {
       "acceptance": "std-togaf-phase-g-s10-g: evidence the missing section(s) Contract and gate of Phase G — S10 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9015,7 +9015,7 @@
     {
       "acceptance": "std-togaf-phase-g-s11-g: evidence the missing section(s) Contract and gate of Phase G — S11 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9057,7 +9057,7 @@
     {
       "acceptance": "std-togaf-phase-g-s12-g: evidence the missing section(s) Contract and gate of Phase G — S12 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9099,7 +9099,7 @@
     {
       "acceptance": "std-togaf-phase-g-s13-g: evidence the missing section(s) Contract and gate of Phase G — S13 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9141,7 +9141,7 @@
     {
       "acceptance": "std-togaf-phase-g-s14-g: evidence the missing section(s) Contract and gate of Phase G — S14 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9183,7 +9183,7 @@
     {
       "acceptance": "std-togaf-phase-g-s15-g: evidence the missing section(s) Contract and gate of Phase G — S15 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9225,7 +9225,7 @@
     {
       "acceptance": "std-togaf-phase-g-s16-g: evidence the missing section(s) Contract and gate of Phase G — S16 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9267,7 +9267,7 @@
     {
       "acceptance": "std-togaf-phase-g-s18-g: evidence the missing section(s) Contract and gate of Phase G — S18 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9309,7 +9309,7 @@
     {
       "acceptance": "std-togaf-phase-g-s19-g: evidence the missing section(s) Contract and gate of Phase G — S19 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9351,7 +9351,7 @@
     {
       "acceptance": "std-togaf-phase-g-s20-g: evidence the missing section(s) Contract and gate of Phase G — S20 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9393,7 +9393,7 @@
     {
       "acceptance": "std-togaf-phase-g-s21-g: evidence the missing section(s) Contract and gate of Phase G — S21 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9435,7 +9435,7 @@
     {
       "acceptance": "std-togaf-phase-g-t12-g: evidence the missing section(s) Contract and gate of Phase G — T12 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9477,7 +9477,7 @@
     {
       "acceptance": "std-togaf-phase-g-t15-g: evidence the missing section(s) Contract and gate of Phase G — T15 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9519,7 +9519,7 @@
     {
       "acceptance": "std-togaf-phase-g-t5-g: evidence the missing section(s) Contract and gate of Phase G — T5 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9561,7 +9561,7 @@
     {
       "acceptance": "std-togaf-phase-g-t6-g: evidence the missing section(s) Contract and gate of Phase G — T6 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
@@ -9603,7 +9603,7 @@
     {
       "acceptance": "std-togaf-phase-g-t8-g: evidence the missing section(s) Contract and gate of Phase G — T8 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
-      "audited_sha": "fb9632867f02eb22d4e885493079936fcb0766f4",
+      "audited_sha": "48683b40c65d7f7a8201394ef9b59920d3b047a5",
       "category": "phase-g",
       "evidence": [
         {
