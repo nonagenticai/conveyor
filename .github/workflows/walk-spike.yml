@@ -3,6 +3,11 @@
 name: walk-spike
 
 on:
+  push:
+    branches: [issue/813-walk-g0]
+    paths:
+      - "spike/walk/**"
+      - ".github/workflows/walk-spike.yml"
   workflow_dispatch:
 
 permissions:
