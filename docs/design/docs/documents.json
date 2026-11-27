@@ -987,8 +987,8 @@
       "path": "docs/evidence/proof-of-delivery.html",
       "source": "docs/evidence/proof-of-delivery.md",
       "section": "Evidence",
-      "sha256": "f19c6dba62c25e8946ca48523d014b0845961d47999cc2e9c9d811409784b328",
-      "bytes": 20176,
+      "sha256": "f6c5405ccee7820f8446883081be267ecbac5af5c75a4314e68a6a03ae7d080d",
+      "bytes": 21103,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
@@ -1719,6 +1719,24 @@
       "sha256": "42811f947bca5b1e716cf6087092d73642fe97b9a1a94d654ee6cf7728b026a2",
       "bytes": 175,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
+    },
+    {
+      "title": "findings",
+      "path": "docs/evidence/units/2026-11-27-findings/findings.html",
+      "source": "docs/evidence/units/2026-11-27-findings/findings.md",
+      "section": "Evidence",
+      "sha256": "54e1db5812693d69934edb6ac21b905589279bd70f33d36ebc9e035933b09453",
+      "bytes": 7873,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/findings.md"
+    },
+    {
+      "title": "report",
+      "path": "docs/evidence/units/2026-11-27-findings/report.html",
+      "source": "docs/evidence/units/2026-11-27-findings/report.md",
+      "section": "Evidence",
+      "sha256": "9c20110bf167a374ac66738aec5285f0b65996fa21ad1417c75639d6cf469ae4",
+      "bytes": 6935,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/units/2026-11-27-findings/report.md"
     },
     {
       "title": "report",

@@ -303,3 +303,16 @@ certificate ids** — the collector is deterministic end to end.
 satisfy `checkUnit` for the 56 units named above, and the control certifies the path accepts a real
 passing set. The facts' provenance and the committed snapshot remain the reviewer's lever; the
 assumption line in § What the certificate says, and what it does not is unchanged.
+
+### The findings run (conveyor#865)
+
+A second live run at 2026-11-27T17:00:47Z (`docs/evidence/units/2026-11-27-findings/`) re-ran this
+method over the current ledger: corpus `a7cf1a1aa2048be2…`, 330 completed units, 24 open in flight,
+31 closed without a keyword-linked PR, 11 orphan PRs, certified through the deployed image
+`cbee6af8…` as chunk-000 `01a21df5-1d01-71f8-a343-1f8a3f40272b` and chunk-001
+`01a21df5-2d86-7ce1-a406-2a03119cd367` (both `unproven`) and the programme bundle
+`01a21df5-3f9d-7f7a-bf50-55230c686bc3` (`proven`). It also found and fixed four instrument defects —
+the in-flight bucket counted closed issues, `verifyParts` fired on non-unit issues, two bodies were
+truncated at a prose `#N` line, and a console publish PR was counted as an orphan — and classifies
+every failure in `findings.md` § The findings. The 11:00 tables above are unchanged; the corrected
+counts are the findings run's.
