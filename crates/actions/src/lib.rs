@@ -41,6 +41,7 @@ pub mod deck;
 pub mod documents;
 pub mod eval;
 pub mod executor;
+pub mod feedback;
 pub mod fixtures;
 pub mod governance;
 pub mod handlers;

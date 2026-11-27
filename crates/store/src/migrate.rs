@@ -362,10 +362,9 @@ mod tests {
                 // moved. The kata union (the lane's candidate/propagation records and
                 // pre-registration fields on main's 0066/0067) sits at 94, after the block,
                 // because main took 70.
-                // v1-w1a-2 (#526): the release's layered kind store — base → industry →
-                // department archetype → department → job — and `department.archetype`
-                // (0080_release_layers.sql, SPEC_V2 §4.1).
-                (80, "release layers".to_owned()),
+                // #842 (main): the tenant's feedback about the platform, its triage columns
+                // and the tenant-isolation policy (0080_feedback.sql).
+                (80, "feedback".to_owned()),
                 // v1-w4a-2 (#526): the write tool's declared verification path on the version
                 // it was published with (0081_tool_verify.sql, SPEC_V2 §11.3).
                 (81, "tool verify".to_owned()),
@@ -453,7 +452,12 @@ mod tests {
                 // T4 spot-audit (2026-11-27): the repair for a `continue` review that closed a
                 // tranche without copying its date onto `programme_tranche.review_at`
                 // (0108_tranche_review_at.sql).
-                (108, "tranche review at".to_owned())
+                (108, "tranche review at".to_owned()),
+                // v1-w1a-2 (#526): the release's layered kind store — base → industry →
+                // department archetype → department → job — and `department.archetype`
+                // (0109_release_layers.sql, renumbered from 0080 because main's #842 took 80;
+                // SPEC_V2 §4.1).
+                (109, "release layers".to_owned()),
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

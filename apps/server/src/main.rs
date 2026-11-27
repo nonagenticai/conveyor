@@ -180,12 +180,56 @@ enum AuthCommand {
     },
 }
 
+/// The operator's feedback commands (#842). The read walks tenants and scopes each one in turn;
+/// the triage records the operator's `app_user` on the row.
+#[derive(Debug, Subcommand)]
+enum FeedbackCommand {
+    /// List every tenant's feedback, newest first.
+    List {
+        /// Only this tenant slug.
+        #[arg(long)]
+        tenant: Option<String>,
+        /// Only this status (`open | triaged | accepted | declined | duplicate`).
+        #[arg(long)]
+        status: Option<String>,
+        /// The page size per tenant (default 50, capped at 200).
+        #[arg(long, default_value_t = 50)]
+        limit: i64,
+        /// Print JSON instead of the table.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Move one row's status and record the operator.
+    Triage {
+        /// The tenant slug the row belongs to.
+        #[arg(long)]
+        tenant: String,
+        /// The row id.
+        #[arg(long)]
+        id: Uuid,
+        /// `triaged | accepted | declined | duplicate`.
+        #[arg(long)]
+        status: String,
+        /// The operator's note.
+        #[arg(long)]
+        note: Option<String>,
+        /// The operator's email; the decision records that `app_user`.
+        #[arg(long)]
+        by: String,
+    },
+}
+
 #[derive(Debug, Subcommand)]
 enum AdminCommand {
     /// Action-registry operations.
     Actions {
         #[command(subcommand)]
         command: ActionsCommand,
+    },
+    /// The platform operator's cross-tenant feedback view and triage (#842).
+    Feedback {
+        #[command(subcommand)]
+        command: FeedbackCommand,
     },
     /// Write a board-export/v1 fixture from a seed. Touches no database.
     Fixture {
@@ -1254,6 +1298,68 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 })
             );
         }
+        AdminCommand::Feedback { command } => match command {
+            FeedbackCommand::List {
+                tenant,
+                status,
+                limit,
+                json,
+            } => {
+                let rows =
+                    admin::feedback::list(&pool, tenant.as_deref(), status.as_deref(), limit)
+                        .await
+                        .map_err(RunError::Refused)?;
+                if json {
+                    let items: Vec<serde_json::Value> = rows
+                        .iter()
+                        .map(|listed| {
+                            serde_json::json!({
+                                "tenant": listed.slug,
+                                "id": listed.row.id,
+                                "author": listed.author_email,
+                                "kind": listed.row.kind,
+                                "title": listed.row.title,
+                                "body": listed.row.body,
+                                "route": listed.row.route,
+                                "status": listed.row.status,
+                                "created_at": listed.row.created_at,
+                            })
+                        })
+                        .collect();
+                    let mut text =
+                        serde_json::to_string_pretty(&serde_json::json!({"feedback": items}))?;
+                    text.push('\n');
+                    println!("{text}");
+                } else if rows.is_empty() {
+                    println!("no feedback");
+                } else {
+                    for listed in &rows {
+                        println!(
+                            "{}\t{}\t{}\t{}\t{}\t{}",
+                            listed.slug,
+                            listed.row.status,
+                            listed.row.kind,
+                            listed.row.created_at.to_rfc3339(),
+                            listed.author_email.as_deref().unwrap_or("—"),
+                            listed.row.title
+                        );
+                    }
+                }
+            }
+            FeedbackCommand::Triage {
+                tenant,
+                id,
+                status,
+                note,
+                by,
+            } => {
+                let row =
+                    admin::feedback::triage(&pool, &tenant, id, &status, note.as_deref(), &by)
+                        .await
+                        .map_err(RunError::Refused)?;
+                println!("{tenant} {} → {} ({})", row.id, row.status, row.title);
+            }
+        },
         AdminCommand::Fixture { .. }
         | AdminCommand::Diff { .. }
         | AdminCommand::TraceDiff { .. } => unreachable!("handled above"),

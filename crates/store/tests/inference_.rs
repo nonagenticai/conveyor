@@ -803,7 +803,10 @@ async fn tool_spend_is_derived_at_read_time_at_the_tenant_and_run_levels() {
     let billing = metrics::conveyor_cost_tx(&mut tx, tenant, since, until)
         .await
         .expect("billing derivation");
-    assert!((billing - 0.0025).abs() < 1e-12, "{billing}");
+    assert!(
+        (billing - 0.0025).abs() < 1e-12,
+        "the billing total differs from the derived cost"
+    );
     tx.commit().await.expect("commit");
 }
 
