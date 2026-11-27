@@ -4,15 +4,6 @@
   "entries": [
     {
       "rule": "project_in_unauthorised_tranche",
-      "subject": "S06b",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
       "subject": "S06c",
       "severity": "P0",
       "disposition": "rework",
@@ -23,33 +14,6 @@
     {
       "rule": "project_in_unauthorised_tranche",
       "subject": "S06d",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S08",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S10",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S11",
       "severity": "P0",
       "disposition": "rework",
       "owner": "programme owner",
@@ -85,15 +49,6 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
-      "subject": "S17",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
       "subject": "S20",
       "severity": "P0",
       "disposition": "rework",
@@ -104,15 +59,6 @@
     {
       "rule": "project_in_unauthorised_tranche",
       "subject": "T15",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T17",
       "severity": "P0",
       "disposition": "rework",
       "owner": "programme owner",
@@ -184,15 +130,6 @@
     },
     {
       "rule": "backlog_refinement_missing",
-      "subject": "tranche 6",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "backlog_refinement_missing",
       "subject": "tranche 7",
       "severity": "P1",
       "disposition": "rework",
@@ -219,24 +156,6 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     },
     {
-      "rule": "benefit_baseline_placeholder",
-      "subject": "B3",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "S05",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
       "rule": "closed_without_closure_review",
       "subject": "S06b",
       "severity": "P1",
@@ -257,33 +176,6 @@
     {
       "rule": "closed_without_closure_review",
       "subject": "S06d",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "S07",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "S08",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "S09",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -337,61 +229,7 @@
     },
     {
       "rule": "closed_without_closure_review",
-      "subject": "S17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
       "subject": "S20",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "P0",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S00",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S01",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S03",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S05",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -419,33 +257,6 @@
     {
       "rule": "closure_outputs_undeclared",
       "subject": "S06d",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S07",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S08",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S09",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -499,34 +310,7 @@
     },
     {
       "rule": "closure_outputs_undeclared",
-      "subject": "S17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
       "subject": "S20",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "compliance_review_missing",
-      "subject": "T11",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -544,52 +328,7 @@
     },
     {
       "rule": "contract_missing",
-      "subject": "T14",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
       "subject": "T15",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T16",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T18",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T3",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -616,70 +355,7 @@
     },
     {
       "rule": "contract_missing",
-      "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "contract_missing",
       "subject": "T8",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S00",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S01",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S02",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S04",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S05",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S06",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -707,33 +383,6 @@
     {
       "rule": "mandatory_artefacts",
       "subject": "S06d",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S07",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S08",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S09",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -805,15 +454,6 @@
     },
     {
       "rule": "mandatory_artefacts",
-      "subject": "S17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
       "subject": "S18",
       "severity": "P1",
       "disposition": "rework",
@@ -850,33 +490,6 @@
     },
     {
       "rule": "mandatory_artefacts",
-      "subject": "T0",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
       "subject": "T12",
       "severity": "P1",
       "disposition": "rework",
@@ -886,52 +499,7 @@
     },
     {
       "rule": "mandatory_artefacts",
-      "subject": "T14",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
       "subject": "T15",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T18",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T2",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T3",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -950,15 +518,6 @@
     {
       "rule": "mandatory_artefacts",
       "subject": "T6",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T7",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -1012,15 +571,6 @@
     },
     {
       "rule": "pi_cadence_missing",
-      "subject": "tranche 6",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "pi_cadence_missing",
       "subject": "tranche 7",
       "severity": "P1",
       "disposition": "rework",
@@ -1040,15 +590,6 @@
     {
       "rule": "pi_cadence_missing",
       "subject": "tranche 9",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S06",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -1110,114 +651,6 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     },
     {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T19F",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T10",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T13",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T16",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T19F",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T3",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T4",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T9",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S05",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S06",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
       "rule": "unpublished_declared_output",
       "subject": "S06b",
       "severity": "P1",
@@ -1238,33 +671,6 @@
     {
       "rule": "unpublished_declared_output",
       "subject": "S06d",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S07",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S08",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S09",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -1336,15 +742,6 @@
     },
     {
       "rule": "unpublished_declared_output",
-      "subject": "S17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
       "subject": "S18",
       "severity": "P1",
       "disposition": "rework",
@@ -1373,24 +770,6 @@
     {
       "rule": "unpublished_declared_output",
       "subject": "S21",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "T14",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "T18",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -1398,15 +777,15 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     }
   ],
-  "accepted_at": "2026-11-26T09:12:46.700793+00:00",
+  "accepted_at": "2026-11-27T12:53:56.389114+00:00",
   "accepted_by": "conveyor-e2e",
   "approver": "conveyor-approver",
-  "acceptance_ref": "01a21720-e105-75b4-822e-ba98024d81fd",
+  "acceptance_ref": "01a21ce9-c68e-761c-94af-3b0b140ef00c",
   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
   "snapshot": {
-    "git_sha": "afe96408",
-    "generated_at": "2026-11-26T09:12:40.605277+00:00",
-    "manifest_sha256": "921866b6255c6f13e810a67006528b8c650a44c7103babe399873df8f3ce7b76",
-    "outputs": 390
+    "git_sha": "d1d023cc930dd6a3fce459979b4a1a82a16f815e",
+    "generated_at": "2026-11-27T12:10:18.740973+00:00",
+    "manifest_sha256": "cb68b2206451d5151bd62a0b3e2264b62e974835b00808a48418f83a09e810c0",
+    "outputs": 846
   }
 }
