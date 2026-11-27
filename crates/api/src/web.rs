@@ -158,6 +158,12 @@ async fn serve(
         let bytes = tokio::fs::read(directory.join("index.html")).await.ok()?;
         return Some(file_response("html", bytes, method));
     }
+    // The walk is a scoped SPA: a deep link under /walk/ serves its own entry, never the
+    // operator app's. Assets keep the 404 rule above; /api never reaches here.
+    if path.starts_with("/walk/") {
+        let bytes = tokio::fs::read(root.join("walk/index.html")).await.ok()?;
+        return Some(file_response("html", bytes, method));
+    }
     let bytes = tokio::fs::read(root.join("index.html")).await.ok()?;
     Some(file_response("html", bytes, method))
 }
@@ -347,6 +353,97 @@ mod tests {
             serve(&config(), None, &Method::GET, &Uri::from_static("/"))
                 .await
                 .is_none()
+        );
+
+        let _ = tokio::fs::remove_dir_all(&root).await;
+    }
+
+    #[tokio::test]
+    async fn walk_deep_links_serve_the_walk_index() {
+        let root =
+            std::env::temp_dir().join(format!("conveyor-web-unit-walk-{}", std::process::id()));
+        tokio::fs::create_dir_all(root.join("walk/src"))
+            .await
+            .expect("the walk site");
+        tokio::fs::write(root.join("index.html"), "<!doctype html><title>app</title>")
+            .await
+            .expect("the app index");
+        tokio::fs::write(
+            root.join("walk/index.html"),
+            "<!doctype html><title>walk</title>",
+        )
+        .await
+        .expect("the walk index");
+        tokio::fs::write(root.join("walk/src/main.js"), "console.log('walk')")
+            .await
+            .expect("the walk asset");
+
+        for path in [
+            "/walk/",
+            "/walk/portfolio",
+            "/walk/portfolio/01a1",
+            "/walk/board/01a1",
+        ] {
+            let response = serve(
+                &config(),
+                Some(&root),
+                &Method::GET,
+                &Uri::from_static(path),
+            )
+            .await
+            .unwrap_or_else(|| panic!("{path} is a walk path"));
+            assert_eq!(response.status(), StatusCode::OK, "{path}");
+            assert!(
+                body_text(response).await.contains("<title>walk</title>"),
+                "{path} must serve the walk entry, not the operator app"
+            );
+        }
+
+        let slashless = serve(
+            &config(),
+            Some(&root),
+            &Method::GET,
+            &Uri::from_static("/walk"),
+        )
+        .await
+        .expect("the slashless walk path");
+        assert_eq!(slashless.status(), StatusCode::PERMANENT_REDIRECT);
+        assert_eq!(slashless.headers().get(header::LOCATION).unwrap(), "/walk/");
+
+        let asset = serve(
+            &config(),
+            Some(&root),
+            &Method::GET,
+            &Uri::from_static("/walk/src/main.js"),
+        )
+        .await
+        .expect("the walk asset");
+        assert_eq!(
+            asset.headers().get(header::CONTENT_TYPE).unwrap(),
+            "text/javascript; charset=utf-8"
+        );
+
+        assert!(
+            serve(
+                &config(),
+                Some(&root),
+                &Method::GET,
+                &Uri::from_static("/walk/src/missing.js"),
+            )
+            .await
+            .is_none(),
+            "a missing walk asset is a 404, never the fallback"
+        );
+        assert!(
+            serve(
+                &config(),
+                Some(&root),
+                &Method::GET,
+                &Uri::from_static("/api/actions"),
+            )
+            .await
+            .is_none(),
+            "/api never reaches the walk fallback"
         );
 
         let _ = tokio::fs::remove_dir_all(&root).await;
