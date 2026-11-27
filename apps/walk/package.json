@@ -5,6 +5,7 @@
   "scripts": {
     "e2e": "playwright test",
     "e2e:list": "playwright test --list",
+    "test:deployed": "playwright test e2e/deployed",
     "test": "find src -name '*.test.js' -exec node --test {} +",
     "typecheck": "tsc -p . --noEmit"
   },
