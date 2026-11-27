@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from "./fixture";
 
-import { createBoardCard, decideAsReviewer, invoke, isDevAuth } from "./helpers";
+import { activateJob, createActiveBinding, createBoardCard, invoke, isDevAuth } from "./helpers";
 
 // #563 T18-2 — Jobs: the catalogue, the release, the binding, and the server's stale-pin
 // refusal. The start control sends the caller's expected hash; the 409 is the server's own.
@@ -38,21 +38,7 @@ async function fixture(
   });
   // A job is born a draft (v1-w1a-4): activation opens a gate, and a second principal must
   // approve it before a release may publish or a binding may pin it.
-  await invoke(request, "job_catalogue.update", {
-    id: position.id,
-    version: 1,
-    status: "active",
-  });
-  const pending = await invoke<{ items: { id: string; gate: string; kind: string }[] }>(
-    request,
-    "approvals.list",
-    { status: "pending", limit: 50 },
-  );
-  const activation = pending.items.find(
-    (item) => item.gate === "job_catalogue.update" && item.kind === "job_activation",
-  );
-  expect(activation, "the job activation gate is pending").toBeTruthy();
-  await decideAsReviewer(request, "approvals.decide", activation!.id);
+  await activateJob(request, position.id);
   const release = await invoke<{ id: string; release_hash: string }>(
     request,
     "job_releases.publish",
@@ -63,7 +49,7 @@ async function fixture(
   });
   const agent = agents.items[0];
   expect(agent, "the dev seed carries one fixture capability agent").toBeTruthy();
-  const binding = await invoke<{ id: string }>(request, "job_bindings.create", {
+  const binding = await createActiveBinding<{ id: string }>(request, {
     job_id: position.id,
     release_id: release.id,
     executor_kind: "internal_agent",

@@ -125,8 +125,12 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await page.goto("/boards");
   await expect(page.getByRole("heading", { name: "Board", exact: true })).toBeVisible();
 
-  // The project is created by the form under test, not by the helper.
+  // The project is created by the form under test, not by the helper. The form's default type
+  // is the catalogue's first, `architecture`, and a card on an architecture-governed board is
+  // refused without a trace link to an approved requirement (v1-w2c-6) — which this round-trip
+  // is not about. State the type explicitly, as the helper's fixtures do.
   await page.getByLabel("Project title").fill(projectTitle);
+  await page.getByLabel("Project type").selectOption("delivery");
   await page.getByRole("button", { name: "Create project" }).click();
 
   // The index is a keyset page. This title derives an early key, but a long-lived dev

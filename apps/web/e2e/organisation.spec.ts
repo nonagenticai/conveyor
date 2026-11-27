@@ -1,6 +1,12 @@
 import { expect, test, type APIRequestContext } from "./fixture";
 
-import { authFor, createBoardCard, invoke } from "./helpers";
+import {
+  answerWaiverPrompt,
+  authFor,
+  createBoardCard,
+  FIXTURE_EVIDENCE_WAIVER,
+  invoke,
+} from "./helpers";
 
 // #563 T18-2 — Organisation and Jobs: the tenant's positions, the catalogue and release, the
 // binding, and the server's own refusals. The fixtures go through the real actions; no screen
@@ -121,6 +127,9 @@ test("a self-approval is refused", async ({ page, request }) => {
   const title = unique("e2e self-gate");
   const fixture = await createBoardCard(request, title);
 
+  // SPEC_V2 §5.4: the gate refuses to open with no typed evidence. The fixture's subject is the
+  // gate's self-approval rule, not a document, so the console's bridge records the waiver reason.
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
   await page.goto(`/board/${fixture.boardId}`);
   const card = page.locator(".card", { hasText: title });
   await expect(card).toBeVisible();

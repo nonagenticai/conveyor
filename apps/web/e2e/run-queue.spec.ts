@@ -31,7 +31,10 @@ test("the queue shows a run this test created, filtered by its state", async ({ 
   await filter.selectOption("cancelled");
   await expect(filter).toHaveValue("cancelled");
 
-  const row = page.locator(".row-card", { hasText: run.id.slice(0, 8) });
+  // The row prints the run's full id in its `.adv` cell, so match on all of it: an 8-char
+  // prefix is shared by every run created in the same millisecond window and resolves to
+  // several rows (strict-mode violation, measured 2026-11-27).
+  const row = page.locator(".row-card", { hasText: run.id });
   await expect(row).toBeVisible();
   await expect(row.locator(".pill")).toHaveText("cancelled");
   await expect(page.locator(".problem")).toHaveCount(0);

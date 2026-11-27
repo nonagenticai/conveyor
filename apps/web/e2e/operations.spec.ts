@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { invoke } from "./helpers";
+import { answerWaiverPrompt, FIXTURE_EVIDENCE_WAIVER, invoke } from "./helpers";
 
 // T18-4 (#565) P3.1 — Operations. A destructive write without an approved gate must change
 // nothing: the console asks the tenant's policy, requests a gate naming the exact target, and
@@ -42,6 +42,10 @@ function notice(page: Page) {
 
 test("a destructive write needs the approvals", async ({ page, request }) => {
   await setPolicy(request, "ops.flag_flip", "required", "forbidden");
+  // SPEC_V2 §5.4: a destructive gate refuses to open with no typed evidence. This fixture's
+  // subject is the gate, not a document, so the console's bridge records the explicit waiver
+  // reason and the gate opens — the write is still blocked behind it.
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
   const before = (await pendingGates(request)).filter((gate) => gate.gate === "ops.flag_flip");
 
   await page.goto("/operations");

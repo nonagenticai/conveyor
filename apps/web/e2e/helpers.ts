@@ -139,6 +139,65 @@ export async function decideAsReviewer(
   );
 }
 
+/** The ids of the tenant's pending gates, as a snapshot to diff against. */
+export async function pendingGateIds(request: APIRequestContext): Promise<Set<string>> {
+  return new Set((await pendingGates(request)).map((gate) => gate.id));
+}
+
+/** The one gate that appeared since `before`. Matching the DIFFERENCE, not just the name,
+ * keeps a suite that carries other fixtures' gates from deciding the wrong one. */
+export async function newGate(
+  request: APIRequestContext,
+  before: Set<string>,
+  gate: string,
+  kind: string,
+): Promise<PendingGate> {
+  const opened = (await pendingGates(request)).find(
+    (row) => !before.has(row.id) && row.gate === gate && row.kind === kind,
+  );
+  if (!opened) {
+    throw new Error(`no new ${kind} gate on ${gate} is pending`);
+  }
+  return opened;
+}
+
+/**
+ * Activate a job so its release may publish and a binding may pin it.
+ *
+ * A job is born a draft (v1-w1a-4), and the store refuses to publish a release or bind a draft
+ * with `409 job_not_live`. `job_catalogue.update {status: "active"}` is what asks for the
+ * activation; its effect is a `job_activation` gate a second principal decides.
+ */
+export async function activateJob(
+  request: APIRequestContext,
+  jobId: string,
+  version = 1,
+): Promise<void> {
+  const before = await pendingGateIds(request);
+  await invoke(request, "job_catalogue.update", { id: jobId, version, status: "active" });
+  const activation = await newGate(request, before, "job_catalogue.update", "job_activation");
+  await decideAsReviewer(request, "approvals.decide", activation.id);
+}
+
+/**
+ * Create a job binding and activate it.
+ *
+ * A binding is never born live (v1-p44-2): `job_bindings.create` writes it `draft` and opens its
+ * own `job_binding` activation gate, and a run that pins a draft binding is refused
+ * `409 job_binding_stale` — the same code a genuinely stale release gets, so a fixture that
+ * skips this step would pass a stale-pin assertion for the wrong reason.
+ */
+export async function createActiveBinding<T>(
+  request: APIRequestContext,
+  input: Record<string, unknown>,
+): Promise<T> {
+  const before = await pendingGateIds(request);
+  const created = await invoke<T>(request, "job_bindings.create", input);
+  const gate = await newGate(request, before, "job_bindings.create", "job_binding");
+  await decideAsReviewer(request, "approvals.decide", gate.id);
+  return created;
+}
+
 /**
  * Fixture path: request a gate for `action`, have a distinct approver decide it, then invoke
  * with its id.
@@ -181,6 +240,7 @@ export async function approvedInvoke<T = unknown>(
 export type PendingGate = {
   id: string;
   gate: string;
+  kind?: string;
   status: string;
   target?: string;
 };

@@ -65,8 +65,19 @@ test("an empty filter and an empty host registry say so", async ({ page }) => {
   await page.goto("/settings/admin");
   await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
 
-  // Empty state: the S12 gate starts `serve` only, so no worker can move a job to the
-  // terminal `dead` state; the filter must render its own empty line, never a bare table.
+  // The filter's own empty line, never a bare table. The read is emptied at the seam because
+  // this workflow is not empty: web.yml starts `conveyor worker`, the seed's maintenance
+  // schedules queue `memory.consolidate`, and with no `strata_rag` credential here it exhausts
+  // its attempts and reaches the terminal `dead` state (measured: 10 dead rows before this
+  // spec runs). The property under test is the screen's — an empty page renders its empty
+  // line — so the page is the thing injected, exactly as the audit read is for the error panel.
+  await page.route("**/api/actions/jobs.list/invocations", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ output: { items: [], next_cursor: null } }),
+    }),
+  );
   await page.getByRole("button", { name: "Jobs", exact: true }).click();
   const status = page.getByLabel("Status");
   await expect(status).toBeVisible();
@@ -74,7 +85,8 @@ test("an empty filter and an empty host registry say so", async ({ page }) => {
   await expect(page.getByText("No job matches this filter.")).toBeVisible();
   await expect(page.locator("table.table tbody tr")).toHaveCount(0);
 
-  // The workers panel's host registry is a second, independently empty read.
+  // The workers panel's host registry is a second, independently empty read — this one real:
+  // nothing in this suite registers a host (`host_registry` holds no row).
   await page.getByRole("button", { name: "Workers", exact: true }).click();
   await expect(page.getByText("No hosts are registered.")).toBeVisible();
   await expect(page.locator(".problem")).toHaveCount(0);

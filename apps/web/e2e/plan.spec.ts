@@ -12,7 +12,11 @@ function unique(prefix: string): string {
 }
 
 test("a change needs a rationale", async ({ page, request }) => {
-  const project = await createBoardCard(request, unique("e2e plan project"));
+  // The project's title is also the FILTER: a run leaves its project behind for the next one,
+  // the table sorts by key, and a fixed prefix's `.first()` would open an older run's project
+  // and assert its empty WBS (measured on a database with two runs).
+  const projectTitle = unique("e2e plan project");
+  const project = await createBoardCard(request, projectTitle);
   const wbsTitle = unique("e2e wbs");
   await invoke(request, "wbs.create", {
     project_id: project.projectId,
@@ -24,13 +28,19 @@ test("a change needs a rationale", async ({ page, request }) => {
     project_id: project.projectId,
     kind: "risk",
     title: registerTitle,
+    // §8.4: a managed risk is probability, impact, owner, review date and at least one link.
+    probability: "medium",
+    impact: 2,
+    review_at: "2027-01-15",
+    meta: { owner: "delivery lead" },
+    links: { cards: [project.card.id], requirements: [], decisions: [] },
   });
   await invoke(request, "baselines.take", { project_id: project.projectId });
 
   await page.goto("/plan");
   const row = page
     .locator('[data-testid="plan-projects"] tr')
-    .filter({ hasText: "e2e plan project" })
+    .filter({ hasText: projectTitle })
     .first();
   await expect(row).toBeVisible();
   await row.getByRole("button", { name: "Open" }).click();
