@@ -24,7 +24,7 @@ MODEL = ROOT / "docs/spec/lean/DeliveryModel.lean"
 
 @dataclass(frozen=True)
 class Unit:
-    """One observation, exactly the eight fields of `UnitObs`."""
+    """One observation, exactly the nine fields of `UnitObs`."""
 
     issue: str | None = "closed"
     branches: int | None = 1
@@ -34,6 +34,7 @@ class Unit:
     ci: int | None = 2
     closes: bool | None = True
     verify: bool | None = True
+    unit: bool | None = True
 
 
 def opt(value, render) -> str:
@@ -59,6 +60,8 @@ def lean_unit(unit: Unit) -> str:
         + opt(unit.closes, lambda v: "true" if v else "false")
         + ", verifyParts := "
         + opt(unit.verify, lambda v: "true" if v else "false")
+        + ", unit := "
+        + opt(unit.unit, lambda v: "true" if v else "false")
         + " }"
     )
 
@@ -90,7 +93,7 @@ def closes_stated(unit: Unit) -> bool:
 
 
 def parts_verified(unit: Unit) -> bool:
-    return unit.verify is True
+    return unit.unit is False or unit.verify is True
 
 
 RULES = [
@@ -156,6 +159,7 @@ NEGATIVES = {
     "negative_unknown_branches": {"branches": None},
     "negative_no_closes": {"closes": False},
     "negative_missing_verify": {"verify": False},
+    "negative_unknown_unit": {"unit": None, "verify": False},
 }
 
 

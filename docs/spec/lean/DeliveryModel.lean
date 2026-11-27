@@ -134,6 +134,10 @@ structure UnitObs where
   closesKeyword : Option Bool
   -- every `### P` part of the issue body carries a `Verify:` line
   verifyParts : Option Bool
+  -- the issue carries the `unit` label. The issue-content contract is scoped to `unit`
+  -- deliverables (03-DELIVERY § Issue content contract), so `verifyParts` is vacuous for a
+  -- non-unit issue; an unreadable issue (`none`) still fails closed.
+  unit : Option Bool
   deriving DecidableEq, BEq, Repr
 
 def oneBranch (o : UnitObs) : Bool :=
@@ -166,7 +170,7 @@ def closesStated (o : UnitObs) : Bool :=
   o.closesKeyword == some true
 
 def partsVerified (o : UnitObs) : Bool :=
-  o.verifyParts == some true
+  o.unit == some false || o.verifyParts == some true
 
 def checkObs (o : UnitObs) : Bool :=
   oneBranch o && onePull o && pullUsable o && ciBudget o && mergeComplete o &&
@@ -194,7 +198,7 @@ theorem merge_complete_implies (o : UnitObs) (h : mergeComplete o = true)
     (hm : o.pull = some .merged) :
     o.issue = some .closed ∧ o.branchDeleted = some true := by
   cases o with
-  | mk issue branches branchDeleted pulls pull ciRuns closesKeyword verifyParts =>
+  | mk issue branches branchDeleted pulls pull ciRuns closesKeyword verifyParts unit =>
     cases hm
     cases issue with
     | none => simp [mergeComplete] at h

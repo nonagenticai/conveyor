@@ -239,7 +239,7 @@ fn a_kind_and_a_theorem_name_must_be_known() {
 fn the_model_digest_is_pinned() {
     assert_eq!(
         render::model_sha256(),
-        "bbbc56e12e729e6daea3b244d29038819fb5802d187dfbc2a14a0a050a138e57",
+        "f6020faea6420ed1db57f7fc4a367622bb38616b18cda791751df8e709ff5e35",
         "the embedded model changed; every future certificate carries the new bytes"
     );
 }
@@ -257,6 +257,7 @@ fn unit(key: &str, issue: Value, branch_deleted: Value, pull: &str, ci_runs: u64
         "ciRuns": ci_runs,
         "closesKeyword": true,
         "verifyParts": true,
+        "unit": true,
     })
 }
 
@@ -282,9 +283,9 @@ fn a_unit_ledger_renders_its_observations_and_rules() {
     assert!(source.starts_with(render::MODEL_SOURCE), "{source}");
     let expected = "\
 def facts : List UnitObs := [
-  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 2, closesKeyword := some true, verifyParts := some true },
-  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 1, closesKeyword := some true, verifyParts := some true },
-  { issue := none, branches := some 1, branchDeleted := none, pulls := some 1, pull := some .ready, ciRuns := some 1, closesKeyword := some true, verifyParts := some true }
+  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 2, closesKeyword := some true, verifyParts := some true, unit := some true },
+  { issue := some .closed, branches := some 1, branchDeleted := some true, pulls := some 1, pull := some .merged, ciRuns := some 1, closesKeyword := some true, verifyParts := some true, unit := some true },
+  { issue := none, branches := some 1, branchDeleted := none, pulls := some 1, pull := some .ready, ciRuns := some 1, closesKeyword := some true, verifyParts := some true, unit := some true }
 ]
 
 theorem ledger_rules : ruleResults facts = [(\"oneBranch\", true), (\"onePull\", true), (\"pullUsable\", true), (\"ciBudget\", true), (\"mergeComplete\", true), (\"closesKeyword\", true), (\"verifyParts\", true)] := by decide
@@ -325,6 +326,52 @@ fn an_unknown_fact_fails_closed() {
     assert!(
         source.contains("closesKeyword := none"),
         "the unknown travels as none: {source}"
+    );
+}
+
+/// A non-unit issue is outside the issue-content contract: `verifyParts` is vacuous there, so a
+/// missing `Verify:` line cannot fail the rule.
+#[test]
+fn a_non_unit_issue_does_not_need_verify_parts() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][0]["unit"] = json!(false);
+    facts["units"][0]["verifyParts"] = json!(false);
+    let source = render::render(&facts, "ledger").expect("a non-unit ledger renders");
+    assert!(source.contains("unit := some false"), "{source}");
+    assert!(source.contains("verifyParts := some false"), "{source}");
+    assert!(
+        source.contains(
+            "[(\"oneBranch\", true), (\"onePull\", true), (\"pullUsable\", true), \
+             (\"ciBudget\", true), (\"mergeComplete\", true), (\"closesKeyword\", true), \
+             (\"verifyParts\", true)]"
+        ),
+        "verifyParts is vacuously true for a non-unit issue: {source}"
+    );
+}
+
+/// The vacuous route is only for `some false`: an unreadable issue (`none`) still fails closed.
+#[test]
+fn an_unknown_unit_fact_fails_closed() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][0]["unit"] = Value::Null;
+    facts["units"][0]["verifyParts"] = json!(false);
+    let source = render::render(&facts, "bad").expect("an unknown unit still renders");
+    assert!(source.contains("unit := none"), "{source}");
+    assert!(source.contains("(\"verifyParts\", false)"), "{source}");
+}
+
+/// The document must carry the fact: absence is a refusal, never a default.
+#[test]
+fn a_missing_unit_fact_is_refused() {
+    let mut facts = unit_ledger_facts();
+    facts["units"][1]
+        .as_object_mut()
+        .expect("a unit object")
+        .remove("unit");
+    let error = render::render(&facts, "ledger").expect_err("a missing unit fact");
+    assert_eq!(
+        error,
+        RenderError::NotA("units[1].unit is missing".to_owned())
     );
 }
 
