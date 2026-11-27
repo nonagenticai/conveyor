@@ -1004,18 +1004,7 @@ class Runner:
             # earlier run created is named here (measured on S07/S09, tr4 repair 2026-11-26:
             # project-registers and change-control stayed refused on the empty code).
             for row in changes:
-                if str(row.get("code") or "").strip():
-                    continue
-                self.invoke(
-                    "registers.update",
-                    {
-                        "id": str(row["id"]),
-                        "code": f"CH-{self.project}-{str(row['id'])[-6:]}",
-                    },
-                    read_action="registers.get",
-                    read_input={"id": str(row["id"])},
-                    if_match=int(row.get("version") or 1),
-                )
+                self.name_change(str(row["id"]))
         else:
             baseline = None
             for row in self._read(
@@ -1043,6 +1032,7 @@ class Runner:
                 read_action="registers.get",
                 read_id_from_output="change_id",
             )
+            self.name_change(str(change["change_id"]))
             self.decide(
                 change["approval_id"],
                 "approve the change that records the retrospective rework",
@@ -1840,6 +1830,27 @@ class Runner:
             )
         print(f"  {category} output: body corrected and republished")
 
+    def name_change(self, change_id: str) -> None:
+        """Name a change row with the code the standard's composer requires.
+
+        `changes.request` writes an empty code by design (a change row is a register row,
+        and the composer refuses an empty code: EMPTY_REGISTER_CODE). The factory names a
+        change as soon as it creates or finds it, so a first run can close without
+        depending on a second pass.
+        """
+        change_id = str(change_id)
+        row = self._read("registers.get", {"id": change_id})
+        output = row.get("output") if isinstance(row.get("output"), dict) else row
+        if str(output.get("code") or "").strip():
+            return
+        self.invoke(
+            "registers.update",
+            {"id": change_id, "code": f"CH-{self.project}-{change_id[-6:]}"},
+            read_action="registers.get",
+            read_input={"id": change_id},
+            if_match=int(output.get("version") or 1),
+        )
+
     def ensure_change(self) -> str | None:
         """The approved change a post-baseline acceptance needs (v1-p5-4, v1-change-1).
 
@@ -1878,18 +1889,7 @@ class Runner:
         # before the gate decides. Measured on S07/S09, tr4 batch 2026-11-26: `project-registers`
         # and `change-control` were refused on the empty code and the close then refused the two
         # missing mandatory documents.
-        change_row = self._read("registers.get", {"id": str(change["change_id"])})
-        row_output = change_row.get("output") if isinstance(change_row.get("output"), dict) else change_row
-        self.invoke(
-            "registers.update",
-            {
-                "id": str(change["change_id"]),
-                "code": f"CH-{self.project}-{str(change['change_id'])[-6:]}",
-            },
-            read_action="registers.get",
-            read_input={"id": str(change["change_id"])},
-            if_match=int(row_output.get("version") or 1),
-        )
+        self.name_change(str(change["change_id"]))
         self.decide(change["approval_id"], "approve the change that authorises the acceptance")
         return str(change["change_id"])
 

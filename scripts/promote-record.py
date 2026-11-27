@@ -1643,9 +1643,16 @@ def load_state(
             raise PromoteError("no input names a programme_id; --apply needs one")
         programme_id = next(iter(programme_ids))
     state = State()
-    state.registers.extend(
-        page_items(client.invoke("registers.list", {"programme_id": programme_id}))
-    )
+    # The deployed image's `registers.list` takes a project_id only; the programme-level
+    # register read is a lane capability. Without it the skip test simply has no
+    # programme-scoped rows to match, and the per-project reads below still cover every
+    # project-scoped register.
+    try:
+        state.registers.extend(
+            page_items(client.invoke("registers.list", {"programme_id": programme_id}))
+        )
+    except PromoteError:
+        pass
     state.benefits.extend(
         page_items(client.invoke("benefits.list", {"programme_id": programme_id}))
     )
@@ -1742,9 +1749,14 @@ def load_state(
         and entry.key.kind == "review"
     }
     for contract_id in sorted(review_contracts):
-        state.compliance_reviews[contract_id] = list_all(
-            client, "architecture.reviews_list", {"contract_id": contract_id}
-        )
+        # The deployed image serves no compliance-review list; the skip test then has no
+        # rows to match and each record's read-back reports the same gap honestly.
+        try:
+            state.compliance_reviews[contract_id] = list_all(
+                client, "architecture.reviews_list", {"contract_id": contract_id}
+            )
+        except PromoteError:
+            state.compliance_reviews[contract_id] = []
     for card_id in sorted(card_gate_cards):
         state.card_gates[card_id] = list_all(
             client, "approvals.list", {"card_id": card_id}
