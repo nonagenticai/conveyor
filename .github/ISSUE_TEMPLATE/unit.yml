@@ -1,0 +1,171 @@
+# The structured unit form (#780 P1). It mirrors `.github/ISSUE_TEMPLATE/unit.md` — the reference
+# copy — field for field, and makes the contract's sections required, so an empty body can no
+# longer be created. Every field renders as `### <label>`; `scripts/ci/board.py` reads both `##`
+# and `###` headings, and the `issue-dor` workflow posts the gaps on the issue.
+name: Unit of work
+description: One deliverable, one branch `issue/<n>-<slug>`, exactly one PR
+title: "[unit] "
+labels: ["unit"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Choose exactly one state label after creating: `status:ready`, `status:blocked` or
+        `status:needs-human` — the form deliberately does not default to ready. The contract is
+        `docs/plans/03-DELIVERY.md` § "Issue content contract".
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One sentence — the outcome that is true after this lands that is not true now.
+      placeholder: "A delivery unit is a row a session can find and resume."
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: Plan / audit source
+      description: Links only — never paste plan prose.
+      placeholder: "`docs/plans/slices/S##-*.md` §… · its `00-INDEX.md` row"
+    validations:
+      required: true
+
+  - type: textarea
+    id: programme
+    attributes:
+      label: Programme
+      description: Every value names a live row or document, or `pending #N`. An empty or `—` value is refused.
+      value: |
+        | Field | Value |
+        |---|---|
+        | Tranche | |
+        | Brief | |
+        | ADM phase/plateau | |
+        | Benefits | |
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Every path resolves at the ref in the last column when the issue is created.
+      value: |
+        | Kind | Reference | Resolves at |
+        |---|---|---|
+        | Spec | `docs/SPEC_V2.md` §… | main@<sha> |
+        | Code | `path:symbol` | main@<sha> |
+        | Test | `path::name` | main@<sha> / to create |
+    validations:
+      required: true
+
+  - type: textarea
+    id: baseline
+    attributes:
+      label: Baseline
+      description: The ref every reference resolves at, and the measured date.
+      value: |
+        - Code: `main@<sha>`, measured <YYYY-MM-DD>
+        - Docs: plan blob `<sha>` (`git rev-parse <ref>:<path>`)
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_state
+    attributes:
+      label: Current state (measured)
+      description: What is true today, part by part, each row naming its evidence.
+      value: |
+        | Part | State | Evidence |
+        |---|---|---|
+        | P1 <name> | ABSENT / PARTIAL / DONE | `<command>` → <result> |
+    validations:
+      required: true
+
+  # The id is load-bearing (`#780` P1.2): the form's Verify scenarios live in this field.
+  - type: textarea
+    id: verify
+    attributes:
+      label: Parts and acceptance criteria
+      description: One subsection per part. Every part needs at least one `Verify:` line.
+      value: |
+        ### P1 — <part name>
+        Requirement: <one sentence.>
+
+        - **P1.1** Given <state>, when <action>, then <observable outcome>.
+          Verify: `<command>` or `path::test` (exists | to create at `path`)
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Blockers are issues, never pull requests. Only `blocked-by` sets `status:blocked`.
+      value: |
+        | Relation | Issue | Why (source) | State |
+        |---|---|---|---|
+        | blocked-by | #N | <quoted precondition> | open |
+        | blocks | #N | <what this unblocks> | open |
+        | related | #N | <no ordering> | — |
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition_of_ready
+    attributes:
+      label: Definition of ready
+      description: Tick each item before the issue is claimable.
+      value: |
+        - [ ] Baseline named and the plan/audit blob shas recorded.
+        - [ ] Every spec/plan/code/test reference resolves at its ref; every `#N` resolves.
+        - [ ] Every part has ≥1 scenario with a `Verify:` command or test target.
+        - [ ] Dependencies complete, typed and cited.
+        - [ ] One-PR scope, file-disjoint from other ready issues or explicitly sequenced.
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition_of_done
+    attributes:
+      label: Definition of done
+      description: What the closing PR must show.
+      value: |
+        - [ ] Every scenario passes at the PR head; `Evidence at completion` has one row per scenario.
+        - [ ] Repo gate green at the exact head (`preflight.yml`, then the PR's `ci-public`).
+        - [ ] Tests added/updated per part; none skipped.
+        - [ ] One PR `Closes #N` merged; issue closed; branch deleted.
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+      description: What this deliberately does not do.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment prerequisite
+      description: Does the unit need a deployed image or cluster surface before it can close?
+      options:
+        - "No"
+        - "Yes — name the issue it waits on"
+    validations:
+      required: true
+
+  - type: textarea
+    id: open_questions
+    attributes:
+      label: Open questions
+      description: Question, owner and the default taken if nobody answers. Optional.
+      value: |
+        | # | Question | Owner | Default |
+        |---|---|---|---|
+    validations:
+      required: false

@@ -18,7 +18,7 @@ git fetch origin --prune
 git ls-remote --heads origin | sed 's#refs/heads/##' | awk '{print $2}' | sort
 
 gh issue list --state open --label unit --limit 200 \
-  --json number,title,labels,closedByPullRequestsReferences
+  --json number,title,labels,closedByPullRequestsReferences,parent
 
 gh pr list --state all --limit 100 \
   --json number,state,isDraft,headRefName,title,body,closedAt
@@ -61,6 +61,9 @@ Then the **drift** set — a row here is a lie the next session would act on:
 9. **abandoned-claim** — `status:claimed` with a live branch, but no push to that branch and no
    issue comment for 48 hours. The claim is adoptable (see `issue-pickup`); a status comment resets
    the clock, so waiting on CI or a blocker is not abandonment.
+10. **unit-without-parent** — a `unit` issue whose `parent` is absent, or names an issue that is
+    not the single open `programme` issue. Native sub-issues are the rollup (#780 P3); a unit
+    parented to a guess is worse than one reported, so the sweep names it and changes nothing.
 
 For 9, compare the branch's last commit time (`git log -1 --format=%cI origin/<branch>`) with the
 issue's last comment time (`gh issue view <N> --json comments --jq '.comments[-1].createdAt'`);

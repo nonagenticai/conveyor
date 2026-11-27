@@ -1,0 +1,54 @@
+name: issue-dor
+
+# The Definition of ready, on the event that changes the body (#780 P2). A unit issue is checked
+# the moment it is opened or edited, so a malformed body is named in one comment instead of
+# waiting for the hourly board sweep or a session's pickup gate. The check itself is
+# `scripts/ci/board.py --contract`, the same instrument `--dor` uses; this file only supplies the
+# event, the token and the one place the verdict is written.
+#
+# A verdict of "not ready" is carried by the `status:not-ready` label and the marked comment, so
+# the run stays green; an instrument failure (exit 2) fails the run, because a check that could
+# not see its subject must never read as a pass.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue-dor-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: Check the issue content contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # The one write is scoped to the job that needs it: zizmor's excessive-permissions audit
+    # fails a workflow-level `issues: write` (the same rule board.yml follows).
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check
+        # Inputs and context go through env, never interpolated into the script.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set +e
+          python3 scripts/ci/board.py --repo "$REPO" --contract "$NUMBER" --apply
+          rc=$?
+          # 0 = contract complete, 1 = gaps (the label and comment carry the verdict).
+          # 2 = the instrument is broken; that must not read as a pass.
+          if [ "$rc" -eq 2 ]; then
+            exit 2
+          fi
+          exit 0

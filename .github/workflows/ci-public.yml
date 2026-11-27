@@ -477,6 +477,12 @@ jobs:
         if: matrix.shard == 1
         run: bash scripts/ci/tests/board.sh
 
+      # The same no-network rule for the issue content contract (#780 P2); the live half is the
+      # `issue-dor` workflow's run on the issue itself.
+      - name: issue content contract fixtures
+        if: matrix.shard == 1
+        run: bash scripts/ci/tests/issue_dor.sh
+
       - name: cargo fmt
         if: matrix.shard == 1
         run: cargo fmt --all -- --check
