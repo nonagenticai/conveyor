@@ -182,7 +182,9 @@ async fn gate_fixture(db: &common::TestDb) -> Gate {
             process_id: None,
             capability_agent_id: Some(agent),
             capability_id: None,
-            meta: json!({}),
+            // #526 / D45: a binding on the internal-agent executor must declare its spend
+            // ceiling, or `runs.create` refuses it before the run row.
+            meta: json!({"limits": {"cost_budget_usd": 5.0}}),
             status: BindingStatus::Active,
         },
         &Registry::builtin(),
