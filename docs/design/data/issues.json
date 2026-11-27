@@ -1,11 +1,32 @@
 {
   "issues": [
     {
+      "number": 888,
+      "title": "walk: the post-freeze destinations \u2014 feedback, knowledge sources/memory, measure \u2014 and the census re-freeze",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/888",
+      "updatedAt": "2026-11-27T22:08:30Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
       "number": 886,
       "title": "walk: reconcile the project record to the delivered S1\u2013S3 (WBS, PI, parity matrix)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/886",
-      "updatedAt": "2026-11-27T21:48:47Z",
+      "updatedAt": "2026-11-27T22:07:54Z",
       "labels": [
         {
           "name": "unit",
@@ -705,15 +726,15 @@
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/817",
-      "updatedAt": "2026-11-27T21:31:38Z",
+      "updatedAt": "2026-11-27T22:06:15Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:blocked",
+          "color": "D93F0B"
         },
         {
           "name": "GEMBA-WALK",
