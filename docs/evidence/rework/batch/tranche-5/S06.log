@@ -1,124 +1,59 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S06 --content docs/evidence/rework/tranche-5/rework-content-S06.json --tranche-label tranche 5 --demo-cadence 01a216d1-1976-7be8-b1a6-e85e9aeeea16 --keep-active
 
   reopen: not needed
-  01 projects.charter ok
-  02 approvals.decide ok
+  charter: already approved
   closure outputs: not applicable (the project stays active)
-  03 architecture.contracts_request ok
-  04 architecture.board_decide ok
-  05 architecture.contracts_approve ok
-  06 documents.compose ok
-  07 documents.publish ok
-  08 architecture.artifacts_create ok
-  09 architecture.artifacts_approve ok
-  10 documents.compose ok
-  11 documents.publish ok
-  12 architecture.artifacts_create ok
-  13 architecture.artifacts_approve ok
-  14 documents.compose ok
-  15 documents.publish ok
-  16 architecture.artifacts_create ok
-  17 architecture.artifacts_approve ok
-  18 documents.compose ok
-  19 documents.publish ok
-  20 architecture.artifacts_create ok
-  21 architecture.artifacts_approve ok
-  22 documents.compose ok
-  23 documents.publish ok
-  24 architecture.artifacts_create ok
-  25 architecture.artifacts_approve ok
-  26 documents.compose ok
-  27 documents.publish ok
-  28 architecture.artifacts_create ok
-  29 architecture.artifacts_approve ok
-  30 documents.compose ok
-  31 documents.publish ok
-  32 architecture.artifacts_create ok
-  33 architecture.artifacts_approve ok
-  34 architecture.artifacts_link ok
-  35 architecture.artifacts_link ok
-  36 architecture.artifacts_link ok
-  37 architecture.artifacts_link ok
-  38 architecture.artifacts_link ok
-  39 architecture.artifacts_link ok
-  40 architecture.artifacts_link ok
-  41 architecture.artifacts_link ok
-  42 documents.compose ok
-  43 documents.publish ok
-  document architecture-artifact: published
-  44 architecture.contracts_request ok
-  45 architecture.board_decide ok
-  46 architecture.contracts_approve ok
-  47 registers.create ok
-  48 registers.create ok
-  49 registers.create ok
-  50 registers.create ok
-  51 registers.create ok
-  52 registers.create ok
-  53 registers.create ok
-  54 registers.create ok
-  55 registers.create ok
-  56 registers.create ok
-  57 registers.create ok
-  58 registers.create ok
+  SoAW: already live
+  artefact: Stakeholder Map — S06 Control Plane (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S06 Control Plane (Phase A) already present
+  artefact: Requirements Catalog — S06 Control Plane (Phase A) already present
+  artefact: Solution Concept Diagram — S06 Control Plane (Phase A) already present
+  artefact: Business Capability Map — S06 Control Plane (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S06 Control Plane (Phase C) already present
+  artefact: Technology Standards Catalog — S06 Control Plane (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The seven gate properties have no recorded run, so the built claim is unproven already present
+  register risk: Issue #4 leaves a shared decision boundary and the Telegram sender identity unresolved already present
+  register issue: The record claims built but carries no Phase-G compliance review or acceptance run already present
+  register issue: Issue #604 closed with the multicast approval test timing out at 10 s under full-suite load already present
+  register assumption: The 2026-11-27 rework snapshot is the authoritative record for S06 already present
+  register assumption: The S03, S04, S05 and S02 primitives exist as the plan declares them already present
+  register assumption: Telegram is the first channel and the signed mcp transport belongs to S06a already present
+  register dependency: S06 is blocked by S03, S04 and S05 already present
+  register dependency: S06 blocks S06a, S07, S10 and S12; the signed channel and the UI are not built here already present
+  register benefit: One claim statement and a monotonic fence replace competing claim paths already present
+  register benefit: Eleven fr timers become one idempotent job runner and three timers are deleted already present
+  register benefit: The close decision is decidable from the acceptance instrument's property set already present
   benefit transitions: none in the content
-  59 projects.baseline ok
-  60 projects.baseline ok
-  61 approvals.decide ok
-  62 projects.baseline ok
-  63 approvals.decide ok
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
   closure-review output: not applicable (the project stays active)
-  64 documents.compose ok
-  65 documents.publish ok
-  66 documents.publish ok
-  67 documents.update ok
-  68 documents.publish ok
-  evidence output: body corrected and republished
-  69 architecture.reviews_record ok
-  70 wbs.update ok
-  71 cadences.credit_demo ok
-  72 approvals.decide ok
-  73 changes.request ok
-  74 approvals.decide ok
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  09 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  10 registers.update ok
   record fixes: none in the content
-  75 approvals.request ok
-  76 approvals.decide ok
-  77 cards.comment ok
-  78 cards.move ok
-  79 cards.move ok
-  card cleared: closure_outputs_undeclared:tranche-5
-  80 approvals.request ok
-  81 approvals.decide ok
-  82 cards.comment ok
-  83 cards.move ok
-  84 cards.move ok
-  card cleared: unpublished_declared_output:tranche-5
-  85 approvals.request ok
-  86 approvals.decide ok
-  87 cards.comment ok
-  88 cards.move ok
-  89 cards.move ok
-  card cleared: contract_missing:tranche-5
-  90 approvals.request ok
-  91 approvals.decide ok
-  92 cards.comment ok
-  93 cards.move ok
-  94 cards.move ok
-  card cleared: wbs_absent:tranche-5
-  95 approvals.request ok
-  96 approvals.decide ok
-  97 cards.comment ok
-  98 cards.move ok
-  99 cards.move ok
-  card cleared: std-togaf-architecture-artifact-s06:S06
-  card discharge: 5 card(s) cleared of 293 open package(s)
+  card discharge: no open rework card owned by the project
   closure: not applicable (the project stays active)
-S06: 99 acts recorded
+S06: 10 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S06 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06-snap-8uppgpkl/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06-snap-8uppgpkl/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-5/S06-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S06 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06-snap-i0cxdt5s/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06-snap-i0cxdt5s/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-5/S06-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",
@@ -126,42 +61,18 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "S06",
       "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "compliance-review",
-      "document_id": "01a21a3a-1d12-749f-b9c6-5627950d6380",
-      "natural_key": "artefact:S06:compliance-review:7d327d4c3718deee",
-      "body_sha256": "7d327d4c3718deee96f22be887ac1853ef06bd3762ae385d01ae550b1eb0f2c2"
+      "category": "change-control",
+      "document_id": "01a21a3b-6a46-73d9-99db-cf7c5de6b05b",
+      "natural_key": "artefact:S06:change-control:ac5864b26d85a850",
+      "body_sha256": "ac5864b26d85a85030763df3be8ae98d2adff284a33d5cf58cf5e2520f342c31"
     },
     {
       "project_key": "S06",
       "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "delivery-contract",
-      "document_id": "01a21a3a-1ea5-70ea-b4d0-da7d1d4deb84",
-      "natural_key": "artefact:S06:delivery-contract:e10558ac876369ad",
-      "body_sha256": "e10558ac876369adc5dd8b5320269d885528d8b924223af9c309694283bb473e"
-    },
-    {
-      "project_key": "S06",
-      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "project-baseline",
-      "document_id": "01a21a3a-2023-7323-bcde-ee65d125474f",
-      "natural_key": "artefact:S06:project-baseline:fdf25d8157b86aa4",
-      "body_sha256": "fdf25d8157b86aa4c53d74ec568b5b0162a2de8820f04831253d35c246c082be"
-    },
-    {
-      "project_key": "S06",
-      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "project-wbs",
-      "document_id": "01a21a3a-21b3-70e7-967c-2a580ed26f92",
-      "natural_key": "artefact:S06:project-wbs:2f543184c8dbc020",
-      "body_sha256": "2f543184c8dbc02026c4dfb21b09ddf62272d2915d3f25a1e80388f539652ad9"
-    },
-    {
-      "project_key": "S06",
-      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "statement-of-architecture-work",
-      "document_id": "01a21a3a-233a-77b1-a0c2-d926ba2c3d05",
-      "natural_key": "artefact:S06:statement-of-architecture-work:12d25d571a3881ec",
-      "body_sha256": "12d25d571a3881ec05ffe121576f012f6fc9dacea5e94465e91917a647bd67fa"
+      "category": "project-registers",
+      "document_id": "01a21a3b-6c16-7356-8b79-6e1ce949936e",
+      "natural_key": "artefact:S06:project-registers:ceb7601fd1f4cdf7",
+      "body_sha256": "ceb7601fd1f4cdf7a9af55e3daa54966a85c4a1b5c078f50e334389674230bce"
     }
   ],
   "skipped": [
@@ -176,10 +87,50 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "S06",
       "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
       "category": "project-brief",
       "mandatory": true,
       "trigger": null,
       "state": "stale"
+    },
+    {
+      "project_key": "S06",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
     }
   ],
   "refused": [
@@ -210,30 +161,6 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "S06",
       "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "change-control",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_REGISTER_CODE",
-        "message": "required heading 'Change requests' resolves a register row with an empty code"
-      }
-    },
-    {
-      "project_key": "S06",
-      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
-      "category": "project-registers",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_REGISTER_CODE",
-        "message": "required heading 'Changes' resolves a register row with an empty code"
-      }
-    },
-    {
-      "project_key": "S06",
-      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
       "category": "statement-of-intent",
       "mandatory": false,
       "trigger": null,
@@ -257,8 +184,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     }
   ],
   "counts": {
-    "due": 11,
-    "present": 0,
+    "due": 6,
+    "present": 5,
     "missing-edge": 0,
     "stale": 2,
     "ambiguous": 0
