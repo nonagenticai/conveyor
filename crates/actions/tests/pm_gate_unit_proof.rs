@@ -176,9 +176,9 @@ async fn change_judging_surface_toggles_required_but_never_repins() {
     .await
     .expect("the reviewer may toggle the requirement");
     assert_eq!(admitted.status, 200, "{}", admitted.body);
-    assert_eq!(
-        required_flag(&pg, seeded.tenant_id, &unit.development_project_id).await,
-        false
+    assert!(
+        !required_flag(&pg, seeded.tenant_id, &unit.development_project_id).await,
+        "the reviewer's toggle cleared the requirement"
     );
 
     // The implementer may tighten it again — and still may not loosen it.
@@ -192,9 +192,9 @@ async fn change_judging_surface_toggles_required_but_never_repins() {
     .await
     .expect("the implementer may tighten the requirement");
     assert_eq!(tightened.status, 200, "{}", tightened.body);
-    assert_eq!(
+    assert!(
         required_flag(&pg, seeded.tenant_id, &unit.development_project_id).await,
-        true
+        "the implementer's tightening set the requirement"
     );
     let reloosened = toggle(
         &pg,
