@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 819,
+      "title": "standards: the 14 TOGAF/SAFe output categories the live documents need",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/819",
+      "updatedAt": "2026-11-27T06:46:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 817,
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
@@ -89,7 +110,7 @@
       "title": "G0 \u2014 Gemba Walk foundation: census/instrument, renderer spike, bevy_ecs world, Portfolio end-to-end",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/813",
-      "updatedAt": "2026-11-27T06:28:23Z",
+      "updatedAt": "2026-11-27T06:52:40Z",
       "labels": [
         {
           "name": "unit",
@@ -335,9 +356,9 @@
     {
       "number": 781,
       "title": "skills: the delivery actor \u2014 delivery-unit, programme-sync, and the six roles on the action route",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/781",
-      "updatedAt": "2026-11-27T06:14:49Z",
+      "updatedAt": "2026-11-27T06:54:07Z",
       "labels": [
         {
           "name": "unit",
@@ -535,15 +556,15 @@
       "title": "programme: the retrospective tranche reviews \u2014 close tranches 3\u201312 and authorise tranches 4\u201313",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/755",
-      "updatedAt": "2026-11-26T21:38:57Z",
+      "updatedAt": "2026-11-27T06:41:41Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -1786,7 +1807,7 @@
       "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/566",
-      "updatedAt": "2026-11-27T06:23:10Z",
+      "updatedAt": "2026-11-27T06:43:20Z",
       "labels": [
         {
           "name": "unit",
@@ -6861,7 +6882,7 @@
       "title": "S04 \u2014 the external action execution contract (import \u2192 invoke \u2192 restart)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/3",
-      "updatedAt": "2026-11-26T17:09:30Z",
+      "updatedAt": "2026-11-27T06:46:49Z",
       "labels": [
         {
           "name": "unit",
