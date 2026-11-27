@@ -135,6 +135,9 @@ test("a failed portfolio read is the error panel, with a retry", async ({ page }
 });
 
 test("another tenant's project is refused by the server", async ({ request }) => {
+  // `authFor(login)` only switches principal under the dev transport: with OIDC it returns the
+  // suite's single bearer, so a cross-tenant read cannot be expressed there.
+  test.skip(!isDevAuth(), "the deployed suite has one principal; this needs the dev transport");
   const fixture = await createBoardCard(request, `e2e tenant refusal ${Date.now()}`);
   const response = await request.get(`/api/projects/${fixture.projectId}`, {
     headers: authFor("bob"),

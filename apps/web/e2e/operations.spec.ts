@@ -160,5 +160,6 @@ test("a refused cluster read shows the server's own problem panel", async ({ pag
   await cluster.getByRole("button", { name: "Read pods" }).click();
   const panel = cluster.locator("div.panel.problem[role=alert]");
   await expect(panel).toBeVisible();
-  await expect(panel).toContainText(/no base URL|unconfigured|ops/);
+  // The server's own sentence, not a loose keyword: ApiError renders `server 503: <detail>`.
+  await expect(panel).toContainText('no base URL is configured for service "ops"');
 });
