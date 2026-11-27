@@ -445,10 +445,11 @@ mod tests {
         // Delivery proofs (#744) adds `proofs.record|reverify|get|list`: 593 -> 597; internal
         // 569 -> 573.
         // #779 adds `development_projects.list` (internal): 597 -> 598.
-        // #842 adds `feedback.create|list` (internal): 598 -> 600.
+        // Delivery proofs (#836) adds `proofs.render` (internal): 598 -> 599.
+        // #842 adds `feedback.create|list` (internal): 599 -> 601.
         assert_eq!(
             registry.len(),
-            600,
+            601,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

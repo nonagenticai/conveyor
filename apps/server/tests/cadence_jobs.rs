@@ -2,7 +2,8 @@
 //!
 //! The first pass materialises the standing backlog into draft cards; the second sees no
 //! planned cadence and creates none. The guard is the cadence's state, moved in the same
-//! transaction as the drafts — not a timer and not a marker on the card.
+//! transaction as the drafts — not a timer and not a marker on the card. The fixture
+//! approves the plan first: an unapproved cadence materialises nothing (#831 P2).
 //!
 //! `cargo test -p conveyor-server --test cadence_jobs`.
 
@@ -109,6 +110,16 @@ async fn fixture(db: &common::TestDb) -> Fixture {
     .fetch_one(&db.super_pool)
     .await
     .expect("insert the cadence");
+    // The unattended tick materialises only a PI plan a person approved (#831 P2).
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, gate, kind, status, required_decisions)
+         VALUES ($1, $2, 'human_approval', 'approved', 1)",
+    )
+    .bind(tenant_id)
+    .bind(format!("cadence/{cadence}/materialise"))
+    .execute(&db.super_pool)
+    .await
+    .expect("approve the PI plan");
     Fixture {
         tenant,
         cadence,

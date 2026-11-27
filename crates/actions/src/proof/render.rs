@@ -46,7 +46,7 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
 /// acts on the difference between "you named the wrong model" and "your facts are incomplete".
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RenderError {
-    /// `kind` is not `slice`, `programme` or `package`.
+    /// `kind` is not `slice`, `programme`, `package` or `unit_ledger`.
     UnknownKind(String),
     /// The document is not a JSON object.
     NotAnObject,
@@ -174,6 +174,10 @@ pub fn render(facts: &Value, theorem: &str) -> Result<String, RenderError> {
             push_field(&mut body, "checks", &lean_checks(&checks), false);
             ("PackageFacts", "checkPackage")
         }
+        // A ledger chunk is a list of observations, not a single facts record: it has its own
+        // emitter and its own theorem pair. Failing units are deliberately *not* refused here —
+        // the kernel is what refuses them, and the resulting unproven certificate is the point.
+        "unit_ledger" => return render_unit_ledger(object, theorem),
         other => return Err(RenderError::UnknownKind(other.to_owned())),
     };
 
@@ -390,4 +394,289 @@ fn lean_leaves(items: &[(String, String)]) -> String {
         .map(|(name, digest)| format!("({}, {})", quoted(name), quoted(digest)))
         .collect();
     format!("[{}]", inner.join(", "))
+}
+
+// ── the unit ledger (`docs/plans/03-DELIVERY.md`, A0 measurement) ────────────────────────
+
+/// The chunk the prover was measured at (`docs/evidence/proof-of-delivery.md` § Units). A failing
+/// chunk is bisected at this size; a larger ledger is the caller's to chunk, never a source that
+/// silently needs `maxRecDepth`.
+const UNIT_LEDGER_MAX: usize = 200;
+
+/// One observed issue state, as the facts document spells it.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum IssueObs {
+    Pending,
+    Closed,
+}
+
+impl IssueObs {
+    fn parse(raw: &str) -> Option<Self> {
+        match raw {
+            "pending" => Some(Self::Pending),
+            "closed" => Some(Self::Closed),
+            _ => None,
+        }
+    }
+
+    fn lean(self) -> &'static str {
+        match self {
+            Self::Pending => ".pending",
+            Self::Closed => ".closed",
+        }
+    }
+}
+
+/// One observed PR state, as the facts document spells it.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum PullObs {
+    Draft,
+    Ready,
+    Merged,
+}
+
+impl PullObs {
+    fn parse(raw: &str) -> Option<Self> {
+        match raw {
+            "draft" => Some(Self::Draft),
+            "ready" => Some(Self::Ready),
+            "merged" => Some(Self::Merged),
+            _ => None,
+        }
+    }
+
+    fn lean(self) -> &'static str {
+        match self {
+            Self::Draft => ".draft",
+            Self::Ready => ".ready",
+            Self::Merged => ".merged",
+        }
+    }
+}
+
+/// One unit's observed facts. Every field is an `Option`: the document must carry it (null when
+/// unknown), and unknown fails closed in the model.
+struct UnitEntry {
+    key: String,
+    issue: Option<IssueObs>,
+    branches: Option<u64>,
+    branch_deleted: Option<bool>,
+    pulls: Option<u64>,
+    pull: Option<PullObs>,
+    ci_runs: Option<u64>,
+    closes_keyword: Option<bool>,
+    verify_parts: Option<bool>,
+}
+
+impl UnitEntry {
+    fn one_branch(&self) -> bool {
+        self.branches == Some(1)
+    }
+
+    fn one_pull(&self) -> bool {
+        self.pulls == Some(1)
+    }
+
+    fn pull_usable(&self) -> bool {
+        matches!(self.pull, Some(PullObs::Ready | PullObs::Merged))
+    }
+
+    fn ci_budget(&self) -> bool {
+        self.ci_runs.is_some_and(|runs| runs <= 2)
+    }
+
+    fn merge_complete(&self) -> bool {
+        match (self.pull, self.issue, self.branch_deleted) {
+            (Some(PullObs::Merged), Some(IssueObs::Closed), Some(true)) => true,
+            (Some(PullObs::Merged), _, _) => false,
+            _ => true,
+        }
+    }
+
+    fn closes_stated(&self) -> bool {
+        self.closes_keyword == Some(true)
+    }
+
+    fn parts_verified(&self) -> bool {
+        self.verify_parts == Some(true)
+    }
+}
+
+/// Render a `unit_ledger` facts document: the model, the observations, the kernel-checked
+/// per-rule outcomes, and the aggregate theorem.
+fn render_unit_ledger(object: &Map<String, Value>, theorem: &str) -> Result<String, RenderError> {
+    let items = object
+        .get("units")
+        .ok_or_else(|| RenderError::Missing("units".to_owned()))?
+        .as_array()
+        .ok_or_else(|| RenderError::NotA("units is not a list".to_owned()))?;
+    if items.len() > UNIT_LEDGER_MAX {
+        return Err(RenderError::Incomplete(format!(
+            "the unit ledger holds {} units; a certificate chunk is at most {UNIT_LEDGER_MAX}",
+            items.len()
+        )));
+    }
+    let mut entries = Vec::with_capacity(items.len());
+    for (index, item) in items.iter().enumerate() {
+        entries.push(unit_entry(item, index)?);
+    }
+    entries.sort_by(|left, right| left.key.cmp(&right.key));
+    if let Some(pair) = entries.windows(2).find(|pair| pair[0].key == pair[1].key) {
+        return Err(RenderError::Incomplete(format!(
+            "unit {:?} appears more than once",
+            pair[0].key
+        )));
+    }
+
+    let literals: Vec<String> = entries.iter().map(unit_literal).collect();
+    let mut source = String::new();
+    source.push_str(MODEL_SOURCE);
+    source.push_str("\ndef facts : List UnitObs := [\n");
+    source.push_str(&literals.join(",\n"));
+    source.push_str("\n]\n\n");
+    source.push_str(&format!(
+        "theorem {theorem}_rules : ruleResults facts = {} := by decide\n\n",
+        rules_literal(&entries)
+    ));
+    source.push_str(&format!(
+        "theorem {theorem} : checkLedger facts = true := by decide\n"
+    ));
+    Ok(source)
+}
+
+fn unit_entry(item: &Value, index: usize) -> Result<UnitEntry, RenderError> {
+    let object = item
+        .as_object()
+        .ok_or_else(|| RenderError::NotA(format!("units[{index}] is not an object")))?;
+    let key = text(object, "key")?.to_owned();
+    if key.is_empty() {
+        return Err(RenderError::NotA(format!("units[{index}].key is empty")));
+    }
+    Ok(UnitEntry {
+        key,
+        issue: unit_issue(object, index)?,
+        branches: unit_nat(object, index, "branches")?,
+        branch_deleted: unit_bool(object, index, "branchDeleted")?,
+        pulls: unit_nat(object, index, "pulls")?,
+        pull: unit_pull(object, index)?,
+        ci_runs: unit_nat(object, index, "ciRuns")?,
+        closes_keyword: unit_bool(object, index, "closesKeyword")?,
+        verify_parts: unit_bool(object, index, "verifyParts")?,
+    })
+}
+
+fn unit_field<'a>(
+    object: &'a Map<String, Value>,
+    index: usize,
+    field: &str,
+) -> Result<&'a Value, RenderError> {
+    object
+        .get(field)
+        .ok_or_else(|| RenderError::NotA(format!("units[{index}].{field} is missing")))
+}
+
+fn unit_bool(
+    object: &Map<String, Value>,
+    index: usize,
+    field: &str,
+) -> Result<Option<bool>, RenderError> {
+    let value = unit_field(object, index, field)?;
+    if value.is_null() {
+        return Ok(None);
+    }
+    value.as_bool().map(Some).ok_or_else(|| {
+        RenderError::NotA(format!("units[{index}].{field} is not a boolean or null"))
+    })
+}
+
+fn unit_nat(
+    object: &Map<String, Value>,
+    index: usize,
+    field: &str,
+) -> Result<Option<u64>, RenderError> {
+    let value = unit_field(object, index, field)?;
+    if value.is_null() {
+        return Ok(None);
+    }
+    value.as_u64().map(Some).ok_or_else(|| {
+        RenderError::NotA(format!(
+            "units[{index}].{field} is not a non-negative integer or null"
+        ))
+    })
+}
+
+fn unit_issue(object: &Map<String, Value>, index: usize) -> Result<Option<IssueObs>, RenderError> {
+    let value = unit_field(object, index, "issue")?;
+    if value.is_null() {
+        return Ok(None);
+    }
+    let raw = value.as_str().ok_or_else(|| {
+        RenderError::NotA(format!("units[{index}].issue is not a string or null"))
+    })?;
+    IssueObs::parse(raw).map(Some).ok_or_else(|| {
+        RenderError::NotA(format!(
+            "units[{index}].issue {raw:?} is not pending or closed"
+        ))
+    })
+}
+
+fn unit_pull(object: &Map<String, Value>, index: usize) -> Result<Option<PullObs>, RenderError> {
+    let value = unit_field(object, index, "pull")?;
+    if value.is_null() {
+        return Ok(None);
+    }
+    let raw = value
+        .as_str()
+        .ok_or_else(|| RenderError::NotA(format!("units[{index}].pull is not a string or null")))?;
+    PullObs::parse(raw).map(Some).ok_or_else(|| {
+        RenderError::NotA(format!(
+            "units[{index}].pull {raw:?} is not draft, ready or merged"
+        ))
+    })
+}
+
+/// One `UnitObs` literal, one line — the shape the A0 emitter measured.
+fn unit_literal(entry: &UnitEntry) -> String {
+    format!(
+        "  {{ issue := {}, branches := {}, branchDeleted := {}, pulls := {}, pull := {}, \
+         ciRuns := {}, closesKeyword := {}, verifyParts := {} }}",
+        option_lean(entry.issue, |value| value.lean().to_owned()),
+        option_lean(entry.branches, |value| value.to_string()),
+        option_lean(entry.branch_deleted, |value| value.to_string()),
+        option_lean(entry.pulls, |value| value.to_string()),
+        option_lean(entry.pull, |value| value.lean().to_owned()),
+        option_lean(entry.ci_runs, |value| value.to_string()),
+        option_lean(entry.closes_keyword, |value| value.to_string()),
+        option_lean(entry.verify_parts, |value| value.to_string()),
+    )
+}
+
+fn option_lean<T>(value: Option<T>, render: impl Fn(T) -> String) -> String {
+    match value {
+        Some(value) => format!("some {}", render(value)),
+        None => "none".to_owned(),
+    }
+}
+
+/// The per-rule outcomes, in the model's `ruleResults` order. The kernel proves this literal, so a
+/// renderer that computes a rule differently from the model is refused, not shipped.
+fn rules_literal(entries: &[UnitEntry]) -> String {
+    let pair = |name: &str, value: bool| format!("(\"{name}\", {value})");
+    let inner = [
+        pair("oneBranch", entries.iter().all(UnitEntry::one_branch)),
+        pair("onePull", entries.iter().all(UnitEntry::one_pull)),
+        pair("pullUsable", entries.iter().all(UnitEntry::pull_usable)),
+        pair("ciBudget", entries.iter().all(UnitEntry::ci_budget)),
+        pair(
+            "mergeComplete",
+            entries.iter().all(UnitEntry::merge_complete),
+        ),
+        pair(
+            "closesKeyword",
+            entries.iter().all(UnitEntry::closes_stated),
+        ),
+        pair("verifyParts", entries.iter().all(UnitEntry::parts_verified)),
+    ]
+    .join(", ");
+    format!("[{inner}]")
 }

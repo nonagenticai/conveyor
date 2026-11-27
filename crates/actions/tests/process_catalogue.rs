@@ -293,7 +293,13 @@ async fn the_shipped_catalogue_runs_a_process_end_to_end() {
         .invoke(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": card, "process_key": PROCESS_KEY}),
+            // The catalogue's steps call a model; a capturing run needs its declared spend
+            // ceiling before the first call (§7.5, D45).
+            json!({
+                "card_id": card,
+                "process_key": PROCESS_KEY,
+                "inputs": {"limits": {"cost_budget_usd": 1.0}}
+            }),
             None,
             None,
             None,
@@ -432,7 +438,11 @@ async fn the_shipped_catalogue_runs_a_process_end_to_end() {
         .invoke(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": ask_card, "process_key": "ask_fr"}),
+            json!({
+                "card_id": ask_card,
+                "process_key": "ask_fr",
+                "inputs": {"limits": {"cost_budget_usd": 1.0}}
+            }),
             None,
             None,
             None,
@@ -513,7 +523,11 @@ async fn the_shipped_catalogue_runs_a_process_end_to_end() {
         .invoke(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": coach_card, "process_key": "cap.kanban_coach.handle_error"}),
+            json!({
+                "card_id": coach_card,
+                "process_key": "cap.kanban_coach.handle_error",
+                "inputs": {"limits": {"cost_budget_usd": 1.0}}
+            }),
             None,
             None,
             None,

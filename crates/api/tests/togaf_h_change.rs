@@ -74,8 +74,33 @@ async fn a_scope_change_produces_a_change_register_row() {
 #[tokio::test]
 async fn an_unrecorded_review_refuses_the_gate() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    // Every phase closes on the adopted profile's explicit empty set; the profile states that
+    // this capability's phases carry no artefacts, so this test observes only the H outcome
+    // rule (and, at G, the universal design gate).
+    arch::tailor_adopted(
+        &f,
+        json!({
+            "preliminary": [], "a": [], "b": [], "c": [], "d": [], "e": [], "f": [], "g": [],
+        }),
+        json!({}),
+    )
+    .await;
     let project = arch::project(&f.running, "architecture").await;
+    // Phase G is a real gate (v1-p81-2): a live delivery contract with its compliance review.
+    let contract = arch::live_contract(&f, &project, "delivery_contract", "g").await;
+    arch::created_as(
+        &f.running,
+        support::REVIEWER,
+        "architecture.reviews_record",
+        json!({
+            "project_id": project,
+            "contract_id": contract,
+            "level": "compliant",
+            "delegation_ref": f.delegation,
+        }),
+        None,
+    )
+    .await;
     for phase in PHASES {
         let (status, out) = arch::advance(&f.running, &project, phase).await;
         assert_eq!(status, 200, "advance {phase}: {out}");

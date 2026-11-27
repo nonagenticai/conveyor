@@ -36,14 +36,18 @@ async fn approved(
 #[tokio::test]
 async fn phases_a_to_f_pass_in_order() {
     let f = arch::fixture().await;
-    arch::tailor(
-        &f.running,
+    arch::tailor_adopted(
+        &f,
         json!({
             "preliminary": { "psa": ["principles_catalog"] },
             "a": { "psa": ["stakeholder_map"] },
             "b": { "hld": ["business_capability_map"] },
             "c": { "hld": ["data_entity_catalog"] },
             "d": { "hld": ["technology_standards"] },
+            // Explicit empty sets: the adopted profile states that E and F carry no artefacts.
+            // An absent key would fall back to the standard's mandatory rows (v1-p81-1).
+            "e": [],
+            "f": [],
         }),
         json!({
             "a": "statement_of_architecture_work",
@@ -116,9 +120,9 @@ async fn phases_a_to_f_pass_in_order() {
 #[tokio::test]
 async fn a_draft_artefact_refuses_the_contract() {
     let f = arch::fixture().await;
-    arch::tailor(
-        &f.running,
-        json!({ "a": { "psa": ["stakeholder_map"] } }),
+    arch::tailor_adopted(
+        &f,
+        json!({ "preliminary": [], "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;
@@ -171,9 +175,9 @@ async fn a_draft_artefact_refuses_the_contract() {
 #[tokio::test]
 async fn a_contract_change_reopens_the_gate() {
     let f = arch::fixture().await;
-    arch::tailor(
-        &f.running,
-        json!({ "a": { "psa": ["stakeholder_map"] } }),
+    arch::tailor_adopted(
+        &f,
+        json!({ "preliminary": [], "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;

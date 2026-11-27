@@ -797,6 +797,20 @@ async fn coach_remedy(
         }
     }
 
+    // The remedy's bounded effect is applied now, in the same transaction that records it, so
+    // it cannot be rolled back by a later dispatch refusal (v1-p6-1). It is applied AFTER the
+    // systemic kata's run start: the kata is the coach's own escalation of this interruption,
+    // not the interrupted card's next dispatch, and must not be stopped by its own block. `ask`
+    // has no card effect: its human gate is enforced by the dispatch.
+    store::coach::apply_remedy_tx(&mut *tx, ctx.tenant, remedy.id)
+        .await
+        .map_err(|error| match error {
+            store::coach::CoachStoreError::RemedyInvalid(why) => {
+                ActionError::new(422, "coach.remedy_invalid", why)
+            }
+            other => store_failure("coach.remedy: apply", other),
+        })?;
+
     emit(
         &mut *tx,
         &ctx,

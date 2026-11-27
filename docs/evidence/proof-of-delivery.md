@@ -123,3 +123,133 @@ failure. Worth its own fix; it is not #746's.
   Verus/Kani work, not part of the corpus.
 - The self-service mint path: the credential above was minted and sealed by an operator, and
   `--mint` still needs the dedicated client and the licence-app decision (#776).
+
+## Units — A0, the chunk-size measurement (2026-11-27)
+
+Part of #836. The unit model is a draft at this point; this section fixes the certificate size
+from real kernel runs, not from an estimate. The model under measurement is `DeliveryModel.lean`
+at 5 537 bytes, `sha256 7bc3a1eb…86f859a` (the 3 179-byte row above belongs to the pre-unit model).
+
+`scripts/proof/a0_units.py` generated the sources at N = 40, 80, 200, 400 and 444 synthetic
+`UnitObs` records, plus seven one-unit negative controls, an empty ledger and a `startsWith`
+probe. Each file was streamed into the prover's own pod and run with the runner's exact command:
+
+```
+cd /lean-project && env -i PATH=/usr/local/bin:/usr/bin:/bin:/opt/elan/bin \
+  ELAN_HOME=/opt/elan /opt/elan/bin/lake env /opt/elan/bin/lean /lean-project/_a0_<n>.lean
+```
+
+| N | Source bytes | Warm wall clock (ms) | Exit |
+|---|---|---|---|
+| 40 | 11 010 | 1 759 · 1 780 · 1 781 · 1 810 | 0 |
+| 80 | 16 390 | 1 899 · 1 902 · 1 925 · 1 839 | 0 |
+| 200 | 32 530 | 2 211 · 2 154 · 2 215 · 2 239 | 0 |
+| 400 | 59 430 | 2 736 · 2 446 · 2 655 (with `set_option maxRecDepth 4000`) | 0 |
+| 444 | 65 348 | 2 678 · 2 735 · 2 732 (with `set_option maxRecDepth 4000`) | 0 |
+
+At the default recursion depth, N = 400 and N = 444 both fail in 2.5–2.9 s with
+`maximum recursion depth has been reached`; N = 200 passes untouched. The first run of the
+session was a smoke theorem at 825 ms; the 10 242 ms cold figure above is the pod's first run
+after a restart and was not re-measured (the live pod was not restarted).
+
+The negative controls — two branches, two PRs, a draft PR, three CI runs, merged with the issue
+pending, merged with the branch live, unknown branches — each exit 1: the kernel refuses
+`checkLedger [bad] = true`, it is not a render refusal. An empty ledger is also exit 1 (the
+`!isEmpty` guard). A `String.startsWith "issue/836-"` probe under `decide` exits 1:
+**`startsWith` is not kernel-reducible in this toolchain**, so prefix checks must arrive as
+derived facts, never as Lean computation in the checker.
+
+One `lean4.check` at N = 200 through the deployed engine was attempted with a machine principal
+minted in the conveyor pod. It answered `403 action-forbidden`: the principal lacks the
+`integrations:read` scope the action declares. That is a principal/grant result, not a prover
+result — the direct runner path above is the command the prover issues. A2 must run with a
+principal holding `integrations:read` (the check) and `approvals:write` (the record). A conveyor
+rollout replaced the pod during the first attempt; the 403 is from the new deployment.
+
+**Decision.** Certificate chunk = **200 units**. At 200 the source is 32 530 bytes against the
+100 000-char cap (3× headroom) and the warm maximum is 2 239 ms against the 120 s prover timeout
+(53× headroom); with the 10 242 ms cold start the worst case is ≈ 12.5 s. The full 444-unit
+ledger would fit one certificate (65 348 bytes, ≈ 2.7 s) but needs
+`set_option maxRecDepth 4000`; 200 is chosen so a failing chunk is bisected cheaply and the
+default recursion depth stays in force. The ledger window is therefore **all** merged PRs in the
+window plus the unit issues — about three chunks. The renderer refuses more than 200 units per
+source unless it emits the option.
+
+Same assumption as every certificate: the kernel certifies *facts ⇒ verdict*. The collector's
+rules, hashes and committed payloads are what a reviewer checks against reality.
+
+### A1 — the shipped unit model (2026-11-27)
+
+The A0 draft had six fields. The shipped model adds the two body-observable facts (the PR's
+`Closes #N`, the issue's `Verify:` lines), names `checkUnit`, and adds `ruleResults` so a
+certificate proves the outcome of every rule, not only the aggregate. Model
+`DeliveryModel.lean` at 6 709 bytes, `sha256 378a1395…574ddae7`.
+
+Measured with `scripts/lean/check-model.sh` against the same pod command (wall includes the
+ssh/exec and stream overhead, so it is an upper bound on the kernel time):
+
+| N | Source bytes | Exit | Wall (ms) |
+|---|---|---|---|
+| 40 | 14 554 | 0 | 4 700 |
+| 80 | 22 094 | 0 | 4 653 |
+| 200 | 44 714 | 0 | 5 892 |
+
+The controls file, checked appended to the model, is kernel-refused: 11/11 negative theorems
+(two branches, two PRs, a draft, three CI runs, merged with the issue pending, merged with the
+branch live, unknown branches, no `Closes`, missing `Verify:`, the empty ledger, a falsified
+`ruleResults` literal). The positive control (`checkUnit goodUnit = true`) elaborates; the
+refusals are the eleven `control_` theorems. Renderer tests: 17/17 (`cargo-guard test -p
+conveyor-actions --test proof_render`). The `unit_ledger` subject is recorded end to end by
+`proofs_record::unit_subject_kind` (1/1) against an ephemeral PostgreSQL 18: 201, subject
+`unit_ledger`, and the stored source is the renderer's output.
+
+The chunk decision is unchanged: **200 units**. The shipped 200-unit source is 44 714 bytes
+(2× headroom under the 90 000-byte working limit, 2.2× under the prover's 100 000-character cap)
+and the warm kernel path is ≈ 2 s; 400 and 444 still require `maxRecDepth 4000` in the A0
+measurement and are not emitted.
+
+### A2 — the evaluation of the real ledger (offline, 2026-11-27)
+
+The collector (`scripts/proof/collect_units.py`, self-test in the `checks` job) fetched the
+window once and rendered it offline. The snapshot is committed at
+`docs/evidence/units/2026-11-27/snapshot.json`: 371 issues, 447 merged PRs (319 non-automation),
+124 live heads and 2 481 workflow runs at 638 shas, collected at `48797526c`. It is redacted per
+`scripts/ci/no-private-refs.sh`: public GitHub issue/PR bodies sometimes quote estate identifiers,
+so the committed copy carries deterministic placeholders — the facts the certificate uses (state,
+closing keyword, `Verify:`) need none of them, and the unredacted payloads are the public GitHub
+records. Two renders of the same snapshot produced the same corpus hash and byte-identical facts
+(`66544ac7ae1e1ed2…`).
+
+| Corpus | Count |
+|---|---|
+| Completed units (certified) | 320 |
+| In flight (no merged PR; not certified) | 54 |
+| Orphan merged PRs (no issue) | 12 |
+| Automation PRs excluded (`github-actions[bot]`, `dependabot[bot]`, `automation/*`) | 128 |
+| Chunks at 200 units | 2 (200 + 120) |
+
+The facts documents measure 112 687 and 67 710 bytes (provenance included; the rendered source
+carries only the observations, so the A1 200-unit source measurement is the prover-side budget).
+The model is the A1 model (`378a1395…`); the spec is `docs/plans/03-DELIVERY.md`
+`12514c99588f8b8c…`. The collector's local mirror of the rules reports **56 of 320 completed
+units failing**:
+
+| Rule | Failing units |
+|---|---|
+| `ciBudget` | 0 |
+| `closesKeyword` | 12 (the orphans: a merged PR that names no issue) |
+| `mergeComplete` | 15 (orphans, an issue left open, a branch left live) |
+| `oneBranch` | 4 |
+| `onePull` | 5 |
+| `pullUsable` | 0 |
+| `verifyParts` | 50 |
+
+The `Verify:` cross-check against `scripts/ci/board.py`: 9 units pass the checker and fail the
+model (the checker accepts one `Verify:` in the exact section; the model requires one per part),
+6 the reverse, 293 agree. Both answers are in `units.json`; neither is silently adopted.
+
+**What is not run yet.** The kernel verdict over these chunks is deployment-gated: the collector
+records through `proofs.render`, which is added by #836 and deploys with this PR. The live step
+(two chunk certificates — one proven, one unproven if the findings persist — a `proofs.reverify`,
+and the programme bundle) is run after the rollout and recorded here with its response bodies.
+Until then these are the collector's facts and mirror, not a certificate.

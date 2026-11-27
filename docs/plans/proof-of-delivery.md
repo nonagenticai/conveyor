@@ -62,6 +62,9 @@ different proof.
 An action handler runs inside one transaction and may not speak HTTP
 (`crates/api/tests/externals_declared.rs`), so the work is two steps, not one action:
 
+0. a caller that is not this Rust process renders the facts through `proofs.render` first, so the
+   source it sends next is the engine's own output (a caller that already runs in-process re-renders
+   at record time, which is the same function);
 1. a job step invokes the declared `lean4.check` external action — the engine owns the timeout,
    breaker, idempotency claim and audit row;
 2. `proofs.record` names that call's idempotency key, reads the engine's persisted response, and
@@ -71,7 +74,7 @@ A caller cannot supply a verdict; it can only name an invocation the engine alre
 
 ## The actions
 
-Four internal actions, all tenant-scoped; the prover calls stay the declared `lean4.*` externals
+Five internal actions, all tenant-scoped; the prover calls stay the declared `lean4.*` externals
 from T14.
 
 | Action | Scope | What it refuses |
@@ -80,6 +83,7 @@ from T14.
 | `proofs.reverify` | `approvals:read` | a row whose digest or facts no longer describe its columns; naming the certificate's own invocation (a replay is not a re-check); a fresh check whose source, verdict or recomputed digest differs from the stored ones |
 | `proofs.get` | `approvals:read` | a missing id in this tenant |
 | `proofs.list` | `approvals:read` | an unknown subject kind |
+| `proofs.render` | `approvals:read` | a facts document that is not JSON; a model the binary does not embed; a kind the renderer does not know; facts the model refuses for that kind; a theorem name that is not a Lean identifier. It writes nothing and derives nothing: it is the renderer's public face, so a collector that is not this Rust process obtains the exact source `proofs.record` will require instead of re-implementing the renderer. |
 
 `proofs.reverify` cannot call the prover — an action handler runs in one transaction and may not
 speak HTTP — so re-verification is two steps like record: the caller runs a **fresh**
@@ -100,6 +104,8 @@ typed `422`, so the gate can fail — which §5.4 requires, and a gate that neve
 |---|---|---|
 | #744 | the store, `proofs.*` actions, the `lean_proof` evidence kind, the credential | provable against a stub prover |
 | #746 | the model, the facts renderer, programme certificates, package manifests, the live gate | needs the deployed engine and a reachable prover |
+| #836 | the unit model (`checkObs` / `checkLedger`, per-rule results), the `unit_ledger` renderer arm and subject, the collector and the evaluation of the real ledger | one chunk certificate over every unit in the window, with the failing units named by rule |
+| #837 | engine-derived facts (`proofs.attest`, `checkRecord`), `proofs.record` refusing caller facts, the close gate | a real unit refused by the model, then the gate required |
 
 ## Out of scope
 

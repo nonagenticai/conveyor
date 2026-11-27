@@ -100,3 +100,111 @@ theorem accepted_path_carries_evidence : ∀ p, accepted p = true → p.evidence
   cases h' : p.evidence with
   | nil => simp [accepted, endsClosed, h'] at h
   | cons x xs => simp
+
+/-! ## Delivery units — `docs/plans/03-DELIVERY.md`
+
+One issue, one branch, one non-draft PR, at most two CI runs, merged, the issue closed and
+the branch deleted. Every fact is an observation; `none` means "not observed" and fails
+closed. These are the GitHub-observable facts, collected with provenance — not the engine
+rows, which do not carry issue state or branch liveness. -/
+
+inductive IssueState where
+  | pending
+  | closed
+  deriving DecidableEq, BEq, Repr
+
+inductive PrState where
+  | draft
+  | ready
+  | merged
+  deriving DecidableEq, BEq, Repr
+
+structure UnitObs where
+  issue : Option IssueState
+  -- distinct claim-branch names: live `issue/<n>-*` refs ∪ PR head refs
+  branches : Option Nat
+  -- the PR head ref is not live
+  branchDeleted : Option Bool
+  pulls : Option Nat
+  pull : Option PrState
+  -- session CI attempts: `ci`-workflow pull_request runs on the PR head. The queue and
+  -- post-merge runs are the merge mechanics, reported beside the certificate, never inputs.
+  ciRuns : Option Nat
+  -- the linked PR's body names this issue (`Closes|Fixes|Resolves #N`)
+  closesKeyword : Option Bool
+  -- every `### P` part of the issue body carries a `Verify:` line
+  verifyParts : Option Bool
+  deriving DecidableEq, BEq, Repr
+
+def oneBranch (o : UnitObs) : Bool :=
+  match o.branches with
+  | some 1 => true
+  | _ => false
+
+def onePull (o : UnitObs) : Bool :=
+  match o.pulls with
+  | some 1 => true
+  | _ => false
+
+def pullUsable (o : UnitObs) : Bool :=
+  match o.pull with
+  | some .ready | some .merged => true
+  | _ => false
+
+def ciBudget (o : UnitObs) : Bool :=
+  match o.ciRuns with
+  | some n => decide (n ≤ 2)
+  | none => false
+
+def mergeComplete (o : UnitObs) : Bool :=
+  match o.pull, o.issue, o.branchDeleted with
+  | some .merged, some .closed, some true => true
+  | some .merged, _, _ => false
+  | _, _, _ => true
+
+def closesStated (o : UnitObs) : Bool :=
+  o.closesKeyword == some true
+
+def partsVerified (o : UnitObs) : Bool :=
+  o.verifyParts == some true
+
+def checkObs (o : UnitObs) : Bool :=
+  oneBranch o && onePull o && pullUsable o && ciBudget o && mergeComplete o &&
+    closesStated o && partsVerified o
+
+/-- The per-unit rule under the name the delivery contract uses. -/
+def checkUnit (o : UnitObs) : Bool :=
+  checkObs o
+
+def checkLedger (units : List UnitObs) : Bool :=
+  !units.isEmpty && units.all checkObs
+
+/-- The per-rule outcome over a ledger. A certificate names this list as a literal, so the
+kernel proves the reported outcome of every rule, not just the aggregate. -/
+def ruleResults (units : List UnitObs) : List (String × Bool) :=
+  [("oneBranch", units.all oneBranch),
+   ("onePull", units.all onePull),
+   ("pullUsable", units.all pullUsable),
+   ("ciBudget", units.all ciBudget),
+   ("mergeComplete", units.all mergeComplete),
+   ("closesKeyword", units.all closesStated),
+   ("verifyParts", units.all partsVerified)]
+
+theorem merge_complete_implies (o : UnitObs) (h : mergeComplete o = true)
+    (hm : o.pull = some .merged) :
+    o.issue = some .closed ∧ o.branchDeleted = some true := by
+  cases o with
+  | mk issue branches branchDeleted pulls pull ciRuns closesKeyword verifyParts =>
+    cases hm
+    cases issue with
+    | none => simp [mergeComplete] at h
+    | some i =>
+      cases i with
+      | pending => simp [mergeComplete] at h
+      | closed =>
+        cases branchDeleted with
+        | none => simp [mergeComplete] at h
+        | some b =>
+          cases b with
+          | false => simp [mergeComplete] at h
+          | true => simp

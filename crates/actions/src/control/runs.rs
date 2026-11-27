@@ -21,7 +21,7 @@ use crate::board::events::{RawEvent, append_raw_event};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
-use super::run_create::create_bound_run_tx;
+use super::run_create::{BoundRun, create_bound_run_tx};
 use super::views::{
     IdIn, RunCancelIn, RunCreateIn, RunFinishIn, RunGetIn, RunGetOut, RunListIn, RunOut,
     RunProcessRef, RunStepOut, RunTreeChildOut, RunTreeOut,
@@ -240,9 +240,12 @@ async fn runs_create(
         &mut *tx,
         &ctx,
         &card,
-        job_binding_id,
-        input.correlation_id,
-        input.release_hash.clone(),
+        BoundRun {
+            job_binding_id,
+            correlation_id: input.correlation_id,
+            release_hash: input.release_hash.clone(),
+            inputs: input.inputs,
+        },
         action,
     )
     .await?;
