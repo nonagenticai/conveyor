@@ -1,7 +1,9 @@
 # Tranche-8 readiness gate — measured 2026-11-28
 
-snapshot: `/tmp/snap-8` — 933 data files, 915 platform outputs, taken at `6d486b179`, manifest
-sha256 `f75183454d15fb5154ec1ad2f6c0c9ff7d60543e8bfe2305c5e95b5930a6b477`.
+snapshot: `/tmp/snap-8` — taken at `44aecddc2`, generated `2026-11-28T15:09:49Z`, manifest
+sha256 `f8f428d8d1937bf9d7e4ebe048cb8bcd97b5a22e7c302d9577a9d72b6aec9523`. The manifest's
+`files` count (999 at this cut) drifts as the shared replay record grows — its sha256 is the
+snapshot's identity, never the count.
 
 ## Content packs
 
@@ -37,6 +39,12 @@ Commands (all at the pinned snapshot):
   `01a20ec4-d2f2-7dbc-a0c7-417e484a32f0`).
 - Ten readiness acts are journaled (`docs/evidence/record/journal.jsonl`, 508 entries,
   `promote-record.py --check` green), with their inputs under `docs/evidence/record/inputs/tr8/`.
+- The PI-plan body was corrected in place after this cut: `documents.update` version 4 (same id
+  `01a2229e-663b-7081-816f-da0c5557549a`, `published_at` preserved) — the Backlog-refinement
+  paragraph now reads 13/14/11 and the Evidence paragraph no longer pins a file count. The
+  correction is a local repair on the replay copy, not a new journaled act: the journal's
+  `documents.compose` entry names the corrected input file, so the promotion replay composes the
+  corrected body. Evidence: `evidence/pi-plan-body-correction.md`.
 
 ## Batch gate — the expected authorisation precondition
 
@@ -49,20 +57,27 @@ exit=1
 
 This is the **only** refusal: `rework-batch.py:113-123` refuses a `planned` tranche before it
 reads the roster or the packs. #755 records the tranche-7 review and authorises tranche 8; on a
-fresh snapshot after that, the same command must exit 0 with all three members `PREFLIGHTED`.
-Exit 0 is not claimed here — the refusal is construction's boundary, not a readiness proof.
+fresh pre-write snapshot (`/tmp/snap-8-exec`) after that, the same command must exit 0 with three
+`rework-batch: <KEY> DRY` lines and `{"blocked": 0, "green": 0, "red": 0}` — `PREFLIGHTED` is the
+journal state of the real run, never a dry-run output. Exit 0 is not claimed here — the refusal is
+construction's boundary, not a readiness proof. The real act is the factory command with
+`--publish` (the close gate reads the publisher's documents); receipts and the exit then verify
+against `/tmp/snap-8-post`, the snapshot taken after that run.
 
 ## Verifier preview (S06d, same snapshot)
 
-`verify-project.py --project S06d --snapshot /tmp/snap-8/data --kind snapshot` (receipt written
-outside the repository):
+`python3 scripts/verify-project.py --project S06d --snapshot /tmp/snap-8/data --kind snapshot
+--evidence-dir /tmp/tr8-verify` (the receipt is written outside the repository):
 
 ```
 PASS  S06d-pi-cadence      PI cadence 01a2229e-29a7-… and refinement 01a2229e-3862-… for tranche-8
 PASS  S06d-pi-plan         the tranche-8 PI plan is published
 PASS  S06d-pi-objectives   the tranche-8 PI objectives are published
 PASS  S06d-lessons         lesson 01a2229e-ca74-… carries a statement and evidence from the tranche-8 retro
+S06d: red — 18 checks, 12 failures, 0 warnings
 ```
 
-The remaining checks (baseline, charter, contract, review, closure gate, WBS, product, artefact
-standard, rework) are the factory's work at execution.
+The red is the expected pre-factory state: baseline, charter, contract, review, closure gate,
+WBS, demo credit, product and the artefact/rework standard are the factory's acts. The four PASS
+lines are the readiness subset — the receipt the factory writes after applying the pack, not this
+preview, is the acceptance.

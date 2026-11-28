@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Tranche-8 readiness gate — measured 2026-11-28 · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/readiness-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tranche-8-readiness-gate--measured-2026-11-28">Tranche-8 readiness gate — measured 2026-11-28</h1>
+<p>snapshot: <code>/tmp/snap-8</code> — taken at <code>44aecddc2</code>, generated <code>2026-11-28T15:09:49Z</code>, manifest sha256 <code>f8f428d8d1937bf9d7e4ebe048cb8bcd97b5a22e7c302d9577a9d72b6aec9523</code>. The manifest's <code>files</code> count (999 at this cut) drifts as the shared replay record grows — its sha256 is the snapshot's identity, never the count.</p>
+<h2 id="content-packs">Content packs</h2>
+<pre><code>rework-content-check: S06d content is consistent with the facts
+exit=0
+rework-content-check: S13 content is consistent with the facts
+exit=0
+rework-content-check: S19 content is consistent with the facts
+exit=0</code></pre>
+<p>Commands (all at the pinned snapshot):</p>
+<ul>
+<li><code>python3 scripts/rework-content-check.py --project S06d --content docs/evidence/rework/tranche-8/rework-content-S06d.json --snapshot /tmp/snap-8/data --wsjf 7,6,7,8 --closes true</code></li>
+<li><code>python3 scripts/rework-content-check.py --project S13 --content docs/evidence/rework/tranche-8/rework-content-S13.json --snapshot /tmp/snap-8/data --wsjf 9,7,9,13 --closes true</code></li>
+<li><code>python3 scripts/rework-content-check.py --project S19 --content docs/evidence/rework/tranche-8/rework-content-S19.json --snapshot /tmp/snap-8/data --wsjf 8,6,8,8 --closes false</code></li>
+</ul>
+<h2 id="record-readiness-replay-record-schema-110">Record readiness (replay record, schema 110)</h2>
+<ul>
+<li>Four <code>programme_cadence</code> rows at <code>period='tranche-8'</code>: <code>pi</code> <code>01a2229e-29a7-7c97-82bb-07e11fd358dc</code>, <code>refinement</code> <code>01a2229e-3862-7591-9819-c009d7d9615b</code>, <code>demo</code> <code>01a2229e-391f-75c4-a165-d3af214b4989</code>, <code>retro</code> <code>01a2229e-39c5-787f-9e98-8f148bc74ad2</code>.</li>
+<li>The <code>pi</code> row carries <code>meta.pi_plan</code> (scope, capacity, WIP, objectives, dependencies) and <code>meta.documents</code>: <code>pi-plan</code> <code>01a2229e-663b-7081-816f-da0c5557549a</code>, <code>pi-objectives</code> <code>01a2229e-66df-7557-b881-9f29be775395</code> — both published and <strong>P0-scoped</strong>, unit <code>tranche-8</code>.</li>
+<li>The <code>refinement</code> row carries <code>meta.refinement.wsjf_inputs</code> — S19 8/6/8/8, S06d 7/6/7/8, S13 9/7/9/13 — matching the three packs' WSJF.</li>
+<li>The PI-plan gate is <code>approved</code> (approval <code>01a2229e-bdf3-74ca-bf5f-17f28543c095</code>) as a <code>rule</code> under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+<li>The tranche lesson <code>01a2229e-ca74-7da8-b5db-c807b58d4036</code> is linked to the retro cadence with <code>independent_count=2</code> (card anchors <code>01a20ea0-7dec-79d0-b350-e193e9778941</code> and <code>01a20ec4-d2f2-7dbc-a0c7-417e484a32f0</code>).</li>
+<li>Ten readiness acts are journaled (<code>docs/evidence/record/journal.jsonl</code>, 508 entries, <code>promote-record.py --check</code> green), with their inputs under <code>docs/evidence/record/inputs/tr8/</code>.</li>
+<li>The PI-plan body was corrected in place after this cut: <code>documents.update</code> version 4 (same id <code>01a2229e-663b-7081-816f-da0c5557549a</code>, <code>published_at</code> preserved) — the Backlog-refinement paragraph now reads 13/14/11 and the Evidence paragraph no longer pins a file count. The correction is a local repair on the replay copy, not a new journaled act: the journal's <code>documents.compose</code> entry names the corrected input file, so the promotion replay composes the corrected body. Evidence: <code>evidence/pi-plan-body-correction.md</code>.</li>
+</ul>
+<h2 id="batch-gate--the-expected-authorisation-precondition">Batch gate — the expected authorisation precondition</h2>
+<pre><code>$ python3 scripts/rework-batch.py --tranche 8 --snapshot /tmp/snap-8/data \
+    --content-dir docs/evidence/rework --journal docs/evidence/rework/batch/tranche-8.jsonl --dry-run
+tranche 8 is &#39;planned&#39;; only authorised/closed/in_review may be reworked
+exit=1</code></pre>
+<p>This is the <strong>only</strong> refusal: <code>rework-batch.py:113-123</code> refuses a <code>planned</code> tranche before it reads the roster or the packs. #755 records the tranche-7 review and authorises tranche 8; on a fresh pre-write snapshot (<code>/tmp/snap-8-exec</code>) after that, the same command must exit 0 with three <code>rework-batch: &lt;KEY&gt; DRY</code> lines and <code>{"blocked": 0, "green": 0, "red": 0}</code> — <code>PREFLIGHTED</code> is the journal state of the real run, never a dry-run output. Exit 0 is not claimed here — the refusal is construction's boundary, not a readiness proof. The real act is the factory command with <code>--publish</code> (the close gate reads the publisher's documents); receipts and the exit then verify against <code>/tmp/snap-8-post</code>, the snapshot taken after that run.</p>
+<h2 id="verifier-preview-s06d-same-snapshot">Verifier preview (S06d, same snapshot)</h2>
+<p><code>python3 scripts/verify-project.py --project S06d --snapshot /tmp/snap-8/data --kind snapshot --evidence-dir /tmp/tr8-verify</code> (the receipt is written outside the repository):</p>
+<pre><code>PASS  S06d-pi-cadence      PI cadence 01a2229e-29a7-… and refinement 01a2229e-3862-… for tranche-8
+PASS  S06d-pi-plan         the tranche-8 PI plan is published
+PASS  S06d-pi-objectives   the tranche-8 PI objectives are published
+PASS  S06d-lessons         lesson 01a2229e-ca74-… carries a statement and evidence from the tranche-8 retro
+S06d: red — 18 checks, 12 failures, 0 warnings</code></pre>
+<p>The red is the expected pre-factory state: baseline, charter, contract, review, closure gate, WBS, demo credit, product and the artefact/rework standard are the factory's acts. The four PASS lines are the readiness subset — the receipt the factory writes after applying the pack, not this preview, is the acceptance.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-8/readiness-gate.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

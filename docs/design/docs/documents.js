@@ -2999,6 +2999,114 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-6/tranche-review-evidence.md"
     },
     {
+      "title": "Evidence — tranche-8 demo cadence",
+      "path": "docs/evidence/rework/tranche-8/evidence/demo-cadence.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/demo-cadence.md",
+      "section": "Evidence",
+      "sha256": "79c33710f23cc798527c0e16c0b4918b317a8571976428d130ceec504b8222a5",
+      "bytes": 368,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/demo-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-8 lesson",
+      "path": "docs/evidence/rework/tranche-8/evidence/lesson.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/lesson.md",
+      "section": "Evidence",
+      "sha256": "55ef4163baaa0613a907cb275269b4e684f2556016578af4dca237c2c75663f5",
+      "bytes": 637,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/lesson.md"
+    },
+    {
+      "title": "Evidence — tranche-8 PI plan approval",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-approval.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-approval.md",
+      "section": "Evidence",
+      "sha256": "2ecdf07257c87192db4323db8cdf05e387baec1f2f8ea60a1a568c47477fcd9a",
+      "bytes": 412,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-approval.md"
+    },
+    {
+      "title": "Evidence — tranche-8 pi cadence",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-cadence.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-cadence.md",
+      "section": "Evidence",
+      "sha256": "8699bf42b4dd351a80e3425dfce9ec5709b1dae28bd4df8f40723f124891fcfe",
+      "bytes": 526,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-8 PI row plan",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-meta.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-meta.md",
+      "section": "Evidence",
+      "sha256": "4ac39f4480b53b5144bd15035a0860dd3c06b672816d79382535b22c6f422d11",
+      "bytes": 418,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-meta.md"
+    },
+    {
+      "title": "Evidence — tranche-8 PI objectives",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-objectives.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-objectives.md",
+      "section": "Evidence",
+      "sha256": "bb16377711ea1ebebde803cd1445689c4d5af7e05c908ffc7bd804f1ef384fbe",
+      "bytes": 377,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-objectives.md"
+    },
+    {
+      "title": "Evidence — tranche-8 PI plan body correction (version 3)",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-plan-body-correction.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-plan-body-correction.md",
+      "section": "Evidence",
+      "sha256": "e0cbc1f3d1bbf00c133496c0b3e5b42122420ae8d5182f8572a9f79825671c7a",
+      "bytes": 1384,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-plan-body-correction.md"
+    },
+    {
+      "title": "Evidence — tranche-8 PI plan",
+      "path": "docs/evidence/rework/tranche-8/evidence/pi-plan.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/pi-plan.md",
+      "section": "Evidence",
+      "sha256": "cea1ec3881131c86361af484e0a9657c78defa481bccb5fd7712bf21b14088e3",
+      "bytes": 896,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/pi-plan.md"
+    },
+    {
+      "title": "Evidence — tranche-8 backlog-refinement cadence",
+      "path": "docs/evidence/rework/tranche-8/evidence/refinement-cadence.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/refinement-cadence.md",
+      "section": "Evidence",
+      "sha256": "b12d3dd699220228d7df08f5f70830a2b381908a973005dc0c7026aa4dd76327",
+      "bytes": 488,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/refinement-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-8 refinement WSJF",
+      "path": "docs/evidence/rework/tranche-8/evidence/refinement-wsjf.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/refinement-wsjf.md",
+      "section": "Evidence",
+      "sha256": "5df91e51fc234fa80e4f423a067c0a1c0088a7e2d6f93744f5e073a8e78da565",
+      "bytes": 654,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/refinement-wsjf.md"
+    },
+    {
+      "title": "Evidence — tranche-8 retro cadence",
+      "path": "docs/evidence/rework/tranche-8/evidence/retro-cadence.html",
+      "source": "docs/evidence/rework/tranche-8/evidence/retro-cadence.md",
+      "section": "Evidence",
+      "sha256": "9b4157339cfa4976a49fdcf949cf372f133fa495e0262b42464d6b57c2ab80c3",
+      "bytes": 369,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/evidence/retro-cadence.md"
+    },
+    {
+      "title": "Tranche-8 readiness gate — measured 2026-11-28",
+      "path": "docs/evidence/rework/tranche-8/readiness-gate.html",
+      "source": "docs/evidence/rework/tranche-8/readiness-gate.md",
+      "section": "Evidence",
+      "sha256": "4fed398b3ff5d8668c20f5da9e19996b24567db1180cb86b1221beb977854412",
+      "bytes": 5025,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-8/readiness-gate.md"
+    },
+    {
       "title": "S04 P4.1 — the live coding, worker and billing receipts",
       "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
       "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",
