@@ -118,6 +118,17 @@ POST /api/query  leaf_ids=[id], metadata={capability:design} -&gt; 1 tenant hit<
 <li><code>capabilities.get</code> <code>{ready, blocking[]}</code> and the <code>capability_agents</code> caps refusal wait on the S15 owner's step-5 handlers (not built; it keeps step 5).</li>
 <li>The catalogue → capability data move is unproven on a pre-existing DB (fresh-DB harness only).</li>
 </ul>
+<h2 id="live-action-path-proof--2026-11-28">Live action-path proof — 2026-11-28</h2>
+<p>The S15 gate's claim — a capability bound to a published pack returns a hit carrying <code>pack</code> and <code>layer</code> — is now proven through the product path against the running compose <code>strata</code>, not a stub. <code>crates/actions/tests/strata_live_action.rs</code> (ignored by default) starts its own Postgres, publishes a pack as the platform owner (<code>0197a0c0-0000-7000-8000-0000000000a1</code>) through strata's owner routes (store → document with <code>provenance</code> → <code>POST /api/platform/packs</code> → publish), seeds the tenant's <code>strata_rag.token</code>, binds the pack with <code>capabilities.bind_knowledge</code>, and invokes <code>knowledge.query</code>.</p>
+<pre class="sh"><code>CONVEYOR_STRATA_RAG_URL=http://127.0.0.1:8092 ~/.claude/scripts/cargo-guard.py test \
+  -p conveyor-actions --test strata_live_action -- --ignored --nocapture</code></pre>
+<p>Measured: <strong>1 passed / 0 failed / 5 filtered out</strong> (2.83 s). The returned pack is the run's own freshly published key — the key is unique per run:</p>
+<ul>
+<li><code>packs = ["s15-live-action-01a2227e794a769fa7cc34187ab6324a@1"]</code></li>
+<li><code>hits[0].pack = "s15-live-action-01a2227e794a769fa7cc34187ab6324a@1"</code></li>
+<li><code>hits[0].layer = "platform"</code></li>
+<li>the seeded capability code was <code>analysis</code>; <code>hits[0].scores.rerank = 0.94606936</code> (post-penalty, and the hit made the <code>top_k</code> cut).</li>
+</ul>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/S15-RUNTIME.md</code> at build time.</span>
