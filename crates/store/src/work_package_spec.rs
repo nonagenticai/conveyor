@@ -158,7 +158,7 @@ pub async fn upsert_tx(
         .bind(&input.dor)
         .fetch_one(&mut *conn)
         .await?;
-    Ok(WorkPackageSpecRecord::try_from(row)?)
+    WorkPackageSpecRecord::try_from(row)
 }
 
 /// Whether an evidence object's named run or step belongs to `card_id` in this tenant.
