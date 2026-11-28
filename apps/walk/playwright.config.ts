@@ -24,6 +24,14 @@ export default defineConfig({
   use: {
     baseURL,
     channel: process.env.PLAYWRIGHT_CHANNEL ?? "chrome",
+    // #916. The performance budgets read `performance.memory.usedJSHeapSize`, and Chrome floors
+    // that value at 10,000,000 bytes unless this switch is set: a real heap of 2.6 MB is reported
+    // as exactly 10000000. A ratio taken without it compares a floor to a floor, so the soak
+    // either passes trivially or reports growth that is mostly the floor giving way — which is
+    // how a 1.89x was recorded against a client whose GC'd heap is flat. Measured 2026-11-28:
+    // playwright-core 1.65.0 sets no such switch, and the same page read 10000000 without it and
+    // 2623436 with it.
+    launchOptions: { args: ["--enable-precise-memory-info"] },
     trace: "retain-on-failure",
     storageState: devLogin
       ? {
