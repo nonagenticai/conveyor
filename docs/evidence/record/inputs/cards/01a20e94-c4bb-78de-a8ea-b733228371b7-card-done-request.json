@@ -1,0 +1,7 @@
+{
+ "card_id": "01a20e94-c4bb-78de-a8ea-b733228371b7",
+ "gate": "card_done",
+ "kind": "card_dod",
+ "require_evidence": true,
+ "evidence_waiver_reason": "the package's finding v1-w4a-2 is resolved in docs/evidence/v1-conformance-findings.json (crates/actions/tests/tool_platform.rs); that resolution is the card's Definition of Done"
+}
