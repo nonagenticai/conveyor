@@ -1,0 +1,36 @@
+{
+  "schema": "conveyor-tranche-member-pin/v1",
+  "tranche": 11,
+  "measured_at": "2026-11-28",
+  "members": {
+    "S14": {
+      "record_status": "active",
+      "manifest_pin_before": "active",
+      "manifest_pin_after": "active",
+      "check_project": "passes: the pin and the row agree",
+      "closes_project": false,
+      "route": "keep-active: issue #29 is open, so the project does not close"
+    },
+    "T6": {
+      "record_status": "closed",
+      "manifest_pin_before": "active",
+      "manifest_pin_after": "closed",
+      "check_project": "passes: the pin and the row agree",
+      "closes_project": true,
+      "route": "reopen -> declare closure_outputs=[closure-review] -> publish the retrospective closure review -> close gate decided by a distinct approver"
+    },
+    "T8": {
+      "record_status": "closed",
+      "manifest_pin_before": "active",
+      "manifest_pin_after": "closed",
+      "check_project": "passes: the pin and the row agree",
+      "closes_project": true,
+      "route": "reopen -> declare closure_outputs=[closure-review] -> publish the retrospective closure review -> close gate decided by a distinct approver"
+    }
+  },
+  "why": "A closed member whose manifest pins it active fails check_project as P0 and makes closes_project false, so the closure content its pack carries could never be published. The pin now states the record's measured status (the S20 precedent), and the factory still refuses a close without closure and closure_review.",
+  "readbacks": {
+    "pins": "python3 -c '<T6/T8-project regex>' -> T6-project pin: closed; T8-project pin: closed",
+    "closes_project": "importlib-loaded rework-batch.py -> manifest_status('T6')='closed', manifest_status('T8')='closed', manifest_status('S14')='active'; closes_project true for T6/T8, false for S14"
+  }
+}

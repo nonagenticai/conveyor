@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>PI plan approval — tranche 11 · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-11/evidence/pi-approval.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="pi-plan-approval--tranche-11">PI plan approval — tranche 11</h1>
+<p>Action: <code>cadences.approve_plan</code> on the PI cadence with <code>docs/evidence/record/inputs/tr11/pi-plan_tranche-11.json</code>; read back with <code>--read-action cadences.list --read-match kind=pi</code>.</p>
+<ul>
+<li>approval <code>01a222e7-9198-7400-8633-d3542cb68347</code>, decision <code>approve</code>, <code>decided_by_kind</code> <code>rule</code>, status <code>approved</code>, under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+<li>the PI row's own state stays <code>awaiting_approval</code>, as tranche 8's and tranche 9's do: the gate is the approval row, not the cadence state.</li>
+</ul>
+<p>The approval is the delegated rule decision the readiness session is authorised to make; the tranche review that closes tranche 11 remains #755's human act.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-11/evidence/pi-approval.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

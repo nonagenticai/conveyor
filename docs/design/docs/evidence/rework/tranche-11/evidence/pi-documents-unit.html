@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>PI documents carry their unit — tranche 11 · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-11/evidence/pi-documents-unit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="pi-documents-carry-their-unit--tranche-11">PI documents carry their unit — tranche 11</h1>
+<p>The trap: <code>verify-project.py::_published_for_period</code> matches the literal <code>tranche-11</code> in a PI output's title and unit. A composed PI document without <code>unit</code> is invisible to the check, so <code>pi_plan</code> and <code>pi_objectives</code> are red for every member even though the documents exist.</p>
+<p>Both inputs carry <code>"unit": "tranche-11"</code>, and the read-back proves it in the platform outputs index:</p>
+<pre><code>python3 -c &#39;import json,re; d=json.loads(re.search(r&quot;=\s*(\{.*\})\s*;?\s*$&quot;, open(&quot;/tmp/snap-11/docs/outputs.js&quot;).read(), re.S).group(1)); rows=[x for x in d[&quot;outputs&quot;] if x.get(&quot;unit&quot;)==&quot;tranche-11&quot;]; print([(x[&quot;category&quot;], x[&quot;project_key&quot;], x[&quot;title&quot;]) for x in rows])&#39;</code></pre>
+<p>Both rows are present: <code>pi-plan</code> and <code>pi-objectives</code>, project key <code>P0</code>, title naming tranche 11.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-11/evidence/pi-documents-unit.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

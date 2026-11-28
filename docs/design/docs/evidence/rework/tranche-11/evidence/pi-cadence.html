@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>PI cadence — tranche 11 · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-11/evidence/pi-cadence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="pi-cadence--tranche-11">PI cadence — tranche 11</h1>
+<p>Action: <code>cadences.create</code> with <code>docs/evidence/record/inputs/tr11/cadence_tranche-11_pi.json</code>. Read back on the replay record (<code>cadences.list</code>, <code>--read-match kind=pi --read-match period=tranche-11</code>).</p>
+<ul>
+<li>id <code>01a222e7-0eb9-7386-8e46-4b8f39fb8302</code>, kind <code>pi</code>, period <code>tranche-11</code>, state <code>planned</code> at creation; version 2 after the PI metadata update.</li>
+<li>meta at creation: <code>tranche_id</code> <code>01a1e9e1-33f4-70a7-8af4-658f1c583e99</code>, <code>tranche_number</code> 11, <code>delegation_ref</code> <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+</ul>
+<pre><code>python3 scripts/programme-record.py --action cadences.create \
+  --input @docs/evidence/record/inputs/tr11/cadence_tranche-11_pi.json \
+  --evidence docs/evidence/record/inputs/tr11/cadence_tranche-11_pi.json \
+  --read-action cadences.list \
+  --read-input &#39;{&quot;programme_id&quot;:&quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;}&#39; \
+  --read-match kind=pi --read-match period=tranche-11 \
+  --local-bin /tmp/conv11-bin/conveyor --quiet</code></pre>
+<p>The row is what clears <code>pi_cadence_missing:tranche-11</code>: the audit at the pinned snapshot no longer reports that rule for this tranche.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-11/evidence/pi-cadence.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
