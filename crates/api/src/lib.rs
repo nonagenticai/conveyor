@@ -426,31 +426,13 @@ mod tests {
         // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
         // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
         // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
-        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551.
-        // T15 (#86) adds ten internal authoring/BYO actions: 551 -> 561.
-        // T12 (#88) adds three internal kata Gets: 561 -> 564.
-        // #655 (T17b) adds one internal read (`authoring.intakes`): 564 -> 565.
-        // S21 step 10 (#656) adds `ladder.case`, `decision_option_sets.get|set` and
-        // `ladder.precheck`: 565 -> 569.
-        // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
-        // `lean4.check|elaborate|prove`): 569 -> 574.
-        // #557 adds eight internal binding/catalogue actions
-        // (`tool_bindings.create|update|retire|list`, `tools.list|get`, `toolkits.list` and
-        // `tool_calls.list`): 574 -> 582; internal 550 -> 558, external stays 24.
-        // T19F (#683) adds five internal actions (`meetings.type_get|type_list`,
-        // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
-        // 582 -> 587; internal 558 -> 563, external stays 24.
-        // S21 step 11 (#697) adds `organisation_layers.list|set`: 587 -> 589.
-        // #745 adds the four `analyse.*` actions: 589 -> 593; internal 565 -> 569.
-        // Delivery proofs (#744) adds `proofs.record|reverify|get|list`: 593 -> 597; internal
-        // 569 -> 573.
-        // #779 adds `development_projects.list` (internal): 597 -> 598.
-        // Delivery proofs (#836) adds `proofs.render` (internal): 598 -> 599.
-        // #842 adds `feedback.create|list` (internal): 599 -> 601.
-        // Delivery proofs (#837) adds `proofs.attest` (internal): 601 -> 602.
+        // #77 T5 (main) adds `proofs.render`: 631 -> 632 (internal).
+        // #842 (main) adds two internal actions (`feedback.create|list`): 632 -> 634.
+        // #859 (main) adds one internal action (`proofs.attest`): 634 -> 635.
+        // The merged registry: 610 internal + 25 external.
         assert_eq!(
             registry.len(),
-            602,
+            635,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -478,15 +460,27 @@ mod tests {
              tranches.authorise) (497) + #511's five \
              rework-path actions (programmes.baseline|baseline_approve|baselines_list, \
              projects.charter, projects.reopen) (502) + #524's closure-request action \
-             (projects.close_request) (503) + #15's five prompt_recipes actions
-             (create, get, list, activate, retire) (508) + #560's five scientific read actions \
-             (scientific_stats.meta_analysis|confidence_interval|trend, \
-             scientific_formal.translate|verify) (513) + T15's ten authoring/BYO actions \
+             (projects.close_request) (503) + T15's ten authoring/BYO actions \
              (toolkits.import_openapi|register_mcp|discover_mcp, \
-             tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) — the \
-             registry total is 587 with the T6, T8, T12, #655, S21-step-10, #561, #557 and #683 \
-             increments above
-             it. \
+             tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) (596) + \
+             #526's reviews_get (504), its four SAFe demo and \
+             lesson actions (508), its two retro actions (510), its cadences.approve_plan \
+             (511) and its tranches.resume (512), plus the five tenant-asset authoring actions \
+             (authoring.intake|draft|review|publish, authoring.assets) (517) + T5's ten kata \
+             actions (kata.open|observe|analyse|propose|measure|adopt|propagate|close, \
+             kata.get|list) (527) + v1-w1c-3's ladder.prepare and laya.classify (529) + \
+             v1-w1c-4's five decision-option actions \
+             (decision_options.create|update|publish|refine|get) (534) + #15's five \
+             prompt_recipes actions (create, get, list, activate, retire) (539) + #560's five \
+             scientific read actions (scientific_stats.meta_analysis|confidence_interval|trend, \
+             scientific_formal.translate|verify) (546) + #556/#590's eight internal storage, tool-binding \
+             and resume actions (554) + #526's five governed_assets actions (559). \
+             Main's a94d2634 commits add T12's kata.standardise|stretch|sustain and #655's \
+             authoring.intakes; S21 step 10's ladder.case, ladder.precheck and \
+             decision_option_sets.get|set are retired with the duplicate ladder path; T11's \
+             metrics.reconciliation read is the 604th action; T11's billing shim adds one \
+             external read (`billing.rollup`), the 619th (619: 594 internal, 25 external); \
+             v1-w2c-5's `trace_links.view` is the 620th (595 internal, 25 external). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

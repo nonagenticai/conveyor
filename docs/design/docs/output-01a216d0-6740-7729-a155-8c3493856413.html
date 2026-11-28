@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T9 (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="eb3b9ef550d64de3243dcb759aac86d39f1facb2ca6b7cec535ddb6481bf0218" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>eb3b9ef550d64de3243dcb759aac86d39f1facb2ca6b7cec535ddb6481bf0218</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Closure review — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>T9's §12 gate asks that an architecture project pass Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; that a phase missing a mandatory artefact be refused; that a delivery project without a live contract be refused at design; that a compliance review record one level and a waiver name its owner and review date; and that an H review produce exactly one change or kata. Clause one holds: <code>togaf_architecture_phases.rs::phases_a_to_f_pass_in_order</code> and the artefact and capability suites prove the approved-artefact and live-contract path. Clause two holds: <code>::a_draft_artefact_refuses_the_contract</code>. Clause three holds: <code>togaf_delivery_design_gate.rs::a_delivery_project_without_a_contract_cannot_pass_design</code> and <code>::a_superseded_contract_refuses_design</code>. Clause four holds: <code>architecture_compliance.rs::one_level_and_a_dated_waiver</code>. Clause five does not: the plan's <code>togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate</code> is absent at HEAD and v1-p81-6 records that exactly-one is not enforced.</p>
+<h2>Evidence</h2>
+<p><code>acceptance/programme/T9.toml</code> is the project's manifest. <code>docs/evidence/v1-conformance-findings.json</code> carries the twelve T9 rows: six resolved at <code>92e6b223</code> and six open. The test files and function names listed in the Phase-G findings were confirmed to exist at HEAD; no test was executed by this authoring pass. The console and seed checks exist but were not run. The delivery commits are <code>c8204432</code> and <code>ddf489ad</code>.</p>
+<h2>Open items</h2>
+<ul>
+<li>v1-p81-4 (P1) — a draft Board can govern with an empty charter. Owned by T9.</li>
+<li>v1-p81-5 (P1) — untyped or unprojected artefacts and links with no tenant/project consistency. Owned by T9.</li>
+<li>v1-p81-6 (P2) — Phase H enforces existence, not exactly one typed outcome; the plan's systemic-finding test is absent. Owned by T9.</li>
+<li>v1-w2a-3 (P1) — profile adoption accepts any UUID as its board decision. Owned by T9.</li>
+<li>v1-w2a-4 (P1) — <code>contracts_request</code> can retire another project's live contract. Owned by T9.</li>
+<li>v1-w2a-6 (P2) — <code>phase_progress</code> accepts draft artefacts and superseded contracts. Owned by T9.</li>
+</ul>
+<p>None is waived.</p>
+<h2>Decision</h2>
+<p>Close T9 on the programme's P0-only product gate: no open P0 finding remains. Requested by <code>conveyor-e2e</code> and decided by the distinct approver <code>conveyor-approver</code> under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the requester is not the approver. The six open items are carried as dated packages and must be disposed by a recorded decision at the programme's viability review if still open. This review is retrospective and does not attest contemporaneous intent.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+ "input": {
+  "run_id": "01a21a05-2417-7472-9e2a-aaf4c3a88770",
+  "toolkit_key": "scientific",
+  "effect_ceiling": "read",
+  "credential_alias": "licence.token"
+ }
+}

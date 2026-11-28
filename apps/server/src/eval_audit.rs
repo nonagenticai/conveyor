@@ -557,6 +557,7 @@ async fn judge_controls(
             registry(),
             tenant,
             InvokeRequest {
+                credential_alias: None,
                 action: "completions.create".to_owned(),
                 input: request,
                 precondition: None,

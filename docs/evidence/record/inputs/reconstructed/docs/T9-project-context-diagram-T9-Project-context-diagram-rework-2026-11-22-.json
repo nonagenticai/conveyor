@@ -1,0 +1,8 @@
+{
+ "title": "T9 \u2014 Project context diagram (rework, 2026-11-22)",
+ "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+ "category": "project-context-diagram",
+ "body": "# Project Context Diagram \u2014 T9 TOGAF ADM capability\n\n## Context\n\nT9 is the programme's architecture capability: it defines the ADM phases, the artefact and link\nmodel, the architecture contracts, the compliance review, the waiver register, the Architecture\nBoard, maturity and skills. It sits inside tenant `nonagentic`, programme\n`01a1d039-0d24-7d16-ae52-4841e96ccfac`, tranche 4.\n\n## Affected organisation\n\n| Actor | Role |\n|---|---|\n| Programme architect (`conveyor-e2e`) | delivery and the record |\n| `conveyor-approver` | approval, distinct from the requester |\n| Architecture Board (`conveyor-architecture-board`) | decides A\u2013D artefacts and the contract |\n| Programme board | reviews the tranche |\n\n## Affected systems\n\n- **conveyor store** \u2014 the eleven ADM tables of \u00a710.3 and the 26 `architecture.*` actions.\n- **the architecture screens** \u2014 the ADM destination of \u00a710.5 and the contracts/reviews views.\n- **the seed** \u2014 the adopted ADM profile and artefact standard the phases read.\n- **T10 and T12** \u2014 the delivery gates and the one-organisation-loop acceptance that depend on\n  this capability's contracts and compliance levels.\n",
+ "publishable": true,
+ "unit": "T9"
+}

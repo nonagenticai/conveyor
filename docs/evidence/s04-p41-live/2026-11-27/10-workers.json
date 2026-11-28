@@ -3,7 +3,7 @@
     {
       "enabled": true,
       "mechanism": "launchctl",
-      "name": "mini1",
+      "name": "media-1",
       "role": "image, OCR and speech host",
       "units": [
         "com.nonagentic.conveyor-probe",
@@ -16,7 +16,7 @@
     {
       "enabled": true,
       "mechanism": "launchctl",
-      "name": "mini2",
+      "name": "media-2",
       "role": "audio, text and vision model host (launchd)",
       "units": [
         "com.nonagentic.conveyor-probe"

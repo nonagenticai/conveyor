@@ -1,0 +1,198 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T4 is closed",
+      "detail": "project T4 is closed",
+      "id": "T4-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "T4-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d33-7e7e-890e-b437b0c78db9\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "T4-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
+      "id": "T4-closure-outputs",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a2028b-dde6-7ed4-9e47-6e582f2341d8 approved by board decision 01a2028b-f63c-7c27-b580-d4cba2c1e70f about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "T4-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a219df-f43e-72a4-b367-9bfa02d68dde (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "T4-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "latest closure gate 01a21a0e-38ed-7aa8-83ad-65f5688aed2e decided by a distinct approver",
+      "id": "T4-closure-gate",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T4-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4",
+      "id": "T4-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "the tranche-4 PI plan is published",
+      "id": "T4-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "the tranche-4 PI objectives are published",
+      "id": "T4-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
+      "id": "T4-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "T4-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
+      "id": "T4-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "T4-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "no open standard artefact package for this project",
+      "id": "T4-artefact-standard",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "T4-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 -I scripts/check-t4-coach-gate.py --self-test",
+      "description": "the named coach tests exercise the gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates instead of a second card; no coach card about a coach card; a systemic class opens a kata; a duplicate remedy is refused",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "T4-coach-gate",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": "t4-coach-gate: 4 clauses and 12 tests are mapped\n"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: T4-project, T4-baseline, T4-charter, T4-closure-outputs, T4-contract, T4-review, T4-closure-gate, T4-waivers, T4-pi-cadence, T4-pi-plan, T4-pi-objectives, T4-wsjf, T4-demo-credits, T4-lessons, T4-product, T4-artefact-standard, T4-rework, T4-coach-gate",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
+  "generated_at": "2026-11-26T22:51:17.977922+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T4.toml",
+  "name": "Kanban coach",
+  "project": "T4",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-26T22:48:49.950980+00:00",
+    "git_sha": "18276de5e8ad4d19fa4c783109dbada1aa107be9",
+    "path": "retained-snapshot/18276de5e8ad4d19fa4c783109dbada1aa107be9"
+  },
+  "verdict": "green",
+  "warnings": []
+}

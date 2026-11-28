@@ -16,8 +16,9 @@
 //! payload `{entity, id, op}` and the topic `<entity>:<id>` — the same shape the portfolio
 //! surface uses, so a subscriber watches one row or a family.
 
-use chrono::{DateTime, Utc};
-use conveyor_domain::spine::{PlanError, WsjfInputs, wsjf};
+use chrono::{DateTime, NaiveDate, Utc};
+use conveyor_domain::spine::{PlanError, WbsKind, WsjfInputs, tranche_review_has_evidence, wsjf};
+use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -33,10 +34,10 @@ use crate::views::{Page, PageIn};
 pub use crate::board::views::IdIn;
 pub use store::spine::{
     BaselineRecord, BenefitLinkRecord, BenefitPatch, BenefitRecord, CadencePatch, CadenceRecord,
-    DependencyRecord, InFlightRecord, NewBenefitLink, NewBenefitProfile, NewRegisterItem,
-    NewStakeholderProfile, NewWbsNode, PlanStoreError, RegisterRecord, StakeholderPatch,
-    StakeholderRecord, TranchePatch, TrancheRecord, TrancheReviewRecord, TransitionPatch,
-    TransitionRecord, WbsPatch, WbsRecord,
+    DemoCreditRecord, DependencyRecord, InFlightRecord, LessonRecord, NewBenefitLink,
+    NewBenefitProfile, NewRegisterItem, NewStakeholderProfile, NewWbsNode, PlanStoreError,
+    RegisterRecord, StakeholderPatch, StakeholderRecord, TranchePatch, TrancheRecord,
+    TrancheReviewRecord, TransitionPatch, TransitionRecord, WbsPatch, WbsRecord,
 };
 
 /// The one event every spine mutation emits.
@@ -69,7 +70,7 @@ async fn emit_spine_event(
 }
 
 /// A plan store failure as the status the caller can act on.
-fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
+pub(crate) fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
     match error {
         PlanStoreError::NotFound { what } => ActionError::resource_not_found(what),
         PlanStoreError::Stale { what } => ActionError::new(
@@ -78,6 +79,46 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             format!("the {what} changed since it was read"),
         ),
         PlanStoreError::Parent(parent) => parent_error(parent, action),
+        // v1-p5-5 (SPEC_V2 §5.1): a work package without a card has no path to the work.
+        PlanStoreError::CardRequired => invalid(
+            "card_id",
+            "card_required",
+            "a work package must name the card that executes it",
+        ),
+        PlanStoreError::Illegal(PlanError::CadenceWrongKind { expected, actual }) => invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            format!("the cadence is {actual}; a credit needs a {expected} cadence"),
+        ),
+        PlanStoreError::Illegal(PlanError::CadenceIllegalTransition { from, to }) => {
+            ActionError::new(
+                409,
+                "cadence_illegal_transition",
+                format!("the cadence is {from}; it cannot move to {to}"),
+            )
+        }
+        PlanStoreError::Illegal(PlanError::DemoDeliverableNotComplete) => invalid(
+            "deliverable_id",
+            "deliverable_not_accepted",
+            "a credit needs an accepted deliverable",
+        ),
+        PlanStoreError::Illegal(PlanError::DemoEvidenceMissing) => invalid(
+            "deliverable_id",
+            "evidence_missing",
+            "a credit needs a deliverable with at least one evidence ref",
+        ),
+        PlanStoreError::Illegal(PlanError::DemoEvidenceUntyped) => invalid(
+            "deliverable_id",
+            "evidence_untyped",
+            "a credit needs typed evidence refs: a non-empty string or an object with a value",
+        ),
+        PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(key)) => invalid(
+            "cadence_id",
+            "finding_incomplete",
+            format!(
+                "the retro finding {key:?} needs a statement, evidence and, when systemic, a kata block"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::DependencyCycle { from, to }) => ActionError::new(
             409,
             "dependency_cycle",
@@ -103,10 +144,31 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_map_incomplete",
             format!("a benefits-map edge is missing: {missing:?}"),
         ),
+        PlanStoreError::Illegal(PlanError::BenefitOutputUnresolved { output_ref }) => invalid(
+            "output_ref",
+            "benefit_output_unresolved",
+            format!(
+                "output_ref {output_ref:?} names no wbs_node of this programme; pass the \
+                 node's id"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceMissing) => invalid(
             "evidence",
             "tranche_evidence_missing",
             "a tranche review needs baselines, benefit status and the risk register",
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceUnresolved { class }) => invalid(
+            "evidence",
+            "tranche_review_evidence_unresolved",
+            format!("the tranche review cites {class} ids that name no row of this programme"),
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheBaselineNotApproved { kind }) => invalid(
+            "evidence",
+            "tranche_baseline_not_approved",
+            format!(
+                "a {kind} baseline is not approved; cite an approved management, governance or \
+                 boundary baseline"
+            ),
         ),
         PlanStoreError::Illegal(PlanError::TrancheReviewNotContinue) => ActionError::new(
             409,
@@ -138,6 +200,23 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_baseline_missing",
             "a benefit with no measured baseline cannot record a post-transition measurement",
         ),
+        PlanStoreError::Illegal(PlanError::BenefitMeasurementInvalid { field }) => invalid(
+            field,
+            "benefit_measurement_invalid",
+            "a baseline or post reading is a number and a unit; a missing value, a blank unit \
+             and a placeholder unit are not measurements",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitMeasurementEvidenceMissing) => invalid(
+            "evidence",
+            "benefit_measurement_evidence_missing",
+            "the readings a realized claim cites must each carry the evidence behind them",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitPostMeasurementMissing) => invalid(
+            "post_measured_at",
+            "benefit_post_measurement_missing",
+            "a benefit is realised only by a post measurement taken after the transition was \
+             enacted",
+        ),
         PlanStoreError::Illegal(PlanError::BenefitChangeRequired) => ActionError::new(
             409,
             "benefit_change_required",
@@ -163,6 +242,53 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
         PlanStoreError::Illegal(PlanError::TrancheRetired) => {
             ActionError::new(409, "tranche_retired", "the tranche is retired")
         }
+        PlanStoreError::Illegal(PlanError::TrancheNotPaused { state }) => ActionError::new(
+            409,
+            "tranche_not_paused",
+            format!("the tranche is {state}; only a paused tranche can be resumed"),
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheResumeApprovalMissing { approval_id }) => {
+            invalid(
+                "approval_id",
+                "approval_missing",
+                format!(
+                    "approval {approval_id} is not an approved tranche.resume gate naming this \
+                 tranche"
+                ),
+            )
+        }
+        PlanStoreError::Illegal(PlanError::RetroFindingWithoutLesson(key)) => invalid(
+            "cadence_id",
+            "retro_finding_without_lesson",
+            format!("the retro finding {key:?} has no lesson; propose one before closing"),
+        ),
+        PlanStoreError::Illegal(PlanError::ClosureAssetMissing) => ActionError::new(
+            409,
+            "programme_closure_asset_missing",
+            "the programme has no approved closure asset; decide its closure first",
+        ),
+        PlanStoreError::Illegal(PlanError::RealizationPlanMissing) => ActionError::new(
+            409,
+            "programme_realization_plan_missing",
+            "the programme has no approved or published benefits realization plan",
+        ),
+        PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing) => ActionError::new(
+            409,
+            "programme_post_closure_owner_missing",
+            "the realization plan's post_closure_owner must name a job id in this tenant",
+        ),
+        PlanStoreError::Illegal(PlanError::LessonEvidenceMissing) => invalid(
+            "evidence",
+            "required",
+            "a lesson needs at least one evidence reference",
+        ),
+        PlanStoreError::PiPlanNotApproved => ActionError::new(
+            409,
+            "pi_plan_not_approved",
+            "the PI plan has no approved human decision: a person must approve it with \
+             cadences.approve_plan before any card is drafted",
+        ),
+        PlanStoreError::Approval(error) => plan_approval_error(error, action),
         PlanStoreError::Illegal(other) => invalid("input", "plan_refused", other.to_string()),
         PlanStoreError::Conflict { what, why } => ActionError::new(
             409,
@@ -174,6 +300,74 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             ActionError::internal()
         }
         PlanStoreError::Database(error) => store_error(error, action),
+    }
+}
+
+/// A gate or decision refusal on the PI-plan approval path.
+fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> ActionError {
+    match error {
+        store::ApprovalStoreError::NotFound => ActionError::resource_not_found("such approval"),
+        store::ApprovalStoreError::Conflict => ActionError::new(
+            409,
+            "conflict",
+            format!("{action:?}: a pending approval already gates this plan"),
+        ),
+        store::ApprovalStoreError::AlreadyDecided => ActionError::new(
+            409,
+            "conflict",
+            format!("{action:?}: this approver already decided the gate"),
+        ),
+        store::ApprovalStoreError::Illegal(ApprovalError::RequesterCannotDecide) => {
+            ActionError::new(
+                409,
+                "requester_cannot_decide",
+                format!("{action:?}: the person who opened the plan's gate cannot decide it"),
+            )
+        }
+        store::ApprovalStoreError::Illegal(error) => {
+            ActionError::new(409, "conflict", error.to_string())
+        }
+        store::ApprovalStoreError::Vocabulary { what, value } => {
+            tracing::error!(what, value = %value, "a stored approval value is outside the domain");
+            ActionError::internal()
+        }
+        store::ApprovalStoreError::Parent(error) => parent_error(error, action),
+        store::ApprovalStoreError::Run(error) => {
+            tracing::error!(%error, action, "decide a PI plan gate");
+            ActionError::internal()
+        }
+        store::ApprovalStoreError::HumanOnlyGate { .. } => ActionError::new(
+            403,
+            "human_only",
+            format!("{action:?}: a PI plan is approved by a person"),
+        ),
+        store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
+            403,
+            "executor_gate_requires_human",
+            format!("{action:?}: an executor gate must be decided by a person"),
+        ),
+        store::ApprovalStoreError::EvalScopeRequired => ActionError::new(
+            403,
+            "eval_scope_required",
+            format!("{action:?}: an eval sign-off needs evals:approve"),
+        ),
+        store::ApprovalStoreError::AnswerMissing => crate::control::invalid(
+            "note",
+            "missing",
+            format!(
+                "{action:?}: this gate requires an answer; a decision with no note answers nothing"
+            ),
+        ),
+        store::ApprovalStoreError::ImplementerCannotDecide => ActionError::new(
+            403,
+            "implementer_cannot_decide",
+            format!(
+                "{action:?}: the implementing principal of a development project cannot decide \
+                 the gate that judges its own work (SPEC_V2 §5.4); the gate stays pending for a \
+                 different principal"
+            ),
+        ),
+        store::ApprovalStoreError::Database(error) => store_error(error, action),
     }
 }
 
@@ -275,6 +469,10 @@ pub struct WbsCreateIn {
     pub body: Option<String>,
     /// The acceptance criteria.
     pub acceptance: Option<Value>,
+    /// The card that executes this node. Required — and stored — for a `work_package` node, whose
+    /// card is the path from the plan to the work; ignored for every other kind.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
     /// WSJF business value.
     pub business_value: Option<i32>,
     /// WSJF time criticality.
@@ -285,6 +483,10 @@ pub struct WbsCreateIn {
     pub job_size: Option<i32>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `wbs.update`; every field is optional and `If-Match` is required.
@@ -316,6 +518,21 @@ pub struct WbsUpdateIn {
     pub position: Option<f64>,
     /// A new parent.
     pub parent_id: Option<Uuid>,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
+}
+
+/// `wbs.delete`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WbsDeleteIn {
+    /// The node to remove.
+    pub id: Uuid,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `wbs.list`.
@@ -384,8 +601,10 @@ pub struct BaselineListIn {
 pub struct RegisterOut {
     /// The row id.
     pub id: String,
-    /// The owning project.
-    pub project_id: String,
+    /// The owning project; null for a programme-level row.
+    pub project_id: Option<String>,
+    /// The owning programme; null for a project-level row.
+    pub programme_id: Option<String>,
     /// The kind.
     pub kind: String,
     /// The human code.
@@ -408,6 +627,10 @@ pub struct RegisterOut {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<String>,
+    /// When the row is next reviewed.
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
     pub meta: Value,
     /// The If-Match version.
@@ -421,7 +644,8 @@ pub struct RegisterOut {
 fn register_out(record: &RegisterRecord) -> RegisterOut {
     RegisterOut {
         id: record.id.to_string(),
-        project_id: record.project_id.to_string(),
+        project_id: record.project_id.map(|id| id.to_string()),
+        programme_id: record.programme_id.map(|id| id.to_string()),
         kind: record.kind.clone(),
         code: record.code.clone(),
         title: record.title.clone(),
@@ -433,6 +657,8 @@ fn register_out(record: &RegisterRecord) -> RegisterOut {
         impact: record.impact,
         links: record.links.clone(),
         baseline_ref: record.baseline_ref.map(|id| id.to_string()),
+        review_at: record.review_at,
+        response: record.response.clone(),
         meta: record.meta.clone(),
         version: record.version,
         created_at: record.created_at,
@@ -443,31 +669,51 @@ fn register_out(record: &RegisterRecord) -> RegisterOut {
 /// `registers.create`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterCreateIn {
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; exactly one of this and `programme_id` is set.
+    #[serde(default)]
+    pub project_id: Option<Uuid>,
+    /// The owning programme; exactly one of this and `project_id` is set.
+    #[serde(default)]
+    pub programme_id: Option<Uuid>,
     /// `risk | issue | assumption | dependency | benefit | change`.
     pub kind: String,
     /// The human code.
+    #[serde(default)]
     pub code: Option<String>,
     /// The title.
     pub title: String,
     /// The body.
+    #[serde(default)]
     pub body: Option<String>,
     /// The owning job.
+    #[serde(default)]
     pub owner_job_id: Option<Uuid>,
     /// The status.
+    #[serde(default)]
     pub status: Option<String>,
     /// The severity.
+    #[serde(default)]
     pub severity: Option<String>,
     /// The probability.
+    #[serde(default)]
     pub probability: Option<String>,
     /// The impact.
+    #[serde(default)]
     pub impact: Option<i32>,
     /// Related links.
+    #[serde(default)]
     pub links: Option<Value>,
     /// The baseline a change changes.
+    #[serde(default)]
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed (required for a risk).
+    #[serde(default)]
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    #[serde(default)]
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
+    #[serde(default)]
     pub meta: Option<Value>,
 }
 
@@ -476,25 +722,60 @@ pub struct RegisterCreateIn {
 pub struct RegisterUpdateIn {
     /// The row to edit.
     pub id: Uuid,
+    /// Move the row to a programme (a project-scoped row cannot gain one).
+    #[serde(default)]
+    pub programme_id: Option<Uuid>,
     /// The new status.
+    #[serde(default)]
     pub status: Option<String>,
     /// The new title.
+    #[serde(default)]
     pub title: Option<String>,
+    /// The new human code.
+    #[serde(default)]
+    pub code: Option<String>,
     /// The new body.
+    #[serde(default)]
     pub body: Option<String>,
     /// The new severity.
+    #[serde(default)]
     pub severity: Option<String>,
+    /// The new probability.
+    #[serde(default)]
+    pub probability: Option<String>,
+    /// The new owning job.
+    #[serde(default)]
+    pub owner_job_id: Option<Uuid>,
     /// The new impact.
+    #[serde(default)]
     pub impact: Option<i32>,
+    /// New related links (a risk must keep at least one).
+    #[serde(default)]
+    pub links: Option<Value>,
+    /// The new review date.
+    #[serde(default)]
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    #[serde(default)]
+    pub response: Option<String>,
     /// New metadata.
+    #[serde(default)]
     pub meta: Option<Value>,
 }
 
 /// `registers.list`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterListIn {
-    /// The project whose register is read.
-    pub project_id: Uuid,
+    /// The project whose register is read; exactly one of this and `programme_id` is set.
+    #[serde(default)]
+    pub project_id: Option<Uuid>,
+    /// The programme whose register is read (the programme-level rows).
+    #[serde(default)]
+    pub programme_id: Option<Uuid>,
+    /// Narrow the page to one `kind` (`risk | issue | assumption | dependency | benefit |
+    /// change`).
+    #[serde(default)]
+    pub kind: Option<String>,
 }
 
 /// A dependency edge as `project_dependencies.*` returns it.
@@ -568,6 +849,31 @@ pub struct InFlightOut {
     pub programme_id: Option<String>,
     /// The If-Match version.
     pub version: i64,
+}
+
+/// One in-flight programme. A programme with no projects is still in flight.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct InFlightProgrammeOut {
+    /// The programme id.
+    pub id: String,
+    /// The name.
+    pub name: String,
+    /// The status.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// `portfolio.in_flight`'s output: the project page plus the in-flight programmes.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct InFlightPageOut {
+    /// The in-flight projects — the page envelope's rows, unchanged.
+    pub items: Vec<InFlightOut>,
+    /// The programmes in the in-flight set; a programme with no projects still appears.
+    pub programmes: Vec<InFlightProgrammeOut>,
+    /// The cursor for the next page, if there is one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_cursor: Option<String>,
 }
 
 /// `portfolio.in_flight` — the shared page envelope, no filters.
@@ -859,7 +1165,7 @@ pub struct BenefitLinkIn {
     pub programme_id: Uuid,
     /// The benefit.
     pub benefit_id: Uuid,
-    /// The output level.
+    /// The output level: a `wbs_node` id of a project in the same programme.
     #[serde(default)]
     pub output_ref: String,
     /// The capability level.
@@ -1013,6 +1319,83 @@ pub struct BenefitTransitionOut {
     pub version: i64,
 }
 
+/// `benefits.measure`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasureIn {
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target this reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: Option<String>,
+    /// How the reading was taken.
+    pub method: Option<String>,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Option<Value>,
+}
+
+/// A benefit measurement as `benefits.measure` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasurementOut {
+    /// The row id.
+    pub id: String,
+    /// The benefit measured.
+    pub benefit_id: String,
+    /// The programme the benefit belongs to.
+    pub programme_id: String,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<String>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+/// `benefits.measurement_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasurementListIn {
+    /// The benefit whose readings are read; a programme read may narrow to one benefit.
+    pub benefit_id: Option<Uuid>,
+    /// The programme whose readings are read.
+    pub programme_id: Option<Uuid>,
+}
+
+fn benefit_measurement_out(
+    record: &store::spine::BenefitMeasurementRecord,
+) -> BenefitMeasurementOut {
+    BenefitMeasurementOut {
+        id: record.id.to_string(),
+        benefit_id: record.benefit_id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        tranche_id: record.tranche_id.map(|id| id.to_string()),
+        kind: record.kind.clone(),
+        target_value: record.target_value,
+        actual_value: record.actual_value,
+        unit: record.unit.clone(),
+        method: record.method.clone(),
+        measured_at: record.measured_at,
+        evidence: record.evidence.clone(),
+    }
+}
+
 fn benefit_link_out(record: &BenefitLinkRecord) -> BenefitLinkOut {
     BenefitLinkOut {
         id: record.id.to_string(),
@@ -1043,6 +1426,47 @@ fn benefit_transition_out(record: &TransitionRecord) -> BenefitTransitionOut {
 
 // ── WBS actions ─────────────────────────────────────────────────────────────────────────
 
+/// Refuse a direct WBS mutation under an approved scope baseline unless the caller cites the
+/// approved change request that names that baseline (v1-p5-4, T3's change guard).
+///
+/// `take_baseline_guarded` guards the baseline itself; without this guard a `wbs.*` call
+/// would edit the scope a frozen, approved baseline records without the change control the
+/// baseline exists to impose. A project with no approved scope baseline is untouched.
+async fn wbs_change_guard(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    change_id: Option<Uuid>,
+) -> Result<(), ActionError> {
+    let Some(baseline) =
+        store::spine::latest_approved_baseline_tx(&mut *tx, ctx.tenant, project_id, "scope")
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+    else {
+        return Ok(());
+    };
+    let refusal = |detail: String| ActionError::new(409, "rebaseline_requires_change", detail);
+    let Some(change_id) = change_id else {
+        return Err(refusal(format!(
+            "project {project_id} already holds an approved scope baseline ({}); a WBS mutation \
+             needs the approved change request that cites it in `change_id`",
+            baseline.id
+        )));
+    };
+    let approved =
+        store::spine::approved_change_for_baseline_tx(&mut *tx, ctx.tenant, change_id, baseline.id)
+            .await
+            .map_err(|error| store_error(error, ctx.action))?;
+    if !approved {
+        return Err(refusal(format!(
+            "`change_id` {change_id} is not an approved change request whose `baseline_ref` is \
+             the approved scope baseline {}",
+            baseline.id
+        )));
+    }
+    Ok(())
+}
+
 /// Create a WBS node.
 #[crate::action(
     name = "wbs.create",
@@ -1061,13 +1485,24 @@ async fn wbs_create(
     input: WbsCreateIn,
 ) -> Result<HandlerOutput<WbsOut>, ActionError> {
     let kind = input.kind.trim().to_owned();
-    if conveyor_domain::spine::WbsKind::parse(&kind).is_none() {
+    let Some(parsed_kind) = WbsKind::parse(&kind) else {
         return Err(invalid(
             "kind",
             "unknown_kind",
             "kind must be phase, deliverable, work_package or milestone",
         ));
-    }
+    };
+    // v1-p5-5 (SPEC_V2 §5.1): a work package's card is the path from the plan to the work, so the
+    // node owes one; every other kind has no executor and stores none.
+    let card_id = if parsed_kind == WbsKind::WorkPackage {
+        Some(
+            input
+                .card_id
+                .ok_or_else(|| spine_error(PlanStoreError::CardRequired, ctx.action))?,
+        )
+    } else {
+        None
+    };
     let title = input.title.trim().to_owned();
     if title.is_empty() {
         return Err(invalid("title", "required", "a title is required"));
@@ -1079,6 +1514,7 @@ async fn wbs_create(
         job_size: input.job_size.unwrap_or(1),
     };
     wsjf(inputs).map_err(|error| spine_error(error.into(), ctx.action))?;
+    wbs_change_guard(&mut *tx, &ctx, input.project_id, input.change_id).await?;
     let record = store::spine::insert_wbs_tx(
         &mut *tx,
         ctx.tenant,
@@ -1090,6 +1526,7 @@ async fn wbs_create(
             title,
             body: input.body.unwrap_or_default(),
             acceptance: input.acceptance.unwrap_or_else(|| serde_json::json!([])),
+            card_id,
             inputs,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
         },
@@ -1126,6 +1563,7 @@ async fn wbs_update(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    wbs_change_guard(&mut *tx, &ctx, current.project_id, input.change_id).await?;
     let inputs = match (
         input.business_value,
         input.time_criticality,
@@ -1169,6 +1607,16 @@ async fn wbs_update(
             "status",
             "unknown_status",
             "status must be open, accepted or cancelled",
+        ));
+    }
+    if input.status.as_deref() == Some("accepted")
+        && !input.evidence.as_ref().is_some_and(carries_evidence)
+        && !carries_evidence(&current.evidence)
+    {
+        return Err(invalid(
+            "evidence",
+            "required",
+            "an accepted deliverable must carry the evidence that met its acceptance",
         ));
     }
     let patch = WbsPatch {
@@ -1247,7 +1695,7 @@ async fn wbs_list(
 }
 
 /// `wbs.delete`'s approval target: what the gate authorises, computed from the input alone.
-fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
+fn target_wbs_delete(input: &WbsDeleteIn) -> Result<String, String> {
     Ok(format!("wbs/{}", input.id))
 }
 
@@ -1267,7 +1715,7 @@ fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
 async fn wbs_delete(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: IdIn,
+    input: WbsDeleteIn,
 ) -> Result<HandlerOutput<()>, ActionError> {
     let current = store::spine::get_wbs_tx(&mut *tx, ctx.tenant, input.id)
         .await
@@ -1278,6 +1726,7 @@ async fn wbs_delete(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    wbs_change_guard(&mut *tx, &ctx, current.project_id, input.change_id).await?;
     store::spine::delete_wbs_tx(
         &mut *tx,
         ctx.tenant,
@@ -1317,23 +1766,33 @@ async fn baselines_take(
             "kind must be scope, schedule or cost",
         ));
     }
+    baseline_change_guard(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     let record =
-        take_baseline_guarded(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
+        take_baseline_linked(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     emit_spine_event(&mut *tx, &ctx, "project_baseline", record.id, "created").await?;
     Ok(HandlerOutput::created(baseline_out(&record)).with_etag(etag_of(record.version)))
 }
 
-/// Take a baseline under T3's change guard: an approved baseline of the same kind advances only
-/// through an approved change request that names it. The change row and the new baseline cite
-/// each other (`change_id` on the baseline, `meta.baseline_id` on the change).
-async fn take_baseline_guarded(
+/// Refuse a new baseline of `kind` under T3's change guard: an approved baseline of the same
+/// kind advances only through a change request whose `change` gate an approver has decided.
+///
+/// This is the guard half of a re-baseline, split out because a caller with its own writes
+/// (`pm.plan`'s WBS rows) must run it BEFORE those writes: a refusal after the inserts would
+/// leave a plan without a baseline. Take the baseline with [`take_baseline_linked`] in the
+/// same transaction once the guard passes.
+///
+/// The approval is the second principal's decision, NEVER the row's self-declared `status`:
+/// `registers.create`/`update` write any status, so a status read would let any
+/// `portfolio:write` caller approve its own change and re-baseline (§8.4). The guard reads
+/// [`store::spine::change_is_approved_tx`], the same approval the decide path writes.
+pub(crate) async fn baseline_change_guard(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
     project_id: Uuid,
     kind: &str,
     change_id: Option<Uuid>,
-) -> Result<store::spine::BaselineRecord, ActionError> {
-    let action = "baselines.take";
+) -> Result<(), ActionError> {
+    let action = ctx.action;
     if let Some(previous) =
         store::spine::latest_approved_baseline_tx(tx, ctx.tenant, project_id, kind)
             .await
@@ -1354,16 +1813,17 @@ async fn take_baseline_guarded(
             .await
             .map_err(|error| spine_error(error, action))?
             .ok_or_else(|| invalid("change_id", "not_found", "no such change request"))?;
-        if change.kind != "change"
-            || change.status != "approved"
-            || change.baseline_ref != Some(previous.id)
-        {
+        let approved =
+            store::spine::change_is_approved_tx(tx, ctx.tenant, change_id, Some(project_id))
+                .await
+                .map_err(|error| store_error(error, action))?;
+        if change.kind != "change" || !approved || change.baseline_ref != Some(previous.id) {
             return Err(ActionError::new(
                 409,
                 "change_request_invalid",
                 format!(
-                    "change {change_id} must be an approved change whose baseline_ref is the \
-                     approved baseline {}",
+                    "change {change_id} must be a change whose `change` gate is approved and \
+                     whose baseline_ref is the approved baseline {}",
                     previous.id
                 ),
             ));
@@ -1375,6 +1835,20 @@ async fn take_baseline_guarded(
             "there is no approved baseline of this kind to change",
         ));
     }
+    Ok(())
+}
+
+/// Take a baseline and, when the caller cites one, link the change request to the new row
+/// (`change_id` on the baseline, `meta.baseline_id` on the change). The take half of a
+/// re-baseline; [`baseline_change_guard`] must have passed in the same transaction.
+pub(crate) async fn take_baseline_linked(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    kind: &str,
+    change_id: Option<Uuid>,
+) -> Result<store::spine::BaselineRecord, ActionError> {
+    let action = ctx.action;
     let record =
         store::spine::take_baseline_tx(tx, ctx.tenant, project_id, kind, ctx.actor_id, change_id)
             .await
@@ -1439,6 +1913,82 @@ async fn baselines_list(
 
 // ── register actions ────────────────────────────────────────────────────────────────────
 
+/// A register row belongs to exactly one parent: a project or a programme (0070's CHECK).
+fn register_scope(project_id: Option<Uuid>, programme_id: Option<Uuid>) -> Result<(), ActionError> {
+    match (project_id, programme_id) {
+        (Some(_), Some(_)) => Err(invalid(
+            "programme_id",
+            "register_scope_invalid",
+            "a register row belongs to a project or a programme, never both",
+        )),
+        (None, None) => Err(invalid(
+            "project_id",
+            "register_scope_required",
+            "a register row needs a project_id or a programme_id",
+        )),
+        _ => Ok(()),
+    }
+}
+
+/// §5.5's declared link document: `{cards[], requirements[], decisions[]}`. The actions are the
+/// client boundary, so a bare array (the pre-0098 default) or any other JSON is a 422 on
+/// `links`; the column's CHECK is the second door for a raw writer.
+fn validate_links(links: &Value) -> Result<(), ActionError> {
+    let declared = links.as_object().is_some_and(|map| {
+        map.len() == 3
+            && ["cards", "requirements", "decisions"]
+                .iter()
+                .all(|key| map.get(*key).is_some_and(Value::is_array))
+    });
+    if declared {
+        return Ok(());
+    }
+    Err(invalid(
+        "links",
+        "links_invalid",
+        "links must be an object with `cards`, `requirements` and `decisions` arrays",
+    ))
+}
+
+/// §8.4's risk register rule: a risk is probability, impact, owner, review date and at least
+/// one link. A row missing one is a note, not a managed risk. The owner is a job when the
+/// work runs as one; in a record whose projects are not queue jobs it is a named role in
+/// `meta.owner` (owner's 2026-11-25 decision: backfill and keep the rule, never a bare risk).
+fn risk_missing(
+    probability: Option<&str>,
+    impact: Option<i32>,
+    owner_job_id: Option<Uuid>,
+    owner_role: Option<&str>,
+    review_at: Option<NaiveDate>,
+    links: &Value,
+) -> Vec<&'static str> {
+    let mut missing = Vec::new();
+    if probability.is_none_or(|value| value.trim().is_empty()) {
+        missing.push("probability");
+    }
+    if impact.is_none() {
+        missing.push("impact");
+    }
+    if owner_job_id.is_none() && owner_role.is_none_or(|value| value.trim().is_empty()) {
+        missing.push("owner_job_id or meta.owner");
+    }
+    if review_at.is_none() {
+        missing.push("review_at");
+    }
+    let linked = match links {
+        Value::Object(map) => ["cards", "requirements", "decisions"].iter().any(|key| {
+            map.get(*key)
+                .and_then(Value::as_array)
+                .is_some_and(|items| !items.is_empty())
+        }),
+        _ => false,
+    };
+    if !linked {
+        missing.push("links");
+    }
+    missing
+}
+
 /// Create a register row.
 #[crate::action(
     name = "registers.create",
@@ -1467,14 +2017,41 @@ async fn registers_create(
             "kind must be risk, issue, assumption, dependency, benefit or change",
         ));
     }
-    // Approval is a gate effect (`approvals.decide` on the `change` gate with
-    // `meta.change_id`), never a status a caller writes: a row born `approved` would let
-    // the tranche baseline guard advance on a self-declaration.
+    register_scope(input.project_id, input.programme_id)?;
+    let links = input
+        .links
+        .unwrap_or_else(store::spine::empty_register_links);
+    validate_links(&links)?;
+    if kind == "risk" {
+        let owner_role = input
+            .meta
+            .as_ref()
+            .and_then(|meta| meta.get("owner"))
+            .and_then(Value::as_str);
+        let missing = risk_missing(
+            input.probability.as_deref(),
+            input.impact,
+            input.owner_job_id,
+            owner_role,
+            input.review_at,
+            &links,
+        );
+        if !missing.is_empty() {
+            return Err(invalid(
+                "review_at",
+                "risk_incomplete",
+                format!("a risk is missing: {missing:?}"),
+            ));
+        }
+    }
+    // §8.4: approval is a gate effect, never a row write. A change is approved by its `change`
+    // gate's decision (the read `baselines.take` uses); a create that self-declares `approved`
+    // would be the bypass that guard exists to close.
     if kind == "change" && input.status.as_deref() == Some("approved") {
         return Err(invalid(
             "status",
-            "approval_is_a_gate_effect",
-            "a change row is approved by its change gate, never by create",
+            "approval_gate_only",
+            "a change is approved by its `change` gate decision, not by a status write",
         ));
     }
     let record = store::spine::insert_register_tx(
@@ -1482,6 +2059,7 @@ async fn registers_create(
         ctx.tenant,
         &NewRegisterItem {
             project_id: input.project_id,
+            programme_id: input.programme_id,
             kind,
             code: input.code.unwrap_or_default(),
             title: input.title,
@@ -1491,8 +2069,10 @@ async fn registers_create(
             severity: input.severity,
             probability: input.probability,
             impact: input.impact,
-            links: input.links.unwrap_or_else(|| serde_json::json!([])),
+            links,
             baseline_ref: input.baseline_ref,
+            review_at: input.review_at,
+            response: input.response,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
         },
     )
@@ -1530,6 +2110,57 @@ async fn registers_update(
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such register item"))?;
+    if let Some(links) = input.links.as_ref() {
+        validate_links(links)?;
+    }
+    // The same rule as `registers.create`: a change's approval is the `change` gate's decision,
+    // so a status edit cannot manufacture one.
+    if current.kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_gate_only",
+            "a change is approved by its `change` gate decision, not by a status write",
+        ));
+    }
+    // Scope is not an editable field that can make a row parentless or doubly-parented: a row
+    // already owned by a project cannot gain a programme (0070's CHECK would refuse it, and the
+    // refusal is a 422 here rather than a database error).
+    if input.programme_id.is_some() && current.project_id.is_some() {
+        return Err(invalid(
+            "programme_id",
+            "register_scope_invalid",
+            "a project-scoped register row cannot also name a programme",
+        ));
+    }
+    // The create rule is not a one-time admission: an update must leave a risk complete, and
+    // the check runs against the merged row (the fields the update leaves alone keep their
+    // stored values).
+    if current.kind == "risk" {
+        let owner_role = input
+            .meta
+            .as_ref()
+            .unwrap_or(&current.meta)
+            .get("owner")
+            .and_then(Value::as_str);
+        let missing = risk_missing(
+            input
+                .probability
+                .as_deref()
+                .or(current.probability.as_deref()),
+            input.impact.or(current.impact),
+            input.owner_job_id.or(current.owner_job_id),
+            owner_role,
+            input.review_at.or(current.review_at),
+            input.links.as_ref().unwrap_or(&current.links),
+        );
+        if !missing.is_empty() {
+            return Err(invalid(
+                "review_at",
+                "risk_incomplete",
+                format!("a risk is missing: {missing:?}"),
+            ));
+        }
+    }
     let expected = require_precondition_with(
         &ctx,
         ctx.action,
@@ -1549,12 +2180,19 @@ async fn registers_update(
         ctx.tenant,
         input.id,
         i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        input.programme_id,
         input.status.as_deref(),
         trimmed(input.title).as_deref(),
         input.body.as_deref(),
         input.severity.as_deref(),
+        trimmed(input.probability).as_deref(),
+        input.owner_job_id,
         input.impact,
+        input.links.as_ref(),
+        input.review_at,
+        trimmed(input.response).as_deref(),
         input.meta.as_ref(),
+        trimmed(input.code).as_deref(),
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
@@ -1610,9 +2248,37 @@ async fn registers_list(
     ctx: HandlerCtx,
     input: RegisterListIn,
 ) -> Result<Page<RegisterOut>, ActionError> {
-    let records = store::spine::list_register_tx(&mut *tx, ctx.tenant, input.project_id)
-        .await
-        .map_err(|error| spine_error(error, ctx.action))?;
+    let kind = input
+        .kind
+        .as_deref()
+        .map(str::trim)
+        .filter(|kind| !kind.is_empty());
+    let records = match (input.project_id, input.programme_id) {
+        (Some(_), Some(_)) => {
+            return Err(invalid(
+                "programme_id",
+                "register_scope_invalid",
+                "read a project's register or a programme's register, not both",
+            ));
+        }
+        (Some(project_id), None) => {
+            store::spine::list_register_tx(&mut *tx, ctx.tenant, project_id, kind)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (None, Some(programme_id)) => {
+            store::spine::list_programme_register_tx(&mut *tx, ctx.tenant, programme_id, kind)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (None, None) => {
+            return Err(invalid(
+                "project_id",
+                "register_scope_required",
+                "name a project_id or a programme_id",
+            ));
+        }
+    };
     Ok(Page {
         items: records.iter().map(register_out).collect(),
         next_cursor: None,
@@ -1781,12 +2447,13 @@ async fn portfolio_in_flight(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     _input: InFlightIn,
-) -> Result<Page<InFlightOut>, ActionError> {
-    let records = store::spine::in_flight_tx(&mut *tx, ctx.tenant)
+) -> Result<InFlightPageOut, ActionError> {
+    let in_flight = store::spine::in_flight_tx(&mut *tx, ctx.tenant)
         .await
         .map_err(|error| spine_error(error, ctx.action))?;
-    Ok(Page {
-        items: records
+    Ok(InFlightPageOut {
+        items: in_flight
+            .projects
             .iter()
             .map(|record: &InFlightRecord| InFlightOut {
                 id: record.id.to_string(),
@@ -1794,6 +2461,16 @@ async fn portfolio_in_flight(
                 name: record.name.clone(),
                 status: record.status.clone(),
                 programme_id: record.programme_id.map(|id| id.to_string()),
+                version: record.version,
+            })
+            .collect(),
+        programmes: in_flight
+            .programmes
+            .iter()
+            .map(|record| InFlightProgrammeOut {
+                id: record.id.to_string(),
+                name: record.name.clone(),
+                status: record.status.clone(),
                 version: record.version,
             })
             .collect(),
@@ -1835,6 +2512,22 @@ async fn tranches_create(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "created").await?;
     Ok(HandlerOutput::created(tranche_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// A git commit id as review evidence names it: exactly 40 hexadecimal characters, either case.
+fn is_git_sha(raw: &str) -> bool {
+    raw.len() == 40 && raw.chars().all(|character| character.is_ascii_hexdigit())
+}
+
+/// The refusal for a review whose evidence does not name the revision it judged (v1-tr2-2).
+fn tranche_review_unpinned() -> ActionError {
+    ActionError::new(
+        422,
+        "tranche_review_unpinned",
+        "a tranche review must name the revision it judged: evidence.snapshot_sha must be a \
+         40-character hex commit id; evidence.snapshot.git_sha is accepted and recorded as \
+         snapshot_sha",
+    )
 }
 
 /// Record an end-of-tranche review; evidence is mandatory.
@@ -1879,7 +2572,7 @@ async fn tranches_review(
                 "the tranche review gate has no approving decision",
             )
         })?;
-    let evidence = match input.evidence {
+    let mut evidence = match input.evidence {
         Value::Object(mut map) => {
             map.insert(
                 "delegation_ref".to_owned(),
@@ -1898,6 +2591,29 @@ async fn tranches_review(
             ));
         }
     };
+    // v1-tr2-2 — once the evidence is complete enough for the §8.3 check to pass, it must also
+    // name the revision it judged, or the review is not pinned to anything reproducible. The
+    // flat `snapshot_sha` is canonical; the nested `snapshot.git_sha` the pack emits is accepted
+    // and normalised into it, so every stored review carries the same key. The pin is checked
+    // only after the completeness predicate, so an empty evidence object still reports the more
+    // fundamental `tranche_evidence_missing` from the store.
+    if tranche_review_has_evidence(&evidence) {
+        let flat = evidence.get("snapshot_sha").cloned();
+        let nested = evidence
+            .pointer("/snapshot/git_sha")
+            .and_then(Value::as_str)
+            .map(str::to_owned);
+        match flat {
+            Some(Value::String(sha)) if is_git_sha(&sha) => {}
+            Some(_) => return Err(tranche_review_unpinned()),
+            None => match nested {
+                Some(sha) if is_git_sha(&sha) => {
+                    evidence["snapshot_sha"] = Value::String(sha);
+                }
+                _ => return Err(tranche_review_unpinned()),
+            },
+        }
+    }
     let record = store::spine::review_tranche_tx(
         &mut *tx,
         ctx.tenant,
@@ -1909,6 +2625,50 @@ async fn tranches_review(
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "reviewed").await?;
+    Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// The gate a paused tranche's resume is authorised under.
+pub const TRANCHE_RESUME_GATE: &str = "tranche.resume";
+
+/// `tranches.resume` — move a paused tranche back to `in_review` under its approved gate.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheResumeIn {
+    /// The paused tranche.
+    pub tranche_id: Uuid,
+    /// The approved `tranche.resume` gate naming this tranche.
+    pub approval_id: Uuid,
+    /// Why the tranche resumes; recorded with the resume.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+#[crate::action(
+    name = "tranches.resume",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_resume(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheResumeIn,
+) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    let record = store::spine::resume_tranche_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.tranche_id,
+        input.approval_id,
+        input.note.as_deref(),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "resumed").await?;
     Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
@@ -2172,6 +2932,115 @@ async fn benefits_get(
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
     Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Record one measurement of a benefit: the baseline, an interim reading or the post-transition
+/// reading (SPEC_V2 §8.3).
+#[crate::action(
+    name = "benefits.measure",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_measure(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitMeasureIn,
+) -> Result<HandlerOutput<BenefitMeasurementOut>, ActionError> {
+    let kind = input.kind.trim().to_owned();
+    if !matches!(kind.as_str(), "baseline" | "interim" | "post") {
+        return Err(invalid(
+            "kind",
+            "unknown_kind",
+            "kind must be baseline, interim or post",
+        ));
+    }
+    let benefit_id = input.benefit_id;
+    let record = store::spine::insert_benefit_measurement_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::spine::NewBenefitMeasurement {
+            benefit_id: input.benefit_id,
+            tranche_id: input.tranche_id,
+            kind,
+            target_value: input.target_value,
+            actual_value: input.actual_value,
+            unit: input.unit.unwrap_or_default(),
+            method: input.method.unwrap_or_default(),
+            measured_at: input.measured_at,
+            evidence: input.evidence.unwrap_or_else(|| serde_json::json!({})),
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    // §8.3: the profile is the measurement record, so a baseline reading writes both the reading
+    // and the profile, in this transaction. A baseline with no evidence is a slot, not a
+    // measurement; an approved profile's complete baseline changes only through a change request.
+    if record.kind == "baseline" {
+        if !conveyor_domain::spine::evidence_present(&record.evidence) {
+            return Err(invalid(
+                "evidence",
+                "benefit_measurement_evidence_missing",
+                "a baseline reading must carry the evidence behind it",
+            ));
+        }
+        store::spine::record_measured_baseline_tx(&mut *tx, ctx.tenant, benefit_id, &record)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    }
+    emit_spine_event(&mut *tx, &ctx, "benefit_measurement", record.id, "created").await?;
+    Ok(HandlerOutput::created(benefit_measurement_out(&record)))
+}
+
+/// Read benefit measurements: one benefit's readings, or a programme's readings optionally
+/// narrowed to one benefit.
+#[crate::action(
+    name = "benefits.measurement_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_measurement_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitMeasurementListIn,
+) -> Result<Page<BenefitMeasurementOut>, ActionError> {
+    let records = match (input.benefit_id, input.programme_id) {
+        (Some(benefit_id), None) => {
+            store::spine::list_benefit_measurements_tx(&mut *tx, ctx.tenant, benefit_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (benefit_id, Some(programme_id)) => store::spine::list_programme_benefit_measurements_tx(
+            &mut *tx,
+            ctx.tenant,
+            programme_id,
+            benefit_id,
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?,
+        (None, None) => {
+            return Err(invalid(
+                "benefit_id",
+                "benefit_scope_required",
+                "name a benefit_id or a programme_id",
+            ));
+        }
+    };
+    Ok(Page {
+        items: records.iter().map(benefit_measurement_out).collect(),
+        next_cursor: None,
+    })
 }
 
 /// List a programme's benefit profiles.
@@ -2700,7 +3569,9 @@ pub struct CadenceCreateIn {
     pub kind: String,
     /// The period label (e.g. `PI-2027.1`).
     pub period: String,
-    /// Free-form metadata.
+    /// Free-form metadata. A cadence that belongs to a programme tranche names it here
+    /// (`tranche_id`/`tranche_number`): `period` is a free-text label, so `meta` is the link
+    /// the conformance audit and the project verifier read.
     pub meta: Option<Value>,
     /// The forum type the cadence instance materialises.
     #[serde(default)]
@@ -2981,6 +3852,15 @@ async fn cadences_update(
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    // A retro closes through `retros.close`, which writes each finding's lesson and refuses a
+    // finding with no lesson content. An edit that sets `closed` directly would bypass that gate.
+    if current.kind == "retro" && input.state.as_deref() == Some("closed") {
+        return Err(invalid(
+            "state",
+            "retro_close_required",
+            "a retro closes through retros.close, which writes every finding's lesson",
+        ));
+    }
     let expected = require_precondition_with(
         &ctx,
         ctx.action,
@@ -3014,6 +3894,241 @@ async fn cadences_update(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_cadence", record.id, "updated").await?;
     Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `cadences.approve_plan` — the gate that stands between a PI plan and its cards.
+///
+/// `decision` absent opens (or returns) the plan's pending `approval`; `approve`/`reject`
+/// records a person's decision, or a `rule` acting under the owner's published delegation
+/// (`delegation_ref`). Nothing materialises until the gate carries such an approve, so the
+/// unattended cadence tick cannot commit an unapproved plan.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceApprovePlanIn {
+    /// The PI cadence whose materialisation is gated.
+    pub cadence_id: Uuid,
+    /// `approve` or `reject`. Absent opens the gate and leaves it pending.
+    pub decision: Option<String>,
+    /// The note the deciding person records on the gate.
+    pub note: Option<String>,
+    /// The published decision document that delegates this act. When present the decision is
+    /// recorded as a `rule` under the owner's delegation (R1), not as a human's.
+    pub delegation_ref: Option<Uuid>,
+}
+
+/// A PI plan's gate as `cadences.approve_plan` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadencePlanApprovalOut {
+    /// The cadence the gate belongs to.
+    pub cadence_id: String,
+    /// The approval row.
+    pub approval_id: String,
+    /// `pending | approved | rejected`.
+    pub status: String,
+    /// The decision this call recorded; absent when the call only opened the gate.
+    pub decision: Option<String>,
+    /// The cadence state after the call (`awaiting_approval` or `rejected`).
+    pub state: String,
+    /// The approval's If-Match version.
+    pub version: i64,
+}
+
+fn plan_approval_out(
+    cadence_id: Uuid,
+    approval: &conveyor_domain::Approval,
+    decision: Option<&str>,
+    state: &str,
+) -> CadencePlanApprovalOut {
+    CadencePlanApprovalOut {
+        cadence_id: cadence_id.to_string(),
+        approval_id: approval.id.to_string(),
+        status: approval.status.as_str().to_owned(),
+        decision: decision.map(str::to_owned),
+        state: state.to_owned(),
+        version: i64::try_from(approval.version.get()).unwrap_or(i64::MAX),
+    }
+}
+
+/// Open, approve or reject a PI plan's gate.
+#[crate::action(
+    name = "cadences.approve_plan",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_approve_plan(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceApprovePlanIn,
+) -> Result<HandlerOutput<CadencePlanApprovalOut>, ActionError> {
+    let current = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if current.kind != "pi" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            format!(
+                "the cadence is {}; a plan approval needs a pi cadence",
+                current.kind
+            ),
+        ));
+    }
+    if current.state == "materialised" {
+        return Err(ActionError::new(
+            409,
+            "plan_already_materialised",
+            "the plan's cards are already drafted; approval is closed",
+        ));
+    }
+    let requested = match input.decision.as_deref().map(str::trim) {
+        None | Some("") => None,
+        Some("approve") => Some(DecisionKind::Approve),
+        Some("reject") => Some(DecisionKind::Reject),
+        Some(other) => {
+            return Err(invalid(
+                "decision",
+                "invalid_value",
+                format!("{other:?} is not approve or reject"),
+            ));
+        }
+    };
+    let Some(kind) = requested else {
+        // Opening the gate is a request, never an approval. The cadence is marked waiting so
+        // the console and the worker read one state; an existing pending gate is reused, so a
+        // retry stacks no second gate.
+        if store::spine::pi_plan_human_approval_tx(&mut *tx, ctx.tenant, input.cadence_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+            .is_some()
+        {
+            return Err(ActionError::new(
+                409,
+                "plan_already_approved",
+                "a person already approved this plan; there is nothing left to request",
+            ));
+        }
+        let approval = store::spine::open_pi_plan_approval_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.cadence_id,
+            Some(ctx.actor_id),
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+        store::spine::set_pi_cadence_approval_state_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.cadence_id,
+            store::spine::CADENCE_AWAITING_APPROVAL,
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+        emit_spine_event(
+            &mut *tx,
+            &ctx,
+            "programme_cadence",
+            input.cadence_id,
+            "updated",
+        )
+        .await?;
+        return Ok(HandlerOutput::ok(plan_approval_out(
+            input.cadence_id,
+            &approval,
+            None,
+            store::spine::CADENCE_AWAITING_APPROVAL,
+        )));
+    };
+    // A decision is a person's act, or a rule acting under the owner's published delegation
+    // (R1). A machine identity with no delegation is refused; a delegated rule is validated
+    // against an active, published `category='decision'` output owned by P0.
+    let delegation_ref = input.delegation_ref;
+    if delegation_ref.is_none() && (ctx.actor_kind != "user" || ctx.channel.is_some()) {
+        return Err(ActionError::new(
+            403,
+            "human_only",
+            "a PI plan is approved by a person or a rule under a published delegation; a machine identity cannot decide it",
+        ));
+    }
+    if let Some(reference) = delegation_ref {
+        crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, reference).await?;
+    }
+    let existing = match kind {
+        DecisionKind::Approve => {
+            store::spine::pi_plan_human_approval_tx(&mut *tx, ctx.tenant, input.cadence_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        DecisionKind::Reject => None,
+    };
+    if let Some(existing) = existing {
+        let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, existing)
+            .await
+            .map_err(|error| plan_approval_error(error, ctx.action))?
+            .ok_or_else(ActionError::internal)?;
+        return Ok(HandlerOutput::ok(plan_approval_out(
+            input.cadence_id,
+            &record.approval,
+            Some("approve"),
+            &current.state,
+        )));
+    }
+    let approval =
+        store::spine::open_pi_plan_approval_tx(&mut *tx, ctx.tenant, input.cadence_id, None)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    let (decided_by_kind, via) = match delegation_ref {
+        Some(reference) => (
+            DeciderKind::Rule,
+            serde_json::json!({
+                "channel": "internal",
+                "delegation_ref": reference.to_string()
+            }),
+        ),
+        None => (DeciderKind::Human, serde_json::json!({ "channel": "web" })),
+    };
+    let decision = Decision {
+        approver_id: ctx.actor_id,
+        kind,
+        note: input.note.unwrap_or_default(),
+        decided_by_kind,
+        via: Some(via),
+        item_decisions: None,
+    };
+    let decided =
+        store::approval::record_decision_tx(&mut *tx, ctx.tenant, approval.id, &decision, false)
+            .await
+            .map_err(|error| plan_approval_error(error, ctx.action))?;
+    let state = match kind {
+        DecisionKind::Approve => store::spine::CADENCE_AWAITING_APPROVAL,
+        DecisionKind::Reject => store::spine::CADENCE_REJECTED,
+    };
+    store::spine::set_pi_cadence_approval_state_tx(&mut *tx, ctx.tenant, input.cadence_id, state)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "updated",
+    )
+    .await?;
+    let recorded = match kind {
+        DecisionKind::Approve => "approve",
+        DecisionKind::Reject => "reject",
+    };
+    Ok(HandlerOutput::ok(plan_approval_out(
+        input.cadence_id,
+        &decided,
+        Some(recorded),
+        state,
+    )))
 }
 
 /// `cadences.materialise` — schedule the meeting the cadence row names, once.
@@ -3106,6 +4221,418 @@ async fn cadences_delete(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_cadence", input.id, "deleted").await?;
     Ok(HandlerOutput::no_content(()))
+}
+
+// ── demo credits and lessons ────────────────────────────────────────────────────────────
+
+/// A demo credit as `cadences.credit_*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DemoCreditOut {
+    /// The credit id.
+    pub id: String,
+    /// The demo cadence the credit was recorded at.
+    pub cadence_id: String,
+    /// The accepted deliverable the credit names.
+    pub deliverable_id: String,
+    /// The deliverable's evidence, copied when the credit was recorded.
+    pub evidence: Value,
+    /// When the credit was recorded.
+    pub credited_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn demo_credit_out(record: &DemoCreditRecord) -> DemoCreditOut {
+    DemoCreditOut {
+        id: record.id.to_string(),
+        cadence_id: record.cadence_id.to_string(),
+        deliverable_id: record.deliverable_id.to_string(),
+        evidence: record.evidence.clone(),
+        credited_at: record.credited_at,
+        version: record.version,
+    }
+}
+
+/// `cadences.credit_demo`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreditDemoIn {
+    /// The demo cadence.
+    pub cadence_id: Uuid,
+    /// The completed deliverable.
+    pub deliverable_id: Uuid,
+}
+
+/// `cadences.credit_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreditListIn {
+    /// The demo cadence whose credits are read.
+    pub cadence_id: Uuid,
+}
+
+/// Record a demo credit; a repeat returns the credit already recorded.
+#[crate::action(
+    name = "cadences.credit_demo",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_credit_demo(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CreditDemoIn,
+) -> Result<HandlerOutput<DemoCreditOut>, ActionError> {
+    let existing = store::spine::find_demo_credit_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.cadence_id,
+        input.deliverable_id,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    if let Some(existing) = existing {
+        return Ok(
+            HandlerOutput::ok(demo_credit_out(&existing)).with_etag(etag_of(existing.version))
+        );
+    }
+    let id =
+        store::spine::credit_demo_tx(&mut *tx, ctx.tenant, input.cadence_id, input.deliverable_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    let record = store::spine::get_demo_credit_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_demo_credit",
+        record.id,
+        "created",
+    )
+    .await?;
+    Ok(HandlerOutput::created(demo_credit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a demo cadence's credits.
+#[crate::action(
+    name = "cadences.credit_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_credit_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CreditListIn,
+) -> Result<Page<DemoCreditOut>, ActionError> {
+    let records = store::spine::list_demo_credits_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(demo_credit_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// The findings the coach gathered on a retro.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RetroFindingsIn {
+    /// The retro cadence.
+    pub cadence_id: Uuid,
+    /// The findings: one object per finding, each carrying its `key`.
+    pub findings: Value,
+}
+
+/// Close a retro.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RetroCloseIn {
+    /// The retro cadence.
+    pub cadence_id: Uuid,
+}
+
+/// Record a retro's findings on its coach card.
+///
+/// The retro was openable only by the worker's tick and closeable only by a store call: the
+/// inspect-and-adapt step had no API. The findings live on the retro card, and closing checks
+/// one lesson per finding key, so a retro cannot be closed over an empty lesson set.
+#[crate::action(
+    name = "retros.record_findings",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn retros_record_findings(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RetroFindingsIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let cadence = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if cadence.kind != "retro" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            "the findings need a retro cadence",
+        ));
+    }
+    // Recording findings opens the retro's one coach card first: the row is the retro's own
+    // record, and a caller with a cadence but no tick yet should not have to know about the card.
+    store::spine::open_retro_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    store::spine::record_retro_findings_tx(&mut *tx, ctx.tenant, input.cadence_id, &input.findings)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "findings_recorded",
+    )
+    .await?;
+    let record = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Close a retro once every recorded finding has its lesson.
+#[crate::action(
+    name = "retros.close",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn retros_close(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RetroCloseIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let cadence = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if cadence.kind != "retro" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            "a retro close needs a retro cadence",
+        ));
+    }
+    store::spine::close_retro_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    let patch = store::spine::CadencePatch {
+        period: None,
+        state: Some("closed".to_owned()),
+        meta: None,
+        meeting_type_key: None,
+    };
+    let record = store::spine::update_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.cadence_id,
+        cadence.version,
+        &patch,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "closed",
+    )
+    .await?;
+    Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// A lesson as `lessons.*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonOut {
+    /// The row id.
+    pub id: String,
+    /// The programme whose memory holds the lesson.
+    pub programme_id: String,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<String>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+    /// How many of the refs are independent.
+    pub independent_count: i32,
+    /// `proposed | reviewed | promoted | rejected`.
+    pub state: String,
+    /// Where the lesson came from.
+    pub source: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+    /// Creation time.
+    pub created_at: DateTime<Utc>,
+    /// Last write.
+    pub updated_at: DateTime<Utc>,
+}
+
+fn lesson_out(record: &LessonRecord) -> LessonOut {
+    LessonOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        cadence_id: record.cadence_id.map(|id| id.to_string()),
+        finding_key: record.finding_key.clone(),
+        statement: record.statement.clone(),
+        evidence: record.evidence.clone(),
+        independent_count: record.independent_count,
+        state: record.state.clone(),
+        source: record.source.clone(),
+        meta: record.meta.clone(),
+        version: record.version,
+        created_at: record.created_at,
+        updated_at: record.updated_at,
+    }
+}
+
+/// `programme_lessons.propose` — the programme's lessons-learned register.
+///
+/// SPEC_V2 §D36's organisational memory keeps the `lessons.*` names (T8): a lesson there must
+/// cite resolvable, independent evidence and pass a person's review. This family is the MSP
+/// register a retro closes over — the same `lesson` table, scoped to a programme and a finding,
+/// with the evidence refs stored as the caller gives them.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonProposeIn {
+    /// The programme whose memory receives the lesson.
+    pub programme_id: Uuid,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<Uuid>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+    /// Free-form metadata (the kata marker a retro lesson carries, §9.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
+}
+
+/// `programme_lessons.list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonListIn {
+    /// The programme whose lessons are read.
+    pub programme_id: Uuid,
+}
+
+/// Propose a lesson for a retro finding.
+#[crate::action(
+    name = "programme_lessons.propose",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn lessons_propose(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LessonProposeIn,
+) -> Result<HandlerOutput<LessonOut>, ActionError> {
+    let statement = input.statement.trim().to_owned();
+    if statement.is_empty() {
+        return Err(invalid(
+            "statement",
+            "required",
+            "a lesson needs a statement",
+        ));
+    }
+    if !input.evidence.is_array() {
+        return Err(invalid(
+            "evidence",
+            "array_required",
+            "evidence must be an array of refs",
+        ));
+    }
+    if let Some(cadence_id) = input.cadence_id {
+        store::spine::get_cadence_tx(&mut *tx, ctx.tenant, cadence_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+            .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    }
+    let id = store::spine::propose_lesson_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        input.cadence_id,
+        input.finding_key.trim(),
+        &statement,
+        &input.evidence,
+        &input.meta.unwrap_or_else(|| serde_json::json!({})),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    let record = store::spine::get_lesson_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    emit_spine_event(&mut *tx, &ctx, "lesson", record.id, "created").await?;
+    Ok(HandlerOutput::created(lesson_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a programme's lessons.
+#[crate::action(
+    name = "programme_lessons.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn lessons_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LessonListIn,
+) -> Result<Page<LessonOut>, ActionError> {
+    let records = store::spine::list_lessons_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(lesson_out).collect(),
+        next_cursor: None,
+    })
 }
 
 /// Create a stakeholder profile.
@@ -3240,6 +4767,17 @@ async fn stakeholders_profile_list(
 /// `stakeholders.profile_delete`'s approval target: what the gate authorises, computed from the input alone.
 fn target_stakeholders_profile_delete(input: &IdIn) -> Result<String, String> {
     Ok(format!("stakeholder/{}/profile", input.id))
+}
+
+/// Whether a WBS patch (or the stored row) carries evidence a person can read.
+fn carries_evidence(value: &serde_json::Value) -> bool {
+    match value {
+        serde_json::Value::Array(items) => !items.is_empty(),
+        serde_json::Value::Object(map) => !map.is_empty(),
+        serde_json::Value::String(text) => !text.trim().is_empty(),
+        serde_json::Value::Null => false,
+        _ => true,
+    }
 }
 
 /// Remove a stakeholder profile.

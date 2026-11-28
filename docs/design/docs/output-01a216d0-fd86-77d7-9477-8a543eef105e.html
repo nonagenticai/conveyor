@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 — Closure review (record completed, 2026-11-23) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="e2da05b5ed50b7156fe78dda67cdb01adc36338c1bcaa8ade3e0bbc96ce261ec" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>e2da05b5ed50b7156fe78dda67cdb01adc36338c1bcaa8ade3e0bbc96ce261ec</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T16 — Closure review (record completed, 2026-11-23)</h1>
+<p>Project: T16 — SOP, RDF/OWL and process-document ingestion · Tranche 4 · Plan: SPEC_V2 §12 · Issues #85, #448</p>
+<h2>Outcome vs acceptance</h2>
+<p>SPEC_V2 §12 T16's gate is met by executed tests at lane head <code>46fc49e2</code>, not by prose: a real SOP, an OWL
+file and a BPMN diagram each ingest end to end (<code>a_pdf_sop_becomes_a_pddl_procedure_draft</code>,
+<code>an_owl_file_becomes_a_knowledge_pack</code>, <code>a_bpmn_diagram_becomes_a_procedure_draft</code>); the draft is published
+behind a human gate while the drafting job cannot publish its own procedure
+(<code>a_human_approval_publishes_the_procedure</code>, <code>the_drafting_job_cannot_publish_its_own_procedure</code>); a re-ingest
+creates the next draft version while the published row keeps its source and pack
+(<code>a_reingest_creates_a_new_draft_version</code>, <code>the_published_procedure_keeps_its_source_and_pack</code>); a bound job
+runs the PDDL steps and an unreviewed source never binds (<code>a_bound_job_runs_the_pddl_steps</code>,
+<code>an_unreviewed_source_cannot_bind</code>). 25 tests, 25 passed, 0 skipped.</p>
+<h2>Evidence</h2>
+<p>The published acceptance evidence <code>01a20a8d-73fb-74f6-849a-d0fb1a535179</code> carries the command and the clause-to-test map; the
+delivery contract is live with its Board decision and the Phase-G review is compliant and cites the
+published standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>. The manifest <code>acceptance/programme/T16.toml</code> executed against
+this record is the gate.</p>
+<h2>Open items</h2>
+<p>None owned by T16. The tranche-4 review and the programme-level benefits are recorded separately.</p>
+<h2>Decision</h2>
+<p>Close.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

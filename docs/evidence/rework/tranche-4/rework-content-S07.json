@@ -1,0 +1,989 @@
+{
+ "charter": "# Charter — S07 Requirements, catalogues, revisions, quality scoring, search (retrospective, 2026-11-24)\n\nProject 01a1d039-0d2c-7322-b2f9-4dd041153894 (S07), tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), delivery track, plateau delivery, status closed at version 7 with the row last updated 2026-11-21T01:06:16Z. This retrospective charter is authored on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n**Mandate.** Carry RM's requirement surface onto S03's `governed_asset`, `revision`, `catalogue_entry` and `trace_link`: one lifecycle for requirements, principles and decisions (ADRs) instead of RM's 57 domain tables, one `revision` per mutation with a working Rust `compare`, read-only quality scoring on immutable revisions, and FTS plus trigram search measured against an agreed baseline.\n\n**Scope.** IN: the plan §5.1 tables (of which `outline` and `outline_node` were later dropped by migration 0011), the 32 actions across `requirements.*`, `principles.*`, `decisions.*`, `catalogues.*`, `quality.score`, `search.query`, `trace_links.*` and `project_requests.*`, the `search` module, the 40-query eval harness, and the §7.2 coverage table over RM's 28 modules. OUT: the TOC API and screens, ArchiMate/UML/renders (S08), project CRUD (S05), `bulk` and RM's `promote`/`project-copy` (dropped), and the UI (S12).\n\n**Expected outputs.** `project-brief` and `evidence`. At the snapshot only the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36 is published (2026-11-16T22:43:11Z); this pack supplies the project brief and the rest of the record.\n\n**What this retrospective does NOT attest.** It does not attest a pass of plan §7's functional gate (the six named test targets and the EXPLAIN check that must name a GIN index) nor of §5.6's relevance targets (recall@5 ≥ 0.75, MRR ≥ 0.60, B ≥ C). The snapshot carries no gate run, no baseline row, no linked issue and no Phase-G review. It reconstructs the lifecycle record and re-closes the project on the recorded facts; the gate and eval runs remain open verification items.",
+ "soaw": {
+  "title": "Statement of Architecture Work — S07 Requirements and search (retrospective, 2026-11-24)",
+  "body": {
+   "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+   "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan §5 material: the five §5.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped.",
+   "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+   "Acceptance criteria": "Phase A closes when this statement is approved, the seven A–D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan §7 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets §5.6's recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+   "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan §7 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S07 Requirements and search (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "The stakeholders who decide, build, review and consume the requirements-and-search slice, with their influence, interest and engagement.",
+   "scope": "Phase A stakeholder view for S07: the tranche authorisation and close decision, the architecture review, the S03 and S04 dependencies, the S08 and S12 consumers, and the tenants the lifecycle serves.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-4 authorisation and the retrospective re-close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for S07's delivery outcome and its record",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "authors the plan, the artefacts, the contract and this retrospective pack",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the artefact set, the delivery contract and the Phase-G review",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "S03 owner",
+     "axis_b": "owns governed_asset, revision, catalogue_entry, trace_link and the fixed kind vocabulary S07 builds on",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consulted"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S04 owner",
+     "axis_b": "owns the action registry, the ActionSpec derive and the OpenAPI and MCP projection every S07 action ships through",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consulted"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "S08 owner",
+     "axis_b": "consumes requirement-to-model_element trace links and the dropped outline tables' history",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consulted"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "S12 owner",
+     "axis_b": "builds the requirements editor, the revision diff and ranked search results declared for S12",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "informed"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Tenants and requirement authors",
+     "axis_b": "use the lifecycle, the quality score and search results in their own tenant",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "informed"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Stakeholder Map — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders sit on the influence/interest/engagement axes. The sponsoring group decides the tranche and the re-close, the SRO is accountable, the programme architect is responsible, and the Architecture Board approves. The S03 and S04 owners are consulted because the slice builds on their tables and registry; S08 and S12 are consulted or informed as consumers; tenants and requirement authors are informed because the lifecycle and search serve them directly.\n\n## Links\n\nDerives from `docs/plans/slices/S07-requirements-search.md` §1–§4 and §10; realizes the Phase A stakeholder view for the requirements and search capability; reuses the programme roles already recorded for the conveyor buildout and the S03/S04 dependency ownership.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project's only contemporaneous publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z; this stakeholder view is authored in the 2026-11-24 retrospective pack and is approved with the rest of the A–D set.\n",
+   "links": [
+    {
+     "to": "Business Capability Map — S07 Requirements and search (Phase B)",
+     "kind": "dependency"
+    }
+   ]
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The drivers behind the requirements-and-search slice, the goal each serves and the objective the plan installs.",
+   "scope": "Phase A driver view: RM's fragmented lifecycle, the missing revision history, unmeasured quality, unsearchable requirements, ungoverned intake and implicit traceability, each with its plan objective.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "D1 RM's 57 domain tables fragment one requirement lifecycle",
+     "axis_b": "G1 One governed_asset lifecycle for requirements, principles and decisions",
+     "value": {
+      "objective": "requirements.*, principles.* and decisions.* share one handler bound to a fixed kind at declaration, so no input can set kind; plan §1 and §5.2."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 No usable revision history or diff exists",
+     "axis_b": "G2 One revision per mutation with a working compare",
+     "value": {
+      "objective": "each mutation writes a revision with seq = version and a SHA-256 hash of JCS-canonical JSON; requirements.compare diffs two content documents in Rust; plan §5.3."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Requirement quality is unmeasured",
+     "axis_b": "G3 An advisory rubric scored on an immutable revision",
+     "value": {
+      "objective": "rubric v1 weights .20/.30/.20/.15/.15, score = 100 times the weighted sum; quality_evaluation is append-only and the job runs after commit; plan §5.5."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Requirements are not searchable across asset kinds",
+     "axis_b": "G4 Ranked full-text plus trigram search measured against a baseline",
+     "value": {
+      "objective": "three ranked arms over governed_asset, card and catalogue_entry with SQL predicates and committed weights; 40 human-labelled queries target recall@5 ≥ 0.75 and MRR ≥ 0.60; plan §5.6."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Catalogue data and project intake live only in RM",
+     "axis_b": "G5 An idempotent catalogue import and a governed project-request intake",
+     "value": {
+      "objective": "seed/catalogue.json is a checked-in export imported per tenant through migrate --seed; project_requests.* is idempotent on (tenant, external_ref) and promote creates its project in the same transaction; plan §5.4 and §5.7."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 Traceability is implicit and single-directional",
+     "axis_b": "G6 trace_links.* is the single writer and reads work both ways",
+     "value": {
+      "objective": "a requirement-to-card link is visible from the requirement with include=trace and from the card's traces endpoint, same tenant only, zero cross-tenant rows; plan §5.7."
+     },
+     "position": 6
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSix drivers and their goals: RM's fragmented tables against one lifecycle, missing history against one revision per mutation, unmeasured quality against the advisory rubric, unsearchable requirements against ranked FTS plus trigram, RM-only catalogue and intake against an idempotent seed and project_requests, and implicit traceability against a single trace-link writer. Each objective names the plan section that installs it, so the catalog is the traceable bridge from driver to requirement.\n\n## Links\n\nDerives from the slice plan §1, §4, §5.6, §5.7 and §9; realizes the Phase A driver, goal and objective view; reuses SPEC §4, §6, §8 S7 and §11 R2 and the data architecture sections §2.4, §2.7 and §3.4 that the plan cites.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; each objective is carried into a requirement in the sibling Requirements Catalog. The plan is `docs/plans/slices/S07-requirements-search.md` and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+   "links": [
+    {
+     "to": "Requirements Catalog — S07 Requirements and search (Phase A)",
+     "kind": "derivation"
+    }
+   ]
+  },
+  {
+   "title": "Requirements Catalog — S07 Requirements and search (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The requirements the S07 gate and its contracts must satisfy, each with the plan section and the executable acceptance that carries it.",
+   "scope": "Phase A requirements view over the schema, the action surface, the revision model, the catalogue import, the rubric, search and its eval, traceability, intake, events and the gate itself.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "R-01 Schema",
+     "axis_b": "Five §5.1 tables with full tenancy and the trigram indexes",
+     "value": {
+      "priority": "must",
+      "acceptance": "tenant_id NOT NULL and ENABLE plus FORCE row-level security with the tenant_isolation policy on every table; quality_evaluation is append-only; pg_trgm and gin(title gin_trgm_ops) on governed_asset and card plus gin(label) on catalogue_entry. outline and outline_node shipped in 0007 and were dropped by 0011."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-02 Actions",
+     "axis_b": "Thirty-two actions over one registry",
+     "value": {
+      "priority": "must",
+      "acceptance": "requirements.*, principles.*, decisions.*, catalogues.list|import, quality.score, search.query, trace_links.* and project_requests.* are declared through the S04 ActionSpec derive; routes are unversioned /api/<resource>."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-03 Kind",
+     "axis_b": "Kind is fixed by the action name, never by input",
+     "value": {
+      "priority": "must",
+      "acceptance": "requirements.* is bound to kind='requirement' at declaration and cannot reach a principle; domain::governance::transition(kind, from, to) is the only legality check and is proptested."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-04 Supersede",
+     "axis_b": "A superseded asset names its successor in the same statement",
+     "value": {
+      "priority": "must",
+      "acceptance": "the migration enforces status <> 'superseded' or superseded_by_id is not null, so a transition to superseded without a successor fails loudly."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-05 Revision",
+     "axis_b": "One revision row per mutation in the same transaction",
+     "value": {
+      "priority": "must",
+      "acceptance": "entity_type='governed_asset', seq = governed_asset.version, label in created|updated|status:<to>, content is the post-mutation snapshot and content_hash is SHA-256 of JCS-canonical JSON; uq(tenant, entity_type, entity_id, seq) refuses a double write."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-06 Compare",
+     "axis_b": "requirements.compare diffs two revisions in Rust",
+     "value": {
+      "priority": "must",
+      "acceptance": "field-level added/removed/changed over the two content documents, with acceptance matched by criterion id rather than array index, returning RevisionDiff."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-07 Catalogue",
+     "axis_b": "Catalogue import is idempotent per tenant",
+     "value": {
+      "priority": "must",
+      "acceptance": "seed/catalogue.json is a checked-in export, never called at runtime; migrate --seed imports it for all tenants by default; a second run returns {0,0,N}; card_type stays its own table while every other line is a catalogue_entry kind."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R-08 Quality",
+     "axis_b": "Quality scoring is read-only and advisory",
+     "value": {
+      "priority": "must",
+      "acceptance": "rubric v1 weights clarity .20, testability .30, atomicity .20, traceability .15 and uniqueness .15; scoring writes only quality_evaluation, never the asset, and runs as a post-commit job with dedupe_key revision:<id>; re-scoring the same revision yields the same number."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R-09 Search",
+     "axis_b": "Three ranked arms with SQL-side predicates",
+     "value": {
+      "priority": "must",
+      "acceptance": "governed_asset, card and catalogue_entry are UNION ALL arms each carrying its own LIMIT, with an outer ORDER BY score, id; tenant, kind, status and project predicates are SQL so Rust sees at most limit+1 rows; ts_headline is capped at 50."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R-10 Eval",
+     "axis_b": "A human-labelled 40-query eval set with explicit targets",
+     "value": {
+      "priority": "must",
+      "acceptance": "tests/eval/search_queries.json holds 40 queries across exact_key, title, body_phrase, paraphrase and typo with at least six each; expected ids are human-labelled; targets are recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector (D) shipped when the loss exceeds 0.05 or C is unreachable and B fails A + 0.20."
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "R-11 Traceability",
+     "axis_b": "trace_links.* is the only writer of trace_link",
+     "value": {
+      "priority": "must",
+      "acceptance": "a requirement-to-card link reads back from both the requirement with include=trace and the card's traces endpoint, in the same tenant, with zero cross-tenant rows."
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "R-12 Intake",
+     "axis_b": "Project requests are idempotent and promote atomically",
+     "value": {
+      "priority": "must",
+      "acceptance": "project_requests are unique on (tenant, external_ref), move through draft, approved, rejected and promoted, and promote creates its project through the store in the same transaction rather than re-calling projects.create."
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "R-13 Events",
+     "axis_b": "Every mutation writes one outbox event in its transaction",
+     "value": {
+      "priority": "must",
+      "acceptance": "eleven event types cover governed_asset.created/updated/transitioned/superseded, quality.evaluated, catalogue.imported and the four project_request transitions plus promoted, with the payload keys fixed in plan §5.8."
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "R-14 Gate",
+     "axis_b": "The plan §7 gate names its targets and its index",
+     "value": {
+      "priority": "must",
+      "acceptance": "the six API and store test targets, the ignored search_eval run and the EXPLAIN block that greps governed_asset_tsv_idx or governed_asset_title_trgm_idx; search_index asserts the index by name as conveyor_runtime."
+     },
+     "position": 14
+    }
+   ],
+   "body": "# Requirements Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen requirements, all must: the five-table schema with tenancy and trigonometry indexes, the 32 registry-declared actions, kind fixed at declaration, the supersede invariant, one revision per mutation, a Rust compare, an idempotent catalogue import, an advisory quality rubric, three ranked search arms, a 40-query human-labelled eval with explicit targets, a single trace-link writer, an idempotent project-request intake, the outbox events and the plan §7 gate itself.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8 and §7; realizes the Phase A requirements view; reuses S03's schema and tenancy conventions and S04's registry contract rather than restating them.\n\n## Document\n\nThe artefact sits under the slice plan; each requirement's acceptance is exercised by one of search_index, s07_assets, s07_requests, s07_store, s07_seed, s07_governance or search_eval, and the record-level instrument is acceptance/programme/S07.toml. The published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S07 Requirements and search (Phase A)",
+     "kind": "derivation"
+    }
+   ]
+  },
+  {
+   "title": "Solution Concept Diagram — S07 Requirements and search (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The components, stores and edges that carry the slice's writes, reads, revisions, quality jobs, events and search.",
+   "scope": "Phase A solution view: migration 0007, the domain modules, the store transaction boundary, the 32 registry actions, the search module, the seed importer, the post-commit quality job and the outbox.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "migrations/0007_requirements.sql",
+     "axis_b": "the schema delta",
+     "value": {
+      "kind": "component",
+      "note": "quality_evaluation, principle_conflict and project_request with FKs, indexes, FORCE RLS and policies; pg_trgm plus the trigram GIN indexes; reuses S03's governed_asset, revision, catalogue_entry and trace_link."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "crates/domain/src/governance.rs",
+     "axis_b": "transition legality",
+     "value": {
+      "kind": "component",
+      "note": "transition(kind, from, to) is the only legality check; kind never arrives as an input."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "crates/domain/src/compare.rs",
+     "axis_b": "the Rust diff",
+     "value": {
+      "kind": "component",
+      "note": "field-level added/removed/changed over two revision content documents, acceptance matched by criterion id."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "crates/domain/src/quality.rs",
+     "axis_b": "the rubric",
+     "value": {
+      "kind": "component",
+      "note": "rubric v1 weights summing to 1 over clarity, testability, atomicity, traceability and uniqueness; criteria records raw and weighted values."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "crates/store/src/*",
+     "axis_b": "the transaction boundary",
+     "value": {
+      "kind": "component",
+      "note": "governed_asset, revision, catalogue, quality, search and project_request stores; the asset write and its revision insert share one transaction."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "crates/actions and crates/api",
+     "axis_b": "the action surface",
+     "value": {
+      "kind": "component",
+      "note": "32 actions declared through the S04 registry, served as unversioned /api/<resource>; search/rank and search/query are a module, not a crate."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "apps/server/src/seed.rs with seed/catalogue.json",
+     "axis_b": "the importer",
+     "value": {
+      "kind": "component",
+      "note": "migrate --seed imports the checked-in export per tenant and at tenant create; ON CONFLICT DO UPDATE is gated by IS DISTINCT FROM."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "quality.score job",
+     "axis_b": "the post-commit edge",
+     "value": {
+      "kind": "edge",
+      "note": "enqueued after commit with dedupe_key revision:<id>; it writes quality_evaluation only and never the asset."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "event outbox",
+     "axis_b": "the fan-out edge",
+     "value": {
+      "kind": "edge",
+      "note": "one row per mutation in the mutation's transaction across the eleven event types of plan §5.8."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "search.query",
+     "axis_b": "the three-arm read",
+     "value": {
+      "kind": "edge",
+      "note": "governed_asset, card and catalogue_entry arms unioned with per-arm limits; every predicate stays in SQL."
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "tests/eval/search_queries.json with search_eval",
+     "axis_b": "the measurement edge",
+     "value": {
+      "kind": "component",
+      "note": "40 human-labelled queries, baselines A and B, live RM baseline C and the pgvector contingency D."
+     },
+     "position": 11
+    }
+   ],
+   "body": "# Solution Concept Diagram — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven elements. The write path runs action, store, asset plus revision, then outbox in one transaction; quality scoring hangs off commit as a job and writes only its evaluation rows; search reads three GIN-backed arms; trace_links and project_requests use the same action surface. The eval harness sits beside the search module and measures it against baselines rather than against itself.\n\n## Links\n\nDerives from the slice plan §5 and the deliverable list in the plan header; realizes the Phase A solution concept; reuses S03's schema, S04's registry and S02's migrate, event and job rather than adding parallel machinery.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the components are the files listed in the plan's deliverable block, and the project's published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
+     "kind": "realization"
+    },
+    {
+     "to": "Business Capability Map — S07 Requirements and search (Phase B)",
+     "kind": "realization"
+    }
+   ]
+  },
+  {
+   "title": "Business Capability Map — S07 Requirements and search (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The business capabilities the slice declares and how far each is evidenced at the rework.",
+   "scope": "Phase B capability view: requirement lifecycle, principle governance and conflicts, decisions, catalogue management, quality scoring, search, traceability, project intake and revision comparison.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "Requirement lifecycle governance",
+     "axis_b": "create, get, update, transition, list and compare a requirement",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "requirements.* over governed_asset with kind fixed at declaration"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Principle management and conflict detection",
+     "axis_b": "principles with list_conflicts and dismiss_conflict",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "principles.* plus principle_conflict with uq(tenant, principle_a_id, principle_b_id)"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Decision (ADR) governance",
+     "axis_b": "decisions on the same lifecycle with supersede",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "decisions.* with the superseded_by same-statement invariant"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Catalogue management",
+     "axis_b": "a governed catalogue per tenant, imported idempotently",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "catalogues.list|import and the migrate --seed importer"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Quality scoring",
+     "axis_b": "an advisory score on every immutable revision",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "quality.score as a post-commit job writing quality_evaluation"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Search and retrieval",
+     "axis_b": "ranked results across assets, cards and catalogue entries",
+     "value": {
+      "maturity": "claimed built in the record; no eval numbers are recorded",
+      "realised_by": "search.query over three GIN-backed arms with a committed weight constant"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Traceability",
+     "axis_b": "links readable from either end of the relation",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "trace_links.* as the single writer of trace_link"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Project intake and promotion",
+     "axis_b": "external requests approved, rejected or promoted into projects",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "project_requests.* with idempotency on (tenant, external_ref) and an atomic promote"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Revision history and comparison",
+     "axis_b": "one immutable revision per mutation and a field-level diff",
+     "value": {
+      "maturity": "claimed built in the record; the functional gate run is not evidenced",
+      "realised_by": "the revision store with seq = version and requirements.compare in Rust"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Business Capability Map — S07 Requirements and search (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine capabilities: requirement lifecycle, principle governance with conflict detection, decision governance, catalogue management, quality scoring, search, traceability, project intake and revision comparison. Each names the action surface that realises it and records the same maturity honestly: the project meta claims built, while the snapshot carries no run of the functional gate or the eval, so the map does not mark any capability proven.\n\n## Links\n\nDerives from the slice plan §1, §5 and §9; realizes the Phase B capability view; reuses the S03 lifecycle, the S04 registry and the S02 job machinery rather than introducing new capability surfaces.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36, which claims the slice but does not carry the gate run.\n",
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
+     "kind": "realization"
+    }
+   ]
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The entities the slice adds or relies on, each with its owner and its one invariant.",
+   "scope": "Phase C data view: the three S07 tables, the four S03 entities it reuses, the dropped outline tables and the indexes that make search and uniqueness work.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "governed_asset",
+     "axis_b": "the reused requirement, principle and decision row",
+     "value": {
+      "owner": "S03",
+      "table": "governed_asset",
+      "note": "kind drawn from the fixed vocabulary, version, status and a generated tsv with a literal english config; gin(tsv) and gin(title gin_trgm_ops)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "revision",
+     "axis_b": "the immutable history row",
+     "value": {
+      "owner": "S03",
+      "table": "revision",
+      "note": "one per mutation with seq = governed_asset.version, a full content snapshot and a SHA-256 content_hash over JCS-canonical JSON; uq(tenant, entity_type, entity_id, seq)."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "catalogue_entry",
+     "axis_b": "the catalogue kind row",
+     "value": {
+      "owner": "S03",
+      "table": "catalogue_entry",
+      "note": "the fixed eleven-kind vocabulary, unique on (tenant, kind, code); card_type does not live here because it has its own table; gin(label gin_trgm_ops)."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "trace_link",
+     "axis_b": "the typed relation row",
+     "value": {
+      "owner": "S03",
+      "table": "trace_link",
+      "note": "written only by trace_links.*; same-tenant constraints are enforced by row-level security, so a bad join reaches no other tenant."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "quality_evaluation",
+     "axis_b": "the append-only score row",
+     "value": {
+      "owner": "S07",
+      "table": "quality_evaluation",
+      "note": "entity_type and entity_id name the revision, score is derived from the rubric criteria JSONB, indexes are (tenant, entity_type, entity_id, created_at desc); no update or delete path exists."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "principle_conflict",
+     "axis_b": "the pairwise conflict row",
+     "value": {
+      "owner": "S07",
+      "table": "principle_conflict",
+      "note": "unique on (tenant, principle_a_id, principle_b_id), carries the verdict and the dismisser with the dismissal time; dismissal is a row update, never a delete."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "project_request",
+     "axis_b": "the intake row",
+     "value": {
+      "owner": "S07",
+      "table": "project_request",
+      "note": "unique on (tenant, external_ref), status in draft|approved|rejected|promoted, and project_id, repository_url plus the external payload and origin."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "outline and outline_node",
+     "axis_b": "the dropped pair",
+     "value": {
+      "owner": "historical 0007",
+      "table": "none",
+      "note": "built by migration 0007 and dropped by 0011 after S00 measured zero usage; the plan's §10.3 open question still assumes they exist and is stale on this point."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "pg_trgm indexes",
+     "axis_b": "the search indexes",
+     "value": {
+      "owner": "S07 migration",
+      "table": "indexes",
+      "note": "gin(title gin_trgm_ops) on governed_asset and card and gin(label gin_trgm_ops) on catalogue_entry; the tsv GIN from S03 is untouched."
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine entries: the four S03 entities the slice reuses (governed_asset, revision, catalogue_entry, trace_link), the three tables it adds (quality_evaluation, principle_conflict, project_request), the dropped outline pair and the trigram indexes. Each entry names its owner and its invariant; the dropped pair is recorded as absent rather than carried forward as if S08 still owns it.\n\n## Links\n\nDerives from the slice plan §5.1, §5.3, §5.4 and the 2026-11-08 header note on the 0011 drop; realizes the Phase C data view; reuses S03's columns and constraints verbatim instead of redefining them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; migration 0007 is the schema record and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
+     "kind": "realization"
+    }
+   ]
+  },
+  {
+   "title": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The standards the slice fixes for its schema, indexing, hashing, eventing, ranking and verification.",
+   "scope": "Phase D standards view: Postgres 18 with forced row-level security, text-plus-CHECK enumerations, full-text and trigram as distinct indexes, canonical JSON hashing, the action-only write path, post-commit jobs and the verification route.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "accountable": "the SRO for the tranche-4 delivery",
+    "consulted": "the S03 and S04 owners, the RM source analysts, S08",
+    "informed": "S12, tenant administrators and requirement authors"
+   },
+   "entries": [
+    {
+     "axis_a": "PostgreSQL 18",
+     "axis_b": "forced row-level security on every new table",
+     "value": {
+      "usage": "each S07 table carries tenant_id NOT NULL with ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy using both USING and WITH CHECK, following S03's convention; quality_evaluation is append-only."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Enumeration storage",
+     "axis_b": "text plus CHECK constraints",
+     "value": {
+      "usage": "status, kind and verdict are text columns constrained by CHECK rather than native enums, so a new value is a migration, not an ALTER TYPE; governed_asset status is draft, in_review, approved or superseded."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Full-text configuration",
+     "axis_b": "a generated tsv with a literal english config",
+     "value": {
+      "usage": "the tsvector column names 'english' literally because current_setting is not immutable; ts_rank_cd must name the same configuration or it scores zero."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Trigram indexing",
+     "axis_b": "pg_trgm beside full text, never instead of it",
+     "value": {
+      "usage": "gin(title gin_trgm_ops) serves %, ILIKE and similarity(); tsv @@ tsquery needs gin(tsv); similarity ordering without a % predicate scans the table and is refused."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "LEAKPROOF provisioning",
+     "axis_b": "scripts/db-roles.sql marks the operators",
+     "value": {
+      "usage": "ts_match_vq and word_similarity_op must be LEAKPROOF or both GINs are dead under FORCE RLS; the plan records the 2026-11-08 measurement where the degraded plan satisfied a loose grep and the check was tightened."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Canonical JSON",
+     "axis_b": "RFC 8785 JCS with SHA-256",
+     "value": {
+      "usage": "revision.content_hash is the SHA-256 of the JCS-canonical post-mutation snapshot, so equal documents hash equally and a diff is over content, not storage order."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Action-only write path",
+     "axis_b": "unversioned /api/<resource> through the registry",
+     "value": {
+      "usage": "all 32 operations are registry-declared actions with unversioned host routes; the durable name is the action, and RM's unprefixed mounts get no alias or rewrite."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Outbox events",
+     "axis_b": "one event per mutation in the transaction",
+     "value": {
+      "usage": "eleven internal event types are written in the mutation's transaction; event names are internal vocabulary and no consumer's naming is copied into the schema."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Post-commit jobs",
+     "axis_b": "quality scoring outside the mutation lock",
+     "value": {
+      "usage": "quality.score runs as job(kind='quality.score', dedupe_key='revision:<id>') after commit; several trigram queries inside the mutation would hold the asset row lock, which the plan refuses."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Ranking weights",
+     "axis_b": "one committed constant, grid-tuned",
+     "value": {
+      "usage": "the three search weights are one constant tuned by a bounded grid search, not a learned model; pgvector ships only on the §5.6 trigger."
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "Verification route",
+     "axis_b": "GitHub-hosted preflight and a named index",
+     "value": {
+      "usage": "compile and test are answered by the repository's GitHub-hosted preflight, never a local compiling cargo; search_index asserts the GIN by name as conveyor_runtime under enable_seqscan=off."
+     },
+     "position": 11
+    }
+   ],
+   "body": "# Technology Standards Catalog — S07 Requirements and search (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven standards: Postgres 18 with forced row-level security, text-plus-CHECK enumerations, a generated tsvector with a literal english config, trigram beside full text, the LEAKPROOF provisioning both GINs depend on, JCS-canonical hashing, the unversioned action-only write path, transactional outbox events, post-commit quality jobs, committed ranking weights and the verification route that names its index.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8, §7 and §8, and the repository contract sections the plan cites; realizes the Phase D standards view; reuses the S03 tenancy and S04 registry standards instead of forking them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the standards are exercised by migrations/0007_requirements.sql, the six gate test targets and search_eval, the instrument is acceptance/programme/S07.toml, and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
+     "kind": "dependency"
+    }
+   ]
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "title": "The plan §7 functional gate has no recorded run",
+    "code": "S07-R1",
+    "body": "The charter, the Phase-G review, the closure and its review all record that plan §7's seven properties (a)–(g), the six named test targets and the EXPLAIN index check have no run at the snapshot; the close stands on the record-level checks of acceptance/programme/S07.toml alone. The slice could therefore close with a gate that has never refused anything outside this pack's checker.",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "run search_index, s07_assets, s07_requests, s07_store, s07_seed and s07_governance plus the EXPLAIN block in the lane and attach the output to the project's evidence page",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R-14 Gate The plan §7 gate names its targets and its index"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "title": "The §5.6 relevance targets have no measured eval numbers",
+    "code": "S07-R2",
+    "body": "No A/B/C/D numbers and no completion record exist for the 40-query eval. The Phase-G review records the level consistent rather than compliant because recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C are unmeasured, and the pgvector contingency (loss above 0.05 or C unreachable) cannot be decided without them.",
+    "probability": "high",
+    "impact": 3,
+    "review_at": "2026-12-15",
+    "severity": "medium",
+    "status": "open",
+    "response": "run search_eval with BASELINE=ab, BASELINE=c and GRID=1, record the §5.6 decision on pgvector, and publish the numbers",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R-10 Eval A human-labelled 40-query eval set with explicit targets"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "title": "Both GIN indexes are dead if the trigram operators are not LEAKPROOF",
+    "code": "S07-R3",
+    "body": "The Technology Standards Catalog records that ts_match_vq and word_similarity_op must be LEAKPROOF or both GIN indexes are dead under FORCE ROW LEVEL SECURITY, and that the 2026-11-08 measurement showed a degraded plan satisfying a loose grep before the check was tightened. No run at the snapshot proves the operators are provisioned.",
+    "probability": "medium",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "re-run the EXPLAIN block under enable_seqscan=off as conveyor_runtime and assert the named GIN index in search_index",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R-01 Schema Five §5.1 tables with full tenancy and the trigram indexes",
+      "R-09 Search Three ranked arms with SQL-side predicates"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "title": "The snapshot carries no linked issue and no baseline row",
+    "code": "S07-I1",
+    "body": "The Phase-G review records that the snapshot carries no charter, Statement of Architecture Work, delivery contract, artefact set, Phase-G review, closure review, baseline row or linked issue, and meta.issues is empty. This retrospective supplies the record set but creates no GitHub issue link or baseline row for S07.",
+    "severity": "medium",
+    "status": "open"
+   },
+   {
+    "title": "The plan §10.3 open question still assumes outline and outline_node exist",
+    "code": "S07-I2",
+    "body": "The Data Entity/Data Component Catalog records that outline and outline_node were built by migration 0007 and dropped by 0011 after S00 measured zero usage, while the plan's §10.3 open question still assumes they exist; the plan text and the schema record disagree.",
+    "severity": "low",
+    "status": "open"
+   }
+  ],
+  "assumption": [
+   {
+    "title": "The 2026-11-24 snapshot is the authoritative record for S07",
+    "code": "S07-A1",
+    "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, where project 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 and last updated 2026-11-21T01:06:16Z; the checker refuses any id that appears nowhere in that snapshot, so the pack assumes the snapshot is complete and current for S07.",
+    "status": "held"
+   },
+   {
+    "title": "S03 and S04 keep the surfaces S07 reuses",
+    "code": "S07-A2",
+    "body": "S07 reuses S03's governed_asset, revision, catalogue_entry and trace_link with their fixed kind vocabulary and tenancy conventions, and ships all 32 actions through S04's registry, ActionSpec derive and OpenAPI and MCP projection; the pack assumes those surfaces stay as the record declares them.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "title": "S03 keeps governed_asset, revision, catalogue_entry and trace_link",
+    "code": "S07-D1",
+    "body": "The Requirements Catalog and the Data Entity/Data Component Catalog reuse S03's four tables, columns, constraints and tenancy verbatim rather than redefining them, and the Solution Concept Diagram treats S03's schema as the transaction boundary; a change to those surfaces invalidates the slice's schema requirements.",
+    "status": "satisfied"
+   },
+   {
+    "title": "S04 projects every S07 action through the registry",
+    "code": "S07-D2",
+    "body": "The 32 actions (requirements.*, principles.*, decisions.*, catalogues.list|import, quality.score, search.query, trace_links.* and project_requests.*) are declared through the S04 ActionSpec derive and served as unversioned /api/<resource> routes; the action surface depends on the registry remaining the single write path.",
+    "status": "satisfied"
+   },
+   {
+    "title": "PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators",
+    "code": "S07-D3",
+    "body": "The Technology Standards Catalog fixes pg_trgm, the generated tsv with a literal english config and the LEAKPROOF provisioning in scripts/db-roles.sql; without the operators both GIN indexes are dead under FORCE RLS, so the search requirements depend on that provisioning.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "title": "One governed_asset lifecycle replaces RM's 57 domain tables",
+    "code": "S07-B1",
+    "body": "D1 and G1 in the Driver/Goal/Objective Catalog put requirements, principles and decisions on one handler bound to a fixed kind at declaration; the Business Capability Map records the lifecycle capability as claimed built in the record, with the functional gate run not evidenced.",
+    "status": "claimed"
+   },
+   {
+    "title": "Every mutation leaves an immutable revision with a Rust field-level compare",
+    "code": "S07-B2",
+    "body": "D2/G2 and R-05/R-06 give each mutation one revision with seq = version and a SHA-256 hash of JCS-canonical JSON, and requirements.compare diffs two revisions in Rust with acceptance matched by criterion id; the capability map records it as claimed built in the record, with the functional gate run not evidenced.",
+    "status": "claimed"
+   },
+   {
+    "title": "A measured relevance baseline over 40 human-labelled queries",
+    "code": "S07-B3",
+    "body": "D4/G4 and R-10 target a 40-query eval over three ranked arms with recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector only when the loss exceeds 0.05; no eval numbers are recorded at the snapshot, so the measurement benefit remains planned.",
+    "status": "planned"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery contract — S07 Requirements and search (retrospective, 2026-11-24)",
+  "body": {
+   "commitments": "S07 commits to carrying RM's requirement surface onto S07's governed_asset, revision, catalogue_entry and trace_link: one lifecycle for requirements, principles and ADRs instead of RM's 57 domain tables, one revision per mutation with a working Rust compare, read-only quality scoring on immutable revisions, FTS plus trigram search measured against an agreed baseline, and traceability in both directions with zero cross-tenant rows.",
+   "approval": "At the 2026-11-24 snapshot S07 has no charter, Statement of Architecture Work, delivery contract, Phase A-D artefact set or Phase-G review; this retrospective contract is the contract of record, approved through the rework's Architecture Board path under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the consistent Phase-G level is recorded, and the close gate is decided by an approver other than the requester against acceptance/programme/S07.toml.",
+   "compliance": "S07 is assessed clause by clause against SPEC §8 S7 and plan §7. The seven properties are: (a) three revisions with max(seq)=3 and a compare that shows the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with idx_scan rising on a 50k-row load; (d) relevance where B meets §5.6's recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector shipped only when the loss exceeds 0.05 or C is unreachable and B fails A + 0.20; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only with version and status untouched; (g) no orphan over RM's 28 modules. Each property is carried by a named target (search_index, s07_assets, s07_requests, s07_store, s07_seed, s07_governance, search_eval) or the EXPLAIN block. The snapshot records no Phase-G review and no run of these properties; this rework supplies the seven artefacts, this contract, the Phase-G review and the closure review, records the level consistent, and re-closes on the 15 P0 checks of acceptance/programme/S07.toml. The close gate is decided by an approver other than its requester under the standing delegation.",
+   "acceptance_at": "the live record at the 2026-11-24 rework snapshot: the project row is closed at version 7 with the row last updated 2026-11-21T01:06:16Z, and tranche 4 was authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9.",
+   "manifest": "acceptance/programme/S07.toml",
+   "retrospective": true,
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The requirements and search slice — one governed_asset lifecycle, one revision per mutation, the advisory quality rubric, FTS plus trigram search and its eval set, the catalogue seed and the project-request intake",
+  "business_value": 10,
+  "time_criticality": 8,
+  "risk_reduction": 10,
+  "job_size": 8
+ },
+ "review": {
+  "level": "consistent",
+  "findings": "This retrospective Phase-G review records the level consistent for S07 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 with the row last updated 2026-11-21T01:06:16Z, inside tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. At the snapshot the project has no charter, Statement of Architecture Work, delivery contract, Phase A–D artefact set, Phase-G review, closure review, baseline row or linked issue; its only publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z. The project meta records measured_status built, plan_status planned, expected_outputs project-brief/evidence, closure_outputs empty and no issues. The plan §7 functional gate has no recorded run and §5.6's relevance targets have no recorded numbers. This content supplies the charter, the Statement of Architecture Work, the seven A–D artefacts, the delivery contract, this review, the project brief, the evidence statement and the closure review; the level is consistent because the record set now matches the snapshot and nothing beyond the record is claimed. A level of compliant, conformant or fully_conformant would require a recorded gate and eval run, which the snapshot does not carry; non_conformant would require a waiver the programme forbids. The plan's traps remain constraints: no Rust-side filtering, SQL predicates with per-arm limits, the generated tsvector with a literal english config, trigram and full-text as distinct indexes, no quality scoring inside the mutation transaction, and the unversioned action path. The gate run and the relevance eval are carried as open verification items in this rework.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "acceptance_manifest": "acceptance/programme/S07.toml",
+   "plan": "docs/plans/slices/S07-requirements-search.md",
+   "snapshot": "/tmp/conv526-w1-snap/data",
+   "evidence_page": "01a1e687-4d95-70a0-8cf9-a624a30dcb36",
+   "content_check": "scripts/rework-content-check.py --project S07 --closes true"
+  }
+ },
+ "project_brief_output": "# Project brief — S07 Requirements and search (retrospective, 2026-11-24)\n\n## Outcome\n\nS07 lands RM's requirement surface on S03's `governed_asset`, `revision`, `catalogue_entry` and `trace_link`: one lifecycle for requirements, principles and decisions, one revision per mutation with a Rust compare, an advisory quality rubric scored on immutable revisions, ranked full-text plus trigram search with a 40-query eval, a per-tenant catalogue import and a governed project-request intake. The record claims the slice built, but no run of the plan §7 gate is recorded at the snapshot, and this brief records that rather than claiming a pass.\n\n## Boundary\n\nOut of scope: the TOC API and screens and ArchiMate/UML/renders (S08), project CRUD (S05), `bulk` and RM's `promote`/`project-copy` (dropped), and the UI (S12). `outline` and `outline_node` were built by 0007 and dropped by 0011 after S00 measured zero usage, and this project does not recreate them. S07 must not filter in Rust, must not score quality inside the mutation transaction, and must not create a second writer of `trace_link` or a second lifecycle table.\n\n## Reuse sources\n\n- S03: `governed_asset` with its generated `tsv` and `gin(tsv)`, `revision`, `catalogue_entry`, `trace_link`, `card_type` and `card.tsv`.\n- S04: the action registry, `/api/actions` and the OpenAPI plus MCP projection.\n- S02: `migrate`, `event` and `job`, for the outbox and the post-commit quality job.\n- 02-DATA-ARCHITECTURE §2.4, §2.7, §3.4, §4 and §5: columns, indexes, the state machine and the JSONB policy verbatim.\n- 02-source-map/30-rm §1 (RM `9ee72ab`) and 20-fr `6f7c509`: the 28 routers, asset shape, traceability and intake — not `bulk`, `pm_card_ledger` or promote/project-copy.\n\n## Inception units\n\nThe project row records `meta.measured_status: built`, `meta.plan_status: planned`, `meta.issues: []` and `meta.viability: rework`, with `expected_outputs: [project-brief, evidence]` and `closure_outputs: []`. The only publication attached is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z. No charter, Statement of Architecture Work, delivery contract, Phase A–D artefact set or closure review exists at the snapshot; the plan's decisions §9.1–§9.8 are the design record, and this pack supplies the rest.\n\n## Dependencies\n\n- blocked-by: S03 — `governed_asset`, `revision`, `catalogue_entry`, `trace_link`, the fixed catalogue kind vocabulary and `card.tsv`.\n- blocked-by: S04 — the ActionSpec derive, the registry and the OpenAPI/MCP projection every one of the 32 actions ships through.\n- blocked-by: S02 — `migrate` (the binary that re-applies runtime grants), `event` and `job`.\n- blocks: S08 — requirement-to-`model_element` trace links and the outline drop decision; S12's requirements editor, revision diff and ranked search.\n\n## Acceptance\n\nThe gate is SPEC §8 S7: the relevance eval set beats the agreed baseline. Plan §7 requires the six corrected test targets (`search_index`, `s07_assets`, `s07_requests`, `s07_store`, `s07_seed`, `s07_governance` — the 2026-11-09 correction replaced five targets that did not exist), the ignored `search_eval` run, and an EXPLAIN grep that names the GIN index rather than any index. §5.6 fixes recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector (D) shipped only on the stated trigger. The snapshot carries no run; the record-level instrument is `acceptance/programme/S07.toml`, 15 P0 checks and two P1.\n\n## Capabilities\n\nThe capabilities the slice declares: requirement lifecycle; principle conflict detection and dismissal; ADR governance; catalogue import; quality scoring; ranked search; traceability; project intake and promotion; revision comparison. Each is realised by named actions or jobs in the plan §5 and declared through the registry, so a consumer reaches it by action name rather than by a route or a table.\n\n## Plan\n\nSequence: `0007_requirements.sql` with the §5.1 tables, FKs, indexes, FORCE RLS, `pg_trgm` and the trigram indexes; `migrate` twice; domain governance, compare and quality; store writes with their revisions; the 32 actions; the compare snapshot test; the catalogue export and idempotent seed; the rubric and post-commit job; search; the eval harness and baselines A, B and C; the bounded weight grid search; the D decision; `project_requests`. The plan §7 command block and the 28-module coverage table (7 here, 2 dropped, 19 elsewhere) close the plan.",
+ "evidence_output": "# Evidence — S07 Requirements and search (retrospective, 2026-11-24)\n\n## Claim\n\nAt the 2026-11-24 snapshot S07 is closed at version 7 with `meta.measured_status: built` and `meta.plan_status: planned`, its only publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, and no gate run, baseline row, linked issue, contract or review is recorded; this retrospective reconstructs the lifecycle record and re-closes the project on that record, not on a claimed pass of the functional gate.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d2c-7322-b2f9-4dd041153894, key S07, `status: closed`, version 7, created 2026-11-12T14:46:02Z, last updated 2026-11-21T01:06:16Z; meta `adm_phase: G`, `plateau: delivery`, `track: v1`, `tranche: 4`, `viability: rework`, `depends_on: [S03, S04]`, `measured_status: built`, `plan_status: planned`, `issues: []`, `expected_outputs: [project-brief, evidence]`, `closure_outputs: []`.\n- **Tranche:** tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) created 2026-11-17T14:19:56Z and authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue).\n- **Publication:** the active evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, created 2026-11-16T22:43:09Z, published 2026-11-16T22:43:11Z, unit S07, attached to the project.\n- **Build artefacts present at HEAD:** `migrations/0007_requirements.sql`; `crates/domain/src/governance.rs`, `quality.rs` and `compare.rs`; the test targets `s07_store`, `s07_seed`, `s07_governance`, `s07_assets`, `s07_requests`, `search_index` and `search_eval`; `seed/catalogue.json`; `tests/eval/search_queries.json`; `acceptance/programme/S07.toml`.\n- **Gap in the record:** the snapshot contains no charter, Statement of Architecture Work, delivery contract, Phase A–D artefact set, Phase-G compliance review, closure review, baseline row, linked issue or gate run for S07.\n\n## Verification\n\nAn independent reader repeats the record checks against the 2026-11-24 snapshot (the artefacts, programme, msp and work rows) and then the plan §7 gate: `source ~/.cargo/env`; `docker compose up -d db`; run the six named API and store test targets and `cargo test -p conveyor-api --test search_eval -- --ignored --nocapture`; then the EXPLAIN block under `enable_seqscan=off`, which must match `governed_asset_tsv_idx` or `governed_asset_title_trgm_idx` by name. The compile and test verdict comes from the repository's GitHub-hosted preflight, never a local compiling cargo. This pack itself is refused or accepted by `scripts/rework-content-check.py --project S07 --closes true` before `scripts/rework-project.py` writes it.\n\n## Links\n\n- Plan: `docs/plans/slices/S07-requirements-search.md`\n- Acceptance instrument: `acceptance/programme/S07.toml`\n- Project: 01a1d039-0d2c-7322-b2f9-4dd041153894\n- Tranche 4: 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; authorising review: 01a216d0-d634-738e-985a-00a85cfd48d9\n- Published evidence page: 01a1e687-4d95-70a0-8cf9-a624a30dcb36\n- Standing delegation: 01a1ff1f-e4ba-72dc-9c1a-13049933cf14\n\n## Gap\n\nNo recorded run of plan §7's gate or of §5.6's eval targets exists in the snapshot; there is no baseline row, no linked issue, no Phase-G review and no closure review before this pack. The plan's open questions §10 remain open: whether Loki's 24-hour sample carries query strings, whether RM's semantic search is reproducible, whether S08 references or recreates `outline`/`outline_node` (0011 dropped both, so §10.3 is stale), and the `project_request.timeout` window. These are carried as open items, not converted into claims.",
+ "closure": "# Closure — S07 Requirements and search (retrospective, 2026-11-24)\n\nS07 is re-closed retrospectively under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project row 01a1d039-0d2c-7322-b2f9-4dd041153894 was already closed at version 7, last updated 2026-11-21T01:06:16Z, inside tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. What this rework delivers is the governance record the close lacked: this charter, the Statement of Architecture Work, the seven Phase A–D artefacts, the delivery contract, the project brief, the evidence statement, the Phase-G review and this closure with its review.\n\nThe evidence is the recorded project row and meta (`measured_status: built`, `plan_status: planned`, `issues: []`, `expected_outputs: [project-brief, evidence]`), the active evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36 published 2026-11-16T22:43:11Z, the plan `docs/plans/slices/S07-requirements-search.md`, and the acceptance instrument `acceptance/programme/S07.toml`. The closure does not attest a pass of plan §7's functional gate or of §5.6's relevance targets: no run is recorded, and that absence is the open item the closure review carries. The close stands on the record set and the instrument's record checks, decided retrospectively on 2026-11-24 by an approver other than the requester.",
+ "closure_review": "# Closure review — S07 Requirements and search (retrospective, 2026-11-24)\n\n## Outcome vs acceptance\n\nJudged against SPEC §8 S7 and plan §7, the seven properties are: (a) three revisions with max(seq)=3 and a compare that shows the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under `enable_seqscan=off` with `idx_scan` rising on a 50k-row load; (d) relevance where B meets §5.6's recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only with version and status untouched; (g) no orphan over RM's 28 modules. The snapshot records no run of any of them, so none is marked pass; the outcome this review can evidence is the record-level outcome, that the project is closed, its meta claims built, and its governance record is now complete. The instrument `acceptance/programme/S07.toml` carries 17 checks, 15 P0 and two P1 (`lessons`, `artefact-standard`), and the re-close is judged on the record checks this rework supplies.\n\n## Evidence\n\nThe project row 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 (last updated 2026-11-21T01:06:16Z) with meta `measured_status: built`, `plan_status: planned`, `viability: rework`, `issues: []`, `expected_outputs: [project-brief, evidence]` and `closure_outputs: []`. Tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) was authorised 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9. The only publication is the active evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z, and the repository carries the build's files: migration 0007, the domain and store modules, the six gate test targets, `seed/catalogue.json`, `tests/eval/search_queries.json` and `acceptance/programme/S07.toml`. The snapshot carries no baseline row, no linked issue, no contract, no Phase-G review and no gate run; those absences are the basis for the level consistent rather than higher.\n\n## Open items\n\n- **Functional gate:** plan §7 properties (a)–(g) have no recorded run. Owner: the programme architect. Next step: run the six targets and the EXPLAIN block in the lane and attach the output to the project's evidence page.\n- **Relevance eval:** no A/B/C/D numbers and no completion record exist. Owner: the programme architect. Next step: run `search_eval` with `BASELINE=ab`, `BASELINE=c` and `GRID=1`, then record the §5.6 decision on pgvector.\n- **Artefact standard (P1):** the seven A–D artefacts are supplied by this pack; `S07-artefact-standard` must be re-run after publication.\n- **Lessons (P1):** the tranche retro holds no S07 lesson; the unrecorded gate is the candidate lesson.\n- **Stale plan question:** §10.3 assumes `outline`/`outline_node` still exist, but 0011 dropped them; S08 must not recreate them by assumption.\n- **No linked issues:** any defect found on the gate run needs a new issue, not a silent fix.\n\n## Decision\n\nClose, retrospectively. The project was already closed before the authorised record existed, and this rework supplies the charter, the Statement of Architecture Work, the seven artefacts, the delivery contract, the Phase-G review, the project brief, the evidence statement and this closure review under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the record checks of `acceptance/programme/S07.toml` are the re-close criteria, and the close gate is decided by an approver other than the requester. The review verdict is consistent: the pack matches the snapshot, and the historical record carries no artefact, contract, review, baseline or gate run. The unrecorded functional gate and relevance eval are open verification items, not a waiver and not a claim of pass; if the gate run fails, the project returns to the tranche queue for a defect issue. Decision date 2026-11-24.",
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S07 (retrospective, 2026-11-26)",
+   "body": "# Architecture Artefact Index — S07 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for S07 is the seven mandatory Phase A–D artefacts on the delivery track: Stakeholder Map — S07 Requirements and search (Phase A), Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A), Requirements Catalog — S07 Requirements and search (Phase A), Solution Concept Diagram — S07 Requirements and search (Phase A) at phase a, plateau psa; Business Capability Map — S07 Requirements and search (Phase B) at phase b; Data Entity/Data Component Catalog — S07 Requirements and search (Phase C) at phase c; and Technology Standards Catalog — S07 Requirements and search (Phase D) at phase d. Each carries an authored body dated 2026-11-26; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S07 Requirements and search (Phase A); a/catalog — Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A); a/catalog — Requirements Catalog — S07 Requirements and search (Phase A); a/diagram — Solution Concept Diagram — S07 Requirements and search (Phase A); b/diagram — Business Capability Map — S07 Requirements and search (Phase B); c/catalog — Data Entity/Data Component Catalog — S07 Requirements and search (Phase C); d/catalog — Technology Standards Catalog — S07 Requirements and search (Phase D). Each row carries the entries recorded in the pack's own artefact, from the stakeholder matrix through the requirement and technology catalogues; the factory re-versions the rows this index names and binds each to its instance document.\n\n## Links\n\nThe artefacts link in lifecycle order — stakeholder map to driver/goal/objective, drivers to requirements, requirements to the solution concept, solution to capability, capability to data, data to technology standards, and technology standards back to the stakeholder map as a reuse edge. Every artefact carries at least one link, so the standard's orphan rule finds no orphan in the set.\n\n## Document\n\nEach artefact's published document is its category-`architecture-artifact-instance` instance document, titled with the artefact's own title (Stakeholder Map — S07 Requirements and search (Phase A); Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A); Requirements Catalog — S07 Requirements and search (Phase A); Solution Concept Diagram — S07 Requirements and search (Phase A); Business Capability Map — S07 Requirements and search (Phase B); Data Entity/Data Component Catalog — S07 Requirements and search (Phase C); Technology Standards Catalog — S07 Requirements and search (Phase D)). The factory publishes each body before binding the row, so `document_id` pins a real document from version one and the mandatory-artefact standard resolves the Document heading against them.\n"
+  }
+ ]
+}

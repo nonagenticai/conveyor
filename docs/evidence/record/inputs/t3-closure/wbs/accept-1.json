@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "charter and baseline gates",
+   "kind": "test",
+   "path": "crates/actions/tests/spine_gates.rs"
+  },
+  {
+   "ref": "plan_project: WBS, baseline, approval in one transaction",
+   "kind": "action",
+   "path": "crates/actions/src/pm/mod.rs"
+  }
+ ],
+ "change_id": "01a2052e-5648-7350-a30d-06514a69eced"
+}

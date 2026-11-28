@@ -95,6 +95,7 @@ async fn a_named_actor_creates_as_itself_and_a_stranger_is_refused() {
             serde_json::json!({"id": project_id, "meta": {"viability": "rework"}}),
             Some(version),
             None,
+            None,
         )
         .await
         .expect("the current version writes");
@@ -107,6 +108,7 @@ async fn a_named_actor_creates_as_itself_and_a_stranger_is_refused() {
             "projects.programme_meta",
             serde_json::json!({"id": project_id, "meta": {"viability": "fold"}}),
             Some(version - 1),
+            None,
             None,
         )
         .await;

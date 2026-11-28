@@ -3,7 +3,9 @@
 //!
 //! Two questions per (tenant, action), and nothing else:
 //!
-//! * `approval` — `required` (the default, and §11.4's rule) or `waived` (this tenant's opt-out);
+//! * `approval` — `required` (the default, and §11.4's rule) or `waived` (an opt-out that must be
+//!   **earned**: §9.3 / D34 make a waiver an in-force `auto` policy with typed conditions and an
+//!   expiry, never a bare row);
 //! * `self_approval` — `forbidden` (the default, and §5.4's rule) or `allowed`.
 //!
 //! ⛔ **An absent row is the safe default, never "no policy".** Every reader in this module
@@ -16,9 +18,10 @@
 
 use std::str::FromStr;
 
+use chrono::Utc;
 use conveyor_domain::TenantId;
 use conveyor_domain::Timestamp;
-use conveyor_domain::development::ApproverKind;
+use conveyor_domain::development::{ApproverKind, AutoMergeConditions, auto_merge_in_force};
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -36,6 +39,10 @@ pub enum ApprovalPolicyStoreError {
         /// The stored value.
         value: String,
     },
+    /// The policy tried to store `self_approval = allowed`; SPEC_V2 §5.4 makes self-approval
+    /// an invariant, not a tenant permission (ledger v1-w4b-4).
+    #[error("SPEC_V2 §5.4: self-approval cannot be stored as `allowed`")]
+    SelfApprovalAllowed,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -46,7 +53,8 @@ pub enum ApprovalPolicyStoreError {
 pub enum ApprovalRequirement {
     /// An approved approval naming the exact target is required. The default.
     Required,
-    /// This tenant has opted out for this action; the call runs without one.
+    /// An earned, in-force `auto` policy has opted this action out. Only [`waives`] may answer
+    /// this way; a bare `waived` row is not a waiver.
     Waived,
 }
 
@@ -162,9 +170,14 @@ struct PolicyRow {
 
 impl PolicyRow {
     fn into_policy(self) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
+        // §5.4 is an invariant, not a stored permission: a historical `allowed` row still
+        // parses (it must read), and NO read path returns it as permission (ledger v1-w4b-4).
+        let self_approval = match SelfApproval::from_str(&self.self_approval)? {
+            SelfApproval::Allowed | SelfApproval::Forbidden => SelfApproval::Forbidden,
+        };
         Ok(ApprovalPolicy {
             approval: ApprovalRequirement::from_str(&self.approval)?,
-            self_approval: SelfApproval::from_str(&self.self_approval)?,
+            self_approval,
             action: self.action,
             approver_kind: ApproverKind::from_str(&self.approver_kind).map_err(|_| {
                 ApprovalPolicyStoreError::Vocabulary {
@@ -220,6 +233,9 @@ pub async fn set(
     policy: &ApprovalPolicy,
     updated_by: Option<Uuid>,
 ) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
+    if policy.self_approval == SelfApproval::Allowed {
+        return Err(ApprovalPolicyStoreError::SelfApprovalAllowed);
+    }
     sqlx::query(
         "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind,
                                       conditions, expires_at, required_decisions, updated_by)
@@ -250,7 +266,10 @@ pub async fn set(
 
 /// Whether this action runs without an approval. **The gate's read.**
 ///
-/// A missing row, or a row that cannot be parsed, answers `false`: the strict behaviour. A
+/// A waiver is earned, never unconditional (§9.3 / D34): the row must say `waived` **and** name
+/// the `auto` approver kind **and** be in force at `now` **and** carry a parseable
+/// [`AutoMergeConditions`] document. A missing row, a bare `waived` row with a human approver, an
+/// expired row or an unparseable condition set answers `false`: the strict behaviour. A
 /// destructive call is never admitted because the policy could not be read.
 pub async fn waives(
     conn: &mut PgConnection,
@@ -258,7 +277,10 @@ pub async fn waives(
     action: &str,
 ) -> Result<bool, ApprovalPolicyStoreError> {
     match get(conn, tenant, action).await {
-        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),
+        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived
+            && policy.approver_kind == ApproverKind::Auto
+            && auto_merge_in_force(policy.expires_at, Utc::now())
+            && AutoMergeConditions::parse(&policy.conditions).is_ok()),
         Ok(None) => Ok(false),
         Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
         Err(error) => Err(error),
@@ -279,4 +301,28 @@ pub async fn allows_self_approval(
         Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
         Err(error) => Err(error),
     }
+}
+
+/// Whether the tenant's policy lets this decider kind decide the action's gate.
+///
+/// The lane's rule (SPEC_V2 §5.4): a policy's `approver_kind` names who may decide; an absent
+/// policy is the strict `human` default. The union's vocabulary adds `auto` (T6's earned
+/// auto-merge policy), whose decisions are the deterministic policy engine's, so a `rule`
+/// decider satisfies it. The writer still refuses a requester deciding their own gate.
+pub async fn allows_approver_kind(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    decider: conveyor_domain::DeciderKind,
+) -> Result<bool, ApprovalPolicyStoreError> {
+    let policy = match get(&mut *conn, tenant, action).await? {
+        Some(policy) => policy,
+        None => ApprovalPolicy::default_for(action),
+    };
+    let wanted = match policy.approver_kind {
+        // An auto policy is decided by the engine's deterministic rule path.
+        ApproverKind::Auto => ApproverKind::Rule,
+        other => other,
+    };
+    Ok(wanted == ApproverKind::from(decider))
 }

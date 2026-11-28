@@ -64,7 +64,7 @@ fn a_missing_namespace_fails_closed_even_when_every_other_key_is_set() {
         |key| match key {
             "SANDBOX_API_URL" => Some("https://kubernetes.default.svc:443".to_owned()),
             "SANDBOX_TOKEN" => Some("token".to_owned()),
-            "SANDBOX_NODE_SELECTOR" => Some("kubernetes.io/hostname=hp1".to_owned()),
+            "SANDBOX_NODE_SELECTOR" => Some("kubernetes.io/hostname=compute-1".to_owned()),
             "SANDBOX_TOLERATION" => Some("ci-runner=true:NoSchedule".to_owned()),
             "SANDBOX_PULL_SECRET" => Some("registry-pull-secret".to_owned()),
             _ => None,

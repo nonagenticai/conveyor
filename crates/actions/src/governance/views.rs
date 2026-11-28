@@ -11,9 +11,12 @@
 //! `Uuid`, so a malformed id is a schema error at the edge rather than a string the store has
 //! to parse.
 //!
-//! **`kind` is never an input.** `requirements.*`, `principles.*` and `decisions.*` share
-//! these documents and are bound to their `AssetKind` at declaration (S07 §5.2), so there is
-//! no field here that could point a requirement action at a principle.
+//! **`kind` is never an input** of a family declaration. `requirements.*`, `principles.*` and
+//! `decisions.*` share these documents and are bound to their `AssetKind` at declaration
+//! (S07 §5.2), so there is no field here that could point a requirement action at a principle.
+//! The one exception is [`AssetComposeIn`]: the generic `governed_assets.*` family serves the
+//! MSP kinds no fixed family owns (SPEC_V2 §8.3), and it parses its `kind` against the same
+//! closed vocabulary before the store ever sees it.
 
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
@@ -58,6 +61,52 @@ pub struct AssetCreateIn {
     /// Kind-specific fields.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
+}
+
+/// `governed_assets.compose` — the generic create for the kinds no fixed family owns
+/// (SPEC_V2 §8.3's MSP programme artefacts).
+///
+/// `kind` is an INPUT here and nowhere else: it is parsed against the domain's closed
+/// vocabulary and an unknown value is a `422 unknown_kind`. The family declarations
+/// (`requirements.*`, `principles.*`, `decisions.*`) still bind their kind at the call site, so
+/// this document cannot point one of them at another kind.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct AssetComposeIn {
+    /// The governed-asset kind (`mandate`, `programme_brief`, `blueprint`, `business_case`,
+    /// `refined_vision`, `benefits_strategy`, `benefits_realization_plan`, `projects_dossier`, …).
+    pub kind: String,
+    /// The owning project (the programme-definition project for an MSP artefact).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<Uuid>,
+    /// The title (required); the key is derived from it.
+    pub title: String,
+    /// The body.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    /// Kind-specific fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
+}
+
+/// `governed_assets.list` — the family list's filters plus an optional kind.
+///
+/// The family lists (`requirements.list`, …) cannot carry a kind filter: their kind is the
+/// declaration's. This one can, and an unknown kind is the same `422 unknown_kind` compose
+/// gives.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct GovernedAssetListIn {
+    /// Only assets of this kind; every kind when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// Only assets in this status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// Only assets of this project.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<Uuid>,
+    /// The shared pagination envelope (cursor + limit).
+    #[serde(flatten)]
+    pub page: PageIn,
 }
 
 /// `.update` — the editable fields. `If-Match` is the precondition; it is never a body field.
@@ -234,11 +283,12 @@ pub struct RevisionDiffOut {
 /// `trace_links.create` — both ends, resolved in the caller's tenant.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TraceLinkCreateIn {
-    /// `governed_asset | card`.
+    /// One of the store's end types: `governed_asset | card | project | document | run | step
+    /// | artefact | evidence`.
     pub from_type: String,
     /// The id in that end's table.
     pub from_id: Uuid,
-    /// `governed_asset | card`.
+    /// One of the store's end types, as `from_type`.
     pub to_type: String,
     /// The id in that end's table.
     pub to_id: Uuid,
@@ -287,6 +337,137 @@ pub struct TraceLinkOut {
     pub kind: String,
     /// When the edge was written.
     pub created_at: DateTime<Utc>,
+}
+
+/// `trace_links.view` — exactly one root: a requirement's asset or a run.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewIn {
+    /// The requirement (`governed_asset`) to read the chain from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requirement_id: Option<Uuid>,
+    /// The run to read the chain from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_id: Option<Uuid>,
+}
+
+/// The root row a trace view was read from.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewRootOut {
+    /// `requirement | run`.
+    #[serde(rename = "type")]
+    pub root_type: String,
+    /// The root row's id.
+    pub id: String,
+    /// The requirement's title; absent for a run root.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// The requirement asset's kind; absent for a run root.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// The run's status; absent for a requirement root.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// The run's card; absent for a requirement root or a card-less run.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<String>,
+}
+
+/// One card in a trace view.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewCardOut {
+    /// The card id.
+    pub id: String,
+    /// The card's name.
+    pub name: String,
+}
+
+/// One run in a trace view.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewRunOut {
+    /// The run id.
+    pub id: String,
+    /// The card the run executes; absent for a project-scoped run.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<String>,
+    /// The run status.
+    pub status: String,
+    /// When the run was created.
+    pub created_at: DateTime<Utc>,
+}
+
+/// One run step in a trace view.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewStepOut {
+    /// The step id.
+    pub id: String,
+    /// The run the step belongs to.
+    pub run_id: String,
+    /// The step's position in the run.
+    pub position: i32,
+    /// The action the step executes.
+    pub action: String,
+    /// The step status.
+    pub status: String,
+}
+
+/// One runner artefact in a trace view.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewArtefactOut {
+    /// The artefact id.
+    pub id: String,
+    /// The run the artefact is evidence for.
+    pub run_id: String,
+    /// The artefact's name within the run.
+    pub name: String,
+    /// SHA-256 of the artefact's bytes.
+    pub sha256: String,
+    /// The artefact's size in bytes.
+    pub bytes: i64,
+}
+
+/// One governed tool call — the addressable evidence of a run.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewEvidenceOut {
+    /// The ledger row id.
+    pub id: String,
+    /// The run the call was made for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_id: Option<String>,
+    /// The step that made the call.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_step_id: Option<String>,
+    /// The card the call was made for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<String>,
+    /// The canonical tool name (`<toolkit>.<operation>`).
+    pub tool_key: String,
+    /// The call's outcome (`ok`, `backend_error`, …).
+    pub status: String,
+    /// The destination's HTTP status, when it answered.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub http_status: Option<i32>,
+}
+
+/// `trace_links.view` — requirement → cards → runs → steps/artefacts/evidence, bounded at
+/// every hop (`truncated` names a cut set).
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TraceViewOut {
+    /// The root row.
+    pub root: TraceViewRootOut,
+    /// The cards the root reaches.
+    pub cards: Vec<TraceViewCardOut>,
+    /// The runs on those cards, newest first.
+    pub runs: Vec<TraceViewRunOut>,
+    /// The steps of those runs, in position order.
+    pub steps: Vec<TraceViewStepOut>,
+    /// The artefacts of those runs, by name.
+    pub artefacts: Vec<TraceViewArtefactOut>,
+    /// The governed tool calls of those runs, newest first.
+    pub evidence: Vec<TraceViewEvidenceOut>,
+    /// Every trace edge incident to a node in this view, newest first.
+    pub edges: Vec<TraceLinkOut>,
+    /// True when a hop hit its cap and rows were dropped.
+    pub truncated: bool,
 }
 
 // ── catalogues ──────────────────────────────────────────────────────────────────────────
@@ -440,7 +621,7 @@ pub struct ProjectRequestOut {
     pub external_origin: String,
     /// The forwarded body.
     pub payload: Value,
-    /// `draft | approved | rejected | promoted`.
+    /// `draft | approved | rejected | promoted | expired`.
     pub status: String,
     /// The project this request became.
     pub project_id: Option<String>,

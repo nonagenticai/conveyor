@@ -24,9 +24,10 @@
 //! **The pod never finishes the job.** `POST /result` records the verdict on the attempt row; the
 //! poll handler, which holds the lease, re-validates it and finishes the job. One finish authority.
 
+use axum::Json;
 use axum::body::{Body, Bytes};
-use axum::extract::{Path, State};
-use axum::http::{HeaderMap, StatusCode, header};
+use axum::extract::{FromRequest, FromRequestParts, Path, Request, State};
+use axum::http::{HeaderMap, HeaderValue, StatusCode, header, request::Parts};
 use axum::response::{IntoResponse, Response};
 use chrono::Utc;
 use conveyor_auth::job_token::{self, JobClaims};
@@ -43,6 +44,67 @@ use crate::state::AppState;
 /// The longest progress document a run may post. Progress is a status line, not a data channel.
 pub const MAX_PROGRESS_BYTES: usize = 4 * 1024;
 
+/// A progress body: at most [`MAX_PROGRESS_BYTES`], JSON, whatever the `Content-Type`.
+///
+/// The pod routes have always taken the bytes as JSON regardless of the header (the tests post
+/// `application/octet-stream`), so the header is normalised before axum's [`Json`] parses. The
+/// parse runs through the framework rather than `serde_json` here; the size check runs first.
+pub struct ProgressBody(Value);
+
+impl FromRequest<AppState> for ProgressBody {
+    type Rejection = ApiError;
+
+    async fn from_request(request: Request, state: &AppState) -> Result<Self, Self::Rejection> {
+        let too_large = || {
+            ApiError::new(
+                StatusCode::PAYLOAD_TOO_LARGE,
+                "progress_too_large",
+                format!("progress is limited to {MAX_PROGRESS_BYTES} bytes"),
+            )
+        };
+        // The router's transport limit is 16 MiB; the progress cap is the route's own rule.
+        let bytes = axum::body::to_bytes(request.into_body(), 16 * 1024 * 1024)
+            .await
+            .map_err(|_| too_large())?;
+        if bytes.len() > MAX_PROGRESS_BYTES {
+            return Err(too_large());
+        }
+        let mut request = Request::new(Body::from(bytes));
+        request.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        match Json::<Value>::from_request(request, state).await {
+            Ok(Json(value)) => Ok(ProgressBody(value)),
+            Err(rejection) => Err(ApiError::unprocessable(format!(
+                "the progress is not JSON: {}",
+                rejection.body_text()
+            ))),
+        }
+    }
+}
+
+/// A `runner/v1` result, deserialized on the original request so the router's limit applies.
+pub struct ResultBody(RunResult);
+
+impl FromRequest<AppState> for ResultBody {
+    type Rejection = ApiError;
+
+    async fn from_request(mut request: Request, state: &AppState) -> Result<Self, Self::Rejection> {
+        request.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        match Json::<RunResult>::from_request(request, state).await {
+            Ok(Json(value)) => Ok(ResultBody(value)),
+            Err(rejection) => Err(ApiError::unprocessable(format!(
+                "the result is not runner/v1: {}",
+                rejection.body_text()
+            ))),
+        }
+    }
+}
+
 /// The one body every credential refusal returns.
 fn refused() -> ApiError {
     ApiError::new(
@@ -54,10 +116,25 @@ fn refused() -> ApiError {
 
 /// What a fenced request established: the job row, the live attempt, and the instruction both
 /// agree with.
-struct Fenced {
+pub struct Fenced {
     claims: JobClaims,
     run: Run,
     instruction: Instruction,
+}
+
+/// The fence as a parts extractor, so every upload route runs it before reading its body.
+impl FromRequestParts<AppState> for Fenced {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        let Path(id) = Path::<Uuid>::from_request_parts(parts, state)
+            .await
+            .map_err(|rejection| ApiError::bad_request(rejection.body_text()))?;
+        fence(state, &parts.headers, id).await
+    }
 }
 
 fn bearer(headers: &HeaderMap) -> Option<&str> {
@@ -206,20 +283,10 @@ pub async fn job_input(
 )]
 pub async fn job_progress(
     State(state): State<AppState>,
-    Path(id): Path<Uuid>,
-    headers: HeaderMap,
-    body: Bytes,
+    fenced: Fenced,
+    body: ProgressBody,
 ) -> Result<Response, ApiError> {
-    let fenced = fence(&state, &headers, id).await?;
-    if body.len() > MAX_PROGRESS_BYTES {
-        return Err(ApiError::new(
-            StatusCode::PAYLOAD_TOO_LARGE,
-            "progress_too_large",
-            format!("progress is limited to {MAX_PROGRESS_BYTES} bytes"),
-        ));
-    }
-    let progress: Value = serde_json::from_slice(&body)
-        .map_err(|error| ApiError::unprocessable(format!("the progress is not JSON: {error}")))?;
+    let progress = body.0;
     if !progress.is_object() {
         return Err(ApiError::unprocessable(
             "the progress must be a JSON object",
@@ -229,7 +296,7 @@ pub async fn job_progress(
     let accepted = store::runner::record_progress(
         &state.pool,
         fenced.claims.tenant,
-        id,
+        fenced.claims.job_id,
         fenced.claims.attempt,
         &progress,
     )
@@ -303,8 +370,11 @@ pub async fn job_output(
         })?;
     let tenant = fenced.claims.tenant;
     let sha256 = hex(&Sha256::digest(&body));
+    // The object adapter serves only keys under `tenant/<tenant>/` (§11.10); a short `t/`
+    // prefix is refused before the store is reached.
     let key = format!(
-        "t/{}/jobs/{}/{}/{}",
+        "{}/{}/jobs/{}/{}/{}",
+        conveyor_actions::storage::TENANT_PREFIX,
         tenant.as_uuid(),
         id,
         fenced.claims.attempt,
@@ -355,14 +425,10 @@ pub async fn job_output(
 )]
 pub async fn job_result(
     State(state): State<AppState>,
-    Path(id): Path<Uuid>,
-    headers: HeaderMap,
-    body: Bytes,
+    fenced: Fenced,
+    body: ResultBody,
 ) -> Result<Response, ApiError> {
-    let fenced = fence(&state, &headers, id).await?;
-    let result: RunResult = serde_json::from_slice(&body).map_err(|error| {
-        ApiError::unprocessable(format!("the result is not runner/v1: {error}"))
-    })?;
+    let result = body.0;
     result
         .validate(&fenced.instruction)
         .map_err(|error| ApiError::unprocessable(error.to_string()))?;
@@ -372,7 +438,7 @@ pub async fn job_result(
     let accepted = store::runner::record_result(
         &state.pool,
         fenced.claims.tenant,
-        id,
+        fenced.claims.job_id,
         fenced.claims.attempt,
         &value,
     )

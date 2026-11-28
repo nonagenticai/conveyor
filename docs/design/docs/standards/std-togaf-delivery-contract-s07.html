@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor generate-standards.py" />
+    <meta name="description" content="TOGAF artefact generated from the published record." />
+    <title>Delivery Contract — Plan: docs/plans/slices/S07-requirements-search.md · conveyor standards</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+    <style>
+      .std-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }
+      .std-meta div { border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }
+      .std-meta dt { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; }
+      .std-meta dd { margin:.15rem 0 0; }
+      .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
+      .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
+      .std-source { font-size:.85rem; opacity:.8; }
+      .std-index { list-style:none; padding:0; }
+      .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <span class="doc-sep">/</span>
+      <a href="index.html">Standards</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="../../data/standards.json">data</a>
+    </header>
+    <main class="doc-body">
+      <h1>Delivery Contract — Plan: docs/plans/slices/S07-requirements-search.md</h1>
+      <dl class="std-meta">
+        <div><dt>Standard</dt><dd>TOGAF</dd></div>
+        <div><dt>Level</dt><dd>project</dd></div>
+        <div><dt>Subject</dt><dd>Plan: docs/plans/slices/S07-requirements-search.md</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>SPEC</dt><dd>§8.1</dd></div>
+        <div><dt>Gate</dt><dd>live</dd></div>
+        <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-s07:S07</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+      </dl>
+      <h2>Commitments</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<ul>
+<li>commitments: S07 commits to carrying RM&#x27;s requirement surface onto S07&#x27;s governed_asset, revision, catalogue_entry and trace_link: one lifecycle for requirements, principles and ADRs instead of RM&#x27;s 57 domain tables, one revision per mutation with a working Rust compare, read-only quality scoring on immutable revisions, FTS plus trigram search measured against an agreed baseline, and traceability in both directions with zero cross-tenant rows.</li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<ul>
+<li>Delivery contract — S07 Requirements and search (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+</ul><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<ul>
+<li>compliance: S07 is assessed clause by clause against SPEC §8 S7 and plan §7. The seven properties are: (a) three revisions with max(seq)=3 and a compare that shows the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with idx_scan rising on a 50k-row load; (d) relevance where B meets §5.6&#x27;s recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector shipped only when the loss exceeds 0.05 or C is unreachable and B fails A + 0.20; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only with version and status untouched; (g) no orphan over RM&#x27;s 28 modules. Each property is carried by a named target (search_index, s07_assets, s07_requests, s07_store, s07_seed, s07_governance, search_eval) or the EXPLAIN block. The snapshot records no Phase-G review and no run of these properties; this rework supplies the seven artefacts, this contract, the Phase-G review and the closure review, records the level consistent, and re-closes on the 15 P0 checks of acceptance/programme/S07.toml. The close gate is decided by an approver other than its requester under the standing delegation.</li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<ul>
+<li>Delivery contract — S07 Requirements and search (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+</ul><h2>Approval</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
+<ul>
+<li>approval 01a219d9-4924-7a6c-bc55-997d9e42ee70 — approved <span class="std-state">approved</span></li>
+</ul>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<ul>
+<li>Delivery contract — S07 Requirements and search (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+</ul>
+    </main>
+  </body>
+</html>

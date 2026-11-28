@@ -227,7 +227,7 @@ pub struct AgentGetIn {
 ///
 /// Plain `Option<Option<T>>` cannot do it: serde maps JSON `null` to the OUTER `None`, so a patch
 /// that means "clear it" would read as "leave it". This wrapper keeps `null` as `Some(None)`.
-fn deserialize_present<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
+pub(crate) fn deserialize_present<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
 where
     T: Deserialize<'de>,
     D: serde::Deserializer<'de>,

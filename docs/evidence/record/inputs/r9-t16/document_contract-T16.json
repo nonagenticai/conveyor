@@ -1,0 +1,22 @@
+{
+ "body": {
+  "acceptance": "SPEC_V2 \u00a712 T16: a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the draft is published behind a human gate; a re-ingest versions while the published row keeps its source and pack; a bound job runs the PDDL steps; an unreviewed source never binds",
+  "evidence": [
+   "crates/actions/tests/sop_ingestion.rs",
+   "crates/actions/tests/procedure_versioning.rs",
+   "crates/actions/tests/procedures.rs",
+   "/tmp/u5a-v14/evidence/T16-acceptance.md"
+  ],
+  "obligations": [
+   "every derived procedure artefact is a draft behind a human review gate",
+   "an unreviewed source can never bind a job",
+   "a re-ingest creates the next draft version while the published row keeps its source and pack",
+   "the drafting job cannot publish its own procedure"
+  ],
+  "scope": "SOP, RDF/OWL and BPMN/Visio/draw.io ingestion, the source review and the human publication gate, re-ingest versioning, and a bound job's PDDL steps"
+ },
+ "kind": "delivery_contract",
+ "phase_code": "g",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "title": "T16 \u2014 delivery contract: governed ingestion of procedure sources"
+}

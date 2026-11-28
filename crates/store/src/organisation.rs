@@ -10,6 +10,13 @@
 //!   plus its placement, hashed by [`conveyor_domain::organisation::release_hash`] — the same
 //!   canonical form twice produces the same hash, and publishing the same content again returns
 //!   the existing row (P2.1);
+//! - the compile walks the knowledge layers **base → industry → department archetype → each
+//!   department in declared order → job** (§4.1). `required` can only be tightened downward; a
+//!   required kind with no resolvable value is [`OrganisationStoreError::ReleaseNotReady`], and
+//!   sibling departments that set one kind to different values are
+//!   [`OrganisationStoreError::DepartmentConflict`] unless a job-layer value resolves them. The
+//!   snapshot records every effective value with the layer it came from; the job layer is the
+//!   catalogue `definition`, so the anatomy is never duplicated;
 //! - a binding pins one release and must satisfy its executor's contract (§4.4). The executor
 //!   `Registry` is passed in, never looked up globally, so a test can register a third kind and
 //!   prove it resolves without touching the run path (P6.2);
@@ -43,12 +50,56 @@ pub enum OrganisationStoreError {
     /// The ordered placement is not 1..=n, or does not name exactly one primary.
     #[error("the job's departments must be ordered 1..=n with exactly one primary")]
     InvalidPlacement,
+    /// A kind the layers require has no resolvable value (SPEC_V2 §4.1: `409 release_not_ready`).
+    #[error(
+        "release_not_ready: the required kind {kind:?} has no resolvable value for department \
+         {department:?}"
+    )]
+    ReleaseNotReady {
+        /// The unresolved kind.
+        kind: String,
+        /// The department the requirement is attributed to.
+        department: String,
+    },
+    /// Two sibling departments set one kind to different values and no job-layer value resolves
+    /// them (SPEC_V2 §4.1: `422 department_conflict`).
+    #[error(
+        "department_conflict: department {left_department:?} sets {kind:?} to {left_value} while \
+         department {right_department:?} sets it to {right_value}"
+    )]
+    DepartmentConflict {
+        /// The contested kind.
+        kind: String,
+        /// The first department, in declared order.
+        left_department: String,
+        /// Its value (boxed: two inline JSON values push the error past clippy's
+        /// `result_large_err` threshold, which every seed function returning it pays for).
+        left_value: Box<Value>,
+        /// The second department, in declared order.
+        right_department: String,
+        /// Its value, boxed for the same reason.
+        right_value: Box<Value>,
+    },
     /// The release does not belong to the job the binding names.
     #[error("the release does not belong to that job")]
     ReleaseJobMismatch,
     /// A mutable row moved underneath the caller.
     #[error("the {0} moved; the caller's version is stale")]
     VersionMismatch(&'static str),
+    /// Publishing or binding named a job that is not `active` (SPEC_V2 §4.1:
+    /// `409 job_not_live`). Only a curated, live job compiles and pins.
+    #[error("job_not_live: the job is {status:?}, not active")]
+    JobNotLive {
+        /// The stored status the write found.
+        status: String,
+    },
+    /// Activation named a job that is not `draft` (SPEC_V2 §4.3: `409 job_not_draft`).
+    /// Activation is the only edge into `active`; retirement is terminal.
+    #[error("job_not_draft: the job is {status:?}, not draft")]
+    JobNotDraft {
+        /// The stored status the write found.
+        status: String,
+    },
     /// The binding's executor contract refused it.
     #[error(transparent)]
     Executor(#[from] BindingError),
@@ -80,7 +131,7 @@ pub enum OrganisationStoreError {
     },
     /// A required knowledge kind has no value anywhere on the job's layer path (SPEC_V2 §4.1).
     #[error("release_not_ready: required kind {kind:?} has no value for department {department:?}")]
-    ReleaseNotReady {
+    LayerReleaseNotReady {
         /// The unresolved kind.
         kind: String,
         /// The department whose path is short (the job key when the job has no placement).
@@ -88,7 +139,7 @@ pub enum OrganisationStoreError {
     },
     /// Two departments in one job's placement set a kind to different values.
     #[error("department_conflict: {departments:?} disagree on kind {kind:?}")]
-    DepartmentConflict {
+    LayerDepartmentConflict {
         /// The kind they disagree on.
         kind: String,
         /// The departments, in placement order.
@@ -174,6 +225,8 @@ pub struct PlacementRow {
     pub department_id: Uuid,
     /// The department's display name.
     pub department_name: String,
+    /// The department's archetype layer, when it declares one (§4.1).
+    pub archetype: Option<String>,
     /// 1-based order inside the job.
     pub ordinal: i32,
     /// The job's primary department.
@@ -240,8 +293,8 @@ const RELEASE_COLUMNS: &str =
 const BINDING_COLUMNS: &str = "id, job_id, release_id, release_hash, release_snapshot, \
                                capability_id, process_id, capability_agent_id, executor_kind, \
                                status, meta, version, created_at, updated_at";
-const PLACEMENT_COLUMNS: &str =
-    "jd.job_id, jd.department_id, d.name AS department_name, jd.ordinal, jd.is_primary";
+const PLACEMENT_COLUMNS: &str = "jd.job_id, jd.department_id, d.name AS department_name, d.archetype, jd.ordinal, \
+     jd.is_primary";
 
 /// One industry to create.
 #[derive(Clone, Debug)]
@@ -454,6 +507,43 @@ pub async fn job_update_tx(
         .ok_or(OrganisationStoreError::VersionMismatch("job"))
 }
 
+/// Activate a job an approved gate names (v1-w1a-4, SPEC_V2 §4.1/§4.3).
+///
+/// Only a `draft` row flips, and the version moves with it so an `If-Match` taken before the
+/// decision is stale rather than silently satisfied. An already-`active` job is returned
+/// unchanged — a replayed decision is not a second activation. Any other status (a retired
+/// job) is refused [`OrganisationStoreError::JobNotDraft`]: activation never resurrects it.
+pub async fn job_activate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<JobRow, OrganisationStoreError> {
+    let sql = format!(
+        "UPDATE job_catalogue
+            SET status = 'active', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'draft'
+          RETURNING {JOB_COLUMNS}"
+    );
+    let row: Option<JobRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    match row {
+        Some(row) => Ok(row),
+        None => {
+            let current = job_get_tx(conn, tenant, id).await?;
+            if current.status == "active" {
+                Ok(current)
+            } else {
+                Err(OrganisationStoreError::JobNotDraft {
+                    status: current.status,
+                })
+            }
+        }
+    }
+}
+
 /// Retire a job (it stays readable; new releases refuse it).
 pub async fn job_retire_tx(
     conn: &mut PgConnection,
@@ -491,16 +581,65 @@ pub async fn job_get_tx(
         .ok_or(OrganisationStoreError::NotFound("job"))
 }
 
-/// The tenant's jobs, by key.
+/// The filters and keyset one catalogue page names (v1-p46-1, SPEC_V2 §4.6).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct JobListQuery<'a> {
+    /// Case-insensitive substring of the job key (the position's code).
+    pub code: Option<&'a str>,
+    /// Case-insensitive substring of a capability the job declares in its draft anatomy or has
+    /// bound to a release.
+    pub capability: Option<&'a str>,
+    /// Case-insensitive substring of the name of a department the job is placed in.
+    pub department: Option<&'a str>,
+    /// Keyset position: only rows strictly after this `(job_key, id)`.
+    pub after: Option<(&'a str, Uuid)>,
+    /// Maximum rows to return.
+    pub limit: i64,
+}
+
+/// One page of the tenant's jobs, filtered, by `(job_key, id)`.
 pub async fn jobs_list_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
+    query: &JobListQuery<'_>,
 ) -> Result<Vec<JobRow>, sqlx::Error> {
     let sql = format!(
-        "SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 ORDER BY job_key, id"
+        "SELECT {JOB_COLUMNS}
+           FROM job_catalogue j
+          WHERE j.tenant_id = $1
+            AND ($2::text IS NULL OR j.job_key ILIKE '%' || $2 || '%')
+            AND ($3::text IS NULL
+                 OR EXISTS (
+                        SELECT 1
+                          FROM job_binding b
+                          JOIN capability c
+                            ON c.tenant_id = b.tenant_id AND c.id = b.capability_id
+                         WHERE b.tenant_id = j.tenant_id AND b.job_id = j.id
+                           AND (c.code ILIKE '%' || $3 || '%'
+                                OR c.label ILIKE '%' || $3 || '%')
+                    )
+                 OR (j.definition -> 'capabilities')::text ILIKE '%' || $3 || '%')
+            AND ($4::text IS NULL
+                 OR EXISTS (
+                        SELECT 1
+                          FROM job_department jd
+                          JOIN department d
+                            ON d.tenant_id = jd.tenant_id AND d.id = jd.department_id
+                         WHERE jd.tenant_id = j.tenant_id AND jd.job_id = j.id
+                           AND d.name ILIKE '%' || $4 || '%'
+                    ))
+            AND ($5::text IS NULL OR (j.job_key, j.id) > ($5::text, $6::uuid))
+          ORDER BY j.job_key, j.id
+          LIMIT $7"
     );
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
+        .bind(query.code)
+        .bind(query.capability)
+        .bind(query.department)
+        .bind(query.after.map(|(job_key, _)| job_key))
+        .bind(query.after.map(|(_, id)| id))
+        .bind(query.limit)
         .fetch_all(&mut *conn)
         .await
 }
@@ -598,11 +737,179 @@ async fn replace_placement_tx(
 
 // ── releases ──────────────────────────────────────────────────────────────────────────────
 
-/// Compile the job's release snapshot: the catalogue definition plus its placement.
+/// One layer of the compile chain (SPEC_V2 §4.1).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Layer {
+    /// The tenant's platform defaults.
+    Base,
+    /// The job's industry.
+    Industry,
+    /// A department archetype a placed department inherits.
+    DepartmentArchetype,
+    /// One placed department.
+    Department,
+    /// The job itself (the catalogue `definition`, plus any explicit job-layer row).
+    Job,
+}
+
+/// One kind declaration in the compile chain, with the source the snapshot records.
+#[derive(Clone, Debug)]
+struct LayerDeclaration {
+    layer: Layer,
+    kind: String,
+    value: Option<Value>,
+    required: bool,
+    source: Value,
+    department_name: Option<String>,
+}
+
+/// One effective value the release snapshot records.
+#[derive(Clone, Debug)]
+struct ResolvedLayerValue {
+    value: Value,
+    required: bool,
+    source: Value,
+}
+
+/// One layer's declaration row, as the compile reads it.
+#[derive(Debug, sqlx::FromRow)]
+struct LayerSettingRow {
+    kind: String,
+    value: Option<Value>,
+    required: bool,
+}
+
+/// Read one layer's rows for the scope named by the non-null filters.
+async fn layer_settings_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    layer: &str,
+    industry_id: Option<Uuid>,
+    department_id: Option<Uuid>,
+    job_id: Option<Uuid>,
+    archetype: Option<&str>,
+) -> Result<Vec<LayerSettingRow>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT kind, value, required
+           FROM organisation_layer_setting
+          WHERE tenant_id = $1 AND layer = $2
+            AND ($3::uuid IS NULL OR industry_id = $3)
+            AND ($4::uuid IS NULL OR department_id = $4)
+            AND ($5::uuid IS NULL OR job_id = $5)
+            AND ($6::text IS NULL OR archetype = $6)
+          ORDER BY kind",
+    )
+    .bind(tenant.as_uuid())
+    .bind(layer)
+    .bind(industry_id)
+    .bind(department_id)
+    .bind(job_id)
+    .bind(archetype)
+    .fetch_all(&mut *conn)
+    .await
+}
+
+/// Resolve one effective value per kind, or refuse.
 ///
-/// Deterministic by construction — no timestamp, no id, and the placement is ordered — so the
-/// same job and pins hash identically on every compile (P2.1). The `anatomy` key carries the
-/// design's job anatomy verbatim (§4.2), which is what P4.2 asserts.
+/// A later layer overrides an earlier one. Sibling departments are peers rather than an order,
+/// so two different values among them are a [`OrganisationStoreError::DepartmentConflict`] unless
+/// a job-layer value resolves the kind (§4.1). `required` is the OR of every declaration in the
+/// chain: a child layer can add a requirement and can never remove its parent's.
+fn resolve_layer_values(
+    chain: &[LayerDeclaration],
+    primary_department: &str,
+) -> Result<BTreeMap<String, ResolvedLayerValue>, OrganisationStoreError> {
+    let kinds: BTreeSet<&str> = chain
+        .iter()
+        .map(|declaration| declaration.kind.as_str())
+        .collect();
+    let mut resolved = BTreeMap::new();
+    for kind in kinds {
+        let declarations: Vec<&LayerDeclaration> = chain
+            .iter()
+            .filter(|declaration| declaration.kind == kind)
+            .collect();
+        let required = declarations.iter().any(|declaration| declaration.required);
+        let job_value = declarations
+            .iter()
+            .rev()
+            .find(|declaration| declaration.layer == Layer::Job && declaration.value.is_some());
+
+        // Sibling departments at different values: only a job-layer value resolves the kind.
+        let mut sibling_values: Vec<(&str, &Value)> = Vec::new();
+        for declaration in &declarations {
+            if declaration.layer != Layer::Department {
+                continue;
+            }
+            let Some(value) = declaration.value.as_ref() else {
+                continue;
+            };
+            if sibling_values
+                .iter()
+                .any(|(_, existing)| *existing == value)
+            {
+                continue;
+            }
+            sibling_values.push((
+                declaration
+                    .department_name
+                    .as_deref()
+                    .unwrap_or(primary_department),
+                value,
+            ));
+        }
+        if sibling_values.len() > 1 && job_value.is_none() {
+            let (left_department, left_value) = sibling_values[0];
+            let (right_department, right_value) = sibling_values[1];
+            return Err(OrganisationStoreError::DepartmentConflict {
+                kind: kind.to_owned(),
+                left_department: left_department.to_owned(),
+                left_value: Box::new(left_value.clone()),
+                right_department: right_department.to_owned(),
+                right_value: Box::new(right_value.clone()),
+            });
+        }
+
+        let Some(effective) = declarations
+            .iter()
+            .rev()
+            .find(|declaration| declaration.value.is_some())
+        else {
+            if required {
+                // Name the department the requirement is attributed to: the declaring one when
+                // the layer is a department or archetype, else the job's primary department.
+                let department = declarations
+                    .iter()
+                    .find(|declaration| declaration.required)
+                    .and_then(|declaration| declaration.department_name.clone())
+                    .unwrap_or_else(|| primary_department.to_owned());
+                return Err(OrganisationStoreError::ReleaseNotReady {
+                    kind: kind.to_owned(),
+                    department,
+                });
+            }
+            continue;
+        };
+        resolved.insert(
+            kind.to_owned(),
+            ResolvedLayerValue {
+                value: effective.value.clone().unwrap_or(Value::Null),
+                required,
+                source: effective.source.clone(),
+            },
+        );
+    }
+    Ok(resolved)
+}
+
+/// Compile the job's release snapshot: the catalogue definition, its placement, and every
+/// effective layer value with its source.
+///
+/// The compile walks **base → industry → department archetype → each department in declared
+/// order → job** (§4.1). Deterministic by construction — no timestamp, no id, the placement is
+/// ordered and the resolved values are keyed by kind — so the same job and pins hash identically
+/// on every compile (P2.1). The `anatomy` key carries the design's job anatomy verbatim (§4.2),
+/// which is what P4.2 asserts.
 pub async fn compile_release_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -611,6 +918,149 @@ pub async fn compile_release_tx(
     let job = job_get_tx(conn, tenant, job_id).await?;
     let industry = industry_get_tx(conn, tenant, job.industry_id).await?;
     let placements = job_placements_tx(conn, tenant, job_id).await?;
+
+    let mut chain: Vec<LayerDeclaration> = Vec::new();
+
+    // base
+    let source = json!({"layer": "base"});
+    for row in layer_settings_tx(conn, tenant, "base", None, None, None, None).await? {
+        chain.push(LayerDeclaration {
+            layer: Layer::Base,
+            kind: row.kind,
+            value: row.value.filter(|value| !value.is_null()),
+            required: row.required,
+            source: source.clone(),
+            department_name: None,
+        });
+    }
+
+    // industry
+    let source = json!({"layer": "industry", "industry": industry.key.clone()});
+    for row in layer_settings_tx(
+        conn,
+        tenant,
+        "industry",
+        Some(job.industry_id),
+        None,
+        None,
+        None,
+    )
+    .await?
+    {
+        chain.push(LayerDeclaration {
+            layer: Layer::Industry,
+            kind: row.kind,
+            value: row.value.filter(|value| !value.is_null()),
+            required: row.required,
+            source: source.clone(),
+            department_name: None,
+        });
+    }
+
+    // department archetypes, in declared order, each archetype once
+    let mut seen_archetypes: Vec<&str> = Vec::new();
+    for placement in &placements {
+        let Some(archetype) = placement.archetype.as_deref() else {
+            continue;
+        };
+        if seen_archetypes.contains(&archetype) {
+            continue;
+        }
+        seen_archetypes.push(archetype);
+        let source = json!({
+            "layer": "department_archetype",
+            "industry": industry.key.clone(),
+            "archetype": archetype,
+        });
+        let rows = layer_settings_tx(
+            conn,
+            tenant,
+            "department_archetype",
+            Some(job.industry_id),
+            None,
+            None,
+            Some(archetype),
+        )
+        .await?;
+        for row in rows {
+            chain.push(LayerDeclaration {
+                layer: Layer::DepartmentArchetype,
+                kind: row.kind,
+                value: row.value.filter(|value| !value.is_null()),
+                required: row.required,
+                source: source.clone(),
+                // The first placed department of this archetype: what `release_not_ready`
+                // names when the archetype layer requires a kind nobody resolves.
+                department_name: Some(placement.department_name.clone()),
+            });
+        }
+    }
+
+    // each department in declared order
+    for placement in &placements {
+        let source = json!({
+            "layer": "department",
+            "department": placement.department_name.clone(),
+            "ordinal": placement.ordinal,
+        });
+        let rows = layer_settings_tx(
+            conn,
+            tenant,
+            "department",
+            None,
+            Some(placement.department_id),
+            None,
+            None,
+        )
+        .await?;
+        for row in rows {
+            chain.push(LayerDeclaration {
+                layer: Layer::Department,
+                kind: row.kind,
+                value: row.value.filter(|value| !value.is_null()),
+                required: row.required,
+                source: source.clone(),
+                department_name: Some(placement.department_name.clone()),
+            });
+        }
+    }
+
+    // job: the catalogue definition is the authored layer; an explicit job row overrides it
+    let source = json!({"layer": "job", "job": job.job_key.clone()});
+    if let Some(definition) = job.definition.as_object() {
+        for (kind, value) in definition {
+            if value.is_null() {
+                continue;
+            }
+            chain.push(LayerDeclaration {
+                layer: Layer::Job,
+                kind: kind.clone(),
+                value: Some(value.clone()),
+                required: false,
+                source: source.clone(),
+                department_name: None,
+            });
+        }
+    }
+    for row in layer_settings_tx(conn, tenant, "job", None, None, Some(job_id), None).await? {
+        chain.push(LayerDeclaration {
+            layer: Layer::Job,
+            kind: row.kind,
+            value: row.value.filter(|value| !value.is_null()),
+            required: row.required,
+            source: source.clone(),
+            department_name: None,
+        });
+    }
+
+    let primary_department = placements
+        .iter()
+        .find(|placement| placement.is_primary)
+        .or_else(|| placements.first())
+        .map(|placement| placement.department_name.clone())
+        .unwrap_or_default();
+    let resolved = resolve_layer_values(&chain, &primary_department)?;
+
     let departments: Vec<Value> = placements
         .iter()
         .map(|row| {
@@ -618,6 +1068,17 @@ pub async fn compile_release_tx(
                 "name": row.department_name,
                 "ordinal": row.ordinal,
                 "is_primary": row.is_primary,
+            })
+        })
+        .collect();
+    let layer_values: Vec<Value> = resolved
+        .iter()
+        .map(|(kind, value)| {
+            json!({
+                "kind": kind,
+                "value": value.value.clone(),
+                "required": value.required,
+                "source": value.source.clone(),
             })
         })
         .collect();
@@ -632,6 +1093,7 @@ pub async fn compile_release_tx(
         "industry": {"key": industry.key, "name": industry.name},
         "departments": departments,
         "anatomy": job.definition,
+        "layer_values": layer_values,
         "layers": layers,
     }))
 }
@@ -646,8 +1108,10 @@ pub async fn job_release_publish_tx(
     job_id: Uuid,
 ) -> Result<ReleaseRow, OrganisationStoreError> {
     let job = job_get_tx(conn, tenant, job_id).await?;
-    if job.status == "retired" {
-        return Err(OrganisationStoreError::NotFound("live job"));
+    // SPEC_V2 §4.1: only a live, curated job compiles into an immutable release; a draft is
+    // still being curated and a retired job is gone (`409 job_not_live`).
+    if job.status != "active" {
+        return Err(OrganisationStoreError::JobNotLive { status: job.status });
     }
     let snapshot = compile_release_tx(conn, tenant, job_id).await?;
     // The execution anatomy is proved before the hash: a malformed grant or limit must never
@@ -745,6 +1209,11 @@ pub async fn job_binding_create_tx(
     input: &NewBinding,
     registry: &Registry,
 ) -> Result<BindingRow, OrganisationStoreError> {
+    // SPEC_V2 §4.1: a binding may pin only a live job's release (`409 job_not_live`).
+    let job = job_get_tx(conn, tenant, input.job_id).await?;
+    if job.status != "active" {
+        return Err(OrganisationStoreError::JobNotLive { status: job.status });
+    }
     let release = job_release_get_tx(conn, tenant, input.release_id).await?;
     if release.job_id != input.job_id {
         return Err(OrganisationStoreError::ReleaseJobMismatch);
@@ -839,6 +1308,35 @@ pub async fn job_binding_retire_tx(
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(OrganisationStoreError::VersionMismatch("binding"))
+}
+
+/// Activate a binding an approved gate names (v1-p44-2, SPEC_V2 §4.4).
+///
+/// Only a `draft` row flips, and the version moves with it so an `If-Match` taken before the
+/// decision is stale rather than silently satisfied. An already-`active` binding is returned
+/// unchanged — a replayed decision is not a second activation — and a `retired` row is **never**
+/// resurrected: retirement is terminal, so a decision that lands late is a no-op instead of
+/// undoing it. A row that does not exist in the tenant is `NotFound`.
+pub async fn job_binding_activate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<BindingRow, OrganisationStoreError> {
+    let sql = format!(
+        "UPDATE job_binding
+            SET status = 'active', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'draft'
+          RETURNING {BINDING_COLUMNS}"
+    );
+    let row: Option<BindingRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    match row {
+        Some(row) => Ok(row),
+        None => job_binding_get_tx(conn, tenant, id).await,
+    }
 }
 
 /// One binding.
@@ -938,7 +1436,15 @@ pub async fn organisation_json_tx(
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)
     .await?;
-    let jobs: Vec<JobRow> = jobs_list_tx(&mut *conn, tenant).await?;
+    let jobs: Vec<JobRow> = jobs_list_tx(
+        &mut *conn,
+        tenant,
+        &JobListQuery {
+            limit: i64::MAX,
+            ..JobListQuery::default()
+        },
+    )
+    .await?;
     let releases: Vec<ReleaseRow> = {
         let sql = format!(
             "SELECT {RELEASE_COLUMNS} FROM job_release
@@ -1342,7 +1848,7 @@ pub async fn resolve_layers_tx(
     for (kind, values) in &department_values {
         let first = &values[0].1;
         if values.iter().any(|(_, value)| value != first) && !job_value_kinds.contains(kind) {
-            return Err(OrganisationStoreError::DepartmentConflict {
+            return Err(OrganisationStoreError::LayerDepartmentConflict {
                 kind: kind.clone(),
                 departments: values.iter().map(|(name, _)| name.clone()).collect(),
             });
@@ -1356,7 +1862,7 @@ pub async fn resolve_layers_tx(
         .unwrap_or_else(|| job.job_key.clone());
     for (kind, state) in &merged {
         if state.required && state.value.is_none() {
-            return Err(OrganisationStoreError::ReleaseNotReady {
+            return Err(OrganisationStoreError::LayerReleaseNotReady {
                 kind: kind.clone(),
                 department: department_label.clone(),
             });

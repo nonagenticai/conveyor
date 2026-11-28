@@ -22,11 +22,18 @@ cd "$(git rev-parse --show-toplevel)" || exit 2
 # Hard failures. No \b: BSD/macOS regcomp has no word boundary, and this must behave the same on
 # the dev box and on the runner.
 HARD=(
-  '\.internal'
+  # A hostname suffix, not an identifier: `input.internal_coach_card` is a Rust field access
+  # (board/cards.rs), while `minio.internal:8389` is a host. No \b (BSD regcomp has none), so
+  # require a non-identifier terminator.
+  '\.internal([^A-Za-z0-9_-]|$)'
   '100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}'
   'ts\.net'
   'strato-(server|vps)'
   'nonagenticai/gitops-production'
+  # The estate's node names are the same kind of private fact as a hostname. They are
+  # distinctive; a false hit is reviewed, never allowlisted. `pgx` stays out: it collides with
+  # the Rust extension crate's name and is scrubbed in docs/evidence only.
+  '(^|[^A-Za-z0-9_])(hp1|hp2|mf1|worker3|mini1|mini2)([^A-Za-z0-9_]|$)'
 )
 
 # Warnings only: RFC1918 literals are usually a test fixture, but they are still an address.

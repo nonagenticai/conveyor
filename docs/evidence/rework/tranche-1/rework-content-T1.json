@@ -1,0 +1,1260 @@
+{
+  "charter": "# Charter — T1 Plan spine (retrospective, 2026-11-26)\n\n- **Project:** T1 'Plan spine', track v2, ADM phase G, plateau capability, tranche 1, issue #72 (CLOSED). The build is the delivery commit `e3d7c4eb` (2026-11-17), subject 'plan spine: T1 — the rows, the actions and the ten scenarios (#72) (#250)'. The project row `01a1d039-0d32-7c81-8365-371217d16ef7` carries `status: closed`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: [closure-review]` and `meta.viability: rework`; it was reopened for the #526 retrospective rework under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** give the conveyor a project plan it can be held to — a promise frozen in an approved baseline, a change path carrying an impact block and the baseline it changes, priority computed from four typed inputs, a portfolio that lists the in-flight set, a dependency graph that refuses a cycle, and MSP programme-definition rows that make a benefit a measurement record and a tranche review an evidence-bearing gate. The same build widens the one gate primitive so a requester or executor can no longer decide the gate judging their own work.\n- **Scope:** the T1 row of `docs/SPEC_V2.md` §12, with §8.2, §8.3 and §10.3; `migrations/0044_plan_spine.sql` — `wbs_node`, `project_baseline`, `project_register_item`, `project_dependency`, `programme_cadence`, `programme_tranche`, `benefit_profile`, `benefit_link`, `benefit_transition`, `stakeholder_profile`, `programme_baseline`, the widened `governed_asset` kinds and the programme `shared_config`; the `wbs.*`, `baselines.*`, `registers.*`, `project_dependencies.*`, `portfolio.in_flight`, `cadences.*`, `tranches.*`, `benefits.*` and `stakeholders.profile_*` action families; the requester/executor exclusion in `approvals.decide`; the project-type selection of phase template, gate set and job family; and the DoD gate on `card_type.definition`. Out of scope: the decision ladder (T2), the PM job (T3), cadence materialisation, PI planning and the benefits-realization procedure (T10), metrics (T11), and any migration or retirement of V1's `outline` tree.\n- **Expected outputs:** `project-brief`, `evidence`. **Closure outputs:** `closure-review`. **Acceptance instrument:** `acceptance/programme/T1.toml`.\n- **Date:** this charter is retrospective and was authored on 2026-11-26. It records the lifecycle of a build completed on 2026-11-17; it does not attest contemporaneous intent and it does not authorise new work beyond the rework.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T1 Plan spine (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework the V2 slice T1 (SPEC_V2 §12, issue #72) by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract and the WBS deliverable, record the Phase-G compliance review, re-publish the project-brief and evidence outputs, and re-close through the one gate. The architecture work is the plan spine itself — the rows, the action families, the refusals and the requester exclusion recorded retrospectively and dated 2026-11-26.",
+      "scope": "In scope: `wbs_node` (a phase, deliverable, work-package and milestone tree with the four WSJF inputs and no stored score), `project_baseline` (an append-only frozen snapshot), `project_register_item` (the one six-kind register; a change carries `baseline_ref` and `meta.impact`), `project_dependency` (blocks, needs, supersedes, informs; cycles refused in the creating transaction), the programme `shared_config` inherited by its projects, `programme_cadence`, `programme_tranche`, `benefit_profile`, `benefit_link` (five levels), `benefit_transition`, `stakeholder_profile`, `programme_baseline`, the widened `governed_asset` kinds, the project-type selection of phase template and gate set, and the DoD gate. Out of scope: T2's decision ladder, T3's PM job, T10's cadence materialisation, PI planning and benefits-realization procedure, T11's metrics, and any change to V1's outline tree.",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the seven A–D artefacts and both contracts; the programme owner signs the closure. The delivery contract is approved by an approver distinct from the requester, which is the same exclusion the build installs in `approvals.decide`: a requester cannot decide the gate judging their own work. The rework remains retrospective and states its evidence rather than claiming a contemporaneous review.",
+      "acceptance_criteria": "The SPEC_V2 §12 T1 gate: one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels. The ten issue-#72 scenarios are proved by named real-Postgres tests in `crates/actions/tests/plan_spine.rs`, `crates/api/tests/approval_dual.rs` and `crates/actions/tests/programme_baseline.rs`; the rework's acceptance instrument is `acceptance/programme/T1.toml`, and the closure gate is decided by an approver other than its requester.",
+      "contract": "This statement 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 sits under its approval 01a1ff89-1794-79d0-8707-f7614987ee7c. It is complemented by the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433 on the approved scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 (kind scope, taken 2026-11-21) and by the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d at level compliant. It is retrospective, dated 2026-11-26, and claims no contemporaneous authoring.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — T1 plan spine",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the plan spine serves, what each needs from the rows and the refusals, and how the rework engages them.",
+      "scope": "The stakeholders of the plan-spine capability delivered by issue #72 and of the tranche-1 governance around it.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "the benefit owner",
+          "the PM job",
+          "the delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the sponsoring group",
+          "axis_b": "tranche authorisation, the tranche-1 exit criteria and the benefit decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the SRO",
+          "axis_b": "accountable for the coherent capability and for the benefits the tranche is judged on",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the benefit owner (BCM)",
+          "axis_b": "each benefit's baseline, target, measurement method and transition record",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the PM job (T3)",
+          "axis_b": "WBS, baseline, change control and gate routing built on these rows",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "the Architecture Board",
+          "axis_b": "conformance of the Phase A–D artefacts and the two contracts",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the delivery teams (T2–T17)",
+          "axis_b": "the WBS rows they accept and the dependency edges they live under",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "operators and tenants",
+          "axis_b": "tenant-scoped rows; the in-flight set is tenant configuration, not a global list",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — T1 plan spine",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder map — T1 plan spine\n\n## Metadata\n\nRetrospective matrix for T1, authored 2026-11-26 from `docs/SPEC_V2.md` §12, `migrations/0044_plan_spine.sql` and the rework transcript. Phase a, plateau psa, kind matrix; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the plan spine and the MSP rows around it.\n\n## Entries\n\nSeven actors. The sponsoring group decides the tranche authorisation and the exit criteria that consume the capability. The SRO is accountable for the coherent capability and its benefits. The benefit owner holds each benefit's baseline, target, method and transition. The PM job consumes the WBS, baseline and change control rows. The Architecture Board approves the A–D set and the two contracts. The delivery teams accept the WBS rows and live under the dependency edges. Operators and tenants supply the tenant configuration that defines the in-flight set.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T1 plan spine as dependency, because the requirements fix what each actor receives from the rows and their refusals. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: place the actors of the plan spine so each concern has a named owner and a stated engagement. Scope: the stakeholders of the capability delivered by issue #72 and of the tranche-1 governance around it. It was reconstructed retrospectively on 2026-11-26 from the recorded roles rather than from a live elicitation, and it does not claim that any actor re-accepted the records after the 2026-11-17 close.\n"
+    },
+    {
+      "title": "Driver/goal/objective — T1 plan spine",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the plan spine exists and the objective each driver installs, from the frozen baseline through to the DoD and the requester exclusion.",
+      "scope": "Baseline and change control, dual control, WSJF, the portfolio read, dependency edges, the MSP rows, project typing and the DoD gate.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "the PM job",
+          "the delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 a programme cannot answer what it promised",
+          "axis_b": "G1 freeze the promise",
+          "value": {
+            "objective": "project_baseline stores an immutable approved snapshot of the WBS, register and budget facts, and a later row edit never moves it; proved by plan_spine.rs::a_baseline_does_not_move_when_rows_change"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 a change can happen by a silent row edit",
+          "axis_b": "G2 change control with an impact block",
+          "value": {
+            "objective": "a change is project_register_item(kind='change') carrying a required impact block and a baseline_ref; without them the row is refused 422 change_impact_missing"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 a requester can decide the gate judging their work",
+          "axis_b": "G3 dual control on every gate",
+          "value": {
+            "objective": "approvals.decide compares the pending row's requester and executor with the actor and refuses before an approval_decision row is written, for every gate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 priority is opinion, and a stored score goes stale",
+          "axis_b": "G4 arithmetic priority",
+          "value": {
+            "objective": "WSJF is (business_value + time_criticality + risk_reduction) / job_size, computed on read from four non-negative integers with job_size > 0; no score column exists"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 no one can say what is in flight",
+          "axis_b": "G5 a computed portfolio view",
+          "value": {
+            "objective": "portfolio.in_flight is a read model with no row over the tenant's configured status set, default active and paused"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 dependency order is a JSON list that cannot express edges or cycles",
+          "axis_b": "G6 an acyclic dependency graph",
+          "value": {
+            "objective": "project_dependency edges are blocks, needs, supersedes and informs; a cycle is refused 409 dependency_cycle by reachability inside the creating transaction, leaving no partial row"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "D7 a benefit is prose and a review can be evidence-free",
+          "axis_b": "G7 a benefit is a measurement record and a tranche review carries evidence",
+          "value": {
+            "objective": "benefit_profile requires baseline, target, measurement method and a benefit owner; benefit_link names all five levels; a tranche review requires baselines, benefit status and the risk register"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "D8 a project has no declared shape and a card has no done condition",
+          "axis_b": "G8 project typing and a DoD gate",
+          "value": {
+            "objective": "project_type_code selects the phase template, the gate set and the default job family, and Definition of Done lives on card_type.definition so the domain layer refuses a card that has not met it"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — T1 plan spine",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/goal/objective — T1 plan spine\n\n## Metadata\n\nRetrospective catalogue for T1, authored 2026-11-26 from the slice record, the migration and the transcript. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the drivers behind the plan spine and the objective each row installs.\n\n## Entries\n\nEight drivers, each with a goal and a measurable objective. D1 records the unfrozen promise; G1 makes the baseline immutable. D2 records the silent edit; G2 requires an impact block and a baseline reference. D3 records self-approval; G3 installs dual control in the one gate primitive. D4 records opinion-driven priority; G4 computes WSJF on read from four typed inputs. D5 records the missing portfolio; G5 makes the in-flight set a tenant-configured read. D6 records a JSON dependency list; G6 refuses cycles in the creating transaction. D7 records prose benefits and evidence-free reviews; G7 makes both measurement records. D8 records an untyped project and an unenforced done condition; G8 selects the template and gate set from the project type and gates on the card type's DoD.\n\n## Links\n\nThis artefact carries one typed edge: Stakeholder map — T1 plan spine as derivation, because each driver is held by an actor named there. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: trace why the plan spine exists and what each row is meant to achieve. Scope: baseline and change control, dual control, prioritisation, the portfolio read, dependency edges, the MSP rows, project typing and the DoD gate. It was authored retrospectively on 2026-11-26 from the verified tests and the migration, and it records the objective the specification set rather than claiming that a later reader can reproduce the 2026-11-17 build.\n"
+    },
+    {
+      "title": "Requirements catalog — T1 plan spine",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the T1 gate and its contracts must satisfy, each with the named test or invariant that carries it.",
+      "scope": "The ten issue-#72 scenarios, the tenant-isolation invariant, the project-type and DoD rules and the one-gate exclusion.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the PM job",
+          "the delivery teams",
+          "the programme owner who signs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1 P1.1",
+          "axis_b": "a taken baseline does not move",
+          "value": {
+            "requirement": "baselines.take freezes the WBS and register facts, and a direct update after the take does not move the snapshot",
+            "acceptance": "crates/actions/tests/plan_spine.rs::a_baseline_does_not_move_when_rows_change",
+            "priority": "must"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 P1.2",
+          "axis_b": "a change needs an impact block and the baseline it changes",
+          "value": {
+            "requirement": "422 change_impact_missing without either; 201 with a scope, schedule, cost and risk impact block plus a baseline_ref",
+            "acceptance": "plan_spine.rs::a_change_request_without_impact_is_refused",
+            "priority": "must"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 P1.3",
+          "axis_b": "a requester cannot decide their own gate",
+          "value": {
+            "requirement": "409 and no approval_decision row when the requester decides; a distinct approver then succeeds",
+            "acceptance": "crates/api/tests/approval_dual.rs::the_requester_cannot_decide_their_own_gate; programme_baseline.rs::the_taker_cannot_approve_their_own_baseline",
+            "priority": "must"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 P2.1",
+          "axis_b": "WSJF recomputes from its inputs and is never stored",
+          "value": {
+            "requirement": "editing the four inputs changes the read score, and information_schema shows no wsjf column on wbs_node",
+            "acceptance": "plan_spine.rs::wsjf_recomputes_when_an_input_changes",
+            "priority": "must"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 P3.1",
+          "axis_b": "the portfolio lists exactly the in-flight set",
+          "value": {
+            "requirement": "active and paused are listed; closed and archived are not; the status set is tenant configuration with default active,paused",
+            "acceptance": "plan_spine.rs::the_portfolio_lists_only_the_in_flight_set",
+            "priority": "must"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 P4.1",
+          "axis_b": "a two-node dependency cycle is refused",
+          "value": {
+            "requirement": "A to B is accepted and B to A is refused 409 dependency_cycle",
+            "acceptance": "plan_spine.rs::a_two_node_dependency_cycle_is_refused",
+            "priority": "must"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7 P4.2",
+          "axis_b": "a deep cycle is refused and leaves no partial row",
+          "value": {
+            "requirement": "a four-node diamond plus a closing edge is refused 409 and the dependency list is unchanged",
+            "acceptance": "plan_spine.rs::a_deep_dependency_cycle_leaves_no_row",
+            "priority": "must"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8 P5.1",
+          "axis_b": "a benefit profile without baseline, target, method or owner is refused",
+          "value": {
+            "requirement": "422 benefit_profile_incomplete and no benefit_profile row",
+            "acceptance": "plan_spine.rs::a_benefit_without_baseline_target_method_or_owner_is_refused",
+            "priority": "must"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9 P5.2",
+          "axis_b": "a benefit-map edge names its five levels",
+          "value": {
+            "requirement": "422 benefit_map_incomplete when a level is missing; 201 when output_ref, capability_ref, operational_outcome, benefit and strategic_objective are all present",
+            "acceptance": "plan_spine.rs::a_benefit_map_edge_names_its_five_levels",
+            "priority": "must"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10 P5.3",
+          "axis_b": "a tranche review without evidence is refused",
+          "value": {
+            "requirement": "422 tranche_evidence_missing without baselines, benefit status and the risk register; with them the review records continue and the tranche state becomes closed",
+            "acceptance": "plan_spine.rs::a_tranche_review_without_evidence_is_refused",
+            "priority": "must"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "R11",
+          "axis_b": "tenant isolation on every plan-spine table",
+          "value": {
+            "requirement": "every table in migrations/0044_plan_spine.sql carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; no V1 table is altered except governed_asset's kind CHECK",
+            "acceptance": "the migration review of migrations/0044_plan_spine.sql",
+            "priority": "must"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "R12",
+          "axis_b": "project typing selects the phase template, gate set and job family, and the DoD is enforced",
+          "value": {
+            "requirement": "project_type_code drives the phase template and gate set, and card_type.definition carries the Definition of Done that the domain layer checks before a card can enter a done column",
+            "acceptance": "the project-type and card-type invariants recorded in SPEC_V2 §8.2 and §10.3",
+            "priority": "must"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/goal/objective — T1 plan spine",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements catalog — T1 plan spine\n\n## Metadata\n\nRetrospective catalogue for T1, authored 2026-11-26 from the slice record, the migration and the named tests. Phase a, plateau psa, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the ten issue-#72 scenarios and the invariants the rows carry.\n\n## Entries\n\nTwelve requirements. R1 to R3 fix the frozen baseline, the impact-bearing change and the refused self-approval. R4 makes WSJF a read computation over four stored inputs. R5 makes the portfolio a tenant-configured read. R6 and R7 refuse a two-node and a deep dependency cycle without a partial row. R8 and R9 make a benefit a measurement record and its map a five-level edge. R10 makes a tranche review evidence-bearing. R11 keeps every new table tenant-scoped with forced row-level security. R12 ties the project type to the phase template, gate set and job family, and places the DoD on the card type so the domain layer can enforce it.\n\n## Links\n\nThis artefact carries one typed edge: Driver/goal/objective — T1 plan spine as derivation, because each requirement serves a stated goal. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements the T1 gate and its contracts must satisfy. Scope: the ten issue-#72 scenarios, tenant isolation, the project-type rule and the DoD gate. It was reconstructed retrospectively on 2026-11-26 from the verified tests and the migration, so each acceptance line names a check that exists in the delivery commit rather than a check the pack hopes will run.\n"
+    },
+    {
+      "title": "Solution concept — T1 plan spine",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the rows, the programme shared configuration and the one gate primitive that carry the plan spine, with the edges that bind them.",
+      "scope": "migrations/0044_plan_spine.sql, the programme shared_config, the spine action families and the requester-aware approvals.decide.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the PM job",
+          "the delivery teams",
+          "the estate operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "the project's phase, deliverable, work-package and milestone tree",
+          "value": {
+            "kind": "component",
+            "note": "stores the four WSJF inputs as non-negative integers; status open, accepted or cancelled; acceptance and evidence as jsonb"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "the frozen promise",
+          "value": {
+            "kind": "component",
+            "note": "kind scope, schedule or cost; immutable snapshot jsonb; taken_by and approved_by; append-only"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "project_register_item",
+          "axis_b": "the one six-kind register",
+          "value": {
+            "kind": "component",
+            "note": "risk, issue, assumption, dependency, benefit or change; a change carries baseline_ref and meta.impact"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "project_dependency",
+          "axis_b": "directed programme edges",
+          "value": {
+            "kind": "component",
+            "note": "blocks, needs, supersedes or informs; unique edge; a self-edge and a cycle are refused in the creating transaction"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "programme.shared_config",
+          "axis_b": "the configuration a programme's projects inherit",
+          "value": {
+            "kind": "component",
+            "note": "knowledge pins, job families, approval-policy defaults, budget and cadence; set through programmes.update and read back through programmes.get"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "the SAFe rhythm row",
+          "value": {
+            "kind": "component",
+            "note": "pi, sprint, demo, retro or refinement; T1 stores the row and T10 materialises its cards"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "programme_tranche",
+          "axis_b": "the unit the programme reviews together",
+          "value": {
+            "kind": "component",
+            "note": "number unique per programme; state planned, authorised, in_review, closed, paused or stopped; entry and exit criteria"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "benefit_profile",
+          "axis_b": "the measurement record",
+          "value": {
+            "kind": "component",
+            "note": "baseline, target, measurement_method and benefit owner are mandatory; six field groups"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "benefit_link",
+          "axis_b": "the benefits-map edge",
+          "value": {
+            "kind": "component",
+            "note": "output to capability to operational outcome to benefit to strategic objective; all five levels non-blank"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "benefit_transition",
+          "axis_b": "the realization record per benefit",
+          "value": {
+            "kind": "component",
+            "note": "baseline_measured_at, readiness, enacted_at, post_measured_at, retired_at and evidence"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "stakeholder_profile",
+          "axis_b": "the MSP stakeholder profile",
+          "value": {
+            "kind": "component",
+            "note": "concerns, influence, interest, support level and trend, engagement target; distinct from V1's project_stakeholder"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "programme_baseline",
+          "axis_b": "the management, governance and boundary trio",
+          "value": {
+            "kind": "component",
+            "note": "snapshot jsonb, taken_by, approved_by; the next tranche is managed against a version"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "governed_asset (widened kinds)",
+          "axis_b": "the MSP narrative artefacts",
+          "value": {
+            "kind": "component",
+            "note": "mandate, programme_brief, blueprint, business_case, refined_vision, benefits_strategy, benefits_realization_plan and projects_dossier use the existing lifecycle"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "approvals.decide",
+          "axis_b": "the one gate primitive, now requester-aware",
+          "value": {
+            "kind": "component",
+            "note": "refuses the requester or executor as the decider for every gate; the approval and approver index remains the second half of dual control"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "portfolio.in_flight",
+          "axis_b": "the computed portfolio read",
+          "value": {
+            "kind": "component",
+            "note": "a read model, no row; the in-flight set comes from the tenant's configured status set, default active,paused"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "wbs_node and project_register_item",
+          "value": {
+            "kind": "edge",
+            "note": "the take freezes the rows as they were; later edits cannot move it"
+          },
+          "position": 16
+        },
+        {
+          "axis_a": "project_register_item(change)",
+          "axis_b": "project_baseline",
+          "value": {
+            "kind": "edge",
+            "note": "a change points at the baseline it changes and carries the impact block"
+          },
+          "position": 17
+        },
+        {
+          "axis_a": "project_dependency",
+          "axis_b": "the programme gate",
+          "value": {
+            "kind": "edge",
+            "note": "the edge table is the dependency source; meta.depends_on is a bounded fallback for unmigrated seed rows"
+          },
+          "position": 18
+        },
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "portfolio.in_flight and the backlog",
+          "value": {
+            "kind": "edge",
+            "note": "the four stored inputs feed the WSJF score on read; the score is never persisted"
+          },
+          "position": 19
+        },
+        {
+          "axis_a": "benefit_link",
+          "axis_b": "benefit_profile",
+          "value": {
+            "kind": "edge",
+            "note": "the five-level edge names exactly one benefit or disbenefit profile"
+          },
+          "position": 20
+        },
+        {
+          "axis_a": "tranches.review",
+          "axis_b": "programme_baseline, benefit status and the risk register",
+          "value": {
+            "kind": "edge",
+            "note": "the review gate refuses without the three evidence sets; a continue authorises the next tranche"
+          },
+          "position": 21
+        },
+        {
+          "axis_a": "approvals.decide",
+          "axis_b": "every gate",
+          "value": {
+            "kind": "edge",
+            "note": "the requester and executor exclusion applies to every action approval, not only T1's"
+          },
+          "position": 22
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — T1 plan spine",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution concept — T1 plan spine\n\n## Metadata\n\nRetrospective diagram for T1, authored 2026-11-26 from `migrations/0044_plan_spine.sql`, the action families and the transcript. Phase a, plateau psa, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the rows and edges that carry the plan spine.\n\n## Entries\n\nTwenty-two rows: fifteen components and seven edges. The tree, the frozen baseline, the six-kind register, the directed dependency graph, the programme shared configuration, the cadence and tranche rows, the benefit profile, link and transition records, the stakeholder profile, the programme baseline and the widened governed-asset kinds are the storage. approvals.decide is the one gate primitive and portfolio.in_flight is a computed read. The edges record what freezes what, what a change must point at, where the dependency source lives, how WSJF is read without a stored score, how a benefit map names its profile, and what a tranche review needs before it can decide.\n\n## Links\n\nThis artefact carries one typed edge: Requirements catalog — T1 plan spine as realization, because the components and edges exist to satisfy those twelve requirements. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: show the components and edges that turn a specification row into a plan a project can be held to. Scope: the migration's rows, the programme shared configuration, the spine action families and the requester-aware gate. It was drawn retrospectively on 2026-11-26 from the delivered schema and the recorded build order, not from a design session held before the work.\n"
+    },
+    {
+      "title": "Business capability map — T1 plan spine",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the plan spine delivers and how far each is live, including the parts that other slices still own.",
+      "scope": "Baseline and change control, dual control, prioritisation, the portfolio, dependencies, the MSP rows, benefit measurement and the tranche gate.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "the benefit owner",
+          "the delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Baseline and change control",
+          "axis_b": "a promise that does not move and a change that carries its impact",
+          "value": {
+            "maturity": "live",
+            "evidence": "project_baseline and project_register_item(kind='change'); P1.1 and P1.2 tests; the 422 change_impact_missing refusal"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Dual control",
+          "axis_b": "no requester decides the gate judging their work",
+          "value": {
+            "maturity": "live",
+            "evidence": "the requester and executor exclusion in approvals.decide; approval_dual.rs and programme_baseline.rs tests; the 409 self_approval refusal"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "WSJF prioritisation",
+          "axis_b": "priority as arithmetic, recomputed on read",
+          "value": {
+            "maturity": "live",
+            "evidence": "crates/domain/src/spine.rs::wsjf; P2.1; information_schema has no wsjf column"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "In-flight portfolio",
+          "axis_b": "the tenant's in-flight set in one read",
+          "value": {
+            "maturity": "live",
+            "evidence": "portfolio.in_flight; the tenant's configured in-flight status set; P3.1"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Dependency graph and cycle refusal",
+          "axis_b": "edges that can be read and a graph that stays acyclic",
+          "value": {
+            "maturity": "live",
+            "evidence": "project_dependency; the recursive reachability query in crates/store/src/spine.rs; P4.1 and P4.2; the 409 dependency_cycle refusal"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Programme definition records",
+          "axis_b": "shared configuration, tranches, cadences, stakeholder profiles and programme baselines as rows",
+          "value": {
+            "maturity": "live",
+            "evidence": "programme.shared_config, programme_tranche, programme_cadence, stakeholder_profile and programme_baseline; P5.3"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Benefit measurement and map",
+          "axis_b": "a benefit is a profile, not a wish, and an edge names five levels",
+          "value": {
+            "maturity": "live",
+            "evidence": "benefit_profile, benefit_link and benefit_transition; P5.1 and P5.2; the 422 benefit_profile_incomplete and 422 benefit_map_incomplete refusals"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Tranche review gate",
+          "axis_b": "continue, pause or stop on evidence",
+          "value": {
+            "maturity": "live",
+            "evidence": "tranches.review; the 422 tranche_evidence_missing refusal; the tranche-1 continue review recorded 2026-11-21"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Project typing and DoD",
+          "axis_b": "a project declares its shape and a card declares when it is done",
+          "value": {
+            "maturity": "live",
+            "evidence": "project.project_type_code selects the phase template, gate set and job family; card_type.definition carries the DoD the domain layer checks"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Cadence materialisation and PI planning",
+          "axis_b": "the rhythm that turns a cadence row into cards",
+          "value": {
+            "maturity": "not built here",
+            "evidence": "T10 owns it; T1 stores the programme_cadence row only"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Benefits-realization procedure",
+          "axis_b": "baseline, readiness, enactment, post-measurement and retirement",
+          "value": {
+            "maturity": "partial",
+            "evidence": "benefit_transition rows and the benefit actions exist; the procedure is T10"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "Portfolio and Plan screens",
+          "axis_b": "the capability surfaced in the console",
+          "value": {
+            "maturity": "partial",
+            "evidence": "portfolio.in_flight is live; the WSJF-backlog, cadence and capacity tabs remain fixtures, and the Plan tab's WBS, baseline and register screens are T1 work recorded here, not a T1 console delivery"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — T1 plan spine",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — T1 plan spine",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Business capability map — T1 plan spine\n\n## Metadata\n\nRetrospective diagram for T1, authored 2026-11-26 from the migration, the named tests and the transcript. Phase b, plateau hld, kind diagram; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the capability the plan spine installs and how far it is live.\n\n## Entries\n\nTwelve capabilities, nine live and three stated as partial or owned elsewhere. Baseline and change control, dual control, WSJF, the in-flight portfolio, the dependency graph, the programme-definition rows, the benefit measurement record and the tranche gate are live and proved. Project typing and the DoD gate are live through project_type_code and card_type.definition. Cadence materialisation and PI planning are T10. The benefits-realization procedure is partial: the transition rows exist, the procedure is T10. The console is partial: only portfolio.in_flight is live, while the Plan tab's screens remain T1 work and the other tabs are fixtures.\n\n## Links\n\nThis artefact carries two typed edges: Solution concept — T1 plan spine and Requirements catalog — T1 plan spine, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the plan spine delivers and the evidence each leaves behind. Scope: baseline and change control, dual control, prioritisation, the portfolio, dependencies, the MSP rows, benefit measurement and the tranche gate. It is retrospective and dated 2026-11-26; it records the capabilities as delivered at the 2026-11-17 build and does not upgrade a partial capability into a live one.\n"
+    },
+    {
+      "title": "Data entity catalog — T1 plan spine",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the stored entities the plan spine adds or extends, each with its owner and its one invariant.",
+      "scope": "migrations/0044_plan_spine.sql, the programme shared configuration and the computed WSJF component.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the PM job",
+          "the delivery teams",
+          "auditors",
+          "the estate operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "the project plan tree",
+          "value": {
+            "kind": "entity",
+            "definition": "tenant-scoped with forced row-level security; kind phase, deliverable, work_package or milestone; status open, accepted or cancelled; four non-negative WSJF integers with job_size > 0",
+            "owner": "plan spine"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "the frozen project promise",
+          "value": {
+            "kind": "entity",
+            "definition": "kind scope, schedule or cost; snapshot jsonb; append-only; taken_by and approved_by",
+            "owner": "plan spine"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "project_register_item",
+          "axis_b": "the one six-kind register",
+          "value": {
+            "kind": "entity",
+            "definition": "risk, issue, assumption, dependency, benefit or change; a change CHECK requires baseline_ref and meta.impact",
+            "owner": "plan spine"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "project_dependency",
+          "axis_b": "the programme's directed edges",
+          "value": {
+            "kind": "entity",
+            "definition": "blocks, needs, supersedes or informs; unique on tenant, from, to and kind; a self-edge CHECK; a cycle refused by the recursive reachability query",
+            "owner": "plan spine"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "programme.shared_config",
+          "axis_b": "the inherited programme configuration",
+          "value": {
+            "kind": "entity",
+            "definition": "the programme column carrying knowledge pins, job families, approval-policy defaults, budget and cadence; written through programmes.update and read back through programmes.get",
+            "owner": "programme"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "the SAFe rhythm row",
+          "value": {
+            "kind": "entity",
+            "definition": "pi, sprint, demo, retro or refinement; period not blank; T10 materialises the cards",
+            "owner": "programme"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "programme_tranche",
+          "axis_b": "the reviewable tranche",
+          "value": {
+            "kind": "entity",
+            "definition": "number unique per programme; state planned, authorised, in_review, closed, paused or stopped; entry and exit criteria jsonb",
+            "owner": "programme"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "benefit_profile",
+          "axis_b": "the benefit measurement record",
+          "value": {
+            "kind": "entity",
+            "definition": "the six field groups of SPEC_V2 §8.3; status draft, active, realized, disbenefit or closed; a unique reference per programme",
+            "owner": "programme"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "benefit_link",
+          "axis_b": "the five-level benefits-map edge",
+          "value": {
+            "kind": "entity",
+            "definition": "output_ref, capability_ref, operational_outcome and strategic_objective are CHECKed non-blank; kind benefit or disbenefit",
+            "owner": "programme"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "benefit_transition",
+          "axis_b": "the realization record per benefit",
+          "value": {
+            "kind": "entity",
+            "definition": "baseline_measured_at, readiness, enacted_at, post_measured_at, retired_at and evidence jsonb",
+            "owner": "programme"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "stakeholder_profile",
+          "axis_b": "the MSP stakeholder profile",
+          "value": {
+            "kind": "entity",
+            "definition": "concerns, sensitivities, importance, influence, interest, exposure, support level and trend, engagement target; distinct from V1's project_stakeholder",
+            "owner": "programme"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "programme_baseline",
+          "axis_b": "the management, governance and boundary baseline",
+          "value": {
+            "kind": "entity",
+            "definition": "kind management, governance or boundary; snapshot jsonb; taken_by and approved_by; a tranche is managed against a version",
+            "owner": "programme"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "governed_asset (widened)",
+          "axis_b": "the MSP narrative artefacts",
+          "value": {
+            "kind": "entity",
+            "definition": "the kind CHECK adds mandate, programme_brief, blueprint, business_case, refined_vision, benefits_strategy, benefits_realization_plan and projects_dossier",
+            "owner": "programme"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "project.project_type_code",
+          "axis_b": "the project's declared shape",
+          "value": {
+            "kind": "entity",
+            "definition": "selects the phase template, the gate set and the default job family for the project",
+            "owner": "portfolio"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "card_type.definition",
+          "axis_b": "the Definition of Done",
+          "value": {
+            "kind": "entity",
+            "definition": "the done condition the domain layer checks before a card can enter a done column; a gate is an approval row naming the phase or DoD",
+            "owner": "control"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "WSJF",
+          "axis_b": "the computed priority score",
+          "value": {
+            "kind": "component",
+            "definition": "crates/domain/src/spine.rs::wsjf; computed on read from the four stored inputs; never persisted",
+            "owner": "plan spine"
+          },
+          "position": 16
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — T1 plan spine",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — T1 plan spine",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Data entity catalog — T1 plan spine\n\n## Metadata\n\nRetrospective catalogue for T1, authored 2026-11-26 from `migrations/0044_plan_spine.sql` and the transcript. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the entities the plan spine adds or extends and the computed priority component.\n\n## Entries\n\nSixteen entities. The tree, the append-only baseline, the six-kind register and the directed dependency graph carry the project plan itself. The programme shared configuration, the cadence row and the tranche row carry the programme's inherited settings and its reviewable units. The benefit profile, the five-level link and the transition record make a benefit measurable. The stakeholder profile and the programme baseline carry the MSP governance rows, and the widened governed-asset kinds carry the narrative artefacts. The project type selects the phase template and gate set, the card type carries the DoD, and WSJF stays a computed component with no stored score.\n\n## Links\n\nThis artefact carries two typed edges: Business capability map — T1 plan spine and Solution concept — T1 plan spine, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the stored entities the plan spine adds or extends, each with its owner and one invariant. Scope: the plan-spine migration, the programme shared configuration, the project-type and DoD rows and the computed WSJF component. It was authored retrospectively on 2026-11-26 from the schema and the tests, so the catalogue does not invent a table or a key the delivered migration does not carry.\n"
+    },
+    {
+      "title": "Technology standards — T1 plan spine",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the formats, disciplines and instruments the plan spine fixes for every later slice, and where each one is enforced.",
+      "scope": "Postgres and row-level security, the migration set, the action registry, WSJF arithmetic, the cycle check, the error vocabulary and verification.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the delivery teams",
+          "auditors",
+          "the estate operator"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "PostgreSQL",
+          "axis_b": "18 with forced row-level security",
+          "value": {
+            "usage": "every plan-spine and MSP table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; migrations/0044_plan_spine.sql"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Rust workspace",
+          "axis_b": "edition 2024 with forbid(unsafe_code)",
+          "value": {
+            "usage": "the workspace is edition 2024 and every crate's lib.rs carries the forbid attribute; the test harness is the repository's real-Postgres integration suite"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Migration discipline",
+          "axis_b": "forward only, numbered, never edited after a slice closes",
+          "value": {
+            "usage": "one set, 0044_plan_spine.sql; no V1 table is altered except governed_asset's kind CHECK, which is widened rather than forked"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "ActionSpec",
+          "axis_b": "one declaration serving HTTP, MCP and the served spec",
+          "value": {
+            "usage": "wbs.*, baselines.*, registers.*, project_dependencies.*, portfolio.in_flight, cadences.*, tranches.*, benefits.* and stakeholders.profile_* are ordinary actions with no second dispatch path"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "HTTP API",
+          "axis_b": "unversioned /api/<resource>",
+          "value": {
+            "usage": "no version segment; errors are RFC 9457 application/problem+json"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "WSJF arithmetic",
+          "axis_b": "(business_value + time_criticality + risk_reduction) / job_size",
+          "value": {
+            "usage": "four non-negative integer inputs with job_size > 0; computed on read; no score column exists"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Cycle check",
+          "axis_b": "recursive reachability in the creating transaction",
+          "value": {
+            "usage": "crates/store/src/spine.rs runs the reachability query; a cycle returns 409 dependency_cycle and the insert rolls back with no partial row"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Optimistic concurrency",
+          "axis_b": "version with If-Match and ETag on edits",
+          "value": {
+            "usage": "every row carries version; wbs.update requires the ETag from the read, and a stale write is 412 version_mismatch"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Error slugs",
+          "axis_b": "stable problem types",
+          "value": {
+            "usage": "409 dependency_cycle, 409 self_approval, 422 change_impact_missing, 422 benefit_profile_incomplete, 422 benefit_map_incomplete, 422 tranche_evidence_missing and 422 self_dependency"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Verification",
+          "axis_b": "real Postgres first, then the GitHub-hosted preflight",
+          "value": {
+            "usage": "the ten scenarios run against real Postgres 18; the compile and test verdict is preflight.yml; the local gate is cargo fmt --all -- --check and cargo metadata --locked --format-version 1"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Programme configuration inheritance",
+          "axis_b": "programme.shared_config",
+          "value": {
+            "usage": "knowledge pins, job families, approval-policy defaults, budget and cadence are set once on the programme and inherited by its projects; a project does not restate them"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "Definition of Done",
+          "axis_b": "card_type.definition",
+          "value": {
+            "usage": "the done condition is data on the card type, checked by the domain layer before a card can enter a done column; a gate is an approval row naming the phase or DoD"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalog — T1 plan spine",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Technology standards — T1 plan spine\n\n## Metadata\n\nRetrospective catalogue for T1, authored 2026-11-26 from the migration and the delivery record. Phase d, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; project 01a1d039-0d32-7c81-8365-371217d16ef7; subject the standards the plan spine fixes for every later slice.\n\n## Entries\n\nTwelve standards. PostgreSQL 18 carries forced row-level security on every new table and the migration stays forward-only. The workspace is edition 2024 with unsafe code forbidden, and the tests are real-Postgres integration tests. One ActionSpec serves HTTP, MCP and the served spec over unversioned routes with RFC 9457 errors. WSJF is arithmetic on read from four typed inputs, and the cycle check is a reachability query inside the creating transaction. Optimistic concurrency and a fixed error vocabulary make refusals stable. Verification runs on real Postgres and then the GitHub-hosted preflight. The programme's shared configuration is inherited rather than restated, and the Definition of Done is data on the card type that the domain layer enforces.\n\n## Links\n\nThis artefact carries one typed edge: Data entity catalog — T1 plan spine as derivation, because each entity is held in one of these formats or enforced by one of these disciplines. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: name the formats, disciplines and instruments the plan spine fixes, and where each one is enforced. Scope: Postgres and row-level security, the migration set, the action registry, WSJF arithmetic, the cycle check, the error vocabulary, verification, shared configuration and the DoD. It was authored retrospectively on 2026-11-26 and names only standards that the delivered migration, the tests and the delivery plan actually apply.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T1 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — T1 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for T1 is the seven mandatory Phase A–D artefacts on the delivery track (track v2): the Stakeholder map, the Driver/goal/objective, the Requirements catalog and the Solution concept at phase a, plateau psa, and the Business capability map, the Data entity catalog and the Technology standards at phases b, c and d, plateau hld. Each is an approved row with a published body; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is project 01a1d039-0d32-7c81-8365-371217d16ef7, the plan spine.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: Stakeholder map — T1 plan spine (matrix), Driver/goal/objective — T1 plan spine (catalog), Requirements catalog — T1 plan spine (catalog), Solution concept — T1 plan spine (diagram), Business capability map — T1 plan spine (diagram), Data entity catalog — T1 plan spine (catalog) and Technology standards — T1 plan spine (catalog). Each carries its own entries: seven stakeholders, eight drivers, twelve requirements, twenty-two components and edges, twelve capabilities, sixteen entities and twelve standards.\n\n## Links\n\nThe typed edges are: the driver catalogue derives from the stakeholder map; the requirements catalogue derives from the driver catalogue; the solution concept realizes the requirements catalogue; the capability map derives from the solution concept and the requirements catalogue; the data entity catalogue derives from the capability map and the solution concept; and the technology standards derive from the data entity catalogue. Every edge names another artefact of this pack, so no artefact is an orphan.\n\n## Document\n\nThe index is the architecture-artifact page the artefact standard reads. The seven artefact rows bind to the adopted standard keys stakeholder_map, driver_goal_objective, requirements_catalog, solution_concept, business_capability_map, data_entity_catalog and technology_standards, and this index is the retrospective page authored on 2026-11-26 over them. It records the set the rework produces; it does not claim that a contemporaneous artefact existed at the 2026-11-17 close.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "A later consumer reads a cadence row as a working PI rhythm",
+        "body": "T1 stores programme_cadence rows but T10 owns materialising their cards, PI planning and the benefits-realization procedure. A reader who sees the row without that boundary may treat the rhythm as delivered. This retrospective row, dated 2026-11-26, keeps the boundary live: the row is the storage T10 consumes, and the Portfolio page's cadence and capacity tabs remain fixtures until T10 lands.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §12 — T1 cadence and MSP rows",
+            "docs/evidence/rework/T1.json — the T1 rework receipt"
+          ],
+          "decisions": []
+        },
+        "code": "R-T1-01"
+      },
+      {
+        "title": "An edit after a baseline is expected to appear in the frozen scope",
+        "body": "project_baseline is append-only and a take freezes the WBS and register facts as they were. A project member who edits a WBS row after the take and then reads the baseline will not see the edit, which is the intended behaviour but an easy surprise. The P1.1 test proves the snapshot does not move; this row records the operational risk that a reader misreads the frozen copy as a stale bug and edits around it.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "migrations/0044_plan_spine.sql — project_baseline",
+            "crates/actions/tests/plan_spine.rs — the frozen-snapshot test"
+          ],
+          "decisions": []
+        },
+        "code": "R-T1-02"
+      },
+      {
+        "title": "The in-flight set is tenant configuration, so a misconfiguration hides live work",
+        "body": "portfolio.in_flight is a computed read over the tenant's configured status set, default active and paused. A tenant that narrows or mistypes that configuration will silently drop work from the portfolio without any row changing. The read model is correct by construction, but its input is configuration; this row records the risk that the portfolio is trusted as a complete inventory when it is only complete for the configured set.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "low",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §8.2 — the in-flight set",
+            "crates/actions/tests/plan_spine.rs — the portfolio test"
+          ],
+          "decisions": []
+        },
+        "code": "R-T1-03"
+      }
+    ],
+    "issue": [
+      {
+        "title": "No contemporaneous governance record existed at the 2026-11-17 close",
+        "body": "No charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored before T1 closed on 2026-11-17. The records in this rework are retrospective and dated 2026-11-26; they reconstitute the lifecycle from the delivered commit, the migration, the named tests and the published inception and architecture outputs. The issue stays open as a fact about the record rather than as a defect the pack can close.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/tranche-1/acts.md — the tranche-1 rework record"
+          ],
+          "decisions": []
+        },
+        "code": "I-T1-01"
+      },
+      {
+        "title": "The Plan tab's WBS, baseline and register screens are not a console delivery",
+        "body": "The plan spine is an action and data capability. The Portfolio page's WSJF-backlog, cadence and capacity tabs remain fixtures, and the Plan tab's WBS, baseline and register screens are T1 work recorded here rather than a delivered console. Only portfolio.in_flight is live. This issue records the gap between the served capability and the rendered console so a later UI slice claims the screens explicitly.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §12 — T1 scope",
+            "docs/evidence/rework/T1.json — the partial-coverage note"
+          ],
+          "decisions": []
+        },
+        "code": "I-T1-02"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "Every gate passes through approvals.decide, so the requester exclusion covers the whole programme",
+        "body": "The requester and executor exclusion is installed in one primitive, approvals.decide, and applies to every action approval rather than only T1's. That is only as strong as the assumption that no gate bypasses the primitive and writes an approval_decision row directly. The P1.3 test proves the exclusion where it runs; this retrospective assumption, recorded 2026-11-26, states the condition under which the exclusion is programme-wide.",
+        "status": "open",
+        "code": "A-T1-01"
+      },
+      {
+        "title": "The four WSJF inputs are valid integers for every WBS row that reaches the read",
+        "body": "WSJF divides the sum of three non-negative integers by job_size, and the column constraints require job_size > 0. The computation therefore assumes that no row reaches the read with a null input or a zero size, including rows written before the constraint or through a path that skips validation. This row records the assumption on 2026-11-26; the arithmetic has no defensive branch for an invalid row, by design.",
+        "status": "open",
+        "code": "A-T1-02"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "T2, T3, T9 and T10 build on the plan-spine rows",
+        "body": "SPEC_V2 §12 records T0 to T1 to T2 to T3, with T9 and T10 after T1 and T3. The decision ladder, the PM job, the ADM capability and the SAFe cadence all read the WBS, baseline, register, dependency, tranche and benefit rows this slice creates. The dependency runs one way: a change to a row's shape or refusal after T1 is a change to every consumer's contract, not a local edit.",
+        "status": "open",
+        "code": "D-T1-01"
+      },
+      {
+        "title": "The frozen baseline depends on the take and the snapshot sharing one transaction",
+        "body": "The P1.1 test proves a later row edit cannot move the baseline because the take writes the snapshot inside the same transaction that reads the rows. The dependency is on that transaction boundary holding for every baseline kind, scope, schedule and cost alike. This retrospective row records the dependency on 2026-11-26 and notes that it is an invariant of the store path rather than a property of the reader.",
+        "status": "open",
+        "code": "D-T1-02"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Priority is arithmetic and never a stale stored score",
+        "body": "WSJF is computed on read from four typed inputs, so a change to business value, time criticality, risk reduction or job size moves the score with the edit and no backfill is possible or needed. The benefit is that a backlog order cannot drift from the inputs it claims, which the P2.1 test demonstrates by moving the read score after an input edit. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §12 — the WSJF clause",
+            "crates/actions/tests/plan_spine.rs — the recomputation test"
+          ],
+          "decisions": []
+        },
+        "code": "B-T1-01"
+      },
+      {
+        "title": "A tranche review cannot decide without baselines, benefit status and the risk register",
+        "body": "tranches.review refuses 422 tranche_evidence_missing unless the three evidence sets are present, and with them records continue, pause or stop and moves the tranche state. The benefit is that a tranche decision is an evidence-bearing gate rather than a meeting note: the review cannot be convened on narrative alone. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §12 — the tranche-review clause",
+            "crates/actions/tests/plan_spine.rs — the evidence refusal test"
+          ],
+          "decisions": []
+        },
+        "code": "B-T1-02"
+      },
+      {
+        "title": "Self-approval is refused on every gate, not only where a test looks",
+        "body": "The exclusion lives in approvals.decide, the one primitive every gate uses, and compares the pending row's requester and executor with the actor before any approval_decision row is written. The benefit is that the refusal is structural: a new gate inherits it without adding a check. The requester test in approval_dual.rs and the taker test in programme_baseline.rs prove the two entry points recorded here on 2026-11-26.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md §10.3 — the approval primitive",
+            "crates/api/tests/approval_dual.rs — the requester exclusion test"
+          ],
+          "decisions": []
+        },
+        "code": "B-T1-03"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T1 Plan spine (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Deliver the plan spine of SPEC_V2 §12: `wbs_node`, `project_baseline`, `project_register_item`, `project_dependency`, the programme `shared_config` and cadence, `programme_tranche`, `benefit_profile`, `benefit_link`, `benefit_transition`, `stakeholder_profile`, `programme_baseline` and the widened `governed_asset` kinds, with the project-type selection of phase template and gate set, the DoD gate on `card_type.definition`, and the requester and executor exclusion in `approvals.decide`. The build is one WBS deliverable accepted with WSJF inputs business value 8, time criticality 5, risk reduction 8 and job size 8.",
+      "compliance": "T1 is assessed clause by clause against the SPEC_V2 §12 gate and the ten issue-#72 scenarios. Each scenario has one named real-Postgres test in `crates/actions/tests/plan_spine.rs`, `crates/api/tests/approval_dual.rs` or `crates/actions/tests/programme_baseline.rs`, and the refusal slugs are stable: 409 dependency_cycle, 409 self_approval, 422 change_impact_missing, 422 benefit_profile_incomplete, 422 benefit_map_incomplete, 422 tranche_evidence_missing and 422 self_dependency. The Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d records the level compliant against this contract, and the rework's acceptance instrument is `acceptance/programme/T1.toml`.",
+      "approval": "The delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433 is approved under approval 01a1ff8a-880f-7d08-b322-9656f2c5355f by an approver distinct from the requester, which is the same exclusion the build installs in the gate primitive. The Statement of Architecture Work 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 sits under its own approval 01a1ff89-1794-79d0-8707-f7614987ee7c, and the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 (kind scope, taken 2026-11-21) was approved by the same approver. The Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d cites this contract.",
+      "acceptance": "Acceptance is executable. The ten scenarios run against real Postgres 18: a baseline that does not move, a change refused without an impact block or baseline, a refused self-approval, WSJF recomputed from inputs with no stored column, the in-flight portfolio, a refused two-node cycle and a refused deep cycle with no partial row, a refused benefit profile missing baseline, target, method or owner, a benefit-map edge naming its five levels, and a tranche review refused without baselines, benefit status and the risk register. The manifest `acceptance/programme/T1.toml` is the rework's acceptance instrument.",
+      "evidence": "The evidence route is the delivery commit `e3d7c4eb` (2026-11-17), issue #72 CLOSED, `migrations/0044_plan_spine.sql`, the named test functions, the published inception analysis and architecture design of 2026-11-16, the seven Phase A–D artefacts, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039, the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d and the rework record in `docs/evidence/rework/T1.json` and `docs/evidence/rework/tranche-1/acts.md`. The published outputs are the project brief and the evidence page.",
+      "manifest": "acceptance/programme/T1.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "programme_shared_config": {
+    "values": {
+      "knowledge_pins": "spec docs/SPEC_V2.md; the plan-spine migration 0044_plan_spine.sql",
+      "job_families": [
+        "pm",
+        "delivery",
+        "coach",
+        "kata",
+        "operations"
+      ],
+      "approval_policy_defaults": "one approver; the requester and the executor are excluded by approvals.decide on every gate",
+      "budget": "the tranche-1 budget line recorded on the programme row",
+      "cadence": "pi, sprint, demo, retro and refinement rows in programme_cadence; T10 materialises their cards"
+    },
+    "locked": [
+      "approval_policy_defaults"
+    ]
+  },
+  "wbs_deliverable": {
+    "title": "The plan spine — baseline, change control, WSJF, portfolio, dependency graph and MSP rows, with the ten-scenario gate",
+    "business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction": 8,
+    "job_size": 8
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d is compliant against the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 is approved, and the seven Phase A–D artefacts in this pack are authored against the plan spine. The gate clauses are proved by named tests: plan_spine.rs::a_baseline_does_not_move_when_rows_change, ::a_change_request_without_impact_is_refused, ::wsjf_recomputes_when_an_input_changes, ::the_portfolio_lists_only_the_in_flight_set, ::a_two_node_dependency_cycle_is_refused, ::a_deep_dependency_cycle_leaves_no_row, ::a_benefit_without_baseline_target_method_or_owner_is_refused, ::a_benefit_map_edge_names_its_five_levels and ::a_tranche_review_without_evidence_is_refused, with approval_dual.rs::the_requester_cannot_decide_their_own_gate and programme_baseline.rs::the_taker_cannot_approve_their_own_baseline for the refused self-approval. Against that, three limits are stated rather than waived: no contemporaneous governance record existed at the 2026-11-17 close, cadence materialisation and PI planning and the benefits-realization procedure are T10, and the console surfaces beyond portfolio.in_flight remain fixtures. Those are scope boundaries of the delivery, not non-compliances.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d",
+      "delivery_contract": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+      "scope_baseline": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
+      "statement_of_architecture_work": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+      "acceptance_manifest": "acceptance/programme/T1.toml",
+      "rework_note": "docs/evidence/rework/T1.json"
+    }
+  },
+  "project_brief_output": "# Project brief — T1 Plan spine (retrospective, 2026-11-26)\n\n## Outcome\n\nThe conveyor has a plan spine: a baseline that does not move, a change request carrying an impact block and the baseline it changes, a refused self-approval, WSJF recomputed from four typed inputs with no stored score, an in-flight portfolio read, an acyclic dependency graph, and MSP rows that make a benefit a measurement record and a tranche review evidence-bearing. The build also selects the phase template, gate set and job family from the project type and enforces the Definition of Done from the card type.\n\n## Boundary\n\nT1 owns the rows, action families and refusals. The decision ladder is T2, the PM job is T3, cadence materialisation, PI planning and the benefits-realization procedure are T10, and metrics are T11. V1's `outline` tree is untouched and not backfilled. The Portfolio page's WSJF-backlog, cadence and capacity tabs remain fixtures, and the Plan tab's WBS, baseline and register screens are T1 work recorded here rather than a delivered console; only `portfolio.in_flight` is live.\n\n## Reuse sources\n\nThe build reuses the existing programme and project aggregates, the approval and approval_decision rows, the one gate primitive in `crates/actions/src/control/approvals.rs` with its required-decisions rule and approver index, the programme action family's dependency assertion and its bounded `meta.depends_on` fallback, the project board actions, and the repository's real-Postgres action and API test harness. It widens `governed_asset`'s kind CHECK rather than forking a second narrative store.\n\n## Inception units\n\nThe published inception analysis and architecture design of 2026-11-16, both measured at main, are the analysis the build starts from; the design records the decisions and the ten scenarios P1.1 to P5.3. The retrospective reconstitutes the governance record over the delivered commit `e3d7c4eb` of 2026-11-17: charter, Statement of Architecture Work, the seven A–D artefacts, the delivery contract, the WBS deliverable, the Phase-G review, this brief, the evidence page and the closure review.\n\n## Dependencies\n\nT1 depends on T0 and P0, recorded as `needs` edges in the project row. Its dependants are T2 and T3 and, through the specification's dependency line, T9 and T10, which read the WBS, baseline, register, dependency, tranche and benefit rows. In governance the rework depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the approved scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 and the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, with the closure gate decided by an approver other than the requester.\n\n## Acceptance\n\nThe SPEC_V2 §12 gate: one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels. Each clause has a named test in plan_spine.rs, approval_dual.rs or programme_baseline.rs, and `acceptance/programme/T1.toml` is the rework's acceptance instrument. The closure gate is approved by an identity distinct from the requester.\n\n## Capabilities\n\nBaseline and change control; dual control on every gate; WSJF prioritisation; the in-flight portfolio; the dependency graph and cycle refusal; programme-definition rows for shared configuration, tranches, cadences, stakeholder profiles and programme baselines; the benefit measurement record and five-level map; the evidence-bearing tranche review; project typing and the DoD gate. Cadence materialisation and the benefits-realization procedure are recorded as T10's, and the console surfaces beyond `portfolio.in_flight` are recorded as partial.\n\n## Plan\n\nThe plan is `docs/SPEC_V2.md` §12, with §8.2, §8.3 and §10.3; the project row's plan pointer is `docs/SPEC_V2.md#12` and no separate plan document exists. The build landed on 2026-11-17 as commit `e3d7c4eb` for issue #72. This brief is retrospective and dated 2026-11-26: it records that build and the governance reconstituted over it, and it does not claim a contemporaneous record or a console delivery the build did not make.\n",
+  "evidence_output": "# Evidence — T1 Plan spine (retrospective, 2026-11-26)\n\n## Claim\n\nT1 delivered the plan spine and its ten-scenario gate: a frozen baseline, controlled change, a refused self-approval, WSJF recomputation, the in-flight portfolio, cycle refusal, the benefit-profile and benefit-map refusals, an evidence-bearing tranche review, project typing and the DoD gate — proved by named tests against real Postgres 18 and recorded retrospectively under the standing delegation.\n\n## Evidence\n\nThe delivery is commit `e3d7c4eb2bc1b0b4ee2a1b7ba561bf119d75a002` (2026-11-17), subject 'plan spine: T1 — the rows, the actions and the ten scenarios (#72) (#250)', with issue #72 CLOSED. `migrations/0044_plan_spine.sql` adds `wbs_node`, `project_baseline`, `project_register_item`, `project_dependency`, `programme_cadence`, `programme_tranche`, `benefit_profile`, `benefit_link`, `benefit_transition`, `stakeholder_profile` and `programme_baseline`, widens `governed_asset`'s kind CHECK, and gives every table tenant-scoped forced row-level security. The programme's `shared_config` carries the inherited configuration. The tests are in `crates/actions/tests/plan_spine.rs`, `crates/api/tests/approval_dual.rs` and `crates/actions/tests/programme_baseline.rs`, and the published inception analysis and architecture design of 2026-11-16 are the analysis the build starts from.\n\n## Verification\n\nAn independent reader can read the named test functions and run them against real Postgres 18 in the repository's harness: the plan-spine suite and the requester-exclusion test. The compile and test verdict is the repository's GitHub-hosted `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1`, per the delivery plan. The rework records the acceptance instrument as `acceptance/programme/T1.toml`; this content pack is checked offline by `scripts/rework-content-check.py --project T1` before the factory reads it, and the closure gate is decided by an approver other than the requester.\n\n## Links\nThe specification is `docs/SPEC_V2.md` §8.2, §8.3 and §12. The governance record is the Statement of Architecture Work 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 under approval 01a1ff89-1794-79d0-8707-f7614987ee7c, the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433 under approval 01a1ff8a-880f-7d08-b322-9656f2c5355f, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039, the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d at level compliant, and the rework record `docs/evidence/rework/T1.json` with the transcript. The standing delegation is 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Gap\n\nThree limits are recorded and none is closed by this pack. No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review existed at the 2026-11-17 close; this set is retrospective and does not attest contemporaneous intent. T1 ships the MSP rows and refusal rules only: cadence materialisation, PI planning and the benefits-realization procedure are T10, and the metrics are T11. Within the console, only `portfolio.in_flight` is live; the WSJF-backlog, cadence and capacity tabs remain fixtures, and the Plan tab's WBS, baseline and register screens are T1 work rather than a delivered screen.\n",
+  "closure": "# Closure — T1 Plan spine (retrospective, 2026-11-26)\n\nT1 re-closes through the one gate on the record the snapshot carries: the approved delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the approved scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039, the compliant Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d and the seven Phase A–D artefacts approved by the board. The closure records the plan spine delivered by commit `e3d7c4eb` on 2026-11-17 for issue #72, with the ten scenarios proved by named real-Postgres tests and the WSJF deliverable accepted at inputs 8, 5, 8 and 8. It keeps three items visible rather than closed: the governance is retrospective, cadence materialisation and PI planning belong to T10, and only `portfolio.in_flight` is live in the console. The closure gate is decided by an approver other than its requester.\n",
+  "closure_review": "# Closure review — T1 Plan spine (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is a project plan the conveyor can be held to, and the acceptance the record carries matches it: the SPEC_V2 §12 gate is a baseline, a change request and a refused self-approval; WSJF recomputed from inputs; the in-flight portfolio; a refused dependency cycle; a refused benefit profile missing baseline, target, method or owner; and a benefit-map edge naming its five levels. Every clause has a named test in plan_spine.rs, approval_dual.rs or programme_baseline.rs, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 was taken with the one WBS deliverable at inputs 8, 5, 8 and 8, and the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d records the level compliant.\n\n## Evidence\n\nThe evidence is the delivery commit `e3d7c4eb2bc1b0b4ee2a1b7ba561bf119d75a002` of 2026-11-17 with issue #72 CLOSED, `migrations/0044_plan_spine.sql` with its twelve plan-spine and MSP tables, the widened `governed_asset` kind CHECK, the programme `shared_config`, and the named tests in `crates/actions/tests/plan_spine.rs`, `crates/api/tests/approval_dual.rs` and `crates/actions/tests/programme_baseline.rs`. The governance record is the Statement of Architecture Work 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5, the delivery contract 01a1ff8a-754f-70de-a63a-fa8d00596433, the scope baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039, the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Open items\n\nThree items remain and none is closable by this pack. The original governance was never authored: no charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review existed at the 2026-11-17 close, and this set is retrospective and does not attest contemporaneous intent. Cadence materialisation, PI planning and the benefits-realization procedure are T10; T1 stores the rows and the refusals and nothing more. The console is partial: `portfolio.in_flight` is live, while the WSJF-backlog, cadence and capacity tabs remain fixtures and the Plan tab's WBS, baseline and register screens are T1 work recorded here rather than delivered screens.\n\n## Decision\n\nThe retrospective decision is to close on the record the snapshot carries, at the level compliant that the Phase-G review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d records, with the three limits stated rather than waived. The decision is dated 2026-11-26 and rests on the delivered commit, the named tests, the approved scope baseline and the two approved contracts, with the closure gate decided by an approver other than its requester. It does not reopen the plan-spine design, does not claim a contemporaneous review that was never written, and does not upgrade a T10 or console capability into a T1 delivery.\n"
+}

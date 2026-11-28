@@ -344,7 +344,7 @@ cargo test -p conveyor-api --test documents_roundtrip --test documents_limits \
 </tr>
 <tr>
 <td>f</td>
-<td>externals — <code>GET /api/actions</code> shows <code>timeout_ms</code> on every external; zero <code>reqwest::</code> outside the executor</td>
+<td>externals — <code>GET /api/actions</code> shows <code>timeout_ms</code> on every external; across the <strong>whole workspace</strong> every <code>reqwest::</code> reference is a declared transport — the exact allowlist and its scope are enforced by <code>python3 scripts/check-egress.py --check</code> (40 declared transports over 767 source files; a planted offender fails its <code>--self-test</code>)</td>
 </tr>
 <tr>
 <td>g</td>

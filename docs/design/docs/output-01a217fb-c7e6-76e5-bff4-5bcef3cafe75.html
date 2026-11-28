@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T3 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="7818a13af3bd8e2993c27a6ae7d7ee111f92952b481211978e11f6987fcefdff" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7818a13af3bd8e2993c27a6ae7d7ee111f92952b481211978e11f6987fcefdff</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Closure review — T3 PM job (retrospective, 2026-11-26)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The outcome the charter records is the PM job of SPEC_V2 §12: a PM runs a request end to end, cannot approve its own gate, and a baseline change requires a change request. The record supports it: the build is recorded as measured_status built under closed issue #74, the scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, the closure gate was decided by an approver distinct from its requester, the charter gate is approved, and the declared outputs project-brief, evidence and closure-review are published. Against that, the pre-rework receipt docs/evidence/rework/T3.json was red on contract, review, artefact standard and rework resolution; this pack supplies the rows those checks read, so the acceptance is met on the completed record rather than on the earlier red one.</p>
+<h2>Evidence</h2>
+<p>The evidence is the snapshot record: the project 01a1d039-0d33-7915-8833-75f4dc31cc07, the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa with its approver, closed issue #74, the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 and the published outputs of 2026-11-26 — evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, project brief 01a216d0-68e5-764d-92af-9864ddae5127, closure review 01a216d0-6635-720e-84e9-005ba604d06f and architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241. The seven A–D artefacts, the five register kinds, the delivery contract and the WBS deliverable are the records this pack authors and the factory writes; the rework receipt remains the statement of what was missing before them.</p>
+<h2>Open items</h2>
+<p>Two items remain visible. First, the record is reconstructed from the snapshot facts, the SPEC_V2 row and the existing receipt; it does not replay each PM run that preceded the rework, so it evidences the lifecycle and its gate decisions rather than every execution step. Second, the pre-rework receipt named seed_live_drift:T3 among its unresolved P0/P1 packages; the factory's live publish of this record clears it, and this review does not claim that publish has already happened. Neither item is a scope gap, and neither is waived: both are stated as limits of the retrospective record.</p>
+<h2>Decision</h2>
+<p>The retrospective decision is to close T3 on the record the rework completes, at the level compliant that the Phase-G review records against the delivery contract this pack authors, with the pre-rework red receipt and the seed-live drift named rather than hidden. The decision is dated 2026-11-26 and rests on the approved baseline, the distinct closure approver, closed issue #74 and the published outputs; it does not add scope, does not reclassify any earlier row, and does not assert a re-measurement of the PM job's original runs. The project closes with the record it now carries, and the durable correction is that a closure without a contract, a Phase-G review and its declared outputs is refused before it can read green.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

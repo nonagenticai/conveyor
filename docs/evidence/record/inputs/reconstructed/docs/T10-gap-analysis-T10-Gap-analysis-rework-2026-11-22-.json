@@ -1,0 +1,8 @@
+{
+ "title": "T10 \u2014 Gap analysis (rework, 2026-11-22)",
+ "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "category": "gap-analysis",
+ "body": "# Gap Analysis \u2014 T10 SAFe cadence and MSP tranches\n\n## Baseline\n\nThe V1 audit's measured state at the rework: eight findings open against T10, of which the\nmaterial ones are `v1-p82-5` (WSJF materialisation proved for a project backlog, not the\nprogramme-wide one), `v1-p83-1` (free-text placeholders satisfy the demo evidence check) and\n`v1-p83-4` (the baseline requirement before realisation is not gated). The tranche-4\nauthorisation was absent when T10 closed \u2014 recorded as the accepted exception `U3-EXC-T10` \u2014 and\nis now carried by the tr4 review.\n\n## Target\n\nThe five \u00a712 clauses, each an executable test: WSJF materialisation within WIP behind an\napproved plan (`programme_cadence.rs`, `cadence_jobs.rs`); typed demo evidence (`demo_gate.rs`);\na retro lesson requirement (`retro.rs`); an evidence-gated tranche review\n(`tranche_review.rs`); a baseline before realisation (`benefit_transition.rs`). Plus the\nretrospective record itself: charter, baseline, A\u2013D set, contract, Phase-G review, the published\noutputs and the closure chain.\n\n## Gaps and work packages\n\n- **Open findings:** `v1-p82-5`, `v1-p83-1`, `v1-p83-4` and the other five T10 findings are\n  carried in the conformance ledger; none is waived (decision 0012).\n- **Standard/code:** the demo gate must refuse free text; the tranche baseline must be a gate\n  condition \u2014 code packages owned by T10's finding set.\n- **Record:** the tranche-4 authorisation (now recorded by the tr4 review) and the closure\n  exception (`U3-EXC-T10`, accepted).\n",
+ "publishable": true,
+ "unit": "T10"
+}

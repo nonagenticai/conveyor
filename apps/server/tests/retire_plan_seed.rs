@@ -7,7 +7,7 @@
 mod common;
 
 use conveyor_domain::TenantId;
-use conveyor_server::admin::retire_plan_seed::run;
+use conveyor_server::admin::retire_plan_seed::{RetireError, run};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -24,6 +24,11 @@ struct Fixture {
 /// card type. The lanes are inserted directly: the board came from the template in production,
 /// and only their kind matters to `cards.archive`.
 async fn fixture(db: &common::TestDb, slug: &str) -> Fixture {
+    fixture_with_members(db, slug, true).await
+}
+
+/// As [`fixture`], optionally without the second member §5.4 needs as the distinct approver.
+async fn fixture_with_members(db: &common::TestDb, slug: &str, with_approver: bool) -> Fixture {
     let tenant: Uuid =
         sqlx::query_scalar("INSERT INTO tenant (slug, name) VALUES ($1, $1) RETURNING id")
             .bind(slug)
@@ -42,6 +47,22 @@ async fn fixture(db: &common::TestDb, slug: &str) -> Fixture {
         .execute(&db.super_pool)
         .await
         .expect("membership");
+    // §5.4: the gate's requester cannot decide it. The command needs a DISTINCT active member to
+    // act as the approver; a tenant with only the requester is refused, not self-approved.
+    if with_approver {
+        let approver: Uuid =
+            sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ($1) RETURNING id")
+                .bind(format!("approver-{slug}"))
+                .fetch_one(&db.super_pool)
+                .await
+                .expect("approver");
+        sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')")
+            .bind(tenant)
+            .bind(approver)
+            .execute(&db.super_pool)
+            .await
+            .expect("approver membership");
+    }
     let programme: Uuid =
         sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id")
             .bind(tenant)
@@ -195,7 +216,7 @@ async fn seeded_cards_are_archived_through_the_action_and_the_rest_are_left_alon
     let report = run(&db.super_pool, tenant, "conveyor")
         .await
         .expect("retire");
-    assert_eq!(report.archived, 2, "the two live seeded cards");
+    assert_eq!(report.archived, 2, "the two live seeded cards: {report:?}");
     assert_eq!(report.already_archived, 0);
     assert_eq!(report.skipped_live, 2, "the leased card and the live run");
     assert!(report.ok(), "{:?}", report.failed);
@@ -243,4 +264,33 @@ async fn seeded_cards_are_archived_through_the_action_and_the_rest_are_left_alon
     .await
     .expect("events");
     assert_eq!(events_after, 2, "a no-op run writes no event");
+}
+
+/// §5.4 (ledger v1-w4b-4): with no second member, the command refuses rather than self-approve
+/// the gates it opens, and no card moves.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_tenant_with_no_distinct_approver_is_refused() {
+    let db = common::TestDb::fresh().await;
+    let f = fixture_with_members(&db, "retire-solo", false).await;
+    let tenant = TenantId::from_uuid(f.tenant).expect("tenant id");
+    let seeded = card(
+        &db,
+        &f,
+        "Seeded solo",
+        json!({"seed_name": "Seeded solo"}),
+        None,
+    )
+    .await;
+
+    let error = run(&db.super_pool, tenant, "conveyor")
+        .await
+        .expect_err("a lone member cannot approve its own gates");
+    assert!(
+        matches!(error, RetireError::NoDistinctApprover(_)),
+        "{error}"
+    );
+
+    let (list_id, stamped) = archived(&db, seeded).await;
+    assert_eq!(list_id, Some(f.intake), "the card stays in intake");
+    assert!(!stamped, "the card is not archived");
 }

@@ -14,6 +14,12 @@
 //! 5. a deadline is the caller's: `tokio::time::timeout` wraps the whole transaction, and
 //!    an expiry rolls it back and records `outcome='timeout'` in a separate short
 //!    transaction (a rolled-back transaction cannot record itself).
+//!
+//! A `captures_usage` action adds one gate before dispatch: the run it names must have a
+//! declared spend budget and must not have exhausted it (`429 tool_budget_exceeded`, #526). It
+//! runs before the input is validated and before any handler, so a refused model call is never
+//! charged. It is the run-level twin of the broker's spend gate (SPEC_V2 §7.5, §11.3 step 2),
+//! which only covers `tools.call`.
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -25,6 +31,7 @@ use std::time::{Duration, Instant};
 
 use base64::Engine as _;
 use conveyor_auth::{Role, ScopePolicy};
+use conveyor_domain::ladder::{FailAction, FailPolicy, Outcome, Rung};
 use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
 use conveyor_store::audit::{self, AuditEntry};
@@ -175,6 +182,13 @@ pub struct InvokeRequest {
     /// Who made a model call and what it belongs to (S16). Captured only when the action
     /// declares `captures_usage`; every other action passes `None`.
     pub usage: Option<UsageContext>,
+    /// The binding's sealed credential alias, when a broker call supplied one (#526).
+    ///
+    /// The broker sets this from `tool_binding.credential_alias`; **no transport may** — an
+    /// HTTP or MCP caller cannot name a secret the tenant's grant did not bind. When present,
+    /// `invoke_external` opens THIS sealed tenant secret and sends it as the bearer instead
+    /// of the destination action's own compiled-in `auth` name.
+    pub credential_alias: Option<String>,
 }
 
 /// Who made a model call and what it belongs to (S16).
@@ -292,6 +306,8 @@ pub struct HandlerCtx {
     /// an approval target is refused by [`crate::invoke::invoke`] unless this names an approved
     /// approval for that exact target; every other action ignores it.
     pub approval_id: Option<Uuid>,
+    /// The request's model-call attribution, when the caller supplied one (§7.4).
+    pub usage: Option<UsageContext>,
 }
 
 impl HandlerCtx {
@@ -332,6 +348,38 @@ pub struct CallContext {
     pub request_id: Option<String>,
 }
 
+/// The explicit `gate_unavailable` payload an action attaches to its refusal (§7.2, finding
+/// v1-w1c-5).
+///
+/// The handler's transaction rolls back with the error, so the `unavailable` decision cannot be
+/// written there. The invocation boundary reads this payload after the rollback and records the
+/// policy's outcome in its own short transaction — see [`record_unavailable_decision`].
+#[derive(Clone, Debug)]
+pub struct GateUnavailable {
+    /// `closed | open` — the policy's fail behaviour.
+    pub fail_policy: FailPolicy,
+    /// The configured below-threshold action the outcome applied.
+    pub action: FailAction,
+    /// What the outage decided: `refused`, `escalated`, or the annotated `accepted`.
+    pub outcome: Outcome,
+    /// The note an open `annotate` policy records; `None` for every other shape.
+    pub note: Option<String>,
+    /// The policy the decision enforced.
+    pub policy_id: Uuid,
+    /// The policy version it read.
+    pub policy_version: Option<i64>,
+    /// The refinement applied, if any.
+    pub policy_refinement_id: Option<Uuid>,
+    /// The refinement version it read.
+    pub refinement_version: Option<i64>,
+    /// The laya config the policy pinned.
+    pub laya_config_id: Option<Uuid>,
+    /// The laya config version it read.
+    pub laya_config_version: Option<i64>,
+    /// The sha256 of the inputs the outage consumed.
+    pub input_hash: String,
+}
+
 /// An invocation failure, rendered as RFC 9457 by both transports.
 #[derive(Clone, Debug, thiserror::Error)]
 #[error("{code}: {detail}")]
@@ -351,6 +399,8 @@ pub struct ActionError {
     /// expiry — the caller may then defer for exactly that long instead of spending a retry
     /// against a row that cannot move yet (conveyor#900).
     pub retry_after: Option<std::time::Duration>,
+    /// The `gate_unavailable` outcome to record after the handler transaction rolls back.
+    pub gate_outage: Option<Box<GateUnavailable>>,
 }
 
 impl ActionError {
@@ -363,12 +413,19 @@ impl ActionError {
             errors: Vec::new(),
             current: None,
             retry_after: None,
+            gate_outage: None,
         }
     }
 
     /// Attach `errors[]`.
     pub fn with_errors(mut self, errors: Vec<FieldError>) -> Self {
         self.errors = errors;
+        self
+    }
+
+    /// Attach the `gate_unavailable` outcome the invocation boundary records after the rollback.
+    pub fn with_gate_outage(mut self, outage: GateUnavailable) -> Self {
+        self.gate_outage = Some(Box::new(outage));
         self
     }
 
@@ -801,11 +858,7 @@ fn bearer_from_secret(bytes: Vec<u8>) -> Option<String> {
 /// same 401/402/503 from any other service is its own credential/outage answer and keeps the
 /// generic mapping. A 503 carrying no licence marker (a host that has not loaded its model, a
 /// restart) is the host's outage, not the tenant's licence.
-fn licence_refusal_marker(
-    auth: Option<&'static str>,
-    status: u16,
-    body: &[u8],
-) -> Option<&'static str> {
+fn licence_refusal_marker(auth: Option<&str>, status: u16, body: &[u8]) -> Option<&'static str> {
     if auth != Some(crate::integrations::audio::LICENCE_TOKEN_SECRET) {
         return None;
     }
@@ -860,6 +913,23 @@ pub fn binding_ceiling(meta: &Value) -> Result<Option<Effect>, ActionError> {
     })
 }
 
+/// Resolve one action name for a tenant: the compiled registry first, then the tenant's
+/// approved imported row (S04 P1, issue #3).
+///
+/// One entry for every invocation path — the synchronous call, the async submit and the bound
+/// caller — so an imported action cannot be callable on one surface and absent on another.
+async fn resolve_action(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    name: &str,
+) -> Result<crate::resolve::ResolvedAction, ActionError> {
+    if let Some(spec) = registry.get(name) {
+        return Ok(crate::resolve::ResolvedAction::from_spec(spec));
+    }
+    crate::resolve::get(pool, tenant, name).await
+}
+
 /// Invoke through a job binding: the action's effect may not exceed what the binding allows.
 ///
 /// This is the entry a bound caller (a job, a procedure step, the broker) uses. The check runs
@@ -872,9 +942,7 @@ pub async fn invoke_bound(
     binding_meta: &Value,
     request: InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
-    let Some(spec) = registry.get(&request.action) else {
-        return Err(ActionError::not_found(&request.action));
-    };
+    let spec = resolve_action(pool, registry, tenant, &request.action).await?;
     if let Some(ceiling) = binding_ceiling(binding_meta)?
         && spec.effect.rank() > ceiling.rank()
     {
@@ -890,18 +958,6 @@ pub async fn invoke_bound(
         ));
     }
     invoke(pool, registry, tenant, request).await
-}
-
-/// Invoke one action.
-/// What [`precheck`] resolves: the spec, the input with `_version` folded out, and the
-/// precondition the call will use.
-pub struct Prechecked<'a> {
-    /// The registry entry the request names.
-    pub spec: &'a crate::spec::ActionSpec,
-    /// The input as the handler will see it.
-    pub input: Value,
-    /// The precondition from `If-Match` or `_version`, whichever named one.
-    pub precondition: Option<Precondition>,
 }
 
 /// The SPEC's typed budget refusal: nothing was dispatched, so nothing is charged.
@@ -1024,6 +1080,19 @@ pub(crate) async fn ensure_binding_budget(
     ))
 }
 
+/// Invoke one action.
+/// What [`precheck`] resolves: the spec, the input with `_version` folded out, and the
+/// precondition the call will use.
+pub struct Prechecked {
+    /// The registry entry the request names: the compiled spec, or the tenant's approved
+    /// imported one.
+    pub spec: crate::resolve::ResolvedAction,
+    /// The input as the handler will see it.
+    pub input: Value,
+    /// The precondition from `If-Match` or `_version`, whichever named one.
+    pub precondition: Option<Precondition>,
+}
+
 /// Everything an invocation must satisfy BEFORE any work starts (#579): the action exists, the
 /// caller may call it, and the input satisfies the schema.
 ///
@@ -1031,15 +1100,13 @@ pub(crate) async fn ensure_binding_budget(
 /// invalid input or a forbidden caller therefore fails the SUBMIT with the status the
 /// synchronous call would have returned — the work is never queued and the caller never has to
 /// poll to learn that its request was bad.
-pub async fn precheck<'a>(
+pub async fn precheck(
     pool: &PgPool,
-    registry: &'a Registry,
+    registry: &Registry,
     tenant: TenantId,
     request: &InvokeRequest,
-) -> Result<Prechecked<'a>, ActionError> {
-    let Some(spec) = registry.get(&request.action) else {
-        return Err(ActionError::not_found(&request.action));
-    };
+) -> Result<Prechecked, ActionError> {
+    let spec = resolve_action(pool, registry, tenant, &request.action).await?;
     if request.depth > MAX_DEPTH {
         return Err(ActionError::recursion(request.depth));
     }
@@ -1049,17 +1116,71 @@ pub async fn precheck<'a>(
     // additionally refuses any machine principal that reaches it, which is the fail-closed
     // guard for a transport that forgot to attach its channel.
     let permitted = match &request.authority {
-        Authority::Channel(authority) => spec.permits_channel(authority),
+        Authority::Channel(authority) => {
+            !spec.machine_forbidden() && crate::channel::allows(authority, &spec.name)
+        }
         Authority::Role => {
             request.actor_kind == "user" && spec.permits_with(request.role, &request.policy)
         }
         Authority::Internal => spec.permits_with(request.role, &request.policy),
     };
     if !permitted {
-        return Err(ActionError::forbidden(spec.name));
+        return Err(ActionError::forbidden(&spec.name));
     }
     if spec.kind == ActionKind::Workflow {
-        return Err(ActionError::workflow(spec.name));
+        return Err(ActionError::workflow(&spec.name));
+    }
+
+    // #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
+    // so the run it belongs to must admit it before the handler or the destination is reached.
+    // It runs before the input is parsed (the broker's order: budget, then validate) and before
+    // the broker dispatch, so neither a refused call nor a tool that would reach one is charged.
+    // `precheck` owns it because both callers — the sync invoke and the async submit — must refuse
+    // a spend before any work starts.
+    if spec.captures_usage
+        && let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id)
+    {
+        enforce_run_budget(pool, registry, tenant, run_id).await?;
+    }
+
+    // #526 (finding v1-w1b-5): the tenant's meta-role authority, resolved through the run's job
+    // binding (§6.7). This is the enforcement half of `store::job_authority::enforce_run_tx`: a
+    // binding narrows the tenant matrix and can never widen it (§4.4), so a delivery binding
+    // calling `coach.remedy` or `projects.baseline` is refused unless the tenant granted it or
+    // the binding's own `meta.authority` names the action. It runs before the input is parsed
+    // and before any handler transaction opens, so a refusal writes nothing.
+    //
+    // A `run_id` that names no row in this tenant is **not** gated: the same rule as the budget
+    // gate above — the engine's attribution may dangle, and a dangling id has no run (and so no
+    // binding meta-role) whose authority could be read.
+    if let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id) {
+        let mut tx = store::begin_scoped_read_only(pool, tenant)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, run = %run_id, "scope the run's job authority read");
+                ActionError::internal()
+            })?;
+        let authority =
+            store::job_authority::enforce_run_tx(&mut tx, tenant, run_id, &spec.name).await;
+        let _ = tx.rollback().await;
+        match authority {
+            Ok(()) | Err(store::job_authority::JobAuthorityError::RunNotFound { .. }) => {}
+            Err(store::job_authority::JobAuthorityError::Forbidden { meta_role, action }) => {
+                return Err(ActionError::new(
+                    403,
+                    "job_authority_forbidden",
+                    format!(
+                        "SPEC_V2 §6.7: the run's job binding resolves meta-role \
+                         {meta_role:?}, which the tenant has not granted {action}; the tenant \
+                         must grant it before this action may run"
+                    ),
+                ));
+            }
+            Err(store::job_authority::JobAuthorityError::Database(error)) => {
+                tracing::error!(%error, run = %run_id, "read the run's job authority");
+                return Err(ActionError::internal());
+            }
+        }
     }
 
     // #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
@@ -1095,10 +1216,26 @@ pub async fn precheck<'a>(
         precondition = precondition.or(from_body);
     }
 
-    let schema = spec.input_schema();
-    let field_errors = validate_input(&schema, &input);
+    let field_errors = validate_input(&spec.input, &input);
     if !field_errors.is_empty() {
         return Err(ActionError::invalid_input(field_errors));
+    }
+
+    // v1-p6-5: `internal_coach` is the engine's own marker — "this move is made while an
+    // interruption that already exists is being handled" — and it suppresses the §6.2 flow
+    // observation. A caller may never name it: `Authority::Internal` is constructed only by
+    // engine code (`Authority::of` yields Role/Channel for every transport), and the coach's own
+    // move calls the handler directly. The member is absent from the served schema.
+    if spec.name == "cards.move"
+        && !matches!(request.authority, Authority::Internal)
+        && input.get("internal_coach").is_some()
+    {
+        return Err(ActionError::new(
+            422,
+            "engine_only_input",
+            "internal_coach is the engine's marker for a move made while handling an existing \
+             interruption; a caller cannot name it",
+        ));
     }
     Ok(Prechecked {
         spec,
@@ -1107,11 +1244,35 @@ pub async fn precheck<'a>(
     })
 }
 
+/// `min(action, override)`: a per-request override can only LOWER an action's own budget.
+fn effective_timeout_ms(action: u32, override_ms: Option<u64>) -> u32 {
+    match override_ms {
+        Some(ms) => u32::try_from(ms).unwrap_or(action).min(action),
+        None => action,
+    }
+}
+
 pub async fn invoke(
     pool: &PgPool,
     registry: &Registry,
     tenant: TenantId,
     request: InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    invoke_with_timeout(pool, registry, tenant, request, None).await
+}
+
+/// [`invoke`] with a per-request ceiling on the action's own timeout.
+///
+/// The override is a CEILING, never an extension: the effective budget is
+/// `min(spec.timeout_ms, override)`, so a caller can be more impatient than the contract but can
+/// never make a call outlive the action's declared budget. It is how the ladder passes a tenant's
+/// `laya_inference_config.timeout_ms` to `laya.classify` (SPEC_V2 §10.2, finding v1-p102-1).
+pub async fn invoke_with_timeout(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    request: InvokeRequest,
+    timeout_ms: Option<u64>,
 ) -> Result<InvokeOutcome, ActionError> {
     // S04 P1: a name the binary does not compile resolves through the tenant's approved
     // registry rows. The compiled path is untouched, and both transports reach this function,
@@ -1124,6 +1285,9 @@ pub async fn invoke(
         input,
         precondition,
     } = precheck(pool, registry, tenant, &request).await?;
+
+    // A caller's override may only LOWER the action's declared budget.
+    let timeout_ms = effective_timeout_ms(spec.timeout_ms, timeout_ms);
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {
@@ -1144,23 +1308,31 @@ pub async fn invoke(
         request_id: request.request_id.clone(),
         version,
         if_match,
-        action: spec.name,
+        action: crate::resolve::intern_name(&spec.name),
         app_key: request.app_key.clone(),
         approval_id: request.approval_id,
+        usage: request.usage.clone(),
     };
 
     // T13 (SPEC_V2 §11.3): the tool broker is dispatched here, on the pool, because it must
     // resolve the run's binding in a read-only transaction, call the destination through the
     // declared external action, and write the `tool_call` ledger AFTER that handler transaction
     // rolls back — none of which an internal handler's `&mut tx` can do.
-    if matches!(spec.handler, HandlerRef::Broker) {
-        return crate::broker::invoke_broker(pool, spec, ctx, input, &request).await;
+    if matches!(
+        &spec.handler,
+        crate::resolve::ResolvedHandler::Compiled(HandlerRef::Broker)
+    ) {
+        let compiled = registry.get(&spec.name).ok_or_else(ActionError::internal)?;
+        return crate::broker::invoke_broker(pool, compiled, ctx, input, &request).await;
     }
 
     // T15 (SPEC_V2 §11.3 step 5): a registered tool destination is the broker's arm. The
     // broker passes `Authority::Internal`; a direct HTTP/MCP caller is refused before the
     // source row is even read, so `tools.dispatch` is never a second call surface.
-    if matches!(spec.handler, HandlerRef::ToolDestination) {
+    if matches!(
+        &spec.handler,
+        crate::resolve::ResolvedHandler::Compiled(HandlerRef::ToolDestination)
+    ) {
         if !matches!(request.authority, Authority::Internal) {
             return Err(ActionError::new(
                 403,
@@ -1171,19 +1343,28 @@ pub async fn invoke(
                 ),
             ));
         }
-        return crate::tool_authoring::invoke_destination(pool, spec, ctx, input, &request).await;
+        let compiled = registry.get(&spec.name).ok_or_else(ActionError::internal)?;
+        return crate::tool_authoring::invoke_destination(pool, compiled, ctx, input, &request)
+            .await;
     }
 
     match spec.kind {
-        ActionKind::Internal => invoke_internal(pool, spec, ctx, input, input_hash, &request).await,
+        ActionKind::Internal => {
+            let compiled = registry.get(&spec.name).ok_or_else(ActionError::internal)?;
+            invoke_internal(pool, compiled, ctx, input, input_hash, &request, timeout_ms).await
+        }
         ActionKind::External => {
-            let Some(call) = ExternalCall::from_spec(spec) else {
+            let compiled = registry.get(&spec.name).ok_or_else(ActionError::internal)?;
+            let Some(call) = ExternalCall::from_spec(compiled) else {
                 return Err(ActionError::internal());
             };
             let call_ctx = ctx.call();
-            invoke_external(pool, &call, &call_ctx, input, input_hash, &request).await
+            invoke_external(
+                pool, &call, &call_ctx, input, input_hash, &request, timeout_ms,
+            )
+            .await
         }
-        ActionKind::Workflow => Err(ActionError::workflow(spec.name)),
+        ActionKind::Workflow => Err(ActionError::workflow(&spec.name)),
     }
 }
 
@@ -1225,7 +1406,16 @@ async fn invoke_imported(
         request_id: request.request_id.clone(),
     };
     let input_hash = idempotency::request_hash(&input);
-    invoke_external(pool, &call, &ctx, input, input_hash, &request).await
+    invoke_external(
+        pool,
+        &call,
+        &ctx,
+        input,
+        input_hash,
+        &request,
+        call.timeout_ms,
+    )
+    .await
 }
 
 async fn invoke_internal(
@@ -1235,6 +1425,7 @@ async fn invoke_internal(
     input: Value,
     input_hash: String,
     request: &InvokeRequest,
+    timeout_ms: u32,
 ) -> Result<InvokeOutcome, ActionError> {
     let HandlerRef::Internal(handler) = spec.handler else {
         return Err(ActionError::internal());
@@ -1243,13 +1434,13 @@ async fn invoke_internal(
     let mut tx = store::begin_scoped(pool, ctx.tenant)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "begin invocation transaction");
+            tracing::error!(%error, action = %spec.name, "begin invocation transaction");
             ActionError::internal()
         })?;
-    store::actions::set_statement_timeout(&mut tx, spec.timeout_ms)
+    store::actions::set_statement_timeout(&mut tx, timeout_ms)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "set statement_timeout");
+            tracing::error!(%error, action = %spec.name, "set statement_timeout");
             ActionError::internal()
         })?;
 
@@ -1264,18 +1455,18 @@ async fn invoke_internal(
         let claimed = idempotency::begin(
             &mut tx,
             ctx.tenant,
-            spec.name,
+            &spec.name,
             key,
             &input_hash,
             chrono::Duration::hours(idempotency::TTL_HOURS),
         )
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "claim idempotency key");
+            tracing::error!(%error, action = %spec.name, "claim idempotency key");
             ActionError::internal()
         })?;
         if !claimed {
-            let found = idempotency::lookup(&mut tx, ctx.tenant, spec.name, key, &input_hash)
+            let found = idempotency::lookup(&mut tx, ctx.tenant, &spec.name, key, &input_hash)
                 .await
                 .map_err(|_| ActionError::internal())?;
             let _ = tx.rollback().await;
@@ -1326,7 +1517,7 @@ async fn invoke_internal(
         let invocation_id = record_bookkeeping(
             &mut tx,
             ctx.tenant,
-            spec.name,
+            spec.name.as_ref(),
             spec.version,
             &spec.spec_hash(),
             &ctx.call(),
@@ -1343,10 +1534,10 @@ async fn invoke_internal(
         Ok::<_, ActionError>((output, body, invocation_id))
     };
 
-    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {
+    match tokio::time::timeout(Duration::from_millis(u64::from(timeout_ms)), work).await {
         Ok(Ok((output, body, invocation_id))) => {
             tx.commit().await.map_err(|error| {
-                tracing::error!(%error, action = spec.name, "commit invocation");
+                tracing::error!(%error, action = %spec.name, "commit invocation");
                 ActionError::internal()
             })?;
             Ok(InvokeOutcome {
@@ -1360,9 +1551,64 @@ async fn invoke_internal(
         Ok(Err(error)) => {
             let _ = tx.rollback().await;
             let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
+            // §7.2 (v1-w1c-5): the gate outage is an outcome, not merely a failure. The
+            // handler's `decision` row rolled back with its transaction, so it is recorded
+            // here, in its own transaction, before the invocation failure is ledgered.
+            if let Some(outage) = error.gate_outage.as_deref() {
+                let kind = input
+                    .get("kind")
+                    .and_then(Value::as_str)
+                    .map(str::trim)
+                    .filter(|kind| !kind.is_empty())
+                    .unwrap_or(&spec.name);
+                let question = input
+                    .get("question")
+                    .and_then(Value::as_str)
+                    .unwrap_or(kind);
+                let uuid = |field: &str| {
+                    input
+                        .get(field)
+                        .and_then(Value::as_str)
+                        .and_then(|raw| Uuid::parse_str(raw).ok())
+                };
+                let mut meta = match input.get("meta").cloned() {
+                    Some(Value::Object(meta)) => Value::Object(meta),
+                    // Preserve a non-object caller meta rather than dropping it; the payload
+                    // keys need an object to carry them.
+                    Some(other) => serde_json::json!({ "caller_meta": other }),
+                    None => serde_json::json!({}),
+                };
+                if let Value::Object(meta) = &mut meta {
+                    meta.insert("decision".to_owned(), serde_json::json!("unavailable"));
+                    meta.insert(
+                        "fail_policy".to_owned(),
+                        serde_json::json!(outage.fail_policy.as_str()),
+                    );
+                    meta.insert(
+                        "action".to_owned(),
+                        serde_json::json!(outage.action.as_str()),
+                    );
+                    if let Some(note) = outage.note.as_ref() {
+                        meta.insert("note".to_owned(), serde_json::json!(note));
+                    }
+                }
+                record_unavailable_decision(
+                    pool,
+                    ctx.tenant,
+                    outage,
+                    kind,
+                    question,
+                    uuid("project_id"),
+                    uuid("card_id"),
+                    meta,
+                    &ctx.actor_kind,
+                    Some(ctx.actor_id),
+                )
+                .await;
+            }
             record_failure(
                 pool,
-                spec.name,
+                spec.name.as_ref(),
                 spec.version,
                 &ctx.call(),
                 &input_hash,
@@ -1380,7 +1626,7 @@ async fn invoke_internal(
             let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
             record_failure(
                 pool,
-                spec.name,
+                spec.name.as_ref(),
                 spec.version,
                 &ctx.call(),
                 &input_hash,
@@ -1390,7 +1636,7 @@ async fn invoke_internal(
                 elapsed,
             )
             .await;
-            Err(ActionError::timeout(spec.name, spec.timeout_ms))
+            Err(ActionError::timeout(&spec.name, timeout_ms))
         }
     }
 }
@@ -1523,20 +1769,20 @@ impl<'a> ExternalCall<'a> {
             auth,
             auth_optional,
             upload,
-        } = spec.handler
+        } = &spec.handler
         else {
             return None;
         };
         Some(Self {
-            name: spec.name,
+            name: spec.name.as_ref(),
             version: spec.version,
             spec_hash: spec.spec_hash(),
-            service,
-            method,
-            path,
-            auth,
-            auth_optional,
-            upload,
+            service: service.as_ref(),
+            method: method.as_ref(),
+            path: path.as_ref(),
+            auth: auth.as_deref(),
+            auth_optional: *auth_optional,
+            upload: *upload,
             timeout_ms: spec.timeout_ms,
             tenancy: spec.tenancy,
             captures_usage: spec.captures_usage,
@@ -1624,6 +1870,7 @@ async fn invoke_external(
     input: Value,
     input_hash: String,
     request: &InvokeRequest,
+    timeout_ms: u32,
 ) -> Result<InvokeOutcome, ActionError> {
     let service = call.service;
     let method = call.method;
@@ -1743,9 +1990,13 @@ async fn invoke_external(
     let url = external_url(&base, call, &input)?;
 
     // A per-tenant credential is opened under the caller's tenant, never compiled in and never
-    // read from the environment. A missing secret is a typed 503 (the caller treats an
-    // unreachable/unconfigured judge as an outage, never as a decision).
-    let bearer: Option<String> = match auth {
+    // read from the environment. The broker's binding alias wins over the action's own
+    // configured name: the alias is the credential the grant resolved, so the destination sees
+    // the binding's credential, not the tool's tenant-wide default. Without an alias, the
+    // spec's `auth` name is read exactly as before. A missing secret is a typed 503 (the caller
+    // treats an unreachable/unconfigured judge as an outage, never as a decision).
+    let secret_name = request.credential_alias.as_deref().or(auth);
+    let bearer: Option<String> = match secret_name {
         None => None,
         Some(name) => {
             let mut tx = store::begin_scoped(pool, ctx.tenant)
@@ -1890,6 +2141,12 @@ async fn invoke_external(
             );
         }
     }
+    // The caller's Idempotency-Key is the mutation's dedupe contract (CONTRACT §5). A declared
+    // destination that implements the same contract (the coding service) refuses a call without
+    // the header, so the engine forwards the key it already claimed.
+    if let Some(key) = request.idempotency_key.as_deref() {
+        builder = builder.header("Idempotency-Key", key);
+    }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
     }
@@ -1906,7 +2163,7 @@ async fn invoke_external(
     // bill. Measured 2026-11-19 on tenant `nonagentic-conveyor`: two cancelled `inference.chat`
     // calls left ~62k vLLM prompt tokens with no billing row and put
     // `LocalLlmMeteringCoverageLow` at 0.75. Unmetered actions keep the old behaviour.
-    let timeout = Duration::from_millis(u64::from(call.timeout_ms));
+    let timeout = Duration::from_millis(u64::from(timeout_ms));
     let result = if call.captures_usage {
         send_metered(builder, timeout).await
     } else {
@@ -1948,7 +2205,7 @@ async fn invoke_external(
     };
 
     let (status, body) = match result {
-        Err(_) => return failure(ActionError::timeout(call.name, call.timeout_ms), false).await,
+        Err(_) => return failure(ActionError::timeout(call.name, timeout_ms), false).await,
         Ok(Err(error)) => {
             tracing::warn!(%error, action = call.name, "external call failed");
             // Distinct from `upstream_failed`: the service never ANSWERED, so a caller cannot
@@ -2389,6 +2646,92 @@ async fn release_claim(
     Ok(())
 }
 
+/// Record a `gate_unavailable` outcome as its own `decision` row (§7.2, finding v1-w1c-5).
+///
+/// The handler's transaction rolls back with the refusal, so the outage decision is written
+/// afterwards in a fresh short scoped transaction — the same shape as [`record_failure`], and
+/// best effort for the same reason: the caller already holds the typed `503`, and a store fault
+/// must never rewrite the policy's answer into a different one.
+///
+/// An outage has no verified laya answer, so it cannot name a `laya_invocation_id`, which the
+/// `decision_laya_provenance_complete` CHECK requires of the laya rung. The row is therefore the
+/// rule rung: the fail policy is the rule that decided, and the row still pins the policy,
+/// refinement and laya-config versions it read.
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn record_unavailable_decision(
+    pool: &PgPool,
+    tenant: TenantId,
+    outage: &GateUnavailable,
+    kind: &str,
+    question: &str,
+    project_id: Option<Uuid>,
+    card_id: Option<Uuid>,
+    meta: Value,
+    actor_kind: &str,
+    actor_id: Option<Uuid>,
+) {
+    let decision = store::ladder::NewDecision {
+        kind: kind.to_owned(),
+        rung: Rung::Rule,
+        project_id,
+        card_id,
+        question: question.to_owned(),
+        answer: "unavailable".to_owned(),
+        option_set_id: None,
+        option_set_version: None,
+        option_set_hash: None,
+        option_refinement_hashes: Vec::new(),
+        probabilities: serde_json::json!({}),
+        confidence: None,
+        input_hash: Some(outage.input_hash.clone()),
+        policy_id: Some(outage.policy_id),
+        policy_version: outage.policy_version,
+        policy_refinement_id: outage.policy_refinement_id,
+        refinement_version: outage.refinement_version,
+        laya_config_id: outage.laya_config_id,
+        laya_config_version: outage.laya_config_version,
+        laya_invocation_id: None,
+        laya_request_hash: None,
+        laya_response_hash: None,
+        actor_kind: sanitize_actor_kind(actor_kind).to_owned(),
+        actor_id,
+        approval_id: None,
+        latency_ms: None,
+        outcome: outage.outcome,
+        decided_at: if matches!(outage.outcome, Outcome::Escalated) {
+            None
+        } else {
+            Some(chrono::Utc::now())
+        },
+        meta,
+        options: Vec::new(),
+    };
+    let short = async {
+        let mut tx = store::begin_scoped(pool, tenant).await?;
+        store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS).await?;
+        store::ladder::record_decision_tx(&mut tx, tenant, &decision)
+            .await
+            .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        tx.commit().await?;
+        Ok::<_, sqlx::Error>(())
+    };
+    match tokio::time::timeout(
+        Duration::from_millis(u64::from(BOOKKEEPING_TIMEOUT_MS)),
+        short,
+    )
+    .await
+    {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            tracing::error!(%error, action = kind, "record the unavailable decision")
+        }
+        Err(_) => tracing::error!(
+            action = kind,
+            "recording the unavailable decision timed out"
+        ),
+    }
+}
+
 /// Record a refused/error/timeout invocation in its own short transaction.
 #[allow(clippy::too_many_arguments)]
 async fn record_failure(
@@ -2425,6 +2768,22 @@ async fn record_failure(
         audit::record(&mut tx, tenant, &entry)
             .await
             .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        // v1-w4b-5: a refusal is the gate saying no, and the handler's own transaction rolled
+        // back, so the durable record belongs here with the invocation and the audit event.
+        // The gate is the input's `gate` when it names one; otherwise the action itself is the
+        // gate a destructive call was refused by.
+        if outcome == "refused" {
+            let gate = request
+                .input
+                .get("gate")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|gate| !gate.is_empty())
+                .unwrap_or(action);
+            store::metrics::record_gate_refusal_tx(&mut tx, tenant, gate, action, audit_status)
+                .await
+                .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        }
         // A failure produced no response: release the in-flight claim so the caller can
         // retry (internal claims already rolled back; this is the external path).
         if let Some(key) = request.idempotency_key.as_deref() {

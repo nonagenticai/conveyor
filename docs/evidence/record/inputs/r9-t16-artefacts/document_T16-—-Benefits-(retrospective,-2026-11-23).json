@@ -1,0 +1,8 @@
+{
+ "body": "# T16 \u2014 Benefits (retrospective, 2026-11-23)\n\n## Goals and outcomes\n\n- G1 \u2014 Procedure knowledge is ingested as typed drafts, not free text.\n- G2 \u2014 Nothing publishes without a human decision.\n- G3 \u2014 One model: knowledge packs are referenced by `knowledge_pack_ref`.\n\n## Measures\n\n- **B7 \u2014 tokens per demo-credited deliverable:** baseline 630,565 \u2192 target 504,452 (20% reduction).\n  T16 contributes six demo-credited deliverables to the denominator.\n- **Publication assurance:** zero unreviewed sources bound; proved by\n  `an_unreviewed_source_cannot_bind`.\n- **Acceptance:** 25/25 tests at the lane head, with the clause-to-test map in the acceptance\n  evidence document.\n\n## Benefits and sub-benefits\n\n- **Efficiency (B7)** \u2190 six accepted deliverables, each demo-credited.\n- **Assurance** \u2190 the human publication gate; the drafting job cannot publish its own procedure.\n- **Reuse (B5)** \u2190 the OWL knowledge pack is bound by reference, so one model serves many procedures.\n- **Operability** \u2190 a bound job runs the PDDL steps of a reviewed procedure.\n",
+ "category": "benefits-diagram",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "publishable": true,
+ "title": "T16 \u2014 Benefits (retrospective, 2026-11-23)",
+ "unit": "T16"
+}

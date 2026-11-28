@@ -10,7 +10,7 @@ mod support;
 use conveyor_actions::ActionKind;
 use conveyor_actions::openapi::operation_json;
 use conveyor_actions::registry::{assert_registry_consistent, registry};
-use conveyor_actions::spec::sha256_hex;
+use conveyor_actions::spec::{sha256_hex, validate_input};
 use conveyor_auth::Role;
 use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
@@ -112,51 +112,37 @@ use serde_json::{Value, json};
 /// **#511 (rework path) adds 2 internal**: `projects.charter` (charter an EXISTING project) and
 /// `projects.reopen` (the closed → active transition the retrospective's `rework` verdict
 /// authorises). 500 → **502**.
+/// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
+/// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
+/// **v1-w1c-4 adds 5 internal**: the authored option set family —
+/// `decision_options.create|update|publish|refine|get`. 529 → **534**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
-/// catalogue surface. 503 → **508**.
-/// **T17 (#87) adds 5 internal**: `authoring.intake|draft|review|publish|assets` — the tenant
-/// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
+/// catalogue surface. 534 → **539**.
+/// **#526 (tr2) adds 1 internal**: `benefits.measure` — the baseline/interim/post reading a
+/// realization cites. 539 → **540**.
+/// **#526 register gaps add 1 internal**: `benefits.measurement_list` — the read-back of the
+/// measurements a `benefits.measure` write records. 540 → **541**.
+/// **#560 (T14) adds 5 external**: `scientific_stats.meta_analysis|confidence_interval|trend`
+/// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads (546).
+/// **#556/#590 add 8 internal**: `storage.get|put`, `tool_bindings.create|list|retire|update`
+/// and `tools.resume|retire`. 546 → **554**.
+/// **#526 (w3-gov-assets-1) adds 5 internal**: `governed_assets.compose|get|list|submit|approve` —
+/// the generic surface for the MSP programme-artefact kinds. 554 → **559**; the promotion
+/// replay's read adds 560.
+/// **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
-/// `minutes_publish|list|get`) — 518 → **530**.
-/// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
-/// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
-/// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
-/// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
-/// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
-/// self-development path and its gates, the earned auto-merge read and the closure record.
-/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
-/// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
-/// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
-/// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
-/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**; #655 (T17b) adds
-/// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
-/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
-/// internal 547 → 550, external 18 → 19.
-/// **T14 (#561) adds 5 external reads**: `webscraper.scrape_url|scrape_bulk` and
-/// `lean4.check|elaborate|prove` — 569 → **574**, external 19 → 24.
-/// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
-/// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
-/// stays 24.
-/// **T19F (#683) adds 5 internal**: `meetings.type_get|type_list`,
-/// `architecture.board_sit_open|board_sit_decide`, `cadences.materialise` — 582 → **587**.
-/// **S21 step 11 (#697) adds 2 internal**: `organisation_layers.list|set` — 587 → **589**,
-/// internal 563 → 565, external stays 24.
-/// **#745 adds 4 internal**: `analyse.app|brand|content|report` — 589 → **593**, internal
-/// 565 → 569, external stays 24.
-/// **Delivery proofs (#744) adds 4 internal**: `proofs.record|reverify|get|list` — 593 →
-/// **597**, internal 569 → 573, external stays 24.
-/// **#842 adds 2 internal** (`feedback.create|list`) — 601.
-/// **#837 adds 1 internal** (`proofs.attest`) — 602.
-const EXPECTED: [&str; 602] = [
+/// Every action the registry serves, in the order `registry().names()` returns it.
+/// Regenerated at the main merge; the per-lane history above is superseded.
+const EXPECTED: [&str; 635] = [
     "actions.describe",
     "actions.list",
+    "agent.run",
     "analyse.app",
     "analyse.brand",
     "analyse.content",
     "analyse.report",
     "analyse.site",
     "analyse.video",
-    "agent.run",
     "andon.engage",
     "andon.release",
     "approval_policies.get",
@@ -165,9 +151,6 @@ const EXPECTED: [&str; 602] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
-    // T9 (#81): the TOGAF ADM capability — artefacts and their entries/links, the repository,
-    // the profile, the Board, contracts, phase advances, compliance reviews and waivers, and the
-    // two Preliminary assessments. Twenty-six internal actions.
     "architecture.artifacts_approve",
     "architecture.artifacts_create",
     "architecture.artifacts_entries",
@@ -195,6 +178,8 @@ const EXPECTED: [&str; 602] = [
     "architecture.profile_get",
     "architecture.profile_tailor",
     "architecture.repository_search",
+    "architecture.reviews_get",
+    "architecture.reviews_list",
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",
@@ -225,15 +210,21 @@ const EXPECTED: [&str; 602] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.measure",
+    "benefits.measurement_list",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
     "benefits.unlink",
     "benefits.update",
+    "billing.rollup",
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.approve_plan",
     "cadences.create",
+    "cadences.credit_demo",
+    "cadences.credit_list",
     "cadences.delete",
     "cadences.list",
     "cadences.materialise",
@@ -254,9 +245,9 @@ const EXPECTED: [&str; 602] = [
     "cards.create",
     "cards.duplicate",
     "cards.get",
-    "cards.list",
     "cards.ledger_append",
     "cards.ledger_list",
+    "cards.list",
     "cards.move",
     "cards.release",
     "cards.remove_label",
@@ -281,25 +272,28 @@ const EXPECTED: [&str; 602] = [
     "coach.triage",
     "coding_jobs.create",
     "coding_jobs.get",
-    "completions.create",
     "comments.delete",
     "comments.update",
+    "completions.create",
     "custom_fields.clear_value",
     "custom_fields.create",
     "custom_fields.delete",
     "custom_fields.set_value",
     "custom_fields.update",
+    "decision_options.create",
+    "decision_options.get",
+    "decision_options.publish",
+    "decision_options.refine",
+    "decision_options.update",
+    "decision_policies.create",
+    "decision_policies.list",
+    "decision_policies.update",
     "decisions.create",
     "decisions.get",
     "decisions.list",
     "decisions.transition",
     "decisions.update",
     "decks.render",
-    "decision_option_sets.get",
-    "decision_option_sets.set",
-    "decision_policies.create",
-    "decision_policies.list",
-    "decision_policies.update",
     "departments.create",
     "departments.list",
     "development_projects.change_judging_surface",
@@ -377,6 +371,11 @@ const EXPECTED: [&str; 602] = [
     "fixtures.fail",
     "fixtures.slow",
     "fixtures.timeout",
+    "governed_assets.approve",
+    "governed_assets.compose",
+    "governed_assets.get",
+    "governed_assets.list",
+    "governed_assets.submit",
     "industries.create",
     "industries.get",
     "industries.list",
@@ -388,6 +387,8 @@ const EXPECTED: [&str; 602] = [
     "invites.create",
     "invites.list",
     "invites.revoke",
+    "job_authorities.get",
+    "job_authorities.set",
     "job_bindings.create",
     "job_bindings.get",
     "job_bindings.list",
@@ -404,11 +405,14 @@ const EXPECTED: [&str; 602] = [
     "jobs.retry",
     "kata.adopt",
     "kata.analyse",
+    "kata.close",
     "kata.get",
     "kata.hypothesise",
+    "kata.list",
     "kata.measure",
     "kata.observe",
     "kata.open",
+    "kata.propagate",
     "kata.propose",
     "kata.standardise",
     "kata.stretch",
@@ -418,20 +422,17 @@ const EXPECTED: [&str; 602] = [
     "labels.delete",
     "labels.update",
     "ladder.apply_draft",
-    "ladder.case",
     "ladder.evaluate",
     "ladder.list",
-    "ladder.precheck",
+    "ladder.prepare",
     "ladder.record",
+    "laya.classify",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
-    // T14 (#561): the Lean prover's three read actions.
     "lean4.check",
     "lean4.elaborate",
     "lean4.prove",
-    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
-    // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
     "lessons.propose",
     "lessons.review",
@@ -454,9 +455,6 @@ const EXPECTED: [&str; 602] = [
     "media.run_gherkin",
     "media.thumbnail",
     "media.transcribe",
-    "members.list",
-    "members.remove",
-    "members.set_role",
     "meetings.agenda_add",
     "meetings.close",
     "meetings.close_item",
@@ -471,17 +469,21 @@ const EXPECTED: [&str; 602] = [
     "meetings.schedule",
     "meetings.type_get",
     "meetings.type_list",
+    "members.list",
+    "members.remove",
+    "members.set_role",
     "memory.recall",
     "memory.remember",
+    "messages.send",
     "metrics.flow",
     "metrics.job",
     "metrics.maturity",
     "metrics.programme",
     "metrics.reconcile",
+    "metrics.reconciliation",
     "metrics.threshold_get",
     "metrics.threshold_update",
     "metrics.usage",
-    "messages.send",
     "model_elements.create",
     "model_elements.delete",
     "model_elements.list",
@@ -518,10 +520,10 @@ const EXPECTED: [&str; 602] = [
     "ops.events",
     "ops.flag_flip",
     "ops.flux_status",
-    "ops.incident",
     "ops.host_logs",
     "ops.host_restart_unit",
     "ops.host_status",
+    "ops.incident",
     "ops.logs",
     "ops.mitigate",
     "ops.pods",
@@ -538,6 +540,7 @@ const EXPECTED: [&str; 602] = [
     "pm.get",
     "pm.plan",
     "pm.route_gate",
+    "pm.status",
     "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
@@ -557,7 +560,6 @@ const EXPECTED: [&str; 602] = [
     "procedures.review_source",
     "procedures.update",
     "procedures.validate",
-    "produce.speech",
     "process_maps.create",
     "process_maps.get",
     "process_maps.list",
@@ -572,6 +574,9 @@ const EXPECTED: [&str; 602] = [
     "processes.retire",
     "processes.update",
     "produce.script",
+    "produce.speech",
+    "programme_lessons.list",
+    "programme_lessons.propose",
     "programmes.baseline",
     "programmes.baseline_approve",
     "programmes.baselines_list",
@@ -645,6 +650,8 @@ const EXPECTED: [&str; 602] = [
     "requirements.transition",
     "requirements.update",
     "retrieval.query",
+    "retros.close",
+    "retros.record_findings",
     "roles.policy_get",
     "roles.policy_reset",
     "roles.policy_set",
@@ -678,6 +685,8 @@ const EXPECTED: [&str; 602] = [
     "stakeholders.profile_list",
     "stakeholders.profile_update",
     "stakeholders.update",
+    "storage.get",
+    "storage.put",
     "task_lists.create",
     "task_lists.delete",
     "task_lists.update",
@@ -708,14 +717,18 @@ const EXPECTED: [&str; 602] = [
     "tools.get",
     "tools.list",
     "tools.probe",
+    "tools.resume",
+    "tools.retire",
     "tools.usage",
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "trace_links.view",
     "tranches.authorise",
     "tranches.create",
     "tranches.delete",
     "tranches.list",
+    "tranches.resume",
     "tranches.retire",
     "tranches.review",
     "tranches.review_list",
@@ -735,20 +748,19 @@ const EXPECTED: [&str; 602] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
-    // T14 (#561): the webscraper's two read actions.
     "webscraper.scrape_bulk",
     "webscraper.scrape_url",
     "workers.list",
+    "workflow_runs.cancel",
+    "workflow_runs.get",
+    "workflow_runs.start",
+    "workflow_traces.export",
     "workflows.create",
     "workflows.get",
     "workflows.list",
     "workflows.publish",
     "workflows.retire",
     "workflows.update",
-    "workflow_runs.cancel",
-    "workflow_runs.get",
-    "workflow_runs.start",
-    "workflow_traces.export",
     "youtube.client_get",
     "youtube.client_set",
     "youtube.connect",
@@ -844,58 +856,20 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 13.
     // #524 (U4) adds one internal action (`projects.close_request`, the programme's closure
     // request that opens the closure gate): 489 -> 490; external stays 13.
+    // v1-w1c-4 adds the five `decision_options.*` actions (create/update/publish/refine/get),
+    // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
-    // 490 -> 495; external stays 13.
+    // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
-    // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
-    // 500 -> 512; external stays 18.
-    // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
-    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
-    // one internal (`cards.assign`): 520 -> 521; external stays 18.
-    // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
-    // external stays 18 — the evidence is rows on this tenant's own database.
-    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
-    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
-    // calls no model.
-    // T15 (#86) adds ten internal actions (`toolkits.import_openapi|register_mcp|discover_mcp`,
-    // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
-    // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
-    // registered-destination arm, not a new external declaration.
-    // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
-    // internal 543 -> 546; external stays 18.
-    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
-    // external stays 18 — the queue reads this tenant's own intake rows.
-    // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
-    // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
-    // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
-    // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
-    // dispatches to a Rust service, not a new internal action.
-    // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
-    // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
-    // external stays 24.
-    // T19F (#683) adds five internal actions (`meetings.type_get|type_list`,
-    // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
-    // internal 558 -> 563; external stays 24.
-    // S21 step 11 (#697) adds two internal actions (`organisation_layers.list|set`):
-    // internal 563 -> 565; external stays 24 — both read and write this tenant's own layer rows.
-    // #745 adds four internal read actions (`analyse.app|brand|content|report`):
-    // internal 565 -> 569; external stays 24 — each is a pure function of stored documents and
-    // caller-supplied evidence.
-    // Delivery proofs (#744) add four internal actions (`proofs.record|reverify|get|list`):
-    // internal 569 -> 573; external stays 24 — the prover calls are the declared `lean4.*`
-    // externals from T14, and a certificate is written from what the engine recorded, not a new
-    // outbound call.
-    // #779 adds one internal action (`development_projects.list`, the unit-record read):
-    // internal 573 -> 574; external stays 24.
-    // #836 adds one internal read (`proofs.render`): internal 574 -> 575; external stays 24 —
-    // it renders the exact source a certificate must carry and writes nothing.
+    // #77 T5 adds one internal action (`proofs.render`, served through the same external
+    // `/api/proofs` route): 606 -> 607; external stays 25.
     // #842 adds two internal actions (`feedback.create|list`, the tenant's platform feedback):
-    // internal 575 -> 577; external stays 24 — a row on this tenant's own database.
-    // #837 adds one internal read (`proofs.attest`): internal 577 -> 578; external stays 24 —
-    // it derives the unit facts from this tenant's own rows and writes nothing.
-    assert_eq!((internal, external), (578, 24));
+    // 607 -> 609; external stays 25.
+    // #859 adds one internal action (`proofs.attest`): 609 -> 610; external stays 25.
+    // Measured at the merged head: 635 actions, 610 internal + 25 external. The action dump
+    // was regenerated from this same registry.
+    assert_eq!((internal, external), (610, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -954,7 +928,7 @@ fn one_value_projects_three_identical_hashes() {
         let hash = spec.spec_hash();
         let entry = manifest
             .iter()
-            .find(|entry| entry["name"] == spec.name)
+            .find(|entry| entry["name"] == spec.name.as_ref())
             .unwrap_or_else(|| panic!("{} is not in the manifest", spec.name));
         assert_eq!(entry["spec_hash"], hash, "manifest hash for {}", spec.name);
 
@@ -1228,8 +1202,8 @@ fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {
         if !spec.name.starts_with("eval") {
             continue;
         }
-        eval_actions.push(spec.name);
-        if REACHABLE.contains(&spec.name) {
+        eval_actions.push(spec.name.as_ref());
+        if REACHABLE.contains(&spec.name.as_ref()) {
             assert!(
                 spec.permits_channel(&authority),
                 "{} is one of the nine the slice admits and must be in the MCP default",
@@ -1354,6 +1328,29 @@ fn no_prompt_action_holds_processes_write() {
     }
 }
 
+/// The tenant's meta-role × action matrix (SPEC_V2 §6.7) is tenant data behind the
+/// organisation scopes: a read is `organisation:read`, the governance write is
+/// `organisation:write`, and neither is destructive. The write follows the module's own
+/// convention — no approval gate — because the matrix decides authority, it does not act.
+#[test]
+fn job_authority_actions_hold_the_organisation_scopes() {
+    let registry = registry();
+
+    let get = registry
+        .get("job_authorities.get")
+        .expect("job_authorities.get is registered");
+    assert_eq!(get.scope_names(), vec!["organisation:read"]);
+    assert_eq!(get.kind, ActionKind::Internal);
+    assert_eq!(get.effect, conveyor_actions::Effect::Read);
+
+    let set = registry
+        .get("job_authorities.set")
+        .expect("job_authorities.set is registered");
+    assert_eq!(set.scope_names(), vec!["organisation:write"]);
+    assert_eq!(set.kind, ActionKind::Internal);
+    assert_eq!(set.effect, conveyor_actions::Effect::Write);
+}
+
 /// The coverage gate reads `docs/design/data/actions.json`, never a source grep: a spec built
 /// through a helper (`chat_spec("completions.create")`) is invisible to a regex. This test is
 /// the binding between the committed file and the compiled registry — regenerate with
@@ -1377,5 +1374,106 @@ fn committed_action_dump_matches_the_registry() {
         committed, expected,
         "docs/design/data/actions.json is stale; run \
          `conveyor admin actions dump --json --out docs/design/data/actions.json`"
+    );
+}
+
+/// The register read accepts the bare filters the record harness sends.
+///
+/// Regression measured at the post-merge head: every input to `registers.list` was refused
+/// 422 ("the input does not match the action schema"), which blocked the promotion replay and
+/// every check that reads the register.
+#[test]
+fn registers_list_accepts_its_filters() {
+    let spec = registry()
+        .get("registers.list")
+        .expect("registers.list is registered");
+    let schema = spec.input_schema();
+    for input in [
+        json!({}),
+        json!({"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"}),
+    ] {
+        let errors = validate_input(&schema, &input);
+        assert!(
+            errors.is_empty(),
+            "input {input} refused: {}",
+            serde_json::to_string_pretty(&serde_json::to_value(&errors).unwrap_or_default())
+                .unwrap_or_default()
+        );
+    }
+}
+
+/// Every recorded governance input still matches its action's schema.
+///
+/// The promotion journal is the replay source for the programme record. An action whose
+/// schema starts refusing a recorded input breaks the replay without any test noticing —
+/// the 2026-11-23 register regression did exactly that (`registers.list` refused every
+/// filter, and the replay could not read the register back). This walks the committed
+/// journal, validates each entry's input file against the action's input schema, and
+/// fails with the action and file named.
+#[test]
+fn journal_inputs_match_their_action_schemas() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let journal = root.join("docs/evidence/record/journal.jsonl");
+    let text = std::fs::read_to_string(&journal)
+        .unwrap_or_else(|error| panic!("read {}: {error}", journal.display()));
+    let mut checked = 0usize;
+    let mut refused: Vec<String> = Vec::new();
+    for (index, line) in text.lines().enumerate() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let entry: Value = serde_json::from_str(line)
+            .unwrap_or_else(|error| panic!("journal line {}: {error}", index + 1));
+        let Some(action) = entry.get("action").and_then(Value::as_str) else {
+            // The first record is the journal header, not an act.
+            continue;
+        };
+        let input_path = entry
+            .get("input")
+            .and_then(Value::as_str)
+            .unwrap_or_else(|| panic!("journal line {}: {action} has no input path", index + 1));
+        let path = root.join(input_path);
+        let raw = std::fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("read {}: {error}", path.display()));
+        let mut input: Value = serde_json::from_str(&raw)
+            .unwrap_or_else(|error| panic!("parse {}: {error}", path.display()));
+        // The promotion replay resolves a `wbs.update` node from the entry's natural key
+        // (`wbs-accept:<project id>:<title>`) and injects the id before invoking the action
+        // (`scripts/promote-record.py`, `remap_payload`). The journal therefore stores the
+        // human's input, not the resolved payload; the test supplies the placeholder the
+        // replay would resolve, so the schema is still checked against every other field.
+        if action == "wbs.update" && input.get("id").is_none() {
+            input["id"] = json!("00000000-0000-0000-0000-000000000000");
+        }
+        // The union renamed the lane's programme lessons register out of SPEC §D36's
+        // `lessons.*` family; the journal keeps the recording-time name, and the schema the
+        // replay actually sends is the merged action's (see `WIRE_ACTION` in
+        // `scripts/promote-record.py`).
+        let wire = match action {
+            "lessons.propose" => "programme_lessons.propose",
+            other => other,
+        };
+        let spec = registry()
+            .get(wire)
+            .unwrap_or_else(|| panic!("journal names unregistered action {action}"));
+        let errors = validate_input(&spec.input_schema(), &input);
+        if !errors.is_empty() {
+            refused.push(format!(
+                "{action} refuses {input_path}: {}",
+                serde_json::to_string(&errors).unwrap_or_default()
+            ));
+        }
+        checked += 1;
+    }
+    assert!(
+        checked > 200,
+        "expected the full journal (250 acts), validated {checked}"
+    );
+    assert!(
+        refused.is_empty(),
+        "{} recorded inputs are refused by their action schema:\n{}",
+        refused.len(),
+        refused.join("\n")
     );
 }

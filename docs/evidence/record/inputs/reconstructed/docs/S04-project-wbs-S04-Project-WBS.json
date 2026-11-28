@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Project WBS",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "project-wbs",
+ "body": "# S04 \u2014 Project WBS\n\n## Work packages\n\n| Node | Work package | BV | TC | RR | JS |\n|---|---|---|---|---|---|\n| 1 | ActionSpec derive crate | 9 | 7 | 6 | 3 |\n| 2 | Registry and spec vocabularies | 9 | 6 | 6 | 3 |\n| 3-11 | The nine decomposition rows | \u2014 | \u2014 | \u2014 | \u2014 |\n\n## Acceptance\n\nBoth deliverables accepted with typed evidence under the approved change; the baseline\n`01a20256-44d0-731d-b345-fffc5f3ac9e8` freezes the set.\n\n## Status\n\nTwo accepted deliverables, two demo credits; the decomposition rows are planning, not scope.\n",
+ "publishable": true,
+ "unit": "S04"
+}

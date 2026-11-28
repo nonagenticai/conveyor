@@ -1,0 +1,20 @@
+{
+ "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "gate": "projects.close",
+ "kind": "action",
+ "action": "projects.close",
+ "input": {
+  "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9"
+ },
+ "proposed_input": {
+  "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+  "reason": "the retrospective rework of T10"
+ },
+ "description": "Close T10 after the retrospective rework",
+ "evidence": [
+  {
+   "kind": "governed_asset",
+   "id": "01a20533-e896-7fe0-92c3-84b537e4200f"
+  }
+ ]
+}

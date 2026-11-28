@@ -14,6 +14,13 @@ use serde_json::Value;
 use sqlx::{AssertSqlSafe, PgConnection};
 use uuid::Uuid;
 
+/// The one read-time price of a tool call (SPEC_V2 §7.5, D52): the `tool_call` ledger row's
+/// recorded cost, or zero when the destination priced none. Every tool-spend figure — the
+/// inference usage report, `metrics.usage` and `billing.summary` — sums this expression over the
+/// ledger at read time; none stores a roll-up. The enclosing statement must name `tool_call` as
+/// `tc` and aggregate the values itself.
+pub(crate) const TOOL_CALL_PRICE: &str = "coalesce(tc.cost, 0)";
+
 /// The metrics store's failures.
 #[derive(Debug, thiserror::Error)]
 pub enum MetricsStoreError {
@@ -44,10 +51,14 @@ pub struct GateCount {
     pub rejected: i64,
     pub decided: i64,
     pub with_evidence: i64,
+    /// Refusals the gate made in the window, from the ledger the engine writes after a call is
+    /// refused (v1-w4b-5) — rejections are only one of the ways a gate says no.
+    pub refused: i64,
     pub latency_seconds: Option<f64>,
 }
 
-/// One benefit profile and its latest transition.
+/// One benefit profile, its latest transition and its latest reading (0071). The evaluation
+/// fields are `None` when the profile has no `benefit_measurement` row.
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct BenefitRow {
     pub id: Uuid,
@@ -57,6 +68,31 @@ pub struct BenefitRow {
     pub target: Option<Value>,
     pub baseline_measured_at: Option<DateTime<Utc>>,
     pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the transition was enacted; a `post` reading after this makes the benefit realised.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// The kind of the latest measurement (`baseline | interim | post`).
+    pub measurement_kind: Option<String>,
+    /// The latest measurement's target and actual values.
+    pub measurement_target: Option<f64>,
+    pub measurement_actual: Option<f64>,
+    /// When the latest measurement was taken.
+    pub measurement_measured_at: Option<DateTime<Utc>>,
+    /// The latest `baseline` reading's actual value, used to orient a reduction target.
+    pub baseline_actual: Option<f64>,
+}
+
+/// One programme risk row and its review date.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct ProgrammeRiskRow {
+    pub id: Uuid,
+    pub code: String,
+    pub title: String,
+    pub severity: Option<String>,
+    pub probability: Option<String>,
+    pub impact: Option<i32>,
+    pub status: String,
+    pub owner_job_id: Option<Uuid>,
+    pub review_at: Option<chrono::NaiveDate>,
 }
 
 /// One benefit put at risk by a non-met project dependency.
@@ -136,26 +172,57 @@ pub async fn insert_threshold_tx(
 }
 
 /// The governance counts per gate over `[since, until)`; the never-refused rule reads these.
+/// Record one refused gate call (v1-w4b-5). Called by the engine's failure bookkeeping, in the
+/// committed short transaction that also records the invocation and the audit event — a refusal
+/// rolls the handler's own transaction back, so this cannot be written there.
+pub async fn record_gate_refusal_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    gate: &str,
+    action: &str,
+    reason: &str,
+) -> Result<(), MetricsStoreError> {
+    sqlx::query(
+        "INSERT INTO gate_refusal (tenant_id, gate, action, reason)
+         VALUES ($1, $2, $3, $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(gate)
+    .bind(action)
+    .bind(reason)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
 pub async fn gate_counts_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     since: DateTime<Utc>,
     until: DateTime<Utc>,
 ) -> Result<Vec<GateCount>, MetricsStoreError> {
-    let sql = "SELECT gate,
-                      count(*) FILTER (WHERE status = 'approved')::bigint AS approved,
-                      count(*) FILTER (WHERE status = 'rejected')::bigint AS rejected,
-                      count(*) FILTER (WHERE status IN ('approved', 'rejected'))::bigint AS decided,
-                      count(*) FILTER (WHERE status IN ('approved', 'rejected')
-                        AND ((meta ? 'evidence_ref' AND btrim(meta ->> 'evidence_ref') <> '')
-                          OR (jsonb_typeof(meta -> 'evidence') = 'array'
-                              AND jsonb_array_length(meta -> 'evidence') > 0)))::bigint AS with_evidence,
-                      (avg(extract(epoch FROM (updated_at - created_at)))
-                        FILTER (WHERE status IN ('approved', 'rejected')))::double precision AS latency_seconds
-                 FROM approval
-                WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
-                GROUP BY gate
-                ORDER BY gate";
+    let sql = "WITH refusals AS (
+                   SELECT gate, count(*)::bigint AS refused
+                     FROM gate_refusal
+                    WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
+                    GROUP BY gate
+               )
+               SELECT a.gate,
+                      count(*) FILTER (WHERE a.status = 'approved')::bigint AS approved,
+                      count(*) FILTER (WHERE a.status = 'rejected')::bigint AS rejected,
+                      count(*) FILTER (WHERE a.status IN ('approved', 'rejected'))::bigint AS decided,
+                      count(*) FILTER (WHERE a.status IN ('approved', 'rejected')
+                        AND ((a.meta ? 'evidence_ref' AND btrim(a.meta ->> 'evidence_ref') <> '')
+                          OR (jsonb_typeof(a.meta -> 'evidence') = 'array'
+                              AND jsonb_array_length(a.meta -> 'evidence') > 0)))::bigint AS with_evidence,
+                      coalesce(r.refused, 0)::bigint AS refused,
+                      (avg(extract(epoch FROM (a.updated_at - a.created_at)))
+                        FILTER (WHERE a.status IN ('approved', 'rejected')))::double precision AS latency_seconds
+                 FROM approval a
+                 LEFT JOIN refusals r ON r.gate = a.gate
+                WHERE a.tenant_id = $1 AND a.created_at >= $2 AND a.created_at < $3
+                GROUP BY a.gate, r.refused
+                ORDER BY a.gate";
     Ok(
         sqlx::query_as::<_, GateCount>(AssertSqlSafe(sql.to_owned()))
             .bind(tenant.as_uuid())
@@ -166,26 +233,67 @@ pub async fn gate_counts_tx(
     )
 }
 
-/// The programme's benefit profiles with their latest transition.
+/// The programme's benefit profiles with their latest transition and latest measurement.
 pub async fn benefit_rows_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
 ) -> Result<Vec<BenefitRow>, MetricsStoreError> {
     let sql = "SELECT b.id, b.reference, b.status, b.baseline, b.target,
-                      t.baseline_measured_at, t.post_measured_at
+                      t.baseline_measured_at, t.post_measured_at, t.enacted_at,
+                      m.kind AS measurement_kind,
+                      m.target_value AS measurement_target,
+                      m.actual_value AS measurement_actual,
+                      m.measured_at AS measurement_measured_at,
+                      bm.actual_value AS baseline_actual
                  FROM benefit_profile b
                  LEFT JOIN LATERAL (
-                     SELECT baseline_measured_at, post_measured_at
+                     SELECT baseline_measured_at, post_measured_at, enacted_at
                        FROM benefit_transition
                       WHERE benefit_id = b.id AND tenant_id = b.tenant_id
                       ORDER BY created_at DESC, id DESC
                       LIMIT 1
                  ) t ON true
+                 LEFT JOIN LATERAL (
+                     SELECT kind, target_value::double precision AS target_value,
+                            actual_value::double precision AS actual_value, measured_at
+                       FROM benefit_measurement
+                      WHERE benefit_id = b.id AND tenant_id = b.tenant_id
+                      ORDER BY measured_at DESC, id DESC
+                      LIMIT 1
+                 ) m ON true
+                 LEFT JOIN LATERAL (
+                     SELECT actual_value::double precision AS actual_value
+                       FROM benefit_measurement
+                      WHERE benefit_id = b.id AND tenant_id = b.tenant_id AND kind = 'baseline'
+                      ORDER BY measured_at DESC, id DESC
+                      LIMIT 1
+                 ) bm ON true
                 WHERE b.tenant_id = $1 AND b.programme_id = $2 AND b.status <> 'retired'
                 ORDER BY b.reference";
     Ok(
         sqlx::query_as::<_, BenefitRow>(AssertSqlSafe(sql.to_owned()))
+            .bind(tenant.as_uuid())
+            .bind(programme_id)
+            .fetch_all(&mut *conn)
+            .await?,
+    )
+}
+
+/// The programme's risk register (0070), reviewed by date. A risk with no review date sorts
+/// last: it is not overdue, but it is not scheduled either.
+pub async fn programme_risk_rows_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<ProgrammeRiskRow>, MetricsStoreError> {
+    let sql = "SELECT id, code, title, severity, probability, impact, status, owner_job_id,
+                      review_at
+                 FROM project_register_item
+                WHERE tenant_id = $1 AND programme_id = $2 AND kind = 'risk'
+                ORDER BY review_at NULLS LAST, created_at DESC, id DESC";
+    Ok(
+        sqlx::query_as::<_, ProgrammeRiskRow>(AssertSqlSafe(sql.to_owned()))
             .bind(tenant.as_uuid())
             .bind(programme_id)
             .fetch_all(&mut *conn)
@@ -264,6 +372,52 @@ pub async fn run_totals_tx(
     )
 }
 
+/// Rework counts over `[since, until)`: the terms of the rework rate.
+#[derive(Debug, Clone, Copy, sqlx::FromRow)]
+pub struct ReworkTotals {
+    /// Every run in the window — the ratio's denominator.
+    pub total: i64,
+    /// The runs that were rework: a retry, or a run an approval returned.
+    pub rework: i64,
+}
+
+/// Rework is derived at read time from the run and approval rows, never stored (D37).
+///
+/// A run is rework when the card was executed again on a later attempt (`run.attempt > 1`, the
+/// sequence [`super::run::next_attempt_for_card_tx`] derives) or when an [`approval`] on it has
+/// `status = 'rejected'` — the card was returned. Both counts are returned beside each other so a
+/// caller can expose the ratio with its own terms; the rate itself is the caller's division.
+pub async fn rework_totals_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Option<Uuid>,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<ReworkTotals, MetricsStoreError> {
+    let row = sqlx::query_as::<_, ReworkTotals>(
+        "SELECT count(*)::bigint AS total,
+                count(*) FILTER (
+                    WHERE r.attempt > 1
+                       OR EXISTS (
+                           SELECT 1
+                             FROM approval a
+                            WHERE a.tenant_id = r.tenant_id
+                              AND a.run_id = r.id
+                              AND a.status = 'rejected'
+                       ))::bigint AS rework
+           FROM run r
+          WHERE r.tenant_id = $1 AND r.created_at >= $2 AND r.created_at < $3
+            AND ($4::uuid IS NULL OR r.project_id = $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(row)
+}
+
 /// Tokens recorded in the inference ledger over `[since, until)`.
 pub async fn token_totals_tx(
     conn: &mut PgConnection,
@@ -286,8 +440,10 @@ pub async fn token_totals_tx(
 
 // ── metering levels and the run drill-down (P1.2/P1.3) ───────────────────────────────────
 
-/// One metering row at a level. `cost_usd` is derived at read time; `tool_cost_usd` is the
-/// ledger's recorded tool cost. A call whose attribution is missing lands under `unattributed`.
+/// One metering row at a level. `cost_usd` is derived at read time from `commercial_price`;
+/// `tool_cost_usd` is the same read-time derivation over the `tool_call` ledger (the recorded
+/// per-call price, [`TOOL_CALL_PRICE`], summed — never a stored roll-up). A call whose
+/// attribution is missing lands under `unattributed`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct UsageRow {
     pub key: String,
@@ -390,7 +546,8 @@ impl MeteringLevel {
     }
 
     /// The grouping expression over the attributed CTEs. `priced` exposes `id`, `run_id`,
-    /// `run_step_id`, `project_id`, `job_binding_id`, `programme_id` and `department`.
+    /// `run_step_id`, `caller_kind`, `project_id`, `job_binding_id`, `programme_id` and
+    /// `department`.
     fn key(self) -> &'static str {
         match self {
             Self::Tenant => "'tenant'",
@@ -430,11 +587,20 @@ pub async fn usage_by_level_tx(
     filter: Option<Uuid>,
 ) -> Result<Vec<UsageRow>, MetricsStoreError> {
     let key = level.key();
+    // `caller_kind = 'other'` is the synthetic/administrative caller: it is its own explicit
+    // bucket, never a project's usage, even when the call carries a run.
+    let inference_key = match level {
+        MeteringLevel::Project => {
+            "CASE WHEN caller_kind = 'other' THEN 'unattributed' \
+             ELSE coalesce(project_id::text, 'unattributed') END"
+        }
+        _ => key,
+    };
     let (filter_clause, has_filter) = level_filter(level, filter);
     let inference = format!(
         "WITH priced AS (
-             SELECT ic.id, ic.run_id, ic.run_step_id, r.project_id, r.job_binding_id,
-                    p.programme_id,
+             SELECT ic.id, ic.run_id, ic.run_step_id, ic.caller_kind, r.project_id,
+                    r.job_binding_id, p.programme_id,
                     coalesce(dep.name, 'unattributed') AS department,
                     (ic.prompt_tokens + ic.completion_tokens)::bigint AS tokens,
                     CASE
@@ -456,7 +622,7 @@ pub async fn usage_by_level_tx(
                      AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
               WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3{filter_clause}
          )
-         SELECT {key} AS key,
+         SELECT {inference_key} AS key,
                 count(*)::bigint AS calls,
                 coalesce(sum(tokens), 0)::bigint AS tokens,
                 coalesce(round(sum(cost), 6), 0)::double precision AS cost_usd,
@@ -472,7 +638,7 @@ pub async fn usage_by_level_tx(
              SELECT tc.id, tc.run_id, tc.run_step_id, r.project_id, r.job_binding_id,
                     p.programme_id,
                     coalesce(dep.name, 'unattributed') AS department,
-                    coalesce(tc.cost, 0)::numeric AS cost
+                    {TOOL_CALL_PRICE}::numeric AS cost
                FROM tool_call tc
                LEFT JOIN run r ON r.id = tc.run_id
                LEFT JOIN project p ON p.id = r.project_id
@@ -682,7 +848,7 @@ pub async fn run_drilldown_tx(
     tenant: TenantId,
     run_id: Uuid,
 ) -> Result<RunDrilldown, MetricsStoreError> {
-    let total = sqlx::query_as::<_, (i64, f64, f64)>(
+    let total = sqlx::query_as::<_, (i64, f64, f64)>(AssertSqlSafe(format!(
         "SELECT coalesce(sum(ic.prompt_tokens + ic.completion_tokens), 0)::bigint,
                 coalesce(round(sum(CASE
                     WHEN pr.model IS NULL THEN NULL
@@ -691,21 +857,22 @@ pub async fn run_drilldown_tx(
                          + ic.completion_tokens::numeric * pr.output_usd_per_1m) / 1000000
                     WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * pr.unit_usd
                     ELSE NULL END), 6), 0)::double precision,
-                coalesce((SELECT round(sum(coalesce(tc.cost, 0)), 6)::double precision
+                coalesce((SELECT round(sum({TOOL_CALL_PRICE}), 6)::double precision
                             FROM tool_call tc
                            WHERE tc.tenant_id = $1 AND tc.run_id = $2), 0)
            FROM inference_call ic
            LEFT JOIN commercial_price pr
                   ON pr.model = coalesce(ic.served_model, ic.model)
                  AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
-          WHERE ic.tenant_id = $1 AND ic.run_id = $2",
-    )
+          WHERE ic.tenant_id = $1 AND ic.run_id = $2"
+    )))
     .bind(tenant.as_uuid())
     .bind(run_id)
     .fetch_one(&mut *conn)
     .await?;
     let steps = sqlx::query_as::<_, (Option<Uuid>, Option<String>, Option<i32>, i64, f64, f64)>(
-        "WITH calls AS (
+        AssertSqlSafe(format!(
+            "WITH calls AS (
              SELECT ic.run_step_id,
                     (ic.prompt_tokens + ic.completion_tokens)::bigint AS tokens,
                     CASE
@@ -722,7 +889,7 @@ pub async fn run_drilldown_tx(
                      AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
               WHERE ic.tenant_id = $1 AND ic.run_id = $2
          ), tools AS (
-             SELECT tc.run_step_id, coalesce(tc.cost, 0)::numeric AS cost
+             SELECT tc.run_step_id, {TOOL_CALL_PRICE}::numeric AS cost
                FROM tool_call tc
               WHERE tc.tenant_id = $1 AND tc.run_id = $2
          )
@@ -736,7 +903,8 @@ pub async fn run_drilldown_tx(
            LEFT JOIN (SELECT run_step_id, sum(cost) AS cost
                         FROM tools GROUP BY run_step_id) t ON t.run_step_id = s.id
           WHERE s.tenant_id = $1 AND s.run_id = $2
-          ORDER BY s.position, s.id",
+          ORDER BY s.position, s.id"
+        )),
     )
     .bind(tenant.as_uuid())
     .bind(run_id)
@@ -863,6 +1031,45 @@ pub async fn record_reconciliation_tx(
         .await?)
 }
 
+/// One recorded reconciliation period, as the read action serves it.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct ReconciliationRecord {
+    pub period_start: chrono::NaiveDate,
+    pub period_end: chrono::NaiveDate,
+    pub conveyor_usd: Option<f64>,
+    pub billing_usd: Option<f64>,
+    pub delta_usd: Option<f64>,
+    pub state: String,
+    pub upstream_error: Option<String>,
+    pub incident_card_id: Option<Uuid>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// The recorded verdicts, newest period first. The table holds one row per period (its unique
+/// constraint makes a re-run an update), so this is the latest state per period; the caller
+/// derives the trend from consecutive deltas and reads the incident link from the row.
+pub async fn list_reconciliations_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    limit: i64,
+) -> Result<Vec<ReconciliationRecord>, MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT period_start, period_end,
+                conveyor_usd::double precision AS conveyor_usd,
+                billing_usd::double precision AS billing_usd,
+                delta_usd::double precision AS delta_usd,
+                state, upstream_error, incident_card_id, created_at
+           FROM metric_reconciliation
+          WHERE tenant_id = $1
+          ORDER BY period_start DESC, period_end DESC
+          LIMIT $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(limit.clamp(1, 365))
+    .fetch_all(&mut *conn)
+    .await?)
+}
+
 /// The conveyor's own derived spend over `[since, until)`: inference cost from the price catalogue
 /// plus the ledger's recorded tool cost. Unpriced calls contribute tokens but no money; the
 /// reconciliation reports a figure only when both sides can be read (P2.3 never invents a zero).
@@ -891,11 +1098,11 @@ pub async fn conveyor_cost_tx(
     .bind(until)
     .fetch_one(&mut *conn)
     .await?;
-    let tools: f64 = sqlx::query_scalar(
-        "SELECT coalesce(round(sum(coalesce(cost, 0)), 6), 0)::double precision
-           FROM tool_call
-          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
-    )
+    let tools: f64 = sqlx::query_scalar(AssertSqlSafe(format!(
+        "SELECT coalesce(round(sum({TOOL_CALL_PRICE}), 6), 0)::double precision
+           FROM tool_call tc
+          WHERE tc.tenant_id = $1 AND tc.created_at >= $2 AND tc.created_at < $3"
+    )))
     .bind(tenant.as_uuid())
     .bind(since)
     .bind(until)
@@ -913,6 +1120,10 @@ pub struct UsageSummary {
     pub inference_calls: i64,
     /// Tool calls recorded in the window.
     pub tool_calls: i64,
+    /// Calls the price catalogue or the tool ledger could not price. A nonzero count makes the
+    /// window's total incomplete: a summary may report it, and a reconciliation must refuse an
+    /// exact verdict while it is nonzero (v1-p75-6).
+    pub unpriced_calls: i64,
 }
 
 /// The ledger summary `billing.summary` serves (issue #450; SPEC_V2 §11.3, #46).
@@ -945,11 +1156,113 @@ pub async fn usage_summary_tx(
     .bind(until)
     .fetch_one(&mut *conn)
     .await?;
+    // A call is unpriced when the cost derivation could not price it: an inference call whose
+    // model/unit has no catalogue row, or a tool call the ledger recorded without a cost. The
+    // join is the same one `conveyor_cost_tx` uses, so the count names exactly the rows whose
+    // contribution to `total_usd` is a silent zero.
+    let unpriced_inference: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint
+           FROM inference_call ic
+           LEFT JOIN commercial_price pr
+                  ON pr.model = coalesce(ic.served_model, ic.model)
+                 AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
+          WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
+            AND pr.model IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
+    let unpriced_tools: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM tool_call
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
+            AND cost IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
     Ok(UsageSummary {
         total_usd,
         inference_calls,
         tool_calls,
+        unpriced_calls: unpriced_inference + unpriced_tools,
     })
+}
+
+// ── the knowledge figures (v1-w1c-6) ────────────────────────────────────────────────────
+
+/// Record one `knowledge.query` retrieval for the pack-hit rate.
+///
+/// Called by the query handler inside its own transaction: the row exists exactly when the
+/// retrieval answered, so the rate's denominator is the number of retrievals, not of queries.
+pub async fn record_knowledge_retrieval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    capability_id: Uuid,
+    packs: i64,
+    hits: i64,
+    degraded: bool,
+    run_id: Option<Uuid>,
+) -> Result<(), MetricsStoreError> {
+    sqlx::query(
+        "INSERT INTO knowledge_retrieval (tenant_id, capability_id, packs, hits, degraded, run_id)
+         VALUES ($1, $2, $3, $4, $5, $6)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(capability_id)
+    .bind(packs)
+    .bind(hits)
+    .bind(degraded)
+    .bind(run_id)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Retrievals in the window, and those with at least one hit.
+pub async fn knowledge_retrieval_counts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<(i64, i64), MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT count(*)::bigint,
+                count(*) FILTER (WHERE hits > 0)::bigint
+           FROM knowledge_retrieval
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?)
+}
+
+/// Lessons promoted, and lessons decided (promoted or rejected), by their latest state change.
+///
+/// `updated_at` is the state transition: a proposal that is still `proposed` is not a decision
+/// and never enters the denominator.
+pub async fn lesson_promotion_counts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<(i64, i64), MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT count(*) FILTER (WHERE state = 'promoted')::bigint,
+                count(*) FILTER (WHERE state IN ('promoted', 'rejected'))::bigint
+           FROM lesson
+          WHERE tenant_id = $1 AND updated_at >= $2 AND updated_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?)
 }
 
 // ── flow (P1.1) ─────────────────────────────────────────────────────────────────────────

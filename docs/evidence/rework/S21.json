@@ -1,0 +1,181 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S21 is active",
+      "detail": "project S21 is active",
+      "id": "S21-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "S21-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d32-71f6-bad4-81493c102060\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "exit": 1,
+      "id": "S21-charter",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stdout": ""
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "no live board-approved delivery contract",
+      "id": "S21-contract",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "no Phase-G compliance review for the project's live contract",
+      "id": "S21-review",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "S21-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "no PI cadence row for tranche-9",
+      "id": "S21-pi-cadence",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "no published pi-plan output for tranche-9",
+      "id": "S21-pi-plan",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-9",
+      "id": "S21-pi-objectives",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "no retro cadence row for tranche-9",
+      "id": "S21-lessons",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "S21-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "S21-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "S21-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S21, unpublished_declared_output:S21, mandatory_artefacts:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
+      "id": "S21-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S21 (P1), unpublished_declared_output:S21 (P1), mandatory_artefacts:S21 (P1)",
+      "id": "S21-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "S21-baseline (P0): no project baseline",
+    "S21-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "S21-contract (P0): no live board-approved delivery contract",
+    "S21-review (P0): no Phase-G compliance review for the project's live contract",
+    "S21-pi-cadence (P0): no PI cadence row for tranche-9",
+    "S21-pi-plan (P0): no published pi-plan output for tranche-9",
+    "S21-pi-objectives (P0): no published pi-objectives output for tranche-9",
+    "S21-lessons (P1): no retro cadence row for tranche-9",
+    "S21-wsjf (P0): no WBS deliverable carries the plan",
+    "S21-demo-credits (P0): no accepted deliverable to demo",
+    "S21-artefact-standard (P1): 8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S21, unpublished_declared_output:S21, mandatory_artefacts:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
+    "S21-rework (P0): 3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S21 (P1), unpublished_declared_output:S21 (P1), mandatory_artefacts:S21 (P1)",
+    "gate (P0): the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass"
+  ],
+  "gate": "S21 is accepted when a step whose recipe requires `procedure` and whose run has none fails by name before a model call, the same recipe and the same facts compile byte-identically, changing the card changes the hash while changing an unrelated tenant's card does not, an over-budget section refuses with the measured size and never truncates, and the prompt audit can name the compiled text it audited by `(prompt_ref, prompt_sha256)`.",
+  "generated_at": "2026-11-25T10:37:53.027609+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S21.toml",
+  "name": "Message construction",
+  "project": "S21",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+  },
+  "verdict": "red",
+  "warnings": []
+}

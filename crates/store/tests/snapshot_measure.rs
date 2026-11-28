@@ -275,10 +275,84 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
         &call("local-llm", hidden.run, 9_000, 9_000),
     )
     .await;
+    // A priced tool call on the public run, and one the destination did not meter: the totals
+    // sum the ledger's own recorded cost, so a NULL cost contributes nothing.
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
+         VALUES ($1, 'echo', 1, 'Echo toolkit', 'echo', 'platform', 'published') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the toolkit");
+    let tool: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, 'ping', '{}'::jsonb, 'read', 30, 'echo.ping', 'published')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the tool");
+    let input_hash = "0".repeat(64);
+    for cost in [Some(Decimal::new(500, 6)), None] {
+        store::tool::insert_call(
+            &mut tx,
+            tenant,
+            &store::tool::NewToolCall {
+                run_id: Some(public.run),
+                run_step_id: None,
+                card_id: None,
+                tool_id: tool,
+                binding_id: None,
+                tool_key: "echo.ping",
+                toolkit_key: "echo",
+                toolkit_version: 1,
+                input_hash: &input_hash,
+                status: "ok",
+                http_status: Some(200),
+                latency_ms: 5,
+                request_bytes: None,
+                response_bytes: None,
+                cost,
+                error_class: None,
+                error_message: None,
+                resume_token: None,
+            },
+        )
+        .await
+        .expect("insert the tool call");
+    }
     tx.commit().await.expect("commit the calls");
 
     let data = snapshot(&db, tenant).await;
     let measure = &data.measure["inference"];
+
+    // The tenant-wide totals carry money: the cost derived at read time (D52), the tool ledger's
+    // recorded spend, and the count of calls the price join cannot price.
+    let totals = &measure["totals"];
+    assert_eq!(totals["calls"], 3, "all three calls, the draft's included");
+    assert_eq!(
+        totals["unpriced_calls"], 1,
+        "the unpriced model is counted in the totals"
+    );
+    let total_cost = totals["cost_usd"]
+        .as_f64()
+        .expect("cost_usd is a JSON number, not a string");
+    // 0.00028 (1k prompt + 500 completion) + 0.00378 (the draft project's 9k/9k call).
+    assert!(
+        (total_cost - 0.004_06).abs() < 1e-9,
+        "derived cost over every row: {total_cost}"
+    );
+    let tool_cost = totals["tool_cost_usd"]
+        .as_f64()
+        .expect("tool_cost_usd is a JSON number, not a string");
+    assert!(
+        (tool_cost - 0.000_5).abs() < 1e-9,
+        "the tool ledger's recorded cost: {tool_cost}"
+    );
 
     let by_project = measure["by_project"].as_array().expect("by_project");
     assert_eq!(
@@ -691,6 +765,92 @@ async fn a_declared_adm_phase_reports_contract_compliance_and_next_required() {
     assert!(phases[1]["contract"].is_null());
     assert!(phases[1]["compliance"].is_null());
     assert_eq!(row["next_required"], "b");
+}
+
+/// The phase gate's evidence, not any row that names a phase: an approved artefact evidences
+/// its phase, a draft one does not, and only a live contract counts (a superseded one is the
+/// record of what used to close the phase).
+#[tokio::test]
+async fn only_approved_artefacts_and_live_contracts_evidence_a_phase() {
+    let (db, tenant, _programme, project) = programme_fixture().await;
+    sqlx::query("UPDATE project SET meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({"adm_phase": "a", "plateau": "psa"}))
+        .bind(project.project)
+        .execute(&db.super_pool)
+        .await
+        .expect("declare the ADM phase");
+    // Phase C: a draft artefact (the table's default status).
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title)
+         VALUES ($1, $2, 'c', 'hld', 'catalog', 'Draft data entity catalog')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the draft artefact");
+    // Phase D: a superseded contract.
+    sqlx::query(
+        "INSERT INTO architecture_contract
+             (tenant_id, project_id, kind, phase_code, title, status)
+         VALUES ($1, $2, 'statement_of_architecture_work', 'd', 'Retired SAW', 'superseded')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the superseded contract");
+    // Phase E: an approved artefact — the positive control.
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title, status)
+         VALUES ($1, $2, 'e', 'hld', 'matrix', 'Approved gap analysis', 'approved')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the approved artefact");
+
+    let data = snapshot(&db, tenant).await;
+    let rows = data.architecture["phase_progress"]
+        .as_array()
+        .expect("phase_progress is an array");
+    let row = rows
+        .iter()
+        .find(|row| row["project"] == "MSP")
+        .expect("the declaring project");
+    let phases = row["phases"].as_array().expect("phases");
+    let phase = |code: &str| {
+        phases
+            .iter()
+            .find(|phase| phase["phase"] == code)
+            .unwrap_or_else(|| panic!("phase {code} in {row}"))
+    };
+    assert_eq!(
+        phase("c")["state"],
+        "not-evidenced",
+        "a draft artefact evidenced its phase: {}",
+        phase("c")
+    );
+    assert_eq!(
+        phase("d")["state"],
+        "not-evidenced",
+        "a superseded contract evidenced its phase: {}",
+        phase("d")
+    );
+    assert!(
+        phase("d")["contract"].is_null(),
+        "a superseded contract is rendered as the phase's contract: {}",
+        phase("d")
+    );
+    assert_eq!(
+        phase("e")["state"],
+        "evidenced",
+        "an approved artefact is the gate's evidence: {}",
+        phase("e")
+    );
 }
 
 /// A rework card's meta keys are projected onto the card row; absent meta is JSON null, never an

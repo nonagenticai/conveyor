@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-context-diagram" data-provenance-version="1" data-provenance-hash="7df6153e8403148bf84b899a6ef6146bf7cd9a93544dec37215aba73de97215c" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-context-diagram</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7df6153e8403148bf84b899a6ef6146bf7cd9a93544dec37215aba73de97215c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26)</h1>
+<h2>Context</h2>
+<p>The work package is the SPEC-V2 definition set: the plan <code>docs/SPEC_V2.md</code>, its decisions and the architecture artefacts it governs. Its boundary is the model the conveyor owns — organisation, work, decisions, programme cadence, architecture, tools and measurement — together with the rows, contracts and gates that make each one executable. The context is the first tenant <code>nonagentic</code>, industry <code>software</code>, with AHTAPol and w2v as separate tenants and industries (D60), and with the delivery slices T0 to T19F as the work that carries the model into the estate.</p>
+<h2>Affected organisation</h2>
+<p>The programme owner and sponsor decides and chairs the Architecture Board; the programme architect authors under the #526 delegation; the Board approves contracts and artefacts. The first departments are delivery, verification, operations, project office and improvement, and their jobs are the first positions the model must staff — conveyor maintenance first, then feature delivery, then operations (§4.6). Development projects act as the system's own capacity to change its substrate, and the agent platform is a front end whose users reach the same work over MCP. Independent reviewers and the public read the published design.</p>
+<h2>Affected systems</h2>
+<p>The conveyor application is one binary on port 8930 with no new port (V2 adds tables and actions), live on 3 pods with <code>/health</code> and <code>/health/ready</code> 200 on the 2026-11-10 deploy record. laya answers on :9210 behind a Jev-compatible bridge. strata_ingest and strata_rag hold knowledge packs and one cold digest per card. MinIO holds bytes directly under tenant prefixes, with no artifact_service or storage-api dependency. The agent platform reaches the conveyor over <code>/mcp</code>; billing_service remains the charging system the metering reconciles to.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

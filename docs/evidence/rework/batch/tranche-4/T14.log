@@ -1,0 +1,200 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T14 --content docs/evidence/rework/tranche-4/rework-content-T14.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — T14 Estate toolkits (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T14 Estate toolkits (Phase A) already present
+  artefact: Requirements Catalog — T14 Estate toolkits (Phase A) already present
+  artefact: Solution Concept Diagram — T14 Estate toolkits (Phase A) already present
+  artefact: Business Capability Map — T14 Estate toolkits (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T14 Estate toolkits (Phase C) already present
+  artefact: Technology Standards Catalog — T14 Estate toolkits (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The four gate clauses have no executed receipt, so the project's built status is unproven already present
+  register risk: scientific_processor could be left scaled up or scaled without a receipt, consuming scarce host compute already present
+  register issue: No probe or live-call receipt exists for any published toolkit at the 2026-11-24 snapshot already present
+  register issue: Issue 561 (research and Lean toolkits, first wave) remains open while the record claims the slice built already present
+  register issue: The plan fragment docs/SPEC_V2.md#12 is status draft and there is no standalone T14 slice plan already present
+  register assumption: The 2026-11-24 facts snapshot is the authoritative record for T14 already present
+  register assumption: The level consistent stands without a waiver because the record shows no refused gate already present
+  register dependency: T13 supplies the tool family, the broker, the effect classes and the credential profiles already present
+  register dependency: P0 supplies the standing delegation and the accepted exception under which this retrospective runs already present
+  register benefit: Every estate tool is called through the broker and leaves one tool_call row, so no call escapes the governed path already present
+  register benefit: Publication requires a probe and one live call, so an unproven toolkit cannot be counted as published already present
+  register benefit: An unused toolkit has a recorded exit path through the zero-use report and the provenance and retirement gate already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: not applicable (the project stays active)
+  project-brief output: current
+  10 documents.publish ok
+  11 documents.update ok
+  12 documents.publish ok
+  evidence output: body corrected and republished
+  Phase-G review: already recorded
+  13 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure: not applicable (the project stays active)
+T14: 13 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T14 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T14-snap-go0lmvse/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T14-snap-go0lmvse/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T14-bodies --local-bin /tmp/conv526-t14-bin-20261126
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "change-control",
+      "document_id": "01a21a0f-909e-70d5-95e6-e19462fb316d",
+      "natural_key": "artefact:T14:change-control:8d7b2cde5d18ba41",
+      "body_sha256": "8d7b2cde5d18ba41ec61051939b93b7a5e21331dcb668e33e84659b2a83cf1bb"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "project-registers",
+      "document_id": "01a21a0f-922e-73f2-b9c7-b6f4eb8e9d42",
+      "natural_key": "artefact:T14:project-registers:36e89a92745b696b",
+      "body_sha256": "36e89a92745b696be489c0d772e51e2a7762493b8a43326f8342d51817ae8214"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T14",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 6,
+    "present": 5,
+    "missing-edge": 0,
+    "stale": 2,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

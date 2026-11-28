@@ -1,0 +1,20 @@
+{
+ "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+ "gate": "projects.close",
+ "kind": "action",
+ "action": "projects.close",
+ "input": {
+  "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9"
+ },
+ "proposed_input": {
+  "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+  "reason": "the retrospective rework of tranche 4 (#526)"
+ },
+ "description": "Close T4 after the retrospective rework",
+ "evidence": [
+  {
+   "id": "01a2053e-2d09-7a53-9138-3557b97aaa4b",
+   "kind": "governed_asset"
+  }
+ ]
+}

@@ -289,11 +289,75 @@ pub struct Seeded {
     pub user_id: Uuid,
 }
 
+/// The three §8.3 evidence classes as real programme rows, for a tranche review in a test.
+///
+/// The review's evidence is citation, not prose: the store resolves every cited id. This
+/// creates an approved management baseline, a benefit profile and a risk row (with its own
+/// fixture project) in the tranche's programme and returns them as the review's evidence.
+pub async fn tranche_review_evidence(pg: &Pg, seeded: &Seeded, tranche: Uuid) -> serde_json::Value {
+    let programme: Uuid = sqlx::query_scalar(
+        "SELECT programme_id FROM programme_tranche WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the tranche's programme");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id, meta)
+         VALUES ($1, $2, 'Review evidence', $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("EVID-{}", Uuid::now_v7().simple()))
+    .bind(programme)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the evidence project");
+    let baseline: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3, $3) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the approved baseline");
+    let benefit: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference, description, status)
+         VALUES ($1, $2, $3, 'Review evidence', 'active') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .bind(format!("B-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the benefit profile");
+    let risk: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title, status)
+         VALUES ($1, $2, 'risk', 'Review evidence risk', 'open') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the risk row");
+    json!({
+        "baselines": [baseline],
+        "benefit_status": [benefit],
+        "risk_register": [risk],
+    })
+}
+
 /// Seed `dev-a`/`alice` (and optionally another tenant) exactly as `migrate --dev-seed`
 /// does, including the active entitlement the licence gate requires.
 /// The second human every fixture can rely on: a distinct reviewer in the same tenant, so a gate
 /// that one principal requested can be decided by another (SPEC_V2 §5.4's requester exclusion).
 pub const REVIEWER: &str = "dev:reviewer";
+
+/// The second distinct human: the second approver a §6.5 dual-control gate needs.
+pub const REVIEWER_TWO: &str = "dev:reviewer2";
 
 pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
     let tenant_id: Uuid = sqlx::query_scalar(
@@ -354,6 +418,27 @@ pub async fn seed(pg: &Pg, slug: &str, login: &str, name: &str) -> Seeded {
         .execute(&mut *tx)
         .await
         .expect("insert reviewer membership");
+        // T7 / v1-w1b-4: an ops destructive gate needs two DISTINCT approvers. The second one
+        // is another admin, never a job participant (the rule is human dual control).
+        let reviewer_two_id: Uuid = sqlx::query_scalar(
+            "INSERT INTO app_user (oidc_subject, email, display_name)
+         VALUES ('dev:reviewer2', 'reviewer2@dev.invalid', 'Reviewer Two')
+         ON CONFLICT (oidc_subject) WHERE oidc_subject IS NOT NULL
+         DO UPDATE SET display_name = excluded.display_name
+         RETURNING id",
+        )
+        .fetch_one(&pg.owner)
+        .await
+        .expect("insert the second reviewer");
+        sqlx::query(
+            "INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')
+         ON CONFLICT (tenant_id, user_id) DO NOTHING",
+        )
+        .bind(tenant_id)
+        .bind(reviewer_two_id)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the second reviewer membership");
     }
     sqlx::query(
         "INSERT INTO app_licence (tenant_id, app_key, status, checked_at)
@@ -387,6 +472,44 @@ pub async fn reviewer_id(pg: &Pg) -> Uuid {
         .expect("the reviewer principal is seeded")
 }
 
+/// The second distinct human [`seed`] provisions for the ops dual-control rule.
+pub async fn reviewer_two_id(pg: &Pg) -> Uuid {
+    sqlx::query_scalar("SELECT id FROM app_user WHERE oidc_subject = 'dev:reviewer2'")
+        .fetch_one(&pg.owner)
+        .await
+        .expect("the second reviewer principal is seeded")
+}
+
+/// The same input with `dry_run: true` — the body a dry run records.
+fn with_dry_run(mut input: Value) -> Value {
+    if let Some(map) = input.as_object_mut() {
+        map.insert("dry_run".to_owned(), Value::Bool(true));
+    }
+    input
+}
+
+/// Record the dry run a later destructive ops call must follow (T7 / v1-w1b-4).
+pub async fn record_dry_run(pg: &Pg, tenant: TenantId, action: &str, input: &Value) {
+    let hash = conveyor_store::request_hash(&with_dry_run(input.clone()));
+    let mut tx = begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the dry run");
+    let record = conveyor_store::InvocationRecord {
+        actor_id: None,
+        action,
+        action_version: 1,
+        input_hash: &hash,
+        idempotency_key: None,
+        outcome: "ok",
+        duration_ms: 0,
+        trace_id: None,
+    };
+    conveyor_store::actions::record_invocation(&mut tx, tenant, &record)
+        .await
+        .expect("record the dry run");
+    tx.commit().await.expect("commit the dry run");
+}
+
 /// An APPROVED gate for `action` with exactly this input, for a test that has to get past the
 /// destructive gate (#282, #285).
 ///
@@ -411,6 +534,12 @@ pub async fn approved_gate(
                 "kind": "action",
                 "action": action,
                 "input": input,
+                // T7 / v1-w1b-4: the §6.5 dual control. Two distinct human decisions are
+                // inserted below; the request names the floor.
+                "required_decisions": 2,
+                // The fixture's subject is the target, not a document; a destructive gate now
+                // requires evidence or an explicit waiver (v1-u5a-approvals-1).
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
             None,
@@ -430,6 +559,52 @@ pub async fn approved_gate(
         .execute(&mut *tx)
         .await
         .expect("approve the gate");
+    for approver in [reviewer_id(pg).await, reviewer_two_id(pg).await] {
+        sqlx::query(
+            "INSERT INTO approval_decision (approval_id, approver_id, decision, decided_by_kind)
+             VALUES ($1, $2, 'approve', 'human')
+             ON CONFLICT (approval_id, approver_id) DO NOTHING",
+        )
+        .bind(id)
+        .bind(approver)
+        .execute(&mut *tx)
+        .await
+        .expect("insert the gate decision");
+    }
+    // T7 / v1-w1b-4: the real ops call must follow a recorded dry run of the same action and
+    // target. The dry run itself needs no predecessor; a no-action mitigation performs no write
+    // and needs none.
+    if input.get("dry_run").and_then(Value::as_bool) != Some(true)
+        && input.get("no_action_required").and_then(Value::as_bool) != Some(true)
+    {
+        let (dry_action, dry_input) = if action == "ops.mitigate" {
+            let inner_action = input
+                .get("action")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            (
+                inner_action,
+                with_dry_run(input.get("input").cloned().unwrap_or(Value::Null)),
+            )
+        } else {
+            (action.to_owned(), with_dry_run(input.clone()))
+        };
+        let hash = conveyor_store::request_hash(&dry_input);
+        let record = conveyor_store::InvocationRecord {
+            actor_id: None,
+            action: &dry_action,
+            action_version: 1,
+            input_hash: &hash,
+            idempotency_key: None,
+            outcome: "ok",
+            duration_ms: 0,
+            trace_id: None,
+        };
+        conveyor_store::actions::record_invocation(&mut tx, tenant, &record)
+            .await
+            .expect("record the dry run");
+    }
     tx.commit().await.expect("commit the gate");
     id
 }
@@ -872,6 +1047,11 @@ impl StubHits {
     pub fn get(&self) -> usize {
         self.0.load(Ordering::SeqCst)
     }
+
+    /// Record one hit against the stub.
+    pub fn record(&self) {
+        self.0.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 /// A running external stub and its base URL.
@@ -930,7 +1110,7 @@ pub struct LayaStub {
     /// The base URL to put in `CONVEYOR_EXTERNAL_LAYA_URL`.
     pub base: String,
     /// How many times `/v1/systemone` was asked.
-    pub hits: Arc<std::sync::Mutex<usize>>,
+    pub hits: StubHits,
     answer: Arc<std::sync::Mutex<Value>>,
 }
 
@@ -938,7 +1118,7 @@ impl LayaStub {
     /// Start a stub answering `answer` for every call.
     pub async fn start(answer: Value) -> LayaStub {
         let answer = Arc::new(std::sync::Mutex::new(answer));
-        let hits: Arc<std::sync::Mutex<usize>> = Arc::new(std::sync::Mutex::new(0));
+        let hits = StubHits::default();
         let answer_state = answer.clone();
         let hit_state = hits.clone();
         let app = Router::new().route(
@@ -947,7 +1127,7 @@ impl LayaStub {
                 let answer_state = answer_state.clone();
                 let hit_state = hit_state.clone();
                 async move {
-                    *hit_state.lock().expect("laya hits") += 1;
+                    hit_state.record();
                     axum::Json(answer_state.lock().expect("laya answer").clone())
                 }
             }),
@@ -969,7 +1149,7 @@ impl LayaStub {
 
     /// How many calls the stub has answered.
     pub fn calls(&self) -> usize {
-        *self.hits.lock().expect("laya hits")
+        self.hits.get()
     }
 }
 

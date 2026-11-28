@@ -1,0 +1,22 @@
+{
+ "benefit": "B1",
+ "profile_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+ "baseline": {
+  "definition": "105 approval_decision / 662 run at 2026-11-22",
+  "value": 0.15861,
+  "unit": "decisions per run",
+  "measured_at": "2026-11-22",
+  "method": "approval_decision rows / run rows from the tenant's tables at the recorded snapshot",
+  "evidence": {
+   "measurement_id": "01a20e7e-0f1d-7c22-9a55-518ec4b4b84c",
+   "instrument": "count approval_decision / count run",
+   "counts": {
+    "approval_decisions": 105,
+    "runs": 662
+   },
+   "re_verified_at_snapshot": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b"
+  }
+ },
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "note": "baseline reading taken 2026-11-22; evidence re-verified at the W0 snapshot"
+}

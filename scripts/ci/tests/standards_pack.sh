@@ -86,7 +86,17 @@ for package in packages:
     assert key in str(package["acceptance_command"]), f"{key}: acceptance does not name its package"
     assert package.get("evidence"), f"{key}: no evidence"
 
-unresolved = [a for a in artefacts if a.get("mandatory") and a.get("status") != "evidenced"]
+def missing_required(artefact):
+    sections = artefact.get("sections") or []
+    if not sections:
+        return artefact.get("status") != "evidenced"
+    return any(
+        section.get("required", True) is not False and section.get("status") != "evidenced"
+        for section in sections
+    )
+
+
+unresolved = [a for a in artefacts if a.get("mandatory") and missing_required(a)]
 for artefact in unresolved:
     assert artefact.get("package_published") is True, f"{artefact['id']}: no published package"
     assert artefact.get("package_key") in set(keys), (

@@ -1,0 +1,185 @@
+{
+  "schema": "check-registers/v1",
+  "generated_at": "2026-11-22T19:52:33.842100+00:00",
+  "snapshot": "/tmp/conveyor-w0-526-snap/data",
+  "summary": {
+    "findings": 28,
+    "P0": 0,
+    "P1": 27,
+    "P2": 1,
+    "risks": 3,
+    "adr_rows": 1,
+    "benefit_profiles": 6,
+    "benefit_measurements": 0
+  },
+  "findings": [
+    {
+      "check": "adr_meta_not_projected",
+      "severity": "P1",
+      "subject": "snapshot.governed_assets",
+      "detail": "the governed-asset projection omits meta, so content hash, decider and decided_at cannot be assessed (crates/store/src/snapshot.rs:338)"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0001",
+      "detail": "0001-ui-stack.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0002",
+      "detail": "0002-editor.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0003",
+      "detail": "0003-public-ci.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0004",
+      "detail": "0004-tool-estate.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0005",
+      "detail": "0005-absorption-sequence-and-repo-scope.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0006",
+      "detail": "0006-tool-absorption-grouping.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0007",
+      "detail": "0007-tool-estate-conveyor-and-coding.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0008",
+      "detail": "0008-card-ledger.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0009",
+      "detail": "0009-prompt-selection-and-recipe-authoring.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "adr_missing_row",
+      "severity": "P1",
+      "subject": "adr-0012",
+      "detail": "0012-no-deferrals.md has no governed_asset(kind='adr') row"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B1",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B2",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B3",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B4",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B5",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_baseline_placeholder",
+      "severity": "P1",
+      "subject": "B6",
+      "detail": "the baseline is a placeholder, not a measurement"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B1",
+      "detail": "missing field group(s): identification, performance, cost, conditions, uncertainty, responsibility"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B2",
+      "detail": "missing field group(s): performance"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B3",
+      "detail": "missing field group(s): performance"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B4",
+      "detail": "missing field group(s): performance"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B5",
+      "detail": "missing field group(s): performance"
+    },
+    {
+      "check": "benefit_group_incomplete",
+      "severity": "P1",
+      "subject": "B6",
+      "detail": "missing field group(s): performance"
+    },
+    {
+      "check": "benefit_kpi_unrecorded",
+      "severity": "P1",
+      "subject": "B7",
+      "detail": "no benefit profile records tokens per accepted deliverable"
+    },
+    {
+      "check": "risk_incomplete",
+      "severity": "P1",
+      "subject": "The six benefit baselines are placeholders",
+      "detail": "open risk missing owner_job_id, review_at"
+    },
+    {
+      "check": "risk_incomplete",
+      "severity": "P1",
+      "subject": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+      "detail": "open risk missing owner_job_id, review_at"
+    },
+    {
+      "check": "risk_incomplete",
+      "severity": "P1",
+      "subject": "V2 acceptance (#88/T12) remains open",
+      "detail": "open risk missing owner_job_id, review_at"
+    },
+    {
+      "check": "contract_citations_not_projected",
+      "severity": "P2",
+      "subject": "snapshot.contracts",
+      "detail": "the contract projection omits links/meta, so ADR citations cannot be assessed"
+    }
+  ]
+}

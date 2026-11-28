@@ -14,12 +14,15 @@ mod support;
 
 use conveyor_actions::{InvokeRequest, invoke, registry};
 use conveyor_auth::Role;
+use conveyor_domain::development::ApproverKind;
+use conveyor_store as store;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
 /// A request as an admin caller (holds `approvals:write` and `ops:write`).
 fn request_as(actor: Uuid, action: &str, input: Value, approval_id: Option<Uuid>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,
@@ -43,6 +46,31 @@ fn scale_input() -> Value {
     json!({"namespace": "conveyor", "deployment": "conveyor", "replicas": 3, "dry_run": true})
 }
 
+/// The earned-waiver shape D34 requires (§9.3): an `auto` approver, typed conditions and a future
+/// expiry. A bare `waived` row admits nothing any more, so the fixture seeds the real shape.
+async fn seed_earned_waiver(pg: &support::Pg, tenant: conveyor_domain::TenantId, action: &str) {
+    let mut tx = store::scope::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the earned waiver");
+    store::approval_policy::set(
+        &mut tx,
+        tenant,
+        &store::approval_policy::ApprovalPolicy {
+            action: action.to_owned(),
+            approval: store::approval_policy::ApprovalRequirement::Waived,
+            self_approval: store::approval_policy::SelfApproval::Forbidden,
+            approver_kind: ApproverKind::Auto,
+            conditions: json!({"max_reverts": 0}),
+            expires_at: Some(chrono::Utc::now() + chrono::Duration::days(1)),
+            required_decisions: 1,
+        },
+        None,
+    )
+    .await
+    .expect("seed the earned waiver");
+    tx.commit().await.expect("commit the earned waiver");
+}
+
 /// P1.1 — request → decide → invoke, with no parent anywhere in the chain.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_standalone_gate_authorises_the_call_it_names() {
@@ -64,7 +92,13 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
                 "kind": "action",
                 "action": "ops.scale",
                 "input": scale_input(),
+                // T7 / v1-w1b-4: ops.scale is in the §6.5 dual-control set, so the gate opens
+                // with a two-decision quorum and two distinct humans have to decide it.
+                "required_decisions": 2,
                 "description": "scale conveyor to 3",
+                // This test is about the computed target and the requester, not evidence;
+                // a destructive gate now requires evidence or an explicit waiver.
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),
@@ -127,6 +161,27 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
     .await
     .expect("the reviewer decides the gate");
 
+    // 3b. The second distinct human meets the §6.5 dual-control floor; the gate approves.
+    let second = support::reviewer_two_id(&pg).await;
+    let approved = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            second,
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+        ),
+    )
+    .await
+    .expect("the second approver decides the gate");
+    assert_eq!(
+        approved.body["output"]["status"],
+        json!("approved"),
+        "two distinct human decisions meet the quorum"
+    );
+
     // 4. The same call, now naming the gate, passes — and does what it says.
     let outcome = invoke(
         &pg.runtime,
@@ -164,6 +219,9 @@ async fn a_second_principal_decides_a_gate_the_first_requested() {
                 "action": "ops.scale",
                 "input": scale_input(),
                 "description": "scale conveyor to 3",
+                // This test is about the computed target and the requester, not evidence;
+                // a destructive gate now requires evidence or an explicit waiver.
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),
@@ -282,8 +340,8 @@ async fn a_gate_whose_target_cannot_be_computed_is_refused() {
     assert_eq!(error.errors[0].field, "input");
 }
 
-/// The tenant's own policy still governs: `waived` means no gate is needed, so a standalone gate
-/// is never required for an action the tenant waived.
+/// The tenant's own policy still governs: an earned `waived` row means no gate is needed, so a
+/// standalone gate is never required for an action the tenant waived.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_waived_action_needs_no_gate_at_all() {
     let pg = support::Pg::fresh().await;
@@ -291,19 +349,7 @@ async fn a_waived_action_needs_no_gate_at_all() {
     support::set_env("OPS_API_URL", "http://127.0.0.1:1");
     support::set_env("OPS_TOKEN", "");
 
-    invoke(
-        &pg.runtime,
-        registry(),
-        seeded.tenant,
-        request_as(
-            seeded.user_id,
-            "approval_policies.set",
-            json!({"action": "ops.scale", "approval": "waived", "self_approval": "forbidden"}),
-            None,
-        ),
-    )
-    .await
-    .expect("waive the action for this tenant");
+    seed_earned_waiver(&pg, seeded.tenant, "ops.scale").await;
 
     let outcome = invoke(
         &pg.runtime,

@@ -1,0 +1,8 @@
+{
+ "title": "T9 \u2014 Project registers (rework, 2026-11-22)",
+ "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+ "category": "project-registers",
+ "body": "# Project Registers \u2014 T9 TOGAF ADM capability\n\n## Risks\n\nNo project-owned risk row is recorded for T9; the live risks are the programme's R1\u2013R14 (scope\nvs capacity, record theatre, instrument self-deception, transport, shared target, register\nstaleness, provenance, standard completeness, CI budget, evidence theatre, seed quality and\nthe quality of the V1 record itself). This section is an explicit absence, not an omission.\n\n## Issues\n\n| Code | Issue | Status |\n|---|---|---|\n| U3-EXC-T9 | Out-of-sequence closure accepted as a retrospective exception (T9) | accepted |\n\n## Assumptions\n\nThe Architecture Board is a live governance body with a published delegation; the ADM profile is\nadopted; the artefacts are typed rows bound to the standard's `artifact_type`, not free text.\n\n## Dependencies\n\nT1's plan rows, T3's PM job and T10's tranche reviews are adjacent contracts, not this slice;\nT10 and T12 depend on this capability's gates.\n\n## Benefits\n\nT9 owns no benefit profile; the capability is the control surface the programme's design gates\nand waivers rest on. The benefit status is carried by U6's profiles.\n\n## Changes\n\nThe retrospective lifecycle-record change is recorded separately in this batch\n(`Complete T9's retrospective lifecycle record`, approved by a distinct approver under the\nstanding delegation) so the change-control artefact resolves. The out-of-sequence closure is\nthe accepted issue above, not a change.\n",
+ "publishable": true,
+ "unit": "T9"
+}

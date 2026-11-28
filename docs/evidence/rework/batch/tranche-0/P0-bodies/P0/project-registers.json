@@ -1,0 +1,101 @@
+{
+  "body_sha256": "94442d4e7cce7829c11551c19613ddfe8e9688bf7f2290b0453712b87fd836a5",
+  "category": "project-registers",
+  "headings": [
+    {
+      "heading": "Risks",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Issues",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Assumptions",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Dependencies",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Benefits",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Changes",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 5,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "30e438c3340c062dd1d9f892bc2bd0f5e842ba820cbc12b7696079fdb98e5be6",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+    "key": "P0",
+    "kind": "project",
+    "title": "Programme definition \u2014 vision, blueprint, plan and project briefs"
+  },
+  "title": "Project Registers \u2014 Programme definition \u2014 vision, blueprint, plan and project briefs"
+}

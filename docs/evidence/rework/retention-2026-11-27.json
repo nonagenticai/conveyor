@@ -1,0 +1,39 @@
+{
+  "schema": "conveyor-retention/v1",
+  "captured_at": "2026-11-27",
+  "why": "public-tree scrub (#526): the raw logs are retained in the production record, the public tree keeps redacted copies",
+  "documents": [
+    {
+      "path": "docs/evidence/rework/full-fidelity-snapshot.md",
+      "bytes": 7461,
+      "sha256": "cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804",
+      "document_id": "01a21c4a-e2f9-72b4-92aa-97da0af7b7c0"
+    },
+    {
+      "path": "docs/evidence/rework/PLATFORM/transcript.jsonl",
+      "bytes": 422537,
+      "sha256": "b95db1af94bc9e4879a23154066a075132b05fea6096e9c1e9898427e8c63c9e",
+      "document_id": "01a21c4b-3e50-75fb-b2c1-570210d05111"
+    },
+    {
+      "path": "docs/evidence/rework/DESIGN-PUBLISH/transcript.jsonl",
+      "bytes": 243795,
+      "sha256": "ecef2c5ba546e66b6e4c765ba6ee858774ae906c25830c63c733aab9e4406194",
+      "document_id": "01a21c4b-4ef1-714c-bd05-3d8ccdbaa11b"
+    },
+    {
+      "path": "docs/evidence/record-w4/replay.jsonl",
+      "bytes": 3853277,
+      "sha256": "2d4392474060964a441454348d716b3f7db162ac930dc65ee024cf1d0d40b303",
+      "document_id": "01a21c4b-694b-776a-9b07-980a3ad1c1b0"
+    },
+    {
+      "path": "docs/evidence/rework/S17/transcript.jsonl",
+      "bytes": 97194,
+      "sha256": "2913e9bd35e1f93bd4c43e616ac3406b899ed198d51b63bbb06fdfd51df4038f",
+      "document_id": "01a21c4c-07c6-71ae-b4c7-fb353f400579"
+    }
+  ],
+  "read_back": "documents.download decoded and SHA-256 matched for every row",
+  "publishable": false
+}

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Delivery Contract — Decision ladder · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-2/T2-bodies/T2/delivery-contract.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="delivery-contract--decision-ladder">Delivery Contract — Decision ladder</h1>
+<h2 id="commitments">Commitments</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<p><em>Explicit absence — the contract's commitment list: a commitments field on the delivery contract body.</em></p>
+<h2 id="compliance-method">Compliance method</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;contract_id&quot;: &quot;01a2180f-1c53-7d7d-ac50-60cdaa37717a&quot;,
+      &quot;field&quot;: &quot;compliance&quot;,
+      &quot;kind&quot;: &quot;contract_field&quot;,
+      &quot;title&quot;: &quot;compliance: T2 is assessed clause by clause against the SPEC_V2 \u00a712 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2. The first three gate clauses are proved by named real-Postgres tests: `crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`. The fourth clause is proved on the apply and update paths by `::a_generated_draft_cannot_transition_a_card` and `crates/actions/tests/ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, but is refuted on the create path by v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document with no gate. The batch admitted six findings \u2014 v1-t2-1 (P0, blocking), v1-t2-2 (L1 never calls laya), v1-t2-3 (`refinements.publish` ungated), v1-t2-4 (inline options and questions), v1-t2-5 (budget code spelling) and v1-t2-6 (a human decision cites any approved approval, not its gate). The compliance level is non_conformant; the project stays ACTIVE and is not closed in this pass. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`.&quot;,
+      &quot;value&quot;: &quot;T2 is assessed clause by clause against the SPEC_V2 \u00a712 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2. The first three gate clauses are proved by named real-Postgres tests: `crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`. The fourth clause is proved on the apply and update paths by `::a_generated_draft_cannot_transition_a_card` and `crates/actions/tests/ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, but is refuted on the create path by v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document with no gate. The batch admitted six findings \u2014 v1-t2-1 (P0, blocking), v1-t2-2 (L1 never calls laya), v1-t2-3 (`refinements.publish` ungated), v1-t2-4 (inline options and questions), v1-t2-5 (budget code spelling) and v1-t2-6 (a human decision cites any approved approval, not its gate). The compliance level is non_conformant; the project stays ACTIVE and is not closed in this pass. The rework&#39;s acceptance instrument is `acceptance/programme/T2.toml`.&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_field&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_at&quot;: &quot;2026-11-26T13:32:53.474747+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;id&quot;: &quot;01a2180f-1cdc-7d7e-940b-7a09f77274bf&quot;,
+      &quot;kind&quot;: &quot;contract_approval&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;approval 01a2180f-1cdc-7d7e-940b-7a09f77274bf \u2014 approved&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_approval&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-2/T2-bodies/T2/delivery-contract.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The full-fidelity snapshot loop · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><!-- retained raw log: record document 01a21c4a-e2f9-72b4-92aa-97da0af7b7c0; sha256 cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804; the public copy is redacted by scripts/private_refs.py -->
+
+<h1 id="the-full-fidelity-snapshot-loop">The full-fidelity snapshot loop</h1>
+<p><strong>Why this exists.</strong> Twice on 2026-11-21 the programme's acceptance evidence was taken against a snapshot the <em>deployed</em> engine built, and that engine's projection is older than the branch's: it omits <code>architecture_contract.requested_by</code>, <code>document.published_at</code> (the <code>outputs.js</code> index) and the demo-credit rows. Three checks per manifest therefore reported failures that were artefacts of the snapshot, not defects in the record — and one closure was paused on them.</p>
+<p>The branch binary carries the newer projection, but it cannot read the live primary directly: the branch is at migration <code>0065</code>, the live database at <code>0061</code>, and (measured 2026-11-22) dev Macs cannot reach <code>postgres.example.com:5432</code> at all — the tailnet ACL permits <code>:22</code> only. Restoring a copy and migrating the copy closes both gaps without touching production and without merging anything.</p>
+<p><strong>What it is not.</strong> Not a second source of truth and not a write path. Records still go through the product's actions (<code>programme-record.py</code>, or the deployed engine). The copy is read-only input to <code>verify-project.py</code> and the strict audit.</p>
+<h2 id="the-loop">The loop</h2>
+<ol type="1">
+<li><p><strong>Dump the primary.</strong> On the control-plane host, as the <code>postgres</code> superuser (no password on disk, no credential in a shell history):</p>
+<pre class="sh"><code>ssh -i ~/.ssh/deploy-key admin@192.0.2.10 \
+  &quot;sudo -u postgres pg_dump -Fc -Z6 -d conveyor -f /tmp/conveyor-lane.dump&quot;
+scp -i ~/.ssh/deploy-key admin@192.0.2.10:/tmp/conveyor-lane.dump /tmp/conveyor-lane.dump</code></pre>
+<p>The database was 74 MB on 2026-11-22; the compressed dump is 7.4 MB.</p></li>
+<li><p><strong>Restore into a throwaway <code>postgres:18</code>.</strong> The dump carries RLS policies that name <code>conveyor_migrate</code>, <code>conveyor_runtime</code> and <code>process</code>, so the roles must exist <strong>before</strong> <code>pg_restore</code> or it stops on <code>CREATE POLICY</code>:</p>
+<pre class="sh"><code>docker run -d --name conveyor-restore -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=&quot;$(openssl rand -hex 16)&quot; -e POSTGRES_DB=conveyor \
+  -p 127.0.0.1:55432:5432 postgres:18
+docker exec conveyor-restore psql -U postgres -q \
+  -c &quot;CREATE ROLE conveyor_migrate; CREATE ROLE conveyor_runtime; CREATE ROLE process;&quot;
+docker exec -i conveyor-restore pg_restore -U postgres -d conveyor \
+  --no-owner --no-privileges --exit-on-error &lt; /tmp/conveyor-lane.dump</code></pre>
+<p><code>--no-owner</code> is required: the tables are owned by <code>conveyor_migrate</code> on the primary and that role is not a superuser here. <code>--exit-on-error</code> is required: <code>pg_restore</code> otherwise reports success after skipping the failed policies.</p></li>
+<li><p><strong>Migrate the copy with the branch binary.</strong> <code>conveyor migrate</code> takes the <em>session</em> advisory lock, so it must not go through PgBouncer:</p>
+<pre class="sh"><code>APP_ENV=test \
+DATABASE_MIGRATE_URL=&quot;postgresql://postgres:$PW@127.0.0.1:55432/conveyor&quot; \
+  target/claude/debug/conveyor migrate</code></pre>
+<p>Verified 2026-11-22: <code>migrations applied … migrations 63</code> (0062–0064 applied over the restored <code>_sqlx_migrations</code> max 61). <code>0064</code>'s <code>programme_cadence_state_check</code> validated against the restored rows (<code>materialised</code> 3, <code>planned</code> 9) — if any row had violated it, the migration would have failed and that row would be the finding, never edited to fit.</p></li>
+<li><p><strong>Build the snapshot from the copy.</strong> <code>scripts/snapshot-live.sh</code> already opens a read-only transaction; only its URL changes:</p>
+<pre class="sh"><code>PROGRAMME_RECORD_BIN=target/claude/debug/conveyor \
+SNAPSHOT_DATABASE_URL=&quot;postgresql://postgres:$PW@127.0.0.1:55432/conveyor&quot; \
+TENANT=nonagentic scripts/snapshot-live.sh /tmp/snap-full</code></pre>
+<p>Verified 2026-11-22: 155 files in the snapshot — 14 JSON sections under <code>data/</code> plus the rendered pages and the <code>docs/outputs.js</code> index — with <code>outputs.js</code> carrying 140 rows <strong>with</strong> <code>published_at</code>, <code>architecture.json</code> carrying 22/23 contracts with <code>requested_by</code>, and <code>msp.json</code> carrying 29 demo credits and 17 lessons. Publication lives in <code>docs/outputs.js</code>, never in <code>artefacts.json</code>'s <code>documents</code> array; counting <code>published_at</code> there reads as zero on a healthy record.</p></li>
+<li><p><strong>Verify with the command clauses pointed at the copy.</strong> Manifest command clauses call <code>programme-record.py</code>, which uses the <em>local binary</em> when <code>PROGRAMME_RECORD_LOCAL_BIN</code> is set — and the binary's admin path connects with <code>DATABASE_MIGRATE_URL</code>, not <code>DATABASE_URL</code> (the default <code>DATABASE_URL</code> points at the compose stack and times out). <strong><code>DATABASE_LISTEN_URL</code> must also point at the copy</strong>: unset, the binary opens its listen pool against the default host and every command clause dies on <code>pool timed out while waiting for an open connection</code> — which reads exactly like a red gate. <code>admin action invoke</code> also takes <code>--input</code> as a <strong>file path</strong>, not inline JSON:</p>
+<pre class="sh"><code>export DATABASE_URL=&quot;$URL&quot; DATABASE_MIGRATE_URL=&quot;$URL&quot; DATABASE_LISTEN_URL=&quot;$URL&quot; APP_ENV=test
+export PROGRAMME_RECORD_LOCAL_BIN=target/claude/debug/conveyor
+python3 scripts/verify-project.py --all --snapshot /tmp/snap-full/data \
+  --evidence-dir /tmp/evidence-full</code></pre>
+<p>Keep <code>--evidence-dir</code> outside the repo until the verdict is accepted; a run against a stale copy must never overwrite committed evidence. Note that <code>verify-viability.py</code> re-runs the verifier <strong>without</strong> an evidence dir of its own: it writes all forty-seven files into <code>docs/evidence/rework/</code>. Run it on a clean tree and restore those generated files unless that render is the one being committed.</p></li>
+<li><p><strong>A live write's read-back is not a branch snapshot.</strong> The branch binary carries the newer projection and <strong>cannot snapshot the live primary while the deployed database is behind its migrations</strong> — measured 2026-11-22 against the primary at <code>0061</code>: <code>column d.archetype does not exist</code>. A live write's read-back therefore uses the action's own response (and any read action that exists); the copy is refreshed by dump → restore → migrate for the next verdict. This is also why a write recorded against the primary shows up in the <em>next</em> full snapshot, not the one at the head that preceded it.</p></li>
+</ol>
+<h2 id="what-the-first-run-proved">What the first run proved</h2>
+<table>
+<thead>
+<tr>
+<th>Reading</th>
+<th>Deployed-engine snapshot (23:21Z)</th>
+<th>Restored + migrated copy (00:00Z)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S03 manifest</td>
+<td>5 failures (contract, review, closure gate, lessons, demo credit)</td>
+<td><strong>1</strong> (<code>lessons</code>)</td>
+</tr>
+<tr>
+<td>T2 manifest</td>
+<td>4 failures (contract, review, lessons, demo credit)</td>
+<td><strong>1</strong> (<code>lessons</code>)</td>
+</tr>
+<tr>
+<td>Contracts with <code>requested_by</code></td>
+<td>0</td>
+<td>22 of 23</td>
+</tr>
+<tr>
+<td>Published outputs with <code>published_at</code></td>
+<td>0</td>
+<td>140</td>
+</tr>
+<tr>
+<td>Demo credits</td>
+<td>0</td>
+<td>29</td>
+</tr>
+<tr>
+<td>Programme-wide</td>
+<td>—</td>
+<td>8 green / 39 red (47 manifests)</td>
+</tr>
+</tbody>
+</table>
+<p>The only tranche-2 defect the fidelity run leaves is the missing retro lesson — plus T2's <code>non_conformant</code> review level, which is a record decision rather than a manifest check.</p>
+<h2 id="the-trap-this-loop-exposed">The trap this loop exposed</h2>
+<p><code>artefacts.json</code>'s <code>documents</code> array is <strong>not</strong> the publication projection: it selects only <code>published_at IS NOT NULL AND status='active'</code> rows but does not expose <code>published_at</code> itself, so counting <code>published_at</code> there reads as "0 published" on a healthy record. The publication evidence is <code>docs/outputs.js</code> from the pack, which the verifier already reads. A measurement that looks at the wrong file invents an outage.</p>
+<h2 id="refresh">Refresh</h2>
+<p>Re-dump before each batch: the live record moves as the tranches close. The copy is disposable; the restore SHA and the copy's <code>_sqlx_migrations</code> head belong in every evidence file that cites it.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/full-fidelity-snapshot.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

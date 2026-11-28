@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Change Control — UI spike — Leptos CSR vs Leptos SSR · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="1" data-provenance-hash="7dca6b8d471d058e27977d2a03017bc767e224f2cbc66b71b80a736d01c7f41a" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7dca6b8d471d058e27977d2a03017bc767e224f2cbc66b71b80a736d01c7f41a</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Change Control — UI spike — Leptos CSR vs Leptos SSR</h1>
+<h2>Change requests</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+      "body": "Change request: rebuild S01's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-S01",
+      "created_at": "2026-11-22T06:45:26.116886+00:00",
+      "id": "01a20200-a6d2-70b7-92aa-f1eca565b293",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of S01 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:26.116886+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Impact</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+      "body": "Change request: rebuild S01's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-S01",
+      "created_at": "2026-11-22T06:45:26.116886+00:00",
+      "id": "01a20200-a6d2-70b7-92aa-f1eca565b293",
+      "impact": {
+        "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+        "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+        "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+        "scope": "the record and declared outputs are rebuilt and republished"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of S01 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:26.116886+00:00",
+      "version": 1
+    }
+  ],
+  "source": "computed:change_impact"
+}
+</code></pre>
+<h2>Decisions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+      "body": "Change request: rebuild S01's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-S01",
+      "created_at": "2026-11-22T06:45:26.116886+00:00",
+      "id": "01a20200-a6d2-70b7-92aa-f1eca565b293",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of S01 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:26.116886+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

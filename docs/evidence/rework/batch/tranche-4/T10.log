@@ -1,0 +1,207 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T10 --content docs/evidence/rework/tranche-4/rework-content-T10.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — T10 SAFe cadence and MSP tranches (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T10 SAFe cadence and MSP tranches (Phase A) already present
+  artefact: Requirements Catalog — T10 SAFe cadence and MSP tranches (Phase A) already present
+  artefact: Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A) already present
+  artefact: Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C) already present
+  artefact: Technology Standards Catalog — T10 SAFe cadence and MSP tranches (Phase D) already present
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The tranche-4 exit review is absent, so the tranche is reconciled unauthorised already present
+  register risk: No benefit can claim realization while no benefit transition has been measured already present
+  register issue: v1-p83-1: the tranche-review evidence check is presence-only already present
+  register issue: v1-p82-5: PI materialisation is pinned to one project backlog already present
+  register issue: v1-p83-5: programme status is writable without a tranche review already present
+  register assumption: The named test functions remain the gate evidence although this pass did not re-run them already present
+  register assumption: T1's plan spine stays the only planning store T10 reads already present
+  register dependency: T1 supplies the plan spine T10 reuses already present
+  register dependency: T3 owns the PM job that charts, baselines, routes gates and closes already present
+  register dependency: Tranche 4 must stay authorised for the PI plan's ten-project scope already present
+  register benefit: Planning is arithmetic rather than opinion already present
+  register benefit: A demo credit needs typed evidence and a retro close needs a lesson already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  09 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  10 projects.close_request ok
+  11 approvals.decide ok
+  12 approvals.request ok
+  13 approvals.decide ok
+  14 projects.close ok
+  closed T10: 01a1d039-0d36-70c1-a5e8-f50956c5e3f9
+T10: 14 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T10 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-05a9t1jj/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-05a9t1jj/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T10-bodies --local-bin /tmp/conv526-t14-bin-20261126
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

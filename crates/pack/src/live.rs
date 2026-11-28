@@ -18,6 +18,7 @@ use std::collections::HashMap;
 
 use conveyor_domain::TenantId;
 use conveyor_store as store;
+#[cfg(test)]
 use conveyor_store::document::DocumentRecord;
 use serde_json::Value;
 use sqlx::PgPool;
@@ -25,7 +26,8 @@ use uuid::Uuid;
 
 use crate::outputs::{PublishOutputsError, render_outputs};
 use crate::snapshot::{
-    SnapshotError, SnapshotHeader, feedback_issues, redact_text, section_json, snapshot_js,
+    SnapshotError, SnapshotHeader, feedback_issues, issue_registry_hash, redact_text, section_json,
+    snapshot_generated_at, snapshot_js,
 };
 
 /// The clock an empty tenant reports: a constant, so the bytes never depend on the request time.
@@ -99,13 +101,15 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     let records = in_programme(records, &bound, |record| record.project_id);
     let attachments = in_programme(attachments, &bound, |attachment| attachment.project_id);
 
-    let generated_at = generated_at(&records);
+    let generated_at = snapshot_generated_at(&data);
 
     // The issue registry is a commit-time artefact, not a database row: inject it before the
-    // wrapper is built, exactly as `snapshot::run_with_pool` does.
-    let feedback = feedback_issues(&args.issues);
+    // wrapper is built, exactly as `snapshot::run_with_pool` does — including the provenance
+    // content hash, so the live wrapper and the CLI's stay byte-identical.
+    let issues = issue_registry_hash(args.issues.clone())?;
+    let feedback = feedback_issues(&issues);
     if let Some(object) = data.programme.as_object_mut() {
-        object.insert("issue_registry".to_owned(), args.issues.clone());
+        object.insert("issue_registry".to_owned(), issues);
         object.insert("feedback".to_owned(), Value::Array(feedback));
     }
     // The declared-vs-evidenced register, built from the same rows this view renders. The
@@ -258,27 +262,28 @@ pub(crate) fn programme_csv(programme: &Value) -> String {
             }
         }
         let issues: Vec<String> = numbers.iter().map(|number| format!("#{number}")).collect();
+        // The same safety net the JSON download applies: a project key, name, status or plan path
+        // is free text and can carry a pasted credential or email.
         let fields = [
-            key.to_owned(),
-            project
-                .get("name")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
-            meta.get("tranche").map(tranche_text).unwrap_or_default(),
-            project
-                .get("status")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
-            blocked_by.join(";"),
+            redact_text(key),
+            redact_text(
+                project
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            ),
+            redact_text(&meta.get("tranche").map(tranche_text).unwrap_or_default()),
+            redact_text(
+                project
+                    .get("status")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            ),
+            redact_text(&blocked_by.join(";")),
             open.to_string(),
             claimed.to_string(),
             issues.join(";"),
-            meta.get("plan")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned(),
+            redact_text(meta.get("plan").and_then(Value::as_str).unwrap_or_default()),
         ];
         out.push_str(
             &fields
@@ -310,6 +315,7 @@ fn csv_field(field: &str) -> String {
 }
 
 /// The newest published document's timestamp, or the empty-tenant constant.
+#[cfg(test)]
 fn generated_at(records: &[DocumentRecord]) -> String {
     records
         .iter()

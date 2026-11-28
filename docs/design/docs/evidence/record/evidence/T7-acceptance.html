@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T7 — Acceptance evidence (executed 2026-11-24) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/evidence/T7-acceptance.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t7--acceptance-evidence-executed-2026-11-24">T7 — Acceptance evidence (executed 2026-11-24)</h1>
+<h2 id="command">Command</h2>
+<p><code>cargo-guard.py nextest run --locked -p conveyor-actions --test ops --test ops_write --test ops_read --test ops_host</code></p>
+<p>Summary [ 5.752s] 31 tests run: 31 passed, 1 skipped</p>
+<h2 id="clause-to-test-map-spec_v2-12-t7">Clause-to-test map (SPEC_V2 §12 T7)</h2>
+<table>
+<thead>
+<tr>
+<th>§12 clause</th>
+<th>Executed test(s)</th>
+<th>Suite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>an injected pod failure is triaged</td>
+<td><code>an_incident_is_triaged_with_no_write</code></td>
+<td><code>ops.rs</code></td>
+</tr>
+<tr>
+<td>mitigated by an approved write</td>
+<td><code>an_approved_mitigation_sets_mitigated_at_with_a_read_back</code>, <code>the_write_reads_back</code></td>
+<td><code>ops.rs</code>, <code>ops_write.rs</code></td>
+</tr>
+<tr>
+<td>resolved and postmortemed</td>
+<td><code>an_incident_resolves_with_a_linked_postmortem</code></td>
+<td><code>ops.rs</code></td>
+</tr>
+<tr>
+<td>a destructive action without the tenant's configured approvals is refused</td>
+<td><code>a_destructive_call_without_approval_is_refused</code>, <code>an_approval_for_another_target_is_refused</code>, <code>a_dry_run_makes_no_write</code>, <code>a_caller_without_the_scope_is_refused</code></td>
+<td><code>ops_write.rs</code></td>
+</tr>
+<tr>
+<td>restart, scale, rollback and flag-flip are callable</td>
+<td><code>the_four_write_verbs_are_callable_and_read_back</code>, <code>an_undeclared_verb_is_refused</code></td>
+<td><code>ops.rs</code></td>
+</tr>
+<tr>
+<td>the tenant's approval policy sets the quorum</td>
+<td><code>the_tenant_policy_sets_the_quorum</code></td>
+<td><code>ops.rs</code></td>
+</tr>
+<tr>
+<td>a systemic finding opens exactly one kata</td>
+<td><code>a_systemic_finding_opens_exactly_one_kata</code></td>
+<td><code>ops.rs</code></td>
+</tr>
+<tr>
+<td>k8s read actions</td>
+<td><code>an_unregistered_host_refuses</code>; <code>the_live_read_returns_the_pod_list</code> (skipped: its harness needs a live API stub)</td>
+<td><code>ops_host.rs</code>, <code>ops_read.rs</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="executed-tests">Executed tests</h2>
+<pre><code>PASS [   0.019s] ( 1/31) conveyor-actions::ops support::redis::tests::a_private_url_falls_back_to_the_container
+PASS [   0.019s] ( 2/31) conveyor-actions::ops support::redis::tests::a_private_url_from_the_environment_wins_without_starting_a_container
+PASS [   0.020s] ( 3/31) conveyor-actions::ops support::redis::tests::a_private_url_from_the_environment_wins
+PASS [   0.010s] ( 4/31) conveyor-actions::ops_host support::redis::tests::a_private_url_from_the_environment_wins_without_starting_a_container
+PASS [   0.013s] ( 5/31) conveyor-actions::ops_host support::redis::tests::a_private_url_from_the_environment_wins
+PASS [   0.014s] ( 6/31) conveyor-actions::ops_host support::redis::tests::a_private_url_falls_back_to_the_container
+PASS [   0.017s] ( 7/31) conveyor-actions::ops_read a_machine_caller_without_a_channel_sees_no_ops_reads
+PASS [   3.412s] ( 8/31) conveyor-actions::ops_read a_caller_without_the_scope_is_refused
+PASS [   0.011s] ( 9/31) conveyor-actions::ops_read support::redis::tests::a_private_url_falls_back_to_the_container
+PASS [   0.010s] (10/31) conveyor-actions::ops_read support::redis::tests::a_private_url_from_the_environment_wins
+PASS [   0.012s] (11/31) conveyor-actions::ops_read support::redis::tests::a_private_url_from_the_environment_wins_without_starting_a_container
+PASS [   3.569s] (12/31) conveyor-actions::ops_host an_unregistered_host_refuses
+PASS [   0.090s] (13/31) conveyor-actions::ops_read the_ops_reads_are_on_the_agent_surface
+PASS [   3.543s] (14/31) conveyor-actions::ops_read an_unconfigured_client_refuses
+PASS [   3.788s] (15/31) conveyor-actions::ops_host the_restart_reads_back
+PASS [   0.017s] (16/31) conveyor-actions::ops_write support::redis::tests::a_private_url_falls_back_to_the_container
+PASS [   0.016s] (17/31) conveyor-actions::ops_write support::redis::tests::a_private_url_from_the_environment_wins
+PASS [   0.015s] (18/31) conveyor-actions::ops_write support::redis::tests::a_private_url_from_the_environment_wins_without_starting_a_container
+PASS [   0.015s] (19/31) conveyor-actions::ops_write the_ops_writes_are_destructive_on_the_surface
+PASS [   3.893s] (20/31) conveyor-actions::ops_host an_agent_refusal_is_not_a_restart
+PASS [   4.016s] (21/31) conveyor-actions::ops an_approved_mitigation_sets_mitigated_at_with_a_read_back
+PASS [   4.182s] (22/31) conveyor-actions::ops an_incident_is_triaged_with_no_write
+PASS [   4.369s] (23/31) conveyor-actions::ops the_four_write_verbs_are_callable_and_read_back
+PASS [   4.404s] (24/31) conveyor-actions::ops an_undeclared_verb_is_refused
+PASS [   4.418s] (25/31) conveyor-actions::ops an_incident_resolves_with_a_linked_postmortem
+PASS [   4.424s] (26/31) conveyor-actions::ops the_tenant_policy_sets_the_quorum
+PASS [   4.575s] (27/31) conveyor-actions::ops a_systemic_finding_opens_exactly_one_kata
+PASS [   1.735s] (28/31) conveyor-actions::ops_write the_write_reads_back
+PASS [   2.086s] (29/31) conveyor-actions::ops_write a_dry_run_makes_no_write
+PASS [   2.127s] (30/31) conveyor-actions::ops_write an_approval_for_another_target_is_refused
+PASS [   2.181s] (31/31) conveyor-actions::ops_write a_destructive_call_without_approval_is_refused</code></pre>
+<h2 id="not-executed--and-not-claimed">Not executed — and not claimed</h2>
+<ul>
+<li>The cluster live proof <code>scripts/ops-live-proof.sh</code> did <strong>not</strong> run: the operator CLI it drives (<code>$HOME/.claude/skills/conveyor-api/scripts/conveyor-ctl</code>) is absent on this box, and the deployed conveyor is digest <code>sha256:60898434…</code> (rollout 2026-11-21T04:38Z). It is the deploy-bound item; the manifest's gate is the executed suite above, not this note.</li>
+<li><code>the_live_read_returns_the_pod_list</code> is skipped by its own harness env gate.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/record/evidence/T7-acceptance.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+{
+  "schema": "w3-deep-review/v1",
+  "snapshot_manifest_sha256": "3b481e846ee871902d4fa644d8ba26eb04382f518bdd30818368449ebe1f3899",
+  "method": "the 13 programme-level documents published by scripts/publish-programme-artefacts.py were reviewed against their facts packs and the record; each finding names the artefact, the evidence and an executable acceptance",
+  "findings": [
+    {
+      "key": "w3-gov-assets-1",
+      "kind": "code",
+      "severity": "P1",
+      "owner_project": "T10",
+      "title": "no governed_assets action family and no MSP kinds on governed_asset",
+      "evidence": "SPEC_V2 §8.3 maps mandate/brief/blueprint/business_case/refined_vision/benefits_strategy/benefits_realization_plan/projects_dossier to governed_asset kinds; §10.4 names governed_assets.compose|submit|approve. The served action surface has no governed_assets.* action; governance/assets.rs defines requirements/principles/decisions only; governed_asset kinds in the live copy are adr, charter, closure, postmortem, requirement.",
+      "acceptance": "an action creates a governed_asset of kind mandate on the programme-definition project, the row reads back, and a test proves the MSP kind set is accepted while an unknown kind is refused",
+      "resolved_by": {
+        "commit": "577806533065d32539cda126e4cb3964b6b654e0",
+        "test": "crates/actions/tests/governed_assets.rs::the_msp_kind_set_is_accepted",
+        "evidence": "The governed_assets.compose|get|list|submit|approve family is served (docs/design/data/actions.json); AssetKind carries Mandate/ProgrammeBrief/BusinessCase at crates/domain/src/governance.rs:40-46; governed_assets.rs::a_mandate_is_composed_on_a_project_and_reads_back, ::the_msp_kind_set_is_accepted and ::an_unknown_kind_is_refused_and_writes_nothing prove the DoD at 57780653, an ancestor of the head."
+      },
+      "artifact": "seed/output-standard.json#mandate"
+    },
+    {
+      "key": "w3-shared-config-1",
+      "kind": "record+code",
+      "severity": "P1",
+      "owner_project": "T1",
+      "title": "programme.shared_config is {} and no action sets it",
+      "evidence": "psql on the staging copy: coalesce(shared_config::text,'<null>')='{}'; the served action surface has no programmes.* update; safe-art's Shared configuration source is computed from this column and yields no rows.",
+      "acceptance": "the programme's shared_config carries the keys the programmes share, is read back through an action, and safe-art's Shared configuration section is evidenced",
+      "artifact": "seed/output-standard.json#safe-art",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "programmes.update wrote the programme's shared_config (act 44, 2026-11-26); the post-write snapshot carries values and locked, and the safe-art Shared configuration section resolves."
+      }
+    },
+    {
+      "key": "w3-lessons-1",
+      "kind": "record+code",
+      "severity": "P1",
+      "owner_project": "T5",
+      "title": "inspect-adapt has no kata candidates because no retro lesson exists",
+      "evidence": "msp.json in the fresh snapshot carries lessons: [] (and demo credits are present); kata_candidate_rows reads msp.lessons meta.kata_candidate; the SAFe inspect-adapt template's Kata candidates section is the only programme-level section still un-evidenced.",
+      "acceptance": "one retro lesson with a typed meta.kata_candidate is recorded for a cadence and inspect-adapt's Kata candidates section is evidenced",
+      "artifact": "seed/output-standard.json#inspect-adapt",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "L-PLATFORM-1 is proposed through programme_lessons.propose with meta.kata_candidate (signature enum-mirrors-check); inspect-adapt's Kata candidates section resolves from it."
+      }
+    },
+    {
+      "key": "w3-standard-register-fields-1",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "programme-risk-register requires Categories and Escalations, which project_register_item does not carry",
+      "evidence": "information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
+      "acceptance": "the template maps Categories to kind (or retires the heading) and Escalations to meta.escalation, and generate-standards --check is green",
+      "acceptance_test": "python3 -I scripts/generate-standards.py --self-test",
+      "artifact": "seed/output-standard.json#programme-risk-register",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "scripts/generate-standards.py",
+        "evidence": "Categories and Escalations are retired as required headings (seed/output-standard.json) — the register model has no category or escalation column — and the published body states the mapping to kind and meta.escalation; generate-standards --self-test passes."
+      }
+    },
+    {
+      "key": "w3-action-registry-projection-1",
+      "kind": "code",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "the product snapshot does not project the action registry",
+      "evidence": "the live snapshot carries 13 files and no actions.json; the blueprint's Action registry section is sourced from actions.json with projection: live, and is authored as a pointer to the design pack.",
+      "acceptance": "the product snapshot projects the served action registry and the blueprint section is row-evidenced",
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "apps/server/tests/snapshot_deterministic.rs",
+        "evidence": "the snapshot command now writes actions.json from conveyor_actions::registry() (crates/pack/src/snapshot.rs, commit 552cb493's parent chain); the post-write snapshot carries the served action names and the blueprint's Action registry section resolves."
+      }
+    },
+    {
+      "key": "w3-licensing-frame-1",
+      "kind": "code",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "the product snapshot does not project the licensing frame",
+      "evidence": "business-case's Licensing frame has no source in the snapshot; the document states the gap; the licences service holds the facts.",
+      "acceptance": "the licensing frame is projected (or a governed asset carries it) and the business-case section is row-evidenced",
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "1c756083c534cf51733ef4940137bfddb4c974f1",
+        "test": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json",
+        "evidence": "the governed asset 'Licensing frame' (ADR kind) carries the public/opt-in/tenant boundary and the business case's Licensing frame section resolves from it; the standard package is no longer open at the post-write snapshot."
+      }
+    },
+    {
+      "key": "w3-verdict-t18-1",
+      "kind": "code",
+      "severity": "P2",
+      "owner_project": "T18",
+      "title": "verify-slices parses SPEC §12 T0-T17, not T18",
+      "evidence": "scripts/verify-slices.py's extractor matches the T0-T17 rows; T18 (the V2 UI, #559) is absent from the verdict table.",
+      "acceptance": "T18 is in the harness and its gate executes (or the harness records it as out-of-scope with a named manifest)",
+      "artifact": "scripts/verify-slices.py",
+      "resolved_by": {
+        "commit": "0350a6cc7202b79517133e9983c7ed52a4124c49",
+        "test": "scripts/verify-slices.py",
+        "evidence": "SPEC_V2 section 12's T18 row was added by this commit (#567); parse_spec_gates now returns T0-T19 and `python3 scripts/verify-slices.py --slice T18` exits 0 with SPEC gate 'yes' at audited sha b597b7e8 (snapshot 37f99108). The finding was measured 2026-11-23 against the pre-#567 SPEC, where the row was absent."
+      }
+    }
+  ]
+}

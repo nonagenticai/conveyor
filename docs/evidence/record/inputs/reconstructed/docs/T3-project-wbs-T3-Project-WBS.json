@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Project WBS",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "project-wbs",
+ "body": "# T3 \u2014 Project WBS\n\n## Work packages\n\n| Node | Work package | BV | TC | RR | JS |\n|---|---|---|---|---|---|\n| 1 | The PM request-to-plan path: plan, WBS, baseline | 8 | 8 | 5 | 3 |\n| 2 | Dual control on every PM gate | 9 | 7 | 6 | 3 |\n| 3 | A baseline change travels as a change request | 9 | 6 | 6 | 2 |\n| 4 | Closure against the frozen baseline | 7 | 5 | 4 | 2 |\n| 5 | The T3 acceptance record: the manifest executes | 5 | 4 | 4 | 2 |\n\n## Acceptance\n\nEach node is accepted with typed evidence on the row (tests `spine_gates.rs`, `closure_gate.rs`,\n`programme_close.rs` and the manifest itself); the scope baseline `01a2052e-061f\u2026` freezes the set.\n\n## Status\n\nFive accepted deliverables, five demo credits at the tranche-3 demo; the baseline is approved and\nfrozen at v1.\n",
+ "publishable": true,
+ "unit": "T3"
+}

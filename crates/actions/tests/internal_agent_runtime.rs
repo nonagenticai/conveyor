@@ -156,6 +156,13 @@ async fn seed_job(
     key: &str,
     definition: Value,
 ) -> (Uuid, Uuid) {
+    // An internal-agent run must declare its spend ceiling before it may start (invoke.rs,
+    // `budget_missing`); the release's anatomy is where it is declared. A test that cares about
+    // the ceiling passes its own `limits`; every other test gets a budget it cannot exhaust.
+    let mut definition = definition;
+    if definition.get("limits").is_none() {
+        definition["limits"] = json!({"cost_budget_usd": 100});
+    }
     let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
         .await
         .expect("scope");
@@ -323,11 +330,14 @@ async fn stub_laya(score: Option<f64>) -> (String, Arc<Mutex<usize>>) {
             let state = state.clone();
             async move {
                 *state.lock().expect("hits") += 1;
+                // The ladder's question key is `decision` (DECISION_QUESTION): the executor
+                // prepares and classifies the ladder's own document, so the stub answers the
+                // key that document carries.
                 match score {
                     Some(score) => axum::Json(json!({
-                        "answers": {"accept": {"score": score, "reason": "the stub's verdict"}}
+                        "answers": {"decision": {"score": score, "reason": "the stub's verdict"}}
                     })),
-                    None => axum::Json(json!({"answers": {"accept": {"error": "unavailable"}}})),
+                    None => axum::Json(json!({"answers": {"decision": {"error": "unavailable"}}})),
                 }
             }
         }),
@@ -524,6 +534,54 @@ async fn a_bound_run_generates_a_draft() {
 }
 
 #[tokio::test]
+async fn a_mutated_agent_does_not_change_a_bound_run() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, models) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "mutated_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Mutated job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    // The live row changes after the binding exists. The release snapshot is the execution
+    // authority, so the pinned run must not see the mutation.
+    sqlx::query(
+        "UPDATE capability_agent SET model_ref = 'router/mutated', max_iterations = 3
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(agent)
+    .execute(&pg.super_pool)
+    .await
+    .expect("mutate the live agent");
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(status, "succeeded", "the pinned run still completes");
+    assert_eq!(
+        models.lock().expect("models").as_slice(),
+        ["router/release"],
+        "the release's model, not the mutated live row, is the execution authority"
+    );
+}
+
+#[tokio::test]
 async fn a_missing_prompt_ref_refuses_before_a_model_call() {
     let _guard = STUBS.lock().await;
     let (pg, seeded, running) = fixture().await;
@@ -612,7 +670,10 @@ async fn the_gate_records_a_laya_decision() {
         row
     };
     assert_eq!(status, "succeeded");
-    assert_eq!(answer, "accept");
+    // The recorded answer is the VERIFIED document's answer: a score question records the
+    // score itself (`ladder.evaluate` reads it from the classify replay), never a caller's
+    // synthetic "accept" label.
+    assert_eq!(answer, "0.9");
     assert!((confidence - 0.9).abs() < f64::EPSILON);
     let judge: Value = {
         let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
@@ -2049,16 +2110,7 @@ async fn an_accepted_draft_parks_by_default() {
 
 #[tokio::test]
 async fn a_cardless_internal_agent_run_is_refused_before_any_call() {
-    let _guard = STUBS.lock().await;
     let (pg, seeded, running) = fixture().await;
-    let (router, _models) = stub_router().await;
-    let (laya, hits) = stub_laya(Some(0.9)).await;
-    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
-    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
-    seal_laya_token(&pg, &seeded).await;
-    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
-    set_on_accept(&pg, &seeded, "apply").await;
-
     let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
     let (job, release) = seed_job(
         &pg,
@@ -2069,33 +2121,43 @@ async fn a_cardless_internal_agent_run_is_refused_before_any_call() {
     )
     .await;
     let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+
+    // The API is the first door: `runs.create` requires a card, so a cardless request is a
+    // typed 422 before any row is written.
+    let (status, body) = running
+        .invoke(
+            "runs.create",
+            "dev:alice",
+            json!({"job_binding_id": binding}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    let runs: i64 = sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seeded.tenant.as_uuid())
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the runs");
+    assert_eq!(runs, 0, "a refused create writes no run row");
+
+    // The database is the second door: a raw writer cannot strip an existing run's card either.
+    // The executor's defensive refusal for a pre-0097 row remains in the code, but no post-0097
+    // write can create that state — asserting the constraint is the truthful invariant.
     let (board, lane) = board_and_lane(&running).await;
     let card = create_card(&running, &board, &lane).await;
     let run = start_run(&running, &card, binding).await;
-    // The defensive shape: a run with no card (runs.create always names one).
-    sqlx::query("UPDATE run SET card_id = NULL WHERE tenant_id = $1 AND id = $2")
+    let refused = sqlx::query("UPDATE run SET card_id = NULL WHERE tenant_id = $1 AND id = $2")
         .bind(seeded.tenant.as_uuid())
         .bind(run)
         .execute(&pg.super_pool)
-        .await
-        .expect("cardless");
-    execute(&pg, &seeded, run).await;
-
-    let (status, class) = run_state(&pg, seeded.tenant, run).await;
-    assert_eq!(
-        status, "failed",
-        "an internal_agent run must execute on a card"
+        .await;
+    let error = refused.expect_err("a run cannot lose its card");
+    assert!(
+        error.to_string().contains("run_job_card_required"),
+        "the CHECK that refused the write is not the card door: {error}"
     );
-    assert_eq!(class.as_deref(), Some("capability_not_ready"));
-    let calls: i64 = scalar(
-        &pg,
-        seeded.tenant,
-        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
-        run,
-    )
-    .await;
-    assert_eq!(calls, 0, "the refusal precedes any model call");
-    assert_eq!(*hits.lock().expect("hits"), 0, "and any laya call");
 }
 
 /// P2.5 (S21 step 11, issue #697): every recorded internal_agent call carries a 64-hex prompt hash.

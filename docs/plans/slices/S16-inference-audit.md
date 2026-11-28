@@ -22,6 +22,13 @@ adds_modules: [inference, prompt_audit]
 parity_ids: PENDING-S0   # net-new: this slice ports no old surface, so S0 has no id for it
 ---
 
+<!-- historical-rbuild -->
+> ⚠️ **Historical build order.** `rbuild` was retired on 2026-11-20 (CONTRACT §16). The
+> `rbuild -- …` lines below record how this slice was gated then, not a route to run now. The
+> current route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+> `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
+
+
 # S16 — Inference ledger and prompt audit
 
 Programme project: S16 · issues #20
@@ -136,31 +143,67 @@ capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by t
 
 ```bash
 set -euo pipefail
-# CONTRACT §16: Rust runs on the build host through rbuild; the dev box's cargo refuses inside a Cargo project.
+# CONTRACT §16 (amended 2026-11-20): rbuild is retired. Read every `rbuild -- test` below as the
+# same command run by the GitHub-hosted preflight; locally it is cargo-guard.py for feedback only.
+# libtest exits 0 when a filter selects zero tests (v1-s16-1), so every exact name below is LISTED before
+# it is run: a zero-match filter is a red gate, not a green one. The target names are the shipped ones.
+one_test() { # <test name> <rbuild test args...>
+  local name="$1"; shift
+  local n
+  n=$(rbuild -- test "$@" -- --list --exact "$name" | grep -c ': test$' || true)
+  test "$n" -eq 1 || { echo "zero-match filter: $name (matched $n)" >&2; exit 1; }
+}
+some_tests() { # <minimum> <rbuild test args...>
+  local min="$1"; shift
+  local n
+  n=$(rbuild -- test "$@" -- --list | grep -c ': test$' || true)
+  test "$n" -ge "$min" || { echo "too few tests: $n < $min for: $*" >&2; exit 1; }
+}
 # 1. the three tables exist with RLS forced (a policy without FORCE reads zero rows and proves nothing)
 test "$(psql "$DATABASE_URL" -tAc "SELECT count(*) FROM pg_class WHERE relname IN
   ('inference_call','prompt_audit','prompt_audit_finding') AND relrowsecurity AND relforcerowsecurity")" -eq 3
 # 2. a REAL call end to end: one `completions.create` through the router, then the stored row compared field-for-field
 #    with the router's own `usage` (SPEC §9 — a fixture cannot prove the capture seam; this is the only line that can)
-rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_call_records_the_router_usage
+#    The shipped test is `a_real_external_call_records_the_router_usage_field_for_field`.
+one_test a_real_external_call_records_the_router_usage_field_for_field -p conveyor-actions --test inference_capture
+rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_external_call_records_the_router_usage_field_for_field
+# 2b. the live rehearsal (v1-s16-1): one real call through the estate router, then one ledger row with
+#     a served model. Ignored without `CONVEYOR_LIVE_ROUTER_TOKEN`; when a token is supplied this is the
+#     line that proves the seam against the deployed router, not a stub. It is recorded as a gap until run.
+rbuild -- test -p conveyor-actions --test inference_live -- --ignored --nocapture
 # 3. the derivation is exhaustive — read>0 hit, creation-only write, both-zero miss, no usage unknown (unit, no router)
-rbuild -- test -p conveyor-domain --test inference_usage
+#    There is no `inference_usage` integration target: the shipped proof is the domain lib's `inference::tests`.
+some_tests 2 -p conveyor-domain --lib inference::tests
+rbuild -- test -p conveyor-domain --lib inference::tests
 # 4. the deterministic scan reproduces: two runs over the same draft differ in no finding's
 #    (pattern, location, confidence). The LLM run is proved with the scripted model (CCR 6).
-rbuild -- test -p conveyor-actions --test prompt_audits -- --exact the_same_draft_scans_identically
-# 5. the audit cannot edit what it audits: no action in this slice carries `procedures:write`.
+#    The shipped name is `the_check_is_deterministic_and_only_a_high_finding_blocks`.
+one_test the_check_is_deterministic_and_only_a_high_finding_blocks -p conveyor-actions --test prompt_audits
+rbuild -- test -p conveyor-actions --test prompt_audits -- --exact the_check_is_deterministic_and_only_a_high_finding_blocks
+# 5. the audit cannot edit what it audits: no action in this slice carries `processes:write`.
 #    A compile-time registry assertion — `action_registry.scopes` does not exist (CCR 3).
-rbuild -- test -p conveyor-actions --test registry -- --exact no_prompt_action_holds_procedures_write
+one_test no_prompt_action_holds_processes_write -p conveyor-actions --test registry
+rbuild -- test -p conveyor-actions --test registry -- --exact no_prompt_action_holds_processes_write
 # 6. the cache definition is a DB invariant, not a convention: the constraint exists, and a Rust test against
 #    the runtime role proves a 'hit' with zero read tokens is refused (psql would otherwise fail for the wrong
-#    reason — a missing app.current_tenant — and the line would pass vacuously)
+#    reason — a missing app.current_tenant — and the line would pass vacuously).
+#    There is no `inference_constraints` target: the shipped test lives in `conveyor-store --test inference_`.
 test "$(psql "$DATABASE_URL" -tAc "SELECT count(*) FROM pg_constraint
   WHERE conname = 'inference_call_cache_status' AND contype = 'c'")" -eq 1
-rbuild -- test -p conveyor-store --test inference_constraints -- --exact cache_status_check_refuses_a_hit_with_no_read
+one_test the_cache_check_refuses_a_hit_with_no_read_tokens -p conveyor-store --test inference_
+rbuild -- test -p conveyor-store --test inference_ -- --exact the_cache_check_refuses_a_hit_with_no_read_tokens
 # 7. the served surface and the lock agree — the repo's own checker, not a hand-rolled count
 rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock
 rbuild --gate
 ```
+
+⚠️ **Gate correction (v1-s16-1, 2026-11-21).** The pre-correction gate named four things that do not
+exist: `a_real_call_records_the_router_usage`, `no_prompt_action_holds_procedures_write`, the
+`conveyor-domain --test inference_usage` target and the `conveyor-store --test
+inference_constraints` target. Each was replaced by the shipped target/test above, and the
+`one_test`/`some_tests` helpers make a zero-match run fail the gate. No test was invented. ⚠️ The
+shipped `inference_capture` test drives the capture seam against a **stub** router; the live-router
+rehearsal (`CONVEYOR_EXTERNAL_INFERENCE_URL`) is still pending (§12) and is NOT proved by this gate.
 
 ## 8. Traps
 

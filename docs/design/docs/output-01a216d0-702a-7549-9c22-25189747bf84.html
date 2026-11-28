@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Compliance Review — SAFe cadence and MSP tranches · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="compliance-review" data-provenance-version="1" data-provenance-hash="ccac41269deb7414e8b89f2c9dcf80dd3c27908cb5cbcabc98ba7a5743c6df3d" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>compliance-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>ccac41269deb7414e8b89f2c9dcf80dd3c27908cb5cbcabc98ba7a5743c6df3d</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Compliance Review — SAFe cadence and MSP tranches</h1>
+<h2>Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 2,
+  "rows": [
+    {
+      "contract_id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+      "created_at": "2026-11-22T09:15:42.588778+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T10.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T10.toml",
+        "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level `compliant with named deviations` for T10 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. All five gate clauses are proved at review scope by named tests:\n\n1. PI planning materialises cards from the backlog by WSJF within WIP \u2014 `crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored` and `::materialisation_respects_wip_slots`, with `apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent`.\n2. A deliverable without evidence cannot demo \u2014 `crates/store/tests/demo_gate.rs::a_credit_needs_typed_evidence`.\n3. Retro produces lessons \u2014 `crates/store/tests/retro.rs::retro_cannot_close_without_lessons`.\n4. An end-of-tranche review with no baselines, benefit status or risk evidence is refused \u2014 `crates/store/tests/tranche_review.rs::a_review_without_evidence_is_refused`.\n5. A transition that never measured its baseline cannot report the benefit realized \u2014 `crates/store/tests/benefit_transition.rs::a_missing_baseline_cannot_claim_realization`.\n\nThe review records the deviations this batch admitted rather than claiming full conformance: v1-p83-1 (tranche-review evidence is presence-only and realized needs only two timestamps), v1-p83-2, v1-p83-3 (BCM and benefit ownership are free text), v1-p83-4 (programme baselines are ungated), v1-p83-5 (closure bypasses the closure review and realisation plan), v1-p83-6 (PMP enforcement is partial), v1-p82-5 (the PI backlog is one project's WBS, not the programme's standing backlog) and v1-p82-6 (lessons need no evidence and produce no kata candidates). No waiver is granted; each is a work package with its own acceptance clause.",
+      "id": "01a2028a-3c4e-7a50-8ee9-d59ad0f11396",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "reviewed_at": "2026-11-22T09:15:42.588778+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T09:15:42.588778+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20287-696c-76a4-a2db-28c6092b5813",
+      "created_at": "2026-11-23T09:00:16.869212+00:00",
+      "evidence": {
+        "closure_review": "01a20533-ddef-745a-a510-de2a58a42e2a",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T10.toml"
+      },
+      "findings": [
+        {
+          "statement": "The SoAW's scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation that a waiver would cover.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a207a2-746b-7079-ac46-c5fcc7ee725f",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "reviewed_at": "2026-11-23T09:00:16.869212+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-23T09:00:16.869212+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 2,
+  "rows": [
+    {
+      "contract_id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+      "created_at": "2026-11-22T09:15:42.588778+00:00",
+      "evidence": {
+        "acceptance_manifest": "acceptance/programme/T10.toml",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T10.toml",
+        "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
+      },
+      "findings": "This retrospective Phase-G review records the compliance level `compliant with named deviations` for T10 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. All five gate clauses are proved at review scope by named tests:\n\n1. PI planning materialises cards from the backlog by WSJF within WIP \u2014 `crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored` and `::materialisation_respects_wip_slots`, with `apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent`.\n2. A deliverable without evidence cannot demo \u2014 `crates/store/tests/demo_gate.rs::a_credit_needs_typed_evidence`.\n3. Retro produces lessons \u2014 `crates/store/tests/retro.rs::retro_cannot_close_without_lessons`.\n4. An end-of-tranche review with no baselines, benefit status or risk evidence is refused \u2014 `crates/store/tests/tranche_review.rs::a_review_without_evidence_is_refused`.\n5. A transition that never measured its baseline cannot report the benefit realized \u2014 `crates/store/tests/benefit_transition.rs::a_missing_baseline_cannot_claim_realization`.\n\nThe review records the deviations this batch admitted rather than claiming full conformance: v1-p83-1 (tranche-review evidence is presence-only and realized needs only two timestamps), v1-p83-2, v1-p83-3 (BCM and benefit ownership are free text), v1-p83-4 (programme baselines are ungated), v1-p83-5 (closure bypasses the closure review and realisation plan), v1-p83-6 (PMP enforcement is partial), v1-p82-5 (the PI backlog is one project's WBS, not the programme's standing backlog) and v1-p82-6 (lessons need no evidence and produce no kata candidates). No waiver is granted; each is a work package with its own acceptance clause.",
+      "id": "01a2028a-3c4e-7a50-8ee9-d59ad0f11396",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "reviewed_at": "2026-11-22T09:15:42.588778+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-22T09:15:42.588778+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a20287-696c-76a4-a2db-28c6092b5813",
+      "created_at": "2026-11-23T09:00:16.869212+00:00",
+      "evidence": {
+        "closure_review": "01a20533-ddef-745a-a510-de2a58a42e2a",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+        "manifest": "acceptance/programme/T10.toml"
+      },
+      "findings": [
+        {
+          "statement": "The SoAW's scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation that a waiver would cover.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a207a2-746b-7079-ac46-c5fcc7ee725f",
+      "level": "compliant",
+      "outcome": null,
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "reviewed_at": "2026-11-23T09:00:16.869212+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-23T09:00:16.869212+00:00",
+      "version": 1
+    }
+  ],
+  "source": "architecture.json#/compliance_reviews"
+}
+</code></pre>
+<h2>Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "kind": "waiver_status",
+      "title": "None recorded \u2014 0 waivers for this project",
+      "waivers": 0
+    }
+  ],
+  "source": "computed:waiver_status"
+}
+</code></pre>
+<h2>Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre><code class="language-json">{
+  "category": "compliance-review",
+  "count": 1,
+  "rows": [
+    {
+      "conditions": null,
+      "findings": [
+        {
+          "statement": "The SoAW's scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation that a waiver would cover.",
+          "verdict": "pass"
+        }
+      ],
+      "id": "01a207a2-746b-7079-ac46-c5fcc7ee725f",
+      "kind": "governing_review",
+      "level": "compliant",
+      "outcome": null,
+      "reviewed_at": "2026-11-23T09:00:16.869212+00:00",
+      "reviewed_by_name": "conveyor-approver",
+      "title": "governing review 01a207a2-746b-7079-ac46-c5fcc7ee725f: compliant / no outcome"
+    }
+  ],
+  "source": "computed:governing_review"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

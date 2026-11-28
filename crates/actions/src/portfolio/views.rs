@@ -39,6 +39,9 @@ pub struct ProgrammeCreateIn {
     /// The accountable user, resolved under the caller's tenant.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_user_id: Option<Uuid>,
+    /// The programme's shared values and locked keys; `{}` when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shared_config: Option<Value>,
 }
 
 /// `programmes.update` — the editable fields. `If-Match` is the precondition, never a body
@@ -56,6 +59,9 @@ pub struct ProgrammeUpdateIn {
     /// The new accountable user.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_user_id: Option<Uuid>,
+    /// The new shared configuration; absent leaves the column unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shared_config: Option<Value>,
 }
 
 /// `programmes.list` — no filters; the shared page envelope only.
@@ -77,6 +83,8 @@ pub struct ProgrammeOut {
     pub status: String,
     /// The accountable user, when one is recorded.
     pub owner_user_id: Option<String>,
+    /// The programme's shared values and locked keys.
+    pub shared_config: Value,
     /// The row version (`ETag`).
     pub version: i64,
     /// When the programme was created.

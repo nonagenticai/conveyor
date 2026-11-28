@@ -370,6 +370,22 @@ async fn an_agent_opens_a_standalone_question_and_its_answer_is_recorded_as_the_
         .collect();
     assert!(ids.contains(&approval_id.as_str()), "{listed}");
 
+    // §5.4 / migration 0093: the answering agent may decide this gate only when the tenant's
+    // policy names `agent` as its approver kind.
+    sqlx::query(
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions,
+              required_decisions, updated_by)
+         VALUES ($1, 'design_choice', 'required', 'forbidden', 'agent', '{}'::jsonb, 1, $2)
+         ON CONFLICT (tenant_id, action) DO UPDATE
+            SET approver_kind = 'agent', updated_by = excluded.updated_by",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("declare the design_choice gate agent-decidable");
+
     // Property (e): the decision is recorded as an AGENT's, with the transport named in
     // `via` — never as a human's, and never with the caller's word for it.
     let decided = mcp

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Delivery Contract — Control plane — claims, runs, approvals, andon, comms and notifications · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-5/S06-bodies/S06/delivery-contract.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="delivery-contract--control-plane--claims-runs-approvals-andon-comms-and-notifications">Delivery Contract — Control plane — claims, runs, approvals, andon, comms and notifications</h1>
+<h2 id="commitments">Commitments</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;contract_id&quot;: &quot;01a21a39-c074-7cac-a6d0-ca18a59d30b7&quot;,
+      &quot;field&quot;: &quot;commitments&quot;,
+      &quot;kind&quot;: &quot;contract_field&quot;,
+      &quot;title&quot;: &quot;commitments: S06 commits to the control plane \u2014 claims, runs, approvals, andon, comms and notifications \u2014 as one durable boundary: one conditional UPDATE per claim with a monotonic claim_fence, one idempotent job row per period in place of fr&#39;s timers, one approvals.decide path with required_decisions and decided_by_kind shared by web and Telegram, an andon_state singleton that pauses the poller and refuses runs, and one message plus N delivery rows with a bounded retry.&quot;,
+      &quot;value&quot;: &quot;S06 commits to the control plane \u2014 claims, runs, approvals, andon, comms and notifications \u2014 as one durable boundary: one conditional UPDATE per claim with a monotonic claim_fence, one idempotent job row per period in place of fr&#39;s timers, one approvals.decide path with required_decisions and decided_by_kind shared by web and Telegram, an andon_state singleton that pauses the poller and refuses runs, and one message plus N delivery rows with a bounded retry.&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_field&quot;
+}</code></pre>
+<h2 id="compliance-method">Compliance method</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;contract_id&quot;: &quot;01a21a39-c074-7cac-a6d0-ca18a59d30b7&quot;,
+      &quot;field&quot;: &quot;compliance&quot;,
+      &quot;kind&quot;: &quot;contract_field&quot;,
+      &quot;title&quot;: &quot;compliance: S06 is assessed clause by clause against the slice gate of `acceptance/programme/S06.toml` and plan \u00a77. The properties are: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 cards.move(done) with run succeeded and one audit, invocation and event row each; (b) dual control \u2014 required_decisions=2, one approve stays pending, the same approver again is 409, a second closes; (c) retry \u2014 a killed run is reaped as failed/crashed and the next create is attempt=2; (d) andon \u2014 engaged gives 409 and a 60 s pending run, released resumes within one poll; (e) delivery retry \u2014 a stub 500 lands attempts=5, failed, one row; (f) no timers \u2014 the setInterval scan is empty and every cadence is a schedule row; (g) human vs agent \u2014 decided_by_kind differs for one human and one agent decision through approvals.decide. Each property is carried by a named test in plan \u00a77. The snapshot records no Phase-G review and no run of these properties; this rework supplies the seven A\u2013D artefacts, this contract, the Phase-G review and the evidence output, records the level non_conformant, and keeps the project active until the instrument runs.&quot;,
+      &quot;value&quot;: &quot;S06 is assessed clause by clause against the slice gate of `acceptance/programme/S06.toml` and plan \u00a77. The properties are: (a) golden path \u2014 card \u2192 claim \u2192 run \u2192 gate \u2192 decide \u2192 cards.move(done) with run succeeded and one audit, invocation and event row each; (b) dual control \u2014 required_decisions=2, one approve stays pending, the same approver again is 409, a second closes; (c) retry \u2014 a killed run is reaped as failed/crashed and the next create is attempt=2; (d) andon \u2014 engaged gives 409 and a 60 s pending run, released resumes within one poll; (e) delivery retry \u2014 a stub 500 lands attempts=5, failed, one row; (f) no timers \u2014 the setInterval scan is empty and every cadence is a schedule row; (g) human vs agent \u2014 decided_by_kind differs for one human and one agent decision through approvals.decide. Each property is carried by a named test in plan \u00a77. The snapshot records no Phase-G review and no run of these properties; this rework supplies the seven A\u2013D artefacts, this contract, the Phase-G review and the evidence output, records the level non_conformant, and keeps the project active until the instrument runs.&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_field&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;delivery-contract&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_at&quot;: &quot;2026-11-26T23:38:42.414513+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;id&quot;: &quot;01a21a39-c0f3-79f7-a78f-5ebc08f411a2&quot;,
+      &quot;kind&quot;: &quot;contract_approval&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;approval 01a21a39-c0f3-79f7-a78f-5ebc08f411a2 \u2014 approved&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:contract_approval&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-5/S06-bodies/S06/delivery-contract.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

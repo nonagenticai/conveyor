@@ -1,0 +1,21 @@
+{
+ "archived_at": null,
+ "assignee_id": null,
+ "board_id": "01a1d3e7-aedf-7a3d-b14e-ee5133cfcfde",
+ "card_type_code": "incident",
+ "created_at": "2026-11-25T11:29:55.869259Z",
+ "description": "",
+ "due_at": null,
+ "due_done_at": null,
+ "id": "01a21278-2ea0-7685-95b5-8ce11d7b12c4",
+ "job_binding_id": null,
+ "list_changed_at": "2026-11-25T11:29:55.869259Z",
+ "list_id": "01a1d3e7-af77-7a06-93e6-3ca7ffeebe15",
+ "meta": {},
+ "name": "T14 live image",
+ "parent_card_id": null,
+ "position": 8192.0,
+ "prev_list_id": null,
+ "updated_at": "2026-11-25T11:29:55.869259Z",
+ "version": 1
+}

@@ -10,6 +10,7 @@
 //! knowledge_degraded`; an optional one is a warning on an otherwise successful answer. Nothing is
 //! ever silently answered from an empty set.
 
+use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -93,6 +94,24 @@ async fn knowledge_query(
     let targets =
         retrieval::resolve_targets_tx(&mut *tx, ctx.tenant, input.capability_id, action).await?;
     let retrieved = retrieval::retrieve(action, &targets, query, top_k).await?;
+    // The pack-hit source (v1-w1c-6): one row per retrieval, so the rate's denominator is the
+    // number of retrievals the retriever actually answered. The row shares the query's
+    // transaction: a failed insert breaks the transaction anyway, and a figure that silently
+    // loses rows would be worse than a refused call.
+    store::metrics::record_knowledge_retrieval_tx(
+        &mut *tx,
+        ctx.tenant,
+        targets.capability_id,
+        retrieved.packs.len() as i64,
+        retrieved.hits.len() as i64,
+        retrieved.degraded,
+        None,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "knowledge.query: record the retrieval");
+        ActionError::internal()
+    })?;
     Ok(HandlerOutput::ok(KnowledgeQueryOut {
         capability_id: targets.capability_id,
         capability_code: targets.capability_code,

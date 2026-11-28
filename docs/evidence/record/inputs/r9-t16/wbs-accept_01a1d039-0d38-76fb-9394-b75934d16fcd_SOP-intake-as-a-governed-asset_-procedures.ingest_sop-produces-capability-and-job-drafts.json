@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::a_pdf_sop_becomes_a_pddl_procedure_draft"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::an_sop_yields_capability_and_job_drafts"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-v14/evidence/T16-acceptance.md",
+   "ref": "T16 acceptance transcript"
+  }
+ ],
+ "id": "01a20a84-b2f9-7a60-9224-8203247a991a",
+ "status": "accepted"
+}

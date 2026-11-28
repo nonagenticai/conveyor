@@ -1,0 +1,7 @@
+{
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "benefit": "B2",
+ "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+ "baseline_id": "01a20279-854d-79f6-a751-a34d51be7589",
+ "reason": "B2's baseline is the measured tool_call count from the call ledger; this change records that reading with the measurement row that proves it. No value changes."
+}

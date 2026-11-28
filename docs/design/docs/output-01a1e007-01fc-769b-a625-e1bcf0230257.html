@@ -23,48 +23,16 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief template</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15
-<strong>Source:</strong> <code>docs/plans/P0-programme-definition.md</code> §4–§5</p>
-<p>Every delivery project has one brief, published on the project with <code>meta.category = project-brief</code>. The brief is the contract the project is held to; it is not a plan summary.</p>
-<h2>The mandatory fields</h2>
-<table><thead><tr><th>Field</th><th>Content</th></tr></thead><tbody>
-<tr><td><strong>Outcome</strong></td><td>One sentence: what is true after the project that is not true now</td></tr>
-<tr><td><strong>Boundary</strong></td><td>In scope, out of scope, and the existing surfaces it must not fork</td></tr>
-<tr><td><strong>Reuse sources</strong></td><td>Paths inside the conveyor, estate services/modules, upstream crates. Each with the analysis question it must answer</td></tr>
-<tr><td><strong>Inception units</strong></td><td><code>analysis</code> and <code>architecture</code>, the project's first two claims</td></tr>
-<tr><td><strong>Dependencies</strong></td><td>Typed: blocked-by, acceptance-blocked-by, blocks, related</td></tr>
-<tr><td><strong>Acceptance</strong></td><td>A BDD scenario per part, each with a <code>Verify:</code> command or an executable gate</td></tr>
-<tr><td><strong>Capabilities</strong></td><td>The organisation positions/capabilities that own it</td></tr>
-<tr><td><strong>Plan</strong></td><td>The slice/S## plan path, or the T## SPEC_V2 section</td></tr>
-</tbody></table>
-<h2>The inception standard</h2>
-<p><strong>Analysis</strong> — current state and reuse: for the project's capability, inventory the code that
-already exists (inside the conveyor repo, in the wider estate, and upstream), the contract and
-licence constraints, the build-vs-reuse decision, and the risks. It cites <code>path:symbol</code> inside the
-repo; outside, it names the capability, not a private host or URL.</p>
-<p><strong>Architecture</strong> — the project's design: aggregates, tables, actions, modules, integrations, the
-decision record, and acceptance. It must fit the blueprint; a deviation is a decision record, not a
-silent fork.</p>
-<p>Both are documents on the project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>. Both are
-published when accepted. A project without both published is an inception gap; its build units are
-not claimed.</p>
-<h2>The brief's own rules</h2>
-<ul>
-<li><strong>No invention.</strong> If the plan does not state a field, the brief says "not recorded — the
-inception analysis supplies it"; it does not fill the gap with a guess.</li>
-<li><strong>No private references.</strong> Name capabilities, not hosts, paths or credentials.</li>
-<li><strong>One page.</strong> A brief is read before every build unit; if it takes more than a page, it is a plan.</li>
-<li><strong>The brief is published, not filed.</strong> It appears on the project's workspace, in the Outputs
-register and at its stable public URL.</li>
-</ul>
-<h2>Worked example</h2>
-<p><code>programme/&lt;project-key&gt;/project-brief/</code> in this repository is the exported copy of every
-project's brief. The P0 set's own brief is the programme definition; the delivery briefs follow
-this template exactly.</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="brief-template" data-provenance-version="2" data-provenance-hash="76d7b50c9a422e685085b3f695a075951c774c0f3d5153d7f2ea31b684439c1c" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>brief-template</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>76d7b50c9a422e685085b3f695a075951c774c0f3d5153d7f2ea31b684439c1c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief template — P0 (retrospective, 2026-11-26)</h1>
+<h2>Mandatory fields</h2>
+<p>The template published on 2026-11-18 at 08:18:22 (<code>01a1e007-01fc-769b-a625-e1bcf0230257</code>) makes eight fields mandatory: Outcome, Boundary, Reuse sources, Inception units, Dependencies, Acceptance, Capabilities and Plan. Plan §4 defines each. The outcome is one sentence about what is true after the project; the boundary states what is out of scope and which existing surfaces must not be forked; dependencies are typed as blocked-by, acceptance-blocked-by, blocks or related.</p>
+<h2>Inception units</h2>
+<p>Every delivery project's first two claims are <code>analysis</code> and <code>architecture</code>. Analysis inventories the code that already exists inside the repository, in the wider estate and upstream, with contract and licence constraints and the build-versus-reuse decision. Architecture is produced to the artefact standard of SPEC_V2 §8.1 and carries the typed artefacts its phase and plateau require. Both are published when accepted, and a project without both is an inception gap whose build units are not claimed.</p>
+<h2>Plan</h2>
+<p>The final mandatory field links the slice or <code>S##</code> plan path, or the <code>T##</code> SPEC_V2 section, that the brief governs. P0's own plan is <code>docs/plans/P0-programme-definition.md</code>, and the template itself was issued by P0 under the tranche 0 definition set. What is measurable now is the published template. Whether tranche 1's briefs comply with it is tested by that tranche's acceptance, not by P0.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T21:15:00Z</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

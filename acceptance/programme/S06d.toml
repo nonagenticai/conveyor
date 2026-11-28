@@ -1,0 +1,117 @@
+[project]
+key = "S06d"
+name = "Interaction connector standard — web, Telegram, MCP first"
+gate = "The connector standard — one registry entry per kind, one inbound route, one command grammar, one multicast dispatcher and a tenant-admin grant matrix — is accepted on the §5 Gate result at `99ed39f` plus the five-failure fix: clippy/fmt clean, lock OK, and every affected binary re-run green."
+gate_checks = ["S06d-project", "S06d-baseline", "S06d-charter", "S06d-closure-outputs", "S06d-contract", "S06d-review", "S06d-closure-gate", "S06d-waivers", "S06d-pi-cadence", "S06d-pi-plan", "S06d-pi-objectives", "S06d-lessons", "S06d-wsjf", "S06d-demo-credits", "S06d-product", "S06d-artefact-standard", "S06d-rework"]
+[[check]]
+id = "S06d-project"
+check = "project"
+severity = "P0"
+description = "S06d is closed"
+
+[[check]]
+id = "S06d-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S06d-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d2b-7b80-93fe-c1daf60c5c1f"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S06d-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "S06d-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S06d-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S06d-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "S06d-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S06d-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S06d-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "S06d-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "S06d-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "S06d-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S06d-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S06d-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S06d-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S06d-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

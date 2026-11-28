@@ -116,6 +116,9 @@ echo "==> cargo nextest"
 "${CARGO_RUN[@]}" nextest run --no-tests=fail --color never --locked
 "${CARGO_RUN[@]}" test --doc --locked
 
+echo "==> egress allowlist (S09 property f)"
+python3 scripts/check-egress.py --check
+
 echo "==> no private references"
 bash scripts/ci/no-private-refs.sh
 

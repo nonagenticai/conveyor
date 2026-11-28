@@ -1,0 +1,1 @@
+{"benefit_id": "01a1e9df-0308-7fdc-8492-32db1e582a2d", "kind": "baseline", "target_value": null, "actual_value": 18.0, "unit": "tool_call rows", "method": "count tool_call rows", "measured_at": "2026-11-22T20:00:00Z", "evidence": {"reference": "B2", "value": 18.0, "instrument": "count tool_call rows", "detail": {"tool_calls": 18}}}

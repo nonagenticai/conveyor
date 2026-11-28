@@ -23,47 +23,26 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief — T4 Kanban coach (retrospective, 2026-11-22)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="4a8c584e6b7a3aa5fe665d782c75c5afd6eb823e9a6a416b43e6bbf893b5eb56" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>4a8c584e6b7a3aa5fe665d782c75c5afd6eb823e9a6a416b43e6bbf893b5eb56</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T4 Kanban coach (retrospective, 2026-11-24)</h1>
 <h2>Outcome</h2>
-<p>The conveyor has a coach loop for an interruption. A failed run opens exactly one coach card with one triage and one remedy from the seeded closed catalogue; a repeat signature escalates instead of opening a second card; a failed coach run opens no coach card and a nested coach run is refused; and a systemic class starts <code>kata.open</code>. The first-interruption shape, escalation and the depth cap are live and proved by named tests; four findings remain open, and v1-p6-4 shows the 'exactly one' does not hold for a fourth distinct signature.</p>
+<p>T4 is the kanban coach of the conveyor: an injected failure becomes exactly one coach card, one triage from a closed five-term set, and at most one remedy from a closed six-term set. A repeat signature inside the coach.window escalates through coach.escalation instead of opening a second card; a failed coach run never opens a coach card, so the coach chain settles at one card; and a systemic class opens one measured kata while a transient class opens none. The record claims the slice built (<code>meta.measured_status: built</code>) and issue #75 is closed, but the 2026-11-24 acceptance run is red on governance checks and this retrospective does not upgrade the claim to accepted.</p>
 <h2>Boundary</h2>
-<p>T4 owns the interruption row, the coach card, its triage and remedy, the per-signature escalation rule and the depth cap. It does not own the board and pull path that calls <code>err.card</code>, the kata's own lifecycle and measurement (T5), the PM job (T3), operations incidents and postmortems (T7), or the tool platform (T13). T4 starts a kata process; it does not build the kata.</p>
+<p>Out of scope: the kata lifecycle after open — observe, analyse, hypothesise, propose, measure, adopt — which belongs to T5 (issue #77); the board UI, which belongs to S12; card writes outside the action registry; and any second board, comment or membership store. The coach opens a kata but never adopts one: adoption is a human decision carrying evals:approve.</p>
 <h2>Reuse sources</h2>
-<p><code>migrations/0057_coach.sql</code> — <code>coach_interruption</code> and <code>coach_remedy</code>. <code>crates/actions/src/coach.rs</code> — <code>coach.interrupt</code>, <code>open_interruption_tx</code>, <code>record_triage_tx</code>, <code>insert_remedy_tx</code>, <code>mark_escalated_tx</code>, <code>is_coach_card_tx</code> and <code>set_kata_candidate_tx</code>. The board card store and <code>cards.create</code>. The seeded process catalogue and its idempotent seed. The approval gates <code>coach.ask</code> and <code>coach.escalation</code>. The real-Postgres action test harness.</p>
+<p>The board card, the process run and the approval primitive from P0; the failed-run provenance from T3, on which the dependency line places T4; the action registry and its HTTP/MCP parity; the policy ladder, reused for coach.window; and the kata action family in <code>crates/actions/src/kata.rs</code>, which supplies the systemic-learning hand-off. The gate instrument reuses the repository's evidence convention: a sha-bound JSON run under <code>docs/evidence/rework/</code>.</p>
 <h2>Inception units</h2>
-<p>No T4-specific inception analysis or architecture design is present in the snapshot; this rework authored none. The inception claim is the SPEC_V2 sections 6.2 and 6.4 text, the T4 row of section 12 and the issue #75 body. The implementation record is the coach action module, the 0057 migration and the two suites.</p>
+<p>This retrospective is the inception record. It carries the charter, the Statement of Architecture Work 01a2028b-dde6-7ed4-9e47-6e582f2341d8, the seven mandatory Phase A–D artefacts 01a2028c-33a0-76d6-acd6-57365a79dd10, 01a2028c-6415-7dbb-bb08-ef2baa58aaa4, 01a2028c-94d6-7e50-9d94-9e94feda14aa, 01a2028c-c575-749c-a0c8-82c44effa477, 01a2028c-f584-75ea-90cd-b929dd945aa4, 01a2028d-27ab-7464-918c-e0e07c1a43dc and 01a2028d-57ed-7267-ab06-1a3585f3acd8, the delivery contract 01a2028d-942b-759a-ad59-ab9c38629977 and the one WBS deliverable whose WSJF inputs are 10, 8, 9 and 13.</p>
 <h2>Dependencies</h2>
-<ul>
-<li>blocked-by: T3 and P0 (<code>project.meta.depends_on = [T3, P0]</code>); the coach writes cards and gates on the board and approval spine T3 and T1 install.</li>
-<li>blocks: T7 (operations severity and the gate pre-check) and T12 (the one organisation loop), per the section 12 dependency line.</li>
-<li>related: T5 (the kata the systemic class opens) and T10 (the cadence retro card the coach owns).</li>
-</ul>
+<p>T4 depends on T3 for the failed-run provenance that supplies the interruption signature, and on P0 for the board card, the process spine, the action registry and the approval primitive. It hands systemic classes to T5. Governance dependencies are the approved scope baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72, the tranche-4 authorisation 01a216d0-d634-738e-985a-00a85cfd48d9 and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</p>
 <h2>Acceptance</h2>
-<p>The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are green by <code>coach.rs</code>; clause 1 is green for a first interruption and red for a fourth distinct signature (v1-p6-4); clause 4 is green as a process start and incomplete as a kata record (v1-p6-2). The rework's acceptance instrument is <code>acceptance/programme/T4.toml</code>.</p>
+<p>SPEC_V2 §12's four clauses, bound to twelve named tests by <code>scripts/check-t4-coach-gate.py</code>: one card, one triage and one remedy per interruption; repeat escalation without retry; no coach card about a coach card; and one measured kata for a systemic class, with escalation when no instrument is pinned and no kata for a transient class. The acceptance instrument is <code>acceptance/programme/T4.toml</code>. At the snapshot the gate is red: <code>docs/evidence/rework/T4.json</code> fails the charter check on the missing transport, the review on its delegation reference, the artefact standard on fifteen open packages and the rework check on the P1 package <code>std-togaf-phase-g-t4-g:T4</code>.</p>
 <h2>Capabilities</h2>
-<p>One card, one triage and one remedy; per-signature escalation; the depth cap; the closed triage and remedy catalogue; the systemic-class <code>kata.open</code> start; the stored interruption, triage and remedy rows.</p>
+<p>Eight capabilities: interruption capture, closed triage, remedy execution, repeat-signature escalation, recursion containment, systemic learning through one measured kata, human decision gates for escalation, ask and adoption, and conformance evidence through the sha-bound gate instrument. Each is declared built with a named code or test carrier; none is recorded as accepted at this snapshot.</p>
 <h2>Plan</h2>
-<p>Held to <code>docs/SPEC_V2.md</code> section 12 (T4) and sections 6.2 and 6.4. The project row's plan pointer is <code>docs/SPEC_V2.md#12</code> with <code>plan_status: draft</code>; no separate plan document exists. The project row is closed in the 2026-11-22 snapshot (version 10); the rework records the lifecycle retrospectively.</p>
-<h2>Risks</h2>
-<ul>
-<li>The per-card cap drops a fourth distinct signature (v1-p6-4): a real interruption can get no card and no owner.</li>
-<li>Only failed runs produce interruptions (v1-p6-5): WIP breaches, stale leases, gate timeouts and board events have no coach path.</li>
-<li>The systemic class opens only a process run (v1-p6-2): no instrument, threshold, measurement or adoption gate.</li>
-<li><code>cards.create</code> can mint an orphan coach card (v1-p6-6).</li>
-<li>Tranche 4 is <code>planned</code> with no authorisation review, <code>authorised_at</code> or baseline; T4 closed out of sequence.</li>
-</ul>
-<h2>Links</h2>
-<ul>
-<li>Issues: https://github.com/nonagenticai/conveyor/issues/75</li>
-<li>Specification: <code>docs/SPEC_V2.md</code> sections 6.2, 6.4 and section 12 (T4)</li>
-<li>Schema: <code>migrations/0057_coach.sql</code></li>
-<li>Tests: <code>crates/actions/tests/coach.rs</code>, <code>process_catalogue.rs</code>, <code>registry.rs</code>; <code>crates/store/tests/s07_seed.rs</code></li>
-<li>Tranche 4: <code>01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce</code></li>
-<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
-</ul>
+<p>The retrospective proceeds in the order the rework runner applies: publish the charter and Statement of Architecture Work, create the seven A–D artefacts with their exact titles, record the delivery contract and the WBS deliverable, record the Phase-G review at non_conformant, and publish this brief and the evidence output. It then stops. It does not reissue the closure review 01a216d0-652c-77e5-b57b-31dd47e18519, does not take a closure gate, and leaves the project active so the live governance failures can be fixed and the coach gate run under the repository's CI route.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-26T21:15:00Z · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>Kanban coach · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

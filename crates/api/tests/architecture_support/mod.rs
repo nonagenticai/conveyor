@@ -283,24 +283,131 @@ pub async fn raw_project(pg: &support::Pg, tenant_id: Uuid, name: &str) -> Uuid 
     .expect("insert the project")
 }
 
-pub async fn tailor(
-    running: &support::Running,
-    requirements: Value,
-    contract_kinds: Value,
-) -> Value {
-    ok(
-        running,
+/// Seed the tenant's `artifact_type` standard through the store.
+///
+/// The served `profile_tailor` seeds it too, but only after validating the payload; the fixture
+/// must read the standard's mandatory rows BEFORE it can keep them in that payload.
+async fn seed_standard(f: &Fixture) {
+    let mut tx = conveyor_store::begin_scoped(&f.pg.owner, f.seeded.tenant)
+        .await
+        .expect("scope the standard seed");
+    conveyor_store::architecture::seed_standard_tx(&mut tx, f.seeded.tenant)
+        .await
+        .expect("seed the artifact_type standard");
+    tx.commit().await.expect("commit the standard seed");
+}
+
+/// Add every `artifact_type.mandatory` row of a covered phase to the caller's requirement map.
+///
+/// A tailored profile may add work but never subtract the standard's mandatory artefacts; the
+/// phase gate joins those rows to every set anyway, so a fixture that omitted them would tailor
+/// a profile the action refuses.
+fn with_mandatory(standard: &[Value], requirements: Value) -> Value {
+    let mut map = match requirements {
+        Value::Object(map) => map,
+        other => panic!("tailor requirements must be an object: {other}"),
+    };
+    for row in standard {
+        if row["mandatory"].as_bool() != Some(true) {
+            continue;
+        }
+        let phase = row["phase_code"].as_str().expect("a phase_code").to_owned();
+        let plateau = row["plateau"].as_str().expect("a plateau").to_owned();
+        let key = row["key"].as_str().expect("a key").to_owned();
+        let entry = map.entry(phase.clone()).or_insert_with(|| json!({}));
+        match entry {
+            Value::Array(items) => {
+                if !items.iter().any(|item| item.as_str() == Some(key.as_str())) {
+                    items.push(Value::String(key));
+                }
+            }
+            Value::Object(plateaus) => {
+                let set = plateaus.entry(plateau.clone()).or_insert_with(|| json!([]));
+                let Value::Array(items) = set else {
+                    panic!("phase {phase}'s plateau {plateau} must be an array");
+                };
+                if !items.iter().any(|item| item.as_str() == Some(key.as_str())) {
+                    items.push(Value::String(key));
+                }
+            }
+            other => {
+                panic!("phase {phase}'s requirements must be an array or a plateau map: {other}")
+            }
+        }
+    }
+    Value::Object(map)
+}
+
+/// Tailor the tenant's ADM profile, then adopt it through the Board.
+///
+/// The profile action refuses a payload that drops a mandatory type or names an unknown key, so
+/// the standard's mandatory rows are merged into the caller's map first. Adoption is the Board's
+/// act: a unique board records an approved decision about this profile, and the same action call
+/// carries that decision id.
+pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
+    seed_standard(f).await;
+    let read = ok(&f.running, "architecture.profile_get", json!({}), None).await;
+    let standard = read["standard"].as_array().expect("the standard").to_vec();
+    let input = json!({
+        "key": "adm",
+        "name": "Tailored ADM",
+        "phase_set": ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"],
+        "artifact_requirements": with_mandatory(&standard, requirements),
+        "contract_kinds": contract_kinds,
+    });
+    let draft = ok(
+        &f.running,
         "architecture.profile_tailor",
+        input.clone(),
+        None,
+    )
+    .await;
+    let board = created(
+        &f.running,
+        "architecture.board_open",
         json!({
-            "key": "adm",
-            "name": "Tailored ADM",
-            "phase_set": ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"],
-            "artifact_requirements": requirements,
-            "contract_kinds": contract_kinds,
+            "kind": "architecture_board",
+            "key": format!("profile-board-{}", Uuid::now_v7().simple()),
+            "name": "Profile adoption board",
+            "charter": "PF-1: adopt the tailored ADM profile",
+            "commissioning_authority": "P0 programme board",
+            "decision_limits": { "spend": "none" },
+            "members": [{ "role": "chief architect" }],
         }),
         None,
     )
-    .await
+    .await;
+    // The profile decision needs an active board; the board's own approval convenes it.
+    created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "convene the profile board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
+    let decision = created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "PF-1" },
+            "subject_kind": "adm_profile",
+            "subject_id": id_of(&draft),
+        }),
+        None,
+    )
+    .await;
+    let mut adopt = input;
+    adopt["adopt_with_decision_id"] = decision["approval_id"].clone();
+    let adopted = ok(&f.running, "architecture.profile_tailor", adopt, None).await;
+    assert_eq!(adopted["status"], "adopted", "{adopted}");
+    adopted
 }
 
 /// Tailor the profile and adopt it on a real approved board decision.
@@ -309,70 +416,11 @@ pub async fn tailor(
 /// architecture-board decision about that profile (v1-p81-3). A test whose tailored set must
 /// govern therefore takes this path; `tailor` alone leaves a draft that never governs.
 pub async fn tailor_adopted(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
-    const PHASES: [&str; 9] = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"];
-    let draft = tailor(&f.running, requirements.clone(), contract_kinds.clone()).await;
-    let profile_id = id_of(&draft);
-    // The decision about the profile, on a board of its own so the fixture does not disturb
-    // board-list assertions.
-    let (status, opened) = f
-        .running
-        .invoke(
-            "architecture.board_open",
-            TOKEN,
-            json!({
-                "kind": "architecture_board",
-                "key": format!("profile-board-{}", Uuid::now_v7().simple()),
-                "name": "Profile board",
-                "charter": "Adopt the tailored ADM profile",
-                "commissioning_authority": "P0 programme board",
-                "decision_limits": {},
-                "members": [],
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "architecture.board_open: {opened}");
-    let body_id = id_of(output(&opened));
-    let (status, decided) = f
-        .running
-        .invoke(
-            "architecture.board_decide",
-            TOKEN,
-            json!({
-                "body_id": body_id,
-                "decision": "approved",
-                "evidence": {"delegation_ref": f.delegation},
-                "subject_kind": "adm_profile",
-                "subject_id": profile_id,
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "architecture.board_decide: {decided}");
-    let decision = output(&decided)["approval_id"]
-        .as_str()
-        .expect("the adoption decision id")
-        .to_owned();
-    // Re-tailor with the same content: the action adopts in the same write, so the row the
-    // gate reads is `adopted`.
-    ok(
-        &f.running,
-        "architecture.profile_tailor",
-        json!({
-            "key": "adm",
-            "name": "Tailored ADM",
-            "phase_set": PHASES,
-            "artifact_requirements": requirements,
-            "contract_kinds": contract_kinds,
-            "adopt_with_decision_id": decision,
-        }),
-        None,
-    )
-    .await
+    // The lane's `tailor` already adopts through the Board: its profile_tailor write carries the
+    // board decision and the row the gate reads is `adopted`. #843's separate path re-adopted
+    // (and its fresh board was still a draft, which `board_decide` refuses), so this is an alias
+    // that keeps #843's callers working on one adoption.
+    tailor(f, requirements, contract_kinds).await
 }
 
 /// The row id of one seeded `artifact_type` key.
@@ -458,7 +506,7 @@ pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
                 "charter": "Approve the delivery contract",
                 "commissioning_authority": "P0 programme board",
                 "decision_limits": {},
-                "members": [],
+                "members": [{ "role": "reviewer" }],
             }),
             None,
             None,
@@ -467,6 +515,19 @@ pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
         .await;
     assert_eq!(status, 201, "architecture.board_open: {opened}");
     let body_id = id_of(output(&opened));
+    // The contract decision needs an active board; the board's own approval convenes it.
+    created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": body_id,
+            "decision": "approved",
+            "evidence": { "charter": "convene the contract board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
     let (status, board) = f
         .running
         .invoke(
@@ -532,7 +593,7 @@ pub async fn advance(running: &support::Running, project: &str, phase: &str) -> 
 
 /// Open the Architecture Board and return the row.
 pub async fn open_board(running: &support::Running) -> Value {
-    created(
+    let board = created(
         running,
         "architecture.board_open",
         json!({
@@ -546,7 +607,22 @@ pub async fn open_board(running: &support::Running) -> Value {
         }),
         None,
     )
-    .await
+    .await;
+    // A board decides only once it is active, and its own approval is the one way a draft board
+    // is convened.
+    created(
+        running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "convene the board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
+    board
 }
 
 /// Insert a document row the artefact can point at; returns its id.

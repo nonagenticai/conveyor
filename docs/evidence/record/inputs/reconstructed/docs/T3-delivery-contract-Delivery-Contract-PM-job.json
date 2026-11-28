@@ -1,0 +1,8 @@
+{
+ "title": "Delivery Contract \u2014 PM job",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "delivery-contract",
+ "body": "# Delivery Contract \u2014 PM job\n\n## Commitments\n\nThe record the section derives from, or an explicit absence.\n\n_Explicit absence \u2014 the contract's commitment list: a commitments field on the delivery contract body._\n\n## Compliance method\n\nThe record the section derives from, or an explicit absence.\n\n_Explicit absence \u2014 the contract's compliance method: a compliance field on the delivery contract body._\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n\n```json\n{\n  \"category\": \"delivery-contract\",\n  \"count\": 1,\n  \"rows\": [\n    {\n      \"approved_at\": \"2026-11-22T21:35:26.906579+00:00\",\n      \"approved_by\": \"01a1e8a7-8b23-76a9-9114-aafb95f7a545\",\n      \"id\": \"01a2052f-5a18-7607-b2c4-a6e3f89015e6\",\n      \"kind\": \"contract_approval\",\n      \"requested_by\": \"01a1efd4-c3e5-7b74-b32b-1b15683a8c4e\",\n      \"status\": \"approved\",\n      \"title\": \"approval 01a2052f-5a18-7607-b2c4-a6e3f89015e6 \\u2014 approved\"\n    }\n  ],\n  \"source\": \"computed:contract_approval\"\n}\n```\n",
+ "publishable": true,
+ "unit": "artefact:T3:delivery-contract:6298ba6e410221c4"
+}

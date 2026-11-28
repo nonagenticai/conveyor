@@ -2,7 +2,7 @@
   "schema": 1,
   "baseline": {
     "date": "2026-11-27",
-    "git_sha": "01544010f9ef4b86fb2d17aa8543e093588c0190",
+    "git_sha": "10e6531582ac698f304aec99b81ec0157caff9b8",
     "prior": {
       "routes": 52,
       "actions": 597,
@@ -10,20 +10,20 @@
     }
   },
   "counts": {
-    "routes": 52,
-    "actions": 598,
-    "attrs": 572,
+    "routes": 56,
+    "actions": 602,
+    "attrs": 576,
     "manual": 26
   },
   "summary": {
-    "routes_total": 52,
+    "routes_total": 56,
     "routes_absent": 2,
-    "routes_registered": 50,
+    "routes_registered": 54,
     "routes_verified": 0,
-    "actions_total": 598,
+    "actions_total": 602,
     "actions_absent": 0,
     "actions_reachable": 0,
-    "actions_schema_rendered": 598
+    "actions_schema_rendered": 602
   },
   "routes": [
     {
@@ -62,7 +62,7 @@
     {
       "pattern": "/architecture",
       "walk": "/architecture",
-      "view": "ArchitectureScreen",
+      "view": "SystemArchitectureScreen",
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/architecture.spec.ts",
@@ -183,7 +183,7 @@
     {
       "pattern": "/design/adm",
       "walk": "/design/adm",
-      "view": "AdmGate",
+      "view": "ArchitectureScreen",
       "room": "governance",
       "owner": "S2",
       "spec": "e2e/procedures-governance/adm.spec.ts",
@@ -313,6 +313,17 @@
       "registered": true
     },
     {
+      "pattern": "/feedback",
+      "walk": "/feedback",
+      "view": "FeedbackScreen",
+      "room": "utilities",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/feedback.spec.ts",
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
+    },
+    {
       "pattern": "/improve",
       "walk": "/improve",
       "view": "Improve",
@@ -337,10 +348,43 @@
     {
       "pattern": "/knowledge",
       "walk": "/knowledge",
-      "view": "KnowledgeGate",
+      "view": "KnowledgeScreen",
       "room": "knowledge",
       "owner": "S3",
       "spec": "e2e/measure-operations-utilities/knowledge.spec.ts",
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
+    },
+    {
+      "pattern": "/knowledge/memory",
+      "walk": "/knowledge/memory",
+      "view": "MemoryScreen",
+      "room": "knowledge",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/memory.spec.ts",
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
+    },
+    {
+      "pattern": "/knowledge/sources",
+      "walk": "/knowledge/sources",
+      "view": "SourcesScreen",
+      "room": "knowledge",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/sources.spec.ts",
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
+    },
+    {
+      "pattern": "/measure",
+      "walk": "/measure",
+      "view": "MeasureScreen",
+      "room": "measure",
+      "owner": "S3",
+      "spec": "e2e/measure-operations-utilities/measure.spec.ts",
       "status": "registered",
       "spec_present": true,
       "registered": true
@@ -3903,6 +3947,36 @@
       "timeout_ms": 30000,
       "scopes": [
         "events:read"
+      ],
+      "metadata_complete": true,
+      "status": "schema-rendered"
+    },
+    {
+      "name": "feedback.create",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "write",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "feedback:write"
+      ],
+      "metadata_complete": true,
+      "status": "schema-rendered"
+    },
+    {
+      "name": "feedback.list",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "feedback:read"
       ],
       "metadata_complete": true,
       "status": "schema-rendered"
@@ -7485,6 +7559,21 @@
       "status": "schema-rendered"
     },
     {
+      "name": "proofs.attest",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "approvals:read"
+      ],
+      "metadata_complete": true,
+      "status": "schema-rendered"
+    },
+    {
       "name": "proofs.get",
       "source": "attr",
       "kind": "internal",
@@ -7525,6 +7614,21 @@
       "timeout_ms": 30000,
       "scopes": [
         "approvals:write"
+      ],
+      "metadata_complete": true,
+      "status": "schema-rendered"
+    },
+    {
+      "name": "proofs.render",
+      "source": "attr",
+      "kind": "internal",
+      "effect": "read",
+      "confirm": "none",
+      "tenancy": "tenant",
+      "idempotent": true,
+      "timeout_ms": 30000,
+      "scopes": [
+        "approvals:read"
       ],
       "metadata_complete": true,
       "status": "schema-rendered"
@@ -9587,22 +9691,12 @@
   ],
   "drift": {
     "live_routes": 56,
-    "census_routes": 52,
+    "census_routes": 56,
     "live_actions": 602,
-    "census_actions": 598,
-    "missing_routes": [
-      "/feedback",
-      "/knowledge/memory",
-      "/knowledge/sources",
-      "/measure"
-    ],
+    "census_actions": 602,
+    "missing_routes": [],
     "extra_routes": [],
-    "missing_actions": [
-      "feedback.create",
-      "feedback.list",
-      "proofs.attest",
-      "proofs.render"
-    ],
+    "missing_actions": [],
     "extra_actions": []
   },
   "exemptions": {

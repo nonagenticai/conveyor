@@ -1,0 +1,147 @@
+{
+ "baseline_kind": "scope",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "wbs": [
+  {
+   "body": "ops.incident opens an incident; triage runs the published runbook and writes nothing.",
+   "business_value": 9,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::an_incident_is_triaged_with_no_write"
+    },
+    {
+     "kind": "document",
+     "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+     "ref": "T7 acceptance transcript"
+    }
+   ],
+   "job_size": 2,
+   "kind": "deliverable",
+   "risk_reduction": 7,
+   "time_criticality": 8,
+   "title": "Incidents are opened and triaged on the board from the operations queue"
+  },
+  {
+   "body": "A runbook is published as a governed document; an incident resolves with a linked postmortem.",
+   "business_value": 8,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::an_incident_resolves_with_a_linked_postmortem"
+    },
+    {
+     "kind": "document",
+     "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+     "ref": "T7 acceptance transcript"
+    }
+   ],
+   "job_size": 2,
+   "kind": "deliverable",
+   "risk_reduction": 6,
+   "time_criticality": 7,
+   "title": "Runbooks and postmortems are governed documents linked to the incident"
+  },
+  {
+   "body": "restart, scale, rollback and flag-flip are callable and read back through the action registry; an undeclared verb never reaches the host.",
+   "business_value": 9,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::the_four_write_verbs_are_callable_and_read_back"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::an_undeclared_verb_is_refused"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops_write.rs",
+     "ref": "ops_write::the_write_reads_back"
+    }
+   ],
+   "job_size": 3,
+   "kind": "deliverable",
+   "risk_reduction": 8,
+   "time_criticality": 8,
+   "title": "The four write verbs are callable and read back; an undeclared verb is refused"
+  },
+  {
+   "body": "The tenant's approval policy sets the quorum; an approval for another target is refused; a dry run makes no write; a caller without the scope is refused.",
+   "business_value": 9,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops_write.rs",
+     "ref": "ops_write::a_destructive_call_without_approval_is_refused"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops_write.rs",
+     "ref": "ops_write::an_approval_for_another_target_is_refused"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::the_tenant_policy_sets_the_quorum"
+    }
+   ],
+   "job_size": 2,
+   "kind": "deliverable",
+   "risk_reduction": 9,
+   "time_criticality": 7,
+   "title": "A destructive call without the tenant's configured approvals is refused"
+  },
+  {
+   "body": "The mitigation runs under an approved, target-checked gate and the incident row reads back mitigated.",
+   "business_value": 8,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+    },
+    {
+     "kind": "document",
+     "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+     "ref": "T7 acceptance transcript"
+    }
+   ],
+   "job_size": 2,
+   "kind": "deliverable",
+   "risk_reduction": 7,
+   "time_criticality": 7,
+   "title": "An approved mitigation sets mitigated_at with a read-back"
+  },
+  {
+   "body": "An unregistered host refuses; the live read returns the pod list when a host is registered; a systemic finding opens exactly one kata.",
+   "business_value": 7,
+   "evidence": [
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops_host.rs",
+     "ref": "ops_host::an_unregistered_host_refuses"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops.rs",
+     "ref": "ops::a_systemic_finding_opens_exactly_one_kata"
+    },
+    {
+     "kind": "test",
+     "path": "crates/actions/tests/ops_read.rs",
+     "ref": "ops_read::the_live_read_returns_the_pod_list (skipped: harness env)"
+    }
+   ],
+   "job_size": 2,
+   "kind": "deliverable",
+   "risk_reduction": 6,
+   "time_criticality": 6,
+   "title": "Hosts are registered before use and a systemic finding opens exactly one kata"
+  }
+ ]
+}

@@ -1841,7 +1841,22 @@ processes:
     capability: kanban_coach
     outputs: []
     steps:
-      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.kanban_coach.handle_error.v2, sop: cap.kanban_coach.handle_error.v2.sop, on_result: fail, max_attempts: 1, input_template: {function: handle_error}}
+      # The triage action needs the interruption's id. The run input is the one source the model
+      # cannot derive from the card, so it travels in the user message (the compiled prompt is the
+      # system message and carries no run inputs).
+      - position: 1
+        kind: agent
+        actor: process_agent
+        action: agent.run
+        process_agent: cap.kanban_coach.handle_error.v2
+        sop: cap.kanban_coach.handle_error.v2.sop
+        on_result: fail
+        max_attempts: 1
+        input_template:
+          function: handle_error
+          messages:
+            - role: user
+              content: "INTERRUPTION={{run.inputs.interruption_id}} — read the interrupted card, then call coach.triage exactly once with one class from the closed set and the confidence the evidence earns."
       - {position: 2, kind: computed, actor: system, action: coach.remedy, sop: cap.kanban_coach.handle_error.v2.system, on_result: fail, max_attempts: 1, input_template: {interruption_id: "{{run.inputs.interruption_id}}"}}
   - key: ask_fr
     title: ask_fr — one human question on a card

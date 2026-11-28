@@ -1,0 +1,22 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R10",
+ "title": "v1 quality unknown: the verdict may find real work",
+ "probability": "H",
+ "impact": 5,
+ "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B3"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "high",
+ "status": "open"
+}

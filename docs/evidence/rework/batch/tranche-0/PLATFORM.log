@@ -1,0 +1,305 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project PLATFORM --content docs/evidence/rework/tranche-0/rework-content-PLATFORM.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9 --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Driver / Goal / Objective Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Requirements Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Solution Concept Diagram — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Business Capability Map — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Data Entity / Data Component Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Technology Standards Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Gap Analysis Matrix — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Candidate Solutions Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Project Context Diagram — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Benefits Diagram — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Implementation and Migration Plan Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Compliance Review Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Architecture Change Request Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  artefact: Architecture Requirement Catalog — PLATFORM (retrospective, 2026-11-26) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  10 architecture.artifacts_link ok
+  11 architecture.artifacts_link ok
+  12 architecture.artifacts_link ok
+  13 architecture.artifacts_link ok
+  14 architecture.artifacts_link ok
+  15 architecture.artifacts_link ok
+  16 architecture.artifacts_link ok
+  17 architecture.artifacts_link ok
+  18 architecture.artifacts_link ok
+  19 architecture.artifacts_link ok
+  20 architecture.artifacts_link ok
+  21 architecture.artifacts_link ok
+  22 architecture.artifacts_link ok
+  23 architecture.artifacts_link ok
+  24 architecture.artifacts_link ok
+  25 architecture.artifacts_link ok
+  26 architecture.artifacts_link ok
+  27 architecture.artifacts_link ok
+  28 architecture.artifacts_link ok
+  document project-brief: already present and published
+  document evidence: already present and published
+  document gap-analysis: already present and published
+  document candidate-solutions: already present and published
+  document project-context-diagram: already present and published
+  document benefits-diagram: already present and published
+  document architecture-artifact: already present and published
+  document safe-art: already present and published
+  document inspect-adapt: already present and published
+  delivery contract: already live
+  29 registers.update ok
+  register risk: The platform's dependency on a single CI node is a single point of failure for every tranche code set to R-PLATFORM-01
+  30 registers.update ok
+  register risk: The standby has not been promoted in a drill, so the recovery path is documented but unproven code set to R-PLATFORM-02
+  31 registers.update ok
+  register issue: The live public window lags the committed pack until the next publish code set to I-PLATFORM-01
+  32 registers.update ok
+  register assumption: The replay record is the programme's working record until the rework is promoted code set to A-PLATFORM-01
+  33 registers.update ok
+  register dependency: Every delivery tranche depends on the platform's CI, registry and Postgres paths code set to D-PLATFORM-01
+  34 registers.update ok
+  register benefit: B1 Auditable decisions: every choice has a decision row code set to B-PLATFORM-01
+  governed asset Licensing frame: already present
+  governed asset Blueprint states: already present
+  governed asset Options appraisal: already present
+  governed asset Programme appraisal: already present
+  governed asset Solution intent: already present
+  35 programmes.update ok
+  benefit transition B1: already present
+  36 benefits.transition_upsert ok
+  benefit transition B2: already present
+  37 benefits.transition_upsert ok
+  benefit transition B3: already present
+  38 benefits.transition_upsert ok
+  benefit transition B4: already present
+  39 benefits.transition_upsert ok
+  benefit transition B5: already present
+  40 benefits.transition_upsert ok
+  benefit transition B6: already present
+  41 benefits.transition_upsert ok
+  benefit transition B7: already present
+  42 benefits.transition_upsert ok
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: not applicable (the project stays active)
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  43 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 3 change row(s) present
+  44 registers.update ok
+  45 registers.update ok
+  46 registers.update ok
+  47 registers.update ok
+  48 wbs.update ok
+  49 wbs.update ok
+  50 wbs.update ok
+  51 wbs.update ok
+  52 wbs.update ok
+  53 tranches.update ok
+  lesson L-PLATFORM-1: already present
+  54 tranches.update ok
+  card discharge: 0 card(s) cleared of 446 open package(s)
+  closure: not applicable (the project stays active)
+PLATFORM: 54 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-oyshb8hi/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-oyshb8hi/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /tmp/conv526-bin-5dcfc953
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "benefits-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "candidate-solutions",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "gap-analysis",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-context-diagram",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "request-for-architecture-work",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Purpose' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "PLATFORM",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 5,
+    "present": 3,
+    "missing-edge": 0,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

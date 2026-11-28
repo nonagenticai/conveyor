@@ -274,6 +274,70 @@ pub async fn find_invocation_by_key(
     .await
 }
 
+/// Whether an `ok` invocation of `action` with exactly this input hash exists.
+///
+/// The dry-run proof: a destructive ops write must follow a recorded dry run of the same
+/// action and input. The hash is the engine's [`crate::idempotency::request_hash`] of the
+/// dry-run input, so a dry run of a different target cannot satisfy it.
+pub async fn has_ok_invocation_with_hash_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    input_hash: &str,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS(
+             SELECT 1 FROM action_invocation
+              WHERE tenant_id = $1 AND action = $2 AND input_hash = $3 AND outcome = 'ok'
+         )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(input_hash)
+    .fetch_one(conn)
+    .await
+}
+
+/// One successful invocation, as a provenance check reads it.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct SuccessfulInvocation {
+    /// The invocation's id (the row a decision cites).
+    pub id: Uuid,
+    /// The canonical hash of the body the engine hashed.
+    pub input_hash: String,
+    /// What the call produced.
+    pub outcome: String,
+    /// The measured latency the engine recorded.
+    pub duration_ms: i32,
+}
+
+/// The most recent `ok` invocation one `Idempotency-Key` produced for `action`.
+///
+/// A failed attempt with the same key releases its claim and is retried, so the key can name
+/// several rows; only a successful one is evidence of an answer. The caller compares the
+/// returned `input_hash` with the request it rebuilt, so a key reused for a different body can
+/// never be cited as this decision's call.
+pub async fn successful_invocation_by_key(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    idempotency_key: &str,
+) -> Result<Option<SuccessfulInvocation>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT id, input_hash, outcome, duration_ms
+           FROM action_invocation
+          WHERE tenant_id = $1 AND action = $2 AND idempotency_key = $3
+            AND outcome = 'ok'
+          ORDER BY created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(idempotency_key)
+    .fetch_optional(conn)
+    .await
+}
+
 /// The invocation an `Idempotency-Key` produced, with the fields a decision cites.
 ///
 /// The ladder records a decision only from a call the engine actually made (SPEC_V2 §7.2's "a

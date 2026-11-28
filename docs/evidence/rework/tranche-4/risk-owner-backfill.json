@@ -1,0 +1,37 @@
+{
+ "action": "registers.update (backfill)",
+ "change": "set meta.owner to a named role; probability, impact, review_at and links are unchanged and already complete",
+ "outcome": {
+  "disposition": "measured product anomaly in the update boundary; carried to the W8 product tail, not hidden. The unique risks (17) all carry a named owner.",
+  "refused": 3,
+  "refused_ids": [
+   "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+   "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+   "01a1ffa9-3907-7c8d-a6c0-819281d6c050"
+  ],
+  "repro": "registers.update {\"id\": <id>, \"meta\": {...}} --if-match 1 -> 422 action-invalid-input \"the input does not match the action schema\"; the same id succeeds on registers.get and reaches the destructive gate on registers.delete, so the id and tenant are valid. The three rows are the older duplicate generation of PLATFORM's three risks; their current duplicates are backfilled.",
+  "updated": 17
+ },
+ "owner_decision": "2026-11-25 \u2014 backfill and ensure proper rigor is applied everywhere",
+ "roles": {
+  "CI/agent budget: an agent burst or a probe run": "the CI owner (estate runners)",
+  "Evidence theatre: the plan claims progress it cannot read back": "the programme auditor (conveyor-conformance)",
+  "Instrument self-deception: a check passes by construction": "the programme architect (conveyor-e2e)",
+  "Live transport/pool: SSH forward, branch binary, one writer": "the record operator (programme-record transport)",
+  "Nullable project_id: a consumer returns zero rows silently": "the product owner (conveyor-spine)",
+  "Peers/shared main: overlapping files and pending SPEC edits": "the lane owner (issue/526-u5a)",
+  "Provenance residual: historical service decisions": "the programme auditor (conveyor-conformance)",
+  "Record theatre: sections resolve thinly, registers look operated but are not": "the programme architect (conveyor-e2e)",
+  "Register staleness: allocation from an old snapshot": "the programme architect (conveyor-e2e)",
+  "Scope vs capacity: 538 packages + 480 artefacts + 13 tranches": "the programme manager (scope and capacity)",
+  "Seed quality: wrong statuses or duplicate ADR ids": "the programme data owner (seed)",
+  "Shared binary/target race": "the record operator (programme-record transport)",
+  "Standard completeness: a tailored profile omits a clause": "the standards owner (conveyor-standards)",
+  "The six benefit baselines are placeholders": "the programme benefits owner (U6)",
+  "Tranches 5 and 10-13 cannot deliver on proposed projects": "the tranche planner (programme architect)",
+  "V2 acceptance (#88/T12) remains open": "the T12 delivery owner (V2 acceptance proof)",
+  "v1 quality unknown: the verdict may find real work": "the programme auditor (conveyor-conformance)"
+ },
+ "schema": "conveyor-record-act/v1",
+ "subject": "every risk row created before the owner validation"
+}

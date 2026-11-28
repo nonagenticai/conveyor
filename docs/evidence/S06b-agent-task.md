@@ -8,6 +8,26 @@ contract over the real `/mcp` HTTP surface with a licence principal. It does **n
 records "no code written" and this build has no conveyor registration — and it does **not** execute the agent's
 `mcp-import`. Both, and the live task against a deployed conveyor, are S14's gate (`S14-cutover.md:33-34`).
 
+## Update — 2026-11-24
+
+The 2026-11-09 note is historical. Since then the agent allowlist gained the run chain
+(`boards.get` → `cards.create` → `runs.create`; 48 tools), and
+`crates/api/tests/mcp_agent.rs::one_licence_principal_task_creates_reads_decides_and_closes` proves the whole
+task over the real `/mcp` HTTP surface as a licence principal. The test now declares the design gate
+agent-decidable in the tenant's gate policy (SPEC_V2 §5.4), so the decision exercises the real authorisation
+rather than bypassing it.
+
+Receipt (verbatim, `cargo test -p conveyor-api --test mcp_agent one_licence_principal_task -- --nocapture`):
+
+```
+S06B-RECEIPT {"agent_tools":48,"approval_id":"01a20f5f-1bd8-7a88-92da-fe4b44278bd7","approval_meta":{"allowed_decisions":["approve","reject"],"description":"Which of the two designs should this follow?","proposed_answer":"the first"},"base_url":"http://127.0.0.1:53562","decided_by_kind":"agent","decision":"approve","project_id":"01a20f5f-1b4b-75d6-96b6-085894e841ca","run_id":"01a20f5f-1bc0-797b-bb83-d2631bb99e4b","via":{"channel":"mcp"}}
+```
+
+Revised verdicts: **(g) PROVEN** — project id, non-null run id and one agent decision, all over `/mcp`.
+**(b) remains S14 §7** — the agent app's own importer is still not executed here. **(h)** is proven on the
+local loopback path; the deployed half remains S14. `v1-s06-2` is resolved on (g)'s proof, and the live
+agent-app run stays the S14 deploy gate it always was — recorded, never claimed as done.
+
 ## Files
 
 | path | change |

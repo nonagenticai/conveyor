@@ -34,6 +34,7 @@ fn unreachable_pool() -> PgPool {
 
 fn request(action: &str) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_string(),
         input: json!({"entries": []}),
         precondition: None,

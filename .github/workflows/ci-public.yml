@@ -204,8 +204,29 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          MERGE_BASE_REF: ${{ github.event.merge_group.base_ref }}
+          MERGE_HEAD_REF: ${{ github.event.merge_group.head_ref }}
         run: |
           set -euo pipefail
+          # The merge queue SQUASHES: `merge_group.head_sha` is one synthetic commit, and a
+          # squash cannot carry a trailer of its own, so checking it fails for every PR whose
+          # history has more than one commit while single-commit PRs pass by accident (their
+          # message is reused verbatim). `merge_group.head_ref` is the queue's synthetic ref
+          # (`refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>`), not the PR branch; the commits
+          # the queue squashes are published as `refs/pull/<n>/head`.
+          range="$BASE_SHA..$HEAD_SHA"
+          if [ "$EVENT_NAME" = "merge_group" ]; then
+            pr="$(printf '%s' "$MERGE_HEAD_REF" | sed -n 's|.*/pr-\([0-9][0-9]*\)-.*|\1|p')"
+            if [ -z "$pr" ]; then
+              echo "::error::DCO: cannot read the PR number from merge_group.head_ref=$MERGE_HEAD_REF"
+              exit 1
+            fi
+            git fetch --no-tags origin \
+              "+$MERGE_BASE_REF:refs/remotes/queue/base" \
+              "+refs/pull/$pr/head:refs/remotes/queue/head"
+            range="refs/remotes/queue/base..refs/remotes/queue/head"
+          fi
           missing=""
           count=0
           while IFS= read -r commit; do
@@ -216,7 +237,7 @@ jobs:
             if ! git log -1 --format=%B "$commit" | grep -qE '^Signed-off-by: .+ <[^<>@ ]+@[^<> ]+>$'; then
               missing="$missing $commit"
             fi
-          done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
+          done < <(git rev-list --no-merges "$range")
           if [ -n "$missing" ]; then
             echo "::error::DCO: these commits have no Signed-off-by trailer:$missing"
             echo "Fix with: git rebase --signoff origin/main (or git commit -s and re-push)"

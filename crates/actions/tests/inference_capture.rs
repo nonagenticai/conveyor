@@ -77,6 +77,7 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
     let run_id = Uuid::now_v7();
     let step_id = Uuid::now_v7();
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": "alias-model",
@@ -189,6 +190,7 @@ async fn a_call_without_a_usage_context_writes_no_row() {
     // The same action, invoked without a usage context (an ordinary HTTP call): the engine
     // captures only what the caller named.
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({"messages": [{"role": "user", "content": "hello"}]}),
         precondition: None,
@@ -260,17 +262,18 @@ async fn a_capture_failure_keeps_the_call_and_never_retries_the_paid_request() {
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
 
     // Only the capture WRITE fails: the ledger itself stays readable, because the run-level
-    // spend gate (§7.5/D45) reads it before a capturing action dispatches. Breaking the table
-    // would refuse the call at the gate — correctly — and prove nothing about the capture's
-    // savepoint. Revoking INSERT leaves the invocation, audit and idempotency bookkeeping
-    // intact, so a 200 still proves the capture rolled back to its own savepoint instead of
-    // poisoning the caller's transaction.
+    // spend gate (§7.5/D45, #526) reads it before a capturing action dispatches. Breaking the
+    // table would refuse the call at the gate — correctly — and prove nothing about the
+    // capture's savepoint. Revoking INSERT leaves the invocation, audit and idempotency
+    // bookkeeping intact, so a 200 still proves the capture rolled back to its own savepoint
+    // instead of poisoning the caller's transaction.
     sqlx::query("REVOKE INSERT ON inference_call FROM conveyor_runtime")
         .execute(&pg.super_pool)
         .await
         .expect("break only the capture write");
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": "alias-model",

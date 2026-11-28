@@ -24,6 +24,9 @@ pub struct ActionCaller<'a> {
     tenant: TenantId,
     actor: Uuid,
     app_key: &'a str,
+    /// How the engine records this caller's acts: `service` for the CLI's own principal, or
+    /// `human` for a named tenant member acting in the machine's place.
+    kind: &'static str,
 }
 
 impl<'a> ActionCaller<'a> {
@@ -65,7 +68,29 @@ impl<'a> ActionCaller<'a> {
             tenant,
             actor,
             app_key,
+            kind: "service",
         })
+    }
+
+    /// As [`new_as`], but the engine records the named member's acts as a HUMAN's.
+    ///
+    /// A destructive command may need a distinct tenant member to decide its gate (§5.4). The
+    /// member is a person, so the decision must carry `actor_kind = "human"`; the caller's own
+    /// service principal cannot stand in for the approver. The identity rules are `new_as`'s.
+    pub async fn human_as(
+        pool: &'a PgPool,
+        tenant: TenantId,
+        app_key: &'a str,
+        actor_id: Option<Uuid>,
+    ) -> Result<Self, CallError> {
+        let mut caller = Self::new_as(pool, tenant, app_key, actor_id).await?;
+        caller.kind = "human";
+        Ok(caller)
+    }
+
+    /// The member this caller acts as.
+    pub fn actor_id(&self) -> Uuid {
+        self.actor
     }
 
     /// Invoke one action and return its `output`. `_version` in the input is honoured by the
@@ -76,7 +101,7 @@ impl<'a> ActionCaller<'a> {
         input: Value,
         precondition: Option<i64>,
     ) -> Result<Value, CallError> {
-        self.call_gated(name, input, precondition, None).await
+        self.call_gated(name, input, precondition, None, None).await
     }
 
     /// As [`call`], for a destructive action whose approval the caller names (#282).
@@ -90,6 +115,7 @@ impl<'a> ActionCaller<'a> {
         input: Value,
         precondition: Option<i64>,
         approval_id: Option<Uuid>,
+        idempotency_key: Option<String>,
     ) -> Result<Value, CallError> {
         let spec = registry()
             .get(name)
@@ -102,13 +128,14 @@ impl<'a> ActionCaller<'a> {
             conveyor_actions::registry(),
             self.tenant,
             InvokeRequest {
+                credential_alias: None,
                 action: name.to_owned(),
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),
-                idempotency_key: None,
+                idempotency_key,
                 approval_id,
                 actor_id: self.actor,
-                actor_kind: "service".to_owned(),
+                actor_kind: self.kind.to_owned(),
                 role: Role::KataExecutor,
                 policy: Default::default(),
                 authority: Authority::Internal,
@@ -133,13 +160,35 @@ impl<'a> ActionCaller<'a> {
             },
         )
         .await
-        .map_err(|error| CallError::Action {
-            name: name.to_owned(),
-            status: error.status,
-            detail: error.detail,
+        .map_err(|error| {
+            let errors = field_errors(&error.errors);
+            CallError::Action {
+                name: name.to_owned(),
+                status: error.status,
+                detail: error.detail,
+                errors,
+            }
         })?;
         Ok(outcome.body.get("output").cloned().unwrap_or(Value::Null))
     }
+}
+
+/// The `errors[]` of a refused action, rendered for the operator.
+///
+/// The CLI printed only the RFC 9457 `detail`, which is the fixed sentence "the input does not
+/// match the action schema" for every 422. Two record investigations (2026-11-25) could not
+/// tell which field failed; the boundary already carries the field, code and detail, so it is
+/// printed here rather than discarded.
+fn field_errors(errors: &[conveyor_actions::spec::FieldError]) -> String {
+    if errors.is_empty() {
+        return String::new();
+    }
+    let rendered = errors
+        .iter()
+        .map(|error| format!("{}: {} ({})", error.field, error.detail, error.code))
+        .collect::<Vec<_>>()
+        .join("; ");
+    format!(" [{rendered}]")
 }
 
 /// Why an operator action could not run.
@@ -161,7 +210,7 @@ pub enum CallError {
     #[error("{0:?} is not an internal action")]
     NotInternal(String),
     /// The action itself refused.
-    #[error("{name} refused ({status}): {detail}")]
+    #[error("{name} refused ({status}): {detail}{errors}")]
     Action {
         /// The action name.
         name: String,
@@ -169,5 +218,7 @@ pub enum CallError {
         status: u16,
         /// The RFC 9457 detail.
         detail: String,
+        /// The rendered `errors[]` (empty when the refusal carries none).
+        errors: String,
     },
 }

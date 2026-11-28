@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,26 +37,102 @@
         <div><dt>Standard</dt><dd>MSP</dd></div>
         <div><dt>Level</dt><dd>programme</dd></div>
         <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
-        <div><dt>Status</dt><dd>partial</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.3</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-26T21:15:00Z · 34753fa35fc2</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
       </dl>
       <h2>Why now</h2>
-<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<p class="std-intent">The problem, the cost of doing nothing, and the trigger for action.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 78 row(s)</p>
 <ul>
-<li>Business case</li>
+<li>Planka&#x27;s database cannot evidence usage: four boards and five test cards <span class="std-state">open</span></li>
+<li>The execution census covers three days, so it cannot answer quarterly use <span class="std-state">open</span></li>
+<li>The five-run sets for metrics 5–7 never completed inside the measurement window <span class="std-state">open</span></li>
+<li>Issue #2 was open at the start of the rework although its P2 test was already written <span class="std-state">open</span></li>
+<li>The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row <span class="std-state">open</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S03) <span class="std-state">accepted</span></li>
+<li>S03 closed out of sequence before the tranche-2 review (U3-EXC-S03) <span class="std-state">accepted</span></li>
+<li>No contemporaneous schema review or Phase A-D artefact set existed at the snapshot <span class="std-state">closed</span></li>
+<li>The parity contract does not yet name S04&#x27;s actions <span class="std-state">open</span></li>
+<li>The pre-rework receipt was red on the delivery contract and the artefact set <span class="std-state">open</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S05) <span class="std-state">accepted</span></li>
+<li>The close preceded tranche 4&#x27;s authorisation by three days and rests only on an accepted P0 exception <span class="std-state">open</span></li>
+</ul>
+<p class="std-source">Source: <code>programme.json#/programme</code> — 1 row(s)</p>
+<ul>
+<li>conveyor buildout <span class="std-state">active</span></li>
 </ul><h2>Benefit map</h2>
-<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<p class="std-intent">Each benefit, its mechanism and its measure; a benefit with no measure is a wish.</p>
+<p class="std-source">Source: <code>msp.json#/benefit_links</code> — 10 row(s)</p>
 <ul>
-<li>Business case</li>
+<li>01a1e9df-6063-783c-a130-075067d33a17</li>
+<li>01a20c80-c262-76be-9b38-184cec184a25</li>
+<li>01a1e9df-6a8a-7e0c-bf4b-022848d53774</li>
+<li>01a1e9df-732b-78a5-9b34-779be11092c5</li>
+<li>01a1e9df-7f1f-769c-bd17-8f71322cc505</li>
+<li>01a1e9df-87b8-7761-ae0d-f5bb03c66628</li>
+<li>01a1e9df-9066-70a9-8050-e86503fb1b7e</li>
+<li>01a20c80-c297-738d-bbfa-c19412e7be69</li>
+<li>01a210ba-c02c-7c91-8ab1-6c51070af1f4</li>
+<li>01a216d0-ae12-7135-b28d-744c32d5b90e</li>
+</ul>
+<p class="std-source">Source: <code>msp.json#/benefit_profiles</code> — 7 row(s)</p>
+<ul>
+<li>Auditable decisions <span class="std-state">active</span></li>
+<li>Less bespoke tooling <span class="std-state">active</span></li>
+<li>Self-development <span class="std-state">draft</span></li>
+<li>Public collaboration <span class="std-state">active</span></li>
+<li>One model <span class="std-state">active</span></li>
+<li>Predictable delivery <span class="std-state">active</span></li>
+<li>Deliberated cross-department decisions <span class="std-state">draft</span></li>
 </ul><h2>Cost and risk posture</h2>
-<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<p class="std-intent">The engineering cost, the recurring cost, and the exposure accepted.</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 92 row(s)</p>
 <ul>
-<li>Business case</li>
+<li>The dated samples cannot be re-measured, so a later reader cannot reproduce the counts <span class="std-state">open</span></li>
+<li>A used id that no later slice builds would break S14&#x27;s 100 % gate <span class="std-state">open</span></li>
+<li>A surface dropped by decision may still receive live traffic after sign-off <span class="std-state">open</span></li>
+<li>Metrics 5–7 cannot be re-established, so the measured table is narrower than the eight-metric protocol <span class="std-state">open</span></li>
+<li>The drag-smoothness threshold was missed by both stacks and passes to S12 as an unmet target <span class="std-state">open</span></li>
+<li>The replay record lost the artefact rows, so a re-creation could duplicate a surviving row <span class="std-state">open</span></li>
+<li>The two-worker lease proof is timing-sensitive and could flake under load <span class="std-state">open</span></li>
+<li>The rework could close S02 while issue #2 still reads open <span class="std-state">open</span></li>
+<li>The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1) <span class="std-state">admitted</span></li>
+<li>The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2) <span class="std-state">admitted</span></li>
+<li>A projection reads a second source and the four surfaces drift apart <span class="std-state">open</span></li>
+<li>An approved imported action is executable by a tenant that should not see it <span class="std-state">open</span></li>
 </ul><h2>Licensing frame</h2>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Licensing frame&#x27;; a document exists but lacks the heading (see <code>std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p>
+<p class="std-intent">The public, opt-in and tenant boundary of the investment.</p>
+<p class="std-source">Source: <code>artefacts.json#/governed_assets</code> — 1 row(s)</p>
+<ul>
+<li>Licensing frame <span class="std-state">approved</span></li>
+</ul><h2>Options, including doing nothing</h2>
+<p class="std-intent">The options considered including doing nothing.</p>
+<p class="std-source">Source: <code>artefacts.json#/governed_assets</code> — 1 row(s)</p>
+<ul>
+<li>Options appraisal <span class="std-state">approved</span></li>
+</ul><h2>Investment appraisal and cash flow</h2>
+<p class="std-intent">The appraisal, the cash flow and the basis of both.</p>
+<p class="std-source">Source: <code>artefacts.json#/governed_assets</code> — 1 row(s)</p>
+<ul>
+<li>Programme appraisal <span class="std-state">approved</span></li>
+</ul><h2>Capabilities the benefits depend on</h2>
+<p class="std-intent">The capabilities and business changes the benefits require, and who delivers them.</p>
+<p class="std-source">Source: <code>msp.json#/benefit_links</code> — 10 row(s)</p>
+<ul>
+<li>01a1e9df-6063-783c-a130-075067d33a17</li>
+<li>01a20c80-c262-76be-9b38-184cec184a25</li>
+<li>01a1e9df-6a8a-7e0c-bf4b-022848d53774</li>
+<li>01a1e9df-732b-78a5-9b34-779be11092c5</li>
+<li>01a1e9df-7f1f-769c-bd17-8f71322cc505</li>
+<li>01a1e9df-87b8-7761-ae0d-f5bb03c66628</li>
+<li>01a1e9df-9066-70a9-8050-e86503fb1b7e</li>
+<li>01a20c80-c297-738d-bbfa-c19412e7be69</li>
+<li>01a210ba-c02c-7c91-8ab1-6c51070af1f4</li>
+<li>01a216d0-ae12-7135-b28d-744c32d5b90e</li>
+</ul>
     </main>
   </body>
 </html>

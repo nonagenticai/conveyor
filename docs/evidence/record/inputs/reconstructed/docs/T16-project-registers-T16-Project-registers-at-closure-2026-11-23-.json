@@ -1,0 +1,8 @@
+{
+ "title": "T16 \u2014 Project registers at closure (2026-11-23)",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "category": "project-registers",
+ "body": "# T16 \u2014 Project registers at closure (2026-11-23)\n\nThe project-scoped registers at the close gate, plus the programme rows that bind this project.\n\n## Risks\n\nNo open project-scoped risk row at closure. The programme risk register holds the live risks; the\ntranche-4 review reads them, not this project page.\n\n## Issues\n\nNo open project-scoped issue row at closure.\n\n## Assumptions\n\n- The record is retrospective and dated 2026-11-23; no row is backdated.\n- Delivery contract v2 is the live contract; v1 is superseded and retained for history.\n- The capability is bound by the adopted profile `conveyor-software-delivery`.\n\n## Dependencies\n\n- T16 follows T2 (architecture contracts) and T13 (broker/MinIO) per SPEC_V2 \u00a712; both are live\n  projects in tranche 3 with their own records.\n- Bound execution depends on the process engine's PDDL step runner.\n\n## Benefits\n\n- B7 \u2014 tokens per demo-credited deliverable: baseline 630,565, target 504,452.\n- B5 \u2014 one model store: the knowledge pack is bound by `knowledge_pack_ref`, not copied.\n\n## Changes\n\n- `Accept the T16 deliverables with their evidence` \u2014 approved. The six deliverables are complete\n  against the frozen scope baseline; the change authorises recording their acceptance.\n",
+ "publishable": true,
+ "unit": "T16"
+}

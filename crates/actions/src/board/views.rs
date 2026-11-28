@@ -103,6 +103,10 @@ pub struct ProjectCreateIn {
     /// An explicit key; absent means derived (`slug(title)`, uppercased, collision-suffixed).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub key: Option<String>,
+    /// Mark this row as test residue: the public pack excludes it and lists it under
+    /// `programme.test_projects` (v1-e2e-1). A real project never sets this.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub test_row: Option<bool>,
 }
 
 /// `projects.programme_meta` — the programme-owned keys, written under `portfolio:write`.
@@ -484,6 +488,14 @@ pub struct CardsMoveIn {
     /// Land immediately after this card of the target lane; absent appends.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after_id: Option<Uuid>,
+    /// Set by `err.card` and the coach's `move` remedy: the engine is moving the card while
+    /// handling an interruption that already exists, so this move is not itself observed as a
+    /// §6.2 flow event. A person's move never sets it (v1-p6-5); the invocation boundary refuses
+    /// any caller that names it, and `schemars(skip)` keeps it out of the public contract while
+    /// the two engine paths still deserialize it.
+    #[serde(default)]
+    #[schemars(skip)]
+    pub internal_coach: bool,
 }
 
 /// `cards.duplicate`.
@@ -841,6 +853,24 @@ pub struct ListMoveIn {
     pub after_id: Option<Uuid>,
 }
 
+/// The trace edge an architecture-governed card is born with (TOGAF §8.5, v1-w2c-6).
+///
+/// [`TraceLinkCreateIn`]'s field names, narrowed to the end the card's creator can name: the
+/// `from` end is always the new card, so its type and id belong to the engine, not the caller.
+/// The vocabulary is the store's `END_TYPES` / `LINK_KINDS`, never a second list.
+///
+/// [`TraceLinkCreateIn`]: crate::governance::views::TraceLinkCreateIn
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CardCreateTraceIn {
+    /// The end the new card traces to; a governed board requires `governed_asset`.
+    pub to_type: String,
+    /// The id in that end's table.
+    pub to_id: Uuid,
+    /// `traces | realises | derives | satisfies | conflicts`; `traces` when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+}
+
 /// `cards.create`. The board is the lane's board; a disagreement is refused.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CardCreateIn {
@@ -870,6 +900,27 @@ pub struct CardCreateIn {
     /// real intake records its `issue` / `unit_key` / `process_key` / `plan` link.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
+    /// The trace edge the card is born with (TOGAF §8.5). Required when the board's project
+    /// type is `architecture`, and then it must point at an APPROVED governed asset (a
+    /// requirement or an ADR); optional elsewhere. Written in the same transaction as the
+    /// card, so a card with no valid edge never commits.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_link: Option<CardCreateTraceIn>,
+    /// Internal only: set by `coach.interrupt` for the one card it is allowed to create
+    /// (SPEC_V2 §6.2). `serde(skip)` keeps it out of the wire document and `schemars(skip)`
+    /// keeps it out of the served schema, so no caller of the public action can name it — a
+    /// coach card can never be an orphan (T4, v1-p6-6).
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub internal_coach_card: bool,
+    /// Internal only: set by the actions that open a SYSTEM record (an ops or reconciliation
+    /// incident), which is a record of what happened, not governed work. It exempts the card
+    /// from the architecture board's required-trace rule (v1-w2c-6) and nothing else; unlike
+    /// `internal_coach_card` it does not relax the coach-type guard. `serde(skip)` and
+    /// `schemars(skip)`, so no public caller can name it.
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub internal_system_card: bool,
 }
 
 /// `cards.update`. Absent members are unchanged.

@@ -54,10 +54,12 @@ use serde_json::{Value, json};
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
+use std::borrow::Cow;
+
 use crate::invoke::{ActionError, HandlerCtx, InvokeOutcome, InvokeRequest};
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, FieldError, HandlerRef, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, FieldError, HandlerRef,
+    SchemaRef, Scope, Tenancy,
 };
 
 /// The gate every publication request cites and every decision resolves.
@@ -2448,12 +2450,12 @@ fn dispatch_output_schema() -> crate::spec::Schema {
 /// `tools.dispatch` — reachable only from the broker (`HandlerRef::ToolDestination`).
 fn tools_dispatch() -> ActionSpec {
     ActionSpec {
-        name: DISPATCH_ACTION,
+        name: Cow::Borrowed(DISPATCH_ACTION),
         version: 1,
         kind: ActionKind::Internal,
-        input: dispatch_input_schema,
-        output: dispatch_output_schema,
-        scopes: &[Scope::RunsWrite],
+        input: SchemaRef::Compiled(dispatch_input_schema),
+        output: SchemaRef::Compiled(dispatch_output_schema),
+        scopes: Cow::Borrowed(&[Scope::RunsWrite]),
         idempotent: false,
         timeout_ms: 300_000,
         effect: Effect::Read,
@@ -2485,7 +2487,7 @@ pub(crate) async fn invoke_destination(
     _request: &InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
     let call: ToolDispatchIn = serde_json::from_value(input).map_err(|error| {
-        tracing::error!(%error, action = spec.name, "the broker's dispatch document is invalid");
+        tracing::error!(%error, action = %spec.name, "the broker's dispatch document is invalid");
         ActionError::internal()
     })?;
     tracing::debug!(

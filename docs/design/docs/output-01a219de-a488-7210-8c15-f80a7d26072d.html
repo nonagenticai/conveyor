@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture Design — T18 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-design" data-provenance-version="1" data-provenance-hash="e736d749e22d265a9ba516d28f3cbb9a065359790eb998a5a406d4206a3f2137" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-design</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>e736d749e22d265a9ba516d28f3cbb9a065359790eb998a5a406d4206a3f2137</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture design — T18 The real V2 UI (retrospective, 2026-11-24)</h1>
+<h2>Context and boundary</h2>
+<p>The design owns the route table, the application shell and the destination screen modules of the one Leptos CSR/WASM application served by the same binary on port 8930. It must not duplicate the action registry of SPEC_V2 §10.4, any aggregate or table owned by T0 to T17, the V1 routes it links, or the design pack, which stays the public programme site at /design/ and the reviewed reference (D64/D65). Out of scope are SSR, a second router or frontend, a mobile app, new ports and any production fixture; the blueprint it fits is the SPEC_V2 §10.5 destination table inside one Router.</p>
+<h2>Aggregates, tables and actions</h2>
+<p>T18 adds no aggregate, table, action or event. The screens read the entities owned by the other slices: project, programme and tranche; wbs_node, project_baseline and project_register_item; department, job_catalogue, job_release, job_binding, approval_policy, decision and laya_inference_config; procedure, process, capability and authoring assets; run, run_step, tool, toolkit, tool_binding and tool_call; card, board, list, comment, kata, lesson, incident and runbook; and architecture artifact, contract, compliance review and waiver. Reads are literal GETs; writes are POST /api/actions/{name}/invocations carrying If-Match, Idempotency-Key and the approval id where the action is gated. Names match the registry, and the UI calls only registered actions.</p>
+<h2>Decisions</h2>
+<p>Three decisions shape the design. ADR 0001 and ADR 0009 keep the client Leptos CSR/WASM in one Rust binary; SSR or a second frontend was rejected because it forks the V1 delivery path and adds a server surface T18 does not own. ADR 0013 makes the real UI the app and the design pack the reviewed reference only (D64/D65); treating docs/design as the operator surface was rejected because a mock page is evidence of intent, not of implementation. The single-writer seam in app.rs and screens/mod.rs required units #562 to #566 to be sequenced rather than parallelised, with #629 and #630 as follow-ons; the consequence is that each destination's spec lands behind its predecessor's merge.</p>
+<h2>Acceptance</h2>
+<p>The design is accepted by the SPEC_V2 §12 T18 gate as encoded in acceptance/programme/T18.toml: every destination route exists with a screen module and a Playwright spec asserting empty, error, happy and one refusal, and the coverage record reports exists only from a real route and a present spec. Verify with <code>grep -n 'path!' apps/web/src/app.rs</code> for the route table, <code>ls apps/web/e2e/*.spec.ts</code> for the specs, <code>python3 scripts/build-v2-coverage.py --check</code> for the coverage record (currently exit 1 on stale output) and <code>python3 scripts/acceptance.py --manifest acceptance/programme/T18.toml</code> for the fifteen checks. The T12 organisation loop remains the final unfilled scenario.</p>
+<h2>Architecture artefacts</h2>
+<p>This pack carries the seven Phase A to D artefacts the delivery track requires: the Stakeholder Map (matrix), the Driver/Goal/Objective Catalog, the Requirements Catalog and the Solution Concept Diagram in Phase A; the Business Capability Map in Phase B; the Data Entity/Data Component Catalog in Phase C; and the Technology Standards Catalog in Phase D. Each is owned by the T18 lane under the programme architect (conveyor-e2e), reviewed by the Architecture Board (conveyor-architecture-board) on 2026-11-24, and linked to its neighbours in the pack. The Phase-G compliance review is retrospective and consistent; no E to H artefact applies because T18 is a delivery-track project.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The real V2 UI · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

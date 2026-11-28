@@ -23,7 +23,7 @@
 //! SANDBOX_NAMESPACE=swe-bench \
 //! SANDBOX_API_URL=https://kubernetes.default.svc:443 \
 //! SANDBOX_TOKEN="$(cat .../token)" SANDBOX_CA_PATH=.../ca.crt \
-//! SANDBOX_NODE_SELECTOR=kubernetes.io/hostname=hp1 \
+//! SANDBOX_NODE_SELECTOR=kubernetes.io/hostname=compute-1 \
 //! SANDBOX_TOLERATION=ci-runner=true:NoSchedule \
 //! SANDBOX_LIVE_IMAGE=swebench/django__django-16493@sha256:<64 hex> \
 //!   cargo test -p conveyor-server --test sandbox_live -- --ignored --nocapture

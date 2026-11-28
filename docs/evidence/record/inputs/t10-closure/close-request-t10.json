@@ -1,0 +1,9 @@
+{
+ "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "closure": "# Closure record — T10 SAFe cadence and MSP tranches (retrospective, 2026-11-22)\n\n- **What was delivered:** the SAFe cadence and MSP tranche machinery of `docs/SPEC_V2.md` sections 8.2 and 8.3 — the cadence state machine and idempotent PI tick, WSJF computed from four typed inputs and never stored, WIP-bounded materialisation behind an approved PI plan, backlog refinement with stale and unscored flags, the typed demo credit, the retro lesson requirement, the tranche review, and the benefit transition with its baseline measurement. The project row is `closed` in the 2026-11-22 snapshot (version 11, updated 2026-11-21T01:07:58Z).\n- **What this rework added:** the programme record the original close never carried — charter, Statement of Architecture Work, the seven Phase A–D artefacts bound to the adopted standard, the board-approved delivery contract, the scope baseline, this Phase-G review and its closure review — plus the eight audit findings of 2026-11-22.\n- **What remains open:** `v1-p83-1` to `v1-p83-5` (P1), `v1-p83-6` (P2), `v1-p82-5` (P2) and `v1-p82-6` (P2). None is waived; each is a package with an acceptance clause.\n- **Honesty note:** no contemporaneous charter, contract, review or closure record existed at the snapshot. This set is written retrospectively under the standing delegation and attests the evidence, not the intent, of the original close. Tranche 4 is `planned` with no authorisation review, `authorised_at` or baseline; T10 closed out of sequence and this record states that fact.",
+ "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+ "evidence": {
+  "manifest": "acceptance/programme/T10.toml",
+  "retrospective": true
+ }
+}

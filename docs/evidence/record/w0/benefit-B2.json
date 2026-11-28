@@ -1,0 +1,19 @@
+{
+ "benefit": "B2",
+ "profile_id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+ "baseline": {
+  "definition": "18 tool_call rows at 2026-11-22",
+  "value": 18.0,
+  "unit": "tool_call rows",
+  "measured_at": "2026-11-22",
+  "method": "tool_call rows by toolkit from the call ledger at the recorded snapshot",
+  "evidence": {
+   "measurement_id": "01a20e7e-0f86-7d14-a246-f5240321ca35",
+   "instrument": "count tool_call rows",
+   "tool_calls": 18,
+   "re_verified_at_snapshot": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b"
+  }
+ },
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "note": "baseline reading taken 2026-11-22; evidence re-verified at the W0 snapshot"
+}

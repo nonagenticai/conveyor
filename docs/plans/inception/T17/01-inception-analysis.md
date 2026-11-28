@@ -54,15 +54,22 @@ to admit the §10.3 kinds including `sop_source`; what the table cannot carry is
 organisation, procedure or policy target.
 The executable procedure tables were renamed by `migrations/0035_process_tree.sql:process`
 (`procedure` → `process`, `procedure_step` → `process_step`), and that migration's new
-`procedure` (`migrations/0035_process_tree.sql:procedure`) is the SOP text; neither carries PDDL
-text or a PKO pin.
+`procedure` (`migrations/0035_process_tree.sql:procedure`) is the SOP text. The PDDL text lives on
+the procedure row (`migrations/0058_data_model_gaps.sql:8`,
+`migrations/0060_procedure_ingestion.sql` domain/precondition/effect) and its knowledge pack is
+pinned by `procedure.knowledge_pack_ref` (`0060:22,38`); there is no PKO store — D53 retired it.
 
-**Absent — hard dependencies.** T16 (#85, OPEN `status:blocked`): no
-`pko_release`/`pko_entity`/`pko_relation` in `migrations/` and no `procedures.ingest_sop|draft`
-action, so the conversion path T17 generalises does not exist. T13 (#76, OPEN `status:claimed`): no
-`tool`/`toolkit`/`tool_binding`/`tool_call` table, so a tool request has no target and no ceiling to
-check. T3 is present as `migrations/0049_pm_job.sql` and `crates/actions/src/pm/`; its acceptance is
-outside this unit.
+**Dependencies — measured.** T16 (#85): the PKO store was retired by D53; RDF/OWL/Turtle imports
+as a strata knowledge pack recorded in `procedure.knowledge_pack_ref`
+(`migrations/0060_procedure_ingestion.sql:22,38`), never read at runtime. The remaining T16 gaps
+are `procedures.draft`, the Visio/draw.io converters, batch intake, a tenant-configurable review
+gate and job-driven conversion; those are the surface T17 generalises.
+`procedures.ingest_sop`/`ingest_rdf` and the PDDL columns **do** resolve
+(`docs/design/data/actions.json`; 0058/0060), so the intake seam exists; what T17 adds is the
+draft/PDDL conversion on top, not the action. T13 (#76): the tool estate exists
+(`migrations/0055_tool_platform.sql:102`; `tools.*` registered), so a tool request has a target and
+a ceiling; T13's remaining scope is its BYO publication surface (v1-w4a-6). T3 is present as
+`migrations/0049_pm_job.sql` and `crates/actions/src/pm/`; its acceptance is outside this unit.
 
 **Planned — this unit.** T17 (#87) is OPEN `status:blocked`; this is inception work, not build
 evidence.
@@ -101,8 +108,8 @@ evidence.
 | Self-publication | author run publishes its own draft | `self_approval` default forbidden (migration 0050); refusal test (to create at `crates/actions/tests/asset_review.rs`) |
 | Tool-grant widening | a policy draft waives its own gate | (to create at `crates/actions/tests/asset_review.rs`) |
 | Unordered publication | job references unpublished department | `depends_on` refusal `crates/actions/tests/authoring.rs::a_draft_that_references_an_unpublished_asset_is_refused` (to create) |
-| T16 slip | no procedure/PKO drafts; gate unmeetable | `git grep pko_release origin/main -- migrations` empty |
-| T13 slip | tool requests unresolvable | `git grep 'CREATE TABLE tool_binding' origin/main -- migrations` empty |
+| T16 slip | no procedure drafts or PDDL surface; gate unmeetable | `procedures.draft` absent from `docs/design/data/actions.json` (the re-scoped T16 surface) |
+| T13 BYO slip | a tool request can name the estate but has no tenant publication path | v1-w4a-6 open in the conformance ledger (`tool_binding` exists — 0055 — so the old grep precondition is retired) |
 | Orphan assets | zero-use catalogue inflation (P10) | zero-use report |
 | Public leak | permanent PUBLIC exposure | P9 scan before publication |
 

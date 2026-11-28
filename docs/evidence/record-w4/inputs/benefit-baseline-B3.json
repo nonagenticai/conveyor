@@ -1,0 +1,19 @@
+{
+  "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+  "baseline": {
+    "definition": "not measured - no instrument exists (recorded as a kata on the kata project)",
+    "value": 0,
+    "unit": "self-development runs",
+    "measured_at": "2026-11-22",
+    "method": "T6 development project runs reaching live verification",
+    "evidence": {
+      "detail": {
+        "T6": "absent at the head; the baseline is the honest zero"
+      },
+      "instrument": "T6 development project runs reaching live verification",
+      "reference": "B3",
+      "value": 0.0
+    }
+  },
+  "change_id": "01a2076b-1e7a-77ee-beaa-82c207ed2109"
+}

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Delivery Contract — Tenant asset authoring · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="delivery-contract" data-provenance-version="1" data-provenance-hash="8ff445b6f58d52654bf7f874576d14011851a95acc38d73f9704447877a2d6cc" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>delivery-contract</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>8ff445b6f58d52654bf7f874576d14011851a95acc38d73f9704447877a2d6cc</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Delivery Contract — Tenant asset authoring</h1>
+<h2>Commitments</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "delivery-contract",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "contract_id": "01a21c1d-c08a-702e-b962-11611d1914d2",
+      "field": "commitments",
+      "kind": "contract_field",
+      "title": "commitments: The delivery commits to the 15-check acceptance manifest, the seven Phase A\u2013D artefacts, the authoring lifecycle tests, the asset-review refusals, the output-standard checks and the real-app authoring E2E. Each commitment is executable: the manifest names the check and the tests are the named scenarios in `crates/actions/tests/authoring.rs`, `asset_review.rs`, `authoring_standard.rs` and `apps/web/e2e/authoring.spec.ts`.",
+      "value": "The delivery commits to the 15-check acceptance manifest, the seven Phase A\u2013D artefacts, the authoring lifecycle tests, the asset-review refusals, the output-standard checks and the real-app authoring E2E. Each commitment is executable: the manifest names the check and the tests are the named scenarios in `crates/actions/tests/authoring.rs`, `asset_review.rs`, `authoring_standard.rs` and `apps/web/e2e/authoring.spec.ts`."
+    }
+  ],
+  "source": "computed:contract_field"
+}
+</code></pre>
+<h2>Compliance method</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "delivery-contract",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "contract_id": "01a21c1d-c08a-702e-b962-11611d1914d2",
+      "field": "compliance",
+      "kind": "contract_field",
+      "title": "compliance: Compliance is assessed at the retrospective Phase-G review: the implementation landed on main through PRs #632, #659 and #687; `docs/evidence/v2-coverage.md` reports `actions:authoring` = `exists`; the record set is supplied by this rework. The dependency order is refused at the draft attempt, not at publish, and that scoped refusal is named rather than rounded up. T17 stays active; the tranche review decides the final closure.",
+      "value": "Compliance is assessed at the retrospective Phase-G review: the implementation landed on main through PRs #632, #659 and #687; `docs/evidence/v2-coverage.md` reports `actions:authoring` = `exists`; the record set is supplied by this rework. The dependency order is refused at the draft attempt, not at publish, and that scoped refusal is named rather than rounded up. T17 stays active; the tranche review decides the final closure."
+    }
+  ],
+  "source": "computed:contract_field"
+}
+</code></pre>
+<h2>Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "delivery-contract",
+  "count": 1,
+  "rows": [
+    {
+      "approved_at": "2026-11-27T08:27:21.869994+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "id": "01a21c1d-c10e-7250-a5d5-a414e8d9a0d6",
+      "kind": "contract_approval",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "approved",
+      "title": "approval 01a21c1d-c10e-7250-a5d5-a414e8d9a0d6 \u2014 approved"
+    }
+  ],
+  "source": "computed:contract_approval"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tenant asset authoring · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

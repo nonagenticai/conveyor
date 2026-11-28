@@ -306,11 +306,17 @@ rows were recorded on 2026-11-27 (#814/#877, #815/#874, #816/#880), and S4's two
 | V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform) | the app path | the app's read contract | actions | the matching `apps/web` spec; S4: `e2e/v1/board.spec.ts`, `e2e/v1/cockpit.spec.ts` | verified except `/boards`, `/card/:card_id` (S4) |
 | Utilities (palette, sign-in, tenant switch, theme) | `/` | `/api/me`, config | none | `shell`/`shell-login` | verified |
 
+**Post-freeze surfaces (2026-11-27, #888).** Four `apps/web` routes landed after the census freeze
+and are part of the parity target: `/feedback` (`feedback.spec.ts`), `/knowledge/sources`
+(`sources.spec.ts`), `/knowledge/memory` (`memory.spec.ts`) and `/measure` (`measure.spec.ts`).
+The census is re-frozen to 56 routes / 602 actions; `--gate=P6` still waits on S4's `/boards` and
+`/card/:card_id`.
+
 ## 10. Risks
 
 | Risk | Mitigation |
 |---|---|
-| 598 actions and 52 routes is a multi-tranche build | schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible |
+| 602 actions and 56 routes is a multi-tranche build | schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible |
 | A second shell/auth/test harness drifts from the app | one contract, one census, behavioural trace parity on named flows, per-destination specs; a change to a contract updates both |
 | The world engine: wasm bundle and startup; the canvas renderer's density limit | the P0 spike measured canvas-2D (60 fps, 24 KB, 1.27 s cold load, stable heap); ADR 0023 selects it; the port keeps WebGL2 and the engine replaceable; the baseline is never deleted |
 | No local Rust builds (owner rule) slows the Bevy loop | all wasm builds on GitHub-hosted CI; the baseline needs no Rust; the spike is CI-first |

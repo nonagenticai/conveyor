@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="71223645725286b6915e59709f0a8e19918323c41d48d581e18133528772d9e2" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>71223645725286b6915e59709f0a8e19918323c41d48d581e18133528772d9e2</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Skeleton — workspace, tenancy, auth, jobs, SSE</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The snapshot carries the S02 contracts, review, baseline and published documents but zero artefact rows. This pack re-creates the seven A\u2013D artefacts, and the check before the run is that no row with the same title and phase survives; if one does, the factory must link it rather than create a duplicate. The risk is recorded because the earlier 2026-11-21 attempt is visible in the transcript while its artefact rows are not visible in the record.",
+      "code": "R-S02-01",
+      "created_at": "2026-11-26T12:50:28.406403+00:00",
+      "id": "01a217e8-47b9-792b-a55f-dc7eba8cb02c",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "docs/evidence/rework/S02/transcript.jsonl",
+          "acceptance/programme/S02.toml"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The replay record lost the artefact rows, so a re-creation could duplicate a surviving row",
+      "updated_at": "2026-11-26T13:04:01.022794+00:00",
+      "version": 4
+    },
+    {
+      "baseline_ref": null,
+      "body": "The proof holds one handler past a two-second lease while a second worker polls. It is a real child-process test against a real Postgres, so it is honest, but it depends on the handler outliving the lease reliably. The risk is a false red under heavy machine load, not a false green; the response is to re-run in isolation rather than to loosen the assertion.",
+      "code": "R-S02-02",
+      "created_at": "2026-11-26T12:50:28.538463+00:00",
+      "id": "01a217e8-483d-7858-a47d-cfa2a5d547bf",
+      "impact": 2,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "apps/server/tests/jobs_lease_two_workers.rs",
+          "issue #2 P2"
+        ]
+      },
+      "meta": {
+        "owner": "the S02 executor"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The two-worker lease proof is timing-sensitive and could flake under load",
+      "updated_at": "2026-11-26T13:04:01.159311+00:00",
+      "version": 4
+    },
+    {
+      "baseline_ref": null,
+      "body": "The acceptance manifest pins S02 to closed, so the batch would close it without consulting the open issue. That is why the order is proof first, then the issue comment and close, then the project run: a closure that contradicts its own linked issue is the exact fake green this rework exists to prevent.",
+      "code": "R-S02-03",
+      "created_at": "2026-11-26T12:50:28.708671+00:00",
+      "id": "01a217e8-48e8-78b9-b262-178c9120880b",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "issue #2",
+          "acceptance/programme/S02.toml"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "low",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "The rework could close S02 while issue #2 still reads open",
+      "updated_at": "2026-11-26T13:04:01.296086+00:00",
+      "version": 4
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The issue's current-state table, measured 2026-11-11, still says P2 is absent, but the lane carries apps/server/tests/jobs_lease_two_workers.rs in commit d367a4a9. The issue is stale, not the code. The rework runs the test, records the result on the issue and closes it; it does not close it on the strength of the file existing.",
+      "code": "I-S02-01",
+      "created_at": "2026-11-26T12:50:28.889408+00:00",
+      "id": "01a217e8-499c-7d4f-89f5-5b169a5ae506",
+      "impact": 3,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "issue #2",
+          "commit d367a4a9"
+        ]
+      },
+      "meta": {
+        "owner": "the S02 executor"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "Issue #2 was open at the start of the rework although its P2 test was already written",
+      "updated_at": "2026-11-26T13:04:01.433111+00:00",
+      "version": 4
+    },
+    {
+      "baseline_ref": null,
+      "body": "Act 3 of the earlier transcript sets closure_outputs to closure-review, yet the current project meta carries an empty list. The pack declares the closure review again through the factory rather than by editing the row, so the record and the evidence agree after the run.",
+      "code": "I-S02-02",
+      "created_at": "2026-11-26T12:50:29.047601+00:00",
+      "id": "01a217e8-4a3d-753c-8eaf-224b6673bf8f",
+      "impact": 2,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "docs/evidence/rework/S02/transcript.jsonl"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row",
+      "updated_at": "2026-11-26T13:04:01.566283+00:00",
+      "version": 4
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 is approved and the rework adds no scope: the artefacts, registers and closure describe the same eleven tables, five crates and two apps. If the plan's scope had changed, the baseline would need a change request before this pack could cite it.",
+      "code": "A-S02-01",
+      "created_at": "2026-11-26T12:50:29.204951+00:00",
+      "id": "01a217e8-4ad8-71ba-983c-f2753c475a9d",
+      "impact": 2,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "docs/plans/slices/S02-skeleton.md"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "low",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "low",
+      "status": "open",
+      "title": "The scope baseline taken on 2026-11-21 still describes S02's boundary",
+      "updated_at": "2026-11-26T13:04:01.700415+00:00",
+      "version": 4
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "S02 consumes S00's parity ids as the authoritative list of surfaces; a function not on that list is not built here. The dependency is a needs edge in the project meta and is the reason S02 follows S00 in tranche 1 rather than running beside it.",
+      "code": "D-S02-01",
+      "created_at": "2026-11-26T12:50:29.379083+00:00",
+      "id": "01a217e8-4b86-790c-897b-e9ca5483da48",
+      "impact": 3,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "parity/parity.yaml",
+          "docs/plans/slices/S02-skeleton.md"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "low",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "S00's signed parity inventory fixes the surfaces S02 must expose",
+      "updated_at": "2026-11-26T13:04:01.840779+00:00",
+      "version": 4
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "Eleven tables with forced RLS and one auth boundary mean S03, S04 and S06 add aggregates and actions, not tenancy. The benefit is measured by the absence of a per-slice tenancy implementation and by the tenant-isolation gate continuing to pass on every later snapshot.",
+      "code": "B-S02-01",
+      "created_at": "2026-11-26T12:50:29.524594+00:00",
+      "id": "01a217e8-4c17-79e9-b360-904c1348f30d",
+      "impact": 4,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "acceptance/programme/S02.toml"
+        ]
+      },
+      "meta": {
+        "owner": "the programme owner"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "low",
+      "status": "open",
+      "title": "The skeleton makes every later slice inherit isolation instead of re-implementing it",
+      "updated_at": "2026-11-26T13:04:01.976273+00:00",
+      "version": 4
+    },
+    {
+      "baseline_ref": null,
+      "body": "The lease is the only coordination primitive between workers, and the proof shows a long handler runs exactly once while a second worker polls. That is the evidence the kill gate alone cannot give: a reclaimed job proves liveness, not exactly-once.",
+      "code": "B-S02-02",
+      "created_at": "2026-11-26T12:50:29.667105+00:00",
+      "id": "01a217e8-4ca6-7926-9329-9fae825190d8",
+      "impact": 4,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "apps/server/tests/jobs_lease_two_workers.rs",
+          "issue #2"
+        ]
+      },
+      "meta": {
+        "owner": "the programme owner"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "low",
+      "status": "open",
+      "title": "The two-worker proof turns the lease policy from a declaration into evidence",
+      "updated_at": "2026-11-26T13:04:02.132774+00:00",
+      "version": 4
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+      "body": "Change request: rebuild S02's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-S02",
+      "created_at": "2026-11-22T06:45:38.446695+00:00",
+      "id": "01a20200-d8b6-77fc-a176-76d4ea3f4567",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of S02 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:38.446695+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

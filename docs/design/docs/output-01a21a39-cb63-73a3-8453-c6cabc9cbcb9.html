@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — S06 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="4c9c0ba2d4b03c2a909fd2b1412ee77e3424e5aabc47782d3a9a8bec307d262c" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>4c9c0ba2d4b03c2a909fd2b1412ee77e3424e5aabc47782d3a9a8bec307d262c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S06 Control Plane (retrospective, 2026-11-27)</h1>
+<h2>Outcome</h2>
+<p>S06 turns claims, runs, approvals, andon, comms and notifications into one durable control plane: one conditional UPDATE per claim with a monotonic claim_fence, one idempotent job row per period in place of fr's 14 timers, one approvals.decide path with required_decisions and decided_by_kind shared by web and Telegram, an andon_state singleton that pauses the poller and refuses runs.create, and one message plus N delivery rows per notification with a bounded retry. The record claims the slice built (meta.measured_status: built); the acceptance gate is not evidenced at the snapshot, and this rework records that rather than claiming a pass.</p>
+<h2>Boundary</h2>
+<p>Out of scope: the signed mcp_server channel (S06a: HMAC, payloads, ±300 s), MCP tool surfacing (S10), project_request.timeout (S07), the UI (S12 screens only) and the audience screens (PENDING-S0). S06 must not fork a second claim path, a second approval decision path, a second event write path or a second delivery store; the plan's traps fix those refusals, and the signed transport stays S06a's.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>SPEC.md</code> §4.5 and <code>02-source-map/20-fr.md</code> (fr <code>6f7c5097</code>) Workers, approvals/conveyor/admin/schedules: the 14 runOnce handlers, andon_state, wip_slot and engagement_deliveries, carried as job kinds.</li>
+<li><code>02-source-map/10-agent-patterns.md</code> (agent <code>83b8de7e</code>) <code>lease.rs</code> and <code>provision/outbox.rs</code>: the conditional UPDATE … RETURNING 1, the lease_until plus lease_token pair and enqueue-in-tx, send-outside.</li>
+<li><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §1 <code>pm_projects</code>: <code>_is_fr_close</code>, with the fr-only close case not carried.</li>
+<li>S03 (card claim columns, run, approval, approval_decision, andon_state), S04 (ActionSpec derive, registry and invocation route), S05 (comment, cards.move and board SSE) and S02 (job, schedule, event, audit_event and SSE replay).</li>
+</ul>
+<h2>Inception units</h2>
+<p>The project row records meta.measured_status: built, meta.plan_status: planned, meta.viability: rework, meta.tranche: 5 and issues #4 (open) and #604 (closed). The only publication attached to the project is the evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). No inception analysis or architecture design document exists for S06 in the snapshot; the nine decisions closed in plan §9 are the design record.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: S03 — card claim columns, run, approval, approval_decision and andon_state.</li>
+<li>blocked-by: S04 — the ActionSpec derive, the registry and POST /api/actions/{name}/invocations.</li>
+<li>blocked-by: S05 — comment, cards.move and the board SSE the reply path reuses.</li>
+<li>blocks: S06a's signed mcp channel (approval callback), S07's project_request.timeout, S10's MCP tool surfacing and S12's run-queue and notification screens.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The slice gate is the one in acceptance/programme/S06.toml and plan §7: (a) golden card-type×list path; (b) dual-control approval; (c) retry after a kill -9; (d) andon refusal and pause; (e) delivery retry to failed; (f) no timers, an empty setInterval scan; (g) human versus agent decided_by_kind. The commands are the six conveyor-api test binaries and four conveyor-server binaries in plan §7. No run is recorded at the snapshot, so the Phase-G level is non_conformant and the project stays active for the rework.</p>
+<h2>Capabilities</h2>
+<p>The capabilities the slice declares are claim and lease, the run lifecycle, dual-control approvals, andon, comms and notifications, channel bindings and Telegram inbound, the control-plane SSE topics, scheduled job kinds and human/agent decision identity. Maturity at the snapshot: the record claims built, all nine capabilities are declared but unevidenced, and the channel and decision-identity capability also carries open issue #4.</p>
+<h2>Plan</h2>
+<p>Held to <code>docs/plans/slices/S06-control-plane.md</code>; the plan frontmatter still reads status: planned and the project row echoes meta.plan_status: planned although meta.measured_status is built. Tranche 5 (01a1e9e0-fe45-77e0-993a-d571fecc5ec1) was authorised at 2026-11-26T22:54:06Z by review 01a21a10-ecb6-70e7-87d5-daa40f5154ac; the refinement cadence 01a216d1-1a40-7246-ba5e-254b8c0986fe records the WSJF inputs 9/13/8/6. This rework publishes the missing lifecycle set and keeps the project active until the gate runs.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Control plane — claims, runs, approvals, andon, comms and notifications · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

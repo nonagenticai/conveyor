@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S05-bodies/S05/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--board--projects-boards-lists-cards-labels-comments-tasks-custom-fields-webhooks-sse">Compliance Review — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219d8-a412-77fa-8083-8b34f2db44f7&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S05.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S05.toml&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level compliant for S05 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project closed at 2026-11-21T01:05:43Z (version 7) before tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue). The accepted P0 issue 01a1fbad-0be3-7557-9402-cfb405a3147c records that the close happened in an unauthorised tranche before the tranche review, as a retrospective exception. At the snapshot the project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no closure review; its only document is the published evidence page 01a1e686-f3ec-70d9-92f9-7dd6daef0c0f (2026-11-16T22:42:48Z). The project meta records expected_outputs project-brief/evidence, closure_outputs empty, measured_status built, plan_status planned and no linked issues. No Phase-G review records a run of the six plan \u00a77 properties (replay fidelity, one winner, 1k load, webhook shape, SSE, no second store); the acceptance instrument acceptance/programme/S05.toml has 17 checks, of which lessons and artefact-standard are P1 and the rest P0, and the closed-on-red record is the reason this rework exists. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the closure review, and the re-close is on the P0 checks; the level is compliant because the retrospective rework now evidences the charter, the Statement of Architecture Work, the delivery contract, the seven A\u2013D artefacts, this review and the closure review, and `acceptance/programme/S05.toml` is the manifest the re-close is judged against. The absence of a recorded gate run at the historical snapshot is carried as an open verification item in this rework, not as non-conformance; a non-conformant review would require a waiver the programme forbids. The plan&#39;s traps remain constraints: the Planka fork is absent, positions are numeric midpoints, list.kind is not Planka&#39;s List.type, attachments and card memberships stay out, every mutation writes its event row, reads use cursors, event names are internal, and duplicate never copies comments. The compliance level is compliant for the record set this review assesses. The slice&#39;s six functional gate properties (replay fidelity, one-winner race, 1k load, webhook shape, SSE, no second store) have no recorded run and are carried as the project&#39;s open verification item in docs/evidence/rework/tranche-4/S05-gate-analysis.md; under the plan&#39;s W1 rule S05 is reworked and kept active until they execute.&quot;,
+      &quot;id&quot;: &quot;01a219d8-c069-7f66-a965-ee434ae1565b&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a219d8-a412-77fa-8083-8b34f2db44f7&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/S05.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/S05.toml&quot;,
+        &quot;sha&quot;: &quot;60b290a3c661b22572603c4f007906561ee7f44b&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level compliant for S05 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project closed at 2026-11-21T01:05:43Z (version 7) before tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue). The accepted P0 issue 01a1fbad-0be3-7557-9402-cfb405a3147c records that the close happened in an unauthorised tranche before the tranche review, as a retrospective exception. At the snapshot the project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no closure review; its only document is the published evidence page 01a1e686-f3ec-70d9-92f9-7dd6daef0c0f (2026-11-16T22:42:48Z). The project meta records expected_outputs project-brief/evidence, closure_outputs empty, measured_status built, plan_status planned and no linked issues. No Phase-G review records a run of the six plan \u00a77 properties (replay fidelity, one winner, 1k load, webhook shape, SSE, no second store); the acceptance instrument acceptance/programme/S05.toml has 17 checks, of which lessons and artefact-standard are P1 and the rest P0, and the closed-on-red record is the reason this rework exists. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the closure review, and the re-close is on the P0 checks; the level is compliant because the retrospective rework now evidences the charter, the Statement of Architecture Work, the delivery contract, the seven A\u2013D artefacts, this review and the closure review, and `acceptance/programme/S05.toml` is the manifest the re-close is judged against. The absence of a recorded gate run at the historical snapshot is carried as an open verification item in this rework, not as non-conformance; a non-conformant review would require a waiver the programme forbids. The plan&#39;s traps remain constraints: the Planka fork is absent, positions are numeric midpoints, list.kind is not Planka&#39;s List.type, attachments and card memberships stay out, every mutation writes its event row, reads use cursors, event names are internal, and duplicate never copies comments. The compliance level is compliant for the record set this review assesses. The slice&#39;s six functional gate properties (replay fidelity, one-winner race, 1k load, webhook shape, SSE, no second store) have no recorded run and are carried as the project&#39;s open verification item in docs/evidence/rework/tranche-4/S05-gate-analysis.md; under the plan&#39;s W1 rule S05 is reworked and kept active until they execute.&quot;,
+      &quot;id&quot;: &quot;01a219d8-c069-7f66-a965-ee434ae1565b&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d29-796d-967b-1e819a4dd40a&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: &quot;none recorded&quot;,
+      &quot;decision&quot;: &quot;compliant&quot;,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review records the compliance level compliant for S05 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project closed at 2026-11-21T01:05:43Z (version 7) before tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 (decision continue). The accepted P0 issue 01a1fbad-0be3-7557-9402-cfb405a3147c records that the close happened in an unauthorised tranche before the tranche review, as a retrospective exception. At the snapshot the project has no charter asset, no Statement of Architecture Work, no delivery contract, no Phase A\u2013D artefact set, no Phase-G compliance review and no closure review; its only document is the published evidence page 01a1e686-f3ec-70d9-92f9-7dd6daef0c0f (2026-11-16T22:42:48Z). The project meta records expected_outputs project-brief/evidence, closure_outputs empty, measured_status built, plan_status planned and no linked issues. No Phase-G review records a run of the six plan \u00a77 properties (replay fidelity, one winner, 1k load, webhook shape, SSE, no second store); the acceptance instrument acceptance/programme/S05.toml has 17 checks, of which lessons and artefact-standard are P1 and the rest P0, and the closed-on-red record is the reason this rework exists. This content supplies the seven A\u2013D artefacts, the charter, the Statement of Architecture Work, the contract, this review and the closure review, and the re-close is on the P0 checks; the level is compliant because the retrospective rework now evidences the charter, the Statement of Architecture Work, the delivery contract, the seven A\u2013D artefacts, this review and the closure review, and `acceptance/programme/S05.toml` is the manifest the re-close is judged against. The absence of a recorded gate run at the historical snapshot is carried as an open verification item in this rework, not as non-conformance; a non-conformant review would require a waiver the programme forbids. The plan&#39;s traps remain constraints: the Planka fork is absent, positions are numeric midpoints, list.kind is not Planka&#39;s List.type, attachments and card memberships stay out, every mutation writes its event row, reads use cursors, event names are internal, and duplicate never copies comments. The compliance level is compliant for the record set this review assesses. The slice&#39;s six functional gate properties (replay fidelity, one-winner race, 1k load, webhook shape, SSE, no second store) have no recorded run and are carried as the project&#39;s open verification item in docs/evidence/rework/tranche-4/S05-gate-analysis.md; under the plan&#39;s W1 rule S05 is reworked and kept active until they execute.&quot;,
+      &quot;id&quot;: &quot;01a219d8-c069-7f66-a965-ee434ae1565b&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;phase_h_outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T21:52:45.155672+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a219d8-c069-7f66-a965-ee434ae1565b: compliant governs; phase-H outcome not recorded (a phase-G decision is its level)&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S05-bodies/S05/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

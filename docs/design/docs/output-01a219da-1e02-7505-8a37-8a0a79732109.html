@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — S09 (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="b0838e1a9545dd317b7a79c629c519719539c27be682cec1f1fdf6ec9ef20213" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>b0838e1a9545dd317b7a79c629c519719539c27be682cec1f1fdf6ec9ef20213</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S09 Documents and integrations (retrospective, 2026-11-24)</h1>
+<h2>Outcome</h2>
+<p>S09 delivers the delivery track's document, repository, secret and read-only display boundary: four tables (document, repository, project_repository and secret), the integrations module, 26 of the front matter's 27 actions, nine event types, bytes in MinIO behind an authorized stream, write-only secrets and repositories as references. The record claims the slice built on 2026-11-08; the functional gate is not evidenced at the snapshot, and this rework records that distinction instead of claiming a pass.</p>
+<h2>Boundary</h2>
+<p>Out of scope and never absorbed: billing logic and metering writes (billing_service), worker scheduling (worker_management), artifact objects, code analysis (coding-*), licence issuance (licenses), ingestion and embeddings as services (strata_ingest and strata_rag), screens (S12) and project_request.repository_url (S07). The slice also refuses bytes in Postgres, local disk, presigned URLs, a reveal endpoint, repository clones, a rollup metrics table and a direct read of any neighbour's database.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li>SPEC sections 2, 3 D12/D14, 5.2, 5.5 and 8 S9 for the nine-service list and the boundary.</li>
+<li>01-CONTRACT sections 6, 9 and 14 for external-action fields, timeout and breaker, and tenant from membership.</li>
+<li>02-DATA-ARCHITECTURE sections 2.10, 5 and 8 for the four tables' DDL and the meta read-whole rule.</li>
+<li>02-source-map/20-fr account, admin, operate, settings and integrations for the repository registry, secret store and display shapes; kag.ts, licensing, pricing, billing sync and project-requests are not carried.</li>
+<li>02-source-map/30 section 4 for artifacts and observability as external nodes only.</li>
+</ul>
+<h2>Inception units</h2>
+<p>The project row records meta.measured_status built, meta.plan_status planned, meta.viability rework, meta.tranche 4 and nine linked issues (156, 168, 183, 195, 231, 245, 571, 577 and 579), all recorded closed in the snapshot. The only contemporaneous publication is the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3 (2026-11-16T22:43:22Z); no project brief or Phase A–D set existed before this rework, and the plan's section 9 decisions are the design record.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: S03 — tenant, trace_link, revision and the tenancy convention for the four new tables.</li>
+<li>blocked-by: S04 — the ActionSpec derive, action_registry, POST /api/actions/{name}/invocations and the OpenAPI and MCP projection.</li>
+<li>blocked-by: S02 — event, job, audit_event and the outbox that carries the nine S09 event types.</li>
+<li>blocked-by: the operators' MinIO endpoint and bucket policy for the deployed leg, and a live strata_ingest target for documents.ingest.</li>
+<li>blocks: S12's declared admin surface (actions, jobs, audit, licences, workers and billing reads) and S15's separation of retrieval.query from knowledge.query.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The gate is the plan section 7 feature list: a 1 MiB round-trip whose sha256 equals content_hash with the object key gone after delete; a 10 MiB upload refused 413; secrets never returning plaintext; the workers page rendering live rows; every report number equal to its SQL count; timeout_ms on every external; and billing with no write action and no metering event. The instrument also requires migration 0013 twice, FORCE RLS, 26 of 27 actions and the nine events. The manifest is acceptance/programme/S09.toml; the snapshot records no run.</p>
+<h2>Capabilities</h2>
+<p>The declared capabilities are document lifecycle, the MinIO bytes backend, repository references, write-only secrets, coding job dispatch, the external service boundary, worker and provider display, billing display, live report queries and the strata ingest handoff. At the snapshot the plan claims Part A and Part B built; the deployed MinIO leg, the live strata path and every gate property remain unevidenced, and documents.ingest is the one action not registered.</p>
+<h2>Plan</h2>
+<p>Held to docs/plans/slices/S09-documents-integrations.md, whose frontmatter still reads status planned while the project meta says measured_status built. The project closed at version 10 (updated 2026-11-24T07:41:22Z); tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9, and the PI plan records the WSJF inputs 10/8/10/5. This rework publishes the missing lifecycle set and re-closes the project retrospectively on 2026-11-24, because every linked issue is recorded closed.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

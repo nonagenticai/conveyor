@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Project registers",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "project-registers",
+ "body": "# T3 \u2014 Project registers\n\n## Risks\n\nNo project-owned risk row is recorded; T3's live risks are carried on the programme register\n(R3 shared binary/target race, R13 evidence theatre) and reviewed at the tranche cadence.\n\n## Issues\n\nThe vacuous closure was the one issue; it is closed by this record set, not waived.\n\n## Assumptions\n\nThe approver job remains distinct from the PM job; the standing delegation stays published.\n\n## Dependencies\n\nT2 (domain model), P0 (programme definition), and the spine primitives the PM path composes.\n\n## Benefits\n\nB1 (auditable decisions) directly; the demo credits record the five deliverables at the tr3 demo.\n\n## Changes\n\n`01a2052e-5648\u2026` \u2014 accept the deliverables with evidence (approved).\n",
+ "publishable": true,
+ "unit": "T3"
+}

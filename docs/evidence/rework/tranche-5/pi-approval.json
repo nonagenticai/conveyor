@@ -1,0 +1,15 @@
+{
+  "schema": "conveyor-pi-plan-approval/v1",
+  "tranche": 5,
+  "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "cadence_id": "01a216d1-1913-70dd-8f69-c8ad230f2364",
+  "approval_id": "01a216d1-1b0a-7249-8b6a-3a2872184f4c",
+  "status": "approved",
+  "decision": "approve",
+  "rule": true,
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "pi_plan": "01a216d1-1bb7-7376-905e-38a776f22190",
+  "pi_objectives": "01a216d1-1cbe-7297-bc1e-ee5e29ea82cc",
+  "members": ["S06", "S08", "S17", "T17", "T7"],
+  "note": "Approved under the tranche-5 delegation. The published plan's narrative order is S08, T7, S06, S17, T17; the operative order is S06 first because it is the only active member and the control plane the other members' checks read."
+}

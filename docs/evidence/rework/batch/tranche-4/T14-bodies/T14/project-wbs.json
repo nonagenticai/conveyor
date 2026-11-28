@@ -1,0 +1,59 @@
+{
+  "body_sha256": "4532563df47de6dd3cb6f1ca345be9d5d2614880dc4b8e424cdd77c2b67d3303",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+    "key": "T14",
+    "kind": "project",
+    "title": "Estate toolkits"
+  },
+  "title": "Project Wbs \u2014 Estate toolkits"
+}

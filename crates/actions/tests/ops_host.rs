@@ -21,6 +21,7 @@ fn request(action: &str, input: Value) -> InvokeRequest {
 /// As [`request`], naming the approved approval the call carries (#282: the id is the CALL's).
 fn request_gated(action: &str, input: Value, approval_id: Option<Uuid>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

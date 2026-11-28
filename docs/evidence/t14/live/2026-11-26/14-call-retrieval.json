@@ -1,0 +1,17 @@
+{
+  "providers": {},
+  "results": [],
+  "routing": {
+    "laya_consulted": false,
+    "leaves": [],
+    "mode_used": "hybrid"
+  },
+  "timings_by_model": [],
+  "timings_ms": {
+    "embed": 0,
+    "rerank": 0,
+    "route": 0,
+    "search": 0,
+    "total": 20
+  }
+}

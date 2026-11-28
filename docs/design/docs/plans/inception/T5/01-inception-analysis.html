@@ -52,7 +52,7 @@
 <li><strong>absent</strong> — no action beginning <code>kata.</code> in <code>docs/design/data/actions.json</code>; the measurement entry points are the built <code>benchmark_runs.start|get|compare</code> and <code>eval_runs.start</code>.</li>
 <li><strong>absent</strong> — no candidate, measurement, propagation or outcome table in <code>migrations/</code>.</li>
 <li><strong>absent</strong> — no decision-time held-out enforcement: the split label exists, but no action refuses an adoption measured on <code>train</code>.</li>
-<li><strong>absent</strong> — no <code>lesson</code> table and no <code>lessons.*</code> action; §7.6 promotion has no mechanism.</li>
+<li><strong>partial</strong> — <code>migrations/0056_cadence_tranche.sql:10</code> creates the <code>lesson</code> table and <code>lessons.propose</code>/<code>lessons.list</code> are registered, so a lesson can be recorded and read; the §7.6 <strong>promotion mechanism</strong> — an evidence-gated promotion of a lesson into a job, prompt or knowledge change — is absent.</li>
 <li><strong>absent</strong> — no kata-tenant policy of D45: tenancy exists, but nothing gives a kata its own approvals and budget.</li>
 <li><strong>refused</strong> — a kata may not edit its instrument, approve its own adoption, measure on the training split only, or open a second kata for an open signature (§6.3, §9.3).</li>
 </ul>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S05 gate analysis — retrospective (2026-11-24) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-4/S05-gate-analysis.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s05-gate-analysis--retrospective-2026-11-24">S05 gate analysis — retrospective (2026-11-24)</h1>
+<p>The six functional gate properties of <code>docs/plans/slices/S05-board.md</code> §7 have no recorded run in the programme record. The plan's W1 rule is explicit: a project whose scenario cannot execute is reworked but not closed. S05 is therefore reworked and kept active; this analysis is the open verification item.</p>
+<h1 id="closure-review--s05-board-retrospective-2026-11-24">Closure review — S05 Board (retrospective, 2026-11-24)</h1>
+<h2 id="outcome-vs-acceptance">Outcome vs acceptance</h2>
+<p>The slice gate is defined in plan §7 and summarised in <code>acceptance/programme/S05.toml</code>; the snapshot records no Phase-G review of any clause, so each is recorded honestly:</p>
+<ul>
+<li><strong>Property (a) replay fidelity.</strong> Not evidenced. The plan requires 1,000 cards/10 lists re-imported through the real actions with <code>admin diff</code> printing zero deltas; no such run is recorded.</li>
+<li><strong>Property (b) one winner.</strong> Not evidenced. The plan requires one 200 and one 412 with the current representation from two clients on the same <code>If-Match</code>; no <code>race_move</code> run is recorded.</li>
+<li><strong>Property (c) 1k load.</strong> Not evidenced. The plan requires p95 ≤ 120 ms at 20 rps and 1,000 cards in five pages ≤ 500 ms; no k6 run is recorded.</li>
+<li><strong>Property (d) webhook shape.</strong> Not evidenced. The plan requires <code>{event,data,prevData,user}</code> with the internal register event and <code>*Out</code> payloads; no <code>webhook_shape</code> run is recorded.</li>
+<li><strong>Property (e) SSE.</strong> Not evidenced. The plan requires <code>card.moved</code> ≤ 200 ms to a second client live and on replay; no <code>sse_board</code> run is recorded.</li>
+<li><strong>Property (f) no second store.</strong> Not evidenced. The catalog read forbidding <code>card_membership</code> and <code>attachment</code> is defined; no run is recorded.</li>
+<li><strong>Record and governance.</strong> Red at the close: the project closed at 2026-11-21T01:05:43Z before tranche 4 was authorised (2026-11-24T17:04:34Z) and before the charter, contract, artefact set, Phase-G review and closure review existed. The accepted P0 issue 01a1fbad-0be3-7557-9402-cfb405a3147c records the out-of-sequence closure.</li>
+</ul>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>Project 01a1d039-0d29-796d-967b-1e819a4dd40a, version 7, <code>status: closed</code> at 2026-11-21T01:05:43Z; <code>meta.measured_status: built</code>, <code>meta.plan_status: planned</code>, <code>meta.issues: []</code>, <code>meta.expected_outputs: [project-brief, evidence]</code>, <code>meta.closure_outputs: []</code>.</li>
+<li>Accepted P0 exception 01a1fbad-0be3-7557-9402-cfb405a3147c (2026-11-21T01:16:24Z).</li>
+<li>Tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, created 2026-11-17T14:19:56Z, authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 (continue).</li>
+<li>Tranche-4 refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e (2026-11-22T09:41:50Z) recording WSJF 10/8/10/5; the tranche-4 PI cadence lists S05 in its capacity.</li>
+<li>The project's only publication is the evidence page 01a1e686-f3ec-70d9-92f9-7dd6daef0c0f (published 2026-11-16T22:42:48Z).</li>
+<li>This rework records the charter, the Statement of Architecture Work, the delivery contract, the seven A–D artefacts, the WBS deliverable with its WSJF inputs, the Phase-G review, the expected outputs (<code>project-brief</code>, <code>evidence</code>) and this closure review.</li>
+</ul>
+<h2 id="open-items">Open items</h2>
+<ul>
+<li><strong>The six gate properties remain unproven.</strong> Run the plan §7 gate and <code>acceptance/programme/S05.toml</code>, and record the outputs; until then the slice is non_conformant.</li>
+<li><strong>P1 checks.</strong> <code>S05-lessons</code> and <code>S05-artefact-standard</code> are P1 in the acceptance instrument; they do not block the P0 closure gate but remain open.</li>
+<li><strong>Plan status.</strong> The plan frontmatter and the project meta still say <code>planned</code> while <code>measured_status</code> says <code>built</code>; reconcile the plan when the gate is recorded.</li>
+<li><strong>Planka source gaps.</strong> The fork is absent; the per-event envelope, <code>List.type</code> transitions and position seeding are UNVERIFIED and must be measured (plan trap 1). The live DB is five test cards and never evidence.</li>
+<li><strong>Scope exclusions.</strong> Attachments and card-level memberships stay out; claims, assignee and stopwatch writes stay in S06; the UI stays in S12.</li>
+</ul>
+<h2 id="decision">Decision</h2>
+<p>Record the compliance level <strong>non_conformant</strong> and re-close S05 as a retrospective re-closure under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and the accepted P0 exception 01a1fbad-0be3-7557-9402-cfb405a3147c, through <code>acceptance/programme/S05.toml</code> on its P0 checks, with the closure gate decided by an approver other than its requester. This decision records the record the project lacked; it does not claim the board slice's acceptance gate passed, and the six unproven properties are carried as open items to be verified through the same instrument.</p>
+<h2 id="retrospective-closure-drafted-for-the-record-level-rework">Retrospective closure drafted for the record-level rework</h2>
+<h1 id="closure--s05-board-retrospective-2026-11-24">Closure — S05 Board (retrospective, 2026-11-24)</h1>
+<ul>
+<li><strong>Delivered (as recorded):</strong> the board slice of <code>docs/plans/slices/S05-board.md</code> — nine tables, 39 actions, 15 events, the SSE topics, the webhook emitter and the board-export/v1 CLI. The project row records <code>meta.measured_status: built</code> but <code>meta.plan_status: planned</code> and <code>meta.issues: []</code>; no Phase-G review or gate run is recorded.</li>
+<li><strong>Closed:</strong> 2026-11-21T01:05:43Z, version 7, in an unauthorised tranche before the tranche review; the accepted P0 issue 01a1fbad-0be3-7557-9402-cfb405a3147c records the retrospective exception under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</li>
+<li><strong>Tranche:</strong> tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 (continue); the tranche-4 refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e records the WSJF inputs 10/8/10/5.</li>
+<li><strong>Rework:</strong> publishes the charter, the Statement of Architecture Work, the delivery contract, the seven Phase A–D artefacts, the one WBS deliverable, the Phase-G review and this closure review, and re-publishes the expected outputs <code>project-brief</code> and <code>evidence</code>; the declared closure output is <code>closure-review</code>.</li>
+<li><strong>Decision:</strong> re-close on the P0 checks of <code>acceptance/programme/S05.toml</code>, with the closure gate decided by an approver other than its requester, recording the level non_conformant because the board slice's six gate properties are not evidenced.</li>
+<li><strong>Not recoverable:</strong> no contemporaneous lifecycle set existed and the close preceded the tranche-4 authorisation; this closure is retrospective and does not attest contemporaneous intent.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-4/S05-gate-analysis.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

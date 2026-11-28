@@ -394,6 +394,7 @@
 </tr>
 </tbody>
 </table>
+<p><strong>Post-freeze surfaces (2026-11-27, #888).</strong> Four <code>apps/web</code> routes landed after the census freeze and are part of the parity target: <code>/feedback</code> (<code>feedback.spec.ts</code>), <code>/knowledge/sources</code> (<code>sources.spec.ts</code>), <code>/knowledge/memory</code> (<code>memory.spec.ts</code>) and <code>/measure</code> (<code>measure.spec.ts</code>). The census is re-frozen to 56 routes / 602 actions; <code>--gate=P6</code> still waits on S4's <code>/boards</code> and <code>/card/:card_id</code>.</p>
 <h2 id="10-risks">10. Risks</h2>
 <table>
 <thead>
@@ -404,7 +405,7 @@
 </thead>
 <tbody>
 <tr>
-<td>598 actions and 52 routes is a multi-tranche build</td>
+<td>602 actions and 56 routes is a multi-tranche build</td>
 <td>schema-driven action sheet gives full reachability early; destinations are prioritised by the owner; the instrument makes gaps visible</td>
 </tr>
 <tr>

@@ -1,0 +1,59 @@
+{
+  "body_sha256": "e2f4100cf990eee308a65a7abb020928bce145b52a8e615e420e3c02ff4115ad",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+    "key": "S05",
+    "kind": "project",
+    "title": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE"
+  },
+  "title": "Project Wbs \u2014 Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE"
+}

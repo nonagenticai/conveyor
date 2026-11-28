@@ -1,0 +1,22 @@
+{
+  "schema": "conveyor-pi-plan-approval/v1",
+  "tranche": 6,
+  "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a21c62-698d-7a02-b32a-1e3cad0ba69e",
+  "approval_id": "01a21c63-4d63-78b2-a489-784cafe0d35f",
+  "status": "approved",
+  "decision": "approve",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "pi_plan": "01a21c62-f6e3-7717-954d-5f608c72c0d4",
+  "pi_objectives": "01a21c62-f797-72b6-9c64-28a2038cdeae",
+  "refinement": "01a21c62-6a43-7d17-9d5b-836ad1801e45",
+  "members": [
+    "S06a",
+    "S06b",
+    "S10",
+    "S11",
+    "T19F"
+  ],
+  "note": "Approved under the standing delegation. The operative order is S06a (retirement), S06b, S10, S11, T19F; S06b is the agent interface and the control plane S10/S11 read."
+}

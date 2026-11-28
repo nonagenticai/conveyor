@@ -15,7 +15,7 @@
 //! whose URL names a non-http(s)/mailto scheme is made inert. The public-page test carries
 //! `<script>`, an `onerror` attribute and a `javascript:` link.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use conveyor_domain::Project;
@@ -26,6 +26,8 @@ use conveyor_store::document::DocumentRecord;
 use serde::Serialize;
 use sqlx::PgPool;
 use uuid::Uuid;
+
+use crate::snapshot::redact_text;
 
 /// The schema name of the generated index.
 pub const OUTPUTS_SCHEMA: &str = "design-outputs/v1";
@@ -205,18 +207,48 @@ pub async fn read_outputs_inputs(
     })
 }
 
+/// One file [`write_rendered`] wrote: its name inside the outputs directory and the exact bytes.
+pub(crate) struct WrittenOutput {
+    /// File name (`output-<id>.html` or `outputs.js`).
+    pub name: String,
+    /// The bytes written; hashed into the snapshot manifest.
+    pub bytes: Vec<u8>,
+}
+
 /// Write the rendered index and pages. No database: the caller already read the rows.
 pub fn write_rendered(
     out: &Path,
     index: &str,
     pages: &HashMap<Uuid, String>,
 ) -> Result<usize, PublishOutputsError> {
+    Ok(write_rendered_with_files(out, index, pages)?.0)
+}
+
+/// [`write_rendered`], plus the exact files it wrote and their bytes.
+///
+/// The snapshot's manifest hashes every published file (SPEC §10.3); the caller needs the
+/// written bytes, not a directory scan — `out` may also hold the tracked document pages.
+pub(crate) fn write_rendered_with_files(
+    out: &Path,
+    index: &str,
+    pages: &HashMap<Uuid, String>,
+) -> Result<(usize, Vec<WrittenOutput>), PublishOutputsError> {
     std::fs::create_dir_all(out)?;
+    let mut written = Vec::with_capacity(pages.len() + 1);
     for (id, page) in pages {
-        std::fs::write(out.join(format!("output-{id}.html")), page)?;
+        let name = format!("output-{id}.html");
+        std::fs::write(out.join(&name), page)?;
+        written.push(WrittenOutput {
+            name,
+            bytes: page.as_bytes().to_vec(),
+        });
     }
     std::fs::write(out.join("outputs.js"), index)?;
-    Ok(pages.len())
+    written.push(WrittenOutput {
+        name: "outputs.js".to_owned(),
+        bytes: index.as_bytes().to_vec(),
+    });
+    Ok((pages.len(), written))
 }
 
 /// Render the published set from rows the caller already read.
@@ -232,12 +264,29 @@ pub fn render_outputs(
     generated_at: &str,
     commit: Option<&str>,
 ) -> Result<(String, HashMap<Uuid, String>), PublishOutputsError> {
+    // The programme boundary, by the same predicate `live::site_view` publishes: a record or
+    // attachment whose project is outside the programme is a session fixture and is not public
+    // (no page, no index row). A row with no project is a tenant-level note and stays.
+    let bound: HashSet<Uuid> = projects
+        .iter()
+        .filter(|project| project.programme_id.is_some())
+        .map(|project| project.id)
+        .collect();
     let projects: HashMap<Uuid, (String, String)> = projects
         .iter()
-        .map(|project| (project.id, (project.key.clone(), project.name.clone())))
+        .filter(|project| bound.contains(&project.id))
+        .map(|project| {
+            (
+                project.id,
+                (redact_text(&project.key), redact_text(&project.name)),
+            )
+        })
         .collect();
     let mut by_parent: HashMap<Uuid, Vec<&DocumentRecord>> = HashMap::new();
     for attachment in attachments {
+        if attachment.project_id.is_some_and(|id| !bound.contains(&id)) {
+            continue;
+        }
         if let Some(parent) = attachment.parent_document_id {
             by_parent.entry(parent).or_default().push(attachment);
         }
@@ -246,20 +295,29 @@ pub fn render_outputs(
     let mut entries = Vec::with_capacity(records.len());
     let mut pages = HashMap::with_capacity(records.len());
     for record in records {
-        let body = record.body.as_deref().unwrap_or_default();
+        // ⛔ A published row outside the programme is not public: no page, no index row.
+        if record.project_id.is_some_and(|id| !bound.contains(&id)) {
+            continue;
+        }
+        let body = redact_text(record.body.as_deref().unwrap_or_default());
         let (project_key, project_name) = record
             .project_id
             .and_then(|id| projects.get(&id).cloned())
             .map_or((None, None), |(key, name)| (Some(key), Some(name)));
         let project_label = project_name.as_deref().or(project_key.as_deref());
-        let author = record.created_by.and_then(|id| names.get(&id).cloned());
+        // The author display name is free text (an email is a common choice) and leaves the tenant
+        // with the page, so it is redacted exactly like the title and the body.
+        let author = record
+            .created_by
+            .and_then(|id| names.get(&id))
+            .map(|name| redact_text(name));
         let attachment_entries: Vec<AttachmentEntry> = by_parent
             .get(&record.id)
             .map(|rows| {
                 rows.iter()
                     .map(|row| AttachmentEntry {
                         id: row.id.to_string(),
-                        filename: row.title.clone(),
+                        filename: redact_text(&row.title),
                         content_type: row
                             .meta
                             .get("content_type")
@@ -277,9 +335,10 @@ pub fn render_outputs(
             })
             .unwrap_or_default();
         let provenance = Provenance::of(record, author.as_deref(), commit);
+        let title = redact_text(&record.title);
         let page = output_page(
-            &record.title,
-            &render_markdown(body),
+            &title,
+            &render_markdown(&body),
             generated_at,
             project_label,
             author.as_deref(),
@@ -289,12 +348,12 @@ pub fn render_outputs(
         pages.insert(record.id, page);
         entries.push(OutputEntry {
             id: record.id.to_string(),
-            title: record.title.clone(),
+            title,
             project_id: record.project_id.map(|id| id.to_string()),
             project_key,
             project_name,
-            category: record.category.clone(),
-            unit: record.unit.clone(),
+            category: record.category.as_deref().map(redact_text),
+            unit: record.unit.as_deref().map(redact_text),
             author,
             attachments: attachment_entries,
             path: format!("docs/output-{}.html", record.id),

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline acceptance — 2026-11-23 (head a2c48db0) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="decision" data-provenance-version="1" data-provenance-hash="78deb003d034434b2e371bbe553978a5b19948a7e53bc174b5a755d19f163dfc" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>decision</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>78deb003d034434b2e371bbe553978a5b19948a7e53bc174b5a755d19f163dfc</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Conformance baseline acceptance — 2026-11-23 (head a2c48db0)</h1>
+<h2>Context</h2>
+<p>The programme's conformance baseline was last accepted at snapshot <code>2a1ff31d</code> (2026-11-21). The head
+snapshot <code>a2c48db0</code> proves that the Phase-G compliance reviews for T9, T10, T13 and T2 now exist, and
+that 43 baseline entries no longer have a live gap. A report is not an acceptance; this record is
+the delegated acceptance of the re-derived baseline.</p>
+<h2>Decision</h2>
+<p>The baseline is re-derived from the head snapshot <code>a2c48db0</code>: 294 snapshot files and 279 published
+outputs, audited against <code>governance/conformance.json</code>. Forty-three entries whose gap no longer
+exists are deleted, not re-dated. The three live P1 gaps the snapshot proves are owned with the
+programme owner and the 2027-02-18 reassessment date; each is a rework commitment, never a waiver:</p>
+<ul>
+<li><code>seed_live_drift S21</code> — the plan says closed; the record says active. S21 is in tranches 9–11 and
+closes only after the chain authorises tranche 9.</li>
+<li><code>seed_live_drift T0</code> — the plan says closed; the record says active. Tranche 0 is closed, so T0
+may close through its own chain.</li>
+<li><code>seed_live_drift T4</code> — the plan says closed; the record says active. Tranche 4 is authorised, so
+T4 may close through its own chain.</li>
+</ul>
+<h2>Consequences</h2>
+<p>The strict gate passes with zero unbaselined P0/P1 and no expired entry. S21 must not be closed
+before tranche 9 is authorised; closing it earlier would manufacture the unauthorised-tranche P0.
+The acceptance is a delegated act under the owner decision
+<code>01a2021d-cca2-757c-bfc2-21bd4e4b6d85</code> (published 2026-11-22): the executor is <code>conveyor-e2e</code>, the
+approver is <code>conveyor-approver</code>, and no human decision is claimed.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Head snapshot: <code>a2c48db0</code>; 294 files; 279 published outputs; the manifest sha256 is recorded in the
+baseline header.</li>
+<li>Strict audit: <code>audit-programme-conformance.py --strict --fail-on P0,P1 --baseline docs/evidence/conformance-baseline.json</code>.</li>
+<li>Journal: the acceptance is replayed through <code>documents.compose</code> and read back by id.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

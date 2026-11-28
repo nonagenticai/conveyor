@@ -227,7 +227,7 @@ impl ServerHandler for McpServer {
                             None,
                         ));
                     }
-                    (spec.name.to_owned(), spec.route_path(), spec.task_capable)
+                    (spec.name.to_string(), spec.route_path(), spec.task_capable)
                 }
                 None => {
                     let imported = crate::resolve::imported(&self.deps.pool, session.tenant)
@@ -278,6 +278,7 @@ impl ServerHandler for McpServer {
             .map(Value::Object)
             .unwrap_or_else(|| json!({}));
         let invoke_request = InvokeRequest {
+            credential_alias: None,
             action: action_name,
             input,
             precondition: None,
@@ -351,12 +352,17 @@ impl ServerHandler for McpServer {
         let Some(session) = session_of(&context) else {
             return Err(McpError::invalid_request("unauthenticated", None));
         };
+        // `_meta` is read from the CONTEXT, not from `request.meta`: rmcp strips the wire
+        // `params._meta` into the request extensions and the service loop moves it to
+        // `context.meta` before dispatch, so `UpdateTaskParams.meta` is always `None` on the
+        // wire (measured in rmcp 3.11). This is where the agent platform's
+        // `_meta.delegation_ref` reaches `approvals.decide`.
         tasks::update(
             &self.deps.pool,
             &session,
             &request.task_id,
             &request.input_responses,
-            request.meta,
+            &context.meta,
         )
         .await
     }
@@ -408,7 +414,8 @@ pub async fn mcp_tool_body(
     app_key: String,
 ) -> (u16, Value) {
     let request = InvokeRequest {
-        action: spec.name.to_owned(),
+        credential_alias: None,
+        action: spec.name.to_string(),
         input: arguments,
         precondition: None,
         idempotency_key: None,

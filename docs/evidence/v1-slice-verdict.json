@@ -1,0 +1,5445 @@
+{
+  "schema": "verify-slices/v1",
+  "audited_sha": "900ec2b267defeaa33075864fee525c6a9c66d46",
+  "snapshot": {
+    "path": "/tmp/u5a-v12/data",
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "generated_at": "2026-11-23T10:28:30.225766+00:00"
+  },
+  "slices": [
+    {
+      "id": "T0",
+      "spec_gate": "a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses `409 job_binding_stale`; no concept has two stores; a test-only third executor kind registers without editing the run path",
+      "plan": null,
+      "manifest": "acceptance/programme/T0.toml",
+      "gate_checks": [
+        "T0-project",
+        "T0-baseline",
+        "T0-charter",
+        "T0-closure-outputs",
+        "T0-contract",
+        "T0-review",
+        "T0-closure-gate",
+        "T0-waivers",
+        "T0-pi-cadence",
+        "T0-wsjf",
+        "T0-demo-credits",
+        "T0-product"
+      ],
+      "checks": [
+        {
+          "id": "T0-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T0 is active"
+        },
+        {
+          "id": "T0-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T0-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T0-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T0-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff45-b2ce-7276-8a88-cf3d744e7976 approved by board decision 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T0-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "T0-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a1ff48-c258-72af-9643-1c830af6b92f decided by a distinct approver"
+        },
+        {
+          "id": "T0-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T0-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0"
+        },
+        {
+          "id": "T0-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T0-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T0-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T0.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.000784+00:00"
+      },
+      "findings": {
+        "total": 15,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T1",
+      "spec_gate": "one project with a baseline, a change request and a refused self-approval; WSJF recomputes from inputs; the portfolio view lists the in-flight set; a dependency cycle is refused; a benefit profile without baseline, target, method or owner is refused; a benefit-map edge names its five levels",
+      "plan": null,
+      "manifest": "acceptance/programme/T1.toml",
+      "gate_checks": [
+        "T1-project",
+        "T1-baseline",
+        "T1-charter",
+        "T1-closure-outputs",
+        "T1-contract",
+        "T1-review",
+        "T1-closure-gate",
+        "T1-waivers",
+        "T1-pi-cadence",
+        "T1-pi-plan",
+        "T1-pi-objectives",
+        "T1-wsjf",
+        "T1-demo-credits",
+        "T1-lessons",
+        "T1-product"
+      ],
+      "checks": [
+        {
+          "id": "T1-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T1 is closed"
+        },
+        {
+          "id": "T1-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T1-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T1-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T1-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 approved by board decision 01a1ff89-1794-79d0-8707-f7614987ee7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T1-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "T1-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a20231-0d43-74ad-80ca-42088a1be984 decided by a distinct approver"
+        },
+        {
+          "id": "T1-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T1-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff73-df1f-78c5-8793-101de5a3dd60 and refinement 01a1ff74-8982-77b9-971e-e4517c55d09a for tranche-1"
+        },
+        {
+          "id": "T1-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI plan is published"
+        },
+        {
+          "id": "T1-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI objectives are published"
+        },
+        {
+          "id": "T1-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T1-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T1-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+        },
+        {
+          "id": "T1-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T1.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.122903+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T2",
+      "spec_gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
+      "plan": null,
+      "manifest": "acceptance/programme/T2.toml",
+      "gate_checks": [
+        "T2-project",
+        "T2-baseline",
+        "T2-charter",
+        "T2-closure-outputs",
+        "T2-contract",
+        "T2-review",
+        "T2-closure-gate",
+        "T2-waivers",
+        "T2-pi-cadence",
+        "T2-pi-plan",
+        "T2-pi-objectives",
+        "T2-wsjf",
+        "T2-demo-credits",
+        "T2-lessons",
+        "T2-product"
+      ],
+      "checks": [
+        {
+          "id": "T2-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T2 is closed"
+        },
+        {
+          "id": "T2-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a2005c-5a4f-7eb5-a004-ccb5545eb6fb approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T2-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T2-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T2-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a2005a-7886-7f2d-9b49-53d174544ee9 approved by board decision 01a2005a-8c6e-708a-84df-ab16d175072e about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T2-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a2009b-0768-72c1-bba1-2a8a3a8dae59 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "T2-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a20060-baee-70c8-babc-9a959e21fb82 decided by a distinct approver"
+        },
+        {
+          "id": "T2-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T2-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a2004a-51f4-7482-b5f8-455a4bd371b5 and refinement 01a2004a-739d-717e-81dd-15ddf37f4c2f for tranche-2"
+        },
+        {
+          "id": "T2-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-2 PI plan is published"
+        },
+        {
+          "id": "T2-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-2 PI objectives are published"
+        },
+        {
+          "id": "T2-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T2-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T2-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a20094-8c61-7174-82aa-bdd6f0816a62 carries a statement and evidence from the tranche-2 retro"
+        },
+        {
+          "id": "T2-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T2.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.313499+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T3",
+      "spec_gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
+      "plan": null,
+      "manifest": "acceptance/programme/T3.toml",
+      "gate_checks": [
+        "T3-project",
+        "T3-baseline",
+        "T3-charter",
+        "T3-closure-outputs",
+        "T3-contract",
+        "T3-review",
+        "T3-closure-gate",
+        "T3-waivers",
+        "T3-pi-cadence",
+        "T3-pi-plan",
+        "T3-pi-objectives",
+        "T3-wsjf",
+        "T3-demo-credits",
+        "T3-lessons",
+        "T3-product"
+      ],
+      "checks": [
+        {
+          "id": "T3-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T3 is closed"
+        },
+        {
+          "id": "T3-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a2076b-20de-77e9-a914-d32a6851761f approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen"
+        },
+        {
+          "id": "T3-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T3-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "T3-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T3-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T3-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T3-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T3-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a20280-a739-7bb9-823f-232f34b32aaa and refinement 01a20280-d52b-7791-a9b1-ebc2a10b5c3d for tranche-3"
+        },
+        {
+          "id": "T3-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
+        },
+        {
+          "id": "T3-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
+        },
+        {
+          "id": "T3-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "5 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T3-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "5 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T3-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+        },
+        {
+          "id": "T3-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "1 open P0 package(s): closed_without_closure_review:T3"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T3-closure-outputs' did not pass: declared closure outputs are not published: closure-review",
+      "evidence": {
+        "path": "docs/evidence/rework/T3.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.430039+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 5
+      }
+    },
+    {
+      "id": "T4",
+      "spec_gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
+      "plan": null,
+      "manifest": "acceptance/programme/T4.toml",
+      "gate_checks": [
+        "T4-project",
+        "T4-baseline",
+        "T4-charter",
+        "T4-closure-outputs",
+        "T4-contract",
+        "T4-review",
+        "T4-closure-gate",
+        "T4-waivers",
+        "T4-pi-cadence",
+        "T4-pi-plan",
+        "T4-pi-objectives",
+        "T4-wsjf",
+        "T4-demo-credits",
+        "T4-lessons",
+        "T4-product"
+      ],
+      "checks": [
+        {
+          "id": "T4-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T4 is active"
+        },
+        {
+          "id": "T4-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a2028d-e17b-793d-9ea2-fe4f7f8e2b72 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T4-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T4-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T4-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a2028b-dde6-7ed4-9e47-6e582f2341d8 approved by board decision 01a2028b-f63c-7c27-b580-d4cba2c1e70f about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T4-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
+        },
+        {
+          "id": "T4-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T4-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T4-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "T4-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "T4-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "T4-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T4-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T4-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "T4-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "1 open P0 package(s): std-pmp-change-control-t4:T4"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T4-review' did not pass: the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
+      "evidence": {
+        "path": "docs/evidence/rework/T4.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.567948+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 3
+      }
+    },
+    {
+      "id": "T5",
+      "spec_gate": "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened",
+      "plan": null,
+      "manifest": "acceptance/programme/T5.toml",
+      "gate_checks": [
+        "T5-project",
+        "T5-baseline",
+        "T5-charter",
+        "T5-closure-outputs",
+        "T5-contract",
+        "T5-review",
+        "T5-closure-gate",
+        "T5-waivers",
+        "T5-pi-cadence",
+        "T5-pi-plan",
+        "T5-pi-objectives",
+        "T5-wsjf",
+        "T5-demo-credits",
+        "T5-lessons",
+        "T5-product"
+      ],
+      "checks": [
+        {
+          "id": "T5-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T5 is active"
+        },
+        {
+          "id": "T5-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T5-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T5-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: evidence, closure-review"
+        },
+        {
+          "id": "T5-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T5-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T5-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T5-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T5-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-10"
+        },
+        {
+          "id": "T5-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-10"
+        },
+        {
+          "id": "T5-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-10"
+        },
+        {
+          "id": "T5-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T5-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T5-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-10"
+        },
+        {
+          "id": "T5-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T5-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T5.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.698406+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "T6",
+      "spec_gate": "a real feature lands: lane \u2192 PR \u2192 CI \u2192 review \u2192 merge \u2192 deploy \u2192 live verify; the project cannot change its own gates; rollback tested",
+      "plan": null,
+      "manifest": "acceptance/programme/T6.toml",
+      "gate_checks": [
+        "T6-project",
+        "T6-baseline",
+        "T6-charter",
+        "T6-closure-outputs",
+        "T6-contract",
+        "T6-review",
+        "T6-closure-gate",
+        "T6-waivers",
+        "T6-pi-cadence",
+        "T6-pi-plan",
+        "T6-pi-objectives",
+        "T6-wsjf",
+        "T6-demo-credits",
+        "T6-lessons",
+        "T6-product"
+      ],
+      "checks": [
+        {
+          "id": "T6-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T6 is active"
+        },
+        {
+          "id": "T6-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T6-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T6-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: evidence, closure-review"
+        },
+        {
+          "id": "T6-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T6-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T6-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T6-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T6-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-11"
+        },
+        {
+          "id": "T6-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-11"
+        },
+        {
+          "id": "T6-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-11"
+        },
+        {
+          "id": "T6-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T6-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T6-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-11"
+        },
+        {
+          "id": "T6-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T6-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T6.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.829506+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "T7",
+      "spec_gate": "an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable",
+      "plan": null,
+      "manifest": "acceptance/programme/T7.toml",
+      "gate_checks": [
+        "T7-project",
+        "T7-baseline",
+        "T7-charter",
+        "T7-closure-outputs",
+        "T7-contract",
+        "T7-review",
+        "T7-closure-gate",
+        "T7-waivers",
+        "T7-pi-cadence",
+        "T7-pi-plan",
+        "T7-pi-objectives",
+        "T7-wsjf",
+        "T7-demo-credits",
+        "T7-lessons",
+        "T7-product"
+      ],
+      "checks": [
+        {
+          "id": "T7-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T7 is closed"
+        },
+        {
+          "id": "T7-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T7-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T7-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "T7-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T7-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T7-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T7-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T7-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-5"
+        },
+        {
+          "id": "T7-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-5"
+        },
+        {
+          "id": "T7-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-5"
+        },
+        {
+          "id": "T7-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T7-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T7-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-5"
+        },
+        {
+          "id": "T7-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "1 open P0 package(s): closed_without_closure_review:T7"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T7-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T7.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.980036+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "T8",
+      "spec_gate": "a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine",
+      "plan": null,
+      "manifest": "acceptance/programme/T8.toml",
+      "gate_checks": [
+        "T8-project",
+        "T8-baseline",
+        "T8-charter",
+        "T8-closure-outputs",
+        "T8-contract",
+        "T8-review",
+        "T8-closure-gate",
+        "T8-waivers",
+        "T8-pi-cadence",
+        "T8-pi-plan",
+        "T8-pi-objectives",
+        "T8-wsjf",
+        "T8-demo-credits",
+        "T8-lessons",
+        "T8-product"
+      ],
+      "checks": [
+        {
+          "id": "T8-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T8 is active"
+        },
+        {
+          "id": "T8-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T8-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T8-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "T8-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T8-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T8-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T8-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T8-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-11"
+        },
+        {
+          "id": "T8-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-11"
+        },
+        {
+          "id": "T8-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-11"
+        },
+        {
+          "id": "T8-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T8-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T8-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-11"
+        },
+        {
+          "id": "T8-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T8-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T8.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:18.112303+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "T9",
+      "spec_gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
+      "plan": null,
+      "manifest": "acceptance/programme/T9.toml",
+      "gate_checks": [
+        "T9-project",
+        "T9-baseline",
+        "T9-charter",
+        "T9-closure-outputs",
+        "T9-contract",
+        "T9-review",
+        "T9-closure-gate",
+        "T9-waivers",
+        "T9-pi-cadence",
+        "T9-pi-plan",
+        "T9-pi-objectives",
+        "T9-wsjf",
+        "T9-demo-credits",
+        "T9-lessons",
+        "T9-product"
+      ],
+      "checks": [
+        {
+          "id": "T9-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T9 is closed"
+        },
+        {
+          "id": "T9-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a20280-71de-7b06-9086-ae0158bfd36f approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T9-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T9-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "2 closure outputs published"
+        },
+        {
+          "id": "T9-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a2023e-4e59-75ad-b2ab-fd7d014511d2 approved by board decision 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T9-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a207b2-5e83-7b6c-a11e-4f0ee5821d4d (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        },
+        {
+          "id": "T9-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a2076b-30da-72c0-a7b3-fa00646a661d decided by a distinct approver"
+        },
+        {
+          "id": "T9-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T9-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "T9-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "T9-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "T9-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T9-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T9-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "T9-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T9.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:18.237674+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T10",
+      "spec_gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
+      "plan": null,
+      "manifest": "acceptance/programme/T10.toml",
+      "gate_checks": [
+        "T10-project",
+        "T10-baseline",
+        "T10-charter",
+        "T10-closure-outputs",
+        "T10-contract",
+        "T10-review",
+        "T10-closure-gate",
+        "T10-waivers",
+        "T10-pi-cadence",
+        "T10-pi-plan",
+        "T10-pi-objectives",
+        "T10-wsjf",
+        "T10-demo-credits",
+        "T10-lessons",
+        "T10-product"
+      ],
+      "checks": [
+        {
+          "id": "T10-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T10 is closed"
+        },
+        {
+          "id": "T10-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a20289-7be3-7e47-afe0-f6b1f82f1892 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T10-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T10-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T10-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a20287-696c-76a4-a2db-28c6092b5813 approved by board decision 01a20287-813e-7abd-83c5-ddf3bb9e98b3 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T10-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a207b2-5e09-701b-b59d-43bc0f385061 (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        },
+        {
+          "id": "T10-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a2076b-2d47-7cf3-a740-c9b2342851d3 decided by a distinct approver"
+        },
+        {
+          "id": "T10-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T10-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "T10-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "T10-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "T10-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T10-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T10-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "T10-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T10.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.246831+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T11",
+      "spec_gate": "every metric and every metering level recomputes from rows; the reconciliation with `billing_service` is exact or opens an incident; a C0\u2013C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged",
+      "plan": null,
+      "manifest": "acceptance/programme/T11.toml",
+      "gate_checks": [
+        "T11-project",
+        "T11-baseline",
+        "T11-charter",
+        "T11-closure-outputs",
+        "T11-contract",
+        "T11-review",
+        "T11-closure-gate",
+        "T11-waivers",
+        "T11-pi-cadence",
+        "T11-pi-plan",
+        "T11-pi-objectives",
+        "T11-wsjf",
+        "T11-demo-credits",
+        "T11-lessons",
+        "T11-product"
+      ],
+      "checks": [
+        {
+          "id": "T11-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T11 is closed"
+        },
+        {
+          "id": "T11-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff8f-47cb-78cf-9db8-d98d863e7dd0 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T11-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T11-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T11-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f approved by board decision 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T11-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff90-4e19-7bcf-acbf-3f29d980572e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "T11-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a20231-bd2b-744e-b9f0-0daf9b21e25a decided by a distinct approver"
+        },
+        {
+          "id": "T11-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T11-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff73-df1f-78c5-8793-101de5a3dd60 and refinement 01a1ff74-8982-77b9-971e-e4517c55d09a for tranche-1"
+        },
+        {
+          "id": "T11-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI plan is published"
+        },
+        {
+          "id": "T11-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI objectives are published"
+        },
+        {
+          "id": "T11-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T11-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T11-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+        },
+        {
+          "id": "T11-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T11.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.366192+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T12",
+      "spec_gate": "one tenant runs request \u2192 PM \u2192 delivery jobs \u2192 coach interruption \u2192 kata \u2192 development project \u2192 deploy \u2192 operations incident \u2192 lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area",
+      "plan": null,
+      "manifest": "acceptance/programme/T12.toml",
+      "gate_checks": [
+        "T12-project",
+        "T12-baseline",
+        "T12-charter",
+        "T12-closure-outputs",
+        "T12-contract",
+        "T12-review",
+        "T12-closure-gate",
+        "T12-waivers",
+        "T12-pi-cadence",
+        "T12-pi-plan",
+        "T12-pi-objectives",
+        "T12-wsjf",
+        "T12-demo-credits",
+        "T12-lessons",
+        "T12-product"
+      ],
+      "checks": [
+        {
+          "id": "T12-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T12 is active"
+        },
+        {
+          "id": "T12-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T12-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T12-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: evidence, closure-review"
+        },
+        {
+          "id": "T12-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T12-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T12-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T12-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T12-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-13"
+        },
+        {
+          "id": "T12-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-13"
+        },
+        {
+          "id": "T12-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-13"
+        },
+        {
+          "id": "T12-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T12-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T12-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-13"
+        },
+        {
+          "id": "T12-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "5 open P0 package(s): project_in_unauthorised_tranche:tranche-10, project_in_unauthorised_tranche:tranche-5, project_in_unauthorised_tranche:tranche-6, project_in_unauthorised_tranche:tranche-7, project_in_unauthorised_tranche:tranche-8"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T12-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T12.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.498052+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "T13",
+      "spec_gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
+      "plan": null,
+      "manifest": "acceptance/programme/T13.toml",
+      "gate_checks": [
+        "T13-project",
+        "T13-baseline",
+        "T13-charter",
+        "T13-closure-outputs",
+        "T13-contract",
+        "T13-review",
+        "T13-closure-gate",
+        "T13-waivers",
+        "T13-pi-cadence",
+        "T13-pi-plan",
+        "T13-pi-objectives",
+        "T13-wsjf",
+        "T13-demo-credits",
+        "T13-lessons",
+        "T13-product"
+      ],
+      "checks": [
+        {
+          "id": "T13-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T13 is closed"
+        },
+        {
+          "id": "T13-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a20277-9131-7ee2-acad-7e40ffa8f947 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "T13-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "T13-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "T13-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a20271-2a37-7329-b159-28031ddcb966 approved by board decision 01a20273-4f0f-77e6-8005-9744d1e3a574 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "T13-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a207b2-5d8c-7ecb-a7ad-af815b8fc70c (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        },
+        {
+          "id": "T13-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a2076b-29cc-7536-992c-4293a57c419b decided by a distinct approver"
+        },
+        {
+          "id": "T13-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T13-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a20280-a739-7bb9-823f-232f34b32aaa and refinement 01a20280-d52b-7791-a9b1-ebc2a10b5c3d for tranche-3"
+        },
+        {
+          "id": "T13-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
+        },
+        {
+          "id": "T13-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
+        },
+        {
+          "id": "T13-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "2 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "T13-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "T13-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+        },
+        {
+          "id": "T13-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/T13.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.618185+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T14",
+      "spec_gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
+      "plan": null,
+      "manifest": "acceptance/programme/T14.toml",
+      "gate_checks": [
+        "T14-project",
+        "T14-baseline",
+        "T14-charter",
+        "T14-closure-outputs",
+        "T14-contract",
+        "T14-review",
+        "T14-closure-gate",
+        "T14-waivers",
+        "T14-pi-cadence",
+        "T14-pi-plan",
+        "T14-pi-objectives",
+        "T14-wsjf",
+        "T14-demo-credits",
+        "T14-lessons",
+        "T14-product"
+      ],
+      "checks": [
+        {
+          "id": "T14-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T14 is closed"
+        },
+        {
+          "id": "T14-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T14-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T14-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "T14-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T14-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T14-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T14-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T14-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "T14-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "T14-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "T14-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T14-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T14-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "T14-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "3 open P0 package(s): closed_without_closure_review:T14, std-pmp-change-control-t14:T14, std-pmp-project-baseline-t14:T14"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T14-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T14.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.752870+00:00"
+      },
+      "findings": {
+        "total": 19,
+        "unresolved": 10
+      }
+    },
+    {
+      "id": "T15",
+      "spec_gate": "a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling",
+      "plan": null,
+      "manifest": "acceptance/programme/T15.toml",
+      "gate_checks": [
+        "T15-project",
+        "T15-baseline",
+        "T15-charter",
+        "T15-closure-outputs",
+        "T15-contract",
+        "T15-review",
+        "T15-closure-gate",
+        "T15-waivers",
+        "T15-pi-cadence",
+        "T15-pi-plan",
+        "T15-pi-objectives",
+        "T15-wsjf",
+        "T15-demo-credits",
+        "T15-lessons",
+        "T15-product"
+      ],
+      "checks": [
+        {
+          "id": "T15-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T15 is active"
+        },
+        {
+          "id": "T15-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T15-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T15-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: evidence, closure-review"
+        },
+        {
+          "id": "T15-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T15-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T15-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T15-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T15-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-12"
+        },
+        {
+          "id": "T15-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-12"
+        },
+        {
+          "id": "T15-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-12"
+        },
+        {
+          "id": "T15-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T15-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T15-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-12"
+        },
+        {
+          "id": "T15-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T15-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T15.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:16.888755+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "T16",
+      "spec_gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
+      "plan": null,
+      "manifest": "acceptance/programme/T16.toml",
+      "gate_checks": [
+        "T16-project",
+        "T16-baseline",
+        "T16-charter",
+        "T16-closure-outputs",
+        "T16-contract",
+        "T16-review",
+        "T16-closure-gate",
+        "T16-waivers",
+        "T16-pi-cadence",
+        "T16-pi-plan",
+        "T16-pi-objectives",
+        "T16-wsjf",
+        "T16-demo-credits",
+        "T16-lessons",
+        "T16-product"
+      ],
+      "checks": [
+        {
+          "id": "T16-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T16 is closed"
+        },
+        {
+          "id": "T16-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T16-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T16-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "T16-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T16-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T16-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T16-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T16-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "T16-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "T16-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "T16-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T16-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T16-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "T16-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "3 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T16-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T16.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.028078+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 9
+      }
+    },
+    {
+      "id": "T17",
+      "spec_gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant",
+      "plan": null,
+      "manifest": "acceptance/programme/T17.toml",
+      "gate_checks": [
+        "T17-project",
+        "T17-baseline",
+        "T17-charter",
+        "T17-closure-outputs",
+        "T17-contract",
+        "T17-review",
+        "T17-closure-gate",
+        "T17-waivers",
+        "T17-pi-cadence",
+        "T17-pi-plan",
+        "T17-pi-objectives",
+        "T17-wsjf",
+        "T17-demo-credits",
+        "T17-lessons",
+        "T17-product"
+      ],
+      "checks": [
+        {
+          "id": "T17-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project T17 is active"
+        },
+        {
+          "id": "T17-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "T17-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "T17-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: evidence, closure-review"
+        },
+        {
+          "id": "T17-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "T17-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "T17-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "T17-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "T17-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-5"
+        },
+        {
+          "id": "T17-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-5"
+        },
+        {
+          "id": "T17-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-5"
+        },
+        {
+          "id": "T17-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "T17-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "T17-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-5"
+        },
+        {
+          "id": "T17-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'T17-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/T17.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.164624+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "T18",
+      "spec_gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture",
+      "plan": null,
+      "manifest": "acceptance/programme/T18.toml",
+      "gate_checks": [
+        "T18-project",
+        "T18-baseline",
+        "T18-closure-outputs",
+        "T18-contract",
+        "T18-review",
+        "T18-closure-gate",
+        "T18-waivers",
+        "T18-pi-cadence",
+        "T18-pi-plan",
+        "T18-pi-objectives",
+        "T18-wsjf",
+        "T18-demo-credits",
+        "T18-lessons",
+        "T18-product",
+        "T18-coverage"
+      ],
+      "checks": [],
+      "status": "absent",
+      "reason": "verify-project produced no evidence (exit 2): verify-project: the snapshot has no project 'T18'",
+      "evidence": {
+        "path": "docs/evidence/rework/T18.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:17.166488+00:00"
+      },
+      "findings": {
+        "total": 3,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "T19",
+      "spec_gate": "a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged",
+      "plan": null,
+      "manifest": null,
+      "gate_checks": [],
+      "checks": [],
+      "status": "absent",
+      "reason": "no manifest at acceptance/programme/T19.toml",
+      "evidence": {
+        "path": null,
+        "git_sha": null,
+        "generated_at": null
+      },
+      "findings": {
+        "total": 3,
+        "unresolved": 2
+      }
+    },
+    {
+      "id": "S00",
+      "spec_gate": null,
+      "plan": "S00-usage-inventory.md",
+      "manifest": "acceptance/programme/S00.toml",
+      "gate_checks": [
+        "S00-project",
+        "S00-baseline",
+        "S00-charter",
+        "S00-closure-outputs",
+        "S00-contract",
+        "S00-review",
+        "S00-closure-gate",
+        "S00-waivers",
+        "S00-pi-cadence",
+        "S00-wsjf",
+        "S00-demo-credits",
+        "S00-product"
+      ],
+      "checks": [
+        {
+          "id": "S00-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S00 is closed"
+        },
+        {
+          "id": "S00-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff39-8d6e-7270-b2ba-9d235eb28b83 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "S00-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S00-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "S00-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff37-e240-779b-aab5-74a3fa86ecad approved by board decision 01a1ff37-f693-7336-8c6d-fe98f6f5c7b7 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "S00-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "S00-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a1ff3b-1a6d-7952-be39-4a4f470ad5c3 decided by a distinct approver"
+        },
+        {
+          "id": "S00-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S00-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0"
+        },
+        {
+          "id": "S00-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "S00-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "S00-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/S00.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:12.296346+00:00"
+      },
+      "findings": {
+        "total": 15,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "S01",
+      "spec_gate": null,
+      "plan": "S01-ui-spike.md",
+      "manifest": "acceptance/programme/S01.toml",
+      "gate_checks": [
+        "S01-project",
+        "S01-baseline",
+        "S01-charter",
+        "S01-closure-outputs",
+        "S01-contract",
+        "S01-review",
+        "S01-closure-gate",
+        "S01-waivers",
+        "S01-decision-record",
+        "S01-pi-cadence",
+        "S01-wsjf",
+        "S01-demo-credits",
+        "S01-product"
+      ],
+      "checks": [
+        {
+          "id": "S01-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S01 is closed"
+        },
+        {
+          "id": "S01-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff31-72ec-766e-8ad3-227d927f64ab approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "S01-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S01-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "S01-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff2e-7974-74cd-be6d-377e3c0071a4 approved by board decision 01a1ff2f-c76b-7bfe-b71a-a39294a95644 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "S01-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "S01-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a1ff34-00a1-75eb-9022-02be586d0bb3 decided by a distinct approver"
+        },
+        {
+          "id": "S01-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S01-decision-record",
+          "kind": "code",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S01-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0"
+        },
+        {
+          "id": "S01-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "S01-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "S01-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "implemented",
+      "reason": "non-record check(s) S01-decision-record exercise the gate text and pass; receipt green",
+      "evidence": {
+        "path": "docs/evidence/rework/S01.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:12.473838+00:00"
+      },
+      "findings": {
+        "total": 16,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "S02",
+      "spec_gate": null,
+      "plan": "S02-skeleton.md",
+      "manifest": "acceptance/programme/S02.toml",
+      "gate_checks": [
+        "S02-project",
+        "S02-baseline",
+        "S02-charter",
+        "S02-closure-outputs",
+        "S02-contract",
+        "S02-review",
+        "S02-waivers",
+        "S02-pi-cadence",
+        "S02-pi-plan",
+        "S02-pi-objectives",
+        "S02-wsjf",
+        "S02-demo-credits",
+        "S02-lessons",
+        "S02-product"
+      ],
+      "checks": [
+        {
+          "id": "S02-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S02 is closed"
+        },
+        {
+          "id": "S02-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a1ff85-faae-7c2e-b897-fe957985ca78 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "S02-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S02-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "S02-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a1ff84-4425-75d9-8772-08e09cf71069 approved by board decision 01a1ff84-57c3-7f67-9229-94bf0188732d about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "S02-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a1ff87-19a4-783f-85c5-033d5f38cedf (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "S02-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S02-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a1ff73-df1f-78c5-8793-101de5a3dd60 and refinement 01a1ff74-8982-77b9-971e-e4517c55d09a for tranche-1"
+        },
+        {
+          "id": "S02-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI plan is published"
+        },
+        {
+          "id": "S02-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-1 PI objectives are published"
+        },
+        {
+          "id": "S02-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "S02-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "S02-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+        },
+        {
+          "id": "S02-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/S02.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:12.610735+00:00"
+      },
+      "findings": {
+        "total": 17,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "S03",
+      "spec_gate": null,
+      "plan": "S03-domain-schema.md",
+      "manifest": "acceptance/programme/S03.toml",
+      "gate_checks": [
+        "S03-project",
+        "S03-baseline",
+        "S03-charter",
+        "S03-closure-outputs",
+        "S03-contract",
+        "S03-review",
+        "S03-closure-gate",
+        "S03-waivers",
+        "S03-pi-cadence",
+        "S03-pi-plan",
+        "S03-pi-objectives",
+        "S03-lessons",
+        "S03-wsjf",
+        "S03-demo-credits",
+        "S03-product"
+      ],
+      "checks": [
+        {
+          "id": "S03-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S03 is closed"
+        },
+        {
+          "id": "S03-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a20063-7af8-727b-b092-24de3821d204 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "S03-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S03-closure-outputs",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 closure outputs published"
+        },
+        {
+          "id": "S03-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a20061-bd73-7a89-b08c-bd8b867eb061 approved by board decision 01a20061-d19f-7269-9f5c-113f3aeb0001 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "S03-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a20066-3107-7b16-8835-6b6cd2aa8c84 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "S03-closure-gate",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "latest closure gate 01a20073-737a-7574-954a-2d54d6be5af5 decided by a distinct approver"
+        },
+        {
+          "id": "S03-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S03-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a2004a-51f4-7482-b5f8-455a4bd371b5 and refinement 01a2004a-739d-717e-81dd-15ddf37f4c2f for tranche-2"
+        },
+        {
+          "id": "S03-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-2 PI plan is published"
+        },
+        {
+          "id": "S03-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-2 PI objectives are published"
+        },
+        {
+          "id": "S03-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a20094-8c61-7174-82aa-bdd6f0816a62 carries a statement and evidence from the tranche-2 retro"
+        },
+        {
+          "id": "S03-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "S03-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "1 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "S03-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "evidence": {
+        "path": "docs/evidence/rework/S03.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:12.756488+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 0
+      }
+    },
+    {
+      "id": "S04",
+      "spec_gate": null,
+      "plan": "S04-action-registry.md",
+      "manifest": "acceptance/programme/S04.toml",
+      "gate_checks": [
+        "S04-project",
+        "S04-baseline",
+        "S04-charter",
+        "S04-closure-outputs",
+        "S04-contract",
+        "S04-review",
+        "S04-closure-gate",
+        "S04-waivers",
+        "S04-pi-cadence",
+        "S04-pi-plan",
+        "S04-pi-objectives",
+        "S04-lessons",
+        "S04-wsjf",
+        "S04-demo-credits",
+        "S04-product"
+      ],
+      "checks": [
+        {
+          "id": "S04-project",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "status is 'active', expected 'closed'"
+        },
+        {
+          "id": "S04-baseline",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "baseline 01a20256-44d0-731d-b345-fffc5f3ac9e8 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen"
+        },
+        {
+          "id": "S04-charter",
+          "kind": "record",
+          "result": "pass",
+          "detail": "exit 0"
+        },
+        {
+          "id": "S04-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S04-contract",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "contract 01a20256-6ede-7d70-aae8-5dbfe681a1b7 approved by board decision 01a20256-80ac-72f0-a310-d114488f1d7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+        },
+        {
+          "id": "S04-review",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "review 01a20284-e742-757a-ae91-0b8fb19ad3c0 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        },
+        {
+          "id": "S04-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S04-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S04-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a20280-a739-7bb9-823f-232f34b32aaa and refinement 01a20280-d52b-7791-a9b1-ebc2a10b5c3d for tranche-3"
+        },
+        {
+          "id": "S04-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
+        },
+        {
+          "id": "S04-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
+        },
+        {
+          "id": "S04-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+        },
+        {
+          "id": "S04-wsjf",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "11 WBS node(s) carry the four WSJF inputs"
+        },
+        {
+          "id": "S04-demo-credits",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "2 accepted deliverable(s), each with a demo credit"
+        },
+        {
+          "id": "S04-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S04-project' did not pass: status is 'active', expected 'closed'",
+      "evidence": {
+        "path": "docs/evidence/rework/S04.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:12.876408+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 3
+      }
+    },
+    {
+      "id": "S05",
+      "spec_gate": null,
+      "plan": "S05-board.md",
+      "manifest": "acceptance/programme/S05.toml",
+      "gate_checks": [
+        "S05-project",
+        "S05-baseline",
+        "S05-charter",
+        "S05-closure-outputs",
+        "S05-contract",
+        "S05-review",
+        "S05-closure-gate",
+        "S05-waivers",
+        "S05-pi-cadence",
+        "S05-pi-plan",
+        "S05-pi-objectives",
+        "S05-lessons",
+        "S05-wsjf",
+        "S05-demo-credits",
+        "S05-product"
+      ],
+      "checks": [
+        {
+          "id": "S05-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S05 is closed"
+        },
+        {
+          "id": "S05-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S05-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S05-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S05-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S05-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S05-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S05-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S05-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "S05-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "S05-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "S05-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "S05-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S05-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S05-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "2 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S05-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S05.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.033442+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 9
+      }
+    },
+    {
+      "id": "S06",
+      "spec_gate": null,
+      "plan": "S06-control-plane.md",
+      "manifest": "acceptance/programme/S06.toml",
+      "gate_checks": [
+        "S06-project",
+        "S06-baseline",
+        "S06-charter",
+        "S06-closure-outputs",
+        "S06-contract",
+        "S06-review",
+        "S06-closure-gate",
+        "S06-waivers",
+        "S06-pi-cadence",
+        "S06-pi-plan",
+        "S06-pi-objectives",
+        "S06-wsjf",
+        "S06-demo-credits",
+        "S06-lessons",
+        "S06-product"
+      ],
+      "checks": [
+        {
+          "id": "S06-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S06 is active"
+        },
+        {
+          "id": "S06-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S06-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S06-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S06-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S06-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S06-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S06-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S06-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-5"
+        },
+        {
+          "id": "S06-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-5"
+        },
+        {
+          "id": "S06-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-5"
+        },
+        {
+          "id": "S06-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S06-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S06-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-5"
+        },
+        {
+          "id": "S06-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "1 open P0 package(s): v1-s06-2:S06"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S06-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S06.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.192776+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S06a",
+      "spec_gate": null,
+      "plan": "S06a-mcp-server-channel.md",
+      "manifest": null,
+      "gate_checks": [],
+      "checks": [],
+      "status": "absent",
+      "reason": "no manifest at acceptance/programme/S06a.toml",
+      "evidence": {
+        "path": null,
+        "git_sha": null,
+        "generated_at": null
+      },
+      "findings": {
+        "total": 3,
+        "unresolved": 3
+      }
+    },
+    {
+      "id": "S06b",
+      "spec_gate": null,
+      "plan": "S06b-agent-direct-interface.md",
+      "manifest": "acceptance/programme/S06b.toml",
+      "gate_checks": [
+        "S06b-project",
+        "S06b-baseline",
+        "S06b-charter",
+        "S06b-closure-outputs",
+        "S06b-contract",
+        "S06b-review",
+        "S06b-closure-gate",
+        "S06b-waivers",
+        "S06b-pi-cadence",
+        "S06b-pi-plan",
+        "S06b-pi-objectives",
+        "S06b-wsjf",
+        "S06b-demo-credits",
+        "S06b-lessons",
+        "S06b-product"
+      ],
+      "checks": [
+        {
+          "id": "S06b-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S06b is closed"
+        },
+        {
+          "id": "S06b-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S06b-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S06b-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S06b-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S06b-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S06b-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S06b-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S06b-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-6"
+        },
+        {
+          "id": "S06b-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-6"
+        },
+        {
+          "id": "S06b-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-6"
+        },
+        {
+          "id": "S06b-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S06b-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S06b-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-6"
+        },
+        {
+          "id": "S06b-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S06b-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S06b.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.343127+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S06c",
+      "spec_gate": null,
+      "plan": "S06c-mcp-tasks.md",
+      "manifest": "acceptance/programme/S06c.toml",
+      "gate_checks": [
+        "S06c-project",
+        "S06c-baseline",
+        "S06c-charter",
+        "S06c-closure-outputs",
+        "S06c-contract",
+        "S06c-review",
+        "S06c-closure-gate",
+        "S06c-waivers",
+        "S06c-pi-cadence",
+        "S06c-pi-plan",
+        "S06c-pi-objectives",
+        "S06c-wsjf",
+        "S06c-demo-credits",
+        "S06c-lessons",
+        "S06c-product"
+      ],
+      "checks": [
+        {
+          "id": "S06c-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S06c is closed"
+        },
+        {
+          "id": "S06c-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S06c-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S06c-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S06c-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S06c-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S06c-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S06c-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S06c-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-7"
+        },
+        {
+          "id": "S06c-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-7"
+        },
+        {
+          "id": "S06c-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-7"
+        },
+        {
+          "id": "S06c-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S06c-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S06c-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-7"
+        },
+        {
+          "id": "S06c-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S06c-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S06c.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.480090+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S06d",
+      "spec_gate": null,
+      "plan": "S06d-connector-standard.md",
+      "manifest": "acceptance/programme/S06d.toml",
+      "gate_checks": [
+        "S06d-project",
+        "S06d-baseline",
+        "S06d-charter",
+        "S06d-closure-outputs",
+        "S06d-contract",
+        "S06d-review",
+        "S06d-closure-gate",
+        "S06d-waivers",
+        "S06d-pi-cadence",
+        "S06d-pi-plan",
+        "S06d-pi-objectives",
+        "S06d-lessons",
+        "S06d-wsjf",
+        "S06d-demo-credits",
+        "S06d-product"
+      ],
+      "checks": [
+        {
+          "id": "S06d-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S06d is closed"
+        },
+        {
+          "id": "S06d-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S06d-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S06d-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S06d-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S06d-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S06d-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S06d-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S06d-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-8"
+        },
+        {
+          "id": "S06d-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-8"
+        },
+        {
+          "id": "S06d-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-8"
+        },
+        {
+          "id": "S06d-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-8"
+        },
+        {
+          "id": "S06d-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S06d-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S06d-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S06d-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S06d.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.616700+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S07",
+      "spec_gate": null,
+      "plan": "S07-requirements-search.md",
+      "manifest": "acceptance/programme/S07.toml",
+      "gate_checks": [
+        "S07-project",
+        "S07-baseline",
+        "S07-charter",
+        "S07-closure-outputs",
+        "S07-contract",
+        "S07-review",
+        "S07-closure-gate",
+        "S07-waivers",
+        "S07-pi-cadence",
+        "S07-pi-plan",
+        "S07-pi-objectives",
+        "S07-lessons",
+        "S07-wsjf",
+        "S07-demo-credits",
+        "S07-product"
+      ],
+      "checks": [
+        {
+          "id": "S07-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S07 is closed"
+        },
+        {
+          "id": "S07-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S07-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S07-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S07-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S07-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S07-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S07-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S07-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "S07-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "S07-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "S07-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "S07-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S07-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S07-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "2 open P0 package(s): std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S07-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S07.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.762698+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 9
+      }
+    },
+    {
+      "id": "S08",
+      "spec_gate": null,
+      "plan": "S08-governance-modelling.md",
+      "manifest": "acceptance/programme/S08.toml",
+      "gate_checks": [
+        "S08-project",
+        "S08-baseline",
+        "S08-charter",
+        "S08-closure-outputs",
+        "S08-contract",
+        "S08-review",
+        "S08-closure-gate",
+        "S08-waivers",
+        "S08-pi-cadence",
+        "S08-pi-plan",
+        "S08-pi-objectives",
+        "S08-wsjf",
+        "S08-demo-credits",
+        "S08-lessons",
+        "S08-product"
+      ],
+      "checks": [
+        {
+          "id": "S08-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S08 is closed"
+        },
+        {
+          "id": "S08-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S08-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S08-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S08-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S08-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S08-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S08-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S08-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-5"
+        },
+        {
+          "id": "S08-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-5"
+        },
+        {
+          "id": "S08-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-5"
+        },
+        {
+          "id": "S08-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S08-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S08-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-5"
+        },
+        {
+          "id": "S08-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S08-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S08.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:13.892930+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "S09",
+      "spec_gate": null,
+      "plan": "S09-documents-integrations.md",
+      "manifest": "acceptance/programme/S09.toml",
+      "gate_checks": [
+        "S09-project",
+        "S09-baseline",
+        "S09-charter",
+        "S09-closure-outputs",
+        "S09-contract",
+        "S09-review",
+        "S09-closure-gate",
+        "S09-waivers",
+        "S09-pi-cadence",
+        "S09-pi-plan",
+        "S09-pi-objectives",
+        "S09-lessons",
+        "S09-wsjf",
+        "S09-demo-credits",
+        "S09-product"
+      ],
+      "checks": [
+        {
+          "id": "S09-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S09 is closed"
+        },
+        {
+          "id": "S09-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S09-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S09-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S09-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S09-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S09-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S09-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S09-pi-cadence",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4"
+        },
+        {
+          "id": "S09-pi-plan",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI plan is published"
+        },
+        {
+          "id": "S09-pi-objectives",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "the tranche-4 PI objectives are published"
+        },
+        {
+          "id": "S09-lessons",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+        },
+        {
+          "id": "S09-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S09-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S09-product",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "2 open P0 package(s): std-pmp-change-control-s09:S09, std-pmp-project-baseline-s09:S09"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S09-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S09.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.022417+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 9
+      }
+    },
+    {
+      "id": "S10",
+      "spec_gate": null,
+      "plan": "S10-copilot-ag-ui.md",
+      "manifest": "acceptance/programme/S10.toml",
+      "gate_checks": [
+        "S10-project",
+        "S10-baseline",
+        "S10-charter",
+        "S10-closure-outputs",
+        "S10-contract",
+        "S10-review",
+        "S10-closure-gate",
+        "S10-waivers",
+        "S10-pi-cadence",
+        "S10-pi-plan",
+        "S10-pi-objectives",
+        "S10-wsjf",
+        "S10-demo-credits",
+        "S10-lessons",
+        "S10-product"
+      ],
+      "checks": [
+        {
+          "id": "S10-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S10 is closed"
+        },
+        {
+          "id": "S10-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S10-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S10-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S10-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S10-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S10-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S10-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S10-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-6"
+        },
+        {
+          "id": "S10-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-6"
+        },
+        {
+          "id": "S10-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-6"
+        },
+        {
+          "id": "S10-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S10-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S10-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-6"
+        },
+        {
+          "id": "S10-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S10-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S10.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.159163+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "S11",
+      "spec_gate": null,
+      "plan": "S11-procedures.md",
+      "manifest": "acceptance/programme/S11.toml",
+      "gate_checks": [
+        "S11-project",
+        "S11-baseline",
+        "S11-charter",
+        "S11-closure-outputs",
+        "S11-contract",
+        "S11-review",
+        "S11-closure-gate",
+        "S11-waivers",
+        "S11-pi-cadence",
+        "S11-pi-plan",
+        "S11-pi-objectives",
+        "S11-wsjf",
+        "S11-demo-credits",
+        "S11-lessons",
+        "S11-product"
+      ],
+      "checks": [
+        {
+          "id": "S11-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S11 is closed"
+        },
+        {
+          "id": "S11-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S11-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S11-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S11-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S11-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S11-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S11-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S11-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-6"
+        },
+        {
+          "id": "S11-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-6"
+        },
+        {
+          "id": "S11-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-6"
+        },
+        {
+          "id": "S11-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S11-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S11-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-6"
+        },
+        {
+          "id": "S11-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S11-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S11.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.296420+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "S12",
+      "spec_gate": null,
+      "plan": "S12-ui-buildout.md",
+      "manifest": "acceptance/programme/S12.toml",
+      "gate_checks": [
+        "S12-project",
+        "S12-baseline",
+        "S12-charter",
+        "S12-closure-outputs",
+        "S12-contract",
+        "S12-review",
+        "S12-closure-gate",
+        "S12-waivers",
+        "S12-pi-cadence",
+        "S12-pi-plan",
+        "S12-pi-objectives",
+        "S12-lessons",
+        "S12-wsjf",
+        "S12-demo-credits",
+        "S12-product"
+      ],
+      "checks": [
+        {
+          "id": "S12-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S12 is closed"
+        },
+        {
+          "id": "S12-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S12-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S12-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S12-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S12-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S12-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S12-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S12-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-10"
+        },
+        {
+          "id": "S12-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-10"
+        },
+        {
+          "id": "S12-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-10"
+        },
+        {
+          "id": "S12-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-10"
+        },
+        {
+          "id": "S12-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S12-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S12-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S12-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S12.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.431021+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S13",
+      "spec_gate": null,
+      "plan": "S13-n8n-engine.md",
+      "manifest": "acceptance/programme/S13.toml",
+      "gate_checks": [
+        "S13-project",
+        "S13-baseline",
+        "S13-charter",
+        "S13-closure-outputs",
+        "S13-contract",
+        "S13-review",
+        "S13-closure-gate",
+        "S13-waivers",
+        "S13-pi-cadence",
+        "S13-pi-plan",
+        "S13-pi-objectives",
+        "S13-lessons",
+        "S13-wsjf",
+        "S13-demo-credits",
+        "S13-product"
+      ],
+      "checks": [
+        {
+          "id": "S13-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S13 is closed"
+        },
+        {
+          "id": "S13-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S13-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S13-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S13-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S13-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S13-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S13-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S13-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-8"
+        },
+        {
+          "id": "S13-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-8"
+        },
+        {
+          "id": "S13-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-8"
+        },
+        {
+          "id": "S13-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-8"
+        },
+        {
+          "id": "S13-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S13-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S13-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S13-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S13.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.565233+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 12
+      }
+    },
+    {
+      "id": "S14",
+      "spec_gate": null,
+      "plan": "S14-cutover.md",
+      "manifest": "acceptance/programme/S14.toml",
+      "gate_checks": [
+        "S14-project",
+        "S14-baseline",
+        "S14-charter",
+        "S14-closure-outputs",
+        "S14-contract",
+        "S14-review",
+        "S14-closure-gate",
+        "S14-waivers",
+        "S14-pi-cadence",
+        "S14-pi-plan",
+        "S14-pi-objectives",
+        "S14-lessons",
+        "S14-wsjf",
+        "S14-demo-credits",
+        "S14-product"
+      ],
+      "checks": [
+        {
+          "id": "S14-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S14 is active"
+        },
+        {
+          "id": "S14-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S14-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S14-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "S14-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S14-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S14-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S14-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S14-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-11"
+        },
+        {
+          "id": "S14-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-11"
+        },
+        {
+          "id": "S14-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-11"
+        },
+        {
+          "id": "S14-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-11"
+        },
+        {
+          "id": "S14-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S14-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S14-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S14-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S14.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.697258+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S15",
+      "spec_gate": null,
+      "plan": "S15-capability-knowledge-memory.md",
+      "manifest": "acceptance/programme/S15.toml",
+      "gate_checks": [
+        "S15-project",
+        "S15-baseline",
+        "S15-charter",
+        "S15-closure-outputs",
+        "S15-contract",
+        "S15-review",
+        "S15-closure-gate",
+        "S15-waivers",
+        "S15-pi-cadence",
+        "S15-pi-plan",
+        "S15-pi-objectives",
+        "S15-wsjf",
+        "S15-demo-credits",
+        "S15-lessons",
+        "S15-product"
+      ],
+      "checks": [
+        {
+          "id": "S15-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S15 is active"
+        },
+        {
+          "id": "S15-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S15-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S15-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S15-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S15-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S15-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S15-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S15-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-7"
+        },
+        {
+          "id": "S15-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-7"
+        },
+        {
+          "id": "S15-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-7"
+        },
+        {
+          "id": "S15-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S15-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S15-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-7"
+        },
+        {
+          "id": "S15-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S15-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S15.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.828440+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S16",
+      "spec_gate": null,
+      "plan": "S16-inference-audit.md",
+      "manifest": "acceptance/programme/S16.toml",
+      "gate_checks": [
+        "S16-project",
+        "S16-baseline",
+        "S16-charter",
+        "S16-closure-outputs",
+        "S16-contract",
+        "S16-review",
+        "S16-closure-gate",
+        "S16-waivers",
+        "S16-pi-cadence",
+        "S16-pi-plan",
+        "S16-pi-objectives",
+        "S16-wsjf",
+        "S16-demo-credits",
+        "S16-lessons",
+        "S16-product"
+      ],
+      "checks": [
+        {
+          "id": "S16-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S16 is closed"
+        },
+        {
+          "id": "S16-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S16-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S16-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S16-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S16-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S16-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S16-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S16-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-7"
+        },
+        {
+          "id": "S16-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-7"
+        },
+        {
+          "id": "S16-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-7"
+        },
+        {
+          "id": "S16-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S16-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S16-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-7"
+        },
+        {
+          "id": "S16-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S16-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S16.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:14.959985+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S17",
+      "spec_gate": null,
+      "plan": "S17-benchmark-harness.md",
+      "manifest": "acceptance/programme/S17.toml",
+      "gate_checks": [
+        "S17-project",
+        "S17-baseline",
+        "S17-charter",
+        "S17-closure-outputs",
+        "S17-contract",
+        "S17-review",
+        "S17-closure-gate",
+        "S17-waivers",
+        "S17-pi-cadence",
+        "S17-pi-plan",
+        "S17-pi-objectives",
+        "S17-wsjf",
+        "S17-demo-credits",
+        "S17-lessons",
+        "S17-product"
+      ],
+      "checks": [
+        {
+          "id": "S17-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S17 is active"
+        },
+        {
+          "id": "S17-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S17-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S17-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S17-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S17-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S17-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S17-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S17-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-5"
+        },
+        {
+          "id": "S17-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-5"
+        },
+        {
+          "id": "S17-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-5"
+        },
+        {
+          "id": "S17-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S17-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S17-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-5"
+        },
+        {
+          "id": "S17-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S17-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S17.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:15.158589+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S18",
+      "spec_gate": null,
+      "plan": "S18-kata-improvement.md",
+      "manifest": "acceptance/programme/S18.toml",
+      "gate_checks": [
+        "S18-project",
+        "S18-baseline",
+        "S18-charter",
+        "S18-closure-outputs",
+        "S18-contract",
+        "S18-review",
+        "S18-closure-gate",
+        "S18-waivers",
+        "S18-pi-cadence",
+        "S18-pi-plan",
+        "S18-pi-objectives",
+        "S18-lessons",
+        "S18-wsjf",
+        "S18-demo-credits",
+        "S18-product"
+      ],
+      "checks": [
+        {
+          "id": "S18-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S18 is active"
+        },
+        {
+          "id": "S18-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S18-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S18-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S18-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S18-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S18-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S18-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S18-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-9"
+        },
+        {
+          "id": "S18-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-9"
+        },
+        {
+          "id": "S18-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-9"
+        },
+        {
+          "id": "S18-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-9"
+        },
+        {
+          "id": "S18-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S18-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S18-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S18-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S18.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:15.298143+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S19",
+      "spec_gate": null,
+      "plan": "S19-eval-builder.md",
+      "manifest": "acceptance/programme/S19.toml",
+      "gate_checks": [
+        "S19-project",
+        "S19-baseline",
+        "S19-charter",
+        "S19-closure-outputs",
+        "S19-contract",
+        "S19-review",
+        "S19-closure-gate",
+        "S19-waivers",
+        "S19-pi-cadence",
+        "S19-pi-plan",
+        "S19-pi-objectives",
+        "S19-lessons",
+        "S19-wsjf",
+        "S19-demo-credits",
+        "S19-product"
+      ],
+      "checks": [
+        {
+          "id": "S19-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S19 is active"
+        },
+        {
+          "id": "S19-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S19-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S19-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S19-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S19-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S19-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S19-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S19-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-8"
+        },
+        {
+          "id": "S19-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-8"
+        },
+        {
+          "id": "S19-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-8"
+        },
+        {
+          "id": "S19-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-8"
+        },
+        {
+          "id": "S19-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S19-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S19-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S19-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S19.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:15.455164+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S20",
+      "spec_gate": null,
+      "plan": "S20-eval-hillclimb.md",
+      "manifest": "acceptance/programme/S20.toml",
+      "gate_checks": [
+        "S20-project",
+        "S20-baseline",
+        "S20-charter",
+        "S20-closure-outputs",
+        "S20-contract",
+        "S20-review",
+        "S20-closure-gate",
+        "S20-waivers",
+        "S20-pi-cadence",
+        "S20-pi-plan",
+        "S20-pi-objectives",
+        "S20-lessons",
+        "S20-wsjf",
+        "S20-demo-credits",
+        "S20-product"
+      ],
+      "checks": [
+        {
+          "id": "S20-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S20 is active"
+        },
+        {
+          "id": "S20-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S20-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S20-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "the project declares no closure_outputs"
+        },
+        {
+          "id": "S20-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S20-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S20-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S20-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S20-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-9"
+        },
+        {
+          "id": "S20-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-9"
+        },
+        {
+          "id": "S20-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-9"
+        },
+        {
+          "id": "S20-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-9"
+        },
+        {
+          "id": "S20-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S20-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S20-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S20-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S20.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:15.618964+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    },
+    {
+      "id": "S21",
+      "spec_gate": null,
+      "plan": "S21-message-construction.md",
+      "manifest": "acceptance/programme/S21.toml",
+      "gate_checks": [
+        "S21-project",
+        "S21-baseline",
+        "S21-charter",
+        "S21-closure-outputs",
+        "S21-contract",
+        "S21-review",
+        "S21-closure-gate",
+        "S21-waivers",
+        "S21-pi-cadence",
+        "S21-pi-plan",
+        "S21-pi-objectives",
+        "S21-lessons",
+        "S21-wsjf",
+        "S21-demo-credits",
+        "S21-product"
+      ],
+      "checks": [
+        {
+          "id": "S21-project",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "project S21 is active"
+        },
+        {
+          "id": "S21-baseline",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no project baseline"
+        },
+        {
+          "id": "S21-charter",
+          "kind": "record",
+          "result": "fail",
+          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+        },
+        {
+          "id": "S21-closure-outputs",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "declared closure outputs are not published: closure-review"
+        },
+        {
+          "id": "S21-contract",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no live board-approved delivery contract"
+        },
+        {
+          "id": "S21-review",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no Phase-G compliance review for the project's live contract"
+        },
+        {
+          "id": "S21-closure-gate",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no approved closure gate for the project"
+        },
+        {
+          "id": "S21-waivers",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "0 active waiver(s), all dated and distinct from the reviewer"
+        },
+        {
+          "id": "S21-pi-cadence",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no PI cadence row for tranche-9"
+        },
+        {
+          "id": "S21-pi-plan",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-plan output for tranche-9"
+        },
+        {
+          "id": "S21-pi-objectives",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no published pi-objectives output for tranche-9"
+        },
+        {
+          "id": "S21-lessons",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no retro cadence row for tranche-9"
+        },
+        {
+          "id": "S21-wsjf",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no WBS deliverable carries the plan"
+        },
+        {
+          "id": "S21-demo-credits",
+          "kind": "generic",
+          "result": "fail",
+          "detail": "no accepted deliverable to demo"
+        },
+        {
+          "id": "S21-product",
+          "kind": "generic",
+          "result": "pass",
+          "detail": "no open P0 package for this project"
+        }
+      ],
+      "status": "absent",
+      "reason": "gate check 'S21-baseline' did not pass: no project baseline",
+      "evidence": {
+        "path": "docs/evidence/rework/S21.json",
+        "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+        "generated_at": "2026-11-23T21:01:15.754972+00:00"
+      },
+      "findings": {
+        "total": 18,
+        "unresolved": 13
+      }
+    }
+  ],
+  "summary": {
+    "implemented": 1,
+    "partial": 10,
+    "absent": 35,
+    "broken": 0
+  }
+}

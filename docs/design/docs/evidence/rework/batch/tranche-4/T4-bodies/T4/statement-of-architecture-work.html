@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Kanban coach · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/T4-bodies/T4/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--kanban-coach">Statement Of Architecture Work — Kanban coach</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2028b-f63c-7c27-b580-d4cba2c1e70f&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are proved by named tests in `crates/actions/tests/coach.rs`; clause 1 is proved for a first interruption but refuted as a universal by v1-p6-4; clause 4 is proved only as a `kata.open` process start and v1-p6-2 shows no kata record, instrument or threshold is created. The rework&#39;s acceptance instrument is `acceptance/programme/T4.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T4 (SPEC_V2 sections 6.2, 6.4 and 12, issue #75) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the section 12 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`) and closure output (`closure-review`). The project is already `closed` in the register; this pass records the lifecycle retrospectively and does not reopen it.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the interruption taxonomy, the closed remedy set, per-signature uniqueness and the depth cap of SPEC_V2 section 6.2, plus the systemic-class path of section 6.4: the `coach_interruption` and `coach_remedy` tables, the `coach.interrupt` action, the seeded coach process and the real-Postgres suite `crates/actions/tests/coach.rs`. Out of scope: the board and pull path&#39;s `err.card` producer, the kata&#39;s own lifecycle and measurement (T5), the PM job (T3), operations (T7) and the tool platform (T13).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:17:30.02765+00:00&quot;,
+      &quot;id&quot;: &quot;01a2028b-dde6-7ed4-9e47-6e582f2341d8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T4 Kanban coach (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2028b-f63c-7c27-b580-d4cba2c1e70f&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are proved by named tests in `crates/actions/tests/coach.rs`; clause 1 is proved for a first interruption but refuted as a universal by v1-p6-4; clause 4 is proved only as a `kata.open` process start and v1-p6-2 shows no kata record, instrument or threshold is created. The rework&#39;s acceptance instrument is `acceptance/programme/T4.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T4 (SPEC_V2 sections 6.2, 6.4 and 12, issue #75) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the section 12 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`) and closure output (`closure-review`). The project is already `closed` in the register; this pass records the lifecycle retrospectively and does not reopen it.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the interruption taxonomy, the closed remedy set, per-signature uniqueness and the depth cap of SPEC_V2 section 6.2, plus the systemic-class path of section 6.4: the `coach_interruption` and `coach_remedy` tables, the `coach.interrupt` action, the seeded coach process and the real-Postgres suite `crates/actions/tests/coach.rs`. Out of scope: the board and pull path&#39;s `err.card` producer, the kata&#39;s own lifecycle and measurement (T5), the PM job (T3), operations (T7) and the tool platform (T13).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:17:30.02765+00:00&quot;,
+      &quot;id&quot;: &quot;01a2028b-dde6-7ed4-9e47-6e582f2341d8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T4 Kanban coach (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2028b-f63c-7c27-b580-d4cba2c1e70f&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are proved by named tests in `crates/actions/tests/coach.rs`; clause 1 is proved for a first interruption but refuted as a universal by v1-p6-4; clause 4 is proved only as a `kata.open` process start and v1-p6-2 shows no kata record, instrument or threshold is created. The rework&#39;s acceptance instrument is `acceptance/programme/T4.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T4 (SPEC_V2 sections 6.2, 6.4 and 12, issue #75) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the section 12 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`) and closure output (`closure-review`). The project is already `closed` in the register; this pass records the lifecycle retrospectively and does not reopen it.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the interruption taxonomy, the closed remedy set, per-signature uniqueness and the depth cap of SPEC_V2 section 6.2, plus the systemic-class path of section 6.4: the `coach_interruption` and `coach_remedy` tables, the `coach.interrupt` action, the seeded coach process and the real-Postgres suite `crates/actions/tests/coach.rs`. Out of scope: the board and pull path&#39;s `err.card` producer, the kata&#39;s own lifecycle and measurement (T5), the PM job (T3), operations (T7) and the tool platform (T13).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:17:30.02765+00:00&quot;,
+      &quot;id&quot;: &quot;01a2028b-dde6-7ed4-9e47-6e582f2341d8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T4 Kanban coach (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2028b-f63c-7c27-b580-d4cba2c1e70f&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are proved by named tests in `crates/actions/tests/coach.rs`; clause 1 is proved for a first interruption but refuted as a universal by v1-p6-4; clause 4 is proved only as a `kata.open` process start and v1-p6-2 shows no kata record, instrument or threshold is created. The rework&#39;s acceptance instrument is `acceptance/programme/T4.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T4 (SPEC_V2 sections 6.2, 6.4 and 12, issue #75) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the section 12 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`) and closure output (`closure-review`). The project is already `closed` in the register; this pass records the lifecycle retrospectively and does not reopen it.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the interruption taxonomy, the closed remedy set, per-signature uniqueness and the depth cap of SPEC_V2 section 6.2, plus the systemic-class path of section 6.4: the `coach_interruption` and `coach_remedy` tables, the `coach.interrupt` action, the seeded coach process and the real-Postgres suite `crates/actions/tests/coach.rs`. Out of scope: the board and pull path&#39;s `err.card` producer, the kata&#39;s own lifecycle and measurement (T5), the PM job (T3), operations (T7) and the tool platform (T13).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:17:30.02765+00:00&quot;,
+      &quot;id&quot;: &quot;01a2028b-dde6-7ed4-9e47-6e582f2341d8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T4 Kanban coach (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a2028b-f63c-7c27-b580-d4cba2c1e70f&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;The SPEC_V2 section 12 T4 gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata. Clauses 2 and 3 are proved by named tests in `crates/actions/tests/coach.rs`; clause 1 is proved for a first interruption but refuted as a universal by v1-p6-4; clause 4 is proved only as a `kata.open` process start and v1-p6-2 shows no kata record, instrument or threshold is created. The rework&#39;s acceptance instrument is `acceptance/programme/T4.toml`. The A\u2013D set and this contract are board-approved, and the Phase-G review cites the standing delegation and records the compliance level non_conformant.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T4 (SPEC_V2 sections 6.2, 6.4 and 12, issue #75) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A\u2013D artefacts, the charter, this Statement of Architecture Work and the delivery contract, record the project&#39;s one WBS deliverable, take the Phase-G compliance review against the section 12 gate, and publish the project&#39;s expected outputs (`project-brief`, `evidence`) and closure output (`closure-review`). The project is already `closed` in the register; this pass records the lifecycle retrospectively and does not reopen it.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;the interruption taxonomy, the closed remedy set, per-signature uniqueness and the depth cap of SPEC_V2 section 6.2, plus the systemic-class path of section 6.4: the `coach_interruption` and `coach_remedy` tables, the `coach.interrupt` action, the seeded coach process and the real-Postgres suite `crates/actions/tests/coach.rs`. Out of scope: the board and pull path&#39;s `err.card` producer, the kata&#39;s own lifecycle and measurement (T5), the PM job (T3), operations (T7) and the tool platform (T13).&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:17:30.02765+00:00&quot;,
+      &quot;id&quot;: &quot;01a2028b-dde6-7ed4-9e47-6e582f2341d8&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d33-7e7e-890e-b437b0c78db9&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T4 Kanban coach (retrospective, U5a)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T09:17:42.179607+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/T4-bodies/T4/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

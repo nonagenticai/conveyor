@@ -85,12 +85,13 @@ enum Command {
     /// Deterministic JSON + `snapshot.js` under `--out`; no secret value, email or key id is
     /// ever selected. `--generated-at` pins the timestamp so a re-run is byte-identical.
     Snapshot {
-        /// The tenant slug to snapshot.
+        /// The tenant slug to snapshot. Required unless `--manifest-only` rehashes an
+        /// already-written pack.
+        #[arg(long, required_unless_present = "manifest_only")]
+        tenant: Option<String>,
+        /// The output directory. Defaults to `docs/design/data`; `--manifest-only` requires it.
         #[arg(long)]
-        tenant: String,
-        /// The output directory.
-        #[arg(long, default_value = "docs/design/data")]
-        out: PathBuf,
+        out: Option<PathBuf>,
         /// Also render every published platform output into this directory
         /// (`docs/design/docs`). Absent means the data snapshot only.
         #[arg(long)]
@@ -117,6 +118,10 @@ enum Command {
         /// working directory; a pod has no checkout, so a publish passes it explicitly.
         #[arg(long)]
         git_sha: Option<String>,
+        /// Rehash an already-written pack directory and rewrite its manifest; nothing else is
+        /// regenerated. Requires `--out`.
+        #[arg(long)]
+        manifest_only: bool,
         /// When the producing image was built (RFC 3339). Defaults to `CONVEYOR_BUILD_TIME`;
         /// absent stamps the snapshot `unknown` and the page shows no staleness (#867).
         #[arg(long)]
@@ -285,8 +290,8 @@ enum AdminCommand {
         #[arg(long, conflicts_with = "expect")]
         write: Option<PathBuf>,
     },
-    /// Seal a tenant's BYO token for an upstream service (`laya`, `inference`, `lean4`). Never
-    /// prints it.
+    /// Seal a tenant's BYO token for an upstream service (`laya`, `inference`, `speech`, `strata`,
+    /// `lean4`). Never prints it.
     UpstreamToken {
         /// The tenant slug.
         #[arg(long)]
@@ -408,6 +413,11 @@ enum ActionCommand {
         /// without this flag a destructive invoke from the CLI could never satisfy its gate.
         #[arg(long)]
         approval_id: Option<uuid::Uuid>,
+        /// The caller's `Idempotency-Key` (CONTRACT §5). It is a property of the CALL: the
+        /// engine claims it for the mutation and forwards it to a declared external destination
+        /// that demands one (the coding service).
+        #[arg(long = "idempotency-key")]
+        idempotency_key: Option<String>,
         /// Act as this active member instead of the tenant's first active member.
         ///
         /// A governance act must be performed by a DISTINCT approver, and the tenant carries a
@@ -641,11 +651,17 @@ async fn run(command: Command) -> Result<(), RunError> {
             feedback_url,
             database_url,
             git_sha,
+            manifest_only,
             build_time,
         } => {
+            if manifest_only && out.is_none() {
+                return Err(RunError::Refused(
+                    "--manifest-only requires --out".to_owned(),
+                ));
+            }
             let report = snapshot::run(snapshot::SnapshotArgs {
-                tenant,
-                out,
+                tenant: tenant.unwrap_or_default(),
+                out: out.unwrap_or_else(|| PathBuf::from("docs/design/data")),
                 outputs_dir,
                 generated_at,
                 issues,
@@ -653,6 +669,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 feedback_url,
                 database_url,
                 git_sha,
+                manifest_only,
                 build_time: build_time.or_else(|| std::env::var("CONVEYOR_BUILD_TIME").ok()),
             })
             .await?;
@@ -721,7 +738,6 @@ async fn serve() -> Result<(), RunError> {
     Ok(())
 }
 
-/// Every approved `action_registry` row must name a compiled action, and an external row's
 /// Every approved `action_registry` row is either a compiled action or a valid imported
 /// contract (S04 P1.1). The rule lives in `conveyor_actions::resolve` so the same model that
 /// invokes an imported action also describes what boot accepts.
@@ -1234,6 +1250,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     name,
                     input,
                     approval_id,
+                    idempotency_key,
                     actor_id,
                     if_match,
                 },
@@ -1248,7 +1265,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     .await
                     .map_err(|error| RunError::Refused(error.to_string()))?;
             let output = caller
-                .call_gated(&name, input, if_match, approval_id)
+                .call_gated(&name, input, if_match, approval_id, idempotency_key)
                 .await
                 .map_err(|error| RunError::Refused(error.to_string()))?;
             println!("{}", serde_json::to_string_pretty(&output)?);

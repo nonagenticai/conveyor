@@ -1,0 +1,87 @@
+{
+  "body_sha256": "c3baefa7793a6c8fbd217ef953b13e0ecef41443ddfc3fc39afe01c51f38e167",
+  "category": "statement-of-architecture-work",
+  "headings": [
+    {
+      "heading": "Assignment",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Responsibilities",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance criteria",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Contract",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "bc2322766512ad69b1a58740b0cffceccfbf2c0ccb3dfd305b652cf2e61ae79b",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+    "key": "S00",
+    "kind": "project",
+    "title": "Usage inventory \u2192 parity/parity.yaml"
+  },
+  "title": "Statement Of Architecture Work \u2014 Usage inventory \u2192 parity/parity.yaml"
+}

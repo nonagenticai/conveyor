@@ -111,7 +111,7 @@ crates/actions/tests/copilot_coverage.rs</code></pre>
 </tr>
 <tr>
 <td><code>PROJECT_BINDING</code> / <code>SurfaceRefusal</code></td>
-<td>the projection <strong>omits</strong>; <code>/mcp</code> answers <code>action-not-found</code>, never <code>403</code> (S04-D6)</td>
+<td>the projection <strong>omits</strong> the action from both surfaces; calling a known-but-omitted name is <code>403 action-forbidden</code> (S04-D6 — the omission is the guarantee, not indistinguishability), and a name outside the registry is <code>-32602</code></td>
 </tr>
 <tr>
 <td><code>rbac.ts</code></td>
@@ -141,7 +141,7 @@ crates/actions/tests/copilot_coverage.rs</code></pre>
 <h3 id="55-the-mcp-channel-and-model-access">5.5 The MCP channel and model access</h3>
 <p><code>/mcp</code> (S04) is the machine channel; the copilot UI is the web channel; both call the same action and, for a proposal, the same <code>approvals.decide</code>. This is D17: <strong>channels are equivalent</strong> — a decision over Telegram, web or MCP closes the identical approval row and unlocks the identical execution job.</p>
 <p>The <code>/mcp</code> surface this slice completes (S04's transport, S10's agent-surface projection) serves machine consumers <strong>by principal</strong>. The <code>agent</code> app is one of them: it calls this surface with a licence bearer and acts as <code>app_user(kind='agent')</code> (SPEC D19, slice S06b). There is one MCP surface; do not build a second agent-facing gateway.</p>
-<p>The conveyor does not absorb <code>inference-router</code> (D14). <code>completions.create</code> is <code>kind: external</code> (<code>scopes: [models:invoke]</code>, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends <code>failed</code> with an RFC 9457 problem and <strong>zero</strong> tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. <strong>S16 adds one declaration to this action</strong> — <code>captures_usage = true</code> — and the engine then writes an <code>inference_call</code> row with <code>caller_kind='copilot'</code> and <code>conversation_turn_id</code> in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses <code>usage</code>, and nothing in the turn runner changes.</p>
+<p>The conveyor does not absorb <code>inference-router</code> (D14). <code>completions.create</code> is <code>kind: external</code> (<code>scopes: [model:write]</code>, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends <code>failed</code> with an RFC 9457 problem and <strong>zero</strong> tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. <strong>S16 adds one declaration to this action</strong> — <code>captures_usage = true</code> — and the engine then writes an <code>inference_call</code> row with <code>caller_kind='copilot'</code> and <code>conversation_turn_id</code> in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses <code>usage</code>, and nothing in the turn runner changes. The scope vocabulary admits <code>model:write</code>; <code>models:invoke</code> in this plan's earlier text was never an admitted scope (<code>crates/actions/src/spec.rs</code> is authoritative).</p>
 <h3 id="56-ag-ui-wire-contract">5.6 AG-UI wire contract</h3>
 <p>Kept only if S0's <code>agui*</code> parity rows (with ingress counts on <code>/api/agui*</code>, <code>agui-session</code>, <code>agui-threads</code>) show a live consumer: then <code>agui.rs</code> serializes the same turn events into fr's wire names, golden fixtures replayed against the native stream; otherwise native SSE only, no adapter, <code>parity.yaml</code> carrying the <code>dropped</code> rows.</p>
 <h2 id="6-build-order">6. Build order</h2>
@@ -201,7 +201,7 @@ cargo clippy --workspace --all-targets -- -D warnings</code></pre>
 <tr>
 <td>e</td>
 <td>scope-absent tool</td>
-<td>low-scope principal's <code>/api/copilot/actions</code> <strong>and</strong> <code>/mcp</code> <code>tools/list</code> both omit it; calling it is <code>action-not-found</code>, not <code>403</code></td>
+<td>low-scope principal's <code>/api/copilot/actions</code> <strong>and</strong> <code>/mcp</code> <code>tools/list</code> both omit it; calling the omitted action is <code>403 action-forbidden</code> on the HTTP invocation route and an <code>isError</code> tool result with the same problem on <code>/mcp</code> (S04-D6); a name outside the registry is <code>-32602</code></td>
 </tr>
 <tr>
 <td>f</td>

@@ -11,8 +11,10 @@
 //! without the stub).
 
 use crate::registry::ActionRegistration;
+use std::borrow::Cow;
+
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Scope, Tenancy,
+    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, SchemaRef, Scope, Tenancy,
 };
 use crate::views::{EchoIn, EchoOut, FailIn, FailOut, SlowIn, SlowOut, TimeoutOut};
 
@@ -27,12 +29,12 @@ fn echo_output() -> schemars::Schema {
 }
 fn echo_spec() -> ActionSpec {
     ActionSpec {
-        name: "fixtures.echo",
+        name: Cow::Borrowed("fixtures.echo"),
         version: 1,
         kind: ActionKind::External,
-        input: echo_input,
-        output: echo_output,
-        scopes: &[Scope::ActionsRead],
+        input: SchemaRef::Compiled(echo_input),
+        output: SchemaRef::Compiled(echo_output),
+        scopes: Cow::Borrowed(&[Scope::ActionsRead]),
         idempotent: true,
         timeout_ms: 30_000,
         effect: Effect::Read,
@@ -44,9 +46,9 @@ fn echo_spec() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/echo",
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/echo"),
             auth: None,
             auth_optional: false,
             upload: None,
@@ -63,12 +65,12 @@ fn slow_output() -> schemars::Schema {
 }
 fn slow_spec() -> ActionSpec {
     ActionSpec {
-        name: "fixtures.slow",
+        name: Cow::Borrowed("fixtures.slow"),
         version: 1,
         kind: ActionKind::External,
-        input: slow_input,
-        output: slow_output,
-        scopes: &[Scope::ActionsRead],
+        input: SchemaRef::Compiled(slow_input),
+        output: SchemaRef::Compiled(slow_output),
+        scopes: Cow::Borrowed(&[Scope::ActionsRead]),
         idempotent: true,
         // Pinned at ingest: the stub sleeps 600 ms, so the caller's 200 ms deadline fires.
         timeout_ms: 200,
@@ -81,9 +83,9 @@ fn slow_spec() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/slow",
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/slow"),
             auth: None,
             auth_optional: false,
             upload: None,
@@ -100,12 +102,12 @@ fn fail_output() -> schemars::Schema {
 }
 fn fail_spec() -> ActionSpec {
     ActionSpec {
-        name: "fixtures.fail",
+        name: Cow::Borrowed("fixtures.fail"),
         version: 1,
         kind: ActionKind::External,
-        input: fail_input,
-        output: fail_output,
-        scopes: &[Scope::ActionsRead],
+        input: SchemaRef::Compiled(fail_input),
+        output: SchemaRef::Compiled(fail_output),
+        scopes: Cow::Borrowed(&[Scope::ActionsRead]),
         idempotent: false,
         timeout_ms: 30_000,
         effect: Effect::Read,
@@ -117,9 +119,9 @@ fn fail_spec() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/fail",
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/fail"),
             auth: None,
             auth_optional: false,
             upload: None,
@@ -136,12 +138,12 @@ fn timeout_output() -> schemars::Schema {
 }
 fn timeout_spec() -> ActionSpec {
     ActionSpec {
-        name: "fixtures.timeout",
+        name: Cow::Borrowed("fixtures.timeout"),
         version: 1,
         kind: ActionKind::External,
-        input: timeout_input,
-        output: timeout_output,
-        scopes: &[Scope::ActionsRead],
+        input: SchemaRef::Compiled(timeout_input),
+        output: SchemaRef::Compiled(timeout_output),
+        scopes: Cow::Borrowed(&[Scope::ActionsRead]),
         idempotent: false,
         timeout_ms: 30_000,
         effect: Effect::Read,
@@ -153,9 +155,9 @@ fn timeout_spec() -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path: "/timeout",
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed("/timeout"),
             auth: None,
             auth_optional: false,
             upload: None,

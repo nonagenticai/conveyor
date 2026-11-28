@@ -1,0 +1,87 @@
+{
+  "dry_run": false,
+  "toolkits": [
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_CODING_URL is not set",
+      "key": "coding",
+      "probe": "unconfigured",
+      "service": "coding",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_CODING_URL is not set",
+      "key": "coding",
+      "probe": "unconfigured",
+      "service": "coding",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_IMAGE_GEN_URL is not set",
+      "key": "image_gen",
+      "probe": "unconfigured",
+      "service": "image_gen",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_IMAGE_GEN_URL is not set",
+      "key": "image_gen",
+      "probe": "unconfigured",
+      "service": "image_gen",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "http_status": 200,
+      "key": "scientific",
+      "latency_ms": 186,
+      "probe": "live",
+      "service": "scientific",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_TTS_URL is not set",
+      "key": "speech",
+      "probe": "unconfigured",
+      "service": "tts",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_TTS_URL is not set",
+      "key": "speech",
+      "probe": "unconfigured",
+      "service": "tts",
+      "toolkit_version": 2
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_ASR_URL is not set",
+      "key": "transcription",
+      "probe": "unconfigured",
+      "service": "asr",
+      "toolkit_version": 1
+    },
+    {
+      "bindings_disabled": 0,
+      "bindings_restored": 0,
+      "detail": "CONVEYOR_EXTERNAL_ASR_URL is not set",
+      "key": "transcription",
+      "probe": "unconfigured",
+      "service": "asr",
+      "toolkit_version": 2
+    }
+  ]
+}

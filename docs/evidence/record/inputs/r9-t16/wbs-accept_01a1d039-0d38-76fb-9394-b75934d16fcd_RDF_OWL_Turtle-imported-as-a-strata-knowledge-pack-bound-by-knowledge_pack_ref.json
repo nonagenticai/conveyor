@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::an_owl_file_becomes_a_knowledge_pack"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-v14/evidence/T16-acceptance.md",
+   "ref": "T16 acceptance transcript"
+  }
+ ],
+ "id": "01a20a84-b2fa-7fab-89e5-8c72b04fb6f2",
+ "status": "accepted"
+}

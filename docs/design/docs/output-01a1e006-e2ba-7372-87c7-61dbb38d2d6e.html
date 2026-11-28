@@ -23,69 +23,24 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Business case</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="business-case" data-provenance-version="2" data-provenance-hash="2d30cc07c09c49548c41f67a9bc42eebfbeded5e48451685a6c458b6661e55e5" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>business-case</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>2d30cc07c09c49548c41f67a9bc42eebfbeded5e48451685a6c458b6661e55e5</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Business case — P0 (retrospective, 2026-11-26)</h1>
 <h2>Why now</h2>
-<ol>
-<li><strong>The machine works; the organisation does not exist yet.</strong> V1 is live at
-<code>conveyor.nonagentic.ai</code>: projects, boards, cards, runs, approvals, documents, procedures,
-capabilities, knowledge, memory, an inference ledger, evals, a benchmark harness and the
-compiled-prompt pipeline (<code>docs/SPEC_V2.md</code> §1.1). What it lacks is the organisation that
-staffs and governs the work — no industry, department, job, programme cadence, PM, coach, kata,
-development or operations position (<code>docs/SPEC_V2.md</code> §1.1). V2 is the difference between a work
-system and an operating organisation.</li>
-<li><strong>The estate has services that must be governed, not just kept running.</strong>
-<code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> records the absorption state: scientific and lean4 are
-absorbed but not deployed; research and media are in flight; the coding fleet is still the
-Python deployment; the eighteen w2v stage directories are a <strong>deliverable vocabulary</strong>, not
-services. A tool platform with a probe, a version and a ledger is cheaper than an unowned fleet.</li>
-<li><strong>The public repository changes the economics of review.</strong> The code and this programme's
-definition set are public; a contributor can read the design, open an issue and propose a
-change without an account. The cost of an outside review drops to a GitHub session.</li>
-<li><strong>The development loop is the bottleneck.</strong> The measured audit in
-<code>docs/plans/development-process-speed.md</code> records a 102-minute run with 75 minutes before the
-heavy job starts, 27 minutes of job time and 18.9 minutes of tests. Improving that loop pays
-back on every one of the 48 projects.</li>
-</ol>
+<p>P0's case rested on the starting state in plan §2: V1 is far implemented, the organisation spine is merged, yet the seed carries 47 projects and no programme-definition project, and T1–T17 are blocked by their SPEC_V2 §12 edges. The business case published on 2026-11-18 at 08:18:32 (<code>01a1e006-e2ba-7372-87c7-61dbb38d2d6e</code>, with a second document) argued that defining the programme first was the way to unblock delivery with briefs and benefit records the board could hold projects to.</p>
 <h2>Benefit map</h2>
-<table><thead><tr><th>Benefit</th><th>Mechanism</th><th>Measure</th></tr></thead><tbody>
-<tr><td>Auditable decisions</td><td>rule → laya → generation → human; every decision pins its policy and versions (<code>docs/SPEC_V2.md</code> §7)</td><td>a decision row for every choice; a gate that never refuses is flagged</td></tr>
-<tr><td>Less bespoke tooling</td><td>every cluster service is a versioned toolkit with a probe and a <code>tool_call</code> ledger (<code>docs/SPEC_V2.md</code> §11)</td><td>zero-use toolkits retired after a programme cycle (P10)</td></tr>
-<tr><td>Self-development</td><td>development projects on the conveyor and one dependency repo, under gates (<code>docs/SPEC_V2.md</code> §9)</td><td>T6's lane → PR → CI → merge → deploy → live verify, with rollback</td></tr>
-<tr><td>Public collaboration</td><td>public repo, public programme site, issue forms, DCO, design PRs against <code>programme/</code></td><td>an outside issue or PR that changes a published output</td></tr>
-<tr><td>One model</td><td>one Rust app, one database, one action registry (<code>docs/SPEC_V2.md</code> §10)</td><td>no concept with two stores (T0 gate)</td></tr>
-<tr><td>Predictable delivery</td><td>tranches are dependency levels; P0 gates T1–T17; the first three months are T0–T3 + T13 (<code>docs/SPEC_V2.md</code> §12)</td><td>the programme plan and the coverage instrument agree</td></tr>
-</tbody></table>
+<p>The case is carried by six benefit profiles, of which "Benefit profile — B1 Auditable decisions" (<code>01a1e9e0-1b2e-7353-9361-16a81a99d354</code>, published 2026-11-18 at 08:17:51) is the representative, and by the benefits map (<code>01a1e9e0-750d-71b9-8230-177eebe80e95</code>) from output through capability and operational outcome to benefit and objective. The public/opt-in licensing frame is recorded as a condition of those benefits.</p>
 <h2>Cost and risk posture</h2>
-<ul>
-<li><strong>Engineering cost is concentrated in T0–T3 and T13</strong> — the organisation and tool spines. Every
-other slice is a job that uses them (<code>docs/SPEC_V2.md</code> §12). The programme does not need all 48
-projects before it produces value; P0's definition set is the gate that prevents building the
-wrong 47.</li>
-<li><strong>The public repo is the exposure.</strong> No secrets, tokens, private hosts or customer data enter the
-repository or a published output; the public pack applies the snapshot's redaction and
-<code>scripts/ci/no-private-refs.sh</code> is the gate. Public input is GitHub only; there are no in-app
-public accounts.</li>
-<li><strong>CI is the recurring cost.</strong> GitHub-hosted runners are free for public repositories; the
-measured risk is queueing and supersession, not spend. The repo's CI budget is two runs per unit:
-the PR and its merge (<code>docs/plans/03-DELIVERY.md</code>); the local gate runs first.</li>
-<li><strong>The migration risk is drift.</strong> V1 stays live until S14's cutover; V2 does not re-open V1 slices.
-A V2 aggregate that no tenant uses does not ship (P10), and a retired binding refuses rather than
-silently serving a stale release.</li>
-</ul>
-<h2>Licensing and boundary</h2>
-<p>The licensing frame is per-tenant, opt-in and public-first: the repository and the programme site
-are public; a tenant's use of a V2 aggregate is a tenant decision, not a programme default. There is
-no per-app delegation header and no hidden dependency on the agent, fr or care-bus applications at
-runtime (<code>docs/SPEC_V2.md</code> §1.2, D33). The agent platform remains a user-interaction front end over
-MCP.</p>
-<h2>Decision</h2>
-<p>Approve P0's definition set and adopt the programme plan. The benefit is not a document: it is the
-operating loop in T12, measured by decision rows, tool calls, run evidence and the maturity levels
-in T11. The cost is the T0–T3 + T13 spine and the discipline of the public gates.</p>
+<p>The plan names the resources, boundaries, controls and cost of producing the definition set, and the delivery contract <code>01a1fdd4-ab0f-7802-b7a7-2541a2902e6b</code> with approval <code>01a1fdd4-cac3-7767-9b0f-4c15d064d6f6</code> records the commitment. The risk posture is dependency-led: the typed architecture rows belong to T9 (#81), and every benefit depends on operational change after delivery. The P0 record carries no monetary risk figure.</p>
+<h2>Licensing frame</h2>
+<p>The licensing frame P0 defined is public/opt-in, and plan §3 item 5 makes it a condition of the benefits rather than a footnote. What is measurable now is that the frame is stated in the published business case and carried into the profiles. No licence revenue, take-up or negotiation appears as a P0 result.</p>
+<h2>Options, including doing nothing</h2>
+<p>P0 considered the definition options MSP requires, including doing nothing. Doing nothing leaves the 47-project seed without a programme plan, keeps T1–T19 blocked, and leaves the two partial V1 slices unexplained. The option taken was to define the programme from the existing seed rather than invent a parallel list, which plan §3 item 7 makes explicit.</p>
+<h2>Investment appraisal and cash flow</h2>
+<p>The appraisal P0 recorded is a definition-stage case, not a cash-flow model. The P0 record available on 2026-11-26 contains no monetary appraisal, discount rate or cash-flow schedule, and this retrospective does not invent one. The honest statement is that the investment case is defined in structure and unmeasured in money, and no positive return is claimed.</p>
+<h2>Capabilities the benefits depend on</h2>
+<p>The benefits depend on the architecture capability baseline P0 published — principles, tailored ADM profile, artefact standard, board charter, and the maturity and skills baselines — plus the programme-management rows and the BCM role that measures realisation. SPEC_V2 §8.3 states the rule the case rests on: a capability is not use and use is not improvement, so each benefit names both the capability and the operational area that must change practice.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-26T21:15:00Z</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

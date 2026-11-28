@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Change Control — Model and contracts · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="1" data-provenance-hash="5e4ee1c673991eb1cc5ef85ba6670109eab64aac9571c6c2e0f8b1c8bad7f630" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>5e4ee1c673991eb1cc5ef85ba6670109eab64aac9571c6c2e0f8b1c8bad7f630</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Change Control — Model and contracts</h1>
+<h2>Change requests</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Change request: rebuild T0's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-T0",
+      "created_at": "2026-11-22T06:45:56.395202+00:00",
+      "id": "01a20201-1d76-7169-871c-ff02d6f012fc",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of T0 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of T0 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:56.395202+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Replayed from docs/evidence/record/journal.jsonl (natural key change:Record the B5 benefit baseline); the recorded request carried no rationale. Impact: {\"scope\": \"B5 one-model baseline and groups\"}",
+      "code": "",
+      "created_at": "2026-11-26T07:44:56.843995+00:00",
+      "id": "01a216d0-9011-7990-a9b0-f1858ad2b5ad",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "B5 one-model baseline and groups"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the B5 benefit baseline",
+      "updated_at": "2026-11-26T07:44:57.239362+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Impact</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Change request: rebuild T0's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-T0",
+      "created_at": "2026-11-22T06:45:56.395202+00:00",
+      "id": "01a20201-1d76-7169-871c-ff02d6f012fc",
+      "impact": {
+        "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+        "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+        "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+        "scope": "the record and declared outputs are rebuilt and republished"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of T0 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of T0 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:56.395202+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Replayed from docs/evidence/record/journal.jsonl (natural key change:Record the B5 benefit baseline); the recorded request carried no rationale. Impact: {\"scope\": \"B5 one-model baseline and groups\"}",
+      "code": "",
+      "created_at": "2026-11-26T07:44:56.843995+00:00",
+      "id": "01a216d0-9011-7990-a9b0-f1858ad2b5ad",
+      "impact": {
+        "scope": "B5 one-model baseline and groups"
+      },
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "B5 one-model baseline and groups"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the B5 benefit baseline",
+      "updated_at": "2026-11-26T07:44:57.239362+00:00",
+      "version": 2
+    }
+  ],
+  "source": "computed:change_impact"
+}
+</code></pre>
+<h2>Decisions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "change-control",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Change request: rebuild T0's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+      "code": "U5-CHG-T0",
+      "created_at": "2026-11-22T06:45:56.395202+00:00",
+      "id": "01a20201-1d76-7169-871c-ff02d6f012fc",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "kind": "issue",
+            "number": 526
+          },
+          {
+            "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "kind": "delegation"
+          }
+        ]
+      },
+      "meta": {
+        "change_request": "the retrospective rework of T0 under #526",
+        "decision": {
+          "decided_at": "2026-11-21",
+          "decided_by": "the programme owner's standing delegation",
+          "decision": "accepted",
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+          "record": "#526"
+        },
+        "impact": {
+          "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+          "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+          "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+          "scope": "the record and declared outputs are rebuilt and republished"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "Retrospective MSP/TOGAF/SAFe rework of T0 under the #526 scope change",
+      "updated_at": "2026-11-22T06:45:56.395202+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "body": "Replayed from docs/evidence/record/journal.jsonl (natural key change:Record the B5 benefit baseline); the recorded request carried no rationale. Impact: {\"scope\": \"B5 one-model baseline and groups\"}",
+      "code": "",
+      "created_at": "2026-11-26T07:44:56.843995+00:00",
+      "id": "01a216d0-9011-7990-a9b0-f1858ad2b5ad",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "B5 one-model baseline and groups"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the B5 benefit baseline",
+      "updated_at": "2026-11-26T07:44:57.239362+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

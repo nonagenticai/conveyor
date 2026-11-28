@@ -23,53 +23,20 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><hr />
-<h2>document: T17/evidence
-version: 1
-status: published
-project: T17
-category: evidence
-owner: programme-manager
-reviewer: Architecture Board
-review_date: 2026-11-25
-artifact_kind: evidence
-phase: G
-plateau: capability</h2>
-<h1>T17 — Tenant asset authoring: evidence</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="evidence" data-provenance-version="2" data-provenance-hash="bcbc25c7a5c2d5d1fa014fcfb7eec57a1b95916eaec7eeae97d3be870829b477" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>evidence</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>bcbc25c7a5c2d5d1fa014fcfb7eec57a1b95916eaec7eeae97d3be870829b477</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Evidence — T17 Tenant Asset Authoring (retrospective, 2026-11-27)</h1>
 <h2>Claim</h2>
-<p>T17 delivers tenant asset authoring: a short brief plus documents drafts a reviewed catalogue of
-departments, jobs, procedures and policies, which publishes with its decisions; no asset can
-publish itself and none can widen a tool grant.</p>
+<p>T17 is built and its acceptance is proven by <code>acceptance/programme/T17.toml</code>: a brief plus documents draft the catalogue, documents yield linked procedure and policy drafts, an unpublished dependency is refused, a reviewed catalogue publishes with its decisions, no asset publishes itself, a non-human decision cannot complete a gate, no asset widens a tool grant, and the real-app E2E creates a draft and sees it render.</p>
 <h2>Evidence</h2>
-<ul>
-<li><code>crates/actions/tests/authoring.rs::a_chat_brief_drafts_the_org_and_job_catalogue</code>,
-<code>::documents_yield_linked_procedure_and_policy_drafts</code>,
-<code>::a_draft_that_references_an_unpublished_asset_is_refused</code>,
-<code>::a_reviewed_catalogue_publishes_with_its_decisions</code></li>
-<li><code>crates/actions/tests/authoring_standard.rs</code> (the output-standard checks)</li>
-<li><code>crates/actions/tests/asset_review.rs::the_authoring_job_cannot_publish_its_own_asset</code>,
-<code>::a_non_human_decision_cannot_complete_an_asset_gate</code>,
-<code>::an_asset_never_widens_a_tool_grant</code></li>
-<li>Merges <code>c29c7f52d939</code> (PR #632), <code>38334552e9b8</code> (PR #659), <code>ca392a97d7d8</code> (PR #687);
-<code>actions:authoring</code> = <code>exists</code> in <code>docs/evidence/v2-coverage.md</code>.</li>
-</ul>
+<p>The evidence is <code>crates/actions/tests/authoring.rs</code> (P1.1–P1.4), <code>asset_review.rs</code> (P2.1–P2.3), <code>authoring_standard.rs</code>, <code>apps/web/e2e/authoring.spec.ts</code>, the merged PRs #632 (c29c7f52d939), #659 (38334552e9b8) and #687 (ca392a97d7d8), the published <code>docs/plans/T17/evidence.md</code> and <code>docs/plans/T17/closure-review.md</code>, and <code>actions:authoring = exists</code> in <code>docs/evidence/v2-coverage.md</code>.</p>
 <h2>Verification</h2>
-<p><code>cargo test -p conveyor-actions --test authoring --test asset_review --test authoring_standard</code>
-and <code>npx playwright test apps/web/e2e/authoring.spec.ts</code> on a checked-out main; the CI equivalent is
-the PRs' <code>preflight</code>, <code>ci-public</code> and <code>web</code> at the merge commits.</p>
+<p>Verification is <code>verify-project.py --project T17</code> at a fresh snapshot: 15 checks plus the gate, 0 failures. The behaviour commands are <code>cargo test -p conveyor-actions --test authoring --test asset_review --test authoring_standard</code> and the Playwright authoring spec; the CI equivalent is the PRs' preflight, ci-public and web runs at the merge commits.</p>
 <h2>Links</h2>
-<ul>
-<li><code>docs/plans/inception/T17/00-project-brief.md</code>, <code>01-inception-analysis.md</code>,
-<code>02-architecture-design.md</code></li>
-<li>Issues #87, #629, #655; PRs #632, #659, #687; <code>docs/evidence/v2-coverage.md</code>.</li>
-</ul>
+<p>The links are the inception set (<code>docs/plans/inception/T17/</code>), the evidence and closure-review documents, the acceptance manifest, the seven A–D artefacts and the architecture-artefact index, the delivery contract and the Phase-G review. Issues #87, #629 and #655; PRs #632, #659 and #687.</p>
 <h2>Gap</h2>
-<p>The dependency order is refused at the draft attempt, not at publish — no publish-time check is
-claimed. The live procedure/policy ingestion is T16's capability; this project proves the linked
-drafts and the refusals. No tool-grant widening is possible and none is claimed.</p>
+<p>The gap is the dependency order: it is refused at the draft attempt, not at publish, and no publish-time check is claimed. The live procedure/policy ingestion is T16's capability; T17 proves the linked drafts and the refusals. Neither gap is a non-conformance; both are named risks T17-R1 and T17-R2.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Tenant asset authoring · conveyor output · published 2026-11-26T21:15:00Z · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Tenant asset authoring · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

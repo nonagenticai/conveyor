@@ -49,10 +49,13 @@ pub struct CoachInterruption {
     pub id: Uuid,
     /// The coach card carrying this interruption.
     pub coach_card_id: Uuid,
-    /// The card whose run failed.
+    /// The card the interruption is about.
     pub interrupted_card_id: Uuid,
-    /// The failed run.
-    pub failed_run_id: Uuid,
+    /// The failed run, present exactly when `trigger_kind` is `failed_run`.
+    pub failed_run_id: Option<Uuid>,
+    /// Which §6.2 input opened it: `failed_run`, `wip_breach`, `stale_lease`, `gate_timeout`
+    /// or `board_event`.
+    pub trigger_kind: String,
     /// The repeat key: `card|error class|process|step`.
     pub signature: String,
     /// The rendered parts of the signature.
@@ -99,10 +102,12 @@ pub struct CoachRemedy {
 pub struct NewInterruption {
     /// The coach card carrying it.
     pub coach_card_id: Uuid,
-    /// The card whose run failed.
+    /// The card whose run failed, or the card a flow input is about.
     pub interrupted_card_id: Uuid,
-    /// The failed run.
-    pub failed_run_id: Uuid,
+    /// The failed run, when the input is a failed run (§6.2).
+    pub failed_run_id: Option<Uuid>,
+    /// Which §6.2 input opened the interruption.
+    pub trigger_kind: String,
     /// The rendered signature.
     pub signature: String,
     /// The signature's parts.
@@ -139,8 +144,8 @@ pub enum CoachStoreError {
     RemedyInvalid(String),
 }
 
-const COLUMNS: &str = "id, coach_card_id, interrupted_card_id, failed_run_id, signature, \
-                       signature_parts, triage_class, confidence, narrative, state, \
+const COLUMNS: &str = "id, coach_card_id, interrupted_card_id, failed_run_id, trigger_kind, \
+                       signature, signature_parts, triage_class, confidence, narrative, state, \
                        window_ends_at, escalated_at, approval_id, kata_candidate_id, closed_at, \
                        created_at";
 
@@ -149,7 +154,8 @@ struct InterruptionRow {
     id: Uuid,
     coach_card_id: Uuid,
     interrupted_card_id: Uuid,
-    failed_run_id: Uuid,
+    failed_run_id: Option<Uuid>,
+    trigger_kind: String,
     signature: String,
     signature_parts: serde_json::Value,
     triage_class: Option<String>,
@@ -183,6 +189,7 @@ impl TryFrom<InterruptionRow> for CoachInterruption {
             coach_card_id: row.coach_card_id,
             interrupted_card_id: row.interrupted_card_id,
             failed_run_id: row.failed_run_id,
+            trigger_kind: row.trigger_kind,
             signature: row.signature,
             signature_parts: row.signature_parts,
             triage_class: row.triage_class,
@@ -207,9 +214,9 @@ pub async fn insert_interruption_tx(
 ) -> Result<CoachInterruption, CoachStoreError> {
     let sql = format!(
         "INSERT INTO coach_interruption
-             (tenant_id, coach_card_id, interrupted_card_id, failed_run_id, signature,
-              signature_parts, window_ends_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+             (tenant_id, coach_card_id, interrupted_card_id, failed_run_id, trigger_kind,
+              signature, signature_parts, window_ends_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING {COLUMNS}"
     );
     let row: InterruptionRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -217,6 +224,7 @@ pub async fn insert_interruption_tx(
         .bind(new.coach_card_id)
         .bind(new.interrupted_card_id)
         .bind(new.failed_run_id)
+        .bind(&new.trigger_kind)
         .bind(&new.signature)
         .bind(&new.signature_parts)
         .bind(new.window_ends_at)
@@ -665,12 +673,12 @@ pub async fn mark_escalated_tx(
     }
 }
 
-/// Record the kata run a systemic class opened.
+/// Record the measured kata a systemic class opened.
 pub async fn set_kata_candidate_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
-    kata_run_id: Uuid,
+    kata_id: Uuid,
 ) -> Result<(), CoachStoreError> {
     sqlx::query(
         "UPDATE coach_interruption
@@ -679,7 +687,7 @@ pub async fn set_kata_candidate_tx(
     )
     .bind(tenant.as_uuid())
     .bind(id)
-    .bind(kata_run_id)
+    .bind(kata_id)
     .execute(&mut *conn)
     .await?;
     Ok(())
@@ -724,26 +732,6 @@ pub async fn failing_step_position_tx(
     .fetch_optional(&mut *conn)
     .await?;
     Ok(position)
-}
-
-/// How many interruptions a card has ever had, of every signature.
-///
-/// The per-card depth cap (SPEC_V2 §1.4 · §12 T4): three interruptions are enough to show the
-/// coach is not converging, and a fourth would only repeat the first three.
-pub async fn count_interruptions_for_card_tx(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    card_id: Uuid,
-) -> Result<i64, CoachStoreError> {
-    let count: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM coach_interruption
-          WHERE tenant_id = $1 AND interrupted_card_id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(card_id)
-    .fetch_one(&mut *conn)
-    .await?;
-    Ok(count)
 }
 
 /// Is this card a coach card?

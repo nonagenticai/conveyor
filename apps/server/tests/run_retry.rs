@@ -123,6 +123,7 @@ impl Fixture {
     /// Invoke one action as the seeded owner and return `(status, etag, body)`.
     async fn call(&self, action: &str, input: Value) -> (u16, Option<String>, Value) {
         let request = InvokeRequest {
+            credential_alias: None,
             action: action.to_owned(),
             input,
             precondition: None,

@@ -1,0 +1,16 @@
+{
+ "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+ "contract_id": "01a2023e-4e59-75ad-b2ab-fd7d014511d2",
+ "level": "compliant",
+ "findings": [
+  {
+   "verdict": "pass",
+   "statement": "The T9 Statement of Architecture Work is delivered as written: its scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation a waiver would cover."
+  }
+ ],
+ "evidence": {
+  "manifest": "acceptance/programme/T9.toml",
+  "closure_review": "01a2053e-9475-7632-b4ff-4b21ce1efb40"
+ },
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

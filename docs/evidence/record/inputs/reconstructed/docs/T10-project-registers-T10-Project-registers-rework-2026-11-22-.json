@@ -1,0 +1,8 @@
+{
+ "title": "T10 \u2014 Project registers (rework, 2026-11-22)",
+ "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "category": "project-registers",
+ "body": "# Project Registers \u2014 T10 SAFe cadence and MSP tranches\n\n## Risks\n\nNo project-owned risk row is recorded for T10; the live risks are the programme's R1\u2013R14\n(scope vs capacity, record theatre, instrument self-deception, transport, shared target,\nregister staleness, provenance, standard completeness, CI budget, evidence theatre, seed\nquality and the quality of the V1 record itself). This section is an explicit absence, not an\nomission.\n\n## Issues\n\n| Code | Issue | Status |\n|---|---|---|\n| U3-EXC-T10 | Out-of-sequence closure accepted as a retrospective exception (T10) | accepted |\n\n## Assumptions\n\nThe cadence job runs on the estate's scheduler; the WIP slots and WSJF inputs are tenant rows,\nnot compiled constants; tranche-4's authorisation is recorded by the tr4 review, not by T10.\n\n## Dependencies\n\nT2 (the decision ladder); T1 (the plan-spine baseline contract); T4 (the coach card, except the\nretro card); T11 (metrics); T12 (the one-organisation-loop acceptance).\n\n## Benefits\n\nT10 owns no benefit profile; the cadence is the delivery machinery the programme's B4/B5\nbenefits are reviewed against. The benefit status is carried by U6's profiles, not here.\n\n## Changes\n\nNo project change row is recorded for this retrospective window. The acceptance travelled\nthrough the tranche-4 authorisation and the project's approved baseline and charter gates\n(`charter`, `baseline`, `closure`, `projects.close` \u2014 all approved, distinct approvers).\n",
+ "publishable": true,
+ "unit": "T10"
+}

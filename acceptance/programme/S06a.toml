@@ -1,0 +1,40 @@
+[project]
+key = "S06a"
+name = "mcp_server signed channel — both directions"
+gate = "S06a is a recorded supersession, not a build: its plan says nothing here is built or to be built, S06b's agent interface is the successor and its receipt is green, no mcp_server component is in the path, and the retirement decision is published."
+gate_checks = ["S06a-project", "S06a-superseded", "S06a-no-component", "S06a-successor", "S06a-decision"]
+
+[[check]]
+id = "S06a-project"
+check = "project"
+status = "archived"
+severity = "P0"
+description = "S06a stays archived; the retirement is a recorded disposition, not a reopen"
+
+[[check]]
+id = "S06a-superseded"
+kind = "command"
+severity = "P0"
+description = "the plan is marked superseded by S06b and says nothing here is to be built"
+command = '''python3 -c 'from pathlib import Path; t=Path("docs/plans/slices/S06a-mcp-server-channel.md").read_text(); assert "status: superseded" in t; assert "S06b-agent-direct-interface.md" in t; assert "Nothing here is built or to be built" in t' '''
+
+[[check]]
+id = "S06a-no-component"
+kind = "command"
+severity = "P0"
+description = "no mcp_server component exists in the tree (S06b's gate clause)"
+command = '''test ! -d apps/mcp_server && test ! -d crates/mcp_server && test ! -e apps/nonagenticai_mcp_server && test ! -e crates/nonagenticai_mcp_server'''
+
+[[check]]
+id = "S06a-successor"
+kind = "command"
+severity = "P0"
+description = "S06b, the successor, has a green acceptance receipt"
+command = '''python3 -c 'import json; d=json.load(open("docs/evidence/rework/S06b.json")); assert d.get("verdict") == "green", d.get("verdict")' '''
+
+[[check]]
+id = "S06a-decision"
+kind = "command"
+severity = "P0"
+description = "the retirement decision is a published record document naming S06b"
+command = '''python3 scripts/programme-record.py --check --action documents.get --input '{"id":"01a21c64-9256-762d-a3d1-2d2d0d5a6596"}' | grep -q "S06a retirement"'''

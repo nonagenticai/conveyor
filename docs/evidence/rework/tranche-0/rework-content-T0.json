@@ -1,0 +1,792 @@
+{
+  "charter": "# Charter — T0 Model and contracts (retrospective, 2026-11-26)\n\n- **Project:** T0 'Model and contracts', track v2, ADM phase G, plateau capability, tranche 0, project `01a1d039-0d32-7734-98da-fb7f1e2386c7`, plan `docs/SPEC_V2.md#12` (draft). The row records `status: closed`, `meta.measured_status: built`, `meta.viability: rework`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: [closure-review]`, `meta.tranche: 0`, `meta.track: v2`, `meta.adm_phase: G` and `meta.close_reason: the retrospective rework of tranche 0 (#526)`. It was reopened at 2026-11-21T20:59:32Z for 'the merged audit finds open P0 v1-w1a-2 after the retrospective closure; rework (#526)' under decision `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** install the organisation spine and its contracts — industry → ordered departments → `job_catalogue`, the immutable `job_release`, the tenant-scoped `job_binding`; the decision-ladder types; and the internal `Executor` contract with two live kinds behind one trait and an extensible `executor_kind`. The gate is a job created in the conveyor, a release published, a binding pinning its hash, a run on a retired binding refused `409 job_binding_stale`, no concept in two stores, and a test-only third executor kind registered without editing the run path (SPEC_V2 §12).\n- **Scope:** the model and its invariants (SPEC_V2 §3 P1–P11, §4.1–§4.6, §10.1, §10.3, §10.4) and the action contracts the registry serves, pinned by `served-spec.lock.json` (version 1, 650 operations). The seven Phase A–D artefacts, the live Statement of Architecture Work `01a1ff45-b2ce-7276-8a88-cf3d744e7976`, the board-approved delivery contract `01a1ff47-1159-707b-a737-582f894cc956`, the approved scope baseline `01a1ff47-5043-73f7-b18d-2fc03832c96a` and the compliant review `01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c` are the record this pack re-issues. Execution behaviour is T2, the plan spine T1 and the tool platform T13.\n- **Provenance and residual:** T0 first closed on 2026-11-14; its original charter, Statement of Architecture Work, delivery contract, Phase-G review and closure review were never authored. The contemporaneous record is the evidence document `01a1e688-678d-76fd-8ae7-6ca2712b64c2` and the git history. The lifecycle was reconstituted on 2026-11-21 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`, and this pack records the rework rather than claiming contemporaneous intent.\n- **Date:** this charter is retrospective and authored on 2026-11-26; it records the lifecycle and does not authorise new work.",
+  "soaw": {
+    "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework T0 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the project-brief and evidence outputs that SPEC_V2 §12's model and contracts owe. The work is retrospective, dated 2026-11-26, and records the 2026-11-25 acceptance state without claiming that it cleared.",
+      "scope": "The model and its invariants (SPEC_V2 §3 P1–P11, §4.1–§4.6, §10.1, §10.3, §10.4): the organisation spine — industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins (version 1, 650 operations). Out of scope: execution behaviour (T2), the plan spine (T1), the tool platform (T13), and any external executor, which stays an explicit non-goal until the four §4.5 conditions hold.",
+      "responsibilities": "The programme architect (conveyor-e2e) authors the pack under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board (conveyor-architecture-board) reviews the A–D set; conveyor-approver records the Phase-G review. The live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 is approved by 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e, and the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 by 01a1ff47-24cb-7ffb-87a0-3097d55adb64; both are approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d.",
+      "acceptance_criteria": "SPEC_V2 §12's T0 gate in six clauses: a job is created in the conveyor; a release is published; a binding pins its hash; a run on a retired binding refuses 409 job_binding_stale before any model call; no concept has two stores; and a test-only third executor kind registers without editing the run path (crates/domain/src/executor.rs, crates/actions/src/organisation.rs, crates/actions/tests/executor_runtime.rs). The A–D set is approved. The acceptance instrument is acceptance/programme/T0.toml. The rework note records verify-project green with 11 checks and 0 failures at d7293f96 on 2026-11-21; docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red on T0-artefact-standard, T0-rework, the gate aggregate and closed-on-red, so this statement records the terms and does not certify them.",
+      "contract": "This statement sits on the approved scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a (approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d) and is complemented by the delivery contract 01a1ff47-1159-707b-a737-582f894cc956; the Phase-G review is 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c at level compliant. The live statement it records is 01a1ff45-b2ce-7276-8a88-cf3d744e7976. It is a retrospective instrument under the delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and is dated 2026-11-26.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — T0 Model and contracts (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the model and its contracts serve, and the engagement each needs for the re-closure.",
+      "scope": "The stakeholders of the organisation spine, the invariants and the action contracts of T0.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "conveyor-approver",
+          "the delivery jobs of the first software departments",
+          "later V2 slices T1, T2, T3 and T13",
+          "the agent platform as a front end over MCP"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme architect (conveyor-e2e)",
+          "axis_b": "authors and re-versions the A–D set under the #526 rework",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the Architecture Board (conveyor-architecture-board)",
+          "axis_b": "reviews the seven artefacts and holds the A–D gate",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "conveyor-approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "axis_b": "approves the statement, the delivery contract and the baseline, distinct from the requester",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the delivery jobs of the first software departments",
+          "axis_b": "bind a position to an immutable release and a pinned binding",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "later V2 slices T1, T2, T3 and T13",
+          "axis_b": "consume the spine and the action contracts unchanged",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "the agent platform",
+          "axis_b": "presents cards and approvals as a front end; never runs a conveyor job",
+          "value": {
+            "influence": "low",
+            "interest": "medium",
+            "engagement": "monitor"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T0 Model and contracts (Phase A)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for T0, authored 2026-11-26 from the snapshot and the rework note docs/evidence/rework/T0.md. Phase a, plateau psa, kind matrix. The approved row it re-versions is 01a20235-b523-700a-93e5-cfe7331dd2fe, whose document is 01a20235-c37d-7769-ac95-51bfa7adc2e6, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe matrix carries six entries. The programme architect authors and re-versions the A–D set; the Architecture Board reviews the seven artefacts and holds the A–D gate; conveyor-approver approves the statement, the delivery contract and the scope baseline and is distinct from the requester; the delivery jobs of the first software departments bind positions to immutable releases; later V2 slices T1, T2, T3 and T13 consume the spine and the action contracts unchanged; the agent platform presents cards and approvals as a front end and never runs a conveyor job.\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — T0 Model and contracts (Phase A) as dependency. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that the requirements bind the actors named here.\n\n## Document\n\nPurpose: place the actors of the organisation spine so each concern has a named owner and a stated engagement. Scope: the stakeholders of the model, the invariants and the action contracts. The map is reconstructed retrospectively from the roles the record carries rather than from a live elicitation; the 2026-11-21 reconstitution and the standing delegation are the provenance."
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the organisation spine, the invariants and the action contracts exist and what each is meant to achieve.",
+      "scope": "The drivers and goals of the T0 model and contracts, each bound to the §12 gate or a named invariant.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the Architecture Board",
+          "the delivery jobs of the first software departments",
+          "later V2 slices T1, T2, T3 and T13"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 no organisation was the conveyor's own",
+          "axis_b": "G1 make the conveyor own its organisation spine",
+          "value": {
+            "objective": "industry, ordered departments, job_catalogue, job_release and job_binding are conveyor rows; no manifest is imported and no other system validates a release"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 a live job could change under a running card",
+          "axis_b": "G2 pin every run to an immutable release",
+          "value": {
+            "objective": "a run records job_key and release_hash; a release change is a new binding and a gate; a retired or mismatched binding refuses 409 job_binding_stale before any model call"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 two stores for one fact make the record unauditable (P1)",
+          "axis_b": "G3 give every fact one system of record",
+          "value": {
+            "objective": "the §10.1 ownership matrix assigns each concern one system; the join is internal and by pinned reference"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 an executor kind branched through the run path cannot be extended",
+          "axis_b": "G4 make executor_kind an extensible enum behind one internal contract",
+          "value": {
+            "objective": "procedure and internal_agent implement one Executor trait; a third kind is an implementation plus one registry entry, and a test proves it without editing the run path"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 an unpinned action surface drifts silently",
+          "axis_b": "G5 pin the served action contracts",
+          "value": {
+            "objective": "served-spec.lock.json holds one sha256 per resolved operation (version 1, 650 operations), written and checked by --print-openapi --write-lock and --check-lock"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — T0 Model and contracts (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for T0, authored 2026-11-26 from the snapshot and the rework note. Phase a, plateau psa, kind catalog. The approved row it re-versions is 01a2020c-f6bc-7f62-917e-9d43f1873309, whose document is 01a2020d-0326-71a1-a2f5-1de597187dc4, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries five driver-to-goal rows. D1 records that no organisation was the conveyor's own, and G1 makes the spine conveyor rows. D2 records that a live job could change under a running card, and G2 pins every run to an immutable release with a 409 refusal. D3 records the unauditable double store, and G3 applies the ownership matrix. D4 records the unextendable executor branch, and G4 puts two live kinds behind one trait. D5 records the unpinned surface, and G5 pins it in served-spec.lock.json.\n\n## Links\n\nThe artefact carries one typed edge: Stakeholder Map — T0 Model and contracts (Phase A) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge places the drivers with the actors who hold them.\n\n## Document\n\nPurpose: trace why the organisation spine, the invariants and the action contracts exist and what each is meant to achieve. Scope: the drivers and goals of the T0 model and contracts, each bound to the §12 gate clause or a named invariant. It is authored retrospectively on 2026-11-26 from the spec and the rework note and does not add a goal the record does not state."
+    },
+    {
+      "title": "Requirements Catalog — T0 Model and contracts (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the organisation spine, the invariants and the action contracts must meet.",
+      "scope": "Organisation, immutability, ownership, executor extension and action-contract requirements of T0.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the delivery jobs of the first software departments",
+          "later V2 slices T1, T2, T3 and T13",
+          "conveyor-approver"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "one organisation spine owned by the conveyor",
+          "value": {
+            "requirement": "industry, ordered departments, job_catalogue, job_release and job_binding exist as conveyor rows; a department from another industry is refused 422 department_industry_mismatch",
+            "acceptance": "crates/actions/src/organisation.rs and the §4.1 hierarchy; no imported manifest"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "an immutable, pinned release",
+          "value": {
+            "requirement": "a release carries a content hash and a frozen snapshot; a release change is a new release and a new binding, never an edit",
+            "acceptance": "crates/domain/src/executor.rs and the §4.4 binding rules"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "a binding that refuses a stale pin",
+          "value": {
+            "requirement": "a run naming a retired binding, or a release that is not the binding's pin, is refused 409 job_binding_stale before any model call",
+            "acceptance": "crates/actions/src/organisation.rs emits the refusal; crates/actions/tests/executor_runtime.rs asserts the class"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "one record per fact",
+          "value": {
+            "requirement": "no concept has two stores; every fact is assigned one system of record and joined by pinned reference",
+            "acceptance": "SPEC_V2 §10.1 ownership matrix and §3 P1"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "two live executor kinds behind one contract, with an extensible kind",
+          "value": {
+            "requirement": "procedure and internal_agent implement one Executor trait; executor_kind is an open slug; a third kind registers without editing the run path",
+            "acceptance": "a_third_kind_registers_without_editing_the_run_loop in crates/actions/tests/executor_runtime.rs"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "the served action contracts are pinned",
+          "value": {
+            "requirement": "the registry serves one ActionSpec as HTTP, MCP, OpenAPI and a generated client, and the served document is pinned operation by operation",
+            "acceptance": "served-spec.lock.json version 1 with 650 operations; crates/actions/src/lock.rs writes and checks it"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "fail closed on missing configuration",
+          "value": {
+            "requirement": "an unresolved binding, release or required knowledge refuses before the first model call, naming what is missing",
+            "acceptance": "409 job_not_live, 409 release_not_ready and 409 job_binding_stale; §3 P8"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "tenant configuration over code",
+          "value": {
+            "requirement": "every policy, threshold and gate condition is a versioned tenant-scoped row with a platform default; code implements mechanisms, never policy values",
+            "acceptance": "SPEC_V2 §3 P11 and the *_policy tables in §10.3"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for T0, authored 2026-11-26 from the snapshot and the rework note. Phase a, plateau psa, kind catalog. The approved row it re-versions is 01a20211-c0b6-7ec0-8104-90a52f26d58d, whose document is 01a20211-d85f-746e-9df3-7f3aceac6820, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries eight requirements, each with its acceptance carrier. R1 owns the organisation spine; R2 makes the release immutable and pinned; R3 refuses a stale binding with 409 job_binding_stale; R4 applies one record per fact; R5 puts two live executor kinds behind one contract and proves a third registers without editing the run path; R6 pins the served action contracts; R7 fails closed on missing configuration; R8 keeps policy values in versioned tenant rows. The eight together restate the §12 T0 gate as requirements.\n\n## Links\n\nThe artefact carries one typed edge: Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge traces each requirement to the goal it serves.\n\n## Document\n\nPurpose: state what the model and its contracts must meet so the seven artefacts and the delivery record can be checked against one list. Scope: organisation, immutability, ownership, executor extension and action-contract requirements. Each row names its acceptance carrier, so an auditor reads the requirement and the code or test that answers it without a second interpretation."
+    },
+    {
+      "title": "Solution Concept Diagram — T0 Model and contracts (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show how a position becomes a pinned binding and a run, and where the executor seam and the action registry sit.",
+      "scope": "The organisation spine, the release and binding chain, the Executor seam and the action-contract registry.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the delivery jobs of the first software departments",
+          "later V2 slices T1, T2, T3 and T13",
+          "the Architecture Board"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "industry",
+          "axis_b": "top of the organisation spine",
+          "value": {
+            "element": "one industry per job placement; software is the first (§4.6)",
+            "edge": "1 → * department"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "department",
+          "axis_b": "ordered departments, primary first",
+          "value": {
+            "element": "a department from another industry is 422 department_industry_mismatch",
+            "edge": "1 → * job_catalogue"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "job_catalogue → job_release",
+          "axis_b": "the position compiles into an immutable release",
+          "value": {
+            "element": "content hash and frozen snapshot; a change is a new release, never an edit",
+            "edge": "1 → * release"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "job_binding",
+          "axis_b": "the tenant-scoped join of position, release and executor",
+          "value": {
+            "element": "pins release_hash and release_snapshot JSONB; status draft, active or retired",
+            "edge": "card.job_binding_id and run.job_binding_id"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Executor seam",
+          "axis_b": "two live kinds behind one internal contract",
+          "value": {
+            "element": "procedure and internal_agent; executor_kind is an open slug; a registry entry adds a kind",
+            "edge": "binding.executor_kind → implementation"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "action registry",
+          "axis_b": "one ActionSpec serves HTTP, MCP, OpenAPI and the generated client",
+          "value": {
+            "element": "served-spec.lock.json pins the $ref-resolved operation hashes",
+            "edge": "registry → /api/actions → lock"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "decision-ladder types",
+          "axis_b": "the types a ladder decision row carries",
+          "value": {
+            "element": "decision, decision_option and decision_policy with the tenant refinement (§10.3)",
+            "edge": "ladder → decision rows"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T0 Model and contracts (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for T0, authored 2026-11-26 from SPEC_V2 §4 and §10 and the rework note. Phase a, plateau psa, kind diagram. The approved row it re-versions is 01a2021b-0621-701c-bc44-cc7f3b80e429, whose document is 01a2021b-11b8-70ae-ba49-b720c4f5c327, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe diagram reads top down. An industry holds ordered departments; a department holds positions in job_catalogue; a position compiles into an immutable job_release; a tenant-scoped job_binding pins one release's hash and snapshot and names its executor; a card names the binding and a run records the binding and the resolved release. The Executor seam sits behind the binding with two live kinds and an open slug, and the action registry serves the operation surface that served-spec.lock.json pins. The decision-ladder types are shown beside the spine because T0 declares their shape.\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — T0 Model and contracts (Phase A) as realization. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that the diagram realises the eight requirements.\n\n## Document\n\nPurpose: show how a position becomes a pinned binding and a run, and where the executor seam and the action registry sit. Scope: the organisation spine, the release and binding chain, the Executor seam and the action-contract registry. It is a retrospective rendering of the structures the code and the spec carry, not a proposed design."
+    },
+    {
+      "title": "Business Capability Map — T0 Model and contracts (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Map the business capabilities the organisation spine provides to the later slices that depend on them.",
+      "scope": "The capabilities T0 installs: catalogue, release, binding, executor selection, action contracts and ownership.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "later V2 slices T1, T2, T3 and T13",
+          "the delivery jobs of the first software departments",
+          "the Architecture Board"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "organisation catalogue",
+          "axis_b": "author industries, departments and positions",
+          "value": {
+            "capability": "industry, department and job_catalogue rows are authored in the conveyor",
+            "carrier": "crates/actions/src/organisation.rs"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "release compilation",
+          "axis_b": "compile and publish an immutable release",
+          "value": {
+            "capability": "a release carries a content hash and a frozen snapshot; a change is a new release",
+            "carrier": "crates/domain/src/executor.rs and job_release"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "binding and pinning",
+          "axis_b": "bind a position to one release for one tenant",
+          "value": {
+            "capability": "a tenant-scoped binding pins release_hash and release_snapshot and refuses a stale pin",
+            "carrier": "job_binding; 409 job_binding_stale in crates/actions/src/organisation.rs"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "executor selection",
+          "axis_b": "serve two live executor kinds and register a third",
+          "value": {
+            "capability": "one Executor trait; procedure and internal_agent live; a third kind registers without editing the run path",
+            "carrier": "crates/domain/src/executor.rs; a_third_kind_registers_without_editing_the_run_loop"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "action contract registry",
+          "axis_b": "serve one declaration as HTTP, MCP, OpenAPI and a client",
+          "value": {
+            "capability": "one ActionSpec per action; the served document is pinned operation by operation",
+            "carrier": "served-spec.lock.json (650 operations); crates/actions/src/lock.rs"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "ownership enforcement",
+          "axis_b": "keep one system of record per fact",
+          "value": {
+            "capability": "each concern has one system of record and the join is by pinned reference",
+            "carrier": "SPEC_V2 §10.1 ownership matrix; §3 P1"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "tenant configuration",
+          "axis_b": "keep policy values in versioned tenant rows",
+          "value": {
+            "capability": "a policy or threshold is a tenant-scoped row with a platform default; code implements mechanisms",
+            "carrier": "SPEC_V2 §3 P11 and the policy tables of §10.3"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — T0 Model and contracts (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements Catalog — T0 Model and contracts (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective capability artefact for T0, authored 2026-11-26 from SPEC_V2 §4 and the rework note. Phase b, plateau hld, kind diagram. The approved row it re-versions is 01a2023d-3076-76e9-9d03-4e96cd16fbea, whose document is 01a2023d-3f21-7255-934f-2af4d3b0061d, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe map carries seven capabilities, each with a named carrier. Organisation catalogue authors the spine; release compilation makes the release immutable; binding and pinning joins a position to one release and refuses a stale pin; executor selection serves two live kinds and registers a third without editing the run path; the action contract registry serves one declaration four ways and pins the served document; ownership enforcement keeps one record per fact; tenant configuration keeps every policy value in a versioned tenant row. Each capability is what a later slice consumes rather than rebuilds.\n\n## Links\n\nThe artefact carries two typed edges: Solution Concept Diagram — T0 Model and contracts (Phase A) and Requirements Catalog — T0 Model and contracts (Phase A), both derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edges place each capability against the structures and requirements it realises.\n\n## Document\n\nPurpose: map the business capabilities the organisation spine provides to the later slices that depend on them. Scope: the capabilities T0 installs — catalogue, release, binding, executor selection, action contracts, ownership and tenant configuration. The map is drawn from the spec's component descriptions and the carriers named in each row, so a reader can move from a capability to the code or table that answers it."
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the entities and data components of the organisation spine, the ladder types and the executor seam.",
+      "scope": "The T0-owned rows and pinned components: industry through job_binding, the ladder types and the executor and action contracts.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "later V2 slices T1, T2, T3 and T13",
+          "the delivery jobs of the first software departments",
+          "conveyor-approver"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "industry",
+          "axis_b": "the top organisation entity",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "id, tenant scope, name",
+            "spec": "§4.1, §10.3"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "department",
+          "axis_b": "an ordered department of an industry",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "id, industry_id, order, primary flag",
+            "spec": "§4.1, §10.3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "job_catalogue",
+          "axis_b": "the position record",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "job_key, placement, status",
+            "spec": "§4.2, §10.3"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "job_release",
+          "axis_b": "the immutable compiled release",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "content hash, snapshot, status",
+            "spec": "§4.4, §10.3"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "job_binding",
+          "axis_b": "the tenant-scoped join of position, release and executor",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "job_key, release_hash, release_snapshot JSONB, executor_kind, capability_id or procedure_id, status, version",
+            "spec": "§4.4, §10.3"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "decision-ladder types",
+          "axis_b": "the shape of one ladder decision and its options and policy",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "decision: probabilities, confidence, policy, latency, input hash; decision_option: authored, versioned; decision_policy: thresholds, fail policy, action",
+            "spec": "§7, §10.3"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Executor contract",
+          "axis_b": "the internal seam between a binding and its implementation",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "Executor trait, ExecutorKind open slug, Registry, BindingError",
+            "spec": "crates/domain/src/executor.rs; §4.5"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "served-spec.lock.json",
+          "axis_b": "the pinned action-contract component",
+          "value": {
+            "owner_system": "conveyor",
+            "key_fields": "version, operations: METHOD path → sha256 of the $ref-resolved operation",
+            "spec": "crates/actions/src/lock.rs; §10.4"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T0 Model and contracts (Phase B)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — T0 Model and contracts (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective data artefact for T0, authored 2026-11-26 from SPEC_V2 §4, §7 and §10.3 and the rework note. Phase c, plateau hld, kind catalog. The approved row it re-versions is 01a20243-b153-728c-b4b8-5cb0f270a3dd, whose document is 01a20243-be53-768a-b737-c8fddc3bae4b, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries eight rows. Industry and department hold the organisation spine; job_catalogue holds the position; job_release holds the immutable compiled release; job_binding joins the position, the release and the executor for one tenant. The decision-ladder types are declared here as the shape T2 will exercise. The Executor contract and served-spec.lock.json are data components rather than tables: the one is the internal seam, the other is the pinned action surface. Each row names its owner system and key fields so no entity is claimed by a second store.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — T0 Model and contracts (Phase B) and Solution Concept Diagram — T0 Model and contracts (Phase A), both derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edges tie each row to the capability and the structure it serves.\n\n## Document\n\nPurpose: name the entities and data components of the organisation spine, the ladder types and the executor seam so the repository has one entity list. Scope: the rows and pinned components T0 owns. Each row is read from the spec's data-model table or the named source file, and a concept that belongs to T1, T2 or T13 is not claimed here."
+    },
+    {
+      "title": "Technology Standards Catalog — T0 Model and contracts (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "State the technology standards the organisation spine and the action contracts follow.",
+      "scope": "The action declaration, lockfile pin, immutable release, open executor kind, unversioned routes and fail-closed refusals.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e) under the #526 rework delegation",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "later V2 slices T1, T2, T3 and T13",
+          "the delivery jobs of the first software departments",
+          "conveyor-approver"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "S1",
+          "axis_b": "one ActionSpec per action",
+          "value": {
+            "standard": "one declaration serves HTTP, MCP, OpenAPI and the generated client; every action is one ActionSpec (V1 §5.5)",
+            "enforcement": "§10.4 action families; the action macro requires exactly one dot"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "S2",
+          "axis_b": "the served specification is pinned operation by operation",
+          "value": {
+            "standard": "served-spec.lock.json version 1 holds one sha256 per $ref-resolved operation, 650 operations; a renamed field is a breaking contract change",
+            "enforcement": "crates/actions/src/lock.rs: --print-openapi --write-lock and --check-lock"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "S3",
+          "axis_b": "a release is an immutable artefact pinned like a lockfile",
+          "value": {
+            "standard": "a release carries a content hash and a frozen release_snapshot JSONB; it is never refreshed in place",
+            "enforcement": "§4.4; a new release is a new binding and a gate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "S4",
+          "axis_b": "executor_kind is an open slug, not a closed enum",
+          "value": {
+            "standard": "job_binding.executor_kind is TEXT with no value CHECK; the registry is the authority; two live kinds implement one Executor trait",
+            "enforcement": "crates/domain/src/executor.rs; the third-kind test in crates/actions/tests/executor_runtime.rs"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "S5",
+          "axis_b": "API routes are unversioned",
+          "value": {
+            "standard": "the route is /api/<resource>, never /api/v1/<resource>",
+            "enforcement": "the served action list and the lock's METHOD path keys"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "S6",
+          "axis_b": "refusals fail closed and name the class",
+          "value": {
+            "standard": "an unresolved binding or release refuses before the first model call with 409 job_binding_stale, 409 job_not_live or 409 release_not_ready naming the missing knowledge",
+            "enforcement": "§3 P8 and §4.4; crates/actions/src/organisation.rs"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "S7",
+          "axis_b": "tenant configuration over code",
+          "value": {
+            "standard": "every policy, threshold and gate condition is a versioned tenant-scoped row with a platform default",
+            "enforcement": "§3 P11; a hard-coded policy value is a review finding"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective technology artefact for T0, authored 2026-11-26 from SPEC_V2 §3, §4 and §10 and the rework note. Phase d, plateau hld, kind catalog. The approved row it re-versions is 01a20247-822f-74be-b5a6-0e0e160eb317, whose document is 01a20247-8e74-7417-82d4-1905cf26d80a, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries seven standards. S1 declares each action once; S2 pins the served document operation by operation in served-spec.lock.json; S3 makes the release an immutable artefact pinned like a lockfile; S4 keeps executor_kind an open slug with the registry as authority; S5 keeps routes unversioned; S6 fails closed with a named 409 class; S7 keeps policy values in versioned tenant rows. Each row names the mechanism that enforces it, so a standard is a checkable rule rather than an aspiration.\n\n## Links\n\nThe artefact carries one typed edge: Data Entity/Data Component Catalog — T0 Model and contracts (Phase C) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that each standard applies to the entities and components named there.\n\n## Document\n\nPurpose: state the technology standards the organisation spine and the action contracts follow so a later slice inherits one set of rules. Scope: action declaration, lockfile pin, immutable release, open executor kind, unversioned routes, fail-closed refusals and tenant configuration. Each standard cites its enforcement point, and a standard the code does not enforce is not listed."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T0 (retrospective, 2026-11-26)",
+      "body": "## Metadata\n\nThe Architecture Artefact Index for T0, authored 2026-11-26, category architecture-artifact. It indexes the seven Phase A–D artefacts of the model and contracts: phase a, plateau psa carries stakeholder_map (matrix), driver_goal_objective (catalog), requirements_catalog (catalog) and solution_concept (diagram); phase b, plateau hld carries business_capability_map (diagram); phase c, plateau hld carries data_entity_catalog (catalog); phase d, plateau hld carries technology_standards (catalog). The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nSeven entries, one per artefact, each naming its phase, plateau, kind, approved row and document. Stakeholder Map 01a20235-b523-700a-93e5-cfe7331dd2fe with document 01a20235-c37d-7769-ac95-51bfa7adc2e6; Driver/Goal/Objective Catalog 01a2020c-f6bc-7f62-917e-9d43f1873309 with 01a2020d-0326-71a1-a2f5-1de597187dc4; Requirements Catalog 01a20211-c0b6-7ec0-8104-90a52f26d58d with 01a20211-d85f-746e-9df3-7f3aceac6820; Solution Concept Diagram 01a2021b-0621-701c-bc44-cc7f3b80e429 with 01a2021b-11b8-70ae-ba49-b720c4f5c327; Business Capability Map 01a2023d-3076-76e9-9d03-4e96cd16fbea with 01a2023d-3f21-7255-934f-2af4d3b0061d; Data Entity/Data Component Catalog 01a20243-b153-728c-b4b8-5cb0f270a3dd with 01a20243-be53-768a-b737-c8fddc3bae4b; Technology Standards Catalog 01a20247-822f-74be-b5a6-0e0e160eb317 with 01a20247-8e74-7417-82d4-1905cf26d80a. All seven rows were approved on 2026-11-22.\n\n## Links\n\nThe index records the pack's edge chain: the Stakeholder Map depends on the Requirements Catalog; the Driver/Goal/Objective Catalog derives from the Stakeholder Map; the Requirements Catalog derives from the Driver/Goal/Objective Catalog; the Solution Concept Diagram realises the Requirements Catalog; the Business Capability Map derives from the Solution Concept Diagram and the Requirements Catalog; the Data Entity/Data Component Catalog derives from the Business Capability Map and the Solution Concept Diagram; the Technology Standards Catalog derives from the Data Entity/Data Component Catalog. The four kinds are derivation, realization, reuse and dependency.\n\n## Document\n\nPurpose: give the seven artefacts one index so the repository and the close gate read a single published document. Scope: the A–D set of T0 only. The bodies are authored from SPEC_V2 §3, §4, §10.1, §10.3 and §10.4 and from served-spec.lock.json (version 1, 650 operations). The pack re-versions the seven existing rows by their exact titles, so the factory updates the approved rows instead of creating duplicates."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T0-R1",
+        "title": "The 2026-11-25 acceptance record is red and the project is closed on a red manifest",
+        "body": "docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red: 12 of 16 checks pass and four fail. T0-artefact-standard lists six mandatory artefact packages open (mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0, std-togaf-phase-g-t0-g:T0); T0-rework names the unresolved P1 package mandatory_artefacts:T0; the gate aggregates those two; and closed-on-red records that the project is closed while its manifest is red. This pack supplies the content the packages read, but it cannot by itself turn the record green.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "response": "Apply this content pack through the rework batch, regenerate the acceptance record on a fresh snapshot and re-close only on a green manifest at the published SHA; do not waive the red or edit the record by hand.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R4 — one record per fact (Requirements Catalog — T0 Model and contracts (Phase A))",
+            "acceptance/programme/T0.toml"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "code": "T0-R2",
+        "title": "The original lifecycle records never existed, so intent is reconstructed rather than attested",
+        "body": "T0 first closed on 2026-11-14, and its original charter, Statement of Architecture Work, delivery contract, Phase-G review and closure review were never authored. The contemporaneous record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2 and the git history; the lifecycle this pack re-issues was reconstituted on 2026-11-21 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. A reader must not mistake the reconstructed record for a contemporaneous decision, and no claim in this pack asserts intent that was never written down.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "response": "Keep the provenance statement in the charter, the review and the evidence output; cite the evidence document and the git history as the contemporaneous record, and retain the retrospective date on every record this pack authors.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "the provenance statement in the T0 rework note docs/evidence/rework/T0.md",
+            "Evidence — T0 Model and contracts, document 01a1e688-678d-76fd-8ae7-6ca2712b64c2"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T0-I1",
+        "title": "Six mandatory artefact packages are open at the 2026-11-25 acceptance record",
+        "body": "The record names mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0 and std-togaf-phase-g-t0-g:T0 as open, and the P1 package mandatory_artefacts:T0 as unresolved. This content pack authors the seven A–D artefact bodies with entries and links, the baseline description, the five register kinds, the delivery contract, the Phase-G review and the closure records that those packages read; the issue stays open until a regenerated record passes them.",
+        "status": "open",
+        "severity": "high",
+        "response": "Run the rework batch with this pack, regenerate docs/evidence/rework/T0.json on a fresh snapshot and confirm the six packages pass before treating the issue as closed."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T0-A1",
+        "title": "T0 ships the executor contract only; execution behaviour arrives with T2 and the plan spine with T1",
+        "body": "crates/domain/src/executor.rs states that T0 ships the contract only: two live kinds implement one Executor trait and validate the configuration a binding must carry, while execution behaviour arrives with T2. The plan spine is T1 and the tool platform is T13, per the §12 dependency line and the live statement's scope. This pack therefore claims the seam, the kinds and the third-kind registration, and claims no execution behaviour of its own.",
+        "status": "open"
+      },
+      {
+        "code": "T0-A2",
+        "title": "The 650-operation action surface is the registry's current surface, not a frozen product scope",
+        "body": "served-spec.lock.json records version 1 with 650 operations at the snapshot, and the lock is written and checked by --print-openapi --write-lock and --check-lock. The count is a measurement at 2026-11-26, not a promised ceiling: a later slice adds operations and regenerates the lock, and a changed field is a breaking contract change the check reports. The assumption is that the lock remains the authority for the served surface until a deliberate format-version change.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T0-D1",
+        "title": "Every later V2 slice depends on T0's organisation spine and action contracts",
+        "body": "SPEC_V2 §12's dependency line places T1 after T0, T2 after T1, T3 after T2 and T4 after T3; T9 and T10 run after T1 and T3, and T13 after T2. The spine — industry, department, job_catalogue, job_release and job_binding — and the action contract surface are what those slices build on, so a change to a T0 row or to the lock's shape reaches them. No other project owns the spine, and this pack does not re-open their scope.",
+        "status": "open"
+      },
+      {
+        "code": "T0-D2",
+        "title": "The re-closure depends on the #526 rework batch and a fresh snapshot",
+        "body": "The project is closed and re-closes through the one gate on a green acceptance manifest; the 2026-11-25 record at 37f99108 is red on six mandatory packages. This pack supplies their content, but the record turns green only when the batch applies the pack and scripts/verify-project.py runs against a fresh snapshot at the published SHA. The closure is therefore conditional on that run, and this pack states the condition rather than assuming it met.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T0-B1",
+        "title": "One organisation spine: a job is a configured position with an immutable release and a pinned binding",
+        "body": "Before T0 the organisation was imported from other apps and a live job could change under a running card. After T0 the conveyor owns industry, ordered departments, job_catalogue, job_release and job_binding; a run records job_key and release_hash; a retired or mismatched binding refuses 409 job_binding_stale before any model call. Every later slice inherits a pinned position instead of rebuilding one, and an auditor can name the exact release a run executed.",
+        "status": "open"
+      },
+      {
+        "code": "T0-B2",
+        "title": "One record per fact and a pinned action surface: 650 operations checked against a committed lock",
+        "body": "The §10.1 ownership matrix assigns each concern one system of record, and the join is by pinned reference, so no concept has two stores. The action surface is pinned operation by operation in served-spec.lock.json: version 1, 650 operations, one sha256 per $ref-resolved operation, written and checked by the repository's own command. A renamed field becomes a visible contract change instead of a silent drift, and a generated client cannot lag the served document unnoticed.",
+        "status": "open"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T0 Model and contracts (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "T0 commits to the model and its contracts as one governed record: the organisation spine (industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding), the decision-ladder types, and the internal Executor contract with two live kinds behind one trait and an extensible executor_kind. It commits to the §12 gate in six clauses and to the seven mandatory A–D artefacts with entries and links.",
+      "compliance": "The Phase-G record is the compliant review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c of the live delivery contract 01a1ff47-1159-707b-a737-582f894cc956, citing the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and no active waiver exists. Against that, docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red on T0-artefact-standard (six mandatory packages open), T0-rework (the P1 package mandatory_artefacts:T0 unresolved), the gate aggregate and closed-on-red.",
+      "approval": "The live delivery contract 01a1ff47-1159-707b-a737-582f894cc956 is approved by board decision 01a1ff47-24cb-7ffb-87a0-3097d55adb64 and sits on the approved scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a. The approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d, and the live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 is approved by 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e. All instruments are retrospective under the delegation and dated 2026-11-26.",
+      "capacity": "T0 delivers the contract surface, not execution behaviour. It delivers the industry, department, job_catalogue, job_release and job_binding rows with their placement, ordering, content hash and frozen release_snapshot; the decision, decision_option and decision_policy types; and one Executor trait with the procedure and internal_agent kinds, an open ExecutorKind slug and a registry that accepts a third kind without a change to the run path. Execution is T2 (crates/domain/src/executor.rs states the split), the plan spine is T1, and the tool platform is T13.",
+      "acceptance": "SPEC_V2 §12's gate: a job is created in the conveyor, a release is published, a binding pins its hash, and a run on a retired binding refuses 409 job_binding_stale before any model call; no concept has two stores; a test-only third executor kind registers without editing the run path. The A–D set is approved. The instrument is acceptance/programme/T0.toml, run by scripts/verify-project.py against a published snapshot. The rework note records 11 checks and 0 failures at d7293f96 on 2026-11-21; the 2026-11-25 record is red on six packages, so this contract records the terms and does not certify them.",
+      "evidence": "The evidence route is docs/evidence/rework/T0.md (the rework note and its verification), docs/evidence/rework/T0.json (the project acceptance record at 37f99108), the 37 acts in transcript.jsonl read back by programme-record.py, the seven approved A–D rows and their documents dated 2026-11-22, the published evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2, the closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92 and the project brief 01a1ff47-af07-76e1-a28f-79397fc636cb. served-spec.lock.json and crates/actions/src/lock.rs carry the action-contract evidence.",
+      "manifest": "acceptance/programme/T0.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The model and contracts — organisation spine, decision-ladder types and the Executor seam",
+    "business_value": 8,
+    "time_criticality": 8,
+    "risk_reduction": 8,
+    "job_size": 5
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the live record supports: the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 is live and approved by 01a1ff47-24cb-7ffb-87a0-3097d55adb64, and its review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c records level compliant and cites the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; no active waiver exists. The scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a is approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, and the live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 is approved by 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e; the approver is distinct from the requester throughout. The seven A–D rows are approved and carry their documents dated 2026-11-22, and the rework note records scripts/verify-project.py green with 11 checks and 0 failures at d7293f96 on 2026-11-21, with the strict audit carrying no P0/P1 entry for the project. Against that, docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red: T0-artefact-standard lists six mandatory artefact packages open (mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0, std-togaf-phase-g-t0-g:T0), T0-rework names the unresolved P1 package mandatory_artefacts:T0, the gate aggregates both, and closed-on-red records that the project is closed while its manifest is red. The findings are that the governance record is sound and the artefact and register content the packages read was missing; this content pack authors that content and does not claim the red is cleared until the batch re-runs. The provenance residual stands: the original charter, statement, contract, review and closure review were never authored, and the contemporaneous record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2 and the git history.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c",
+      "delivery_contract": "01a1ff47-1159-707b-a737-582f894cc956",
+      "scope_baseline": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+      "acceptance_manifest": "acceptance/programme/T0.toml",
+      "rework_note": "docs/evidence/rework/T0.md"
+    }
+  },
+  "project_brief_output": "# Project brief — T0 Model and contracts (retrospective, 2026-11-26)\n\n## Outcome\n\nT0 installs the conveyor's organisation spine and its contracts: industry → ordered departments → job_catalogue, the immutable job_release, and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract with two live kinds behind one trait and an extensible executor_kind. The slice's gate is that a job is created in the conveyor, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale before any model call, no concept has two stores, and a test-only third executor kind registers without editing the run path. The row records status closed, measured status built and viability rework, and is re-closed through the one gate on the record this pack re-issues.\n\n## Boundary\n\nOut of scope: execution behaviour, which arrives with T2; the plan spine, which is T1; and the tool platform, which is T13. No external executor is in scope: SPEC_V2 §4.5 makes one an explicit non-goal until a generic work-packet ingress returns verifiable per-step evidence, governance sits at the boundary, owners and roadmaps are separate, and it beats the internal agent on the conveyor's own benchmark. Customer care is the agent platform's product, not conveyor work (D48). The agent platform is a front end over MCP, never a runtime for conveyor jobs.\n\n## Reuse sources\n\nThe content source is docs/SPEC_V2.md §3 (P1–P11), §4.1–§4.6, §10.1, §10.3 and §10.4. The action contracts are served-spec.lock.json, version 1 with 650 operations, written and checked through crates/actions/src/lock.rs. The code carriers are crates/domain/src/executor.rs (the Executor trait, the open ExecutorKind slug and the registry), crates/actions/src/organisation.rs (the organisation actions and the 409 job_binding_stale refusal) and crates/actions/tests/executor_runtime.rs (including a_third_kind_registers_without_editing_the_run_loop). The seven approved A–D rows and their documents dated 2026-11-22 are re-versioned, not replaced.\n\n## Inception units\n\nThis retrospective is the inception record. It carries the charter, the Statement of Architecture Work (live record 01a1ff45-b2ce-7276-8a88-cf3d744e7976), the seven A–D artefacts (Stakeholder Map 01a20235-b523-700a-93e5-cfe7331dd2fe, Driver/Goal/Objective Catalog 01a2020c-f6bc-7f62-917e-9d43f1873309, Requirements Catalog 01a20211-c0b6-7ec0-8104-90a52f26d58d, Solution Concept Diagram 01a2021b-0621-701c-bc44-cc7f3b80e429, Business Capability Map 01a2023d-3076-76e9-9d03-4e96cd16fbea, Data Entity/Data Component Catalog 01a20243-b153-728c-b4b8-5cb0f270a3dd and Technology Standards Catalog 01a20247-822f-74be-b5a6-0e0e160eb317), the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 and one WBS deliverable whose WSJF inputs are 8, 8, 8 and 5.\n\n## Dependencies\n\nTyped dependencies from SPEC_V2 §12: T1 follows T0, T2 follows T1 and T3 follows T2; T4 follows T3; T9 and T10 run after T1 and T3; T13 follows T2. Within the slice, a job_binding depends on an immutable job_release, a card depends on a binding, and a run depends on the binding's pin and the resolved release. Governance dependencies are the compliant review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c, the approved baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Acceptance\n\nSPEC_V2 §12's T0 gate in six clauses: a job created, a release published, a binding pinning its hash, a retired binding refusing 409 job_binding_stale, no concept in two stores, and a test-only third executor kind without an edit to the run path; the A–D set approved. The instrument is acceptance/programme/T0.toml. The rework note records scripts/verify-project.py green with 11 checks and 0 failures at d7293f96 on 2026-11-21; docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red on six mandatory packages, so the re-closure is claimed through the one gate only when a regenerated record passes.\n\n## Capabilities\n\nSeven capabilities are declared. Organisation catalogue authors industries, departments and positions. Release compilation produces an immutable release with a content hash and frozen snapshot. Binding and pinning joins a position to one release for one tenant and refuses a stale pin. Executor selection serves procedure and internal_agent behind one trait and registers a third kind without editing the run path. The action contract registry serves one declaration as HTTP, MCP, OpenAPI and a client and pins the surface. Ownership enforcement keeps one system of record per fact. Tenant configuration keeps policy values in versioned rows. Each is declared with a named carrier and none is claimed beyond what the record shows.\n\n## Plan\n\nThe retrospective proceeds in the rework runner's order: author the charter and the Statement of Architecture Work, re-version the seven A–D artefacts by their exact existing titles with entries and links, record the delivery contract and the one WBS deliverable, record the Phase-G review at compliant, publish this brief and the evidence output, then record the closure review and the closure through the one gate. It keeps two residuals on the record: the 2026-11-25 acceptance record is red on six packages, and the original lifecycle records were never authored, leaving the evidence document and the git history as the contemporaneous record.",
+  "evidence_output": "# Evidence — T0 Model and contracts (retrospective, 2026-11-26)\n\n## Claim\n\nT0 installs the conveyor's organisation spine and its contracts: industry → ordered departments → job_catalogue, the immutable job_release, the tenant-scoped job_binding, the decision-ladder types and the internal Executor contract with two live kinds behind one trait and an extensible executor_kind. The action contracts are those the registry serves and served-spec.lock.json pins (version 1, 650 operations). The seven Phase A–D artefacts are approved and re-versioned by their exact titles. The lifecycle itself is reconstructed: the original charter, statement, delivery contract, Phase-G review and closure review were never authored, and this evidence does not present the reconstruction as contemporaneous intent.\n\n## Evidence\n\nThe project row 01a1d039-0d32-7734-98da-fb7f1e2386c7 records key T0, status closed, tranche 0, ADM phase G, track v2, plan docs/SPEC_V2.md#12 (draft), expected outputs project-brief and evidence, closure output closure-review, and a reopen at 2026-11-21T20:59:32Z for the retrospective rework (#526). The live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 is approved by 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e; the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 by 01a1ff47-24cb-7ffb-87a0-3097d55adb64; the scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a was taken 2026-11-21T18:03:45Z. The Phase-G review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c records level compliant. The seven approved rows and documents are dated 2026-11-22; the project's one WBS deliverable is titled 'The model and contracts — organisation spine, decision-ladder types and the Executor seam' and carries WSJF inputs 8, 8, 8 and 5. The published evidence document is 01a1e688-678d-76fd-8ae7-6ca2712b64c2, the project brief 01a1ff47-af07-76e1-a28f-79397fc636cb and the closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92.\n\n## Verification\n\nThe governance instrument is python3 scripts/verify-project.py --project T0 against a fresh snapshot; the rework note records it green with 11 checks and 0 failures at d7293f96 on 2026-11-21, and the strict audit carries no P0/P1 entry. The current acceptance record docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, reports a red verdict: 12 of 16 checks pass and T0-artefact-standard, T0-rework, the gate aggregate and closed-on-red fail. The action contracts are verified by served-spec.lock.json and the --check-lock path in crates/actions/src/lock.rs. This content pack is verified offline by scripts/rework-content-check.py --project T0 with the facts snapshot and the recorded WSJF inputs; the Rust compile verdict is taken from the repository's GitHub-hosted preflight, never from a local cargo run.\n\n## Links\n\n- SPEC_V2 §3 (P1–P11), §4.1–§4.6 (the organisation model and the executor seam), §10.1 (ownership matrix), §10.3 (data model additions) and §10.4 (action families); §12's T0 row and dependency line.\n- served-spec.lock.json (version 1, 650 operations) and crates/actions/src/lock.rs.\n- crates/domain/src/executor.rs, crates/actions/src/organisation.rs and crates/actions/tests/executor_runtime.rs.\n- acceptance/programme/T0.toml, docs/evidence/rework/T0.md and docs/evidence/rework/T0.json.\n- The seven approved A–D rows with their documents; the live statement, contract, baseline and review; the published evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2, project brief 01a1ff47-af07-76e1-a28f-79397fc636cb and closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92.\n\n## Gap\n\nThe 2026-11-25 acceptance record is red on six mandatory artefact packages (mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0 and std-togaf-phase-g-t0-g:T0), on the P1 package mandatory_artefacts:T0, on the gate aggregate and on closed-on-red; this pack supplies the content those packages read and does not claim the red is cleared. The original charter, Statement of Architecture Work, delivery contract, Phase-G review and closure review were never authored before T0 closed on 2026-11-14, so the contemporaneous record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2 and the git history. No fresh green verify-project run at the 2026-11-26 snapshot is claimed, and the execution behaviour behind the executor kinds remains T2's acceptance, not this slice's.",
+  "closure": "# Closure — T0 Model and contracts (retrospective, 2026-11-26)\n\nThe project T0 is re-closed through the one gate on the record the snapshot carries: the live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976, the board-approved delivery contract 01a1ff47-1159-707b-a737-582f894cc956, the approved scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a and the compliant Phase-G review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c. This closure statement is retrospective and dated 2026-11-26. It keeps two residuals open: the 2026-11-25 acceptance record is red on six mandatory artefact packages and on closed-on-red, for which this pack supplies the content without claiming the red cleared, and the original charter, statement, delivery contract, Phase-G review and closure review were never authored, so the contemporaneous record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2 and the git history.",
+  "closure_review": "# Closure review — T0 Model and contracts (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the organisation spine and its contracts, and the acceptance the record carries is SPEC_V2 §12's six-clause gate. The rework note records scripts/verify-project.py green with 11 checks and 0 failures at d7293f96 on 2026-11-21, and the strict audit carries no P0/P1 entry, so the acceptance matched at that record. Against it, docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, is red on four checks: T0-artefact-standard with six mandatory packages open, T0-rework with the P1 package mandatory_artefacts:T0 unresolved, the gate aggregate and closed-on-red. This review records both states and does not present the later red as green.\n\n## Evidence\n\nThe evidence is the live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 with approval 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e, the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 with approval 01a1ff47-24cb-7ffb-87a0-3097d55adb64, the scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, the compliant review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c, the seven approved A–D rows and their documents dated 2026-11-22, served-spec.lock.json with 650 operations, and the 37 acts in transcript.jsonl read back by programme-record.py. The published record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2, the project brief 01a1ff47-af07-76e1-a28f-79397fc636cb and the closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92.\n\n## Open items\n\nSix mandatory artefact packages remain open in the 2026-11-25 record: mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0 and std-togaf-phase-g-t0-g:T0, with the P1 package mandatory_artefacts:T0 unresolved. This content pack supplies the artefacts, the register rows, the baseline description, the delivery contract and the Phase-G review those packages read; a green verdict needs the rework batch to apply the pack and a fresh snapshot to re-run. The provenance residual also remains open: the original charter, statement, contract, Phase-G review and closure review were never authored, and no active waiver exists.\n\n## Decision\n\nThe retrospective decision is to close T0 on the record the snapshot carries while stating both the red package state and the provenance residual, and to let the rework batch apply this content pack so the six packages can clear on a regenerated acceptance record. The decision level is compliant, as the Phase-G review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c records. It is dated 2026-11-26 and does not assert that the red manifest or the missing originals are repaired; it asserts that the record is honest about both and that the content the packages need is now authored."
+}

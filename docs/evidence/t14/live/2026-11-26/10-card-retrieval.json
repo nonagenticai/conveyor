@@ -1,0 +1,21 @@
+{
+  "archived_at": null,
+  "assignee_id": null,
+  "board_id": "01a1d3e7-aedf-7a3d-b14e-ee5133cfcfde",
+  "card_type_code": "incident",
+  "created_at": "2026-11-26T22:42:55.205426Z",
+  "description": "",
+  "due_at": null,
+  "due_done_at": null,
+  "id": "01a21a06-ae6c-7457-848e-68acaa5626ad",
+  "job_binding_id": null,
+  "list_changed_at": "2026-11-26T22:42:55.205426Z",
+  "list_id": "01a1d3e7-af77-7a06-93e6-3ca7ffeebe15",
+  "meta": {},
+  "name": "T14 live gate 2026-11-26 — retrieval",
+  "parent_card_id": null,
+  "position": 9216.0,
+  "prev_list_id": null,
+  "updated_at": "2026-11-26T22:42:55.205426Z",
+  "version": 1
+}

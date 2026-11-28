@@ -1,0 +1,1047 @@
+{
+ "charter": "# Charter — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n- **Project:** T9 'TOGAF ADM capability', SPEC_V2 slice T9 (docs/SPEC_V2.md §12), track v2, ADM phase G, capability plateau, project `01a1d039-0d35-7bd1-945d-cea12c5dfd6d`, tranche 4. The row is `status: closed`, version 15, created 2026-11-12T14:46:02Z and updated 2026-11-24T17:04:34Z, with `meta.measured_status: built`, `meta.plan_status: draft`, `meta.viability: rework`, `meta.reopen_reason: the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)`, `meta.reopened_at: 2026-11-24T16:57:39Z` and `meta.close_reason: the retrospective rework of T9`. The rework is carried under the standing retrospective delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`, which the row names as `meta.reopen_decision_ref`, and under the tranche-4 row `01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce`, authorised at 2026-11-24T17:04:34Z by the review `01a216d0-d634-738e-985a-00a85cfd48d9`.\n- **Mandate:** install the TOGAF ADM capability in the conveyor — the Preliminary phase (architecture principles, the tailored ADM profile, the artefact standard and repository, the Architecture Board, governance, and the maturity and skills assessments), the architecture project type, phases A–H with typed artefacts and contracts, and delivery-project compliance and waivers — so that the gate recorded in the project meta holds: an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata.\n- **Scope:** the capability described by the SPEC_V2 §12 T9 row and by the architecture row of the capability table, which places the ADM surface at `/design/adm` and expects `adm.spec.ts`; the Preliminary artefacts (the principles catalogue, the tailored ADM profile and the artefact standard), the typed artefact repository, the phase contract lifecycle, the compliance review and waiver path, and the board, governance, maturity and skills record. This retrospective authors the seven approved A–D artefacts (stakeholder map, driver/goal/objective catalog, requirements catalog, solution concept, business capability map, data entity/data component catalog and technology standards catalog), the charter, the Statement of Architecture Work, one delivery contract, one WBS deliverable and the Phase-G compliance review, plus the project-brief and evidence pages. Out of scope: re-running the capability's runtime acceptance, superseding the existing compliance reviews, and re-closing the project.\n- **Expected outputs:** the row's `meta.expected_outputs` — project-brief, inception-analysis, architecture-design, architecture-principles, adm-profile, artifact-standard, architecture-artifact, statement-of-architecture-work, compliance-review, waiver, maturity-assessment and skills-assessment — with the closure outputs evidence and closure-review. At the snapshot the record already publishes the architecture principles (`01a1f2dc-db53-7729-b0f1-686bcf81a1e4`), the tailored ADM profile (`01a1f2dd-0583-73fe-a8b5-7d1166116f4a`), the artefact standard (`01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa`), the principles catalogue artefact (`01a1f2dd-3623-701c-b0ba-169d83d7907a`), the Statement of Architecture Work (`01a1f2dd-5c13-73b9-845e-3f1673585e1e`), the compliance review (`01a1f360-3420-73f4-8f42-b636a32c29c1`), the waiver `Architecture waiver — the register at 2026-11-19` (`01a1f2e0-d72c-776e-b137-a48ad1560663`), the maturity assessment (`01a1f2dd-74a7-739d-96e9-edc665a7b847`) and the skills assessment (`01a1f2dd-99d8-74fa-9f71-b02b976b4521`), plus the retrospective project brief (`01a20280-9490-7278-88dc-af487c379f55`), the evidence page (`01a1f35f-1032-72bf-a2ee-4ee1a9375550`) and the closure review (`01a216d0-6740-7729-a155-8c3493856413`). This pack adds authored project-brief and evidence prose; it does not duplicate the published pages.\n- **What this retrospective does NOT attest:** it does not attest contemporaneous authorship or intent — the prose in this pack was written at the 2026-11-24 rework from the record, not when the capability was built. It re-closes T9 at 2026-11-24 on the record evidence — the seven approved artefacts, the live Statement of Architecture Work and delivery contract, the scope baseline and the three compliant reviews — and the closure review records that decision; the earlier closure review `01a216d0-6740-7729-a155-8c3493856413` remains part of the history. It does not re-run the capability's acceptance and does not supersede the three compliant reviews recorded against the superseded Statement of Architecture Work `01a1f2c2-0e1a-787f-9011-46b424d1ec71`, the live delivery contract `01a20280-25ea-759d-8f96-51980017b97e` and the live Statement of Architecture Work `01a2023e-4e59-75ad-b2ab-fd7d014511d2`. It does not attest a tranche-4 review of T9: the tranche row's reviews list is empty and its `review_at` is null, so no tranche-level decision on this project is in the record. Finally, it does not reconcile `meta.plan_status: draft` with `meta.measured_status: built`; that difference stays open and is carried in the evidence gap.",
+ "soaw": {
+  "title": "Statement of Architecture Work — T9 TOGAF ADM capability (retrospective, 2026-11-24)",
+  "body": {
+   "assignment": "Rework T9 (SPEC_V2 §12) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A–D artefacts for the TOGAF ADM capability, the charter, this Statement of Architecture Work, one delivery contract, one WBS deliverable and the Phase-G compliance review, and publish the project-brief and evidence pages, all under the standing retrospective delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The assignment is to make the record consistent and machine-checked, not to rebuild the capability.",
+   "scope": "The Preliminary phase record (the principles catalogue, the tailored ADM profile and the artefact standard), the typed artefact repository for phases A–D at plateaus psa and hld, the phase contract lifecycle (a live Statement of Architecture Work in phase a and a live delivery contract in phase f, with the superseded predecessor retained), the compliance review and waiver path, the scope baseline, and the published output set named by meta.expected_outputs. Out of scope: re-running the runtime acceptance of the `/design/adm` surface, superseding any of the three recorded compliance reviews, and re-closing the project.",
+   "responsibilities": {
+    "approver": "conveyor-approver (records the Phase-G level; the 2026-11-22 and 2026-11-24 reviews are recorded under this reviewer name)",
+    "architecture board": "conveyor-architecture-board (approves the artefact set and the phase contracts)",
+    "programme architect": "conveyor-e2e (owns the capability, the tailored ADM profile and this A–D artefact set)",
+    "delivery teams": "the tranche-4 projects S05, S07, S09, T10, T14, T16 and T4, held by the tranche exit criteria to live contracts and compliance reviews"
+   },
+   "acceptance_criteria": "The gate in the project meta is the acceptance: an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata. Against the record at the snapshot this means: the seven A–D artefacts 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80 and 01a2027f-e9b2-7af9-9758-acc4947a9122 are approved; the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are live; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken; and the three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record one level. The pack itself is accepted only when scripts/rework-content-check.py passes for T9; the runtime behaviour of the ADM surface is not part of this acceptance and is not evidenced here.",
+   "contract": "The governing contract record is the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2, approved under 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2 and re-issued 2026-11-22; its predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71 remains recorded as superseded. The phase-f delivery contract 01a20280-25ea-759d-8f96-51980017b97e is live. This retrospective re-issue publishes the authored content behind the record and re-closes T9 at 2026-11-24 on that record; the earlier closure review 01a216d0-6740-7729-a155-8c3493856413 remains part of the history.",
+   "retrospective": true
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — T9 TOGAF ADM capability (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Who is affected by the TOGAF ADM capability, what each needs from it, and how the rework engages them.",
+   "scope": "the Preliminary and A–H capability set, the artefact repository and phase contracts, the compliance and waiver path, and the tranche-4 governance around T9.",
+   "stakeholders": [
+    "the sponsoring group",
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme architect (conveyor-e2e)",
+    "the programme approver (conveyor-approver)",
+    "the tranche-4 delivery teams",
+    "the senior responsible owner",
+    "the seed and record maintainers",
+    "tenants and downstream readers",
+    "auditors and later reviewers"
+   ],
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-4 authorisation, the T9 gate and the decision to keep the record open under this rework",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Architecture Board (conveyor-architecture-board)",
+     "axis_b": "approves the phase artefact set and each phase contract; the board is named in the T9 capability row of SPEC_V2 §12",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "owns the capability, the tailored ADM profile and this seven-artefact A–D set",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Programme approver (conveyor-approver)",
+     "axis_b": "records the compliance level against the live contracts; the 2026-11-22 and 2026-11-24 reviews are recorded under this reviewer name",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Tranche-4 delivery teams",
+     "axis_b": "S05, S07, S09, T10, T14, T16 and T4 are held by the tranche exit criteria to live contracts and compliance reviews that T9 supplies",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Senior responsible owner",
+     "axis_b": "accountable for the tranche outcome that the exit criteria define over the eight tranche-4 projects including T9",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Seed and record maintainers",
+     "axis_b": "keep seed/output-standard.json, the artefact categories and the record writes consistent; scripts/rework-content-check.py refuses a pack before scripts/rework-project.py publishes it",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Tenants and downstream readers",
+     "axis_b": "read the published ADM pages and the artefact set; the architecture surface is `/design/adm` in SPEC_V2's capability table",
+     "value": {
+      "influence": "low",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Auditors and later reviewers",
+     "axis_b": "repeat the checks from the facts snapshot and the published outputs; the status precedence is GitHub issue state, then measured coverage, then plan frontmatter",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — T9 TOGAF ADM capability (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — T9 TOGAF ADM capability (Phase A)\n\n## Metadata\n\nType matrix; phase a; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders on the influence/interest/engagement axes. The sponsoring group decides the tranche and the record's disposition, the Architecture Board and the programme approver approve the artefacts and contracts, the programme architect is responsible, the tranche-4 delivery teams and the seed maintainers are consulted, and the senior responsible owner, tenants and later reviewers are accountable or informed. The delivery-team row names the eight tranche-4 projects the exit criteria bind: S05, S07, S09, T10, T14, T16, T4 and T9.\n\n## Links\n\nDerives from the SPEC_V2 §12 T9 row and the architecture row of the SPEC_V2 capability table (`/design/adm`, `adm.spec.ts`); realizes the Phase A stakeholder view for the ADM capability; reuses the programme roles already recorded in the conveyor buildout programme and the tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce.\n\n## Document\n\nThe artefact sits under the project's architecture set and the tranche-4 evidence folder; the published pages it depends on are the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa, the tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a and the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The drivers behind the ADM capability, the goal each serves and the objective the record installs.",
+   "scope": "typed artefacts, the phase gate and its refusal, contract states, the compliance level, waivers, the Phase H stopping rule, status precedence and the dated assessments.",
+   "stakeholders": [
+    "the sponsoring group",
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme architect (conveyor-e2e)",
+    "the programme approver (conveyor-approver)",
+    "the tranche-4 delivery teams"
+   ],
+   "entries": [
+    {
+     "axis_a": "D1 Architecture was carried in free-form documents with no typed artefact record",
+     "axis_b": "G1 One typed artefact standard and repository",
+     "value": {
+      "objective": "seed/output-standard.json fixes the categories and required headings; the seven A–D artefacts in this pack carry phase_code, plateau and artifact_kind and are approved in the record; the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the principles catalogue artefact 01a1f2dd-3623-701c-b0ba-169d83d7907a are the published standard."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 A phase gate expressed only as prose cannot refuse anything",
+     "axis_b": "G2 An executable refusal at the gate",
+     "value": {
+      "objective": "the gate in the project meta is the normative text; scripts/rework-content-check.py encodes the mechanical refusals — the seven artefacts in the adopted order, the required headings, the WSJF inputs and ids that must exist in the snapshot — and runs before any write by scripts/rework-project.py."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 A contract with no state cannot govern a phase",
+     "axis_b": "G3 Contracts carry a live or superseded state and an approval",
+     "value": {
+      "objective": "the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 is live and re-issued 2026-11-22 under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2; its predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71 is retained as superseded; the delivery contract 01a20280-25ea-759d-8f96-51980017b97e is live in phase f."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Compliance was asserted rather than recorded at one level",
+     "axis_b": "G4 One level per review",
+     "value": {
+      "objective": "the record holds three reviews — 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa — each level compliant; the six allowed levels are encoded in the checker and an unknown level is refused."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 A waiver without an owner and a review date is permanent",
+     "axis_b": "G5 Every waiver names an owner and a review date",
+     "value": {
+      "objective": "the published waiver 'Architecture waiver — the register at 2026-11-19' (01a1f2e0-d72c-776e-b137-a48ad1560663) records the register state; the gate makes the accepting owner and the reassessment date mandatory."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 A Phase H review that returns a list of changes has no stopping point",
+     "axis_b": "G6 Exactly one change or kata",
+     "value": {
+      "objective": "the gate clause fixes the H outcome to one change or kata, so an H review cannot silently expand into an unbounded backlog."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "D7 Project status drifted from plan status",
+     "axis_b": "G7 One stated precedence for status",
+     "value": {
+      "objective": "meta.status_source fixes the order: GitHub issue state, then measured coverage, then plan frontmatter. The row currently reads measured_status built and plan_status draft; this retrospective records that difference rather than resolving it."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "D8 Maturity and skills claims without a dated baseline cannot be compared",
+     "axis_b": "G8 Dated assessments with named dimensions",
+     "value": {
+      "objective": "the architecture maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847 and the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521 are published 2026-11-22 and give the next assessment a dated baseline."
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — T9 TOGAF ADM capability (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEight driver/goal/objective rows: typed artefacts and a repository, an executable gate refusal, the contract state machine, one compliance level, the waiver's owner and date, the Phase H stopping rule, the status precedence and the dated maturity and skills baselines. Each objective names a record id or a repository path that makes it checkable rather than aspirational.\n\n## Links\n\nDerives from the SPEC_V2 §12 T9 row, the gate recorded in the project meta and the capability table's architecture row; realizes the Phase A driver view; reuses the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a.\n\n## Document\n\nThe artefact sits under the project's architecture set; its objectives are exercised by the seven-artefact pack, the contract rows and the three review records, and they are checked mechanically by scripts/rework-content-check.py before publication."
+  },
+  {
+   "title": "Requirements Catalog — T9 TOGAF ADM capability (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The requirements the ADM gate and its record must satisfy, each tied to a record id or a named check.",
+   "scope": "the Preliminary and A–D artefacts, the live contracts, the compliance levels, the waiver, the Phase H rule, the scope baseline, the expected outputs and the status source.",
+   "stakeholders": [
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme approver (conveyor-approver)",
+    "the programme architect (conveyor-e2e)",
+    "the tranche-4 delivery teams",
+    "auditors and later reviewers"
+   ],
+   "entries": [
+    {
+     "axis_a": "R1 The Preliminary phase produces principles, a tailored ADM profile and the artefact standard",
+     "axis_b": "Three published pages, each under its own category",
+     "value": {
+      "priority": "must",
+      "acceptance": "the architecture principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, the tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a and the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa are published on 2026-11-22 under the categories architecture-principles, adm-profile and artifact-standard."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R2 The four Phase A artefacts are approved",
+     "axis_b": "Stakeholder map, driver/goal/objective catalog, requirements catalog and solution concept",
+     "value": {
+      "priority": "must",
+      "acceptance": "01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8 and 01a2027f-4e4b-72dc-88de-d3ae876995c3 all carry status approved at phase a and plateau psa."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R3 Phase A closes on a live contract",
+     "axis_b": "The Statement of Architecture Work is live and approved",
+     "value": {
+      "priority": "must",
+      "acceptance": "01a2023e-4e59-75ad-b2ab-fd7d014511d2 is status live, re-issued 2026-11-22, under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2; the superseded predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71 is retained, not deleted."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R4 Phases B, C and D each carry their mandatory artefact",
+     "axis_b": "Capability map, data entity catalog and technology standards catalog",
+     "value": {
+      "priority": "must",
+      "acceptance": "01a2027f-835a-7682-922b-a5ed89a1c39e (phase b, plateau hld, diagram), 01a2027f-b71a-753f-adec-3d7c8185de80 (phase c, hld, catalog) and 01a2027f-e9b2-7af9-9758-acc4947a9122 (phase d, hld, catalog) all carry status approved."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R5 A compliance review records exactly one level",
+     "axis_b": "The level is one of the six allowed values",
+     "value": {
+      "priority": "must",
+      "acceptance": "the three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record the single level compliant; the checker refuses any level outside irrelevant, consistent, compliant, conformant, fully_conformant and non_conformant."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R6 A waiver names its owner and review date",
+     "axis_b": "The register waiver is a governed record, not a note",
+     "value": {
+      "priority": "must",
+      "acceptance": "the published waiver 'Architecture waiver — the register at 2026-11-19' (01a1f2e0-d72c-776e-b137-a48ad1560663) is under the waiver category, and the gate requires the accepting owner and the reassessment date."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R7 A Phase H review produces exactly one change or kata",
+     "axis_b": "The H outcome is bounded",
+     "value": {
+      "priority": "must",
+      "acceptance": "the clause is part of the gate recorded in the project meta; an H review returning several changes would fail the gate and no such review is recorded for T9 in the facts."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R8 The project has a scope baseline",
+     "axis_b": "One baseline of kind scope",
+     "value": {
+      "priority": "must",
+      "acceptance": "01a20280-71de-7b06-9086-ae0158bfd36f is the single baseline, kind scope, taken 2026-11-22T09:05:00Z against the project."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R9 The expected outputs are published",
+     "axis_b": "The twelve expected categories and the two closure categories",
+     "value": {
+      "priority": "must",
+      "acceptance": "meta.expected_outputs names project-brief, inception-analysis, architecture-design, architecture-principles, adm-profile, artifact-standard, architecture-artifact, statement-of-architecture-work, compliance-review, waiver, maturity-assessment and skills-assessment, and meta.closure_outputs names evidence and closure-review; the facts list twenty-four published outputs covering them, including the project brief 01a20280-9490-7278-88dc-af487c379f55 and the evidence page 01a1f35f-1032-72bf-a2ee-4ee1a9375550."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R10 The project status is traceable",
+     "axis_b": "Issues and the stated status precedence",
+     "value": {
+      "priority": "must",
+      "acceptance": "the project meta names issues #81 'T9 — the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance' and #503 'programme: the seed records tranche 1 as authorised after the continue review', both CLOSED, and meta.status_source orders GitHub issue state before measured coverage and plan frontmatter."
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — T9 TOGAF ADM capability (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Requirements Catalog — T9 TOGAF ADM capability (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements: the Preliminary outputs, the four approved Phase A artefacts, the live Phase A contract, the three B–D artefacts, the single compliance level, the governed waiver, the bounded Phase H outcome, the scope baseline, the expected output set and the status source. Each requirement names the record id or the gate clause that satisfies or judges it.\n\n## Links\n\nDerives from the SPEC_V2 §12 T9 row, the gate in the project meta and the tranche-4 exit criteria; realizes the Phase A requirements view; reuses the artefact standard and the tailored ADM profile, and the three review records.\n\n## Document\n\nThe artefact sits under the project's architecture set; the requirements are checked against the facts snapshot by scripts/rework-content-check.py and published alongside the project brief and evidence pages."
+  },
+  {
+   "title": "Solution Concept Diagram — T9 TOGAF ADM capability (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The components and edges that carry the ADM capability's artefacts, contracts, reviews and publications.",
+   "scope": "the seed standard, the record tables, the check-and-publish scripts, the `/design/adm` surface, the artefact set, the contract lifecycle and the published outputs.",
+   "stakeholders": [
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme architect (conveyor-e2e)",
+    "the programme approver (conveyor-approver)",
+    "the seed and record maintainers",
+    "the tranche-4 delivery teams"
+   ],
+   "entries": [
+    {
+     "axis_a": "seed/output-standard.json",
+     "axis_b": "the category list and required headings",
+     "value": {
+      "kind": "component",
+      "note": "the categories architecture-artifact, project-brief, evidence and statement-of-architecture-work each carry required sections; the checker reads them before a write"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "scripts/rework-content-check.py",
+     "axis_b": "the offline refusal",
+     "value": {
+      "kind": "component",
+      "note": "refuses a mistyped key, the wrong artefact set, a missing required heading, a wrong WSJF input or an id absent from the snapshot"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "scripts/rework-project.py",
+     "axis_b": "the publisher",
+     "value": {
+      "kind": "component",
+      "note": "performs the live governance writes in a fixed order; this content pack is its input for T9"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "the architecture record",
+     "axis_b": "artefacts, contracts, reviews, waivers, baselines",
+     "value": {
+      "kind": "component",
+      "note": "seven approved artefacts, two SoAW rows and one delivery contract, three compliant reviews and one scope baseline"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "`/design/adm` surface",
+     "axis_b": "the ADM capability in SPEC_V2",
+     "value": {
+      "kind": "component",
+      "note": "the architecture row of the SPEC_V2 capability table names /design/adm for T9 and expects adm.spec.ts; this pack does not run it"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "the published output pages",
+     "axis_b": "twenty-four publications",
+     "value": {
+      "kind": "component",
+      "note": "from the inception analysis 01a1f2dc-89e9-77ae-9321-b57ad2e28d09 through the project WBS 01a216d0-bc27-74c5-9fd9-24c0001fb459, each under one category"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "the seven-artefact A–D set",
+     "axis_b": "matrix, catalog, catalog, diagram, diagram, catalog, catalog",
+     "value": {
+      "kind": "component",
+      "note": "this pack's ordered set; the checker selects it because T9's snapshot meta names track v2 rather than an architecture profile"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+     "axis_b": "the authorising tranche",
+     "value": {
+      "kind": "component",
+      "note": "state authorised at 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9; its exit criteria name T9"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "phase and plateau",
+     "axis_b": "mandatory artefacts",
+     "value": {
+      "kind": "edge",
+      "note": "the pair selects the required artefact set; a missing mandatory artefact is refused at the gate"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "contract",
+     "axis_b": "phase",
+     "value": {
+      "kind": "edge",
+      "note": "the Statement of Architecture Work holds phase a and the delivery contract holds phase f; live state is what the gate reads"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "compliance review",
+     "axis_b": "contract",
+     "value": {
+      "kind": "edge",
+      "note": "each review names its contract: 01a1f357-69eb-7716-811e-ce22ea93d496 the superseded SoAW, 01a20284-debf-7149-ba0d-d59c876255f7 the delivery contract and 01a216d0-f287-70f2-aa92-af02b9ce9daa the live SoAW"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f",
+     "axis_b": "project",
+     "value": {
+      "kind": "edge",
+      "note": "the baseline of kind scope taken 2026-11-22T09:05:00Z fixes what this rework is measured against"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "output page",
+     "axis_b": "category",
+     "value": {
+      "kind": "edge",
+      "note": "every publication carries one category; the project brief 01a20280-9490-7278-88dc-af487c379f55 and the evidence page 01a1f35f-1032-72bf-a2ee-4ee1a9375550 are the retrospective prose outputs"
+     },
+     "position": 13
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C)",
+     "kind": "realization"
+    },
+    {
+     "to": "Business Capability Map — T9 TOGAF ADM capability (Phase B)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Solution Concept Diagram — T9 TOGAF ADM capability (Phase A)\n\n## Metadata\n\nType diagram; phase a; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThirteen rows: eight components (the seed standard, the checker, the publisher, the architecture record, the `/design/adm` surface, the published pages, this artefact set and the tranche row) and five edges (phase to artefacts, contract to phase, review to contract, baseline to project, output to category). The diagram is deliberately split between the record that exists and the runtime surface that this pack does not exercise.\n\n## Links\n\nDerives from the SPEC_V2 §12 T9 row and the capability table's architecture row; realizes the Phase A solution concept; reuses the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the project-row gate.\n\n## Document\n\nThe artefact sits under the project's architecture set; the named scripts and the facts snapshot are its executable counterpart, and the published pages are its documentary counterpart."
+  },
+  {
+   "title": "Business Capability Map — T9 TOGAF ADM capability (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The capabilities the ADM project declares and how far each is evidenced at the rework snapshot.",
+   "scope": "the typed artefact repository, the phase-gated lifecycle, contracts, compliance and waivers, board and governance, maturity and skills, the architecture project type and the retrospective assembly.",
+   "stakeholders": [
+    "the sponsoring group",
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme architect (conveyor-e2e)",
+    "the tranche-4 delivery teams",
+    "tenants and downstream readers"
+   ],
+   "entries": [
+    {
+     "axis_a": "Typed artefact repository",
+     "axis_b": "seven approved A–D artefacts with phase, plateau and kind",
+     "value": {
+      "maturity": "approved in the record on 2026-11-22",
+      "evidence": "01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80 and 01a2027f-e9b2-7af9-9758-acc4947a9122, all status approved"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Phase-gated ADM lifecycle",
+     "axis_b": "Preliminary and A–H with mandatory artefacts per phase and plateau",
+     "value": {
+      "maturity": "declared by the gate in the project meta; exercised in the record by approved artefacts and live contracts",
+      "evidence": "meta.gate in the project row 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; no runtime run of the phase gates is in the facts"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Contract lifecycle",
+     "axis_b": "live and superseded states with approvals",
+     "value": {
+      "maturity": "live phase-a Statement of Architecture Work and live phase-f delivery contract; the predecessor is retained as superseded",
+      "evidence": "01a2023e-4e59-75ad-b2ab-fd7d014511d2 (live), 01a20280-25ea-759d-8f96-51980017b97e (live), 01a1f2c2-0e1a-787f-9011-46b424d1ec71 (superseded)"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Compliance review",
+     "axis_b": "one recorded level per delivery",
+     "value": {
+      "maturity": "three compliant reviews recorded",
+      "evidence": "01a1f357-69eb-7716-811e-ce22ea93d496 (2026-11-19), 01a20284-debf-7149-ba0d-d59c876255f7 (2026-11-22), 01a216d0-f287-70f2-aa92-af02b9ce9daa (2026-11-24)"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Waiver record",
+     "axis_b": "a named owner and reassessment date over the register",
+     "value": {
+      "maturity": "published waiver page; the register state is dated 2026-11-19",
+      "evidence": "01a1f2e0-d72c-776e-b137-a48ad1560663, category waiver"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Architecture Board and governance",
+     "axis_b": "the board that approves artefacts and contracts",
+     "value": {
+      "maturity": "declared in the SPEC_V2 §12 T9 row; no board minutes are in the facts",
+      "evidence": "the T9 row names the Architecture Board and governance; the programme approver role is recorded on the reviews"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Architecture maturity assessment",
+     "axis_b": "a dated baseline over the nine dimensions",
+     "value": {
+      "maturity": "published 2026-11-22T09:09:17Z",
+      "evidence": "01a1f2dd-74a7-739d-96e9-edc665a7b847"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Architecture skills assessment",
+     "axis_b": "proficiency by role against the seven categories",
+     "value": {
+      "maturity": "published 2026-11-22T09:09:42Z",
+      "evidence": "01a1f2dd-99d8-74fa-9f71-b02b976b4521"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Architecture project type",
+     "axis_b": "projects of this type run the phase-gated architecture lifecycle",
+     "value": {
+      "maturity": "declared built by meta.measured_status; the project row carries project_type_code it and plateau capability",
+      "evidence": "project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; SPEC_V2 §12 T9 row"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Retrospective record assembly",
+     "axis_b": "charter, SoAW, seven artefacts, contract, WBS, review, brief and evidence",
+     "value": {
+      "maturity": "this pack; the pack re-closes the project at 2026-11-24 on the record evidence, and the closure review carries the decision",
+      "evidence": "scripts/rework-content-check.py acceptance for T9; the delivery contract and review in this pack"
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — T9 TOGAF ADM capability (Phase B)\n\n## Metadata\n\nType diagram; phase b; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen capabilities. The record is strong on approved artefacts, live contracts, the baseline and the review levels; it is weaker on board minutes and on any measured run of the phase gates or the `/design/adm` surface. Each row states the maturity the snapshot supports rather than the maturity the project name suggests.\n\n## Links\n\nDerives from the Phase A requirements and solution concept and from the SPEC_V2 §12 T9 row; realizes the Phase B capability view; reuses the artefact standard, the tailored ADM profile and the published maturity and skills pages.\n\n## Document\n\nThe artefact sits under the project's architecture set and the tranche-4 evidence folder; the maturity column is the state at the 2026-11-24 rework snapshot, not a claim that the runtime acceptance passed."
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The record entities the ADM capability owns and the invariant each one carries.",
+   "scope": "the project row, its tranche, the seven artefacts, the three contracts, the reviews, the baseline and the published outputs.",
+   "stakeholders": [
+    "the programme architect (conveyor-e2e)",
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme approver (conveyor-approver)",
+    "the seed and record maintainers",
+    "auditors and later reviewers"
+   ],
+   "entries": [
+    {
+     "axis_a": "project",
+     "axis_b": "the T9 row",
+     "value": {
+      "owner": "programme record",
+      "table": "programme projects",
+      "note": "id 01a1d039-0d35-7bd1-945d-cea12c5dfd6d, key T9, status closed, version 15, created 2026-11-12T14:46:02Z, updated 2026-11-24T17:04:34Z; meta carries the gate, expected outputs and status source"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "tranche",
+     "axis_b": "tranche 4",
+     "value": {
+      "owner": "programme record",
+      "table": "programme tranches",
+      "note": "id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, state authorised at 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9; exit criteria name T9; reviews list empty"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "artefact 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67",
+     "axis_b": "Stakeholder Map — T9 TOGAF ADM capability (Phase A)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase a, plateau psa, kind matrix, status approved"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "artefact 01a2027e-e784-7a23-9098-ca96a7610047",
+     "axis_b": "Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase a, plateau psa, kind catalog, status approved"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "artefact 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8",
+     "axis_b": "Requirements Catalog — T9 TOGAF ADM capability (Phase A)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase a, plateau psa, kind catalog, status approved"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "artefact 01a2027f-4e4b-72dc-88de-d3ae876995c3",
+     "axis_b": "Solution Concept Diagram — T9 TOGAF ADM capability (Phase A)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase a, plateau psa, kind diagram, status approved"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "artefact 01a2027f-835a-7682-922b-a5ed89a1c39e",
+     "axis_b": "Business Capability Map — T9 TOGAF ADM capability (Phase B)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase b, plateau hld, kind diagram, status approved"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "artefact 01a2027f-b71a-753f-adec-3d7c8185de80",
+     "axis_b": "Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase c, plateau hld, kind catalog, status approved"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "artefact 01a2027f-e9b2-7af9-9758-acc4947a9122",
+     "axis_b": "Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)",
+     "value": {
+      "owner": "architecture record",
+      "table": "artefacts",
+      "note": "phase d, plateau hld, kind catalog, status approved"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "contract",
+     "axis_b": "the three contract rows",
+     "value": {
+      "owner": "architecture record",
+      "table": "contracts",
+      "note": "01a2023e-4e59-75ad-b2ab-fd7d014511d2 is the live Statement of Architecture Work, 01a1f2c2-0e1a-787f-9011-46b424d1ec71 its superseded predecessor and 01a20280-25ea-759d-8f96-51980017b97e the live phase-f delivery contract"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "compliance review",
+     "axis_b": "the three review rows",
+     "value": {
+      "owner": "architecture record",
+      "table": "compliance reviews",
+      "note": "01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa, each level compliant"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "baseline",
+     "axis_b": "the scope baseline",
+     "value": {
+      "owner": "programme record",
+      "table": "baselines",
+      "note": "01a20280-71de-7b06-9086-ae0158bfd36f, kind scope, taken 2026-11-22T09:05:00Z"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "output",
+     "axis_b": "the published pages",
+     "value": {
+      "owner": "document record",
+      "table": "documents",
+      "note": "twenty-four publications; the project brief 01a20280-9490-7278-88dc-af487c379f55, the evidence 01a1f35f-1032-72bf-a2ee-4ee1a9375550 and the closure review 01a216d0-6740-7729-a155-8c3493856413 are the latest project-scope pages"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "gate",
+     "axis_b": "the refusal rule",
+     "value": {
+      "owner": "project record",
+      "component": "meta.gate",
+      "note": "the six-clause gate text on the project row; scripts/rework-content-check.py encodes its mechanical parts"
+     },
+     "position": 14
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C)\n\n## Metadata\n\nType catalog; phase c; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen rows: the project, its tranche, the seven artefact records, the three contract rows, the three review rows, the scope baseline, the published output set and the gate. Each row names the record set that owns it and the invariant a reader can verify without re-deriving it.\n\n## Links\n\nDerives from the Phase A requirements and the Phase B capability map and from the facts snapshot generated from the record; realizes the Phase C data view; reuses the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a.\n\n## Document\n\nThe artefact sits under the project's architecture set; the record tables are the entity record and the facts snapshot is the verification surface, with scripts/rework-content-check.py refusing a pack whose ids are not in that snapshot."
+  },
+  {
+   "title": "Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The standards the ADM capability fixes for artefact typing, contract states, review levels, publication and status.",
+   "scope": "the seed standard, the record shapes, the checker's refusals, the status precedence, the publication categories, the WBS inputs and the route convention.",
+   "stakeholders": [
+    "the Architecture Board (conveyor-architecture-board)",
+    "the programme architect (conveyor-e2e)",
+    "the seed and record maintainers",
+    "the tranche-4 delivery teams",
+    "auditors and later reviewers"
+   ],
+   "entries": [
+    {
+     "axis_a": "Artefact typing",
+     "axis_b": "phase_code, plateau and artifact_kind select the mandatory set",
+     "value": {
+      "usage": "T9's snapshot meta names track v2 and no architecture profile, so the checker requires the seven A–D artefacts in the order matrix, catalog, catalog, diagram, diagram, catalog, catalog; the E–H architecture set applies only when a project names an architecture profile."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Required document sections",
+     "axis_b": "seed/output-standard.json is the heading standard",
+     "value": {
+      "usage": "an architecture-artifact body carries Metadata, Entries, Links and Document; a project-brief carries Outcome, Boundary, Reuse sources, Inception units, Dependencies, Acceptance, Capabilities and Plan; evidence carries Claim, Evidence, Verification, Links and Gap."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Contract states",
+     "axis_b": "live or superseded, with an approval and a phase",
+     "value": {
+      "usage": "the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 is live under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2 in phase a; the delivery contract 01a20280-25ea-759d-8f96-51980017b97e is live in phase f; the predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71 stays superseded rather than deleted."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Review levels",
+     "axis_b": "exactly one of six values",
+     "value": {
+      "usage": "irrelevant, consistent, compliant, conformant, fully_conformant and non_conformant; this pack records compliant, matching all three existing reviews, and the checker refuses any other spelling."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Refusal before write",
+     "axis_b": "the checker runs offline before the publisher",
+     "value": {
+      "usage": "scripts/rework-content-check.py reads the content, the snapshot, the WSJF inputs and the close flag, and exits non-zero before scripts/rework-project.py can write a half-formed record."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Snapshot traceability",
+     "axis_b": "every cited id must exist in the snapshot",
+     "value": {
+      "usage": "the facts file declares schema rework-facts/v1 and names its snapshot; the checker collects every id from that snapshot and refuses a UUID that appears nowhere in it, so authored prose cannot invent a record."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Status precedence",
+     "axis_b": "GitHub issue state, then measured coverage, then plan frontmatter",
+     "value": {
+      "usage": "meta.status_source is the standard; it explains why the row reads closed and measured_status built while plan_status remains draft, and this retrospective records the difference instead of overwriting it."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Publication categories",
+     "axis_b": "each page carries one category from the standard",
+     "value": {
+      "usage": "the twenty-four publications include architecture-principles, adm-profile, artifact-standard, architecture-artifact, statement-of-architecture-work, compliance-review, waiver, maturity-assessment, skills-assessment, project-brief and evidence; the evidence and closure-review categories are the closure outputs."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "WBS and WSJF inputs",
+     "axis_b": "the batch's PI plan fixes the four integers",
+     "value": {
+      "usage": "the T9 WBS deliverable carries business_value 10, time_criticality 13, risk_reduction 10 and job_size 8; the checker compares them to the values passed for the batch and refuses a drift."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Route convention",
+     "axis_b": "unversioned API routes and the `/design/adm` surface",
+     "value": {
+      "usage": "services use /api/<resource>, never /api/v1/<resource>; the ADM surface named for T9 in the SPEC_V2 capability table is /design/adm, verified by adm.spec.ts, and this pack does not add a second route."
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)\n\n## Metadata\n\nType catalog; phase d; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: artefact typing, required document sections, contract states, the six review levels, refusal before write, snapshot traceability, status precedence, publication categories, the WBS WSJF inputs and the route convention. Each standard names the file, the record id or the check that enforces it.\n\n## Links\n\nDerives from the Phase C data catalog, the gate in the project meta and the repository's current delivery rules; realizes the Phase D standards view; reuses seed/output-standard.json, the artefact standard page and the review records.\n\n## Document\n\nThe artefact sits under the project's architecture set; the standards are exercised by scripts/rework-content-check.py and the published pages, and the runtime `/design/adm` surface remains the named but unexercised system under test."
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "title": "The plan fragment and the measured status are never reconciled",
+    "code": "T9-R1",
+    "body": "The row records meta.plan_status: draft against meta.measured_status: built, and the plan path docs/SPEC_V2.md#12 is a draft fragment rather than a standalone plan file; the charter, the evidence Gap and the Phase-G review all carry that difference as open rather than resolved. A reader can therefore mistake the draft plan for an accepted one.",
+    "probability": "high",
+    "impact": 3,
+    "review_at": "2026-12-15",
+    "severity": "medium",
+    "status": "open",
+    "response": "reconcile the plan fragment with meta.measured_status at the next tranche-4 review and record the decision",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R10 The project status is traceable"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "title": "The phase gate's refusal is declared but has no measured runtime run",
+    "code": "T9-R2",
+    "body": "The gate in the project meta and the seven approved A–D artefacts are exercised in the record, but no runtime run of the /design/adm surface or of adm.spec.ts is in the facts, and the Business Capability Map records that no runtime run of the phase gates is recorded. A production phase could therefore pass a gate that has never refused anything outside this pack's checker.",
+    "probability": "medium",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "measure adm.spec.ts against /design/adm at the next tranche review and record the run as evidence",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R2 The four Phase A artefacts are approved",
+      "R4 Phases B, C and D each carry their mandatory artefact"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "title": "The plan path docs/SPEC_V2.md#12 is a draft fragment, not a standalone plan file",
+    "code": "T9-I1",
+    "body": "The plan fragment reports meta.plan_status: draft and is not a standalone plan file in the facts; docs/SPEC_V2.md section 12 is the only plan evidence for T9, so the record and the SPEC_V2 row must be read together. The closure review's open items and the evidence Gap carry the same finding.",
+    "severity": "medium",
+    "status": "open"
+   },
+   {
+    "title": "No tranche-level review of T9 is recorded",
+    "code": "T9-I2",
+    "body": "The tranche-4 row lists no reviews and its review_at is null, although its exit criteria name T9 among the eight tranche-4 projects. The charter, the Phase-G review and the closure review all record the absent tranche-level decision rather than inferring it.",
+    "status": "open"
+   },
+   {
+    "title": "No Architecture Board minutes are in the facts",
+    "code": "T9-I3",
+    "body": "The Architecture Board (conveyor-architecture-board) is declared in the SPEC_V2 section 12 T9 row and approves the artefact set and the phase contracts, but the facts hold no board minutes or attendance; the Business Capability Map states the governance is declared, not evidenced.",
+    "status": "open"
+   }
+  ],
+  "assumption": [
+   {
+    "title": "The three compliant reviews remain valid and are not superseded by this rework",
+    "code": "T9-A1",
+    "body": "The retrospective re-issues the authored content behind the record and re-closes T9 at 2026-11-24 without superseding the three compliant reviews recorded against the superseded and live contracts. The charter and the Statement of Architecture Work both state the limitation, so the rework assumes those levels still judge the contracts they name.",
+    "status": "held"
+   },
+   {
+    "title": "The 2026-11-24 facts snapshot is the authoritative record for T9",
+    "code": "T9-A2",
+    "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, project closed at version 15 and updated 2026-11-24T17:04:34Z; the checker refuses any id that appears nowhere in that snapshot, so the pack assumes the snapshot is complete and current for this project.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "title": "T9 is blocked by T1, T3 and P0",
+    "code": "T9-D1",
+    "body": "meta.depends_on names T1, T3 and P0, and SPEC_V2 section 12 states that T9 and T10 follow T1 and T3 and may run in parallel once T1 and T3 exist; the project brief carries the same blocked-by edge. The record closes T9 at version 15 with that dependency set as recorded.",
+    "status": "satisfied"
+   },
+   {
+    "title": "The tranche-4 exit criteria gate the tranche review on every project's published evidence",
+    "code": "T9-D2",
+    "body": "The project brief's acceptance-blocked-by edge holds T9 to the tranche-4 exit criteria: S05, S07, S09, T10, T14, T16, T4 and T9 must each meet its acceptance with published evidence before the review records continue, pause or stop. T9's own re-close is carried under that criterion.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "title": "A phase missing a mandatory artefact is refused, not discovered late",
+    "code": "T9-B1",
+    "body": "The gate in the project meta refuses a phase whose mandatory artefact set is incomplete, and the checker enforces the seven-artefact order before any write. An architecture phase therefore cannot silently close incomplete, which the record demonstrates with seven approved A–D artefacts and a live contract.",
+    "status": "realized"
+   },
+   {
+    "title": "A delivery project without a live contract is refused at design",
+    "code": "T9-B2",
+    "body": "The gate holds delivery projects to a live contract at design, and the record carries a live Statement of Architecture Work and a live phase-f delivery contract with its superseded predecessor retained. A delivery project therefore cannot start design against a contract that no longer governs it.",
+    "status": "realized"
+   },
+   {
+    "title": "One recorded compliance level and a dated waiver make governance auditable",
+    "code": "T9-B3",
+    "body": "The three reviews each record the single level compliant and the waiver names its owner and review date over the register state at 2026-11-19; the checker refuses any level outside the six standard values. A reader can audit the project's compliance without re-deriving it from prose.",
+    "status": "realized"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-24)",
+  "body": {
+   "commitments": "The contract commits T9 to installing the TOGAF ADM capability in conveyor: the Preliminary phase record of architecture principles, the tailored ADM profile, the artefact standard and repository, the Architecture Board and governance; the architecture project type; phases A-H with typed artefacts and contracts; and delivery-project compliance and waivers, so the gate refuses a missing artefact, a missing live contract or an unsupported compliance level.",
+   "compliance": "The Phase-G review records the level compliant under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14: the seven A-D artefacts are approved, the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are live, the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken, and three reviews each record the single level compliant. Fully conformant is not claimed because no runtime run of the /design/adm surface or adm.spec.ts is in the facts.",
+   "approval": "The seven A-D artefacts and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are approved by the Architecture Board (conveyor-architecture-board), and the Phase-G level is decided by conveyor-approver under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. No Architecture Board minutes and no tranche-level review of T9 are recorded, and the review carries that absence rather than inventing an approval.",
+   "capacity": "The TOGAF ADM capability of conveyor: the Preliminary phase record (architecture principles, tailored ADM profile, artefact standard and repository, Architecture Board and governance), the architecture project type, phases A–H with typed artefacts and contracts, and delivery-project compliance and waivers, so the gate in the project meta can refuse a missing artefact, a missing live contract or an unsupported compliance level.",
+   "acceptance": "The gate recorded in the project meta, judged against the record: the seven A–D artefacts (01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80 and 01a2027f-e9b2-7af9-9758-acc4947a9122) are approved; the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are live; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken; and the three reviews record one level each. Runtime acceptance of the `/design/adm` surface is outside this contract and is not claimed.",
+   "evidence": "The project brief, the evidence page and the record ids in this pack; the checker scripts/rework-content-check.py must print that the T9 content is consistent with the facts before scripts/rework-project.py publishes it. The published pages it relies on include the architecture principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa, the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1, the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663, the maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847 and the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521.",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "acceptance_at": "the record at the 2026-11-24 rework snapshot: project closed, version 15, updated 2026-11-24T17:04:34Z; tranche 4 authorised at 2026-11-24T17:04:34Z",
+   "retrospective": true
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The TOGAF ADM capability — typed artefacts, phase contracts, compliance and governance",
+  "business_value": 10,
+  "time_criticality": 13,
+  "risk_reduction": 10,
+  "job_size": 8
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for T9 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The record supports compliant rather than a stronger level: the project row 01a1d039-0d35-7bd1-945d-cea12c5dfd6d holds the gate and the expected outputs, the seven A–D artefacts are approved, the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are live, the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken, and three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record the single level compliant. The project is closed (version 15, updated 2026-11-24T17:04:34Z) and the rework is authorised by the tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, authorised at 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9. It does not support fully_conformant: no runtime run of the `/design/adm` surface or of adm.spec.ts is in the facts, the plan fragment docs/SPEC_V2.md#12 is status draft and not a standalone plan file, the tranche row's reviews list is empty with review_at null, and no Architecture Board minutes are recorded. It equally does not support non_conformant: no review records an unmet clause, and the gate's artefact, contract, baseline and level conditions are all satisfied in the record. The pack supplies the charter, this Statement of Architecture Work, the seven artefacts, the delivery contract, the WBS deliverable, this review, the closure and the closure review; the re-close decision is recorded in the closure review at 2026-11-24 on this record evidence, and the earlier closure review 01a216d0-6740-7729-a155-8c3493856413 remains in the history. The open items are the draft plan, the absent tranche-level review of T9 and the unmeasured runtime; they are carried in the evidence gap, not converted into a waiver or a fail.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "contracts": [
+    "01a2023e-4e59-75ad-b2ab-fd7d014511d2",
+    "01a20280-25ea-759d-8f96-51980017b97e",
+    "01a1f2c2-0e1a-787f-9011-46b424d1ec71"
+   ],
+   "reviews": [
+    "01a1f357-69eb-7716-811e-ce22ea93d496",
+    "01a20284-debf-7149-ba0d-d59c876255f7",
+    "01a216d0-f287-70f2-aa92-af02b9ce9daa"
+   ],
+   "baseline": "01a20280-71de-7b06-9086-ae0158bfd36f",
+   "tranche": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+   "closure_record": "01a216d0-6740-7729-a155-8c3493856413"
+  }
+ },
+ "project_brief_output": "# Project brief — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Outcome\n\nT9 makes architecture a governed capability of the conveyor: typed artefacts selected by phase and plateau, a live contract per phase, compliance reviews that record one level, waivers that name their owner and reassessment date, the Architecture Board and governance, and dated maturity and skills baselines. The outcome is true when the gate in the project meta holds — an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live, a missing mandatory artefact is refused, a delivery project without a live contract is refused at design, and a Phase H review produces exactly one change or kata. The record claims the capability built (`meta.measured_status: built`); this retrospective republishes the authored lifecycle record and re-closes T9 at 2026-11-24 on that record evidence.\n\n## Boundary\n\nOut of scope: re-running the runtime acceptance of the `/design/adm` surface, superseding any of the three recorded compliance reviews, and re-closing T9. The project must not fork the artefact standard into a second repository, invent a parallel status source, or turn the superseded Statement of Architecture Work 01a1f2c2-0e1a-787f-9011-46b424d1ec71 into a live contract again; the record's live/superseded states are the boundary.\n\n## Reuse sources\n\n- `docs/SPEC_V2.md` §12, the T9 row: the Preliminary phase set, the architecture project type, phases A–H, delivery-project compliance and waivers, and the gate text echoed in the project meta.\n- The architecture row of the SPEC_V2 capability table: the ADM surface at `/design/adm`, verified by `adm.spec.ts`.\n- `seed/output-standard.json`: the publication categories and the required sections for architecture-artifact, project-brief, evidence and statement-of-architecture-work.\n- The Preliminary publications: architecture principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a, artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the principles catalogue artefact 01a1f2dd-3623-701c-b0ba-169d83d7907a.\n- The governance record: the SoAW pages 01a1f2dd-5c13-73b9-845e-3f1673585e1e and 01a2023e-4e59-75ad-b2ab-fd7d014511d2, the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1, the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663, the maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847 and the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521.\n- The tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce and its authorising review 01a216d0-d634-738e-985a-00a85cfd48d9.\n\n## Inception units\n\nThe inception base is the record itself, not a separate inception document: the project row holds seven approved artefacts, three contracts, three compliant reviews, one scope baseline and twenty-four published outputs, with `meta.measured_status: built`, `meta.plan_status: draft`, `meta.viability: rework` and `meta.tranche: 4`. The plan path `docs/SPEC_V2.md#12` resolves to a draft fragment rather than a standalone plan file, so the retrospective reads the record and the SPEC_V2 row together and records the difference instead of inventing plan sections.\n\n## Dependencies\n\n- blocked-by: T1, T3 and P0, the three keys named in `meta.depends_on`.\n- sequencing: SPEC_V2 §12 states that T9 and T10 follow T1 and T3 and may run in parallel once T1 and T3 exist.\n- acceptance-blocked-by: the tranche-4 exit criteria, which require every project in tranche 4 — S05, S07, S09, T10, T14, T16, T4 and T9 — to meet its acceptance with published evidence before the review records continue, pause or stop.\n- blocks: the delivery projects that need a live contract and a compliance review before design and delivery, because T9 is where that obligation is defined.\n\n## Acceptance\n\nThe acceptance is the gate in the project meta, read against the record: seven A–D artefacts approved (01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80, 01a2027f-e9b2-7af9-9758-acc4947a9122); the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e live; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f taken 2026-11-22T09:05:00Z; and one recorded level per review. `python3 scripts/rework-content-check.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --snapshot <snapshot> --wsjf 10,13,10,8 --closes false` is the local acceptance of this pack. Runtime acceptance of `/design/adm` is not claimed.\n\n## Capabilities\n\nThe capabilities T9 declares are the typed artefact repository, the phase-gated ADM lifecycle, the contract lifecycle, compliance review and waiver, the Architecture Board and governance, the maturity assessment, the skills assessment, the architecture project type and the retrospective record assembly. Maturity at the snapshot: the artefacts and contracts are approved and live, the three reviews are compliant, the maturity and skills assessments are published, the board and governance are declared in the T9 row but have no minutes in the facts, and no runtime run of the phase gates is recorded.\n\n## Plan\n\nHeld to `docs/SPEC_V2.md` §12 (the T9 row) and the gate it records in the project meta. The plan fragment reports `meta.plan_status: draft` and does not exist as a standalone plan file in the facts; the project row is `status: closed` at version 15 and the rework is carried under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce. This retrospective publishes the project brief, the evidence, the seven artefacts, the SoAW, the contract, the WBS, the Phase-G review, the closure and the closure review; the re-close is dated 2026-11-24 and rests on the record evidence.\n",
+ "evidence_output": "# Evidence — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Claim\n\nT9 is the TOGAF ADM capability of the conveyor — Preliminary artefacts, the architecture project type, phases A–H with typed artefacts and contracts, and delivery-project compliance and waivers — and the record holds seven approved A–D artefacts, a live Statement of Architecture Work, a live delivery contract, a scope baseline and three compliant reviews. This retrospective republishes the authored lifecycle content at the level compliant and re-closes T9 at 2026-11-24 on that record evidence.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d35-7bd1-945d-cea12c5dfd6d, key T9, name TOGAF ADM capability, `status: closed`, version 15, created 2026-11-12T14:46:02Z, updated 2026-11-24T17:04:34Z; meta `adm_phase: G`, `plateau: capability`, `track: v2`, `tranche: 4`, `viability: rework`, `measured_status: built`, `plan_status: draft`, `plan: docs/SPEC_V2.md#12`, `depends_on: [T1, T3, P0]`, `expected_outputs` twelve categories, `closure_outputs: [evidence, closure-review]` and the gate text.\n- **Artefacts:** seven approved records — 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67 (matrix), 01a2027e-e784-7a23-9098-ca96a7610047 (catalog), 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8 (catalog), 01a2027f-4e4b-72dc-88de-d3ae876995c3 (diagram), 01a2027f-835a-7682-922b-a5ed89a1c39e (diagram), 01a2027f-b71a-753f-adec-3d7c8185de80 (catalog) and 01a2027f-e9b2-7af9-9758-acc4947a9122 (catalog), covering phases a–d at plateaus psa and hld.\n- **Contracts:** the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2, re-issued 2026-11-22 under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2; its superseded predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71; and the live phase-f delivery contract 01a20280-25ea-759d-8f96-51980017b97e.\n- **Reviews:** 01a1f357-69eb-7716-811e-ce22ea93d496 (2026-11-19, against the superseded SoAW), 01a20284-debf-7149-ba0d-d59c876255f7 (2026-11-22, against the delivery contract) and 01a216d0-f287-70f2-aa92-af02b9ce9daa (2026-11-24, against the live SoAW), each level compliant.\n- **Baseline:** 01a20280-71de-7b06-9086-ae0158bfd36f, kind scope, taken 2026-11-22T09:05:00Z.\n- **Tranche:** tranche 4, 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, authorised at 2026-11-24T17:04:34Z by review 01a216d0-d634-738e-985a-00a85cfd48d9; its exit criteria name T9 among the eight tranche-4 projects and its own reviews list is empty.\n- **Publications:** twenty-four outputs, including the project brief 01a20280-9490-7278-88dc-af487c379f55, the evidence page 01a1f35f-1032-72bf-a2ee-4ee1a9375550, the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1, the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663, the maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847, the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521 and the closure review 01a216d0-6740-7729-a155-8c3493856413.\n- **Issues:** #81 'T9 — the TOGAF ADM capability: artefacts, phases, contracts, compliance and governance' is CLOSED and #503 'programme: the seed records tranche 1 as authorised after the continue review' is CLOSED.\n\n## Verification\n\nAn independent reader repeats the record checks from the facts snapshot: confirm the project row's status, version, meta and gate; confirm the seven artefact ids carry phase a–d, plateaus psa/hld, the kinds matrix, catalog, catalog, diagram, diagram, catalog, catalog and status approved; confirm the three contracts' states and the three reviews' single level; confirm the baseline's kind and timestamp; and confirm the published categories. The pack itself is verified by `python3 scripts/rework-content-check.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --snapshot <snapshot> --wsjf 10,13,10,8 --closes false`, which must print `rework-content-check: T9 content is consistent with the facts` before `scripts/rework-project.py` is allowed to publish it. Runtime verification of the `/design/adm` surface through `adm.spec.ts` is named in the SPEC_V2 capability table and is not performed or claimed by this pack.\n\n## Links\n\n- Project: 01a1d039-0d35-7bd1-945d-cea12c5dfd6d\n- Plan: `docs/SPEC_V2.md` §12 (T9 row) and the capability table's architecture row (`/design/adm`, `adm.spec.ts`)\n- Tranche 4: 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; authorising review: 01a216d0-d634-738e-985a-00a85cfd48d9\n- Live Statement of Architecture Work: 01a2023e-4e59-75ad-b2ab-fd7d014511d2; superseded predecessor: 01a1f2c2-0e1a-787f-9011-46b424d1ec71\n- Live delivery contract: 01a20280-25ea-759d-8f96-51980017b97e\n- Scope baseline: 01a20280-71de-7b06-9086-ae0158bfd36f\n- Compliance reviews: 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7, 01a216d0-f287-70f2-aa92-af02b9ce9daa\n- Project brief: 01a20280-9490-7278-88dc-af487c379f55; evidence: 01a1f35f-1032-72bf-a2ee-4ee1a9375550; closure review: 01a216d0-6740-7729-a155-8c3493856413\n- Standing delegation: 01a1ff1f-e4ba-72dc-9c1a-13049933cf14\n\n## Gap\n\n- No runtime run of the `/design/adm` surface or of `adm.spec.ts` is in the facts; the capability is declared built (`meta.measured_status: built`) but its runtime behaviour is not evidenced by this pack.\n- The plan path `docs/SPEC_V2.md#12` is a draft fragment and not a standalone plan file in the facts (`plan.exists: false`, `plan_status: draft`), so the record and the SPEC_V2 row are the only plan evidence.\n- The tranche-4 row's reviews list is empty and its `review_at` is null; no tranche-level review of T9 is in the record, although the exit criteria name T9.\n- The Architecture Board and governance are declared in the SPEC_V2 T9 row but no board minutes or attendance are in the facts.\n- This retrospective does not attest contemporaneous authorship; the authored prose was written at the 2026-11-24 rework.\n- This pack re-closes T9 at 2026-11-24 on the record evidence; the earlier closure review 01a216d0-6740-7729-a155-8c3493856413 remains in the history, and the re-close does not attest the runtime acceptance or a tranche-level review.\n",
+ "closure": "# Closure — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\nT9 re-closes at 2026-11-24 as the retrospective rework of tranche 4 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, on the record it leaves behind: seven approved A–D artefacts, a live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and a live delivery contract 01a20280-25ea-759d-8f96-51980017b97e, one scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f and three compliant reviews. The capability is the TOGAF ADM capability of the conveyor — the Preliminary artefacts, the architecture project type, phases A–H with typed artefacts and contracts, and delivery-project compliance and waivers. The closure is retrospective: it attests the record at the 2026-11-24 snapshot, not contemporaneous intent, and it does not attest a runtime run of the `/design/adm` surface.",
+ "closure_review": "# Closure review — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Outcome vs acceptance\n\nThe gate in the project meta is the acceptance. Each clause is met in the record: the seven A–D artefacts 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80 and 01a2027f-e9b2-7af9-9758-acc4947a9122 are approved at their phase and plateau; the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 is live with its superseded predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71 retained; the delivery contract 01a20280-25ea-759d-8f96-51980017b97e is live in phase f; the three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa record one level each; and the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663 names the register state at 2026-11-19. The runtime clause — the `/design/adm` surface verified by `adm.spec.ts` — is outside this acceptance.\n\n## Evidence\n\nThe evidence is the record: the project row 01a1d039-0d35-7bd1-945d-cea12c5dfd6d (status closed, version 15, updated 2026-11-24T17:04:34Z); the seven approved artefacts with their kinds and plateaus; the three contract rows and their states; the three compliant review rows; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f taken 2026-11-22T09:05:00Z; the twenty-four published outputs including the project brief 01a20280-9490-7278-88dc-af487c379f55, the evidence page 01a1f35f-1032-72bf-a2ee-4ee1a9375550, the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1, the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663, the maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847 and the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521; the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce under review 01a216d0-d634-738e-985a-00a85cfd48d9; and issues #81 and #503, both CLOSED.\n\n## Open items\n\n- The plan path `docs/SPEC_V2.md#12` is a draft fragment and not a standalone plan file; the programme architect role carries reconciling it with `meta.measured_status: built`.\n- The tranche-4 row's reviews list is empty and `review_at` is null; the tranche review carries the outstanding tranche-level decision on T9.\n- The `/design/adm` surface and `adm.spec.ts` have no recorded run in the facts; the next runtime measurement carries that evidence.\n- The Architecture Board and governance are declared in the SPEC_V2 §12 T9 row but no minutes are in the facts; the board role carries recording them.\n- The runtime and plan gaps are carried as open items, not waived and not converted into a fail.\n\n## Decision\n\nClose T9 at 2026-11-24 as a retrospective re-close under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, at the compliance level compliant recorded in the Phase-G review, on the record evidence above. The earlier closure review 01a216d0-6740-7729-a155-8c3493856413 remains in the history. The decision does not attest contemporaneous intent, does not re-run the acceptance and does not supersede any recorded review; the open items above stay owned and dated to the next tranche review.",
+ "inception_analysis_output": "# Inception analysis — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Current state\n\nAt the 2026-11-24 snapshot the TOGAF ADM capability is record, not greenfield. Project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d (T9) is closed at version 15 with `meta.measured_status: built`, `meta.plan_status: draft` and `meta.viability: rework`, and it carries seven approved A–D artefacts, three contract rows, three compliant reviews, the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f and twenty-four published outputs. The typed repository is already held by `crates/api/tests/architecture_artifacts.rs::a_catalog_is_queryable_rows`, `::an_approved_artefact_is_immutable` and `::reuse_is_searchable_across_plateaus`, and the tailored profile by `crates/api/tests/architecture_capability.rs::the_profile_names_the_mandatory_set`. What the pack lacks is authored prose for five of the twelve declared output categories; this retrospective supplies the inception analysis, architecture design, principles, tailored profile and artefact standard from those rows.\n\n## Reuse sources\n\nReuse inside the repository comes first: the seven approved artefacts (Stakeholder Map 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, Driver/Goal/Objective Catalog 01a2027e-e784-7a23-9098-ca96a7610047, Requirements Catalog 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, Solution Concept Diagram 01a2027f-4e4b-72dc-88de-d3ae876995c3, Business Capability Map 01a2027f-835a-7682-922b-a5ed89a1c39e, Data Entity/Data Component Catalog 01a2027f-b71a-753f-adec-3d7c8185de80 and Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122) answer whether the prose can cite existing rows instead of minting new ones. The Preliminary publications — principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, tailored profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a and artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa — answer which rules are already adopted, so the pack must restate them in substance rather than invent alternatives. The rulebook `seed/output-standard.json` answers which sections each category requires. The live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2, the delivery contract 01a20280-25ea-759d-8f96-51980017b97e, the scope baseline and the three compliant reviews answer what evidence fixes the acceptance.\n\n## Build vs reuse\n\nThe decision per candidate is to reuse the record and build only the missing documents. The record's artefact, contract, review, baseline and publication ids are reused verbatim; no artefact row is re-created and no UUID is minted, because the checker refuses an id that appears nowhere in the snapshot. The section structure is reused from `seed/output-standard.json` rather than invented. The proof is reused from the existing `architecture_artifacts.rs` and `architecture_capability.rs` tests rather than re-derived, and runtime acceptance of the `/design/adm` surface through `adm.spec.ts` stays unclaimed. The boundary is explicit: no second artefact repository, no parallel status source (precedence is GitHub issue state, then measured coverage, then plan frontmatter), and no revival of the superseded SoAW 01a1f2c2-0e1a-787f-9011-46b424d1ec71. The constraint is the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce.\n\n## Risks\n\nThe risk register carries T9-R1 (medium, review 2026-12-15, owner the programme architect conveyor-e2e): `meta.plan_status: draft` against `meta.measured_status: built` is never reconciled, and `docs/SPEC_V2.md#12` is a draft fragment rather than a standalone plan file. T9-R2 (high, review 2026-12-15, same owner) is that the phase gate's refusal is declared but has no measured runtime run of `/design/adm` or `adm.spec.ts`, so the refusals are proven only by record rows and tests. A third exposure is grounded in the tranche row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce: its reviews list is empty and its `review_at` is null, so no tranche-level decision on T9 exists, and the Architecture Board's charter is recorded but no minutes are in the facts.\n",
+ "architecture_design_output": "# Architecture design — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Context and boundary\n\nThis design owns the ADM capability inside conveyor: typed artefacts selected by phase and plateau, the phase contract lifecycle, compliance reviews and waivers, the Architecture Board and governance, and dated maturity and skills baselines, with the surface declared at `/design/adm` in the SPEC_V2 capability table and expected `adm.spec.ts`. It must not duplicate the artefact standard into a second repository, must not invent a parallel status source (the precedence is GitHub issue state, then measured coverage, then plan frontmatter), and must not revive the superseded SoAW 01a1f2c2-0e1a-787f-9011-46b424d1ec71. It fits the blueprint as the architecture row over the `architecture_artifact`, contract, review and baseline tables, with the seven approved A–D artefacts as its Phase A–D evidence and the live SoAW 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and delivery contract 01a20280-25ea-759d-8f96-51980017b97e as its live phase contracts.\n\n## Aggregates, tables and actions\n\nThe aggregates are `architecture_artifact`, the typed parent whose `artifact_kind` is catalog, matrix or diagram, whose phase is a–h, whose plateau is psa or hld, and whose entries are `architecture_artifact_entry` rows carrying axis_a, axis_b, value and position; an approved artefact is immutable and a supersede writes version 2. The contract aggregate carries kind statement_of_architecture_work (Phase A) or delivery_contract (Phase F) with a live or superseded state, keeping supersession as an edge. The review aggregate records exactly one level, the baseline aggregate holds the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f, and the register aggregate holds risk, issue, assumption, dependency and benefit rows. The actions are `architecture.artifacts_list`, `architecture.artifacts_create`, `architecture.artifacts_entries` and `architecture.artifacts_link`, plus the contract, review and publication actions; every table is tenant-scoped on PostgreSQL 18 with ENABLE and FORCE ROW LEVEL SECURITY, and the invariants are proven by `a_catalog_is_queryable_rows`, `an_approved_artefact_is_immutable` and `reuse_is_searchable_across_plateaus` in `crates/api/tests/architecture_artifacts.rs`.\n\n## Decisions\n\nThe first decision is typed artefact rows over a document library: a library cannot be queried, gated or reused across plateaus, so every artefact names kind, phase, plateau, owner, reviewer, version and the document or contract it sits under. The profile row 01a1f2c1-14c1-74c5-a078-eef117c4f82c records the board decision that adopted the profile and the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa, and the principles catalogue 01a1f2dc-db53-7729-b0f1-686bcf81a1e4 records the adopted principles. The second is a gate that closes only on the approved mandatory set plus a live contract: a draft artefact therefore refuses the advance and names the artefact, and a contract change re-opens the gate. The third is one compliance level per review and a waiver that names its owner and review date, with the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663 carrying both. The fourth is that a Phase H review produces exactly one change or kata, giving the review a stopping point. The retrospective re-close itself is decided in the closure review 01a216d0-6740-7729-a155-8c3493856413.\n\n## Acceptance\n\nThe acceptance is the gate in the project meta, judged against the record: the seven A–D artefacts 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80 and 01a2027f-e9b2-7af9-9758-acc4947a9122 are approved; the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e are live; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken; and each of the three reviews records one level, compliant. The scenarios are the meta gate's own: a phase missing a mandatory artefact is refused, a delivery project without a live contract is refused at design, a waiver names its owner and review date, and an H review yields one change or kata. The pack's check is `python3 scripts/rework-content-check.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --snapshot <snapshot> --wsjf 10,13,10,8 --closes false`. Verify: `adm.spec.ts` on `/design/adm` is named by SPEC_V2 and is not run by this pack, so runtime acceptance is not claimed.\n\n## Architecture artefacts\n\nThe seven typed artefacts this design produces cover phases A–D at plateaus psa and hld. The Stakeholder Map 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67 is a matrix at Phase A on psa; the Driver/Goal/Objective Catalog 01a2027e-e784-7a23-9098-ca96a7610047, the Requirements Catalog 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8 and the Solution Concept Diagram 01a2027f-4e4b-72dc-88de-d3ae876995c3 are the remaining Phase A psa artefacts, the last as a diagram; the Business Capability Map 01a2027f-835a-7682-922b-a5ed89a1c39e is a diagram at Phase B on hld; the Data Entity/Data Component Catalog 01a2027f-b71a-753f-adec-3d7c8185de80 is a catalog at Phase C on hld; and the Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122 is a catalog at Phase D on hld. They sit over the Preliminary publications — the principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, the profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a, the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the principles catalogue 01a1f2dd-3623-701c-b0ba-169d83d7907a — and their entries are queryable rows, with one declared edge: the Stakeholder Map depends on the Business Capability Map.\n",
+ "architecture_principles_output": "# Architecture principles — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Principles\n\n**P1 — Artefacts are typed rows, not documents in a library.** Rationale: a document cannot be queried, gated or reused across plateaus. Implications: every artefact declares kind catalog, matrix or diagram, its phase and plateau, owner, reviewer, version and the document or contract it sits under; an approved artefact is immutable and a supersede writes version 2, proven by `an_approved_artefact_is_immutable`.\n\n**P2 — A phase closes on its approved mandatory set and a live contract.** Rationale: a gate expressed only as prose refuses nothing. Implications: a draft artefact refuses the phase advance and names the missing artefact; a contract change re-opens the gate; a delivery project without a live contract is refused at design.\n\n**P3 — A compliance review records exactly one level.** Rationale: two levels in one review cannot be compared or trended. Implications: each review records one of irrelevant, consistent, compliant, conformant, fully_conformant or non_conformant, and T9's three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record compliant.\n\n**P4 — A waiver names its owner and its review date.** Rationale: a waiver without either is permanent. Implications: the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663 carries both, and the Architecture Board accepts or rejects it without waiving a deviation it owns.\n\n**P5 — A Phase H review produces exactly one change or kata.** Rationale: a review that returns an open-ended list has no stopping point. Implications: the H review closes on a single output and a second round needs its own review.\n\n**P6 — Status is read by precedence: GitHub issue state, then measured coverage, then plan frontmatter.** Rationale: T9's draft plan and built measurement disagree, and a reader must not mistake the draft plan for an accepted one. Implications: the record reports the project closed and measured built while carrying the draft plan as an open evidence gap, not as a resolved status.\n\n**P7 — Every new table is tenant-scoped with ENABLE and FORCE ROW LEVEL SECURITY.** Rationale: artefact and link visibility must be per tenant. Implications: PostgreSQL 18 is the fixed platform in the Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122, and v1-p81-5 records that artefacts and links are not yet fully consistent.\n\n## Approval\n\nThe Architecture Board conveyor-architecture-board, row 01a1f2c0-b22a-7e27-a6cc-1a8e48db327e, adopted the principles: its decision limits list principles_catalog, adm_profile, architecture_contract and architecture_waiver as approvable, set quorum at the chair, and forbid it from approving a gate it requested or waiving a deviation it owns. The profile row 01a1f2c1-14c1-74c5-a078-eef117c4f82c records adoption at 2026-11-19T07:50:26Z, citing its board decision, status adopted, version 3, and the principles catalogue is published as 01a1f2dc-db53-7729-b0f1-686bcf81a1e4. The board charter says it meets at each tranche review and on a contract request; no minutes are in the facts, so this approval cites the decision id, the adopted profile and the published catalogue rather than an attendance record.\n\n## Application\n\nA deviation is detected at two places. The phase gate compares the approved mandatory set for the phase and plateau against the record and refuses an advance on a missing or draft artefact; the compliance review records one level against a live contract. The waiver path handles an accepted deviation: 01a1f2e0-d72c-776e-b137-a48ad1560663 names its owner and review date, and the board accepts or rejects it. The three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record compliant, so no deviation is open. Unresolved differences are carried as risk rather than converted into a waiver or a fail: T9-R1 (plan against measured status, review date 2026-12-15) and T9-R2 (the gate's runtime unmeasured, review date 2026-12-15), both owned by the programme architect conveyor-e2e.\n",
+ "adm_profile_output": "# Tailored ADM profile — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Phases\n\nThe adopted profile conveyor-software-delivery, row 01a1f2c1-14c1-74c5-a078-eef117c4f82c, runs the phases preliminary, a, b, c, d, e, f, g and h in that order for conveyor software delivery; it is status adopted, version 3, adopted 2026-11-19T07:50:26Z. T9 itself is recorded at `meta.adm_phase: G` on the capability plateau, so the project sits in the governance phase over a capability whose record already carries the Preliminary material, the A–D artefact set and live Phase-A and Phase-F contracts. The order is the gate order: a phase cannot advance before the previous phase's mandatory set is approved and its contract is live.\n\n## Artefacts by phase and plateau\n\nThe profile's `artifact_requirements` name the mandatory set per phase and plateau. Preliminary at psa requires principles_catalog, principle_derivation and principle_realization; Phase A at psa requires stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept; Phase B at hld requires business_capability_map; Phase C at hld requires data_entity_catalog; and Phase D at hld requires technology_standards. The three plateaus are project start (psa), high-level design (hld) and solution design. The record matches these requirements: the Stakeholder Map 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, Driver/Goal/Objective Catalog 01a2027e-e784-7a23-9098-ca96a7610047, Requirements Catalog 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8 and Solution Concept Diagram 01a2027f-4e4b-72dc-88de-d3ae876995c3 at A/psa; the Business Capability Map 01a2027f-835a-7682-922b-a5ed89a1c39e at B/hld; the Data Entity/Data Component Catalog 01a2027f-b71a-753f-adec-3d7c8185de80 at C/hld; and the Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122 at D/hld. Phases E–H carry no mandatory artefact set in this profile; they close on their contract kinds.\n\n## Contracts\n\nThe profile's `contract_kinds` bind each closing phase to one contract kind: Phase A closes on a statement_of_architecture_work, Phase F on a delivery_contract, Phase G on a statement_of_intent and Phase H on a request_for_architecture. In the record, the live Phase-A Statement of Architecture Work is 01a2023e-4e59-75ad-b2ab-fd7d014511d2, approved 2026-11-22 under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2 and superseding 01a1f2c2-0e1a-787f-9011-46b424d1ec71; the live Phase-F delivery contract is 01a20280-25ea-759d-8f96-51980017b97e, approved by the programme approver. The Architecture Board approves architecture contracts under its decision limits, and the programme approver records the review level; a contract change re-opens the phase gate rather than leaving the old contract live.\n\n## Adoption\n\nThe profile row 01a1f2c1-14c1-74c5-a078-eef117c4f82c records the board decision that adopted the profile at 2026-11-19T07:50:26Z with status adopted and version 3. The Architecture Board charter fixes the review cadence: it meets at each tranche review and on a contract request, so the tailored profile is revisited at the tranche-4 review 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce rather than on a separate calendar. The open reconciliation of the draft plan against the built measurement is carried as T9-R1 with review date 2026-12-15 under the programme architect conveyor-e2e, and the unmeasured runtime gate as T9-R2 with the same review date; neither is a waiver of adoption, and runtime acceptance of `/design/adm` through `adm.spec.ts` remains unclaimed.\n",
+ "artifact_standard_output": "# Artefact standard — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Common metadata\n\nEvery artefact carries a title, status, version, author and date, reviewer and review date, related initiative, rationale, and the document or contract it sits under. In the record this is the `architecture_artifact` parent with `artifact_kind`, `artifact_type_id`, `artifact_version`, created and updated timestamps, its `contract_id` and `document_id`, and the published page it backs; the Requirements Catalog's acceptance entry requires that an artefact names owner, reviewer, version and document. The seven A–D artefacts are approved at their recorded versions, and the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and delivery contract 01a20280-25ea-759d-8f96-51980017b97e are the contracts they sit under.\n\n## Catalogues\n\nA catalogue carries a unique identifier, an item name and the description of use or structure for each entry; entries are `architecture_artifact_entry` rows with axis_a, axis_b, value and position, proven by `crates/api/tests/architecture_artifacts.rs::a_catalog_is_queryable_rows`, which returns the rows of a ten-entry catalogue. The pack's catalogues are the Driver/Goal/Objective Catalog 01a2027e-e784-7a23-9098-ca96a7610047, whose drivers D1–D8 map to their goals and objectives, the Requirements Catalog 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, whose requirements R1–R8 each name the record id or check that proves them, the Data Entity/Data Component Catalog 01a2027f-b71a-753f-adec-3d7c8185de80, which names the record entities and their invariants, and the Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122, which fixes PostgreSQL 18 with FORCE RLS, contract states, review levels and status precedence.\n\n## Matrices\n\nA matrix records a relationship on two axes: axis_a names one side, axis_b names the other, and the value cell carries the relationship and the engagement it requires. The Stakeholder Map 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67 is the pack's Phase-A psa matrix: axis_a names the nine stakeholder positions — the sponsoring group, the Architecture Board conveyor-architecture-board, the programme architect conveyor-e2e, the programme approver conveyor-approver, the tranche-4 delivery teams, the senior responsible owner, the seed and record maintainers, tenants and downstream readers, and auditors — while axis_b names what each needs from the capability, with value influence, interest and engagement: the sponsoring group decides, the board and approver approve, the delivery teams are consulted, and tenants and auditors are informed.\n\n## Diagrams\n\nA diagram names the building block or metamodel it draws and the viewpoint it takes, and its entries are component and edge rows rather than free drawing. The Solution Concept Diagram 01a2027f-4e4b-72dc-88de-d3ae876995c3, a diagram at Phase A on psa, draws the components that carry the capability — `seed/output-standard.json`, `scripts/rework-content-check.py`, `scripts/rework-project.py`, the architecture record, the `/design/adm` surface, the published output pages and the seven-artefact A–D set — and names the tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce as the governing edge. The Business Capability Map 01a2027f-835a-7682-922b-a5ed89a1c39e, a diagram at Phase B on hld, takes the capability viewpoint and records how far each declared capability is evidenced at the snapshot, from the typed artefact repository and phase-gated lifecycle through the board, maturity and skills capabilities.\n\n## Links\n\nLinks carry four kinds — derivation, realization, reuse and dependency — and both ends must be artefacts the pack creates, or the edge is an orphan and is refused before the write. A reuse link is searchable across plateaus under `crates/api/tests/architecture_artifacts.rs::reuse_is_searchable_across_plateaus`, which is what lets an hld artefact cite a psa artefact instead of copying it. The pack declares one edge: the Stakeholder Map depends on the Business Capability Map. Supersession is kept as its own contract edge rather than deleted history, as the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 records against its predecessor 01a1f2c2-0e1a-787f-9011-46b424d1ec71.\n\n## Repository\n\nArtefacts live in the architecture record, reached through `architecture.artifacts_list`, `architecture.artifacts_create` and `architecture.artifacts_link`, with entries under `architecture.artifacts_entries`; every table is tenant-scoped on PostgreSQL 18 with ENABLE and FORCE ROW LEVEL SECURITY. Publication is governed by `seed/output-standard.json`, and `scripts/rework-content-check.py` refuses a pack with a missing heading, a thin section, a template stub or an id absent from the snapshot before `scripts/rework-project.py` publishes it. Approval is immutable — an approved artefact cannot be edited, and a supersede writes version 2 — and the repository must not be forked into a second store: the standard is adopted once as 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the seven A–D rows are its record.\n",
+ "architecture_artifact_output": "# Architecture artefact — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Metadata\n\nThe artefact index covers the seven A–D records this pack publishes for project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d: the Stakeholder Map 01a2027e-b3fc-7af8-a4d2-53e0ba2cca67 (phase a, plateau psa, matrix), the Driver/Goal/Objective Catalog 01a2027e-e784-7a23-9098-ca96a7610047 (a, psa, catalog), the Requirements Catalog 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8 (a, psa, catalog), the Solution Concept Diagram 01a2027f-4e4b-72dc-88de-d3ae876995c3 (a, psa, diagram), the Business Capability Map 01a2027f-835a-7682-922b-a5ed89a1c39e (b, hld, diagram), the Data Entity/Data Component Catalog 01a2027f-b71a-753f-adec-3d7c8185de80 (c, hld, catalog) and the Technology Standards Catalog 01a2027f-e9b2-7af9-9758-acc4947a9122 (d, hld, catalog). The owner is the programme architect (conveyor-e2e), the reviewer is the Architecture Board (conveyor-architecture-board, row 01a1f2c0-b22a-7e27-a6cc-1a8e48db327e), the review date is 2026-11-24 and the typing standard is the published artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa.\n\n## Entries\n\nEvery catalogue, matrix and diagram is a set of `architecture_artifact_entry` rows carrying axis_a, axis_b, value and position, and the pack's entries follow that schema. The Stakeholder Map has nine influence/interest/engagement cells, the Driver/Goal/Objective Catalog pairs eight drivers D1–D8 with their goals and checkable objectives, the Requirements Catalog states ten requirements R1–R10, the Solution Concept Diagram carries eight components and five edges, the Business Capability Map records ten capabilities with their maturity and evidence, the Data Entity/Data Component Catalog names fourteen record entities and the Technology Standards Catalog fixes ten standards. Each entry names the record id, file path or test that makes it verifiable, so an auditor can read a row without re-deriving its source.\n\n## Links\n\nThe seven artefacts form one governing chain rather than a flat set. The Stakeholder Map depends on the Business Capability Map; the Driver/Goal/Objective Catalog derives from the SPEC_V2 §12 row and the gate in the project meta; the Requirements Catalog derives from the drivers and the solution concept realizes it as components and edges; the Business Capability Map and the Data Entity/Data Component Catalog reuse the Preliminary publications — the principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, the tailored profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a and the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa — while the Technology Standards Catalog depends on the data catalog. Link kinds are limited to derivation, realization, reuse and dependency, and both ends must be artefacts of this pack or the checker refuses the edge as an orphan.\n\n## Document\n\nEach artefact is published as a typed `architecture_artifact` row whose body is the document, approved by the Architecture Board and sitting under the T9 contracts: the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2, the live delivery contract 01a20280-25ea-759d-8f96-51980017b97e and the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f. The published architecture-artefact page 01a1f2dd-3623-701c-b0ba-169d83d7907a carries the project's artefact index from the 2026-11-22 retrospective, and this pack re-issues the same typed set at 2026-11-24. An approved artefact is immutable and a supersede writes version 2; open finding v1-p81-5 on untyped links is carried in the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1.",
+ "statement_of_architecture_work_output": "# Statement of Architecture Work — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Assignment\n\nThe assignment is to deliver the TOGAF ADM capability as rows and actions in the one workspace — the artefact standard and repository, the Preliminary capability, the architecture project and its phase gates, delivery compliance, change management and the Architecture console surface — and to rework T9 by the reconstituted lifecycle. Under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 the pack authors and publishes the seven A–D artefacts, the charter, this Statement of Architecture Work, the delivery contract 01a20280-25ea-759d-8f96-51980017b97e, the WBS deliverable and the Phase-G review, plus the project brief 01a20280-9490-7278-88dc-af487c379f55 and the evidence page 01a1f35f-1032-72bf-a2ee-4ee1a9375550. It makes the record consistent and machine-checked; it does not rebuild the runtime capability.\n\n## Scope\n\nThe scope is the Preliminary record (the principles catalogue, the tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a and the artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa), the typed artefact repository for phases A–D at plateaus psa and hld, the phase contract lifecycle with the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the live delivery contract 01a20280-25ea-759d-8f96-51980017b97e, the compliance review and waiver path, the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f and the twelve declared output categories. Out of scope: re-running the runtime acceptance of the `/design/adm` surface, superseding any of the three recorded compliance reviews and re-closing the project.\n\n## Responsibilities\n\nThe programme architect (conveyor-e2e) owns the capability, the tailored ADM profile and the seven-artefact A–D set, and performs the rework. The Architecture Board (conveyor-architecture-board, row 01a1f2c0-b22a-7e27-a6cc-1a8e48db327e) approves the artefact set and the phase contracts and is the approving body for the capability. The programme approver (conveyor-approver) records the compliance level and is a distinct identity from the requester. The tranche-4 delivery teams S05, S07, S09, T10, T14, T16 and T4 are held by the tranche exit criteria to live contracts and compliance reviews that T9 supplies.\n\n## Acceptance criteria\n\nThe gate in the project meta is the acceptance: an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; and an H review produces exactly one change or kata. Against the snapshot this means the seven artefact ids are approved, the two contracts are live, the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f is taken and the three reviews 01a1f357-69eb-7716-811e-ce22ea93d496, 01a20284-debf-7149-ba0d-d59c876255f7 and 01a216d0-f287-70f2-aa92-af02b9ce9daa each record one level. The pack is accepted only when scripts/rework-content-check.py exits 0 for T9; runtime acceptance is not claimed.\n\n## Contract\n\nThe governing contract is the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2, approved 2026-11-22 under approval 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2, which supersedes 01a1f2c2-0e1a-787f-9011-46b424d1ec71 while retaining that predecessor as superseded history. The Phase-F delivery contract 01a20280-25ea-759d-8f96-51980017b97e is live and judged against the 2026-11-22 record with the acceptance manifest acceptance/programme/T9.toml. This retrospective re-issues the authored content and re-closes T9 at 2026-11-24; the earlier closure review 01a216d0-6740-7729-a155-8c3493856413 remains part of the history.",
+ "compliance_review_output": "# Compliance review — T9 TOGAF ADM capability (Phase G, retrospective, 2026-11-24)\n\n## Relationship\n\nThe review records the single level compliant for project 01a1d039-0d35-7bd1-945d-cea12c5dfd6d against the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and, through the record, against the live delivery contract 01a20280-25ea-759d-8f96-51980017b97e. It sits beside three recorded reviews: 01a1f357-69eb-7716-811e-ce22ea93d496 (2026-11-19, against the superseded SoAW 01a1f2c2-0e1a-787f-9011-46b424d1ec71), 01a20284-debf-7149-ba0d-d59c876255f7 (2026-11-22, against the delivery contract) and 01a216d0-f287-70f2-aa92-af02b9ce9daa (2026-11-24, against the live SoAW), each level compliant. The reviewer is conveyor-approver, an identity distinct from the requester, and the evidence is the acceptance manifest acceptance/programme/T9.toml.\n\n## Findings\n\nThe record satisfies the gate's artefact, contract, baseline and level clauses: seven approved A–D artefacts, two live contracts with the predecessor retained as superseded, one scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f taken 2026-11-22T09:05:00Z, and one level per review. It does not support a stronger level. Open finding v1-p81-6 records that Phase H enforces existence rather than exactly one typed outcome, and the plan-named `togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate` is absent at HEAD; v1-p81-4, v1-p81-5, v1-w2a-3, v1-w2a-4 and v1-w2a-6 remain open on board drafting, artefact and link integrity, profile adoption, contract supersession and phase-evidence reporting. No runtime run of the `/design/adm` surface or `adm.spec.ts` is in the facts, the plan fragment docs/SPEC_V2.md#12 is still draft, the tranche row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce has no reviews and no review date, and no Architecture Board minutes are recorded. It equally does not support non_conformant: no review records an unmet clause.\n\n## Waivers\n\nNo waiver is granted and none is claimed. Each open finding is carried as a work package with an acceptance clause, not accepted as a deviation from the contract, so the level stays compliant rather than waived. The published waiver 01a1f2e0-d72c-776e-b137-a48ad1560663 records the empty register at 2026-11-19, and the waiver action refuses a record without an accepting owner and a reassessment date, proved by `crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver`. A future waiver must name the accepting asset owner, the reason, the additional cost and risk, and the review date.\n\n## Decision\n\nRecord the level compliant for T9's delivery against the live Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 at the 2026-11-24 rework snapshot. The project may close on the programme's P0-only product gate because no open P0 finding remains; the six P1/P2 findings stay visible in the conformance ledger and are owned by the programme architect (conveyor-e2e) with review dates at the next tranche review. The decision is retrospective and does not supersede the three recorded reviews or attest contemporaneous intent; the closure review records the re-close on this evidence.",
+ "waiver_output": "# Architecture waiver — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Deviation\n\nNo deviation is waived in this rework. The architecture waiver register for T9 is empty at the snapshot, and the published page 01a1f2e0-d72c-776e-b137-a48ad1560663 records that same empty register at 2026-11-19. The Phase-G review records the level compliant and carries six open findings — v1-p81-4, v1-p81-5, v1-p81-6, v1-w2a-3, v1-w2a-4 and v1-w2a-6 — as work packages with acceptance clauses rather than deviations accepted against the delivery contract 01a20280-25ea-759d-8f96-51980017b97e. The one clause not proved, the Phase-H exactly-one rule, is a finding to fix, not a capability the programme chooses to live without.\n\n## Accepting owner\n\nNo accepting owner is named because no waiver row is created; the absence is the record, not an omission in it. The rule the empty register enforces is that a waiver must name the accepting asset owner and the scope of that owner's authority, and the action refuses a waiver without one. The Architecture Board (conveyor-architecture-board, row 01a1f2c0-b22a-7e27-a6cc-1a8e48db327e) is the approving body for the capability and its contracts, but it is not the accepting owner of a deviation, and this document does not assign that role to it.\n\n## Reason and impact\n\nNo reason or impact is recorded because no deviation is accepted, and inventing one would manufacture an approval the reviews do not support. The impact of not waiving is explicit: the six open findings stay visible in the conformance ledger and the Phase-G findings, the project closes on the P0-only product gate with the P1/P2 packages still owned, and the next reader inherits an honest gap rather than a silent acceptance. The alternative — a dated waiver for the Phase-H clause — would hide the missing proof behind an owner and a review date that no evidence justifies.\n\n## Reassessment\n\nNo reassessment date is set, for the same reason: there is no accepted deviation to reassess. The rule is nevertheless live — `crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver` proves that a waiver without an owner or a review date is refused — so a future review that does accept a deviation must name the owner, the reason, the additional cost and risk, and the reassessment date before the waiver row can exist. Until then this document records the absence at the 2026-11-24 snapshot.",
+ "maturity_assessment_output": "# Architecture maturity assessment — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Dimensions\n\nThe assessment covers the nine dimensions: architecture process, architecture development, business linkage, senior-management involvement, operating-unit participation, architecture communication, IT security, architecture governance, and IT investment and acquisition strategy. Each dimension is scored from 0 (none) to 5 (measured) with a stage, a date and evidence, and the schema refuses a missing dimension, proved by `crates/api/tests/architecture_capability.rs::a_maturity_assessment_needs_every_dimension`. The instrument is live in the architecture record; the question this document answers is what the record actually measures.\n\n## Scores\n\nThe record holds two nine-dimension assessment groups dated 2026-11-19, both staged \"under development (baseline 2026-11-19)\": architecture process 3, IT security 3, senior management 3, architecture communication 2, architecture development 2, architecture governance 2, business linkage 2, investment strategy 2 and operating-unit participation 1. This rework does not run `architecture.maturity_assess` and claims no new score; the published page 01a1f2dd-74a7-739d-96e9-edc665a7b847 records that no score is claimed by the retrospective, and reporting nine fresh 0–5 numbers without a dated assessment would invent a receipt. The 2026-11-19 rows are the dated evidence an auditor can compare against.\n\n## Baseline\n\nThe baseline for the next comparison is the dated 2026-11-19 state recorded above, and the published assessment page 01a1f2dd-74a7-739d-96e9-edc665a7b847 keeps P0's proposed MA-1 content — delivered by #122's A7 and marked proposed for P0 acceptance — as the programme-level proposal rather than converting it into an adopted measurement. The plan's starting-state table records that no maturity row existed when T9 was built, so the first Board-adopted assessment becomes the baseline the next review holds the capability to. No Board adoption of a maturity baseline is in the facts.\n\n## Milestones\n\nThe milestones are the development plan the Board approves with a baseline: one dated target per dimension, held by a tranche review, with the `architecture.maturity_plan` action as the mechanism. No milestone row is claimed here because no baseline has been adopted and no target has a date. The open findings v1-p81-4 (a draft Board can govern and be approved with an empty charter) and v1-w2a-3 (profile adoption accepts any UUID as its board decision) bear on the body that must adopt the baseline, so resolving them precedes any milestone commitment.",
+ "skills_assessment_output": "# Architecture skills assessment — T9 TOGAF ADM capability (retrospective, 2026-11-24)\n\n## Categories\n\nThe assessment covers the seven categories of the Architecture Skills Framework: general; business skills and methods; architecture skills; programme and project management; general IT knowledge; technical IT skills; and the legal environment. Each category is assessed at a proficiency level per role, against the role's job key, with a date and evidence, and `crates/api/tests/architecture_capability.rs::a_skills_assessment_names_its_role` proves that the seven categories and the job key are required. The record's category keys are general, business, architecture, programme_management, it_knowledge, technical and legal.\n\n## Proficiency by role\n\nThe record holds one dated assessment from 2026-11-19 with six roles across the seven categories, forty-two rows in all: business change manager (position, unstaffed), programme manager (position, unstaffed), outside contributor, maintainer sessions (AI), programme architect (maintainer sessions under the owner's authority), and sponsor/owner. The programme architect is recorded at proficiency 5 for architecture and technical skills, 4 for IT knowledge, 3 for general, 2 for business and programme management and 1 for legal; the sponsor/owner at 5 for business and general. The unstaffed positions carry 0 across every category. This rework asserts no new proficiency and does not run `architecture.skills_assess`; the published page 01a1f2dd-99d8-74fa-9f71-b02b976b4521 records that the 2026-11-19 rows are the dated evidence.\n\n## Baseline\n\nThe baseline is the dated 2026-11-19 assessment recorded above, which the next review can compare against, while the published page 01a1f2dd-99d8-74fa-9f71-b02b976b4521 keeps P0's proposed SA-1 content — delivered by #122's A7 and marked proposed for P0 acceptance — as the programme-level proposal rather than an adopted measurement. The plan's starting-state table records that no skills row existed when T9 was built, so the first Board-adopted assessment becomes the baseline. No Board adoption of a skills baseline is in the facts.\n\n## Development milestones\n\nThe development plan is one milestone per category and role where the assessment measures a gap, held by a tranche review, with `architecture.skills_assess` as the recording action. The 2026-11-19 rows identify the gaps the milestones would target: the legal category is 1 for the programme architect and 0 for the AI maintainer sessions, business and programme management sit at 1–2 for the same roles, and both unstaffed positions score 0 across all seven categories. No milestone row is claimed here because no baseline has been adopted; when the Board records the assessment, the milestones become dated targets rather than implied intentions.",
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — T9 (retrospective, 2026-11-26)",
+   "body": "# Architecture Artefact Index — T9 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for T9 is the seven mandatory Phase A–D artefacts on the delivery track: Stakeholder Map — T9 TOGAF ADM capability (Phase A), Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A), Requirements Catalog — T9 TOGAF ADM capability (Phase A), Solution Concept Diagram — T9 TOGAF ADM capability (Phase A) at phase a, plateau psa; Business Capability Map — T9 TOGAF ADM capability (Phase B) at phase b; Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C) at phase c; and Technology Standards Catalog — T9 TOGAF ADM capability (Phase D) at phase d. Each carries an authored body dated 2026-11-26; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — T9 TOGAF ADM capability (Phase A); a/catalog — Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A); a/catalog — Requirements Catalog — T9 TOGAF ADM capability (Phase A); a/diagram — Solution Concept Diagram — T9 TOGAF ADM capability (Phase A); b/diagram — Business Capability Map — T9 TOGAF ADM capability (Phase B); c/catalog — Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C); d/catalog — Technology Standards Catalog — T9 TOGAF ADM capability (Phase D). Each row carries the entries recorded in the pack's own artefact, from the stakeholder matrix through the requirement and technology catalogues; the factory re-versions the rows this index names and binds each to its instance document.\n\n## Links\n\nThe artefacts link in lifecycle order — stakeholder map to driver/goal/objective, drivers to requirements, requirements to the solution concept, solution to capability, capability to data, data to technology standards, and technology standards back to the stakeholder map as a reuse edge. Every artefact carries at least one link, so the standard's orphan rule finds no orphan in the set.\n\n## Document\n\nEach artefact's published document is its category-`architecture-artifact-instance` instance document, titled with the artefact's own title (Stakeholder Map — T9 TOGAF ADM capability (Phase A); Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A); Requirements Catalog — T9 TOGAF ADM capability (Phase A); Solution Concept Diagram — T9 TOGAF ADM capability (Phase A); Business Capability Map — T9 TOGAF ADM capability (Phase B); Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C); Technology Standards Catalog — T9 TOGAF ADM capability (Phase D)). The factory publishes each body before binding the row, so `document_id` pins a real document from version one and the mandatory-artefact standard resolves the Document heading against them.\n"
+  }
+ ]
+}

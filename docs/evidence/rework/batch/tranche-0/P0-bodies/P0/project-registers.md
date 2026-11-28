@@ -1,0 +1,453 @@
+# Project Registers — Programme definition — vision, blueprint, plan and project briefs
+
+## Risks
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The 2026-11-25 acceptance record reports P0 closed while its manifest is red: the closure outputs are undeclared, the eight E\u2013H artefacts do not exist and several mandatory packages are open. This retrospective row records the state before the rework; the pack authors the missing content and does not claim the red cleared until the batch re-runs.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.1466+00:00",
+      "id": "01a21732-6fef-7135-8bb9-1f09966c223c",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "docs/evidence/rework/P0.json \u2014 the 2026-11-25 acceptance record"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "The definition set is red on the mandatory artefact standard at the 2026-11-25 record",
+      "updated_at": "2026-11-26T09:31:51.1466+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "Seven benefit profiles now carry measured baselines with evidence, but no profile has been through a transition and a post-transition measurement. The token-spend KPI is baselined and not yet measured after an improvement. This row records the gap; U6 owns the transition, and no realisation is claimed here.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.288772+00:00",
+      "id": "01a21732-707c-7034-bbab-594a14c1ec1e",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "01a20c80-c0c3-7788-9cc2-bb18a102a2f7"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect under the #526 rework delegation"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "Benefit realisation is unproven until a transition is exercised end to end",
+      "updated_at": "2026-11-26T09:31:51.288772+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Issues
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "",
+      "code": "",
+      "created_at": "2026-11-21T01:20:13.977267+00:00",
+      "id": "01a1fbb0-8d6a-73c8-9d78-7024e80222b5",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "accepted",
+      "title": "schema probe \u2014 delete me",
+      "updated_at": "2026-11-21T01:20:13.977267+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The project row carried an empty closure_outputs list although the closure review and the close gate existed. The rework declares the closure-review output and republishes it; this retrospective row records the defect the rework repairs.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.42838+00:00",
+      "id": "01a21732-7107-727a-af5c-964c94aee0ae",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "docs/evidence/rework/P0.json \u2014 the failures array"
+        ]
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": "high",
+      "status": "open",
+      "title": "P0 was closed with no declared closure outputs at the 2026-11-25 record",
+      "updated_at": "2026-11-26T09:31:51.42838+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Assumptions
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The rework writes through the product's actions against the replay base rebuilt from the production dump on 2026-11-26. The assumption, recorded here, is that the replay is the record of work until the promotion unit replays these acts into the live database; if it is not, the receipts prove a copy rather than the programme.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.55981+00:00",
+      "id": "01a21732-718a-7f1c-952a-0c0849e86d2c",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The replay record is the programme's working record until the rework is promoted",
+      "updated_at": "2026-11-26T09:31:51.55981+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Dependencies
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "A delivery project's brief is the contract it is held to, and its brief cites the blueprint, the inception standard and the benefit profiles P0 publishes. This row records that the delivery rework in tranches 1\u201313 depends on P0's set remaining live and resolvable; a fork of the set would break every brief that cites it.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.695125+00:00",
+      "id": "01a21732-7212-7117-af44-6654ed42464c",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Every delivery project's governing brief depends on this definition set",
+      "updated_at": "2026-11-26T09:31:51.695125+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Benefits
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The benefit profile `01a1e9de-4e4f-757e-a8c8-bf3522e5adcf` records B1 Auditable decisions, measured at 0.15861 approval decisions per run on 2026-11-22 and re-recorded with its evidence on 2026-11-26. This retrospective row links the benefit to its measured baseline without claiming realisation.",
+      "code": "",
+      "created_at": "2026-11-26T09:31:51.827775+00:00",
+      "id": "01a21732-7296-78c0-a55e-a54db696bec1",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf"
+        ]
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "B1 Auditable decisions: every choice has a decision row",
+      "updated_at": "2026-11-26T09:31:51.827775+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```
+
+## Changes
+
+The record the section derives from, or an explicit absence.
+
+```json
+{
+  "category": "project-registers",
+  "count": 5,
+  "rows": [
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+      "code": "U3-REBASELINE",
+      "created_at": "2026-11-21T01:21:50.581194+00:00",
+      "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+      "impact": 0,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "impact": {
+          "cost": 0,
+          "schedule": 0,
+          "scope": "record correction"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+      "updated_at": "2026-11-21T01:21:55.82619+00:00",
+      "version": 2
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:54.167507+00:00",
+      "id": "01a216d0-859e-7b45-b353-58e21b46c2e6",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Record the six benefit profile baselines and six field groups",
+      "updated_at": "2026-11-26T07:44:54.793217+00:00",
+      "version": 3
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The architecture decision register has zero governed_asset(kind='adr') rows. This change authorises seeding every docs/decisions record and every SPEC_V2 D## decision through the decisions.* actions, with the linked approval recorded in meta until the register's own approval gate lands.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:57.575713+00:00",
+      "id": "01a216d0-92ed-7d8a-9faf-a6cee37f6e5c",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') rows, their published index and the Architecture screen"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Seed the architecture decision register",
+      "updated_at": "2026-11-26T07:44:57.796377+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The seed wrote file-backed ADRs under filename-stem keys; the register grammar is adr-NNNN. This change authorises archiving the stem-keyed rows and re-seeding adr-0001..adr-0012, with the no-deferrals row keeping its delegation evidence on adr-0012.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.051327+00:00",
+      "id": "01a216d0-98b1-7468-bbc7-1834732b0e25",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Re-key the architecture decision register to its grammar",
+      "updated_at": "2026-11-26T07:44:59.274124+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+      "body": "The baseline dicts carry value/unit/definition but not measured_at/method; B7 has no benefits-map edge and no preconditions. This change authorises completing those records under the programme-level profiles.",
+      "code": "",
+      "created_at": "2026-11-26T07:44:59.394858+00:00",
+      "id": "01a216d0-9a08-79de-b214-15238740db5b",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          {
+            "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            "kind": "benefit"
+          },
+          {
+            "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+            "kind": "benefit"
+          }
+        ]
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "Complete the benefit records: B7 link, B7 conditions, and the baseline measurement fields",
+      "updated_at": "2026-11-26T07:45:17.175637+00:00",
+      "version": 3
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+```

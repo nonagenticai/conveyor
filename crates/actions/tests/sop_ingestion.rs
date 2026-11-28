@@ -173,41 +173,6 @@ async fn step_rows(
     .expect("the step rows")
 }
 
-/// The whole `checks` list as one string, for a targeted `contains` assertion.
-fn checks_text(body: &Value) -> String {
-    output(body)["checks"]
-        .as_array()
-        .map(|checks| {
-            checks
-                .iter()
-                .filter_map(Value::as_str)
-                .collect::<Vec<_>>()
-                .join("\n")
-        })
-        .unwrap_or_default()
-}
-
-/// One `tool_request` authored asset: `(kind, status, payload)`, found by its key.
-async fn tool_request_row(pg: &support::Pg, key: &str) -> (String, String, Value) {
-    let found: Option<(String, String, Value)> = sqlx::query_as(
-        "SELECT kind, status, payload FROM authoring_asset \
-          WHERE kind = 'tool_request' AND key = $1",
-    )
-    .bind(key)
-    .fetch_optional(&pg.super_pool)
-    .await
-    .expect("read the tool-request row");
-    if let Some(row) = found {
-        return row;
-    }
-    let all: Vec<(String, String, String)> =
-        sqlx::query_as("SELECT kind, key, status FROM authoring_asset ORDER BY created_at")
-            .fetch_all(&pg.super_pool)
-            .await
-            .expect("read every authored asset");
-    panic!("no tool_request {key:?}; authored assets are {all:?}");
-}
-
 async fn review_source(running: &support::Running, asset_id: &str) -> (u16, Value) {
     running
         .invoke(
@@ -856,8 +821,63 @@ async fn start_run(
     (status, body)
 }
 
-/// A job, its release and a `procedure` binding pinned to `process_id`.
-/// Returns `(binding_id, release_hash, binding_version)`.
+/// Make a freshly created job live the way a tenant does (v1-w1a-4): the `status: "active"`
+/// update opens the `job_activation` gate, and only a second principal's approval flips it.
+async fn activate_job(running: &support::Running, job: &Value) {
+    let job_id = field(job, "id").to_owned();
+    let version = output(job)["version"]
+        .as_i64()
+        .expect("the created job's version");
+    let (status, draft) = running
+        .invoke(
+            "job_catalogue.update",
+            TOKEN,
+            json!({"id": job_id, "version": version, "status": "active"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{draft}");
+    assert_eq!(
+        output(&draft)["status"],
+        "draft",
+        "activation waits for another principal: {draft}"
+    );
+    let (status, pending) = running
+        .invoke(
+            "approvals.list",
+            TOKEN,
+            json!({"status": "pending", "limit": 50}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{pending}");
+    let gate = output(&pending)["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .find(|item| item["gate"] == "job_catalogue.update" && item["kind"] == "job_activation")
+        .unwrap_or_else(|| panic!("no pending activation gate in {pending}"));
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": gate["id"], "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    assert_eq!(output(&decided)["status"], "approved", "{decided}");
+}
+
+/// A job, its release and an APPROVED `procedure` binding pinned to `process_id`.
+/// Returns `(binding_id, release_hash, binding_version)` — the version after activation, which
+/// is what an `If-Match` on the retire must carry (v1-p44-2).
 async fn bind_process(
     running: &support::Running,
     process_id: &str,
@@ -905,6 +925,9 @@ async fn bind_process(
         .await;
     assert!(status == 200 || status == 201, "{job}");
     let job_id = field(&job, "id").to_owned();
+    // v1-w1a-4 (T0): a draft job can neither publish a release nor bind one (`409
+    // job_not_live`); create leaves it draft, so the fixture activates it first.
+    activate_job(running, &job).await;
     let (status, release) = running
         .invoke(
             "job_releases.publish",
@@ -933,10 +956,59 @@ async fn bind_process(
         )
         .await;
     assert!(status == 200 || status == 201, "{binding}");
+    let binding_id = field(&binding, "id").to_owned();
+    assert_eq!(
+        output(&binding)["status"],
+        "draft",
+        "a binding is born draft (v1-p44-2): {binding}"
+    );
+    // v1-p44-2: the create opened the activation gate; a second principal approves it, and only
+    // then is the binding usable by a run.
+    let (status, gates) = running
+        .invoke(
+            "approvals.list",
+            TOKEN,
+            json!({"status": "pending", "limit": 50}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{gates}");
+    let gate = output(&gates)["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .find(|item| item["gate"] == "job_bindings.create" && item["kind"] == "job_binding")
+        .unwrap_or_else(|| panic!("no pending binding gate in {gates}"));
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": gate["id"], "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    // Activation moves the version past the create's, so the caller's If-Match must be re-read.
+    let (status, active) = running
+        .invoke(
+            "job_bindings.get",
+            TOKEN,
+            json!({"id": binding_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{active}");
+    assert_eq!(output(&active)["status"], "active", "{active}");
     (
-        field(&binding, "id").to_owned(),
+        binding_id,
         field(&binding, "release_hash").to_owned(),
-        output(&binding)["version"].as_i64().unwrap_or(1),
+        output(&active)["version"].as_i64().unwrap_or(2),
     )
 }
 
@@ -1171,10 +1243,55 @@ async fn an_unreviewed_source_cannot_bind() {
     assert_eq!(process_row(&pg, &process_id).await.0, "draft");
 }
 
+/// SPEC_V2 §11.6 item 3: a procedure step that needs an operation with no tool opens a
+/// tool-request card; a published toolkit version rebinds the step, and the procedure is
+/// retryable. The SOP still grants nothing — the derived agent's ceiling stays empty.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn an_sop_cannot_grant_a_tool() {
+async fn a_missing_operation_opens_a_tool_request_and_binds_once_published() {
     let _env = ENV_LOCK.lock().await;
-    let (pg, _seeded, running) = fixture().await;
+    let (pg, seeded, running) = fixture().await;
+    let tenant = seeded.tenant;
+
+    // A project with one board lane: where a system-opened record is born.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("a scoped write");
+    let project_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, 'sop-tool-requests', 'SOP tool requests') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the project");
+    let board_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO board (tenant_id, project_id, name, position)
+         VALUES ($1, $2, 'Requests', 0) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the board");
+    let _list_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO list (tenant_id, board_id, name, position, kind)
+         VALUES ($1, $2, 'Active', 0, 'active') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the lane");
+    // The dev seed carries only the three types a project start needs; the tenant catalogue's
+    // `tool_request` type (seed/catalogue.json) is installed by the provisioning import.
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label) VALUES ($1, 'tool_request', 'Tool request')",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("the tool_request card type");
+    tx.commit().await.expect("commit the lane");
+
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     draft_content.lock().await.clone_from(&draft(
@@ -1187,15 +1304,10 @@ async fn an_sop_cannot_grant_a_tool() {
         )],
         &["shell.exec"],
     ));
+    let mut input = sop_input("receiving-tool", "receiving-sop-tool");
+    input["project_id"] = json!(project_id.to_string());
     let (status, body) = running
-        .invoke(
-            "procedures.ingest_sop",
-            TOKEN,
-            sop_input("receiving-tool", "receiving-sop-tool"),
-            None,
-            None,
-            None,
-        )
+        .invoke("procedures.ingest_sop", TOKEN, input, None, None, None)
         .await;
     assert_eq!(status, 201, "{body}");
     let process_id = field(&body, "process_id").to_owned();
@@ -1206,7 +1318,31 @@ async fn an_sop_cannot_grant_a_tool() {
         "the tool request is never echoed as a grant"
     );
 
-    // The agent holds nothing: intake records the request as a governed record instead.
+    // The request is a card: it names the operation, the process and the steps that wait.
+    let (card_id, card_type, card_meta): (uuid::Uuid, String, Value) = sqlx::query_as(
+        "SELECT c.id, t.code, c.meta
+           FROM card c JOIN card_type t ON t.tenant_id = c.tenant_id AND t.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND c.board_id = $2 AND c.archived_at IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(board_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the tool-request card");
+    assert_eq!(card_type, "tool_request", "{card_type}");
+    assert_eq!(card_meta["tool"], "shell.exec", "{card_meta}");
+    assert_eq!(card_meta["process_id"], process_id, "{card_meta}");
+    assert_eq!(card_meta["process_key"], "receiving-tool", "{card_meta}");
+    assert!(
+        !card_meta["steps"]
+            .as_array()
+            .expect("the card names its steps")
+            .is_empty(),
+        "{card_meta}"
+    );
+    assert_eq!(card_meta["state"], "open", "{card_meta}");
+
+    // The agent holds nothing — a request is not a grant.
     let allowed: Vec<String> =
         sqlx::query_scalar("SELECT allowed_actions FROM capability_agent WHERE id = $1")
             .bind(uuid::Uuid::parse_str(&agent_id).expect("agent id"))
@@ -1214,18 +1350,9 @@ async fn an_sop_cannot_grant_a_tool() {
             .await
             .expect("the agent row");
     assert!(allowed.is_empty(), "{allowed:?}");
-    let (kind, request_status, payload) =
-        tool_request_row(&pg, "receiving-tool.0.shell.exec").await;
-    assert_eq!(kind, "tool_request");
-    assert_eq!(request_status, "draft");
-    assert_eq!(payload["operation"], "shell.exec", "{payload}");
-    assert!(
-        payload["step_position"].is_null(),
-        "no step names the requested operation: {payload}"
-    );
 
-    // Validation no longer refuses the draft: it stays retryable, and the check names the gap.
-    let (status, validation) = running
+    // Validation passes and names the open request: the procedure is not dead-ended.
+    let (status, body) = running
         .invoke(
             "procedures.validate",
             TOKEN,
@@ -1235,12 +1362,74 @@ async fn an_sop_cannot_grant_a_tool() {
             None,
         )
         .await;
-    assert_eq!(status, 200, "{validation}");
-    assert_eq!(output(&validation)["valid"], false, "{validation}");
+    assert_eq!(status, 200, "{body}");
+    let checks = output(&body)["checks"]
+        .as_array()
+        .expect("the checks")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>()
+        .join("\n");
     assert!(
-        checks_text(&validation).contains("shell.exec"),
-        "{validation}"
+        checks.contains("1 tool request(s) open") && checks.contains(&card_id.to_string()),
+        "{checks}"
     );
+
+    // A development job publishes the toolkit version that provides the operation.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("a scoped write");
+    let toolkit_id: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, auth_adapter,
+                              owner, status)
+         VALUES ($1, 'shell', 1, 'Shell tools', 'shell', 'none', 'platform', 'published')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the published toolkit");
+    sqlx::query(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, 'exec', '{}'::jsonb, 'read', 30, 'tools.dispatch', 'published')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .execute(&mut *tx)
+    .await
+    .expect("the published tool");
+    tx.commit().await.expect("commit the publication");
+
+    // Retry: the step now resolves to the immutable pin, and no request is open.
+    let (status, body) = running
+        .invoke(
+            "procedures.validate",
+            TOKEN,
+            json!({"process_id": process_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let checks = output(&body)["checks"]
+        .as_array()
+        .expect("the checks")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        checks.contains("shell.exec -> shell.exec v1"),
+        "the step does not name its published pin: {checks}"
+    );
+    assert!(
+        !checks.contains("tool request(s) open"),
+        "the request is still open after the publication: {checks}"
+    );
+
+    // The ceiling is unchanged: the publication is not a grant to the derived agent.
     let allowed_after: Vec<String> =
         sqlx::query_scalar("SELECT allowed_actions FROM capability_agent WHERE id = $1")
             .bind(uuid::Uuid::parse_str(&agent_id).expect("agent id"))
@@ -1248,167 +1437,4 @@ async fn an_sop_cannot_grant_a_tool() {
             .await
             .expect("the agent row");
     assert!(allowed_after.is_empty(), "the ceiling is unchanged");
-}
-
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_missing_operation_opens_a_tool_request_and_rebinds() {
-    let _env = ENV_LOCK.lock().await;
-    let (pg, _seeded, running) = fixture().await;
-    let (base, draft_content) = stub_inference().await;
-    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
-    draft_content.lock().await.clone_from(&draft(
-        vec![step(
-            "weather.current",
-            "check_weather",
-            &[],
-            &["weather_checked"],
-            &[],
-        )],
-        &[],
-    ));
-    let (status, body) = running
-        .invoke(
-            "procedures.ingest_sop",
-            TOKEN,
-            sop_input("receiving-missing", "receiving-sop-missing"),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{body}");
-    let procedure_id = field(&body, "procedure_id").to_owned();
-    let process_id = field(&body, "process_id").to_owned();
-
-    // The missing operation is a governed request naming its step and its procedure.
-    let (kind, request_status, payload) =
-        tool_request_row(&pg, "receiving-missing.1.weather.current").await;
-    assert_eq!(kind, "tool_request");
-    assert_eq!(request_status, "draft");
-    assert_eq!(payload["operation"], "weather.current", "{payload}");
-    assert_eq!(payload["step_position"], 1, "{payload}");
-    assert_eq!(payload["procedure_id"], procedure_id.as_str(), "{payload}");
-
-    // The draft is retryable, not refused — and the check names what is missing.
-    let (status, validation) = running
-        .invoke(
-            "procedures.validate",
-            TOKEN,
-            json!({"process_id": process_id}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{validation}");
-    assert_eq!(output(&validation)["valid"], false, "{validation}");
-    assert!(
-        checks_text(&validation).contains("weather.current"),
-        "{validation}"
-    );
-
-    // Author a tool for the requested operation and publish it behind the human gate.
-    let (status, drafted) = running
-        .invoke(
-            "tool_authoring.draft",
-            TOKEN,
-            json!({
-                "key": "weather",
-                "title": "Weather",
-                "source": {
-                    "kind": "openapi",
-                    "key": "weather",
-                    "base_url": "https://weather.example",
-                },
-                "operations": [{
-                    "key": "current",
-                    "path": "/current",
-                    "method": "GET",
-                    "input_schema": {"type": "object", "additionalProperties": false},
-                }],
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert!(status == 200 || status == 201, "{drafted}");
-    let draft_id = field(&drafted, "draft_id").to_owned();
-    let (status, validated) = running
-        .invoke(
-            "tool_authoring.validate",
-            TOKEN,
-            json!({"draft_id": draft_id}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{validated}");
-    assert_eq!(output(&validated)["valid"], true, "{validated}");
-    let (status, pending) = running
-        .invoke(
-            "tool_authoring.publish",
-            TOKEN,
-            json!({"draft_id": draft_id}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{pending}");
-    let approval_id = field(&pending, "approval_id").to_owned();
-    let (status, decided) = running
-        .invoke(
-            "approvals.decide",
-            REVIEWER,
-            json!({"approval_id": approval_id, "decision": "approve"}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{decided}");
-    let (status, published) = running
-        .invoke(
-            "tool_authoring.publish",
-            TOKEN,
-            json!({"draft_id": draft_id, "approval_id": approval_id}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{published}");
-    assert_eq!(output(&published)["outcome"], "published", "{published}");
-    let toolkit_version = output(&published)["toolkit_version"]
-        .as_i64()
-        .expect("the published toolkit version");
-
-    // Publication rebinds the step: the pin records the tool and the version it trusted.
-    let (tool_id, pinned_version): (Option<uuid::Uuid>, Option<i64>) = sqlx::query_as(
-        "SELECT tool_id, tool_version FROM process_step \
-          WHERE process_id = $1 AND action = $2",
-    )
-    .bind(uuid::Uuid::parse_str(&process_id).expect("process id"))
-    .bind("weather.current")
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("the pinned step");
-    assert!(tool_id.is_some(), "the step carries a tool pin");
-    assert_eq!(pinned_version, Some(toolkit_version));
-
-    // With the operation resolved, the same draft now validates.
-    let (status, validation) = running
-        .invoke(
-            "procedures.validate",
-            TOKEN,
-            json!({"process_id": process_id}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{validation}");
-    assert_eq!(output(&validation)["valid"], true, "{validation}");
 }

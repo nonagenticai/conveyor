@@ -32,7 +32,12 @@ test("the ADM destination renders the capability, its standard and the Board", a
   await invoke(request, "architecture.profile_tailor", {
     key: `e2e_adm_${Date.now()}`,
     name: profileName,
-    artifact_requirements: { a: { hld: ["catalog"] } },
+    // A tailored profile declares the phases it covers and may never subtract the standard's
+    // mandatory artefacts: phase A's four are the seeded standard's (`seed_standard_tx`).
+    phase_set: ["a"],
+    artifact_requirements: {
+      a: ["stakeholder_map", "driver_goal_objective", "requirements_catalog", "solution_concept"],
+    },
     contract_kinds: { a: "delivery_contract" },
   });
 
@@ -60,7 +65,10 @@ test("a phase cannot close without its mandatory artefact and a live contract", 
   await invoke(request, "architecture.profile_tailor", {
     key: `e2e_adm_gate_${Date.now()}`,
     name: unique("e2e adm gate profile"),
-    artifact_requirements: { a: { hld: ["catalog"] } },
+    phase_set: ["a"],
+    artifact_requirements: {
+      a: ["stakeholder_map", "driver_goal_objective", "requirements_catalog", "solution_concept"],
+    },
     contract_kinds: { a: "delivery_contract" },
   });
   await invoke(request, "wbs.create", {

@@ -23,48 +23,38 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Project brief — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="3c3567d7fd3e32a4eb512af73b52b7cbb513c55c27ab8118e5b65ed45970ba77" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>3c3567d7fd3e32a4eb512af73b52b7cbb513c55c27ab8118e5b65ed45970ba77</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T9 TOGAF ADM capability (retrospective, 2026-11-24)</h1>
 <h2>Outcome</h2>
-<p>The conveyor has an architecture capability, not a document library. The Preliminary phase establishes the typed artefact standard and repository, the tailored <code>adm_profile</code>, the Architecture Board, the four contract kinds, the compliance review and waiver register, and the nine-dimension maturity and seven-category skills assessments. An <code>architecture</code> project walks Preliminary and A–H as WBS nodes, each phase closing on an approved contract once its mandatory artefacts are approved; a delivery project is refused at design without a live contract. Six P1/P2 findings remain open, and the Phase-H exactly-one clause is not proved.</p>
+<p>T9 makes architecture a governed capability of the conveyor: typed artefacts selected by phase and plateau, a live contract per phase, compliance reviews that record one level, waivers that name their owner and reassessment date, the Architecture Board and governance, and dated maturity and skills baselines. The outcome is true when the gate in the project meta holds — an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live, a missing mandatory artefact is refused, a delivery project without a live contract is refused at design, and a Phase H review produces exactly one change or kata. The record claims the capability built (<code>meta.measured_status: built</code>); this retrospective republishes the authored lifecycle record and re-closes T9 at 2026-11-24 on that record evidence.</p>
 <h2>Boundary</h2>
-<p>T9 owns the eleven tables of SPEC_V2 §10.3, the 26 <code>architecture.*</code> actions of §10.4, the four contract kinds, the six compliance levels, the waiver register, the Board row, the two assessments and the Architecture destination of §10.5. It does not own an ArchiMate editor or live metamodel, a diagram renderer, full TOGAF conformance, a portfolio optimiser, the T1 plan rows, the T3 PM job, or the T10 tranche reviews and benefits realization.</p>
+<p>Out of scope: re-running the runtime acceptance of the <code>/design/adm</code> surface, superseding any of the three recorded compliance reviews, and re-closing T9. The project must not fork the artefact standard into a second repository, invent a parallel status source, or turn the superseded Statement of Architecture Work 01a1f2c2-0e1a-787f-9011-46b424d1ec71 into a live contract again; the record's live/superseded states are the boundary.</p>
 <h2>Reuse sources</h2>
-<p><code>migrations/0044_plan_spine.sql</code> — <code>wbs_node</code>, <code>project_register_item</code> and the plan spine from T1. <code>migrations/0040_organisation.sql</code> — the tenant and governance foundations. The approval primitive (<code>approval</code>, <code>approval_decision</code>, dual control). <code>trace_link</code> in both directions. <code>governed_asset</code> for requirements, principles and ADRs. <code>document</code> plus MinIO for artefact documents. T3's PM gate routing. The real-Postgres test harness.</p>
+<ul>
+<li><code>docs/SPEC_V2.md</code> §12, the T9 row: the Preliminary phase set, the architecture project type, phases A–H, delivery-project compliance and waivers, and the gate text echoed in the project meta.</li>
+<li>The architecture row of the SPEC_V2 capability table: the ADM surface at <code>/design/adm</code>, verified by <code>adm.spec.ts</code>.</li>
+<li><code>seed/output-standard.json</code>: the publication categories and the required sections for architecture-artifact, project-brief, evidence and statement-of-architecture-work.</li>
+<li>The Preliminary publications: architecture principles 01a1f2dc-db53-7729-b0f1-686bcf81a1e4, tailored ADM profile 01a1f2dd-0583-73fe-a8b5-7d1166116f4a, artefact standard 01a1f2dd-1e74-77e9-8b11-1ab87a0db7fa and the principles catalogue artefact 01a1f2dd-3623-701c-b0ba-169d83d7907a.</li>
+<li>The governance record: the SoAW pages 01a1f2dd-5c13-73b9-845e-3f1673585e1e and 01a2023e-4e59-75ad-b2ab-fd7d014511d2, the compliance review 01a1f360-3420-73f4-8f42-b636a32c29c1, the waiver 01a1f2e0-d72c-776e-b137-a48ad1560663, the maturity assessment 01a1f2dd-74a7-739d-96e9-edc665a7b847 and the skills assessment 01a1f2dd-99d8-74fa-9f71-b02b976b4521.</li>
+<li>The tranche-4 row 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce and its authorising review 01a216d0-d634-738e-985a-00a85cfd48d9.</li>
+</ul>
 <h2>Inception units</h2>
-<p>No T9-specific inception analysis or architecture design existed at the 2026-11-18 close; this rework authored both. The inception claim is <code>docs/SPEC_V2.md</code> §8.1, §8.5 and §10.3–§10.5, the T9 row of §12, <code>docs/plans/T9-architecture-capability.md</code> and issue #81.</p>
+<p>The inception base is the record itself, not a separate inception document: the project row holds seven approved artefacts, three contracts, three compliant reviews, one scope baseline and twenty-four published outputs, with <code>meta.measured_status: built</code>, <code>meta.plan_status: draft</code>, <code>meta.viability: rework</code> and <code>meta.tranche: 4</code>. The plan path <code>docs/SPEC_V2.md#12</code> resolves to a draft fragment rather than a standalone plan file, so the retrospective reads the record and the SPEC_V2 row together and records the difference instead of inventing plan sections.</p>
 <h2>Dependencies</h2>
 <ul>
-<li>blocked-by: T1 (#72), T3 (#74) and P0 (#122, #121).</li>
-<li>blocks: T12 (#88), whose <code>meta.depends_on</code> includes T9.</li>
-<li>related: #216 (the MSP layer) and #221 (output-standard categories).</li>
+<li>blocked-by: T1, T3 and P0, the three keys named in <code>meta.depends_on</code>.</li>
+<li>sequencing: SPEC_V2 §12 states that T9 and T10 follow T1 and T3 and may run in parallel once T1 and T3 exist.</li>
+<li>acceptance-blocked-by: the tranche-4 exit criteria, which require every project in tranche 4 — S05, S07, S09, T10, T14, T16, T4 and T9 — to meet its acceptance with published evidence before the review records continue, pause or stop.</li>
+<li>blocks: the delivery projects that need a live contract and a compliance review before design and delivery, because T9 is where that obligation is defined.</li>
 </ul>
 <h2>Acceptance</h2>
-<p>The SPEC_V2 §12 T9 gate. The artefact, Preliminary, A–F, design-gate and compliance clauses are proved by the named tests listed in the review evidence. The fifth clause, an H review producing exactly one change or kata, is not proved: v1-p81-6 is open and the plan's <code>a_systemic_finding_produces_a_kata_candidate</code> is absent at HEAD. The acceptance instrument is <code>acceptance/programme/T9.toml</code>.</p>
+<p>The acceptance is the gate in the project meta, read against the record: seven A–D artefacts approved (01a2027e-b3fc-7af8-a4d2-53e0ba2cca67, 01a2027e-e784-7a23-9098-ca96a7610047, 01a2027f-1a9a-78d0-bddb-1f7d1898d3f8, 01a2027f-4e4b-72dc-88de-d3ae876995c3, 01a2027f-835a-7682-922b-a5ed89a1c39e, 01a2027f-b71a-753f-adec-3d7c8185de80, 01a2027f-e9b2-7af9-9758-acc4947a9122); the Statement of Architecture Work 01a2023e-4e59-75ad-b2ab-fd7d014511d2 and the delivery contract 01a20280-25ea-759d-8f96-51980017b97e live; the scope baseline 01a20280-71de-7b06-9086-ae0158bfd36f taken 2026-11-22T09:05:00Z; and one recorded level per review. <code>python3 scripts/rework-content-check.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --snapshot &lt;snapshot&gt; --wsjf 10,13,10,8 --closes false</code> is the local acceptance of this pack. Runtime acceptance of <code>/design/adm</code> is not claimed.</p>
 <h2>Capabilities</h2>
-<p>A typed artefact repository; approve and supersede immutability; reuse search across plateaus; profile-driven mandatory sets; the A–F phase gates; measured maturity and skills; the design gate; the one-level compliance review and dated waiver; the Phase-H typed outcome; the Architecture console destination.</p>
+<p>The capabilities T9 declares are the typed artefact repository, the phase-gated ADM lifecycle, the contract lifecycle, compliance review and waiver, the Architecture Board and governance, the maturity assessment, the skills assessment, the architecture project type and the retrospective record assembly. Maturity at the snapshot: the artefacts and contracts are approved and live, the three reviews are compliant, the maturity and skills assessments are published, the board and governance are declared in the T9 row but have no minutes in the facts, and no runtime run of the phase gates is recorded.</p>
 <h2>Plan</h2>
-<p>Held to <code>docs/plans/T9-architecture-capability.md</code> and <code>docs/SPEC_V2.md</code> §12 T9; the programme row's plan pointer is <code>docs/SPEC_V2.md#12</code> with <code>plan_status: draft</code>. Delivered at <code>c8204432</code> (2026-11-18, #81/#350) with the measured state at <code>ddf489ad</code> (#356/#358); finding fixes at <code>92e6b223</code> (2026-11-21). Reworked retrospectively 2026-11-22.</p>
-<h2>Risks</h2>
-<ul>
-<li>v1-p81-4: a draft Board can govern and be approved with an empty charter.</li>
-<li>v1-p81-5: artefacts and links are not fully typed or projected and lack tenant/project consistency.</li>
-<li>v1-p81-6: Phase H enforces existence, not exactly one typed outcome.</li>
-<li>v1-w2a-3: profile adoption accepts any UUID as its board decision.</li>
-<li>v1-w2a-4: <code>contracts_request</code> can retire another project's live contract.</li>
-<li>v1-w2a-6: <code>phase_progress</code> accepts draft artefacts and superseded contracts as evidence.</li>
-</ul>
-<h2>Links</h2>
-<ul>
-<li>Issue: https://github.com/nonagenticai/conveyor/issues/81</li>
-<li>Commits: <code>c8204432</code>, <code>ddf489ad</code>, <code>92e6b223</code></li>
-<li>Specification: <code>docs/SPEC_V2.md</code> §8.1, §8.5, §10.3–§10.5 and §12 (T9)</li>
-<li>Plan: <code>docs/plans/T9-architecture-capability.md</code></li>
-<li>Tests: <code>crates/api/tests/architecture_artifacts.rs</code>, <code>architecture_capability.rs</code>, <code>togaf_architecture_phases.rs</code>, <code>togaf_delivery_design_gate.rs</code>, <code>architecture_compliance.rs</code>, <code>togaf_h_change.rs</code>; <code>crates/actions/tests/togaf_kata_outcome.rs</code></li>
-<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
-</ul>
+<p>Held to <code>docs/SPEC_V2.md</code> §12 (the T9 row) and the gate it records in the project meta. The plan fragment reports <code>meta.plan_status: draft</code> and does not exist as a standalone plan file in the facts; the project row is <code>status: closed</code> at version 15 and the rework is carried under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce. This retrospective publishes the project brief, the evidence, the seven artefacts, the SoAW, the contract, the WBS, the Phase-G review, the closure and the closure review; the re-close is dated 2026-11-24 and rests on the record evidence.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-26T21:15:00Z · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

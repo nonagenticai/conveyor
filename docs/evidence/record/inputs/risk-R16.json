@@ -1,0 +1,21 @@
+{
+ "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+ "kind": "risk",
+ "code": "R16",
+ "title": "The six benefit baselines are placeholders",
+ "body": "All six benefit profiles are draft with placeholder baselines and no measurement instrument. U6 owns the instruments and the before/after transition; no benefit may be claimed realized before that measurement.",
+ "severity": "high",
+ "probability": "high",
+ "impact": 4,
+ "status": "open",
+ "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+ "review_at": "2026-11-29",
+ "links": {
+  "cards": [],
+  "requirements": [
+   "acceptance/programme/P0.toml",
+   "docs/evidence/conformance-gap-register.json"
+  ],
+  "decisions": []
+ }
+}

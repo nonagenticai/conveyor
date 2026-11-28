@@ -32,7 +32,7 @@ use crate::tenants;
 /// `licence.sync` every 5 minutes keeps `app_licence.checked_at` inside the one-hour
 /// staleness window (`crates/auth`'s `LICENCE_MAX_AGE_SECS`) with twelve missed runs to
 /// spare — the licence extractor refuses a row older than that.
-pub const DEFAULT_SCHEDULES: [(&str, &str); 24] = [
+pub const DEFAULT_SCHEDULES: [(&str, &str); 25] = [
     ("event.prune", "15 3 * * *"),
     ("job.prune", "45 3 * * *"),
     // The three rules §6 stated and nothing produced until 0012: the invocation trace (30 d), terminal
@@ -67,6 +67,9 @@ pub const DEFAULT_SCHEDULES: [(&str, &str); 24] = [
     ("approval.expire", "* * * * *"),
     // The close hand-off to the signed mcp channel: every closed gate is queued once.
     ("approval.closed.emit", "* * * * *"),
+    // S07 §5.4 / S06 §5.3: a `draft` intake still unresolved after 24 h is expired in place.
+    // Five minutes is ample against a day-long window and keeps the sweep off the 60 s lane.
+    ("project_request.timeout", "*/5 * * * *"),
     // S06d: multicast an interaction to every eligible channel, then close the losing
     // recipients once one answer resolves it. The dispatch row is the idempotency witness.
     ("interaction.dispatch", "* * * * *"),

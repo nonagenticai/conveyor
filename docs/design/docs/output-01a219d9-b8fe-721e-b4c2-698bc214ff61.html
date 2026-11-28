@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Statement Of Architecture Work — Requirements, catalogues, revisions, quality scoring, search · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="statement-of-architecture-work" data-provenance-version="1" data-provenance-hash="0ceecdbf3e989133e5968f8e1049ad8a25dae2f95df476f24f39f6c3108c5b9c" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>statement-of-architecture-work</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>0ceecdbf3e989133e5968f8e1049ad8a25dae2f95df476f24f39f6c3108c5b9c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Statement Of Architecture Work — Requirements, catalogues, revisions, quality scoring, search</h1>
+<h2>Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
+      "approved_at": "2026-11-26T21:53:13.933646+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "Acceptance criteria": "Phase A closes when this statement is approved, the seven A\u2013D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan \u00a77 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets \u00a75.6's recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+        "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+        "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan \u00a77 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester.",
+        "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+        "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan \u00a75 material: the five \u00a75.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped."
+      },
+      "created_at": "2026-11-26T21:53:13.637379+00:00",
+      "id": "01a219d9-2fa8-703a-99f2-fb7e7572e467",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S07 Requirements and search (retrospective, 2026-11-24)",
+      "updated_at": "2026-11-26T21:53:13.933646+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
+      "approved_at": "2026-11-26T21:53:13.933646+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "Acceptance criteria": "Phase A closes when this statement is approved, the seven A\u2013D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan \u00a77 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets \u00a75.6's recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+        "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+        "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan \u00a77 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester.",
+        "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+        "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan \u00a75 material: the five \u00a75.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped."
+      },
+      "created_at": "2026-11-26T21:53:13.637379+00:00",
+      "id": "01a219d9-2fa8-703a-99f2-fb7e7572e467",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S07 Requirements and search (retrospective, 2026-11-24)",
+      "updated_at": "2026-11-26T21:53:13.933646+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
+      "approved_at": "2026-11-26T21:53:13.933646+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "Acceptance criteria": "Phase A closes when this statement is approved, the seven A\u2013D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan \u00a77 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets \u00a75.6's recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+        "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+        "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan \u00a77 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester.",
+        "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+        "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan \u00a75 material: the five \u00a75.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped."
+      },
+      "created_at": "2026-11-26T21:53:13.637379+00:00",
+      "id": "01a219d9-2fa8-703a-99f2-fb7e7572e467",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S07 Requirements and search (retrospective, 2026-11-24)",
+      "updated_at": "2026-11-26T21:53:13.933646+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
+      "approved_at": "2026-11-26T21:53:13.933646+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "Acceptance criteria": "Phase A closes when this statement is approved, the seven A\u2013D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan \u00a77 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets \u00a75.6's recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+        "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+        "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan \u00a77 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester.",
+        "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+        "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan \u00a75 material: the five \u00a75.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped."
+      },
+      "created_at": "2026-11-26T21:53:13.637379+00:00",
+      "id": "01a219d9-2fa8-703a-99f2-fb7e7572e467",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S07 Requirements and search (retrospective, 2026-11-24)",
+      "updated_at": "2026-11-26T21:53:13.933646+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a219d9-303c-7fdc-b217-ec349e82329b",
+      "approved_at": "2026-11-26T21:53:13.933646+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "Acceptance criteria": "Phase A closes when this statement is approved, the seven A\u2013D artefacts are approved in standard order, and the seven artefacts each carry metadata, entries, links and a document section with authored prose. Delivery acceptance is the plan \u00a77 gate: (a) three revisions with max(seq)=3 and a compare showing the status change; (b) an idempotent seed returning {0,0,N}; (c) both GIN indexes used under enable_seqscan=off with rising idx_scan; (d) relevance where B meets \u00a75.6's recall@5 \u2265 0.75, MRR \u2265 0.60 and B \u2265 C; (e) traceability in both directions with zero cross-tenant rows; (f) quality scoring read-only; (g) no orphan over the 28 RM modules. The record-level acceptance is `acceptance/programme/S07.toml`, whose 17 checks are 15 P0 and two P1.",
+        "Assignment": "The assignment is to give the conveyor one governed requirements surface: requirements, principles and decisions share a single `governed_asset` lifecycle carried by S03, every mutation writes one immutable `revision`, `requirements.compare` diffs two revisions in Rust, quality is scored adviserily on a revision, and search ranks assets, cards and catalogue entries through SQL. The work is asked for by the tranche-4 sponsoring group and accepted by the Architecture Board; this statement is authored retrospectively on 2026-11-24 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for project 01a1d039-0d2c-7322-b2f9-4dd041153894.",
+        "Contract": "The contract record is the delivery contract of project 01a1d039-0d2c-7322-b2f9-4dd041153894, version 1, approved by the Architecture Board on 2026-11-24 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its compliance clause is plan \u00a77 and the acceptance instrument `acceptance/programme/S07.toml`; its manifest names that instrument; its acceptance date is the snapshot of 2026-11-24, when the project row is closed at version 7 and tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) is authorised by the tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9. The close gate is decided by an approver other than the requester.",
+        "Responsibilities": "The programme architect (conveyor-e2e) is responsible for the plan, the seven artefacts, this statement, the delivery contract and the retrospective pack. The Architecture Board (conveyor-architecture-board) reviews and approves the artefact set and the Phase-G review. The S03 and S04 owners are consulted because `governed_asset`, `revision`, `catalogue_entry`, `trace_link` and the action registry are their surfaces; S08 and S12 are informed as consumers. The approver of the closure gate is deliberately a different principal from the requester under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.",
+        "Scope": "The phase set is A to D: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept diagram, the business capability map, the data entity/data component catalog and the technology standards catalog. The boundary is the plan \u00a75 material: the five \u00a75.1 tables, the 32 actions, the `search` module, the catalogue seed, the quality rubric and job, the eval set and the traceability actions. The project does not build the TOC API, ArchiMate or UML renders, project CRUD, batch bulk operations, RM's promote/project-copy or any UI, and it does not recreate `outline`/`outline_node`, which migration 0011 dropped."
+      },
+      "created_at": "2026-11-26T21:53:13.637379+00:00",
+      "id": "01a219d9-2fa8-703a-99f2-fb7e7572e467",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S07 Requirements and search (retrospective, 2026-11-24)",
+      "updated_at": "2026-11-26T21:53:13.933646+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Requirements, catalogues, revisions, quality scoring, search · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

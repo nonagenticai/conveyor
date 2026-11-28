@@ -1,0 +1,16 @@
+{
+ "benefit": "B7",
+ "profile_id": "01a20c80-c0c3-7788-9cc2-bb18a102a2f7",
+ "baseline": {
+  "value": 0,
+  "measured_at": "2026-11-24T17:38:13+00:00"
+ },
+ "evidence": {
+  "inception": "docs/plans/T19/inception-analysis.md",
+  "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+  "meeting_created_at": "2026-11-24T07:51:52Z",
+  "note": "the one meeting row and its two decided items are post-T19",
+  "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b"
+ },
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b"
+}

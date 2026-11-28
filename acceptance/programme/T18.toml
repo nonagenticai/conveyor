@@ -1,0 +1,97 @@
+[project]
+key = "T18"
+name = "The real V2 UI"
+gate = "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture"
+gate_checks = ["T18-project", "T18-baseline", "T18-contract", "T18-review", "T18-waivers", "T18-pi-cadence", "T18-pi-plan", "T18-pi-objectives", "T18-wsjf", "T18-demo-credits", "T18-lessons", "T18-product", "T18-coverage", "T18-artefact-standard", "T18-rework"]
+[[check]]
+id = "T18-project"
+check = "project"
+status = "active"
+severity = "P0"
+description = "T18 is active"
+
+[[check]]
+id = "T18-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "T18-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "T18-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "T18-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "T18-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "T18-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "T18-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "T18-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "T18-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "T18-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "T18-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T18-coverage"
+kind = "command"
+severity = "P0"
+description = "the V2 coverage record reports every destination's route and present spec as exists; no screen renders a fixture"
+command = '''python3 scripts/build-v2-coverage.py --check'''
+
+[[check]]
+id = "T18-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T18-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

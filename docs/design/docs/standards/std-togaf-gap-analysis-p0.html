@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor generate-standards.py" />
+    <meta name="description" content="TOGAF artefact generated from the published record." />
+    <title>Gap Analysis — Programme-level unit (plan: docs/plans/P0-programme-definition.md) · conveyor standards</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+    <style>
+      .std-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }
+      .std-meta div { border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }
+      .std-meta dt { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; }
+      .std-meta dd { margin:.15rem 0 0; }
+      .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
+      .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
+      .std-source { font-size:.85rem; opacity:.8; }
+      .std-index { list-style:none; padding:0; }
+      .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <span class="doc-sep">/</span>
+      <a href="index.html">Standards</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="../../data/standards.json">data</a>
+    </header>
+    <main class="doc-body">
+      <h1>Gap Analysis — Programme-level unit (plan: docs/plans/P0-programme-definition.md)</h1>
+      <dl class="std-meta">
+        <div><dt>Standard</dt><dd>TOGAF</dd></div>
+        <div><dt>Level</dt><dd>project</dd></div>
+        <div><dt>Subject</dt><dd>Programme-level unit (plan: docs/plans/P0-programme-definition.md)</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>SPEC</dt><dd>§8.1</dd></div>
+        <div><dt>Gate</dt><dd>live</dd></div>
+        <div><dt>Package</dt><dd><code>std-togaf-gap-analysis-p0:P0</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+      </dl>
+      <h2>Baseline</h2>
+<p class="std-intent">The current state, with the evidence that establishes it.</p>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<ul>
+<li>Gap Analysis — P0 (retrospective, 2026-11-26)</li>
+</ul><h2>Target</h2>
+<p class="std-intent">The target state the architecture specifies, with the plateau it belongs to.</p>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<ul>
+<li>Gap Analysis — P0 (retrospective, 2026-11-26)</li>
+</ul><h2>Gaps and work packages</h2>
+<p class="std-intent">Each gap between baseline and target, and the work package that closes it.</p>
+<p class="std-source">Source: <code>gap-analysis</code> — 126 row(s)</p>
+<ul>
+<li>Planka&#x27;s database cannot evidence usage: four boards and five test cards <span class="std-state">open</span></li>
+<li>The execution census covers three days, so it cannot answer quarterly use <span class="std-state">open</span></li>
+<li>Every later slice depends on parity_ids, and S14 gates on 100 % of used <span class="std-state">open</span></li>
+<li>The measurement depends on read-only access to master Postgres and Loki <span class="std-state">open</span></li>
+<li>The five-run sets for metrics 5–7 never completed inside the measurement window <span class="std-state">open</span></li>
+<li>S01 depends on S00 for the parity ids the UI build consumes <span class="std-state">open</span></li>
+<li>Issue #2 was open at the start of the rework although its P2 test was already written <span class="std-state">open</span></li>
+<li>The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row <span class="std-state">open</span></li>
+<li>S00&#x27;s signed parity inventory fixes the surfaces S02 must expose <span class="std-state">open</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S03) <span class="std-state">accepted</span></li>
+<li>S03 closed out of sequence before the tranche-2 review (U3-EXC-S03) <span class="std-state">accepted</span></li>
+<li>S02 platform migration and tenancy primitives land first <span class="std-state">open</span></li>
+</ul>
+    </main>
+  </body>
+</html>

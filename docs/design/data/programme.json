@@ -1,8 +1,1078 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-26T21:15:00Z",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 878,
+        "state": "OPEN",
+        "title": "fix(walk): the registry test must allow a wing's rows",
+        "updatedAt": "2026-11-27T18:39:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/878"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          }
+        ],
+        "number": 871,
+        "state": "CLOSED",
+        "title": "proof: the live unit-gate refusal on the released engine",
+        "updatedAt": "2026-11-27T19:17:13Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/871"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "5319E7",
+            "name": "status:needs-human"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 869,
+        "state": "OPEN",
+        "title": "delivery: the 8 no-issue PRs — adopt or exempt",
+        "updatedAt": "2026-11-27T17:03:27Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/869"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 868,
+        "state": "OPEN",
+        "title": "proof: verifyParts must apply only to unit-labeled issues",
+        "updatedAt": "2026-11-27T19:25:22Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/868"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 867,
+        "state": "CLOSED",
+        "title": "design: the deployed build stamp and the stale-snapshot badge (P3.2)",
+        "updatedAt": "2026-11-27T18:58:21Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/867"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 865,
+        "state": "CLOSED",
+        "title": "proof: the live unit ledger's findings — the real defects and the unfinished queue",
+        "updatedAt": "2026-11-27T18:08:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/865"
+      },
+      {
+        "labels": [
+          {
+            "color": "d73a4a",
+            "name": "bug"
+          },
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 864,
+        "state": "CLOSED",
+        "title": "coverage: a live unit attaches by its project label, so a frozen seed cannot orphan a project",
+        "updatedAt": "2026-11-27T17:59:43Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/864"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 862,
+        "state": "CLOSED",
+        "title": "fix(walk): a multi-segment deep link loads the app without its assets",
+        "updatedAt": "2026-11-27T18:26:03Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/862"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 860,
+        "state": "CLOSED",
+        "title": "fix(walk): the action sheet shows the server's field errors in a refusal",
+        "updatedAt": "2026-11-27T18:26:01Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/860"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 857,
+        "state": "CLOSED",
+        "title": "fix(walk): the deployed Playwright run selects only e2e/deployed",
+        "updatedAt": "2026-11-27T16:32:28Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/857"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 855,
+        "state": "CLOSED",
+        "title": "proof: record the live unit certification and make the collector reach the public engine",
+        "updatedAt": "2026-11-27T16:15:57Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/855"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 854,
+        "state": "OPEN",
+        "title": "programme: the tranche-4 and tranche-5 exits — the residual P2s and the two reviews",
+        "updatedAt": "2026-11-27T14:21:00Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/854"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 853,
+        "state": "OPEN",
+        "title": "benefits: the complete profiles, the measured baselines and the first transition (U6)",
+        "updatedAt": "2026-11-27T15:42:19Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/853"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 852,
+        "state": "OPEN",
+        "title": "programme: promote the reworked record to production and record the tranche-3 review",
+        "updatedAt": "2026-11-27T14:20:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/852"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 849,
+        "state": "CLOSED",
+        "title": "skills: the seven remaining role playbooks act through the session channel",
+        "updatedAt": "2026-11-27T15:26:46Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/849"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          },
+          {
+            "color": "6E7781",
+            "name": "T18"
+          }
+        ],
+        "number": 848,
+        "state": "OPEN",
+        "title": "test: T18 — every V2 destination's spec asserts empty, error, happy and one refusal",
+        "updatedAt": "2026-11-27T18:12:34Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/848"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 847,
+        "state": "CLOSED",
+        "title": "walk: G0 conformance — the record and the parity instrument tell the truth",
+        "updatedAt": "2026-11-27T14:08:40Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/847"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 842,
+        "state": "CLOSED",
+        "title": "feedback: in-app bug reports and feature requests for every tenant",
+        "updatedAt": "2026-11-27T16:53:10Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/842"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 839,
+        "state": "CLOSED",
+        "title": "fix(walk): mount the wasm engine — the config must carry the seed the boundary requires",
+        "updatedAt": "2026-11-27T13:00:32Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/839"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 838,
+        "state": "OPEN",
+        "title": "programme: tranche 6 — S06b, S10, S11, T19F packs + S06a receipt, exit and review",
+        "updatedAt": "2026-11-27T12:15:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/838"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 837,
+        "state": "CLOSED",
+        "title": "proof: engine-derived unit facts and the required DoD gate",
+        "updatedAt": "2026-11-27T17:09:50Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/837"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T1"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 836,
+        "state": "CLOSED",
+        "title": "proof: the unit delivery model and the evaluation of the real ledger",
+        "updatedAt": "2026-11-27T14:37:12Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/836"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T13"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 832,
+        "state": "CLOSED",
+        "title": "T13: the spend budget gate (v1-w4a-1, with v1-p75-1) — carve-out from the #526 lane",
+        "updatedAt": "2026-11-27T13:50:47Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/832"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T4"
+          },
+          {
+            "color": "6E7781",
+            "name": "T9"
+          },
+          {
+            "color": "6E7781",
+            "name": "T10"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 831,
+        "state": "CLOSED",
+        "title": "T4/T9/T10: the tranche-4 P0 residuals — six code findings and the two missing reviews",
+        "updatedAt": "2026-11-27T13:25:44Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/831"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 830,
+        "state": "OPEN",
+        "title": "publish: the strict pack at the tranche-3 close — the blocked documents, the register and the reconciled baseline",
+        "updatedAt": "2026-11-27T14:21:48Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/830"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 826,
+        "state": "CLOSED",
+        "title": "design: publish the Gemba Walk demo at conveyor.nonagentic.ai/game",
+        "updatedAt": "2026-11-27T08:28:49Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/826"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 822,
+        "state": "CLOSED",
+        "title": "deps: land jsonwebtoken 12 on an issue-owned branch",
+        "updatedAt": "2026-11-27T08:08:23Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/822"
+      },
+      {
+        "labels": [
+          {
+            "color": "d73a4a",
+            "name": "bug"
+          },
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 821,
+        "state": "CLOSED",
+        "title": "ci: the required checks are load-sensitive — the console race timer and the Redis connect",
+        "updatedAt": "2026-11-27T08:48:55Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/821"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 819,
+        "state": "CLOSED",
+        "title": "standards: the 14 TOGAF/SAFe output categories the live documents need",
+        "updatedAt": "2026-11-27T11:39:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/819"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "D93F0B",
+            "name": "status:blocked"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 817,
+        "state": "OPEN",
+        "title": "S4 — Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
+        "updatedAt": "2026-11-27T07:33:44Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/817"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 816,
+        "state": "OPEN",
+        "title": "S3 — Gemba Walk: Knowledge, Measure, Operations & Utilities read/write parity",
+        "updatedAt": "2026-11-27T18:52:19Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/816"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 815,
+        "state": "OPEN",
+        "title": "S2 — Gemba Walk: Procedures & authoring + Govern & design read/write parity",
+        "updatedAt": "2026-11-27T18:23:27Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/815"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 814,
+        "state": "OPEN",
+        "title": "S1 — Gemba Walk: Portfolio & plan + Organisation read/write parity",
+        "updatedAt": "2026-11-27T18:27:20Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/814"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 813,
+        "state": "CLOSED",
+        "title": "G0 — Gemba Walk foundation: census/instrument, renderer spike, bevy_ecs world, Portfolio end-to-end",
+        "updatedAt": "2026-11-27T10:30:29Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/813"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "S04"
+          }
+        ],
+        "number": 812,
+        "state": "CLOSED",
+        "title": "S04 P4.1 — the live coding, worker and billing receipts",
+        "updatedAt": "2026-11-27T10:52:06Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/812"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 806,
+        "state": "CLOSED",
+        "title": "architecture: the Gemba Walk's bevy_ecs world layer — ADR 0022, the ECS design and its publication",
+        "updatedAt": "2026-11-27T03:10:11Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/806"
+      },
+      {
+        "labels": [],
+        "number": 803,
+        "state": "CLOSED",
+        "title": "prover: the deployed image is hand-built from nonagenticai/lean4-prover — a merge here never reaches the cluster",
+        "updatedAt": "2026-11-27T08:22:35Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/803"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T3"
+          },
+          {
+            "color": "6E7781",
+            "name": "T13"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 797,
+        "state": "CLOSED",
+        "title": "T3/T13: the three tranche-3 P0 residuals — baseline guard, spend budget, write-verify",
+        "updatedAt": "2026-11-27T07:28:06Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/797"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "1D76DB",
+            "name": "GEMBA-WALK"
+          }
+        ],
+        "number": 792,
+        "state": "CLOSED",
+        "title": "GEMBA-WALK inception — register the programme project and publish the MSP/TOGAF/SAFe set",
+        "updatedAt": "2026-11-27T03:08:57Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/792"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 791,
+        "state": "CLOSED",
+        "title": "skills: add the authoring, build, architecture, procedural and analysis role playbooks; harden the six",
+        "updatedAt": "2026-11-26T23:48:30Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/791"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 789,
+        "state": "CLOSED",
+        "title": "ci: run design-pack on merge_group so it can be a required check",
+        "updatedAt": "2026-11-26T22:41:18Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/789"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          }
+        ],
+        "number": 788,
+        "state": "CLOSED",
+        "title": "estate: the conveyor-bundle-minter client and the lean4-prover licence app (#776 P3)",
+        "updatedAt": "2026-11-26T23:17:03Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/788"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 787,
+        "state": "CLOSED",
+        "title": "prover: a failing lean4.check returns no diagnostics because only stderr is parsed",
+        "updatedAt": "2026-11-27T01:15:37Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/787"
+      },
+      {
+        "labels": [
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 784,
+        "state": "OPEN",
+        "title": "conveyor-buildout — the SPEC_V2 programme",
+        "updatedAt": "2026-11-27T02:33:29Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/784"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 783,
+        "state": "OPEN",
+        "title": "design: conformance and standards as row-derived sections",
+        "updatedAt": "2026-11-27T11:24:39Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/783"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 782,
+        "state": "CLOSED",
+        "title": "design: the unit record on the public site, and the retirement of the superseded Python",
+        "updatedAt": "2026-11-27T16:53:12Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/782"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 781,
+        "state": "CLOSED",
+        "title": "skills: the delivery actor — delivery-unit, programme-sync, and the six roles on the action route",
+        "updatedAt": "2026-11-27T06:55:05Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/781"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 780,
+        "state": "CLOSED",
+        "title": "github: the intent channel — issue form, DoR on events, sub-issues and tranche milestones",
+        "updatedAt": "2026-11-27T02:35:59Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/780"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 779,
+        "state": "CLOSED",
+        "title": "programme: the unit record — charter, list and close a delivery unit as a row",
+        "updatedAt": "2026-11-26T23:48:30Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/779"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T13"
+          }
+        ],
+        "number": 778,
+        "state": "CLOSED",
+        "title": "T13 — a missing operation opens a tool request; publish rebinds the step",
+        "updatedAt": "2026-11-27T06:29:40Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/778"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "T14"
+          }
+        ],
+        "number": 776,
+        "state": "CLOSED",
+        "title": "add: the mint path uses a dedicated minter credential, and refuses without one",
+        "updatedAt": "2026-11-26T23:17:29Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/776"
+      },
       {
         "labels": [
           {
@@ -19,9 +1089,9 @@
           }
         ],
         "number": 773,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "publish: republish the standards record and register after the delivery-contract filter",
-        "updatedAt": "2026-11-26T21:10:48Z",
+        "updatedAt": "2026-11-26T21:40:50Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/773"
       },
       {
@@ -52,8 +1122,8 @@
             "name": "unit"
           },
           {
-            "color": "5319E7",
-            "name": "status:needs-human"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -65,9 +1135,9 @@
           }
         ],
         "number": 762,
-        "state": "OPEN",
-        "title": "proof: the live delivery drills on the released engine, and the mint path that blocks them",
-        "updatedAt": "2026-11-26T15:57:47Z",
+        "state": "CLOSED",
+        "title": "proof: the live delivery drills on the released engine",
+        "updatedAt": "2026-11-26T22:04:02Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/762"
       },
       {
@@ -82,10 +1152,23 @@
           }
         ],
         "number": 760,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "auth: the session channel — a machine principal and a licence-bearer mint",
-        "updatedAt": "2026-11-26T16:33:36Z",
+        "updatedAt": "2026-11-26T23:48:30Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/760"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          }
+        ],
+        "number": 756,
+        "state": "CLOSED",
+        "title": "design: provenance on every output page and a declared-vs-evidenced register",
+        "updatedAt": "2026-11-27T02:35:55Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/756"
       },
       {
         "labels": [
@@ -96,23 +1179,6 @@
           {
             "color": "FBCA04",
             "name": "status:claimed"
-          }
-        ],
-        "number": 756,
-        "state": "OPEN",
-        "title": "design: provenance on every output page and a declared-vs-evidenced register",
-        "updatedAt": "2026-11-26T13:33:10Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/756"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "D93F0B",
-            "name": "status:blocked"
           },
           {
             "color": "5319E7",
@@ -121,8 +1187,8 @@
         ],
         "number": 755,
         "state": "OPEN",
-        "title": "programme: the retrospective tranche reviews — close tranches 3–12 and authorise tranches 4–13",
-        "updatedAt": "2026-11-26T13:24:31Z",
+        "title": "programme: the retrospective tranche reviews — close tranches 7–12 and authorise tranches 8–13",
+        "updatedAt": "2026-11-27T14:21:33Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/755"
       },
       {
@@ -700,9 +1766,9 @@
           }
         ],
         "number": 660,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-26T15:05:23Z",
+        "updatedAt": "2026-11-27T02:33:37Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -1350,9 +2416,9 @@
           }
         ],
         "number": 569,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-24T04:28:12Z",
+        "updatedAt": "2026-11-27T02:33:34Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/569"
       },
       {
@@ -1360,10 +2426,6 @@
           {
             "color": "1D76DB",
             "name": "unit"
-          },
-          {
-            "color": "0E8A16",
-            "name": "status:ready"
           },
           {
             "color": "5319E7",
@@ -1375,9 +2437,9 @@
           }
         ],
         "number": 566,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
-        "updatedAt": "2026-11-25T07:19:29Z",
+        "updatedAt": "2026-11-27T07:48:50Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/566"
       },
       {
@@ -1771,7 +2833,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-26T16:23:53Z",
+        "updatedAt": "2026-11-27T17:03:32Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -2267,9 +3329,9 @@
           }
         ],
         "number": 435,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-22T07:06:55Z",
+        "updatedAt": "2026-11-27T02:33:31Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/435"
       },
       {
@@ -5180,9 +6242,9 @@
           }
         ],
         "number": 88,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T12 — One organisation loop (the acceptance of V2)",
-        "updatedAt": "2026-11-25T07:20:21Z",
+        "updatedAt": "2026-11-26T21:37:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/88"
       },
       {
@@ -5900,7 +6962,7 @@
         "number": 31,
         "state": "OPEN",
         "title": "S19: the Tier-3 per-case LLM auditor",
-        "updatedAt": "2026-11-13T06:32:29Z",
+        "updatedAt": "2026-11-27T16:02:00Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/31"
       },
       {
@@ -5931,8 +6993,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -5942,7 +7004,7 @@
         "number": 29,
         "state": "OPEN",
         "title": "S14: rewrite the cutover plan for independent deployment and coexistence",
-        "updatedAt": "2026-11-18T09:24:14Z",
+        "updatedAt": "2026-11-27T18:51:18Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/29"
       },
       {
@@ -6089,7 +7151,7 @@
         ],
         "number": 21,
         "state": "CLOSED",
-        "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale hp1 doc",
+        "title": "CI capacity: measure the arc-large CPU ceiling and correct the stale compute-1 doc",
         "updatedAt": "2026-11-13T06:32:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/21"
       },
@@ -6175,7 +7237,7 @@
         "number": 16,
         "state": "OPEN",
         "title": "train — post-#9 queue sweep and merged-branch cleanup",
-        "updatedAt": "2026-11-25T07:20:19Z",
+        "updatedAt": "2026-11-27T17:35:39Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/16"
       },
       {
@@ -6259,7 +7321,7 @@
         "number": 12,
         "state": "OPEN",
         "title": "S18 — executor-backed producers and the real improvement loop",
-        "updatedAt": "2026-11-25T07:20:18Z",
+        "updatedAt": "2026-11-27T16:01:57Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/12"
       },
       {
@@ -6322,7 +7384,7 @@
         "number": 9,
         "state": "OPEN",
         "title": "S15 — live strata proof and native memory provenance",
-        "updatedAt": "2026-11-13T06:31:54Z",
+        "updatedAt": "2026-11-27T16:01:56Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/9"
       },
       {
@@ -6427,7 +7489,7 @@
         "number": 4,
         "state": "OPEN",
         "title": "S06 — one shared decision boundary; Telegram sender identity",
-        "updatedAt": "2026-11-13T06:31:43Z",
+        "updatedAt": "2026-11-27T16:01:54Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/4"
       },
       {
@@ -6448,7 +7510,7 @@
         "number": 3,
         "state": "CLOSED",
         "title": "S04 — the external action execution contract (import → invoke → restart)",
-        "updatedAt": "2026-11-26T17:09:30Z",
+        "updatedAt": "2026-11-27T06:46:49Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/3"
       },
       {
@@ -6489,7 +7551,13 @@
         "updatedAt": "2026-11-13T06:31:38Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/1"
       }
-    ]
+    ],
+    "provenance": {
+      "sha256": "0a2752ada6b60e14510c28a91fe60219b35b7ee4f8a770c2f9dbcf1200898081",
+      "source": "github:nonagenticai/conveyor",
+      "tenant": "nonagentic"
+    },
+    "schema": "issue-registry/v1"
   },
   "programme": [
     {
@@ -6497,46 +7565,24 @@
       "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "name": "conveyor buildout",
       "owner_user_id": null,
+      "shared_config": {
+        "locked": [
+          "approval_policy_default"
+        ],
+        "values": {
+          "approval_policy_default": "the tenant default; a destructive action needs a distinct approver",
+          "budget_basis": "inference is metered per call; no programme money budget while the rework completes",
+          "cadence": "a PI, a refinement and a retro per tranche",
+          "job_families": "delivery, governance and platform jobs are catalogued and bound",
+          "knowledge_pins": "the programme definition set and the accepted conformance baseline"
+        }
+      },
       "status": "active",
-      "updated_at": "2026-11-12T14:46:02.275593+00:00",
-      "version": 1
+      "updated_at": "2026-11-26T13:13:53.780782+00:00",
+      "version": 4
     }
   ],
   "projects": [
-    {
-      "board_count": 1,
-      "card_count": 3,
-      "created_at": "2026-11-19T07:36:44.012+00:00",
-      "description": "current-image UI proof for #285",
-      "id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
-      "key": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
-      "meta": {},
-      "name": "AAA UI proof #285 2026-11-19T07:36 1795073796184",
-      "phase_code": null,
-      "programme_id": null,
-      "project_type_code": "it",
-      "repo_url": null,
-      "status": "active",
-      "updated_at": "2026-11-19T07:36:44.012+00:00",
-      "version": 1
-    },
-    {
-      "board_count": 1,
-      "card_count": 2,
-      "created_at": "2026-11-19T07:40:36.265466+00:00",
-      "description": "current-image UI proof for #285",
-      "id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
-      "key": "AAA-UI-PROOF-285-2026-11-19T07-4",
-      "meta": {},
-      "name": "AAA UI proof #285 2026-11-19T07:40 1795074026931",
-      "phase_code": null,
-      "programme_id": null,
-      "project_type_code": "it",
-      "repo_url": null,
-      "status": "active",
-      "updated_at": "2026-11-19T07:40:36.265466+00:00",
-      "version": 1
-    },
     {
       "board_count": 1,
       "card_count": 4,
@@ -6571,7 +7617,7 @@
         "plateau": "definition",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
-        "reopened_at": "2026-11-21T17:51:30.731777+00:00",
+        "reopened_at": "2026-11-26T08:07:25.824365+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "programme",
         "tranche": 0,
@@ -6583,20 +7629,22 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T17:55:54.720006+00:00",
-      "version": 12
+      "updated_at": "2026-11-26T08:44:51.99607+00:00",
+      "version": 14
     },
     {
       "board_count": 1,
-      "card_count": 2,
+      "card_count": 3,
       "created_at": "2026-11-15T01:01:00.532195+00:00",
       "description": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
       "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "key": "P0",
       "meta": {
         "adm_phase": "Preliminary",
-        "close_reason": "the retrospective rework of tranche 0: manifest green, closure gate decided by a distinct approver, SAFe artefacts recorded",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 0 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [],
         "expected_outputs": [
           "vision",
@@ -6630,9 +7678,9 @@
         "plan": "docs/plans/P0-programme-definition.md",
         "plan_status": "active",
         "plateau": "definition",
-        "reopen_decision_ref": "01a1fb9f-f19e-749b-9218-a4428b2e3dac",
-        "reopen_reason": "U5a retrospective rework by the book; the U3 verdict is rework (#511)",
-        "reopened_at": "2026-11-21T11:15:34.710111+00:00",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
+        "reopened_at": "2026-11-26T09:34:43.09243+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "programme",
         "tranche": 0,
@@ -6644,12 +7692,12 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 14
+      "updated_at": "2026-11-26T09:34:54.678729+00:00",
+      "version": 19
     },
     {
       "board_count": 1,
-      "card_count": 335,
+      "card_count": 339,
       "created_at": "2026-11-12T14:46:02.275593+00:00",
       "description": "Programme-level unit (plan: docs/plans/development-process-speed.md)",
       "id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
@@ -6721,7 +7769,9 @@
       "meta": {
         "adm_phase": "G",
         "close_reason": "the retrospective rework of tranche 0 (#526)",
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [],
         "expected_outputs": [
           "project-brief",
@@ -6734,7 +7784,7 @@
         "plateau": "delivery",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
-        "reopened_at": "2026-11-21T17:46:23.54215+00:00",
+        "reopened_at": "2026-11-26T09:48:08.626867+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 0,
@@ -6746,8 +7796,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 11
+      "updated_at": "2026-11-26T09:48:24.331911+00:00",
+      "version": 16
     },
     {
       "board_count": 1,
@@ -6759,7 +7809,9 @@
       "meta": {
         "adm_phase": "G",
         "close_reason": "the retrospective rework of tranche 0 (#526)",
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [],
         "expected_outputs": [
           "project-brief",
@@ -6772,7 +7824,7 @@
         "plateau": "delivery",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
-        "reopened_at": "2026-11-21T17:36:03.508468+00:00",
+        "reopened_at": "2026-11-26T09:48:32.663618+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 0,
@@ -6784,8 +7836,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 12
+      "updated_at": "2026-11-26T09:49:10.931969+00:00",
+      "version": 15
     },
     {
       "board_count": 1,
@@ -6797,9 +7849,14 @@
       "meta": {
         "adm_phase": "G",
         "close_reason": "the retrospective rework of tranche 1 (#526)",
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S00"
+          {
+            "kind": "needs",
+            "to": "S00"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -6814,7 +7871,7 @@
         "plateau": "delivery",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 1 (#526)",
-        "reopened_at": "2026-11-21T19:27:22.936678+00:00",
+        "reopened_at": "2026-11-26T13:06:18.991239+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 1,
@@ -6825,9 +7882,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "active",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 13
+      "status": "closed",
+      "updated_at": "2026-11-26T13:06:26.681257+00:00",
+      "version": 18
     },
     {
       "board_count": 1,
@@ -6838,10 +7895,15 @@
       "key": "S03",
       "meta": {
         "adm_phase": "G",
-        "close_reason": "S03 closes after the tranche-2 rework: its acceptance, closure review and declared outputs are proven at the closing head; resumed under the owner's published delegation of 2026-11-22.",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 2 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S02"
+          {
+            "kind": "needs",
+            "to": "S02"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -6854,7 +7916,7 @@
         "plateau": "delivery",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 2 (#526)",
-        "reopened_at": "2026-11-21T23:11:45.439962+00:00",
+        "reopened_at": "2026-11-26T13:11:01.808724+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 2,
@@ -6866,8 +7928,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 11
+      "updated_at": "2026-11-26T13:11:12.638093+00:00",
+      "version": 17
     },
     {
       "board_count": 1,
@@ -6878,10 +7940,19 @@
       "key": "S04",
       "meta": {
         "adm_phase": "G",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 3 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S02",
-          "S03"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S03"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -6904,9 +7975,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "active",
-      "updated_at": "2026-11-21T01:05:37.877938+00:00",
-      "version": 8
+      "status": "closed",
+      "updated_at": "2026-11-26T21:32:30.290258+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -6919,8 +7990,14 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S03",
-          "S04"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -6931,6 +8008,9 @@
         "plan": "docs/plans/slices/S05-board.md",
         "plan_status": "planned",
         "plateau": "delivery",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
+        "reopened_at": "2026-11-26T21:52:30.86674+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 4,
@@ -6941,9 +8021,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "closed",
-      "updated_at": "2026-11-21T01:05:43.612418+00:00",
-      "version": 7
+      "status": "active",
+      "updated_at": "2026-11-26T21:52:30.86674+00:00",
+      "version": 9
     },
     {
       "board_count": 1,
@@ -6956,9 +8036,18 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S03",
-          "S04",
-          "S05"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -6983,8 +8072,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:25.972169+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -6997,9 +8086,18 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S04",
-          "S05",
-          "S06"
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          }
         ],
         "expected_outputs": [
           "project-brief"
@@ -7020,8 +8118,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "archived",
-      "updated_at": "2026-11-21T01:05:54.461393+00:00",
-      "version": 8
+      "updated_at": "2026-11-26T10:40:26.101327+00:00",
+      "version": 9
     },
     {
       "board_count": 1,
@@ -7034,9 +8132,18 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S04",
-          "S05",
-          "S06"
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7058,8 +8165,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:00.260942+00:00",
-      "version": 7
+      "updated_at": "2026-11-26T10:40:26.23324+00:00",
+      "version": 8
     },
     {
       "board_count": 1,
@@ -7072,10 +8179,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S04",
-          "S05",
-          "S06",
-          "S06b"
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S06b"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7097,8 +8216,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:05.72812+00:00",
-      "version": 7
+      "updated_at": "2026-11-26T10:40:26.362251+00:00",
+      "version": 8
     },
     {
       "board_count": 1,
@@ -7111,12 +8230,30 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S02",
-          "S04",
-          "S05",
-          "S06",
-          "S06b",
-          "S06c"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S06b"
+          },
+          {
+            "kind": "needs",
+            "to": "S06c"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7138,8 +8275,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:11.56029+00:00",
-      "version": 7
+      "updated_at": "2026-11-26T10:40:26.493743+00:00",
+      "version": 8
     },
     {
       "board_count": 1,
@@ -7150,10 +8287,19 @@
       "key": "S07",
       "meta": {
         "adm_phase": "G",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S03",
-          "S04"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7164,6 +8310,9 @@
         "plan": "docs/plans/slices/S07-requirements-search.md",
         "plan_status": "planned",
         "plateau": "delivery",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
+        "reopened_at": "2026-11-26T22:48:58.105833+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 4,
@@ -7175,8 +8324,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:16.952858+00:00",
-      "version": 7
+      "updated_at": "2026-11-26T22:49:06.757866+00:00",
+      "version": 13
     },
     {
       "board_count": 1,
@@ -7187,11 +8336,23 @@
       "key": "S08",
       "meta": {
         "adm_phase": "G",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 5 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S03",
-          "S04",
-          "S07"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S07"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7202,6 +8363,9 @@
         "plan": "docs/plans/slices/S08-governance-modelling.md",
         "plan_status": "planned",
         "plateau": "delivery",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 5 (#526)",
+        "reopened_at": "2026-11-27T08:19:27.206731+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 5,
@@ -7213,8 +8377,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:22.300031+00:00",
-      "version": 7
+      "updated_at": "2026-11-27T08:22:51.238471+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -7225,10 +8389,19 @@
       "key": "S09",
       "meta": {
         "adm_phase": "G",
-        "closure_outputs": [],
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [
-          "S03",
-          "S04"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7249,6 +8422,9 @@
         "plan": "docs/plans/slices/S09-documents-integrations.md",
         "plan_status": "planned",
         "plateau": "delivery",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
+        "reopened_at": "2026-11-26T22:49:18.514996+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 4,
@@ -7260,8 +8436,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T22:49:26.784621+00:00",
+      "version": 16
     },
     {
       "board_count": 1,
@@ -7274,10 +8450,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S02",
-          "S03",
-          "S04",
-          "S06"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7299,8 +8487,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:33.244507+00:00",
-      "version": 7
+      "updated_at": "2026-11-26T10:40:27.009592+00:00",
+      "version": 8
     },
     {
       "board_count": 1,
@@ -7313,10 +8501,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S03",
-          "S04",
-          "S06",
-          "S07"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S07"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7340,8 +8540,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:38.710001+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:27.139549+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -7354,18 +8554,54 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S01",
-          "S02",
-          "S04",
-          "S05",
-          "S06",
-          "S07",
-          "S08",
-          "S09",
-          "S10",
-          "S11",
-          "S17",
-          "S18"
+          {
+            "kind": "needs",
+            "to": "S01"
+          },
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S05"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S07"
+          },
+          {
+            "kind": "needs",
+            "to": "S08"
+          },
+          {
+            "kind": "needs",
+            "to": "S09"
+          },
+          {
+            "kind": "needs",
+            "to": "S10"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          },
+          {
+            "kind": "needs",
+            "to": "S17"
+          },
+          {
+            "kind": "needs",
+            "to": "S18"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7403,8 +8639,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:06:44.148285+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T10:40:27.268179+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -7417,10 +8653,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S03",
-          "S04",
-          "S11",
-          "S15"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          },
+          {
+            "kind": "needs",
+            "to": "S15"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7449,8 +8697,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:27.399491+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -7465,10 +8713,22 @@
           "closure-review"
         ],
         "depends_on": [
-          "S00",
-          "S06b",
-          "S12",
-          "S13"
+          {
+            "kind": "needs",
+            "to": "S00"
+          },
+          {
+            "kind": "needs",
+            "to": "S06b"
+          },
+          {
+            "kind": "needs",
+            "to": "S12"
+          },
+          {
+            "kind": "needs",
+            "to": "S13"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7493,8 +8753,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-21T01:06:55.185897+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:27.531005+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -7507,10 +8767,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S03",
-          "S04",
-          "S06",
-          "S11"
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7534,8 +8806,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-21T01:07:00.970924+00:00",
-      "version": 8
+      "updated_at": "2026-11-26T10:40:27.660672+00:00",
+      "version": 9
     },
     {
       "board_count": 1,
@@ -7548,11 +8820,26 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S02",
-          "S03",
-          "S04",
-          "S10",
-          "S11"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S10"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7576,8 +8863,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:07:06.572796+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:27.790106+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -7590,10 +8877,22 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S02",
-          "S03",
-          "S04",
-          "S09"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S09"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7607,6 +8906,9 @@
         "plan": "docs/plans/slices/S17-benchmark-harness.md",
         "plan_status": "built 2026-11-09",
         "plateau": "delivery",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 5 (#526)",
+        "reopened_at": "2026-11-27T08:25:06.91283+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v1",
         "tranche": 5,
@@ -7617,9 +8919,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 9
+      "status": "active",
+      "updated_at": "2026-11-27T08:25:06.91283+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -7632,9 +8934,18 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S13",
-          "S15",
-          "S17"
+          {
+            "kind": "needs",
+            "to": "S13"
+          },
+          {
+            "kind": "needs",
+            "to": "S15"
+          },
+          {
+            "kind": "needs",
+            "to": "S17"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7659,8 +8970,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T10:40:28.04824+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -7673,14 +8984,38 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S02",
-          "S03",
-          "S04",
-          "S06",
-          "S09",
-          "S10",
-          "S11",
-          "S16"
+          {
+            "kind": "needs",
+            "to": "S02"
+          },
+          {
+            "kind": "needs",
+            "to": "S03"
+          },
+          {
+            "kind": "needs",
+            "to": "S04"
+          },
+          {
+            "kind": "needs",
+            "to": "S06"
+          },
+          {
+            "kind": "needs",
+            "to": "S09"
+          },
+          {
+            "kind": "needs",
+            "to": "S10"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          },
+          {
+            "kind": "needs",
+            "to": "S16"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7705,8 +9040,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-21T01:07:24.186048+00:00",
-      "version": 8
+      "updated_at": "2026-11-26T10:40:28.177586+00:00",
+      "version": 9
     },
     {
       "board_count": 1,
@@ -7719,7 +9054,10 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S19"
+          {
+            "kind": "needs",
+            "to": "S19"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7743,8 +9081,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 9
+      "updated_at": "2026-11-26T10:40:28.306908+00:00",
+      "version": 10
     },
     {
       "board_count": 1,
@@ -7757,13 +9095,34 @@
         "adm_phase": "G",
         "closure_outputs": [],
         "depends_on": [
-          "S09",
-          "S11",
-          "S13",
-          "S15",
-          "S16",
-          "T2",
-          "T13"
+          {
+            "kind": "needs",
+            "to": "S09"
+          },
+          {
+            "kind": "needs",
+            "to": "S11"
+          },
+          {
+            "kind": "needs",
+            "to": "S13"
+          },
+          {
+            "kind": "needs",
+            "to": "S15"
+          },
+          {
+            "kind": "needs",
+            "to": "S16"
+          },
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T13"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7795,8 +9154,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 11
+      "updated_at": "2026-11-26T10:40:28.438574+00:00",
+      "version": 12
     },
     {
       "board_count": 1,
@@ -7808,7 +9167,9 @@
       "meta": {
         "adm_phase": "Preliminary",
         "close_reason": "the retrospective rework of tranche 0 (#526)",
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "depends_on": [],
         "expected_outputs": [
           "spec"
@@ -7833,9 +9194,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 13
+      "status": "closed",
+      "updated_at": "2026-11-26T11:47:44.454754+00:00",
+      "version": 15
     },
     {
       "board_count": 1,
@@ -7864,8 +9225,8 @@
         "plan_status": "draft",
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "reopen_reason": "the merged audit finds open P0 v1-w1a-2 after the retrospective closure; rework (#526)",
-        "reopened_at": "2026-11-21T20:59:32.665347+00:00",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
+        "reopened_at": "2026-11-26T09:49:19.201293+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 0,
@@ -7877,8 +9238,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 14
+      "updated_at": "2026-11-26T09:50:04.679545+00:00",
+      "version": 16
     },
     {
       "board_count": 1,
@@ -7889,13 +9250,19 @@
       "key": "T1",
       "meta": {
         "adm_phase": "G",
-        "close_reason": "Close T1 after the tranche-1 rework (#526)",
+        "close_reason": "the retrospective rework of tranche 1 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T0",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T0"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7910,8 +9277,8 @@
         "plan_status": "draft",
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "reopen_reason": "the merged audit finds open P0 v1-p5-2 after the retrospective closure; rework (#526)",
-        "reopened_at": "2026-11-21T20:59:23.90301+00:00",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 1 (#526)",
+        "reopened_at": "2026-11-26T13:06:36.069551+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 1,
@@ -7923,8 +9290,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-22T07:38:39.519399+00:00",
-      "version": 16
+      "updated_at": "2026-11-26T13:06:43.695873+00:00",
+      "version": 21
     },
     {
       "board_count": 1,
@@ -7935,13 +9302,23 @@
       "key": "T10",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T1",
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -7958,7 +9335,7 @@
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
-        "reopened_at": "2026-11-22T09:12:05.014129+00:00",
+        "reopened_at": "2026-11-26T22:49:38.844601+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 4,
@@ -7970,8 +9347,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 13
+      "updated_at": "2026-11-26T22:49:47.138842+00:00",
+      "version": 20
     },
     {
       "board_count": 1,
@@ -7982,12 +9359,15 @@
       "key": "T11",
       "meta": {
         "adm_phase": "G",
-        "close_reason": "Close T11 after the tranche-1 rework (#526)",
+        "close_reason": "the retrospective rework of tranche 1 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "P0"
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8003,8 +9383,8 @@
         "plan_status": "draft",
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "reopen_reason": "the merged audit finds open P0 v1-p75-1 after the retrospective closure; rework (#526)",
-        "reopened_at": "2026-11-21T20:59:37.893031+00:00",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 1 (#526)",
+        "reopened_at": "2026-11-26T13:06:52.990864+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 1,
@@ -8016,8 +9396,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-22T07:39:43.475365+00:00",
-      "version": 16
+      "updated_at": "2026-11-26T13:07:00.564229+00:00",
+      "version": 21
     },
     {
       "board_count": 1,
@@ -8032,24 +9412,78 @@
           "closure-review"
         ],
         "depends_on": [
-          "T0",
-          "T1",
-          "T2",
-          "T3",
-          "T4",
-          "T5",
-          "T6",
-          "T7",
-          "T8",
-          "T9",
-          "T10",
-          "T11",
-          "T13",
-          "T14",
-          "T15",
-          "T16",
-          "T17",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T0"
+          },
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "T4"
+          },
+          {
+            "kind": "needs",
+            "to": "T5"
+          },
+          {
+            "kind": "needs",
+            "to": "T6"
+          },
+          {
+            "kind": "needs",
+            "to": "T7"
+          },
+          {
+            "kind": "needs",
+            "to": "T8"
+          },
+          {
+            "kind": "needs",
+            "to": "T9"
+          },
+          {
+            "kind": "needs",
+            "to": "T10"
+          },
+          {
+            "kind": "needs",
+            "to": "T11"
+          },
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "T14"
+          },
+          {
+            "kind": "needs",
+            "to": "T15"
+          },
+          {
+            "kind": "needs",
+            "to": "T16"
+          },
+          {
+            "kind": "needs",
+            "to": "T17"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8074,8 +9508,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 11
+      "updated_at": "2026-11-26T10:40:28.949192+00:00",
+      "version": 12
     },
     {
       "board_count": 1,
@@ -8086,12 +9520,19 @@
       "key": "T13",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 3 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T2",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8110,7 +9551,7 @@
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 3 (#526)",
-        "reopened_at": "2026-11-22T08:41:23.883968+00:00",
+        "reopened_at": "2026-11-26T21:50:42.521588+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 3,
@@ -8121,13 +9562,13 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "active",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 12
+      "status": "closed",
+      "updated_at": "2026-11-26T21:50:57.990999+00:00",
+      "version": 16
     },
     {
       "board_count": 1,
-      "card_count": 10,
+      "card_count": 19,
       "created_at": "2026-11-12T14:46:02.275593+00:00",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
       "id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
@@ -8138,8 +9579,14 @@
           "closure-review"
         ],
         "depends_on": [
-          "T13",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8168,8 +9615,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 12
+      "updated_at": "2026-11-26T10:40:29.206495+00:00",
+      "version": 13
     },
     {
       "board_count": 1,
@@ -8184,9 +9631,18 @@
           "closure-review"
         ],
         "depends_on": [
-          "T13",
-          "T6",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "T6"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8211,8 +9667,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T10:40:29.334007+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -8223,13 +9679,23 @@
       "key": "T16",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T2",
-          "T13",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8244,6 +9710,9 @@
         "plan": "docs/SPEC_V2.md#12",
         "plan_status": "draft",
         "plateau": "capability",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
+        "reopened_at": "2026-11-26T22:49:58.225053+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 4,
@@ -8255,8 +9724,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:08:31.73617+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T22:50:10.836063+00:00",
+      "version": 15
     },
     {
       "board_count": 1,
@@ -8271,9 +9740,18 @@
           "closure-review"
         ],
         "depends_on": [
-          "T16",
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T16"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8289,6 +9767,9 @@
         "plan": "docs/SPEC_V2.md#12",
         "plan_status": "draft",
         "plateau": "capability",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 5 (#526)",
+        "reopened_at": "2026-11-27T08:27:15.089066+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 5,
@@ -8299,9 +9780,9 @@
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
-      "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 11
+      "status": "active",
+      "updated_at": "2026-11-27T08:27:15.089066+00:00",
+      "version": 13
     },
     {
       "board_count": 1,
@@ -8317,11 +9798,26 @@
           "closure-review"
         ],
         "depends_on": [
-          "T0",
-          "T1",
-          "T2",
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T0"
+          },
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8348,11 +9844,11 @@
       "name": "The real V2 UI",
       "phase_code": null,
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "project_type_code": null,
+      "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 1
+      "updated_at": "2026-11-26T22:05:10.071583+00:00",
+      "version": 3
     },
     {
       "board_count": 1,
@@ -8363,14 +9859,27 @@
       "key": "T19",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T1",
-          "T2",
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8386,9 +9895,13 @@
         "plan": "docs/SPEC_V2.md#12",
         "plan_status": "draft",
         "plateau": "capability",
+        "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
+        "reopened_at": "2026-11-26T22:50:41.202988+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
-        "tranche": 4
+        "tranche": 4,
+        "viability": "rework"
       },
       "name": "Decision forums (meetings)",
       "phase_code": null,
@@ -8396,8 +9909,8 @@
       "project_type_code": null,
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 2
+      "updated_at": "2026-11-26T22:50:49.893121+00:00",
+      "version": 8
     },
     {
       "board_count": 1,
@@ -8412,11 +9925,26 @@
           "closure-review"
         ],
         "depends_on": [
-          "T19",
-          "T17",
-          "T9",
-          "T10",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T19"
+          },
+          {
+            "kind": "needs",
+            "to": "T17"
+          },
+          {
+            "kind": "needs",
+            "to": "T9"
+          },
+          {
+            "kind": "needs",
+            "to": "T10"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8442,8 +9970,8 @@
       "project_type_code": null,
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "active",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 1
+      "updated_at": "2026-11-26T10:40:29.981992+00:00",
+      "version": 2
     },
     {
       "board_count": 1,
@@ -8454,13 +9982,19 @@
       "key": "T2",
       "meta": {
         "adm_phase": "G",
-        "close_reason": "T2 closes after the tranche-2 rework: the decision ladder's record, closure review and declared outputs are proven at the closing head; resumed under the owner's published delegation of 2026-11-22.",
+        "close_reason": "the retrospective rework of tranche 2 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T1",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8476,7 +10010,7 @@
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 2 (#526)",
-        "reopened_at": "2026-11-21T23:03:50.639092+00:00",
+        "reopened_at": "2026-11-26T13:34:18.714641+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 2,
@@ -8488,8 +10022,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-22T07:23:16.974582+00:00",
-      "version": 12
+      "updated_at": "2026-11-26T13:34:30.113951+00:00",
+      "version": 17
     },
     {
       "board_count": 1,
@@ -8500,12 +10034,19 @@
       "key": "T3",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 3 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T2",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8519,6 +10060,9 @@
         "plan": "docs/SPEC_V2.md#12",
         "plan_status": "draft",
         "plateau": "capability",
+        "reopen_decision_ref": "tranche-review/01a2051c-97df-7574-949c-219be5f25907",
+        "reopen_reason": "The tr3 review recorded T3 as closed without its baseline, delivery contract and Phase-G review; the project is reopened to complete the record, not to add scope.",
+        "reopened_at": "2026-11-26T07:44:41.629779+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 3,
@@ -8530,8 +10074,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:08:48.11323+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T13:12:04.48817+00:00",
+      "version": 13
     },
     {
       "board_count": 1,
@@ -8542,12 +10086,19 @@
       "key": "T4",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8563,7 +10114,7 @@
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
-        "reopened_at": "2026-11-22T09:16:57.105806+00:00",
+        "reopened_at": "2026-11-26T22:51:01.569231+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 4,
@@ -8575,8 +10126,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 12
+      "updated_at": "2026-11-26T22:51:09.980385+00:00",
+      "version": 17
     },
     {
       "board_count": 1,
@@ -8591,13 +10142,34 @@
           "closure-review"
         ],
         "depends_on": [
-          "T2",
-          "S16",
-          "S17",
-          "S18",
-          "S19",
-          "S20",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "S16"
+          },
+          {
+            "kind": "needs",
+            "to": "S17"
+          },
+          {
+            "kind": "needs",
+            "to": "S18"
+          },
+          {
+            "kind": "needs",
+            "to": "S19"
+          },
+          {
+            "kind": "needs",
+            "to": "S20"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8623,8 +10195,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T10:40:30.508379+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -8639,9 +10211,18 @@
           "closure-review"
         ],
         "depends_on": [
-          "T5",
-          "T13",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T5"
+          },
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8666,8 +10247,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 10
+      "updated_at": "2026-11-26T10:40:30.644395+00:00",
+      "version": 11
     },
     {
       "board_count": 1,
@@ -8678,14 +10259,27 @@
       "key": "T7",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 5 (#526)",
         "closure_outputs": [
           "closure-review"
         ],
         "depends_on": [
-          "T2",
-          "T4",
-          "T13",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T2"
+          },
+          {
+            "kind": "needs",
+            "to": "T4"
+          },
+          {
+            "kind": "needs",
+            "to": "T13"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8702,6 +10296,9 @@
         "plan": "docs/SPEC_V2.md#12",
         "plan_status": "draft",
         "plateau": "capability",
+        "reopen_decision_ref": "document/01a1fb9f-f19e-749b-9218-a4428b2e3dac",
+        "reopen_reason": "Closed without its charter, baseline, delivery contract, Phase-G review and published closure review; reopened to complete the record against its manifest, not to add scope.",
+        "reopened_at": "2026-11-26T07:44:41.528661+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 5,
@@ -8713,8 +10310,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-21T01:09:09.889391+00:00",
-      "version": 10
+      "updated_at": "2026-11-27T08:38:03.099926+00:00",
+      "version": 13
     },
     {
       "board_count": 1,
@@ -8729,8 +10326,14 @@
           "closure-review"
         ],
         "depends_on": [
-          "T5",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T5"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8755,8 +10358,8 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-25T03:23:11.832884+00:00",
-      "version": 11
+      "updated_at": "2026-11-26T10:40:30.905902+00:00",
+      "version": 12
     },
     {
       "board_count": 1,
@@ -8767,14 +10370,23 @@
       "key": "T9",
       "meta": {
         "adm_phase": "G",
+        "close_reason": "the retrospective rework of tranche 4 (#526)",
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "depends_on": [
-          "T1",
-          "T3",
-          "P0"
+          {
+            "kind": "needs",
+            "to": "T1"
+          },
+          {
+            "kind": "needs",
+            "to": "T3"
+          },
+          {
+            "kind": "needs",
+            "to": "P0"
+          }
         ],
         "expected_outputs": [
           "project-brief",
@@ -8801,7 +10413,7 @@
         "plateau": "capability",
         "reopen_decision_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
         "reopen_reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 4 (#526)",
-        "reopened_at": "2026-11-22T09:02:31.488773+00:00",
+        "reopened_at": "2026-11-26T22:51:21.5548+00:00",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "track": "v2",
         "tranche": 4,
@@ -8813,9 +10425,23 @@
       "project_type_code": "it",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "status": "closed",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 13
+      "updated_at": "2026-11-26T22:51:30.54977+00:00",
+      "version": 19
     }
   ],
-  "schema": "design-snapshot/v1"
+  "schema": "design-snapshot/v1",
+  "test_projects": [
+    {
+      "key": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "name": "AAA UI proof #285 2026-11-19T07:36 1795073796184",
+      "reason": "a known pre-marker e2e project key",
+      "status": "active"
+    },
+    {
+      "key": "AAA-UI-PROOF-285-2026-11-19T07-4",
+      "name": "AAA UI proof #285 2026-11-19T07:40 1795074026931",
+      "reason": "a known pre-marker e2e project key",
+      "status": "active"
+    }
+  ]
 }

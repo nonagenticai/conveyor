@@ -268,6 +268,23 @@ async fn decided_by_kind_is_derived_from_the_actor_never_from_the_input() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "pending");
 
+    // SPEC_V2 §5.4 / migration 0093: an agent may decide a gate only when the tenant's policy
+    // names `agent` as the approver kind for it. The rule is read per decision, so declaring it
+    // now does not rewrite the human decision above — it opens the agent's turn.
+    sqlx::query(
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions,
+              required_decisions, updated_by)
+         VALUES ($1, 'review', 'required', 'forbidden', 'agent', '{}'::jsonb, 1, $2)
+         ON CONFLICT (tenant_id, action) DO UPDATE
+            SET approver_kind = 'agent', updated_by = excluded.updated_by",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("declare the review gate agent-decidable");
+
     // One agent decision through the ACTION engine with an agent context. There is no HTTP
     // surface that presents `actor_kind = "agent"` yet (the signed mcp channel is S06a), so
     // the action itself is driven with the context that channel will use.
@@ -277,6 +294,7 @@ async fn decided_by_kind_is_derived_from_the_actor_never_from_the_input() {
             conveyor_actions::registry::registry(),
             seeded.tenant,
             conveyor_actions::InvokeRequest {
+                credential_alias: None,
                 action: "approvals.decide".to_owned(),
                 input: json!({"approval_id": approval_id, "decision": "approve"}),
                 precondition: None,
@@ -325,12 +343,24 @@ async fn decided_by_kind_is_derived_from_the_actor_never_from_the_input() {
     // A service/connector ctx maps to `service` (S06d): a machine identity, not a rule.
     let (service_gate, _) = seed_gate(&pg, &seeded, 1, None).await;
     let service = seed_principal(&pg, &seeded, "scheduler", "service").await;
+    // The policy is read per decision: this opens the service's turn on the same gate action
+    // without rewriting the human/agent decisions already recorded.
+    sqlx::query(
+        "UPDATE approval_policy SET approver_kind = 'service', updated_by = $2
+          WHERE tenant_id = $1 AND action = 'review'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("declare the review gate service-decidable");
     let outcome =
         conveyor_actions::invoke(
             &pg.runtime,
             conveyor_actions::registry::registry(),
             seeded.tenant,
             conveyor_actions::InvokeRequest {
+                credential_alias: None,
                 action: "approvals.decide".to_owned(),
                 input: json!({"approval_id": service_gate, "decision": "reject"}),
                 precondition: None,

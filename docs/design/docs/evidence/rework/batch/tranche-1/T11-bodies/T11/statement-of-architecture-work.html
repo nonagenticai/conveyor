@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement Of Architecture Work — Metrics, metering and maturity · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/statement-of-architecture-work.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--metrics-metering-and-maturity">Statement Of Architecture Work — Metrics, metering and maturity</h1>
+<h2 id="assignment">Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/T11.toml is green against the published snapshot at the re-close: every metric and every metering level recomputes from rows; the reconciliation with billing_service is exact at six decimals or opens an incident; a C0\u2013C5 level moves only when the measured evidence crosses its recorded threshold, naming that threshold version; a gate that never refused is flagged. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T11 (SPEC_V2 \u00a77.5, \u00a710.4, \u00a712; issues #84 and #458) by the reconstituted TOGAF/MSP lifecycle: produce and approve the Phase A\u2013D mandatory artefacts, this Statement of Architecture Work, the delivery contract, the Phase-G compliance review and the closure review; publish the declared outputs; and re-close the project through the one gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The metrics, metering and maturity capability delivered by #84 (commit 183f5111, 2026-11-19) and the live Metering screen delivered by #458 (commit 0a8a6e95, 2026-11-20): migration 0059_metrics.sql, crates/domain/src/metrics.rs, crates/store/src/metrics.rs, crates/actions/src/metrics/mod.rs, the eight metrics actions, the billing.summary reconciliation input, the incident card type, the served-spec lock and the console screen. Charging, eval/benchmark-ledger quality metrics, knowledge metrics without ledgers and per-tool health are out of scope.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T19:20:34.079029+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff8d-a0ad-7a91-b026-d9a2575daa3f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T11 Metrics, metering and maturity (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="scope">Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/T11.toml is green against the published snapshot at the re-close: every metric and every metering level recomputes from rows; the reconciliation with billing_service is exact at six decimals or opens an incident; a C0\u2013C5 level moves only when the measured evidence crosses its recorded threshold, naming that threshold version; a gate that never refused is flagged. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T11 (SPEC_V2 \u00a77.5, \u00a710.4, \u00a712; issues #84 and #458) by the reconstituted TOGAF/MSP lifecycle: produce and approve the Phase A\u2013D mandatory artefacts, this Statement of Architecture Work, the delivery contract, the Phase-G compliance review and the closure review; publish the declared outputs; and re-close the project through the one gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The metrics, metering and maturity capability delivered by #84 (commit 183f5111, 2026-11-19) and the live Metering screen delivered by #458 (commit 0a8a6e95, 2026-11-20): migration 0059_metrics.sql, crates/domain/src/metrics.rs, crates/store/src/metrics.rs, crates/actions/src/metrics/mod.rs, the eight metrics actions, the billing.summary reconciliation input, the incident card type, the served-spec lock and the console screen. Charging, eval/benchmark-ledger quality metrics, knowledge metrics without ledgers and per-tool health are out of scope.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T19:20:34.079029+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff8d-a0ad-7a91-b026-d9a2575daa3f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T11 Metrics, metering and maturity (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="responsibilities">Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/T11.toml is green against the published snapshot at the re-close: every metric and every metering level recomputes from rows; the reconciliation with billing_service is exact at six decimals or opens an incident; a C0\u2013C5 level moves only when the measured evidence crosses its recorded threshold, naming that threshold version; a gate that never refused is flagged. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T11 (SPEC_V2 \u00a77.5, \u00a710.4, \u00a712; issues #84 and #458) by the reconstituted TOGAF/MSP lifecycle: produce and approve the Phase A\u2013D mandatory artefacts, this Statement of Architecture Work, the delivery contract, the Phase-G compliance review and the closure review; publish the declared outputs; and re-close the project through the one gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The metrics, metering and maturity capability delivered by #84 (commit 183f5111, 2026-11-19) and the live Metering screen delivered by #458 (commit 0a8a6e95, 2026-11-20): migration 0059_metrics.sql, crates/domain/src/metrics.rs, crates/store/src/metrics.rs, crates/actions/src/metrics/mod.rs, the eight metrics actions, the billing.summary reconciliation input, the incident card type, the served-spec lock and the console screen. Charging, eval/benchmark-ledger quality metrics, knowledge metrics without ledgers and per-tool health are out of scope.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T19:20:34.079029+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff8d-a0ad-7a91-b026-d9a2575daa3f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T11 Metrics, metering and maturity (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/T11.toml is green against the published snapshot at the re-close: every metric and every metering level recomputes from rows; the reconciliation with billing_service is exact at six decimals or opens an incident; a C0\u2013C5 level moves only when the measured evidence crosses its recorded threshold, naming that threshold version; a gate that never refused is flagged. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T11 (SPEC_V2 \u00a77.5, \u00a710.4, \u00a712; issues #84 and #458) by the reconstituted TOGAF/MSP lifecycle: produce and approve the Phase A\u2013D mandatory artefacts, this Statement of Architecture Work, the delivery contract, the Phase-G compliance review and the closure review; publish the declared outputs; and re-close the project through the one gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The metrics, metering and maturity capability delivered by #84 (commit 183f5111, 2026-11-19) and the live Metering screen delivered by #458 (commit 0a8a6e95, 2026-11-20): migration 0059_metrics.sql, crates/domain/src/metrics.rs, crates/store/src/metrics.rs, crates/actions/src/metrics/mod.rs, the eight metrics actions, the billing.summary reconciliation input, the incident card type, the served-spec lock and the console screen. Charging, eval/benchmark-ledger quality metrics, knowledge metrics without ledgers and per-tool health are out of scope.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T19:20:34.079029+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff8d-a0ad-7a91-b026-d9a2575daa3f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T11 Metrics, metering and maturity (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+<h2 id="contract">Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;statement-of-architecture-work&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approval_id&quot;: &quot;01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd&quot;,
+      &quot;approved_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;body&quot;: {
+        &quot;acceptance_criteria&quot;: &quot;acceptance/programme/T11.toml is green against the published snapshot at the re-close: every metric and every metering level recomputes from rows; the reconciliation with billing_service is exact at six decimals or opens an incident; a C0\u2013C5 level moves only when the measured evidence crosses its recorded threshold, naming that threshold version; a gate that never refused is flagged. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.&quot;,
+        &quot;assignment&quot;: &quot;Rework the V2 slice T11 (SPEC_V2 \u00a77.5, \u00a710.4, \u00a712; issues #84 and #458) by the reconstituted TOGAF/MSP lifecycle: produce and approve the Phase A\u2013D mandatory artefacts, this Statement of Architecture Work, the delivery contract, the Phase-G compliance review and the closure review; publish the declared outputs; and re-close the project through the one gate.&quot;,
+        &quot;responsibilities&quot;: {
+          &quot;approver&quot;: &quot;conveyor-approver&quot;,
+          &quot;architecture board&quot;: &quot;conveyor-architecture-board&quot;,
+          &quot;programme architect&quot;: &quot;conveyor-e2e&quot;
+        },
+        &quot;retrospective&quot;: true,
+        &quot;scope&quot;: &quot;The metrics, metering and maturity capability delivered by #84 (commit 183f5111, 2026-11-19) and the live Metering screen delivered by #458 (commit 0a8a6e95, 2026-11-20): migration 0059_metrics.sql, crates/domain/src/metrics.rs, crates/store/src/metrics.rs, crates/actions/src/metrics/mod.rs, the eight metrics actions, the billing.summary reconciliation input, the incident card type, the served-spec lock and the console screen. Charging, eval/benchmark-ledger quality metrics, knowledge metrics without ledgers and per-tool health are out of scope.&quot;
+      },
+      &quot;created_at&quot;: &quot;2026-11-21T19:20:34.079029+00:00&quot;,
+      &quot;id&quot;: &quot;01a1ff8d-a0ad-7a91-b026-d9a2575daa3f&quot;,
+      &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+      &quot;links&quot;: {},
+      &quot;meta&quot;: {},
+      &quot;phase_code&quot;: &quot;a&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;status&quot;: &quot;live&quot;,
+      &quot;superseded_by_id&quot;: null,
+      &quot;supersedes_id&quot;: null,
+      &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T11 Metrics, metering and maturity (retrospective, 2026-11-21)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:20:43.741951+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/contracts&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/T11-bodies/T11/statement-of-architecture-work.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

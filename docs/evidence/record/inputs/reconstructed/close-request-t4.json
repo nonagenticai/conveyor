@@ -1,0 +1,11 @@
+{
+ "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+ "closure": "# Closure record \u2014 T4 Kanban coach (retrospective, 2026-11-22)\n\n- **What was delivered:** the coach loop of `docs/SPEC_V2.md` sections 6.2 and 6.4 \u2014 the `coach_interruption` and `coach_remedy` tables (`migrations/0057_coach.sql`), the `coach.interrupt` action, one coach card with one triage and one remedy from the seeded closed catalogue, per-signature escalation, the depth cap that refuses a coach card about a coach card, and the systemic-class path that starts `kata.open`. The project row is `closed` in the 2026-11-22 snapshot (version 10, updated 2026-11-21T01:08:53Z).\n- **What this rework added:** the programme record the original close never carried \u2014 charter, Statement of Architecture Work, the seven Phase A\u2013D artefacts bound to the adopted standard, the board-approved delivery contract, the scope baseline, this Phase-G review and its closure review \u2014 plus the four audit findings of 2026-11-22.\n- **What remains open:** `v1-p6-2`, `v1-p6-4` and `v1-p6-5` (P1, owned by T4) and `v1-p6-6` (P2). None is waived; each is a package with an acceptance clause.\n- **Honesty note:** no contemporaneous charter, contract, review or closure record existed at the snapshot. This set is written retrospectively under the standing delegation and attests the evidence, not the intent, of the original close.",
+ "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+ "evidence": {
+  "sha": "df7d648894ecedceffef7b3fe2923b6235c34f44",
+  "manifest": "acceptance/programme/T4.toml",
+  "retrospective": true
+ },
+ "reason": "the retrospective rework of tranche 4 (#526)"
+}

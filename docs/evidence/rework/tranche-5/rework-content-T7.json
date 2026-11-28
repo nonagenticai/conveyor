@@ -1,0 +1,786 @@
+{
+  "charter": "# Charter — T7 Operations (retrospective, 2026-11-27)\n\n- **Project:** T7 'Operations', track v2, ADM phase G, capability plateau, tranche 5, project `01a1d039-0d34-7f89-a0be-f3de3c9f540e`, plan `docs/SPEC_V2.md` §12 T7 (plan_status draft), issues #78, #170, #171 and #172. At the 2026-11-27 snapshot the project row is `status: active`, version 12, with `meta.track: v2`, `meta.tranche: 5`, `meta.viability: rework`, `meta.measured_status: built`, `meta.expected_outputs: [project-brief, evidence]` and `meta.closure_outputs: [closure-review]`. This rework rebuilds the lifecycle record and closes the project; the seed says closed and the close resolves the seed/live drift. The rework is retrospective and does not attest contemporaneous intent.\n- **Mandate:** an operations job family detects a pod failure, triages it, mitigates it through an approved gated write, resolves it and records a postmortem; a destructive ops action without the tenant's configured approvals is refused before it reaches the cluster; and restart, scale, rollback and flag-flip are all callable write verbs (§6.5, §9.2, §12 T7).\n- **Scope:** the five incident actions `ops.incident`, `ops.triage`, `ops.mitigate`, `ops.postmortem` and `ops.resolve`; the four cluster write verbs behind the destructive gate; the k8s read family; the incident card's meta lifecycle; the `/operations` console. Out of scope: tools and bindings (T13), the agent tool surface (the ops writes are not agent-reachable), and a second ops service.\n- **Expected outputs:** `project-brief`, `evidence`. **Closure outputs:** `closure-review`.\n- **Acceptance:** the §12 T7 gate, carried by `acceptance/programme/T7.toml` with 17 checks and evidenced by the executed suite in `docs/evidence/record/evidence/T7-acceptance.md` (31 tests, 2026-11-24): triage, the approved mitigation and read-back, the postmortem and resolution, the refused unapproved write, the callable four verbs, the policy quorum, the systemic kata and the RLS/read family. The live cluster proof `scripts/ops-live-proof.sh` is deploy-bound and was not executed on this box; the manifest's gate is the executed suite, as the acceptance record states.\n- **Fixes landed for the close:** `v1-w1b-4` (destructive ops writes lacked dual control and a dry run) and `v1-w3a-5` (a zero-write incident could never be postmortemed or resolved) are fixed at `ca155fada6f28e72e2afc8e8516d81f0ac67c6f5`: the invoke boundary now requires two distinct human approvers, `required_decisions >= 2` and a recorded dry run of the same action/input for the five ops actions, and `ops.mitigate` accepts a no-action mitigation with a reason. The tests are in `destructive_gate.rs`, `ops.rs` and `ops_write.rs`.\n- **Dependencies:** T2 (jobs/events/audit), T4 (registry/scopes), T13 (tools) and P0. All are closed; the dependency is one-way and T7 ships no duplicate of those surfaces.\n- **Tranche and governance:** tranche 5 (`01a1e9e0-fe45-77e0-993a-d571fecc5ec1`) is `state: authorised`, authorised at 2026-11-26T22:54:06Z by review `01a21a10-ecb6-70e7-87d5-daa40f5154ac`. The PI plan `01a216d1-1bb7-7376-905e-38a776f22190`, its objectives `01a216d1-1cbe-7297-bc1e-ee5e29ea82cc`, the cadence `01a216d1-1913-70dd-8f69-c8ad230f2364` and the refinement `01a216d1-1a40-7246-ba5e-254b8c0986fe` govern the planning inputs; the refinement records WSJF 10/9/8/6 for T7. The rework runs under standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Residual finding:** `v1-u5-copilot-gate-quorum` remains open and owned by S10; its copilot-policy half is not part of this T7 fix.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — T7 Operations (retrospective, 2026-11-27)",
+    "body": {
+      "assignment": "The programme architect (conveyor-e2e) is assigned the T7 record: the incident lifecycle over the existing card and approval primitives, the four gated cluster writes, the postmortem/kata loop and the /operations console. The assignment is recorded retrospectively for the 2026-11-27 rework and is bounded by SPEC_V2 §6.5, §9.2 and §12 T7.",
+      "scope": "In scope are the five incident actions, the four write verbs and their gate, the k8s read family, the incident meta lifecycle and the /operations screen. Out of scope are tools and bindings (T13), the agent tool surface (the ops writes are not agent-reachable) and a second ops service; each exclusion is deliberate.",
+      "responsibilities": "The programme architect owns the record and the acceptance instrument; the Architecture Board approves the Phase A–D set and the contract; T2 supplies the job/event/audit rows; T4 supplies the registry and the destructive effect; T13 owns tools; the web team owns the /operations screen; the on-call operators take the incident decisions; the SRO is accountable for the tranche outcome.",
+      "acceptance_criteria": "The §12 T7 gate: an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable. The executed suite maps each clause to a named test in T7-acceptance.md; the live cluster script is deploy-bound and is not claimed as run.",
+      "retrospective": "This Statement of Architecture Work is authored by the 2026-11-27 rework from the SPEC row, the issue #78 delivery, the acceptance evidence and the two fixes at ca155fada. It records the assignment and the acceptance the delivery was measured against; it does not claim a contemporaneous board approval, and it carries the live-proof limitation into the Phase-G review.",
+      "constraints": "The build must not let an ops write reach the cluster without an approval, a recorded dry run and two distinct human approvers; must not let the mitigation wrapper bypass the gate; must not let an incident that needed no write stay unresolvable; must not widen a tool grant; and must not claim the live cluster proof before the deployed image carries the gate. These constraints are the finding acceptance and are carried into the contract."
+    }
+  },
+  "artifacts": [
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "title": "Stakeholder Map — T7 Operations (Phase A)",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "tranche-5 authorisation, the rework decision and the T7 close decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the operations capability and the tranche outcome",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect (conveyor-e2e)",
+          "axis_b": "owns the T7 record, the Phase A–D set and the acceptance instrument",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D set and the delivery contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "T2 delivery team",
+          "axis_b": "supplies the job, event and audit rows the incident lifecycle writes",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "T4 delivery team",
+          "axis_b": "supplies the ActionSpec registry, scopes and the destructive effect",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "T13 delivery team",
+          "axis_b": "owns tools and bindings; an ops asset never widens a tool grant",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "S12/web team",
+          "axis_b": "owns the /operations screen and its Operations E2E",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "On-call operators and SRE",
+          "axis_b": "open, triage, mitigate, postmortem and resolve incidents; run the gated writes",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Tenants and incident consumers",
+          "axis_b": "read the incident, the postmortem and the kata candidate",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T7 Operations (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — T7 Operations (Phase A)\n\n## Metadata\n\nType matrix; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 10 entries. Sponsoring group — tranche-5 authorisation, the rework decision and the T7 close decision; SRO — accountable for the operations capability and the tranche outcome; Programme architect (conveyor-e2e) — owns the T7 record, the Phase A–D set and the acceptance instrument; Architecture Board — approves the Phase A–D set and the delivery contract; T2 delivery team — supplies the job, event and audit rows the incident lifecycle writes; T4 delivery team — supplies the ActionSpec registry, scopes and the destructive effect; T13 delivery team — owns tools and bindings; an ops asset never widens a tool grant; S12/web team — owns the /operations screen and its Operations E2E; On-call operators and SRE — open, triage, mitigate, postmortem and resolve incidents; run the gated writes; Tenants and incident consumers — read the incident, the postmortem and the kata candidate. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Business Capability Map — T7 Operations (Phase B) (dependency). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Stakeholder Map — T7 Operations (Phase A) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Driver/Goal/Objective Catalog — T7 Operations (Phase A)",
+      "entries": [
+        {
+          "axis_a": "D1",
+          "axis_b": "An incident is a card with one lifecycle: open → triaged → mitigated → resolved",
+          "value": {
+            "goal": "G1",
+            "priority": "must"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2",
+          "axis_b": "A destructive write needs an approval, a recorded dry run and human dual control (§6.5)",
+          "value": {
+            "goal": "G2",
+            "priority": "must"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3",
+          "axis_b": "The four verbs are the only cluster writes; the read family is read-first",
+          "value": {
+            "goal": "G3",
+            "priority": "must"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4",
+          "axis_b": "A postmortem follows a mitigation; a systemic finding opens exactly one kata (§9.2)",
+          "value": {
+            "goal": "G4",
+            "priority": "must"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5",
+          "axis_b": "An incident whose fix needed no write can record a no-action mitigation and resolve",
+          "value": {
+            "goal": "G5",
+            "priority": "must"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6",
+          "axis_b": "The tenant's approval policy sets the quorum; a one-decision ops gate is refused",
+          "value": {
+            "goal": "G6",
+            "priority": "must"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "G1",
+          "axis_b": "Every state has one timestamp and one card meta block",
+          "value": {
+            "driver": "D1",
+            "measure": "triaged_at, mitigated_at, resolved_at"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "G2",
+          "axis_b": "A single-decision or no-dry-run ops call is refused before the cluster",
+          "value": {
+            "driver": "D2",
+            "measure": "dual_control_* and dry_run_required"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "G3",
+          "axis_b": "Restart, scale, rollback and flag-flip each read back",
+          "value": {
+            "driver": "D3",
+            "measure": "the four write verbs test"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "G4",
+          "axis_b": "A systemic postmortem opens exactly one kata",
+          "value": {
+            "driver": "D4",
+            "measure": "a_systemic_finding_opens_exactly_one_kata"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "G5",
+          "axis_b": "A zero-write incident reaches resolved with a postmortem",
+          "value": {
+            "driver": "D5",
+            "measure": "a_zero_write_incident_resolves..."
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "G6",
+          "axis_b": "A one-decision ops gate is refused; a compliant gate proceeds",
+          "value": {
+            "driver": "D6",
+            "measure": "the_tenant_policy_sets_the_quorum"
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — T7 Operations (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — T7 Operations (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 12 entries. D1 — An incident is a card with one lifecycle: open → triaged → mitigated → resolved; D2 — A destructive write needs an approval, a recorded dry run and human dual control (§6.5); D3 — The four verbs are the only cluster writes; the read family is read-first; D4 — A postmortem follows a mitigation; a systemic finding opens exactly one kata (§9.2); D5 — An incident whose fix needed no write can record a no-action mitigation and resolve; D6 — The tenant's approval policy sets the quorum; a one-decision ops gate is refused; G1 — Every state has one timestamp and one card meta block; G2 — A single-decision or no-dry-run ops call is refused before the cluster; G3 — Restart, scale, rollback and flag-flip each read back; G4 — A systemic postmortem opens exactly one kata; G5 — A zero-write incident reaches resolved with a postmortem; G6 — A one-decision ops gate is refused; a compliant gate proceeds. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Requirements Catalog — T7 Operations (Phase A) (derivation). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Driver/Goal/Objective Catalog — T7 Operations (Phase A) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Requirements Catalog — T7 Operations (Phase A)",
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "An injected pod failure is triaged with no write",
+          "value": {
+            "acceptance": "ops.rs::an_incident_is_triaged_with_no_write"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "An approved mitigation sets mitigated_at with a read-back",
+          "value": {
+            "acceptance": "ops.rs::an_approved_mitigation_sets_mitigated_at_with_a_read_back"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "An incident resolves with a linked postmortem",
+          "value": {
+            "acceptance": "ops.rs::an_incident_resolves_with_a_linked_postmortem"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "A destructive call without an approval is refused",
+          "value": {
+            "acceptance": "ops_write.rs::a_destructive_call_without_approval_is_refused"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "A single-decision or no-dry-run ops call is refused",
+          "value": {
+            "acceptance": "destructive_gate.rs::an_ops_destructive_call_needs_dual_control_and_a_dry_run"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "Restart, scale, rollback and flag-flip are callable and read back",
+          "value": {
+            "acceptance": "ops.rs::the_four_write_verbs_are_callable_and_read_back"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "A zero-write incident resolves with a postmortem and one kata",
+          "value": {
+            "acceptance": "ops.rs::a_zero_write_incident_resolves_with_a_postmortem_and_one_kata"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "The tenant policy sets the quorum",
+          "value": {
+            "acceptance": "ops.rs::the_tenant_policy_sets_the_quorum"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "The /operations screen reads the live incident record",
+          "value": {
+            "acceptance": "apps/web/e2e/operations.spec.ts (S12)"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "The executed operations suite is green at one revision",
+          "value": {
+            "acceptance": "docs/evidence/record/evidence/T7-acceptance.md (31 tests)"
+          },
+          "position": 10
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — T7 Operations (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Requirements Catalog — T7 Operations (Phase A)\n\n## Metadata\n\nType catalog; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 10 entries. R1 — An injected pod failure is triaged with no write; R2 — An approved mitigation sets mitigated_at with a read-back; R3 — An incident resolves with a linked postmortem; R4 — A destructive call without an approval is refused; R5 — A single-decision or no-dry-run ops call is refused; R6 — Restart, scale, rollback and flag-flip are callable and read back; R7 — A zero-write incident resolves with a postmortem and one kata; R8 — The tenant policy sets the quorum; R9 — The /operations screen reads the live incident record; R10 — The executed operations suite is green at one revision. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Solution Concept Diagram — T7 Operations (Phase A) (realization). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Requirements Catalog — T7 Operations (Phase A) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "title": "Solution Concept Diagram — T7 Operations (Phase A)",
+      "entries": [
+        {
+          "axis_a": "Detect",
+          "axis_b": "an alert or a person opens an incident card",
+          "value": {
+            "channel": "ops.incident",
+            "outcome": "an open incident"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Triage",
+          "axis_b": "the triage selects a runbook and records triaged_at with no write",
+          "value": {
+            "channel": "ops.triage",
+            "outcome": "a triaged incident"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Mitigate",
+          "axis_b": "an approved write (or a no-action record) sets mitigated_at and the read-back",
+          "value": {
+            "channel": "ops.mitigate",
+            "outcome": "a mitigated incident"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Gate",
+          "axis_b": "approval + dry run + dual control precede every destructive write",
+          "value": {
+            "channel": "enforce_destructive_gate",
+            "outcome": "a refused or admitted write"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Postmortem",
+          "axis_b": "one postmortem is linked; a systemic finding opens one kata",
+          "value": {
+            "channel": "ops.postmortem",
+            "outcome": "a postmortem asset"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Resolve",
+          "axis_b": "the resolution follows the postmortem",
+          "value": {
+            "channel": "ops.resolve",
+            "outcome": "a resolved incident"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Read",
+          "axis_b": "the /operations screen reads the incident lifecycle",
+          "value": {
+            "channel": "the web screen",
+            "outcome": "the live operations view"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — T7 Operations (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Solution Concept Diagram — T7 Operations (Phase A)\n\n## Metadata\n\nType diagram; phase a; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 7 entries. Detect — an alert or a person opens an incident card; Triage — the triage selects a runbook and records triaged_at with no write; Mitigate — an approved write (or a no-action record) sets mitigated_at and the read-back; Gate — approval + dry run + dual control precede every destructive write; Postmortem — one postmortem is linked; a systemic finding opens one kata; Resolve — the resolution follows the postmortem; Read — the /operations screen reads the incident lifecycle. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Business Capability Map — T7 Operations (Phase B) (dependency). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Solution Concept Diagram — T7 Operations (Phase A) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "title": "Business Capability Map — T7 Operations (Phase B)",
+      "entries": [
+        {
+          "axis_a": "Incident intake",
+          "axis_b": "open an incident card with the service, severity and detection time",
+          "value": {
+            "maturity": "built",
+            "actions": "ops.incident"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Triage and runbooks",
+          "axis_b": "select a runbook procedure and record the triage",
+          "value": {
+            "maturity": "built",
+            "actions": "ops.triage"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Gated writes",
+          "axis_b": "restart, scale, rollback and flag-flip behind §6.5",
+          "value": {
+            "maturity": "built",
+            "actions": "ops.restart/scale/rollback/flag_flip"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Mitigation",
+          "axis_b": "an approved write or a no-action record",
+          "value": {
+            "maturity": "built",
+            "actions": "ops.mitigate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Postmortem and kata",
+          "axis_b": "one postmortem, one kata when systemic",
+          "value": {
+            "maturity": "built",
+            "actions": "ops.postmortem, ops.resolve"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Operations console",
+          "axis_b": "the live incident and write view",
+          "value": {
+            "maturity": "built",
+            "actions": "/operations, operations.spec.ts"
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T7 Operations (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — T7 Operations (Phase B)\n\n## Metadata\n\nType diagram; phase b; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 6 entries. Incident intake — open an incident card with the service, severity and detection time; Triage and runbooks — select a runbook procedure and record the triage; Gated writes — restart, scale, rollback and flag-flip behind §6.5; Mitigation — an approved write or a no-action record; Postmortem and kata — one postmortem, one kata when systemic; Operations console — the live incident and write view. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Data Entity/Data Component Catalog — T7 Operations (Phase C) (dependency). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Business Capability Map — T7 Operations (Phase B) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Data Entity/Data Component Catalog — T7 Operations (Phase C)",
+      "entries": [
+        {
+          "axis_a": "incident card",
+          "axis_b": "the incident's typed card and its meta block",
+          "value": {
+            "owner": "T7 ships",
+            "used_by": "ops.incident/triage/mitigate/postmortem/resolve"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "approval, approval_decision",
+          "axis_b": "the gate, its target, its quorum and the two human decisions",
+          "value": {
+            "owner": "T3/T7",
+            "used_by": "require_approval_tx"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "action_invocation",
+          "axis_b": "the dry run's own ok row, matched by the canonical request hash",
+          "value": {
+            "owner": "S04",
+            "used_by": "require_ops_dry_run_tx"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "governed_asset (postmortem)",
+          "axis_b": "the one postmortem asset linked to the incident",
+          "value": {
+            "owner": "T7 ships",
+            "used_by": "ops.postmortem"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "process run (kata.open)",
+          "axis_b": "the one kata candidate a systemic finding opens",
+          "value": {
+            "owner": "T7 ships",
+            "used_by": "ops.postmortem"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "job, event, audit_event",
+          "axis_b": "the lifecycle's job, event and audit rows",
+          "value": {
+            "owner": "T2",
+            "used_by": "the incident actions"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "tool_binding, tool grant",
+          "axis_b": "T13 owns the tools; an ops asset may request, never widen",
+          "value": {
+            "owner": "T13",
+            "used_by": "the asset's request"
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — T7 Operations (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — T7 Operations (Phase C)\n\n## Metadata\n\nType catalog; phase c; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 7 entries. incident card — the incident's typed card and its meta block; approval, approval_decision — the gate, its target, its quorum and the two human decisions; action_invocation — the dry run's own ok row, matched by the canonical request hash; governed_asset (postmortem) — the one postmortem asset linked to the incident; process run (kata.open) — the one kata candidate a systemic finding opens; job, event, audit_event — the lifecycle's job, event and audit rows; tool_binding, tool grant — T13 owns the tools; an ops asset may request, never widen. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Technology Standards Catalog — T7 Operations (Phase D) (dependency). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Data Entity/Data Component Catalog — T7 Operations (Phase C) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    },
+    {
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Technology Standards Catalog — T7 Operations (Phase D)",
+      "entries": [
+        {
+          "axis_a": "Language",
+          "axis_b": "Rust for the five incident actions, the four writes and the gate",
+          "value": {
+            "kind": "standard",
+            "version": "workspace toolchain"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Kubernetes",
+          "axis_b": "the in-cluster client for the write verbs and the read family; the API returns the observed state",
+          "value": {
+            "kind": "platform",
+            "version": "apps/server"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Approval policy",
+          "axis_b": "the tenant's policy is the quorum floor; a one-decision ops gate is refused",
+          "value": {
+            "kind": "governance",
+            "version": "approvals.request"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Dry run",
+          "axis_b": "a recorded ok action_invocation of the same action and input, matched by request_hash",
+          "value": {
+            "kind": "control",
+            "version": "action_invocation"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Dual control",
+          "axis_b": "two distinct human approvers; a job participant does not count",
+          "value": {
+            "kind": "control",
+            "version": "approval_decision"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Card meta keys",
+          "axis_b": "triaged_at, mitigated_at, mitigation, postmortem, evidence, resolved_at",
+          "value": {
+            "kind": "state",
+            "version": "the incident card"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Web",
+          "axis_b": "the /operations route and the Operations E2E",
+          "value": {
+            "kind": "ui",
+            "version": "apps/web"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Evidence",
+          "axis_b": "the 31-test operations suite and the two T7 findings fixed at ca155fada",
+          "value": {
+            "kind": "coverage",
+            "version": "T7-acceptance.md"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — T7 Operations (Phase A)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Technology Standards Catalog — T7 Operations (Phase D)\n\n## Metadata\n\nType catalog; phase d; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-27; project 01a1d039-0d34-7f89-a0be-f3de3c9f540e; tranche 5; retrospective under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the 2026-11-27 retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe artefact carries 8 entries. Language — Rust for the five incident actions, the four writes and the gate; Kubernetes — the in-cluster client for the write verbs and the read family; the API returns the observed state; Approval policy — the tenant's policy is the quorum floor; a one-decision ops gate is refused; Dry run — a recorded ok action_invocation of the same action and input, matched by request_hash; Dual control — two distinct human approvers; a job participant does not count; Card meta keys — triaged_at, mitigated_at, mitigation, postmortem, evidence, resolved_at; Web — the /operations route and the Operations E2E; Evidence — the 31-test operations suite and the two T7 findings fixed at ca155fada. The entries are the set the factory writes through architecture.artifacts_create; each carries axis_a, an optional axis_b value and a position.\n\n## Links\n\nThe artefact is not an orphan: Stakeholder Map — T7 Operations (Phase A) (dependency). The link kinds are the four §8.1 kinds and both ends of every edge are artefacts of this pack, so the factory's architecture.artifacts_link read-back resolves.\n\n## Document\n\nThe document records the Technology Standards Catalog — T7 Operations (Phase D) for T7. It is anchored in SPEC_V2 §6.5/§9.2, the issue #78 delivery, the executed T7-acceptance suite and the two fixes at ca155fada: the incident lifecycle, the four gated writes, the postmortem/kata loop and the console are the build the record now governs. The artefact is authored for the retrospective close; where the execution record and the plan differ, the execution record is carried.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T7-R1",
+        "title": "The live cluster proof is deploy-bound and was not run on this box",
+        "body": "docs/evidence/record/evidence/T7-acceptance.md records the executed 31-test operations suite as the manifest's gate and states that scripts/ops-live-proof.sh did not run: the operator CLI it drives is absent on this box and the deployed conveyor was digest sha256:60898434 (rollout 2026-11-21), older than the lane. The live proof remains a deploy-bound item, not a green claim; the record must not present the suite as the live cluster proof.",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "severity": "medium",
+        "status": "open",
+        "response": "After the deployed image carries the lane (at least ca155fada), run scripts/ops-live-proof.sh against the cluster and record the incident, the approved write, the postmortem and the resolution; cite the receipt, not this suite, for the live clause.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R10 Executed suite",
+            "R4 Refused unapproved write"
+          ],
+          "decisions": [
+            "D2 Approval + dry run + dual control"
+          ]
+        }
+      },
+      {
+        "code": "T7-R2",
+        "title": "The deployed image predates the dual-control and zero-write fixes",
+        "body": "The §6.5 gate and the no-action mitigation are fixed at ca155fada. A deployed conveyor older than that commit still admits a one-decision ops gate and still refuses a zero-write mitigation. Until the image rolls, the live behaviour is the old behaviour; the tests and the receipt prove the lane, not the deployment.",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-15",
+        "severity": "medium",
+        "status": "open",
+        "response": "Verify the deployed CONVEYOR_GIT_SHA is at least ca155fada before any live ops proof; if it is older, record the gap and do not claim the fix live.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R5 Dual control and dry run",
+            "R7 Zero-write incident"
+          ],
+          "decisions": [
+            "D5 A no-action mitigation is a record, not a write"
+          ]
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T7-I1",
+        "title": "The record claimed built without the lifecycle set the close gate reads",
+        "body": "At the 2026-11-27 snapshot the T7 project row is active at version 12 with a scope baseline and a charter but no delivery contract, Phase A–D artefact set, Phase-G compliance review or closure evidence; the seed says closed, so the record also drifts. This pack supplies the lifecycle set, the contract and the review, closes the project through the one gate, and resolves the seed/live drift.",
+        "severity": "high",
+        "status": "closed",
+        "response": "Supplied by this rework and re-verified by verify-project.py --project T7 at a fresh snapshot."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T7-A1",
+        "title": "The 2026-11-27 rework snapshot is the authoritative record for T7",
+        "body": "The rework reads the project row, the SPEC row, the issue #78 delivery and the T7 acceptance evidence at the 2026-11-27 snapshot. It assumes that snapshot is the authoritative lifecycle state and that no contemporaneous T7 approval exists outside it. If one is found, the retrospective review must be re-read against it rather than silently overwritten.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T7-D1",
+        "title": "T7 depends on T2, T4, T13 and P0",
+        "body": "T7 builds on T2's job, event and audit rows, T4's ActionSpec registry and destructive effect, T13's tools and bindings, and P0's programme definition. The dependency is one-way: T7 consumes those surfaces and ships no duplicate of them, and an ops asset may request a tool grant but never widen one.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T7-B1",
+        "title": "One incident lifecycle makes every destructive ops write gated, dry-run and dual-controlled",
+        "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 and D2/G2 record the benefit: one incident card with one lifecycle, and every destructive ops write behind an approval, a recorded dry run and two distinct human approvers. The benefit is declared in the record and carried by the operations suite, the two fixes at ca155fada and the /operations console; the live proof remains deploy-bound.",
+        "status": "open"
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — T7 Operations (retrospective, 2026-11-27)",
+    "body": {
+      "manifest": "acceptance/programme/T7.toml",
+      "commitments": "The delivery commits to the 17-check acceptance manifest, the seven Phase A–D artefacts, the executed 31-test operations suite, the §6.5 gate (approval + dry run + dual control) and the §9.2 postmortem/kata loop. Each commitment is executable: the manifest names the check and the suite maps each spec clause to a named test.",
+      "compliance": "Compliance is assessed at the retrospective Phase-G review: the delivery landed through PR #438 and the /operations console through #434; the executed suite is recorded in T7-acceptance.md; the two P1 findings v1-w1b-4 and v1-w3a-5 are fixed at ca155fada with named tests; the live cluster proof is carried as a deploy-bound open item, not as a run. The level is compliant for the record set this contract governs.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_at": "2026-11-27",
+      "approval": "The Architecture Board approves the Phase A–D set and this contract under the standing delegation; the programme architect prepares the evidence and the recommendation, and the Board's approval is recorded as the contract's gate rather than asserted by the builder. The closure gate is a separate decision by an approver distinct from its requester.",
+      "retrospective": "This contract is retrospective. It binds the rework's record set and the acceptance manifest, not a contemporaneous commitment. Its evidence is the fresh snapshot receipt, the executed suite and the two fixes; where the record and the plan differ, the receipt wins and the difference is recorded."
+    }
+  },
+  "wbs_deliverable": {
+    "title": "T7 operations — the retrospective close",
+    "business_value": 10,
+    "time_criticality": 9,
+    "risk_reduction": 8,
+    "job_size": 6
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the operations delivery was executed and merged, but no contemporaneous lifecycle review exists, and that absence is carried as the project's open record item rather than as non-conformance. At the 2026-11-27 snapshot the project row is active at version 12 (track v2, ADM phase G, capability plateau, tranche 5) with meta.measured_status built; it carries a scope baseline and a charter but no contract, Phase A–D artefact set, Phase-G review or closure evidence. The delivery evidence is PR #438 (the incident lifecycle, the four write verbs and the postmortem) and PR #434 (the /operations console), plus docs/evidence/record/evidence/T7-acceptance.md: 31 tests pass on 2026-11-24 and the clause map covers every §12 T7 clause. The two P1 findings the fresh snapshot found unresolved are fixed at ca155fada: v1-w1b-4 (dual control and a recorded dry run at the invoke boundary) and v1-w3a-5 (a no-action mitigation that lets a zero-write incident be postmortemed and resolved); their tests are in destructive_gate.rs, ops.rs and ops_write.rs. The live cluster proof scripts/ops-live-proof.sh did not run: the operator CLI is absent on this box and the deployed conveyor was older than the lane. The manifest's gate is the executed suite, as T7-acceptance.md states; the live clause is carried as a deploy-bound open item, not rounded up. The seed says closed and the record is active; this rework closes the project through the one gate, which resolves the seed/live drift. The residual v1-u5-copilot-gate-quorum finding remains S10's, not T7's. This content supplies the seven A–D artefacts, the charter, the Statement of Architecture Work, the delivery contract, this review, the project-brief/evidence outputs and the closure review. A non-conformant level would require a waiver the programme forbids; the honest residue is the deploy-bound live proof and the S10 finding.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/T7.toml",
+      "build_record": "docs/evidence/record/evidence/T7-acceptance.md (31 tests, 2026-11-24); fixes at ca155fada"
+    }
+  },
+  "project_brief_output": "# Project brief — T7 Operations (retrospective, 2026-11-27)\n\n## Outcome\n\nT7 delivers the operations lifecycle: an incident card is opened, triaged, mitigated through an approved gated write (or a no-action record), postmortemed and resolved; every destructive ops write is refused before the cluster unless it carries an approval, a recorded dry run and two distinct human approvers; and restart, scale, rollback and flag-flip are callable.\n\n## Boundary\n\nIn scope are the five incident actions, the four gated write verbs, the k8s read family, the incident meta lifecycle and the /operations console. Out of scope are tools and bindings (T13), the agent tool surface (the ops writes are not agent-reachable) and a second ops service. The boundary is SPEC_V2 §6.5/§9.2 and §12 T7.\n\n## Reuse sources\n\nT7 reuses the existing card and approval primitives (the incident card, the approval and approval_decision rows, the governed_asset postmortem, the process run for the kata), T2's job/event/audit rows and T4's registry and destructive effect. It ships no second ops service and no duplicate of T13's tools.\n\n## Inception units\n\nThe delivery unit is issue #78 (PR #438) for the incident lifecycle and the four write verbs, plus PR #434 for the /operations console. The executed evidence is T7-acceptance.md (31 tests, 2026-11-24); the two P1 findings v1-w1b-4 and v1-w3a-5 are fixed at ca155fada.\n\n## Dependencies\n\nT7 depends on T2 (jobs/events/audit), T4 (registry/scopes), T13 (tools) and P0. All are closed; the live cluster proof is deploy-bound on the deployed image carrying ca155fada.\n\n## Acceptance\n\nThe acceptance is `acceptance/programme/T7.toml` with 17 checks, backed by the executed suite in T7-acceptance.md: triage, the approved mitigation and read-back, the postmortem and resolution, the refused unapproved write, the callable four verbs, the policy quorum, the systemic kata and the RLS/read family. The live cluster script is not claimed as run.\n\n## Capabilities\n\nThe built capability set is sixfold: incident intake, triage and runbooks, the four gated write verbs, mitigation (approved write or no action), the postmortem/kata loop and the /operations console. The §6.5 gate and the no-action mitigation are the two fixes that make the set conformant.\n\n## Plan\n\nThe plan is SPEC_V2 §6.5, §9.2 and §12 T7, delivered through #78 and #434. This rework does not rebuild it: it supplies the lifecycle record, closes the project on the executed suite and the two fixes, and carries the live cluster proof as a deploy-bound open item.\n",
+  "evidence_output": "# Evidence — T7 Operations (retrospective, 2026-11-27)\n\n## Claim\n\nT7 is built and its acceptance is proven by `acceptance/programme/T7.toml`: an incident is triaged, mitigated through an approved write, postmortemed and resolved; a destructive ops action without the tenant's approvals is refused; restart, scale, rollback and flag-flip are callable; and a one-decision or no-dry-run ops call is refused.\n\n## Evidence\n\nThe evidence is docs/evidence/record/evidence/T7-acceptance.md (31 tests, 2026-11-24, the clause map), PRs #438 and #434, the two fixes at ca155fada (the dual-control/dry-run gate and the no-action mitigation) and their tests in destructive_gate.rs, ops.rs and ops_write.rs. The fresh receipt verifies 17 checks green at the snapshot.\n\n## Verification\n\nVerification is `verify-project.py --project T7` at a fresh snapshot: 17 checks plus the gate and closure review, 0 failures. The executed commands are the operations suite named in T7-acceptance.md; the live cluster script is deploy-bound and is not claimed. The findings ledger verifies with scripts/verify-findings.py (200 findings, 185 resolved).\n\n## Links\n\nThe links are the SPEC_V2 §12 T7 row, the acceptance manifest, the seven A–D artefacts and the index, the delivery contract, the Phase-G review and the closure review. The delivery is #78/PR #438 and #434; the fixes are ca155fada.\n\n## Gap\n\nThe gap is the live cluster proof: scripts/ops-live-proof.sh did not run because the operator CLI is absent and the deployed image predated the lane. The deployed image must carry ca155fada before a live proof can claim the dual-control and no-action behaviour. The residual v1-u5-copilot-gate-quorum finding remains S10's.\n",
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — T7 (retrospective, 2026-11-27)",
+      "body": "# Architecture Artefact Index — T7 (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for T7 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase A; the Business Capability Map at phase B; the Data Entity/Data Component Catalog at phase C; and the Technology Standards Catalog at phase D. All seven are authored under the 2026-11-27 retrospective rework for project 01a1d039-0d34-7f89-a0be-f3de3c9f540e (track v2), tranche 5, under standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. T7 closes after this rework.\n\n## Entries\n\nThe index names each artefact and its role: the stakeholder map fixes who decides and who is consulted; the driver/goal catalogue fixes the six decisions and six goals that bound the incident lifecycle; the requirements catalogue carries ten executable requirements; the solution concept shows detect-triage-mitigate-gate-postmortem-resolve; the capability map records six built capabilities; the data catalogue records the incident card, the approval and decision rows, the dry-run invocation, the postmortem asset and the kata run; the technology catalogue names the k8s client, the policy, the dry run and the dual control.\n\n## Links\n\nEach artefact links to another artefact of this pack, so the set has no orphan: the stakeholder map depends on the capability map, the driver catalogue derives the requirements catalogue, the requirements realise the solution concept, and the capability, data and technology catalogues form the dependency chain back to the stakeholder map.\n\n## Document\n\nThis index is itself an architecture-artifact document. It carries the retrospective provenance: the operations delivery landed through PR #438 and the /operations console through #434; docs/evidence/record/evidence/T7-acceptance.md records 31 tests passing on 2026-11-24; and the two P1 findings v1-w1b-4 and v1-w3a-5 were fixed at ca155fada with the dual-control/dry-run gate and the zero-write mitigation. The record carried no lifecycle set; this rework authored it so the close rests on evidence.\n"
+    }
+  ],
+  "closure": "T7 is re-closed through the one gate on the record this run creates: the board-approved delivery contract, the approved scope baseline, the compliant Phase-G review and the closure gate, with the closure asset named as the destructive gate's typed evidence. The acceptance is `acceptance/programme/T7.toml`, 17 checks plus the gate and closure review, green at the fresh snapshot; the delivery evidence is T7-acceptance.md and the two fixes at ca155fada. The close is retrospective and the live cluster proof remains a deploy-bound open item.",
+  "closure_review": "# Closure review — T7 Operations (retrospective, 2026-11-27)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the operations lifecycle — the five incident actions, the four gated write verbs, the postmortem/kata loop and the /operations console — and the acceptance is `acceptance/programme/T7.toml`: 17 checks plus the gate and closure review, green at the 2026-11-27 snapshot. The historical record was active with a scope baseline and a charter but no contract, Phase A–D set, Phase-G review or closure evidence; this review records both states and closes on the completed set.\n\n## Evidence\n\nThe evidence is the executed 31-test operations suite in docs/evidence/record/evidence/T7-acceptance.md (2026-11-24), the delivery PRs #438 and #434, the two fixes at ca155fada with their tests, the seven Phase A–D artefacts and their index, the charter, the Statement of Architecture Work, the delivery contract, the approved scope baseline, the Phase-G review and the closure gate. The seed says closed and the record is now closed, so the seed/live drift is resolved.\n\n## Open items\n\nTwo items remain open and are named rather than rounded up. First, the live cluster proof scripts/ops-live-proof.sh did not run: the operator CLI is absent on this box and the deployed image predated the lane, so the manifest's gate is the executed suite and the live clause awaits a deployment carrying ca155fada. Second, the residual v1-u5-copilot-gate-quorum finding (a copilot proposal gate ignoring the tenant quorum) remains open and owned by S10; it is not part of the T7 fix. Neither item blocks this close; both are recorded as T7-R1/T7-R2 and S10's ledger entry.\n\n## Decision\n\nThe decision is to close T7 on the record set this run creates. The closure gate is approved by an approver distinct from its requester; the destructive close gate names the closure asset as its typed evidence; the run is recorded under standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. The close resolves the seed/live drift, and the two open items stay managed.\n"
+}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture Requirement Catalog — PLATFORM (retrospective, 2026-11-26) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="8c87a2adf78999a6774de3978a1186fb9a3193f85582018c809c50858c1fc514" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>8c87a2adf78999a6774de3978a1186fb9a3193f85582018c809c50858c1fc514</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>The requirement catalog states what the architecture must be able to prove. AR1 is one record: the seed, the snapshot and the published pack agree at every review. AR2 is one action surface: every state change is a registered action with a read-back. AR3 is the benefit measurement record. AR4 is the delivery contract rule.</p>
+<h2>Entries</h2>
+<p>Each requirement names its source and its verification. AR1 comes from B6 and the conformance baseline, verified by the coverage and register checks. AR2 comes from the action registry, verified by the projection and the audit. AR3 comes from SPEC_V2 §8.3, verified by the benefit lifecycle tests. AR4 comes from TOGAF and D63, verified by the contract and phase gates.</p>
+<h2>Links</h2>
+<p>The catalog is the architecture's own requirements, distinct from the platform's operational ones. A requirement that cannot name a verification is removed or rewritten. The four rows are the ones the rework's decisions and the standards impose on this record.</p>
+<h2>Document</h2>
+<p>The catalog closes the platform's artefact set. The requirements are the tests the platform's next review will run; the change catalog records the changes that made them true. Together they are the platform's argument that the standing project is governed, not merely running.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

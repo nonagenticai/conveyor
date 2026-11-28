@@ -17,15 +17,15 @@
 //! cannot gate a successor forever). A key that names no project fails closed: a programme with a
 //! dangling dependency is a data defect, not an unblocked project.
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 use conveyor_domain::{AssetStatus, Project};
 use conveyor_store::{
-    TenantId, approval as approval_store, architecture as architecture_store,
+    TenantId, approval as approval_store, architecture as architecture_store, card as card_store,
     document as document_store, governance as governance_store, project as project_store,
     spine as spine_store,
 };
-use serde_json::Value;
+use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -378,11 +378,15 @@ pub(crate) async fn assert_delegation_ref(
                 "the delegation output's owning project no longer exists",
             )
         })?;
-    if project.key != "P0" {
+    // The standing delegation is a programme-governance output. P0 is the programme definition
+    // project and PLATFORM is the platform record project; the live delegation
+    // (01a2021d-cca2-757c-bfc2-21bd4e4b6d85) is owned by PLATFORM. Accepting only P0 refused the
+    // owner's own published delegation.
+    if project.key != "P0" && project.key != "PLATFORM" {
         return Err(ActionError::new(
             409,
             "delegation_wrong_project",
-            "the delegation output is not owned by P0",
+            "the delegation output is not owned by P0 or PLATFORM",
         ));
     }
     Ok(())
@@ -390,12 +394,15 @@ pub(crate) async fn assert_delegation_ref(
 
 /// The one close gate every writer that reaches `closed` calls.
 ///
-/// A standalone project keeps the #302 output gate only: the MSP and TOGAF obligations attach to
-/// the programme's projects. A programme project closes only when its tranche is authorised,
-/// every declared closure output is published, the closure decision was taken by a distinct
-/// actor over an approved closure asset, and — for a delivery project — the charter, the scope
-/// baseline, a live board-approved delivery contract and its Phase-G compliance review (or an
-/// active waiver) all exist. The refusal writes nothing; the caller checks before its update.
+/// A bare standalone project keeps the #302 output gate only: the MSP and TOGAF obligations
+/// attach to the programme's projects. A project with a closure decision (a standalone one, or
+/// every programme project) closes only when every declared closure output is published, the
+/// decision was taken by a distinct actor over an approved closure asset, and (v1-close-1) its
+/// mandatory artefact set is complete and it owns no open P0. A programme project additionally
+/// closes only when its tranche is authorised and — for a delivery project — the charter, the
+/// scope baseline, a live board-approved delivery contract and its Phase-G compliance review
+/// (or an active waiver) all exist. The refusal writes nothing; the caller checks before its
+/// update.
 pub(crate) async fn assert_project_can_close(
     tx: &mut PgConnection,
     tenant: TenantId,
@@ -541,8 +548,12 @@ pub(crate) async fn assert_project_can_close(
         ));
     }
     // The decision and the asset govern a standalone project's close; the programme records
-    // (charter, baseline, delivery contract, Phase-G) apply only to a programme project.
+    // (charter, baseline, delivery contract, Phase-G) apply only to a programme project. The
+    // artefact standard and the P0 rule bind every close, so a project that got this far — a
+    // standalone project has a closure gate — meets them before this return.
     if project.programme_id.is_none() {
+        assert_mandatory_artefacts(&mut *tx, tenant, &project).await?;
+        assert_no_open_p0(&mut *tx, tenant, &project).await?;
         return Ok(());
     }
 
@@ -570,62 +581,462 @@ pub(crate) async fn assert_project_can_close(
         ));
     }
 
-    let track = project
-        .meta
-        .get("track")
-        .and_then(Value::as_str)
-        .unwrap_or("");
-    if track != "programme" {
-        // The board-approved live delivery contract is the design approval at programme level:
-        // the PM's own `design` gate is PM-binding-only, and `contracts_approve` already
-        // requires the board decision about this contract.
-        let contract = architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project_id)
+    // The board-approved live delivery contract is the design approval at programme level: the
+    // PM's own `design` gate is PM-binding-only, and `contracts_approve` already requires the
+    // board decision about this contract. Phase G binds EVERY programme project — no `meta.track`
+    // is exempt from the contract, its compliance review or the waiver rule.
+    let contract = architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the delivery contract");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_contract_missing",
+                "the delivery project has no live, board-approved delivery contract",
+            )
+        })?;
+    let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the compliance review");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_review_missing",
+                "the delivery contract has no Phase-G compliance review",
+            )
+        })?;
+    if matches!(review.level.as_str(), "non_conformant" | "irrelevant") {
+        let waiver = architecture_store::active_waiver_for_review_tx(&mut *tx, tenant, review.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the waiver");
+                ActionError::internal()
+            })?;
+        if waiver.is_none() {
+            return Err(ActionError::new(
+                409,
+                "closure_review_non_conformant",
+                format!(
+                    "the Phase-G review is {}; an active waiver is required",
+                    review.level
+                ),
+            ));
+        }
+    }
+    // v1-close-1 (SPEC_V2 §5.4): the closure also reads the artefact standard and the committed
+    // findings ledger directly. For a programme project both run after Phase G so the refusal
+    // order above is unchanged; a standalone project with a closure gate met them at its branch.
+    assert_mandatory_artefacts(&mut *tx, tenant, &project).await?;
+    assert_no_open_p0(&mut *tx, tenant, &project).await?;
+
+    // v1-p83-6 (PMP §8.4): the plan the closure freezes must itself be complete — the schedule
+    // and cost baselines approved, at least one deliverable accepted, and the four running
+    // registers populated. An archived or folded project is history, so it keeps the same
+    // exemption the mandatory artefact set applies.
+    if !mandatory_artefacts_exempt(&project) {
+        for (kind, code) in [
+            ("schedule", "closure_schedule_baseline_missing"),
+            ("cost", "closure_cost_baseline_missing"),
+        ] {
+            let baseline =
+                spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, kind)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, kind, "close gate: read the baseline");
+                        ActionError::internal()
+                    })?;
+            if baseline.is_none() {
+                return Err(ActionError::new(
+                    409,
+                    code,
+                    format!("the project has no approved {kind} baseline"),
+                ));
+            }
+        }
+        let wbs = spine_store::list_wbs_tx(&mut *tx, tenant, project_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's WBS");
+                ActionError::internal()
+            })?;
+        if !wbs
+            .iter()
+            .any(|node| node.kind == "deliverable" && node.status == "accepted")
+        {
+            return Err(ActionError::new(
+                409,
+                "closure_deliverable_missing",
+                "the project has no accepted deliverable",
+            ));
+        }
+        let registers = spine_store::list_register_tx(&mut *tx, tenant, project_id, None)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's registers");
+                ActionError::internal()
+            })?;
+        let missing: Vec<&str> = ["risk", "issue", "assumption", "dependency"]
+            .into_iter()
+            .filter(|kind| !registers.iter().any(|row| row.kind == *kind))
+            .collect();
+        if !missing.is_empty() {
+            return Err(ActionError::new(
+                409,
+                "closure_register_missing",
+                format!(
+                    "the project's registers are incomplete (missing: {})",
+                    missing.join(", ")
+                ),
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// The embedded output standard. `include_str!` fails the build if the file moves.
+const OUTPUT_STANDARD: &str = include_str!("../../../seed/output-standard.json");
+
+/// The profile phases an artefact requirement binds, in ADM order. Preliminary is the
+/// capability page, not a per-project phase.
+const PROFILE_PHASES: [&str; 8] = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+/// Refuse with `409 closure_mandatory_artefacts_missing` unless the project holds every
+/// artefact the output standard and the adopted ADM profile require of it.
+///
+/// Four sources, read directly (never a generated register or the standards pack):
+///
+/// * the project's first matching standard class (`now` + `closure` documents);
+/// * the standard's mandatory project templates that apply — PMP always, the Phase-G pair (the
+///   contract and its compliance review are already enforced above), a declared category, and
+///   the TOGAF set for a governed project. `change-control` is a register change,
+///   `project-baseline` a baseline row, everything else a published document;
+/// * the adopted profile's `artifact_requirements` from phase A through the project's phase, as
+///   approved artefacts of the required type.
+///
+/// An archived `measured_status` and a `viability` fold/close-by-decision are the only
+/// exemptions: the tranche that is not authorised was already refused above, and a bare
+/// standalone project returns before this check.
+async fn assert_mandatory_artefacts(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project: &Project,
+) -> Result<(), ActionError> {
+    if mandatory_artefacts_exempt(project) {
+        return Ok(());
+    }
+    // A programme project is contract-bound by the Phase-G block above; a standalone project
+    // is governed only when it holds a live delivery contract of its own.
+    let governed = project.programme_id.is_some()
+        || architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project.id)
             .await
             .map_err(|error| {
                 tracing::error!(%error, "close gate: read the delivery contract");
                 ActionError::internal()
             })?
-            .ok_or_else(|| {
-                ActionError::new(
-                    409,
-                    "closure_contract_missing",
-                    "the delivery project has no live, board-approved delivery contract",
-                )
-            })?;
-        let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)
+            .is_some();
+    let (documents, change_control, baseline) = mandatory_artefacts(project, governed);
+    let mut missing: Vec<String> = Vec::new();
+
+    if !documents.is_empty() {
+        let published = document_store::published_categories_tx(&mut *tx, tenant, project.id)
             .await
             .map_err(|error| {
-                tracing::error!(%error, "close gate: read the compliance review");
+                tracing::error!(%error, "close gate: read published mandatory documents");
                 ActionError::internal()
-            })?
-            .ok_or_else(|| {
-                ActionError::new(
-                    409,
-                    "closure_review_missing",
-                    "the delivery contract has no Phase-G compliance review",
-                )
             })?;
-        if matches!(review.level.as_str(), "non_conformant" | "irrelevant") {
-            let waiver =
-                architecture_store::active_waiver_for_review_tx(&mut *tx, tenant, review.id)
-                    .await
-                    .map_err(|error| {
-                        tracing::error!(%error, "close gate: read the waiver");
-                        ActionError::internal()
-                    })?;
-            if waiver.is_none() {
-                return Err(ActionError::new(
-                    409,
-                    "closure_review_non_conformant",
-                    format!(
-                        "the Phase-G review is {}; an active waiver is required",
-                        review.level
-                    ),
-                ));
+        missing.extend(
+            documents
+                .into_iter()
+                .filter(|category| !published.iter().any(|slot| slot == category)),
+        );
+    }
+    if change_control {
+        let rows = spine_store::list_register_tx(&mut *tx, tenant, project.id, None)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's registers");
+                ActionError::internal()
+            })?;
+        if !rows.iter().any(|row| row.kind == "change") {
+            missing.push("change-control".to_owned());
+        }
+    }
+    if baseline {
+        let rows = spine_store::list_baselines_tx(&mut *tx, tenant, project.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's baselines");
+                ActionError::internal()
+            })?;
+        if rows.is_empty() {
+            missing.push("project-baseline".to_owned());
+        }
+    }
+    missing.extend(profile_missing_artefacts(&mut *tx, tenant, project).await?);
+    missing.sort_unstable();
+    missing.dedup();
+    if missing.is_empty() {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        409,
+        "closure_mandatory_artefacts_missing",
+        format!(
+            "project {} cannot close until its mandatory artefacts exist (missing: {})",
+            project.key,
+            missing.join(", ")
+        ),
+    ))
+}
+
+/// Whether the mandatory artefact set does not bind this project.
+///
+/// An archived measurement is history, and a retrospective's fold/close-by-decision verdict
+/// closes a project the programme decided not to complete; neither has live artefacts to owe.
+/// A standalone project without a closure gate never reaches this check (the gate's first
+/// early return covers it), and an unauthorised tranche was already refused above.
+fn mandatory_artefacts_exempt(project: &Project) -> bool {
+    if project.meta.get("measured_status").and_then(Value::as_str) == Some("archived") {
+        return true;
+    }
+    matches!(
+        project.meta.get("viability").and_then(Value::as_str),
+        Some("fold" | "close-by-decision")
+    )
+}
+
+/// The project's ADM track, from the same two facts the generator uses: `meta.adm_profile`
+/// naming an architecture profile wins; otherwise `meta.track == "programme"`.
+///
+/// The owner's tailoring (2026-11-24) gives the delivery track Preliminary, A-D and the Phase-G
+/// review; E-H belong to the architecture track. `mandatory_artefacts` applies this so a
+/// delivery project is not asked for artefacts the standard never instanced for it.
+fn architecture_track(meta: &Value) -> bool {
+    if let Some(named) = meta.get("adm_profile").and_then(Value::as_str) {
+        let named = named.trim().to_ascii_lowercase();
+        if !named.is_empty() {
+            return named.contains("architecture")
+                || matches!(named.as_str(), "programme" | "a-h" | "ah");
+        }
+    }
+    meta.get("track")
+        .and_then(Value::as_str)
+        .is_some_and(|track| track.trim().eq_ignore_ascii_case("programme"))
+}
+
+/// The document categories and typed rows the standard requires of `project`.
+///
+/// The output standard's first matching class is read for every project, so no project can
+/// close without the outputs its class declares (`now` + `closure`). The declaration in
+/// `meta.expected_outputs` / `meta.closure_outputs` is enforced separately by the output gate
+/// above; the class is the standard's own copy and is not weakened by editing it.
+fn mandatory_artefacts(project: &Project, governed: bool) -> (Vec<String>, bool, bool) {
+    let standard: Value =
+        serde_json::from_str(OUTPUT_STANDARD).expect("seed/output-standard.json is valid JSON");
+    let declared = closure_outputs(&project.meta);
+    let mut documents: Vec<String> = Vec::new();
+    if let Some(class) = class_for(&standard, project) {
+        for field in ["now", "closure"] {
+            if let Some(categories) = class[field].as_array() {
+                for category in categories.iter().filter_map(Value::as_str) {
+                    if !documents.iter().any(|seen| seen == category) {
+                        documents.push(category.to_owned());
+                    }
+                }
             }
         }
     }
-    Ok(())
+    let mut change_control = false;
+    let mut baseline = false;
+    if let Some(templates) = standard["templates"].as_object() {
+        for (key, template) in templates {
+            if template["mandatory"].as_bool() != Some(true) {
+                continue;
+            }
+            if template["subject_kind"].as_str() != Some("project") {
+                continue;
+            }
+            let named = template["standard"].as_str().unwrap_or_default();
+            let declared_here = declared.iter().any(|slot| slot == key);
+            // The TOGAF set follows the ADM tailoring: a delivery project owes the contract and
+            // its review (enforced by the Phase-G block, and skipped below) and the outputs its
+            // class declares, not the architecture track's E/F artefacts. Demanding the whole
+            // governed set put four categories on delivery projects that the standard's own
+            // `applies()` never instanced for them (measured 2026-11-25).
+            let applies = named == "PMP"
+                || (named == "TOGAF"
+                    && governed
+                    && (declared_here || architecture_track(&project.meta)))
+                || declared_here;
+            if !applies {
+                continue;
+            }
+            // Phase G above already binds the live contract and its compliance review.
+            if matches!(key.as_str(), "delivery-contract" | "compliance-review") {
+                continue;
+            }
+            match key.as_str() {
+                "change-control" => change_control = true,
+                "project-baseline" => baseline = true,
+                _ => {
+                    let category = template["document_category"]
+                        .as_str()
+                        .unwrap_or(key.as_str());
+                    if !documents.iter().any(|seen| seen == category) {
+                        documents.push(category.to_owned());
+                    }
+                }
+            }
+        }
+    }
+    (documents, change_control, baseline)
+}
+
+/// The first standard class whose `when` facts all match the project.
+fn class_for<'a>(standard: &'a Value, project: &Project) -> Option<&'a Value> {
+    let facts = json!({
+        "key": project.key,
+        "track": project.meta.get("track").cloned().unwrap_or(Value::Null),
+        "status": project.status,
+        "measured_status": project.meta.get("measured_status").cloned().unwrap_or(Value::Null),
+    });
+    standard["classes"].as_array()?.iter().find(|class| {
+        class["when"].as_object().is_some_and(|when| {
+            when.iter()
+                .all(|(key, value)| facts.get(key) == Some(value))
+        })
+    })
+}
+
+/// The profile's required artefact types the project has no approved artefact for.
+async fn profile_missing_artefacts(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project: &Project,
+) -> Result<Vec<String>, ActionError> {
+    let profile = architecture_store::get_profile_tx(&mut *tx, tenant, None)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the ADM profile");
+            ActionError::internal()
+        })?;
+    let Some(profile) = profile else {
+        return Ok(Vec::new());
+    };
+    if profile.status != "adopted" {
+        return Ok(Vec::new());
+    }
+    let phase = project
+        .phase_code
+        .as_deref()
+        .map(str::trim)
+        .map(str::to_ascii_lowercase)
+        .or_else(|| {
+            project
+                .meta
+                .get("adm_phase")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .map(str::to_ascii_lowercase)
+        });
+    let Some(phase) = phase else {
+        return Ok(Vec::new());
+    };
+    let Some(limit) = PROFILE_PHASES.iter().position(|slot| *slot == phase) else {
+        return Ok(Vec::new());
+    };
+    let mut required: BTreeSet<String> = BTreeSet::new();
+    for slot in &PROFILE_PHASES[..=limit] {
+        if let Some(plateaus) = profile
+            .artifact_requirements
+            .get(*slot)
+            .and_then(Value::as_object)
+        {
+            for kinds in plateaus.values().filter_map(Value::as_array) {
+                required.extend(kinds.iter().filter_map(Value::as_str).map(str::to_owned));
+            }
+        }
+    }
+    if required.is_empty() {
+        return Ok(Vec::new());
+    }
+    let standard = architecture_store::list_standard_tx(&mut *tx, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the artefact standard");
+            ActionError::internal()
+        })?;
+    let key_by_id: HashMap<Uuid, &str> = standard
+        .iter()
+        .map(|row| (row.id, row.key.as_str()))
+        .collect();
+    let artifacts =
+        architecture_store::list_artifacts_tx(&mut *tx, tenant, Some(project.id), None, None)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's artefacts");
+                ActionError::internal()
+            })?;
+    let mut actual: BTreeSet<String> = BTreeSet::new();
+    for artifact in artifacts.iter().filter(|row| row.status == "approved") {
+        match artifact
+            .artifact_type_id
+            .and_then(|id| key_by_id.get(&id).copied())
+        {
+            Some(key) => {
+                actual.insert(key.to_owned());
+            }
+            None => {
+                actual.insert(artifact.artifact_kind.clone());
+            }
+        }
+    }
+    Ok(required.difference(&actual).cloned().collect())
+}
+
+/// Refuse with `409 closure_open_p0` while the project owns an open P0 finding or rework card.
+///
+/// The findings are read from the committed ledger (never the generated rework register) and
+/// the materialised cards from the board, so a package whose card does not exist yet (#545) is
+/// still caught by its finding, and a finding the audit has not yet picked up is still caught by
+/// its card.
+async fn assert_no_open_p0(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project: &Project,
+) -> Result<(), ActionError> {
+    let mut open: Vec<String> =
+        conveyor_domain::findings::open_p0_findings(&project.key, chrono::Utc::now())
+            .into_iter()
+            .map(|finding| finding.id)
+            .collect();
+    let cards = card_store::open_p0_rework_packages_tx(&mut *tx, tenant, &project.key)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read open P0 rework cards");
+            ActionError::internal()
+        })?;
+    open.extend(cards);
+    open.sort_unstable();
+    open.dedup();
+    if open.is_empty() {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        409,
+        "closure_open_p0",
+        format!(
+            "project {} owns open P0 work (open: {})",
+            project.key,
+            open.join(", ")
+        ),
+    ))
 }
 
 /// A dependency is met when its project is closed or archived. `archived` covers a superseded
@@ -638,7 +1049,21 @@ fn is_met(status: &str) -> bool {
 mod tests {
     use serde_json::json;
 
-    use super::{closure_outputs, dependency_keys};
+    use super::{architecture_track, closure_outputs, dependency_keys};
+
+    #[test]
+    fn the_adm_track_follows_the_owner_tailoring() {
+        assert!(architecture_track(&json!({"track": "programme"})));
+        assert!(architecture_track(
+            &json!({"adm_profile": "architecture-capability"})
+        ));
+        assert!(architecture_track(&json!({"adm_profile": "a-h"})));
+        assert!(!architecture_track(&json!({"track": "v2"})));
+        assert!(!architecture_track(&json!({})));
+        assert!(!architecture_track(
+            &json!({"adm_profile": "", "track": "v2"})
+        ));
+    }
 
     #[test]
     fn dependency_keys_trims_dedupes_and_ignores_non_strings() {

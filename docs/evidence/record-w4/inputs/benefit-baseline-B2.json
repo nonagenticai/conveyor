@@ -1,0 +1,19 @@
+{
+  "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+  "baseline": {
+    "definition": "18 tool_call rows at 2026-11-22",
+    "value": 18,
+    "unit": "tool_call rows",
+    "measured_at": "2026-11-22",
+    "method": "count tool_call rows",
+    "evidence": {
+      "detail": {
+        "tool_calls": 18
+      },
+      "instrument": "count tool_call rows",
+      "reference": "B2",
+      "value": 18.0
+    }
+  },
+  "change_id": "01a2076b-0d9b-7350-bf4f-4c0e91130e31"
+}

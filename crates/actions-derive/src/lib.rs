@@ -539,12 +539,12 @@ pub fn action(args: TokenStream, item: TokenStream) -> TokenStream {
         #[doc(hidden)]
         fn #spec_fn_ident() -> ::conveyor_actions::ActionSpec {
             ::conveyor_actions::ActionSpec {
-                name: #name_lit,
+                name: ::std::borrow::Cow::Borrowed(#name_lit),
                 version: #version,
                 kind: ::conveyor_actions::ActionKind::#kind,
-                input: #in_schema_ident,
-                output: #out_schema_ident,
-                scopes: #scopes,
+                input: ::conveyor_actions::SchemaRef::Compiled(#in_schema_ident),
+                output: ::conveyor_actions::SchemaRef::Compiled(#out_schema_ident),
+                scopes: ::std::borrow::Cow::Borrowed(#scopes),
                 idempotent: #idempotent,
                 timeout_ms: #timeout_ms,
                 effect: ::conveyor_actions::Effect::#effect,

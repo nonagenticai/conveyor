@@ -792,6 +792,7 @@ async fn invoke_and_record(
     let input = tools_call_input(&row.action, row.run_id, row.id, &row.input)?;
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: row.action.clone(),
         input,
         // The precondition is the input's reserved `_version` member; `invoke` strips it itself
@@ -931,10 +932,50 @@ pub(crate) fn database(error: impl std::fmt::Display) -> StepFailure {
     StepFailure::retryable(format!("database: {error}"))
 }
 
+/// What a readable verdict pins about the call that decided (v1-p101-1).
+///
+/// The verdict's own document goes on `run_step.judge`; these are the fields the `decision` row
+/// needs to be reproducible — the recorded `laya.judge` invocation behind a laya answer, the
+/// hashes that call was verified against, the eval version a grade was produced for, and the
+/// call's latency.
+#[derive(Clone, Debug, Default)]
+struct DecisionEvidence {
+    /// The verified `laya.judge` invocation behind a laya answer.
+    laya_invocation_id: Option<Uuid>,
+    /// The sha256 of the `laya.judge` request document.
+    laya_request_hash: Option<String>,
+    /// The sha256 of laya's answer document.
+    laya_response_hash: Option<String>,
+    /// The eval version the settled grade was produced against.
+    eval_version_id: Option<Uuid>,
+    /// The judge call's wall-clock latency.
+    latency_ms: Option<i32>,
+}
+
+/// Who decided, and what the decision row pins (v1-p101-1).
+#[derive(Clone, Debug)]
+struct StepDecision {
+    /// Which rung made the verdict: a checker or eval applies a rule; laya is its own rung.
+    rung: conveyor_domain::ladder::Rung,
+    /// The judge's own name (`checker | laya | eval`), kept in the row's metadata.
+    judge: &'static str,
+    /// The SOP version the judge enforced.
+    sop_version: i64,
+    /// The eval an eval judge graded against, when it is the decider.
+    eval_id: Option<Uuid>,
+    /// The invocation, hashes and latency the row pins.
+    evidence: DecisionEvidence,
+}
+
 /// What a judge call produced.
 enum JudgeCall {
-    /// A readable verdict.
-    Verdict(judge::Verdict),
+    /// A readable verdict, and what produced it.
+    Verdict {
+        /// The verdict document recorded on the step.
+        verdict: judge::Verdict,
+        /// The call's pins for the decision row.
+        evidence: DecisionEvidence,
+    },
     /// No decision — an unreachable or unconfigured judge, or an answer with no verdict in it.
     /// Never a reject, and never an accept.
     Unavailable(String),
@@ -943,7 +984,12 @@ enum JudgeCall {
 /// What an eval inspection produced.
 enum EvalJudge {
     /// The grade settled; its status is the verdict.
-    Verdict(judge::Verdict),
+    Verdict {
+        /// The verdict document recorded on the step.
+        verdict: judge::Verdict,
+        /// The grade's eval version for the decision row.
+        evidence: DecisionEvidence,
+    },
     /// The grade exists and is still running; the caller parks this attempt on it.
     Pending(Uuid),
     /// This call created the grade and parked the attempt in one transaction — there is nothing
@@ -1022,6 +1068,7 @@ pub(crate) async fn judge_and_record(
             row,
             output,
             None,
+            None,
             next_position,
         )
         .await;
@@ -1065,7 +1112,18 @@ pub(crate) async fn judge_and_record(
 
     match judge::judge_of(&inspection) {
         judge::JudgeKind::Checker { rule } => {
+            let started = std::time::Instant::now();
             let verdict = judge::checker_verdict(rule, &output);
+            let decided = StepDecision {
+                rung: conveyor_domain::ladder::Rung::Rule,
+                judge: "checker",
+                sop_version: sop.version,
+                eval_id: None,
+                evidence: DecisionEvidence {
+                    latency_ms: Some(elapsed_ms(started)),
+                    ..DecisionEvidence::default()
+                },
+            };
             settle(
                 pool,
                 tenant,
@@ -1077,10 +1135,12 @@ pub(crate) async fn judge_and_record(
                 &sop.acceptance_criteria,
                 max_rejects,
                 next_position,
+                &decided,
             )
             .await
         }
         judge::JudgeKind::Laya { threshold } => {
+            let started = std::time::Instant::now();
             match laya_verdict(
                 pool,
                 tenant,
@@ -1094,7 +1154,18 @@ pub(crate) async fn judge_and_record(
             )
             .await?
             {
-                JudgeCall::Verdict(verdict) => {
+                JudgeCall::Verdict {
+                    verdict,
+                    mut evidence,
+                } => {
+                    evidence.latency_ms = Some(elapsed_ms(started));
+                    let decided = StepDecision {
+                        rung: conveyor_domain::ladder::Rung::Laya,
+                        judge: "laya",
+                        sop_version: sop.version,
+                        eval_id: None,
+                        evidence,
+                    };
                     settle(
                         pool,
                         tenant,
@@ -1106,6 +1177,7 @@ pub(crate) async fn judge_and_record(
                         &sop.acceptance_criteria,
                         max_rejects,
                         next_position,
+                        &decided,
                     )
                     .await
                 }
@@ -1123,8 +1195,22 @@ pub(crate) async fn judge_and_record(
             }
         }
         judge::JudgeKind::Eval { eval_id, threshold } => {
+            let started = std::time::Instant::now();
             match eval_verdict(pool, tenant, row, &output, eval_id, threshold).await? {
-                EvalJudge::Verdict(verdict) => {
+                EvalJudge::Verdict {
+                    verdict,
+                    mut evidence,
+                } => {
+                    evidence.latency_ms = Some(elapsed_ms(started));
+                    let decided = StepDecision {
+                        // The eval applies its threshold as a rule over a settled grade; the
+                        // grade (and its model) is the evidence, not a second rung.
+                        rung: conveyor_domain::ladder::Rung::Rule,
+                        judge: "eval",
+                        sop_version: sop.version,
+                        eval_id: Some(eval_id),
+                        evidence,
+                    };
                     settle(
                         pool,
                         tenant,
@@ -1136,6 +1222,7 @@ pub(crate) async fn judge_and_record(
                         &sop.acceptance_criteria,
                         max_rejects,
                         next_position,
+                        &decided,
                     )
                     .await
                 }
@@ -1218,9 +1305,11 @@ async fn laya_verdict(
         gate: step.gate_kind.clone(),
     };
     let request_document = facts.request().unwrap_or(Value::Null);
+    let request_body = judge::request(None, output, acceptance_criteria, Some(&request_document));
     let request = InvokeRequest {
+        credential_alias: None,
         action: "laya.judge".to_owned(),
-        input: judge::request(None, output, acceptance_criteria, Some(&request_document)),
+        input: request_body.clone(),
         precondition: None,
         // No `Idempotency-Key`. A failed call keeps its claim live for the TTL, which would turn
         // an outage into a `409` that cannot clear; and the call decides nothing and changes
@@ -1248,7 +1337,17 @@ async fn laya_verdict(
             // `answers` and turn every judge call into a silent, permanent park.
             let answer = outcome.body.get("output").unwrap_or(&outcome.body);
             match judge::parse_verdict(answer, threshold) {
-                Ok(verdict) => Ok(JudgeCall::Verdict(verdict)),
+                Ok(verdict) => Ok(JudgeCall::Verdict {
+                    verdict,
+                    evidence: DecisionEvidence {
+                        laya_invocation_id: outcome.invocation_id,
+                        // The invocation's own canonical request hash (0086's shape); the
+                        // response hash is the sha256 of laya's answer document.
+                        laya_request_hash: Some(store::idempotency::request_hash(&request_body)),
+                        laya_response_hash: Some(conveyor_domain::compare::content_hash(answer)),
+                        ..DecisionEvidence::default()
+                    },
+                }),
                 // The judge answered, but not in a shape that carries a verdict. A garbled answer
                 // is evidence of nothing: the step waits.
                 Err(error) => {
@@ -1311,17 +1410,23 @@ async fn eval_verdict(
         let status = grade.status.clone();
         return Ok(match status.as_str() {
             "pending" => EvalJudge::Pending(grade_id),
-            "accepted" | "rejected" => EvalJudge::Verdict(judge::Verdict {
-                accepted: status == "accepted",
-                score,
-                reason: grade.reason.unwrap_or_default(),
-                raw: json!({
-                    "grade_id": grade_id,
-                    "status": status,
-                    "score": score,
-                    "threshold": threshold,
-                }),
-            }),
+            "accepted" | "rejected" => EvalJudge::Verdict {
+                verdict: judge::Verdict {
+                    accepted: status == "accepted",
+                    score,
+                    reason: grade.reason.unwrap_or_default(),
+                    raw: json!({
+                        "grade_id": grade_id,
+                        "status": status,
+                        "score": score,
+                        "threshold": threshold,
+                    }),
+                },
+                evidence: DecisionEvidence {
+                    eval_version_id: Some(grade.version_id),
+                    ..DecisionEvidence::default()
+                },
+            },
             // A grader failure was never a verdict on the output (eval_grade's own rule): the
             // step waits for a judge that can decide — on the grade it already owns, never a
             // fresh one.
@@ -1445,6 +1550,85 @@ fn criteria_names(criteria: &Value) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// A judge call's wall-clock latency, clamped to the column's `int`.
+fn elapsed_ms(started: std::time::Instant) -> i32 {
+    i32::try_from(started.elapsed().as_millis()).unwrap_or(i32::MAX)
+}
+
+/// The `decision` row a readable step verdict records (v1-p101-1).
+///
+/// One store, the same audit shape every ladder decision uses: the rung, the answer, the SOP
+/// version and (for a laya judge) the recorded invocation behind it, the hash of the output it
+/// judged, and the call's latency. The row is written in the transaction that writes
+/// `run_step.judge`, so the two can never disagree.
+fn new_step_decision(
+    context: &RunContext,
+    row: &RunStepRecord,
+    output: &Value,
+    verdict: &judge::Verdict,
+    decided: &StepDecision,
+) -> store::ladder::NewDecision {
+    let input_hash = conveyor_domain::compare::content_hash(output);
+    let mut meta = json!({
+        "judge": decided.judge,
+        "sop_version": decided.sop_version,
+        "run_position": row.position,
+        "run_attempt": row.attempt,
+        "output_hash": input_hash,
+        "score": verdict.score,
+        "reason": verdict.reason,
+    });
+    if let Some(eval_id) = decided.eval_id {
+        meta["eval_id"] = json!(eval_id);
+    }
+    if let Some(version_id) = decided.evidence.eval_version_id {
+        meta["eval_version_id"] = json!(version_id);
+    }
+    if let Some(grade_id) = verdict.raw.get("grade_id") {
+        meta["grade_id"] = grade_id.clone();
+    }
+    store::ladder::NewDecision {
+        kind: "process.step.judge".to_owned(),
+        rung: decided.rung,
+        project_id: Some(context.project_id),
+        card_id: context.card_id,
+        question: format!(
+            "Does step {} (attempt {}) meet its SOP's acceptance criteria?",
+            row.position, row.attempt
+        ),
+        answer: if verdict.accepted { "accept" } else { "reject" }.to_owned(),
+        option_set_id: None,
+        option_set_version: None,
+        option_set_hash: None,
+        option_refinement_hashes: Vec::new(),
+        probabilities: json!({}),
+        // A judge score outside [0, 1] is not a confidence; the row records it in `meta` only.
+        confidence: verdict.score.filter(|score| (0.0..=1.0).contains(score)),
+        input_hash: Some(input_hash),
+        policy_id: None,
+        policy_version: Some(decided.sop_version),
+        policy_refinement_id: None,
+        refinement_version: None,
+        laya_config_id: None,
+        laya_config_version: None,
+        laya_invocation_id: decided.evidence.laya_invocation_id,
+        laya_request_hash: decided.evidence.laya_request_hash.clone(),
+        laya_response_hash: decided.evidence.laya_response_hash.clone(),
+        actor_kind: "service".to_owned(),
+        actor_id: None,
+        approval_id: None,
+        latency_ms: decided.evidence.latency_ms,
+        outcome: if verdict.accepted {
+            conveyor_domain::ladder::Outcome::Accepted
+        } else {
+            conveyor_domain::ladder::Outcome::Refused
+        },
+        decided_at: Some(Utc::now()),
+        meta,
+        options: Vec::new(),
+    }
+}
+
 /// Record what a readable verdict decided: accept, or the reject ladder.
 #[allow(clippy::too_many_arguments)]
 async fn settle(
@@ -1458,7 +1642,12 @@ async fn settle(
     criteria: &Value,
     max_rejects: u32,
     next_position: Option<i32>,
+    decided: &StepDecision,
 ) -> Result<(), StepFailure> {
+    // v1-p101-1: the verdict is a decision row too, written with the document below in the same
+    // transaction — never a JSON-only fact on `run_step`. Built first, before the document takes
+    // the raw answer.
+    let decision = new_step_decision(context, row, &output, &verdict, decided);
     // S13 §5.5: the verdict records WHAT it judged against and the hash of the output it judged.
     // Without them "accepted" is an opinion with no reproducible subject: the criteria could be
     // edited afterwards and the output could not be re-hashed from the run.
@@ -1479,6 +1668,7 @@ async fn settle(
             row,
             output,
             Some(&document),
+            Some(&decision),
             next_position,
         )
         .await;
@@ -1491,6 +1681,7 @@ async fn settle(
         row,
         &output,
         &document,
+        &decision,
         max_rejects,
     )
     .await
@@ -1506,6 +1697,7 @@ async fn record_success(
     row: &RunStepRecord,
     output: Value,
     verdict: Option<&Value>,
+    decision: Option<&store::ladder::NewDecision>,
     next_position: Option<i32>,
 ) -> Result<(), StepFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(database)?;
@@ -1513,6 +1705,13 @@ async fn record_success(
         store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)
             .await
             .map_err(database)?;
+    }
+    if let Some(decision) = decision {
+        store::process_judge::record_step_decision_tx(
+            &mut tx, tenant, decision, row.run_id, row.id,
+        )
+        .await
+        .map_err(database)?;
     }
     record_and_chain(
         &mut tx,
@@ -1542,6 +1741,7 @@ async fn record_reject(
     row: &RunStepRecord,
     output: &Value,
     verdict: &Value,
+    decision: &store::ladder::NewDecision,
     max_rejects: u32,
 ) -> Result<(), StepFailure> {
     let reason = verdict
@@ -1555,6 +1755,9 @@ async fn record_reject(
     };
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(database)?;
     store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)
+        .await
+        .map_err(database)?;
+    store::process_judge::record_step_decision_tx(&mut tx, tenant, decision, row.run_id, row.id)
         .await
         .map_err(database)?;
     // Counted after the verdict above, on this transaction's own connection, so the count

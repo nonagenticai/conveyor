@@ -1,0 +1,14 @@
+{
+  "schema": "conveyor-retirement/v1",
+  "project": "S06a",
+  "decision": "retired by recorded supersession, not rebuilt",
+  "successor": "S06b",
+  "document_id": "01a21c64-9256-762d-a3d1-2d2d0d5a6596",
+  "category": "decision",
+  "title": "S06a retirement \u2014 superseded by S06b (2026-11-27)",
+  "evidence": [
+    "docs/plans/slices/S06a-mcp-server-channel.md",
+    "docs/plans/slices/S06b-agent-direct-interface.md",
+    "acceptance/programme/S06a.toml"
+  ]
+}

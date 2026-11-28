@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::an_incident_is_triaged_with_no_write"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+   "ref": "T7 acceptance transcript"
+  }
+ ],
+ "id": "01a20ae2-1b54-7c01-b61c-45fd96158343",
+ "status": "accepted"
+}

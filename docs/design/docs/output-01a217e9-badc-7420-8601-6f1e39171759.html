@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data entity catalog — metrics, metering and maturity · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="8de2eb4ee605c5d8d054dd46ed6ebad4c994c17e94d20ef9ed5ffa1c1496fb6e" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>8de2eb4ee605c5d8d054dd46ed6ebad4c994c17e94d20ef9ed5ffa1c1496fb6e</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Data entity catalog — metrics, metering and maturity</h1>
+<h2>Metadata</h2>
+<p>Retrospective catalogue for T11, authored 2026-11-26 from the 2026-11-21 rework transcript, migration 0059_metrics.sql and the snapshot. Phase c, plateau hld, kind catalog; owner the programme architect under the #526 rework delegation; reviewer the Architecture Board; subject project 01a1d039-0d36-782b-8b18-ff07a64dedbe.</p>
+<h2>Entries</h2>
+<p>Thirteen entities. The two T11 rows are metric_threshold, an append-only version per tenant and level, and metric_reconciliation, one verdict per tenant and period with six-decimal figures and an incident-card reference. The ledgers T11 reads are inference_call and tool_call for spend, run and run_step for attribution, approval for governance, card, list and event for flow, the organisation join for department attribution, the project and programme rows for roll-ups, the benefit rows for realisation, and commercial_price for the derived cost. measure.inference is the console projection, and the thirteenth row records the absence: there is no metric, roll-up or cost table.</p>
+<h2>Links</h2>
+<p>This artefact carries two typed edges: Business capability map — metrics, metering and maturity and Solution concept — metrics, metering and maturity, both as derivation. Every edge names another artefact this pack creates, so the set has no orphan.</p>
+<h2>Document</h2>
+<p>Purpose: name the two entities T11 adds, the ledger entities it reads and the deliberate absence of a stored metric. Scope: migration 0059_metrics.sql, the read-model source tables and the snapshot projection. It was authored retrospectively on 2026-11-26 from the migration and the store code, so the catalogue names a table and a key the record actually carries and marks the one absence that the design requires.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

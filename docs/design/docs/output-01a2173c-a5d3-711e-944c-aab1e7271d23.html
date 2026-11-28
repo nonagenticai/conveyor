@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Statement Of Architecture Work — Model and contracts · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="statement-of-architecture-work" data-provenance-version="1" data-provenance-hash="172078b397fa3acd9c69445e28d72860668f5e0e0bd66401638d3bfc98b506ae" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>statement-of-architecture-work</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>172078b397fa3acd9c69445e28d72860668f5e0e0bd66401638d3bfc98b506ae</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Statement Of Architecture Work — Model and contracts</h1>
+<h2>Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+      "approved_at": "2026-11-21T18:02:10.160888+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/T0.toml is green against the live record at the published SHA: a job is created, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale, no concept has two stores, and a test-only third executor kind registers without editing the run path. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.",
+        "assignment": "Rework the V2 slice T0 (SPEC_V2 \u00a712, issue #34) by the reconstituted TOGAF/MSP lifecycle: produce and publish the Phase A\u2013D mandatory artefacts, the charter and the delivery contract, the Phase-G compliance review and the closure review, declare the closure outputs and re-close through the one gate.",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T0.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "the model and its invariants (SPEC_V2 \u00a73 P1\u2013P11, \u00a74.1\u2013\u00a74.6, \u00a710.1, \u00a710.3): the organisation spine \u2014 industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins. Execution behaviour is T2; the plan spine is T1; the tool platform is T13."
+      },
+      "created_at": "2026-11-21T18:02:00.126911+00:00",
+      "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 T0 Model and contracts (retrospective, U5a)",
+      "updated_at": "2026-11-21T18:02:10.160888+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+      "approved_at": "2026-11-21T18:02:10.160888+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/T0.toml is green against the live record at the published SHA: a job is created, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale, no concept has two stores, and a test-only third executor kind registers without editing the run path. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.",
+        "assignment": "Rework the V2 slice T0 (SPEC_V2 \u00a712, issue #34) by the reconstituted TOGAF/MSP lifecycle: produce and publish the Phase A\u2013D mandatory artefacts, the charter and the delivery contract, the Phase-G compliance review and the closure review, declare the closure outputs and re-close through the one gate.",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T0.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "the model and its invariants (SPEC_V2 \u00a73 P1\u2013P11, \u00a74.1\u2013\u00a74.6, \u00a710.1, \u00a710.3): the organisation spine \u2014 industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins. Execution behaviour is T2; the plan spine is T1; the tool platform is T13."
+      },
+      "created_at": "2026-11-21T18:02:00.126911+00:00",
+      "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 T0 Model and contracts (retrospective, U5a)",
+      "updated_at": "2026-11-21T18:02:10.160888+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+      "approved_at": "2026-11-21T18:02:10.160888+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/T0.toml is green against the live record at the published SHA: a job is created, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale, no concept has two stores, and a test-only third executor kind registers without editing the run path. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.",
+        "assignment": "Rework the V2 slice T0 (SPEC_V2 \u00a712, issue #34) by the reconstituted TOGAF/MSP lifecycle: produce and publish the Phase A\u2013D mandatory artefacts, the charter and the delivery contract, the Phase-G compliance review and the closure review, declare the closure outputs and re-close through the one gate.",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T0.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "the model and its invariants (SPEC_V2 \u00a73 P1\u2013P11, \u00a74.1\u2013\u00a74.6, \u00a710.1, \u00a710.3): the organisation spine \u2014 industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins. Execution behaviour is T2; the plan spine is T1; the tool platform is T13."
+      },
+      "created_at": "2026-11-21T18:02:00.126911+00:00",
+      "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 T0 Model and contracts (retrospective, U5a)",
+      "updated_at": "2026-11-21T18:02:10.160888+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+      "approved_at": "2026-11-21T18:02:10.160888+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/T0.toml is green against the live record at the published SHA: a job is created, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale, no concept has two stores, and a test-only third executor kind registers without editing the run path. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.",
+        "assignment": "Rework the V2 slice T0 (SPEC_V2 \u00a712, issue #34) by the reconstituted TOGAF/MSP lifecycle: produce and publish the Phase A\u2013D mandatory artefacts, the charter and the delivery contract, the Phase-G compliance review and the closure review, declare the closure outputs and re-close through the one gate.",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T0.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "the model and its invariants (SPEC_V2 \u00a73 P1\u2013P11, \u00a74.1\u2013\u00a74.6, \u00a710.1, \u00a710.3): the organisation spine \u2014 industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins. Execution behaviour is T2; the plan spine is T1; the tool platform is T13."
+      },
+      "created_at": "2026-11-21T18:02:00.126911+00:00",
+      "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 T0 Model and contracts (retrospective, U5a)",
+      "updated_at": "2026-11-21T18:02:10.160888+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+      "approved_at": "2026-11-21T18:02:10.160888+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/T0.toml is green against the live record at the published SHA: a job is created, a release is published, a binding pins its hash, a run on a retired binding refuses 409 job_binding_stale, no concept has two stores, and a test-only third executor kind registers without editing the run path. The A\u2013D set is approved, the delivery contract is live and board-approved, the Phase-G review cites the published standing delegation, and the closure gate is decided by an approver other than its requester.",
+        "assignment": "Rework the V2 slice T0 (SPEC_V2 \u00a712, issue #34) by the reconstituted TOGAF/MSP lifecycle: produce and publish the Phase A\u2013D mandatory artefacts, the charter and the delivery contract, the Phase-G compliance review and the closure review, declare the closure outputs and re-close through the one gate.",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        "manifest": "acceptance/programme/T0.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "the model and its invariants (SPEC_V2 \u00a73 P1\u2013P11, \u00a74.1\u2013\u00a74.6, \u00a710.1, \u00a710.3): the organisation spine \u2014 industry, ordered departments, job_catalogue, the immutable job_release and the tenant-scoped job_binding; the decision-ladder types; and the internal Executor contract. The action contracts are those the registry serves and served-spec.lock.json pins. Execution behaviour is T2; the plan spine is T1; the tool platform is T13."
+      },
+      "created_at": "2026-11-21T18:02:00.126911+00:00",
+      "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 T0 Model and contracts (retrospective, U5a)",
+      "updated_at": "2026-11-21T18:02:10.160888+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

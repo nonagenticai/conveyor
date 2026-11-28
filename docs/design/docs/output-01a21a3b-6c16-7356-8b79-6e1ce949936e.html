@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Registers — Control plane — claims, runs, approvals, andon, comms and notifications · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-registers" data-provenance-version="1" data-provenance-hash="ceb7601fd1f4cdf7a9af55e3daa54966a85c4a1b5c078f50e334389674230bce" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-registers</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>ceb7601fd1f4cdf7a9af55e3daa54966a85c4a1b5c078f50e334389674230bce</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Registers — Control plane — claims, runs, approvals, andon, comms and notifications</h1>
+<h2>Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "At the 2026-11-27 snapshot no review or evidence page records a run of the plan \u00a77 properties: golden path, dual control, retry after a crash, andon, delivery retry, no timers and human versus agent. The project row carries meta.measured_status built, but built is a record claim, not a gate pass, and acceptance/programme/S06.toml has not been evidenced. Until the properties run at a rework head, the project stays active and the Phase-G level stays non_conformant.",
+      "code": "S06-R1",
+      "created_at": "2026-11-26T23:38:42.625331+00:00",
+      "id": "01a21a39-c245-77f6-985e-a01e62ed0051",
+      "impact": 4,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R1 Property (a) golden path",
+          "R2 Property (b) dual control",
+          "R3 Property (c) retry after a crash",
+          "R4 Property (d) andon",
+          "R5 Property (e) delivery retry",
+          "R6 Property (f) no timers",
+          "R7 Property (g) human versus agent"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "high",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": "Run acceptance/programme/S06.toml and the ten plan \u00a77 test binaries on a live stack, keep one receipt per property, and re-read the Phase-G review on that evidence rather than inferring a pass from the built status.",
+      "review_at": "2026-12-15",
+      "severity": "high",
+      "status": "open",
+      "title": "The seven gate properties have no recorded run, so the built claim is unproven",
+      "updated_at": "2026-11-26T23:38:42.625331+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The open issue #4 ('S06 \u2014 one shared decision boundary; Telegram sender identity') records that the Telegram reply path and the one approvals.decide path were still being reconciled at the snapshot. The plan declares one decision path for web, Telegram and mcp, so an unresolved boundary would let a reply decide through a different shape than the web and would make the sender attribution in approval_decision ambiguous. The channel_inbound gate target is the check that would expose this.",
+      "code": "S06-R2",
+      "created_at": "2026-11-26T23:38:42.753978+00:00",
+      "id": "01a21a39-c2c4-7bbe-ad04-bdbd456d30fe",
+      "impact": 3,
+      "kind": "risk",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": [
+          "R11 Channels and Telegram inbound",
+          "R7 Property (g) human versus agent"
+        ]
+      },
+      "meta": {
+        "owner": "the programme architect (conveyor-e2e)"
+      },
+      "owner_job_id": null,
+      "probability": "medium",
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": "Close #4 against the channel_inbound test: assert the Telegram reply resolves (chat_id, topic_id) to binding, tenant and sender and calls the same approvals.decide or cards.comment as the web.",
+      "review_at": "2026-12-15",
+      "severity": "medium",
+      "status": "open",
+      "title": "Issue #4 leaves a shared decision boundary and the Telegram sender identity unresolved",
+      "updated_at": "2026-11-26T23:38:42.753978+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The project row records measured_status built with plan_status planned, and the snapshot contains no charter, Statement of Architecture Work, delivery contract, Phase A\u2013D set, Phase-G review or gate receipt for S06. The only publication is the evidence page 01a1e687-0674-7371-902f-58c7376b113f (2026-11-16T22:42:53Z). This pack supplies the missing lifecycle set retrospectively and records the Phase-G level non_conformant, because the acceptance is not evidenced.",
+      "code": "S06-I1",
+      "created_at": "2026-11-26T23:38:42.88113+00:00",
+      "id": "01a21a39-c343-7e12-b433-390fef09a386",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": "Run the acceptance instrument and the ten gate binaries; record a receipt per property; re-review the Phase-G level against that evidence before any close decision.",
+      "review_at": null,
+      "severity": "high",
+      "status": "open",
+      "title": "The record claims built but carries no Phase-G compliance review or acceptance run",
+      "updated_at": "2026-11-26T23:38:42.88113+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The closed issue #604 records that the multicast approval test times out at 10 s under full-suite load. A closed issue is not a green re-run: the flakiness sits in the approval fan-out path that S06 owns, and a clean single-test pass would not prove the full-suite behaviour. The rework must re-test the multicast path at the rework head.",
+      "code": "S06-I2",
+      "created_at": "2026-11-26T23:38:43.013771+00:00",
+      "id": "01a21a39-c3c8-7a99-a93e-c908bf73de75",
+      "impact": null,
+      "kind": "issue",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": "Re-run the multicast approval test under full-suite load at the rework head and record the timing; raise a new issue if the timeout reproduces.",
+      "review_at": null,
+      "severity": "medium",
+      "status": "open",
+      "title": "Issue #604 closed with the multicast approval test timing out at 10 s under full-suite load",
+      "updated_at": "2026-11-26T23:38:43.013771+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The delivery contract judges acceptance against the record at the 2026-11-27 rework snapshot, project 01a1d039-0d2a-7007-bcd8-29bb24f36b54 active at version 10, and the checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from the snapshot, so if the snapshot is incomplete or stale for S06 the pack's facts and any re-close move with it.",
+      "code": "S06-A1",
+      "created_at": "2026-11-26T23:38:43.141816+00:00",
+      "id": "01a21a39-c448-7bcc-ad5e-d020cba27b31",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "The 2026-11-27 rework snapshot is the authoritative record for S06",
+      "updated_at": "2026-11-26T23:38:43.141816+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The plan's starting state assumes S03 supplies the card claim columns and the run, approval, approval_decision and andon_state tables; S04 the ActionSpec registry and invocation route; S05 comment, cards.move and board SSE; and S02 job, schedule, event, audit_event and SSE replay. The record claims those slices built, but their acceptance is not evidenced here, so S06's gate both depends on and exercises them.",
+      "code": "S06-A2",
+      "created_at": "2026-11-26T23:38:43.267808+00:00",
+      "id": "01a21a39-c4c6-7b67-8028-c76f9192fd74",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "The S03, S04, S05 and S02 primitives exist as the plan declares them",
+      "updated_at": "2026-11-26T23:38:43.267808+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The plan fixes Telegram as the first channel while web and mcp share the message and delivery rows, and defers the signed mcp_server channel (HMAC, payloads and the \u00b1300 s window) to S06a. This pack treats the mcp transport as out of scope, so the S06 gate can pass on Telegram and web without pretending the signed channel exists.",
+      "code": "S06-A3",
+      "created_at": "2026-11-26T23:38:43.395507+00:00",
+      "id": "01a21a39-c546-79f6-9853-2fadf7cc1bf1",
+      "impact": null,
+      "kind": "assumption",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "held",
+      "title": "Telegram is the first channel and the signed mcp transport belongs to S06a",
+      "updated_at": "2026-11-26T23:38:43.395507+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 2,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The project row records depends_on needs S03, needs S04 and needs S05. S06 adds no claim storage of its own: it writes the claim columns S03 created and registers its 17 actions through the S04 registry, reusing S05's comment, cards.move and board SSE for its reply and notification paths. The dependency status stays open because the upstream acceptance is itself not evidenced at the snapshot.",
+      "code": "S06-D1",
+      "created_at": "2026-11-26T23:38:43.524942+00:00",
+      "id": "01a21a39-c5c8-752c-af9a-773719cfa590",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "S06 is blocked by S03, S04 and S05",
+      "updated_at": "2026-11-26T23:38:43.524942+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The plan puts the signed mcp_server channel in S06a, MCP tool surfacing in S10, project_request.timeout in S07 and the UI in S12, and declares a run-queue surface for S12. Those consumers stand on the control plane's actions, events and topics, so S06's re-close neither supplies nor verifies their work; the dependency stays open until each delivers against the declared surface.",
+      "code": "S06-D2",
+      "created_at": "2026-11-26T23:38:43.654996+00:00",
+      "id": "01a21a39-c649-7cff-ab85-8f75ea1f39b4",
+      "impact": null,
+      "kind": "dependency",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "S06 blocks S06a, S07, S10 and S12; the signed channel and the UI are not built here",
+      "updated_at": "2026-11-26T23:38:43.654996+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 3,
+  "rows": [
+    {
+      "baseline_ref": null,
+      "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 record the benefit: one conditional UPDATE per claim, with the caller's If-Match bound to the version, a monotonic claim_fence as the ABA witness, a deduped card.claim job for a waiter and a lease sweep for a dead holder. The benefit is declared in the record and carried by the golden-path and claim-race tests; it is not yet evidenced by a recorded run.",
+      "code": "S06-B1",
+      "created_at": "2026-11-26T23:38:43.791305+00:00",
+      "id": "01a21a39-c6d2-732e-a2e2-aefde6a45a70",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "One claim statement and a monotonic fence replace competing claim paths",
+      "updated_at": "2026-11-26T23:38:43.791305+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The charter and D2/G2 record that 11 of fr's 14 timers become job kinds deduped on (kind, dedupe_key), with periods as schedule rows under one advisory lock, while analytics-rollup, signup-onboarding-tick and workflows-cache are deleted because rollups derive from the event row. The benefit is declared and has the empty-`setInterval` assertion as its check; it is not yet evidenced by a recorded run.",
+      "code": "S06-B2",
+      "created_at": "2026-11-26T23:38:43.927428+00:00",
+      "id": "01a21a39-c75a-75a3-8dfa-be8d744db31c",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "Eleven fr timers become one idempotent job runner and three timers are deleted",
+      "updated_at": "2026-11-26T23:38:43.927428+00:00",
+      "version": 1
+    },
+    {
+      "baseline_ref": null,
+      "body": "The SoAW and the delivery contract fix the seven plan \u00a77 properties and their named test binaries in acceptance/programme/S06.toml, so an independent approver can repeat the close decision on receipts rather than prose. The instrument and the properties exist in the record; the receipts do not, so this benefit stays open until the gate runs and the review is re-read on its evidence.",
+      "code": "S06-B3",
+      "created_at": "2026-11-26T23:38:44.058368+00:00",
+      "id": "01a21a39-c7dd-72a1-b379-e957945b595b",
+      "impact": null,
+      "kind": "benefit",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {},
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "open",
+      "title": "The close decision is decidable from the acceptance instrument's property set",
+      "updated_at": "2026-11-26T23:38:44.058368+00:00",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<h2>Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-registers",
+  "count": 1,
+  "rows": [
+    {
+      "baseline_ref": "01a21a39-c867-720b-b440-0b8a9b04d907",
+      "body": "The retrospective MSP/TOGAF/SAFe rework changed this project's record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.",
+      "code": "CH-S06-0da26c",
+      "created_at": "2026-11-26T23:38:52.86505+00:00",
+      "id": "01a21a39-ea46-7871-8a13-a62ecc0da26c",
+      "impact": null,
+      "kind": "change",
+      "links": {
+        "cards": [],
+        "decisions": [],
+        "requirements": []
+      },
+      "meta": {
+        "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+        "impact": {
+          "scope": "the retrospective rework's record acts"
+        }
+      },
+      "owner_job_id": null,
+      "probability": null,
+      "programme_id": null,
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "response": null,
+      "review_at": null,
+      "severity": null,
+      "status": "approved",
+      "title": "The retrospective rework of S06",
+      "updated_at": "2026-11-26T23:40:24.352132+00:00",
+      "version": 2
+    }
+  ],
+  "source": "msp.json#/register_items"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Control plane — claims, runs, approvals, andon, comms and notifications · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

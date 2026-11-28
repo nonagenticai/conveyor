@@ -1,0 +1,536 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T0 --content docs/evidence/rework/tranche-0/rework-content-T0.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+  01 projects.reopen ok
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  02 documents.compose ok
+  03 documents.publish ok
+  04 architecture.artifacts_supersede ok
+  05 architecture.artifacts_update ok
+  06 architecture.artifacts_approve ok
+  artefact: Stakeholder Map — T0 Model and contracts (Phase A) re-versioned, bound and documented
+  07 documents.compose ok
+  08 documents.publish ok
+  09 architecture.artifacts_supersede ok
+  10 architecture.artifacts_update ok
+  11 architecture.artifacts_approve ok
+  artefact: Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A) re-versioned, bound and documented
+  12 documents.compose ok
+  13 documents.publish ok
+  14 architecture.artifacts_supersede ok
+  15 architecture.artifacts_update ok
+  16 architecture.artifacts_approve ok
+  artefact: Requirements Catalog — T0 Model and contracts (Phase A) re-versioned, bound and documented
+  17 documents.compose ok
+  18 documents.publish ok
+  19 architecture.artifacts_supersede ok
+  20 architecture.artifacts_update ok
+  21 architecture.artifacts_approve ok
+  artefact: Solution Concept Diagram — T0 Model and contracts (Phase A) re-versioned, bound and documented
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_supersede ok
+  25 architecture.artifacts_update ok
+  26 architecture.artifacts_approve ok
+  artefact: Business Capability Map — T0 Model and contracts (Phase B) re-versioned, bound and documented
+  27 documents.compose ok
+  28 documents.publish ok
+  29 architecture.artifacts_supersede ok
+  30 architecture.artifacts_update ok
+  31 architecture.artifacts_approve ok
+  artefact: Data Entity/Data Component Catalog — T0 Model and contracts (Phase C) re-versioned, bound and documented
+  32 documents.compose ok
+  33 documents.publish ok
+  34 architecture.artifacts_supersede ok
+  35 architecture.artifacts_update ok
+  36 architecture.artifacts_approve ok
+  artefact: Technology Standards Catalog — T0 Model and contracts (Phase D) re-versioned, bound and documented
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 architecture.artifacts_link ok
+  42 architecture.artifacts_link ok
+  43 architecture.artifacts_link ok
+  44 architecture.artifacts_link ok
+  45 architecture.artifacts_link ok
+  46 documents.compose ok
+  47 documents.publish ok
+  document architecture-artifact: published
+  48 architecture.contracts_request ok
+  49 architecture.board_decide ok
+  50 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  51 registers.create ok
+  52 registers.create ok
+  53 registers.create ok
+  54 registers.create ok
+  55 registers.create ok
+  56 registers.create ok
+  57 registers.create ok
+  58 registers.create ok
+  59 registers.create ok
+  baseline: already taken
+  60 projects.baseline ok
+  61 approvals.decide ok
+  62 projects.baseline ok
+  63 approvals.decide ok
+  closure-review output: already published
+  64 documents.publish ok
+  65 documents.update ok
+  66 documents.publish ok
+  project-brief output: body corrected and republished
+  67 documents.publish ok
+  68 documents.update ok
+  69 documents.publish ok
+  evidence output: body corrected and republished
+  70 architecture.reviews_record ok
+  71 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  72 approvals.request ok
+  73 approvals.decide ok
+  74 cards.comment ok
+  75 cards.move ok
+  76 cards.move ok
+  card cleared: v1-w1a-2:T0
+  77 approvals.request ok
+  78 approvals.decide ok
+  79 cards.comment ok
+  80 cards.move ok
+  81 cards.move ok
+  card cleared: v1-p42-1:T0
+  82 approvals.request ok
+  83 approvals.decide ok
+  84 cards.comment ok
+  85 cards.move ok
+  86 cards.move ok
+  card cleared: v1-p44-1:T0
+  87 approvals.request ok
+  88 approvals.decide ok
+  89 cards.comment ok
+  90 cards.move ok
+  91 cards.move ok
+  card cleared: v1-p44-2:T0
+  92 approvals.request ok
+  93 approvals.decide ok
+  94 cards.comment ok
+  95 cards.move ok
+  96 cards.move ok
+  card cleared: v1-p66-1:T0
+  97 approvals.request ok
+  98 approvals.decide ok
+  99 cards.comment ok
+  100 cards.move ok
+  101 cards.move ok
+  card cleared: v1-w1a-4:T0
+  102 approvals.request ok
+  103 approvals.decide ok
+  104 cards.comment ok
+  105 cards.move ok
+  106 cards.move ok
+  card cleared: v1-w1a-5:T0
+  107 approvals.request ok
+  108 approvals.decide ok
+  109 cards.comment ok
+  110 cards.move ok
+  111 cards.move ok
+  card cleared: std-pmp-project-registers-t0:T0
+  112 approvals.request ok
+  113 approvals.decide ok
+  114 cards.comment ok
+  115 cards.move ok
+  116 cards.move ok
+  card cleared: v1-p46-1:T0
+  117 approvals.request ok
+  118 approvals.decide ok
+  119 cards.comment ok
+  120 cards.move ok
+  121 cards.move ok
+  card cleared: std-togaf-architecture-artifact-t0:T0
+  122 approvals.request ok
+  123 approvals.decide ok
+  124 cards.comment ok
+  125 cards.move ok
+  126 cards.move ok
+  card cleared: std-togaf-compliance-review-t0:T0
+  127 approvals.request ok
+  128 approvals.decide ok
+  129 cards.comment ok
+  130 cards.move ok
+  131 cards.move ok
+  card cleared: std-togaf-phase-b-t0-b:T0
+  132 approvals.request ok
+  133 approvals.decide ok
+  134 cards.comment ok
+  135 cards.move ok
+  136 cards.move ok
+  card cleared: std-togaf-phase-c-t0-c:T0
+  137 approvals.request ok
+  138 approvals.decide ok
+  139 cards.comment ok
+  140 cards.move ok
+  141 cards.move ok
+  card cleared: std-togaf-phase-d-t0-d:T0
+  142 approvals.request ok
+  143 approvals.decide ok
+  144 cards.comment ok
+  145 cards.move ok
+  146 cards.move ok
+  card cleared: std-togaf-phase-f-t0-f:T0
+  card discharge: 15 card(s) cleared of 557 open package(s)
+  147 projects.close_request ok
+  148 approvals.decide ok
+  149 approvals.request ok
+  150 approvals.decide ok
+
+rework: projects.close refused at act 151: error: projects.close refused (409): project T0 cannot close until its mandatory artefacts exist (missing: project-registers)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T0 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T0-snap-g0agk_t5/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T0-snap-g0agk_t5/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/T0-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-registers",
+      "document_id": "01a21742-f9cd-71b8-91cf-029154ca5772",
+      "natural_key": "artefact:T0:project-registers:a91d382df0a5ec65",
+      "body_sha256": "a91d382df0a5ec655532dc0043741050c8a0ff43f02afb02b5fac3608ef442c6"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 5,
+    "present": 3,
+    "missing-edge": 0,
+    "stale": 5,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T0 --content docs/evidence/rework/tranche-0/rework-content-T0.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — T0 Model and contracts (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A) already present
+  artefact: Requirements Catalog — T0 Model and contracts (Phase A) already present
+  artefact: Solution Concept Diagram — T0 Model and contracts (Phase A) already present
+  artefact: Business Capability Map — T0 Model and contracts (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T0 Model and contracts (Phase C) already present
+  artefact: Technology Standards Catalog — T0 Model and contracts (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  09 architecture.artifacts_link ok
+  document architecture-artifact: already present
+  delivery contract: already live
+  register risk: The 2026-11-25 acceptance record is red and the project is closed on a red manifest already present
+  register risk: The original lifecycle records never existed, so intent is reconstructed rather than attested already present
+  register issue: Six mandatory artefact packages are open at the 2026-11-25 acceptance record already present
+  register assumption: T0 ships the executor contract only; execution behaviour arrives with T2 and the plan spine with T1 already present
+  register assumption: The 650-operation action surface is the registry's current surface, not a frozen product scope already present
+  register dependency: Every later V2 slice depends on T0's organisation spine and action contracts already present
+  register dependency: The re-closure depends on the #526 rework batch and a fresh snapshot already present
+  register benefit: One organisation spine: a job is a configured position with an immutable release and a pinned binding already present
+  register benefit: One record per fact and a pinned action surface: 650 operations checked against a committed lock already present
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  10 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 2 change row(s) present
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+  11 projects.close ok
+  closed T0: 01a1d039-0d32-7734-98da-fb7f1e2386c7
+T0: 11 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T0 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T0-snap-pw1nlu78/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T0-snap-pw1nlu78/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/T0-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T0",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 4,
+    "present": 4,
+    "missing-edge": 0,
+    "stale": 6,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+

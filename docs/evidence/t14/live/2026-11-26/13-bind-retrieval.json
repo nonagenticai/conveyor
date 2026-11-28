@@ -1,0 +1,11 @@
+{
+  "credential_alias": "strata.token",
+  "effect_ceiling": "read",
+  "enabled": true,
+  "id": "01a21a06-af12-73f6-9663-fae3c8bb4014",
+  "run_id": "01a21a06-aea7-7f8a-9d81-c4b02971fa4b",
+  "toolkit_id": "01a21a02-3654-760c-95ba-2feb82fefe37",
+  "toolkit_key": "retrieval",
+  "toolkit_version": 2,
+  "version": 1
+}

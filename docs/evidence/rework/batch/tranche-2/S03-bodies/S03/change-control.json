@@ -1,0 +1,59 @@
+{
+  "body_sha256": "232cc1e349648f7bb8a7294bf8e77fe2f7c428290dae87aac52d875b9ea7a2a6",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+    "key": "S03",
+    "kind": "project",
+    "title": "Domain and schema \u2014 aggregates, state machines, baseline domain migration"
+  },
+  "title": "Change Control \u2014 Domain and schema \u2014 aggregates, state machines, baseline domain migration"
+}

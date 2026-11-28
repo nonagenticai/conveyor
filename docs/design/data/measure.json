@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26T21:15:00Z",
+  "generated_at": "2026-11-27T12:10:18.740973+00:00",
   "inference": {
     "by_caller": [
       {
@@ -9,7 +9,7 @@
       },
       {
         "caller_kind": "other",
-        "calls": 17,
+        "calls": 20,
         "total_tokens": 2718
       }
     ],
@@ -35,40 +35,80 @@
         "unpriced_calls": 0
       },
       {
-        "calls": 11,
-        "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
-        "completion_tokens": 1523,
-        "cost_usd": "0.004524",
-        "priced_calls": 11,
-        "prompt_tokens": 29265,
-        "total_tokens": 30788,
+        "calls": 1,
+        "card_id": "01a21a03-6978-7489-b190-a76941e9efb1",
+        "completion_tokens": 0,
+        "cost_usd": "0.001200",
+        "priced_calls": 1,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
         "unpriced_calls": 0
       },
       {
-        "calls": 8,
-        "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
-        "completion_tokens": 1582,
-        "cost_usd": "0.053787",
-        "priced_calls": 8,
-        "prompt_tokens": 381030,
-        "total_tokens": 382612,
+        "calls": 1,
+        "card_id": "01a21a03-7d39-75a5-852b-922683fa63a6",
+        "completion_tokens": 0,
+        "cost_usd": "0.000499",
+        "priced_calls": 1,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
         "unpriced_calls": 0
       },
       {
-        "calls": 7,
-        "card_id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
-        "completion_tokens": 1414,
+        "calls": 0,
+        "card_id": "01a21a03-aedb-7a90-a1ad-f66d00df01a3",
+        "completion_tokens": 0,
         "cost_usd": "0",
         "priced_calls": 0,
-        "prompt_tokens": 142349,
-        "total_tokens": 143763,
-        "unpriced_calls": 7
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 0,
+        "card_id": "01a21a03-f5d1-7578-82a3-91bf5694449c",
+        "completion_tokens": 0,
+        "cost_usd": "0",
+        "priced_calls": 0,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 1,
+        "card_id": "01a21a04-0374-7a02-b825-374d59fcddce",
+        "completion_tokens": 0,
+        "cost_usd": "0.040000",
+        "priced_calls": 1,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 0,
+        "card_id": "01a21a05-23dd-794d-b2a0-b486d52c581b",
+        "completion_tokens": 0,
+        "cost_usd": "0",
+        "priced_calls": 0,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 0,
+        "card_id": "01a21a06-ae6c-7457-848e-68acaa5626ad",
+        "completion_tokens": 0,
+        "cost_usd": "0",
+        "priced_calls": 0,
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
       }
     ],
     "by_model": [
       {
         "cache_hits": 0,
-        "calls": 1,
+        "calls": 2,
         "completion_tokens": 0,
         "model": "asr",
         "prompt_tokens": 0,
@@ -84,7 +124,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 5,
+        "calls": 6,
         "completion_tokens": 0,
         "model": "image_gen",
         "prompt_tokens": 0,
@@ -116,7 +156,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 1,
+        "calls": 2,
         "completion_tokens": 0,
         "model": "tts",
         "prompt_tokens": 0,
@@ -124,6 +164,16 @@
       }
     ],
     "by_project": [
+      {
+        "calls": 0,
+        "completion_tokens": 0,
+        "cost_usd": "0",
+        "priced_calls": 0,
+        "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+        "prompt_tokens": 0,
+        "total_tokens": 0,
+        "unpriced_calls": 0
+      },
       {
         "calls": 8,
         "completion_tokens": 1040,
@@ -133,38 +183,21 @@
         "prompt_tokens": 3978,
         "total_tokens": 5018,
         "unpriced_calls": 0
-      },
-      {
-        "calls": 18,
-        "completion_tokens": 2937,
-        "cost_usd": "0.004524",
-        "priced_calls": 11,
-        "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
-        "prompt_tokens": 171614,
-        "total_tokens": 174551,
-        "unpriced_calls": 7
-      },
-      {
-        "calls": 8,
-        "completion_tokens": 1582,
-        "cost_usd": "0.053787",
-        "priced_calls": 8,
-        "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
-        "prompt_tokens": 381030,
-        "total_tokens": 382612,
-        "unpriced_calls": 0
       }
     ],
     "totals": {
       "cache_hit_calls": 0,
-      "cache_miss_calls": 643,
+      "cache_miss_calls": 644,
       "cache_write_calls": 0,
-      "calls": 649,
+      "calls": 652,
       "completion_tokens": 127874,
+      "cost_usd": 1.459623,
       "non_ok_calls": 0,
       "prompt_tokens": 9422929,
+      "tool_cost_usd": 0.041699,
       "total_tokens": 9550803,
-      "unknown_cache_calls": 6
+      "unknown_cache_calls": 8,
+      "unpriced_calls": 84
     }
   },
   "note": "tokens are stored; cost is derived by the app from the pinned price version and is not stored in the ledger. `totals`, `by_model` and `by_caller` are tenant-wide; `by_project` and `by_card` cover only the rows this snapshot publishes, so the differences are the boundary, not a missing call",

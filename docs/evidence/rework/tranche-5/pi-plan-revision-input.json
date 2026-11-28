@@ -1,0 +1,87 @@
+{
+  "id": "01a216d1-1913-70dd-8f69-c8ad230f2364",
+  "meta": {
+    "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+    "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+    "tranche_number": 5,
+    "pi_plan": {
+      "period": "tranche-5",
+      "scope": ["S06", "S08", "S17", "T17", "T7"],
+      "objectives": [
+        {
+          "business_value": 10,
+          "committed": true,
+          "id": "O1",
+          "statement": "T7's record is complete and its manifest green: charter, WSJF baseline, live delivery contract, Phase-G review and a published closure review, closed by a distinct approver."
+        },
+        {
+          "business_value": 9,
+          "committed": true,
+          "id": "O2",
+          "statement": "The operations gate executes: an incident is triaged with no write, an approved mitigation reads back, the incident resolves with a linked postmortem, and a destructive call without the tenant's approvals is refused."
+        },
+        {
+          "business_value": 8,
+          "committed": true,
+          "id": "O3",
+          "statement": "The four write verbs are callable and read back; an undeclared verb is refused; a dry run makes no write."
+        },
+        {
+          "business_value": 7,
+          "committed": false,
+          "id": "O4",
+          "statement": "The cluster live proof runs against the deployed service once its operator CLI exists; it is deploy-bound and not claimed before then."
+        },
+        {
+          "business_value": 6,
+          "committed": false,
+          "id": "O5",
+          "statement": "The tranche's members are reworked in the operative order S06 -> S08 -> S17 -> T17 -> T7. S06 is first: it is the only active member and the control plane every other member's checks read, and it carries the workspace-gate blocker the tranche's acceptance waits on. The tranche review decides continue or pause on the evidence."
+        }
+      ],
+      "revision": {
+        "at": "2026-11-27",
+        "by": "programme manager under the standing delegation",
+        "why": "the published plan's narrative ordered S08, T7, S06, S17, T17 while the approval records S06 first: S06 is the only active member and the control plane every other member's checks read, and it carries the workspace-gate blocker. The scope is the same five members; the order and O5 are aligned to the operative sequence.",
+        "supersedes": ["S08", "T7", "S06", "S17", "T17"],
+        "evidence": "docs/evidence/rework/tranche-5/refinement-wsjf.json"
+      },
+      "capacity": {
+        "build_concurrency": 1,
+        "live_record_writer": 1,
+        "projects": ["S06", "S08", "S17", "T17", "T7"],
+        "read_agents_max": 6
+      },
+      "dependencies": [
+        {
+          "from": "T7",
+          "note": "the manifest's PI checks read this plan and the objectives before the chain closes",
+          "to": "tranche-5 PI plan"
+        },
+        {
+          "from": "T7",
+          "note": "needs the deployed operator CLI",
+          "to": "live proof"
+        },
+        {
+          "from": "T7",
+          "note": "an unregistered host refuses; the live read is skipped in the suite",
+          "to": "ops.host registration"
+        }
+      ],
+      "refinement": {
+        "cadence_id": "01a216d1-1a40-7246-ba5e-254b8c0986fe"
+      },
+      "evidence": [
+        "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+        "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+        "docs/evidence/record/journal.jsonl",
+        "/tmp/u5a-r9/evidence/T7-acceptance.md"
+      ],
+      "wip_limit": {
+        "open_batches": 2,
+        "open_cards_per_writer": 1
+      }
+    }
+  }
+}

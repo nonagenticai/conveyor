@@ -31,9 +31,10 @@
 
 mod support;
 
-use std::sync::atomic::Ordering;
+use support::LayaStub;
 
 use conveyor_domain::ListKind;
+use conveyor_domain::development::ApproverKind;
 use rust_decimal::Decimal;
 use serde_json::{Value, json};
 use uuid::Uuid;
@@ -129,25 +130,31 @@ async fn create_card(running: &support::Running, board: &str, lane: &str) -> Str
 /// A published SOP whose inspection is the judge under test — the only way a step names a judge.
 /// Let a procedure step run the destructive `custom_fields.clear_value` (#285).
 ///
-/// A process step carries no approval id, and a step-level gate is its own unit — so the tenant
-/// waives the action here. What these tests exercise is the judge's handling of a null output,
-/// never the approval gate.
-async fn waive_clear_value(running: &support::Running) {
-    let (status, body) = running
-        .invoke(
-            "approval_policies.set",
-            TOKEN,
-            json!({
-                "action": "custom_fields.clear_value",
-                "approval": "waived",
-                "self_approval": "forbidden",
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "waive the destructive step: {body}");
+/// A process step carries no approval id, and a step-level gate is its own unit — so the fixture
+/// records D34's earned waiver: an `auto` approver with typed conditions and a future expiry. A
+/// bare `waived` row no longer admits anything. What these tests exercise is the judge's handling
+/// of a null output, never the approval gate.
+async fn waive_clear_value(pg: &support::Pg, seeded: &support::Seeded) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope the earned waiver");
+    conveyor_store::approval_policy::set(
+        &mut tx,
+        seeded.tenant,
+        &conveyor_store::approval_policy::ApprovalPolicy {
+            action: "custom_fields.clear_value".to_owned(),
+            approval: conveyor_store::approval_policy::ApprovalRequirement::Waived,
+            self_approval: conveyor_store::approval_policy::SelfApproval::Forbidden,
+            approver_kind: ApproverKind::Auto,
+            conditions: json!({"max_reverts": 0}),
+            expires_at: Some(chrono::Utc::now() + chrono::Duration::days(1)),
+            required_decisions: 1,
+        },
+        None,
+    )
+    .await
+    .expect("seed the earned waiver");
+    tx.commit().await.expect("commit the earned waiver");
 }
 
 async fn publish_sop(running: &support::Running, key: &str, inspection: Value) -> String {
@@ -432,58 +439,6 @@ async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
     tx.commit().await.expect("commit the laya token");
 }
 
-/// A laya stub: every call is answered with one fixed document and counted.
-struct LayaStub {
-    base: String,
-    hits: support::StubHits,
-    task: tokio::task::JoinHandle<()>,
-}
-
-impl LayaStub {
-    /// A stub answering every laya call with `body`, counting the calls it served.
-    async fn start(body: Value) -> LayaStub {
-        let hits = support::StubHits::default();
-        let app = axum::Router::new()
-            .fallback(axum::routing::post(laya_answer))
-            .with_state(LayaAnswer {
-                body,
-                hits: hits.clone(),
-            });
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind the laya stub");
-        let addr = listener.local_addr().expect("the laya stub's address");
-        let task = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
-        });
-        LayaStub {
-            base: format!("http://{addr}"),
-            hits,
-            task,
-        }
-    }
-}
-
-impl Drop for LayaStub {
-    fn drop(&mut self) {
-        self.task.abort();
-    }
-}
-
-/// The stub's state: the document it answers and the count of answers served.
-#[derive(Clone)]
-struct LayaAnswer {
-    body: Value,
-    hits: support::StubHits,
-}
-
-async fn laya_answer(
-    axum::extract::State(answer): axum::extract::State<LayaAnswer>,
-) -> axum::Json<Value> {
-    answer.hits.0.fetch_add(1, Ordering::SeqCst);
-    axum::Json(answer.body)
-}
-
 /// An eval with a current version — the instrument an `inspection.kind = 'eval'` SOP needs.
 async fn eval_with_version(running: &support::Running) -> String {
     let (status, body) = running
@@ -664,7 +619,7 @@ async fn a_checker_reject_reruns_the_position_with_the_reason_on_its_input() {
     let (board, lane) = board_and_lane(&pg, &seeded).await;
     let card = create_card(&running, &board, &lane).await;
     let field = create_custom_field(&running, &board).await;
-    waive_clear_value(&running).await;
+    waive_clear_value(&pg, &seeded).await;
     // A `204` action: the step succeeds but its output is `null`, which `non_empty` refuses.
     let sop = publish_sop(
         &running,
@@ -780,7 +735,7 @@ async fn the_reject_budget_blocks_the_run_and_starts_the_coach_once() {
     let (board, lane) = board_and_lane(&pg, &seeded).await;
     let card = create_card(&running, &board, &lane).await;
     let field = create_custom_field(&running, &board).await;
-    waive_clear_value(&running).await;
+    waive_clear_value(&pg, &seeded).await;
     let sop = publish_sop(
         &running,
         "judge.block",
@@ -1320,4 +1275,94 @@ async fn a_failed_eval_grade_never_creates_a_second_grade_or_job() {
         "the `:grade:<n>` slot is written once and the wait suffixes keep rising"
     );
     assert_eq!(run_status(&pg, &seeded, &run).await.0, "running");
+}
+
+// ── the hard budget: a stalled engine is abandoned, not waited on ──────────────────────
+
+/// A laya that accepts every connection and never answers — the stall SPEC_V2 §10.2's 3 s hard
+/// budget exists for. The accepted sockets are held (never read or written) until the guard
+/// drops, which aborts the task and closes them.
+struct StalledLaya {
+    base: String,
+    task: tokio::task::JoinHandle<()>,
+}
+
+impl Drop for StalledLaya {
+    fn drop(&mut self) {
+        self.task.abort();
+    }
+}
+
+async fn stalled_laya() -> StalledLaya {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the stalled laya");
+    let addr = listener.local_addr().expect("the stalled laya's address");
+    let task = tokio::spawn(async move {
+        let mut held = Vec::new();
+        while let Ok((socket, _)) = listener.accept().await {
+            held.push(socket);
+        }
+    });
+    StalledLaya {
+        base: format!("http://{addr}"),
+        task,
+    }
+}
+
+/// SPEC_V2 §10.2 (finding v1-p102-1): laya accepts the connection and never answers. The judge
+/// abandons the call at the 3 s hard budget, records the outage and parks the attempt —
+/// `unavailable`, never a reject — instead of holding a worker for the old 60 s.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_stalled_laya_judge_is_abandoned_within_three_seconds_and_parked_unavailable() {
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    // The service resolves and the tenant holds a token, so the call reaches the socket and
+    // stalls there instead of failing closed before the budget applies.
+    let stalled = stalled_laya().await;
+    support::set_env(LAYA_URL_ENV, &stalled.base);
+    seal_laya_token(&pg, &seeded).await;
+
+    let (board, lane) = board_and_lane(&pg, &seeded).await;
+    let card = create_card(&running, &board, &lane).await;
+    let sop = publish_sop(
+        &running,
+        "judge.laya",
+        json!({"kind": "laya", "threshold": 0.5}),
+    )
+    .await;
+    let process = create_process(
+        &running,
+        "judge-laya",
+        json!([{"action": "cards.get", "procedure_id": sop,
+                "input_template": {"id": "{{card.id}}"}}]),
+    )
+    .await;
+    publish(&running, &process).await;
+    let run = start(&running, &card, "judge-laya", json!({})).await;
+
+    let started = std::time::Instant::now();
+    execute(&pg, &seeded, &run, 1, 1).await;
+    let elapsed = started.elapsed();
+
+    let (status, _, _, error, judge) = step_row(&pg, &seeded, &run, 1, 1).await;
+    assert_eq!(
+        status, "running",
+        "an abandoned judge neither decides nor drops the attempt"
+    );
+    assert_eq!(error, None, "nothing was decided, so nothing failed");
+    let judge = judge.expect("a park document");
+    assert_eq!(judge["decision"], "unavailable");
+    assert!(
+        judge["detail"]
+            .as_str()
+            .is_some_and(|detail| detail.contains("action-timeout")),
+        "the park names the timeout, got {judge}"
+    );
+    // The acceptance is the abandonment and the recorded outcome, not an exact wall clock: the
+    // old 60 s budget could not finish inside this bound.
+    assert!(
+        elapsed < std::time::Duration::from_secs(10),
+        "a stalled laya must be abandoned at the 3 s hard budget, took {elapsed:?}"
+    );
 }

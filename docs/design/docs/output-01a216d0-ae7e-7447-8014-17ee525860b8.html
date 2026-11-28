@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Closure review (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="cce3eb867c9fc8c21cda06a8ecf90b751cfb8ebabc62caca007089d8b6a43bd7" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>cce3eb867c9fc8c21cda06a8ecf90b751cfb8ebabc62caca007089d8b6a43bd7</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T13 — Closure review (rework, 2026-11-22)</h1>
+<p>Project: T13 — Tool platform · Tranche 3 · Plan: SPEC_V2 §12 · Issue #76
+Reopened under the owner's 2026-11-21 scope change; reworked through the full lifecycle and
+reviewed at the tr3 record.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Clause</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>A development job calls coding through the broker (not <code>nonagenticai_mcp_server</code>)</td><td><code>tool_platform.rs::a_bound_job_calls_coding_through_the_broker</code>; <code>tools.call</code> → <code>broker</code></td><td>pass</td></tr>
+<tr><td>One <code>tool_call</code> ledger row per call</td><td><code>tool_platform.rs::one_call_is_one_ledger_row</code></td><td>pass</td></tr>
+<tr><td>A destructive call without the tenant's approvals is refused before the destination</td><td><code>tool_platform.rs::a_destructive_call_without_approvals_is_refused</code>; <code>a_binding_ceiling_cannot_be_raised_at_run_time</code></td><td>pass</td></tr>
+<tr><td>Schema-invalid input is refused before the backend call</td><td><code>tool_platform.rs::a_closed_schema_refuses_before_the_call</code> (422, zero hits)</td><td>pass</td></tr>
+<tr><td>A tenant-prefixed object round-trips; the compiled prompt carries no S3 key</td><td><code>tool_platform.rs::a_job_round_trips_a_tenant_prefixed_object</code>, <code>::the_compiled_prompt_carries_no_s3_key</code>; <code>storage.put</code>/<code>storage.get</code> tests</td><td>pass</td></tr>
+<tr><td>The binding writer, release grant, redaction and long operations</td><td><code>v1-p111-1</code>, <code>v1-p111-2</code>, <code>v1-p111-3</code>, <code>v1-w4a-5</code> implemented with named tests</td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>Snapshot <code>/tmp/conveyor-t13-closure-snap/data</code> (manifest <code>bb38b11e…</code>) from the live copy at
+migration 75, recorded with the <code>94f090b4</code> binary.</li>
+<li><code>acceptance/programme/T13.toml</code>: 14 of 16 checks pass at the snapshot; the two remaining are the
+closure gate this request opens and the aggregate gate line it discharges.</li>
+<li>Named tests: <code>tool_platform.rs</code> (17/17 at the rework head), the storage action tests, the
+long-operation pending/resume test, and the release-grant unit tests.</li>
+<li>Phase-G review <code>01a2027a-6502-72a6-9ef8-4c1582dbdf36</code> (compliant) against the live contract;
+tr3 review <code>01a2051c-97df…</code> (continue).</li>
+</ul>
+<h2>Rework record</h2>
+<ul>
+<li>Reopened with a recorded decision; charter; Statement of Architecture Work; the seven A–D
+artefacts; delivery contract; approved scope baseline <code>01a20279</code>; the WBS deliverable accepted
+with change <code>01a202c2</code>; Phase-G review <code>01a2027a</code> (compliant) against the live contract.</li>
+<li>Change control: the WBS accept and the B2 baseline change (<code>01a204d7</code>) approved by rule under the
+standing delegation; the change-control artefact <code>01a204d8</code> published and evidenced.</li>
+<li>SAFe tr3: PI plan v2 (gate <code>01a2051a</code>), PI objectives, system demo, inspect-and-adapt, retro
+lessons k1–k5, the demo credit <code>01a202c3</code>, refinement; the tr3 review <code>01a2051c</code> (continue) with
+baselines, benefit status, risk register and snapshot evidence; tranche 4 authorised from it.</li>
+<li>Benefits: B2's baseline recorded under the change above; B2/B4/B5 profiles active with measured
+baselines.</li>
+</ul>
+<h2>Open items</h2>
+<p>These are not satisfied and not waived:</p>
+<ul>
+<li><strong><code>v1-w4a-6</code></strong> — the BYO tool publication surface is T15's mechanism.</li>
+<li><strong><code>v1-p119-1</code>, kata half</strong> — the schema-drift kata is re-anchored to T5 by the programme
+approver: T5 must add a contract-test instrument class before it can open that kata.</li>
+<li><strong><code>v1-u5a-tool-idempotency-publish-1</code></strong> and <strong><code>v1-p118-2</code></strong> — two P2s remain open.</li>
+</ul>
+<p>The programme gate stays red until these clear. This closure records the project's own acceptance
+and names the open items; it is not a programme-wide green and it waives nothing.</p>
+<h2>Decision</h2>
+<p>At the tr3 snapshot (manifest <code>bb38b11e</code>), 14 of 16 T13 checks pass; the two remaining are the
+closure gate this request opens and the aggregate gate line it discharges. The closure request is
+decided by an approver distinct from its requester and closed through <code>projects.close</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

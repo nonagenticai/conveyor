@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T0 Model and contracts (Phase C) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="8f16e35b42d6ed93c5ec6d992aed6c60a7e006ec5c0d5872dadc0c7c6a62438e" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>8f16e35b42d6ed93c5ec6d992aed6c60a7e006ec5c0d5872dadc0c7c6a62438e</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h2>Metadata</h2>
+<p>Retrospective data artefact for T0, authored 2026-11-26 from SPEC_V2 §4, §7 and §10.3 and the rework note. Phase c, plateau hld, kind catalog. The approved row it re-versions is 01a20243-b153-728c-b4b8-5cb0f270a3dd, whose document is 01a20243-be53-768a-b737-c8fddc3bae4b, published 2026-11-22. The owner is the programme architect (conveyor-e2e) under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.</p>
+<h2>Entries</h2>
+<p>The catalog carries eight rows. Industry and department hold the organisation spine; job_catalogue holds the position; job_release holds the immutable compiled release; job_binding joins the position, the release and the executor for one tenant. The decision-ladder types are declared here as the shape T2 will exercise. The Executor contract and served-spec.lock.json are data components rather than tables: the one is the internal seam, the other is the pinned action surface. Each row names its owner system and key fields so no entity is claimed by a second store.</p>
+<h2>Links</h2>
+<p>The artefact carries two typed edges: Business Capability Map — T0 Model and contracts (Phase B) and Solution Concept Diagram — T0 Model and contracts (Phase A), both derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edges tie each row to the capability and the structure it serves.</p>
+<h2>Document</h2>
+<p>Purpose: name the entities and data components of the organisation spine, the ladder types and the executor seam so the repository has one entity list. Scope: the rows and pinned components T0 owns. Each row is read from the spec's data-model table or the named source file, and a concept that belongs to T1, T2 or T13 is not claimed here.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

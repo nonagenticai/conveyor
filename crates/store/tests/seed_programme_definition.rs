@@ -67,11 +67,14 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
     .await
     .expect("tranches");
     assert_eq!(tranches.len(), 14);
-    assert_eq!(tranches[0], (0, "closed".to_owned()));
+    // The seed never authorises a tranche on its own: every row starts `planned`, and a
+    // continue review is what closes a tranche and authorises its successor (see
+    // `a_seeded_tranche_one_project_starts_after_the_continue_review`).
+    assert_eq!(tranches[0], (0, "planned".to_owned()));
     assert_eq!(
         tranches[1],
-        (1, "authorised".to_owned()),
-        "the tranche-0 continue review authorises tranche 1: {tranches:?}"
+        (1, "planned".to_owned()),
+        "the seed asserts no authorisation: {tranches:?}"
     );
     assert!(
         tranches[2..].iter().all(|(_, state)| state == "planned"),
@@ -181,28 +184,104 @@ async fn a_seeded_tranche_one_project_starts_after_the_continue_review() {
     .expect("the seeded T1 project");
     let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant id");
 
-    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
-    let allowed = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
-    tx.commit().await.expect("commit");
-    assert!(
-        allowed.is_ok(),
-        "a seeded tranche-1 project starts: {allowed:?}"
-    );
-
-    // The negative arm: the same project is refused while its tranche is still planned.
-    sqlx::query(
-        "UPDATE programme_tranche SET state = 'planned'
-          WHERE tenant_id = $1 AND number = 1",
-    )
-    .bind(seeded.tenant)
-    .execute(&db.super_pool)
-    .await
-    .expect("put tranche 1 back to planned");
+    // The seed asserts no authorisation: every tranche starts planned, so the tranche-1
+    // project is refused until a review authorises it.
     let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
     let refused = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
     tx.rollback().await.expect("rollback");
     assert!(
         refused.is_err(),
-        "a planned tranche cannot start: {refused:?}"
+        "a seeded planned tranche cannot start: {refused:?}"
+    );
+
+    // The continue review's effect: a review row of the tranche, named by
+    // authorisation_review_id, is what authorises the start. The review's own evidence
+    // resolution is proved in tranche_review.rs.
+    // The review's reviewer is the seeded tenant member.
+    let reviewer: uuid::Uuid = seeded.user;
+    let review: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review
+             (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         SELECT $1, id, 'continue', '{\"fixture\": true}'::jsonb, $2
+           FROM programme_tranche WHERE tenant_id = $1 AND number = 1
+         RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the authorising review");
+    sqlx::query(
+        "UPDATE programme_tranche
+            SET state = 'authorised', authorisation_review_id = $2, authorised_at = now()
+          WHERE tenant_id = $1 AND number = 1",
+    )
+    .bind(seeded.tenant)
+    .bind(review)
+    .execute(&db.super_pool)
+    .await
+    .expect("authorise tranche 1");
+    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
+    let allowed = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "the reviewed tranche-1 project starts: {allowed:?}"
+    );
+}
+
+/// T10 — every seeded benefit resolves both job owners, and the governance roles are real
+/// `job_catalogue` rows rather than text in `operational_area`.
+#[tokio::test]
+async fn every_seeded_benefit_resolves_both_job_owners() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "msp-jobs").await;
+    seed_programme(&db.super_pool, Some("msp-jobs"))
+        .await
+        .expect("seed");
+
+    let owners: Vec<(String, String, String, bool)> = sqlx::query_as(
+        "SELECT b.reference, owner.job_key, benefit_owner.job_key,
+                b.owner_job_id = b.benefit_owner_job_id
+           FROM benefit_profile b
+           JOIN job_catalogue owner ON owner.id = b.owner_job_id
+           JOIN job_catalogue benefit_owner ON benefit_owner.id = b.benefit_owner_job_id
+          WHERE b.tenant_id = $1
+          ORDER BY b.reference",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("every benefit joins both owner jobs");
+    assert_eq!(
+        owners.len(),
+        7,
+        "all seven benefits have both owners: {owners:?}"
+    );
+    for (reference, owner, benefit_owner, same) in owners {
+        assert_eq!(owner, "bcm", "{reference} owner is the BCM job");
+        assert_eq!(
+            benefit_owner, "bcm",
+            "{reference} benefit owner is the BCM job"
+        );
+        assert!(
+            same,
+            "{reference} owner and benefit owner resolve the same job id"
+        );
+    }
+
+    let roles: Vec<String> = sqlx::query_scalar(
+        "SELECT job_key FROM job_catalogue
+          WHERE tenant_id = $1 AND job_key IN ('bcm', 'board', 'sro', 'sponsoring_group')
+          ORDER BY job_key",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("governance roles");
+    assert_eq!(
+        roles,
+        vec!["bcm", "board", "sponsoring_group", "sro"],
+        "SRO, BCM, sponsoring group and board are seeded as job keys"
     );
 }

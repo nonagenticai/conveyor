@@ -1,0 +1,20 @@
+{
+  "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+  "baseline": {
+    "definition": "105 approval_decision / 662 run at 2026-11-22",
+    "value": 0.15861,
+    "unit": "decisions per run",
+    "measured_at": "2026-11-22",
+    "method": "count approval_decision / count run",
+    "evidence": {
+      "detail": {
+        "approval_decisions": 105,
+        "runs": 662
+      },
+      "instrument": "count approval_decision / count run",
+      "reference": "B1",
+      "value": 0.15861
+    }
+  },
+  "change_id": "01a2076b-1e7a-77ee-beaa-82c207ed2109"
+}

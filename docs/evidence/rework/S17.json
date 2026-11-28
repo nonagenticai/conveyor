@@ -1,0 +1,167 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S17 is active",
+      "detail": "project S17 is active",
+      "id": "S17-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a21c1b-d17a-7a7f-9482-8101d9f71ab0 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "S17-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d30-794f-bd53-c72986b18e60\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S17-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a21c1b-b557-7b0a-ba9d-bc9a2de9247d approved by board decision 01a21c1b-b5de-788c-9918-d57c95016a17 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "S17-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a21c1b-e602-7978-ad2d-6acfe3277dd2 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "S17-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "S17-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a216d1-1913-70dd-8f69-c8ad230f2364 and refinement 01a216d1-1a40-7246-ba5e-254b8c0986fe for tranche-5",
+      "id": "S17-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "the tranche-5 PI plan is published",
+      "id": "S17-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "the tranche-5 PI objectives are published",
+      "id": "S17-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
+      "id": "S17-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "S17-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a216d1-1dde-7519-a046-d30c934c6fb6 carries a statement and evidence from the tranche-5 retro",
+      "id": "S17-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "S17-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "no open standard artefact package for this project",
+      "id": "S17-artefact-standard",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no unresolved P0/P1 package for this project",
+      "id": "S17-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: S17-project, S17-baseline, S17-charter, S17-contract, S17-review, S17-waivers, S17-pi-cadence, S17-pi-plan, S17-pi-objectives, S17-wsjf, S17-demo-credits, S17-lessons, S17-product, S17-artefact-standard, S17-rework",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop \u2014 seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs.",
+  "generated_at": "2026-11-27T08:38:58.172859+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S17.toml",
+  "name": "Native benchmark harness",
+  "project": "S17",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-27T08:37:46.833305+00:00",
+    "git_sha": "f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c",
+    "path": "retained-snapshot/f8e9fe4dbebac7b8c6a7d1f66c5d8144670c888c"
+  },
+  "verdict": "green",
+  "warnings": []
+}

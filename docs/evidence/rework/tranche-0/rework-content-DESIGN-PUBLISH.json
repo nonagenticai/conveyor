@@ -1,0 +1,957 @@
+{
+  "charter": "# Charter — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n- **Project:** DESIGN-PUBLISH 'Publish the SPEC_V2 studio design pack, live', track programme, ADM phase Preliminary, plateau definition, tranche 0, project `01a1d039-0d39-7414-b43c-450de170ffe1`, programme `01a1d039-0d24-7d16-ae52-4841e96ccfac`, plan `docs/design/STUDIO-SPEC.md` (active). The row records `status: closed`, `meta.measured_status: built`, `meta.viability: rework`, `meta.expected_outputs: [project-brief, evidence]`, `meta.closure_outputs: [closure-review]` and issues 32, 33, 36, 37, 89, 97, 103 and 149. It was reopened at 2026-11-21T17:51:30Z for 'the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)' under decision `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** publish the studio design pack live — the Project Brief, Evidence and Closure review outputs and the seven Phase A–D artefact documents dated 2026-11-22 — and re-close the project through the one gate.\n- **Scope:** the committed pack and its governance records. Out of scope is the republish from live rows, which the rework note assigns to U7; the live public window is 102 outputs against 165 in the pack at the 2026-11-21 record.\n- **Date:** this charter is retrospective and was authored on 2026-11-26; it records the lifecycle, it does not authorise new work.",
+  "soaw": {
+    "title": "Statement of Architecture Work — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework DESIGN-PUBLISH by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven mandatory Phase A–D artefacts and the eight Phase E–H artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the project-brief and evidence outputs. The work is retrospective and dated 2026-11-26.",
+      "scope": "The published studio design pack and its records: the ten project documents (Project Brief 01a1ff3e-b21f-7453-aec6-03779a26bda0, Evidence 01a1e686-6efd-7683-9d5a-27e5b05081de, Closure review 01a1ff3e-7ef1-717a-8854-c5883a8b68f5 and the seven A–D artefact documents dated 2026-11-22), the scope baseline, the delivery contract and the closure gate. The live-window republish is out of scope; the rework note assigns it to U7.",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews the A–D set. The delivery contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8 is approved by board decision 01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597; the approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d.",
+      "acceptance_criteria": "scripts/verify-project.py --project DESIGN-PUBLISH --snapshot <fresh> is green: 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry for the project. The closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 is decided by an approver distinct from its requester. The 2026-11-25 acceptance record at 37f99108 is red on 12 mandatory packages; this pack authors their content and does not claim the red cleared before the batch re-runs.",
+      "contract": "This statement sits on the approved scope baseline 01a1ff3e-51c4-75b1-9db1-a2f729dd10b8 (approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d) and is complemented by the delivery contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8. It is retrospective, dated 2026-11-26.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Name the actors the publication serves and the engagement each needs.",
+      "scope": "The stakeholders of the design pack and its live public window.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "readers of the published design pack"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the sponsoring group",
+          "axis_b": "tranche-0 authorisation and exit criteria",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the programme architect",
+          "axis_b": "authors the design pack under the #526 rework",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "manage closely"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "later-tranche delivery teams",
+          "axis_b": "consume the published studio design",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "keep informed"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "public readers of the site",
+          "axis_b": "read the live pages published from the pack",
+          "value": {
+            "influence": "low",
+            "interest": "medium",
+            "engagement": "monitor"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note docs/evidence/rework/DESIGN-PUBLISH.md. Phase a, plateau psa, kind matrix. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe matrix carries four entries: the sponsoring group (tranche-0 authorisation and exit criteria); the programme architect (authors the design pack under the #526 rework); later-tranche delivery teams (consume the published studio design); public readers of the site (read the live pages published from the pack). Each row fixes one influence and one interest so the engagement is decidable.\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as dependency. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that the requirements bind the actors named here.\n\n## Document\n\nPurpose: place the actors of the publication so each concern has a named owner and a stated engagement. Scope: the stakeholders of the design pack and its live public window; the map was reconstructed retrospectively on 2026-11-26 from the recorded roles rather than from a live elicitation."
+    },
+    {
+      "title": "Driver / Goal / Objective Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the pack is published and what the publication is meant to achieve.",
+      "scope": "The drivers and goals of the studio design pack publication.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "readers of the published design pack"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 the studio design is readable only from the repository",
+          "axis_b": "G1 publish the SPEC_V2 studio design pack live",
+          "value": {
+            "objective": "the pack is published as documents, data and evidence pages; 165 outputs are in the committed pack and 102 are live at the 2026-11-21 record"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 the live public window is narrower than the committed pack",
+          "axis_b": "G2 republish from live rows",
+          "value": {
+            "objective": "the republish is U7's work and is not executed by this project; the project-brief URL 404s live until it runs"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase a, plateau psa, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries two driver-to-goal rows. D1 records that the studio design is readable only from the repository, and G1 publishes the SPEC_V2 studio design pack live. D2 records that the live public window is narrower than the committed pack, and G2 republishes from live rows; the rework note assigns that republish to U7.\n\n## Links\n\nThe artefact carries one typed edge: Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge places the drivers with the actors who hold them.\n\n## Document\n\nPurpose: trace why the pack is published and what the publication is meant to achieve. Scope: the drivers and goals of the studio design pack publication as the 2026-11-21 record carries them; authored retrospectively on 2026-11-26, it does not add a goal the record does not state."
+    },
+    {
+      "title": "Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the publication and its governance records must meet.",
+      "scope": "Publication, artefact content, closure and read-back requirements.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the Architecture Board",
+          "readers of the published design pack"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "publish the declared outputs",
+          "value": {
+            "requirement": "the project publishes its project-brief and evidence outputs; both documents exist in the snapshot",
+            "acceptance": "scripts/verify-project.py --project DESIGN-PUBLISH is green with 11 checks and 0 failures at d7293f96"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "publish the seven A–D artefact documents",
+          "value": {
+            "requirement": "Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog, Solution Concept Diagram, Business Capability Map, Data Entity/Data Component Catalog and Technology Standards Catalog were published 2026-11-22",
+            "acceptance": "the seven documents are rows in artefacts.json with status active"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "re-close through the one gate",
+          "value": {
+            "requirement": "the closure gate is decided by an approver other than its requester",
+            "acceptance": "closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 was decided by a distinct approver"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "record every act and read it back",
+          "value": {
+            "requirement": "the 37 acts are in transcript.jsonl and each write was read back by programme-record.py",
+            "acceptance": "the rework note records 37 acts and the read-back"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver / Goal / Objective Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase a, plateau psa, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries four requirements. R1 publishes the declared project-brief and evidence outputs. R2 publishes the seven A–D artefact documents dated 2026-11-22. R3 re-closes through the one gate with an approver distinct from the requester. R4 records every act in transcript.jsonl and reads each write back with programme-record.py.\n\n## Links\n\nThe artefact carries one typed edge: Driver / Goal / Objective Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge traces each requirement back to the goal it serves.\n\n## Document\n\nPurpose: state the requirements the publication and its governance records must meet. Scope: publication, artefact content, closure and read-back; the catalogue was reconstructed retrospectively on 2026-11-26 from the verified record, so each acceptance line names a check that actually ran."
+    },
+    {
+      "title": "Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the components that publish the pack and prove the publication.",
+      "scope": "The pack, its instrument, its governance record and the live site.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "runtime operators",
+          "the programme office",
+          "readers of the published design pack"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the design pack",
+          "axis_b": "documents and data pages",
+          "value": {
+            "kind": "component",
+            "note": "ten project documents are recorded: Project Brief, Evidence, Closure review and the seven A–D artefact documents dated 2026-11-22"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the acceptance instrument",
+          "axis_b": "scripts/verify-project.py over a fresh snapshot",
+          "value": {
+            "kind": "component",
+            "note": "11 checks and 0 failures at d7293f96; the strict audit on the same snapshot carries no P0/P1 entry"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "the governance record",
+          "axis_b": "charter, statement, contract, WBS, review and closure gate",
+          "value": {
+            "kind": "component",
+            "note": "contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8 approved by board decision 01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "the public site",
+          "axis_b": "the live window",
+          "value": {
+            "kind": "component",
+            "note": "102 outputs live against 165 in the committed pack at the 2026-11-21 record"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase a, plateau psa, kind diagram. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe diagram carries four components: the design pack (ten recorded project documents); the acceptance instrument (scripts/verify-project.py, green with 11 checks at d7293f96); the governance record (charter, statement, contract, WBS, review and closure gate); and the public site (102 live outputs against 165 in the pack).\n\n## Links\n\nThe artefact carries one typed edge: Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as realization. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records which components realise the publication requirements.\n\n## Document\n\nPurpose: show the components that publish the pack and prove the publication. Scope: the pack, its instrument, its governance record and the live site as the 2026-11-21 record carries them. It was drawn retrospectively on 2026-11-26 from the snapshot rather than from a design session."
+    },
+    {
+      "title": "Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the publication exercises and their recorded maturity.",
+      "scope": "Design publication, evidence generation and closure governance.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "later-tranche delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Design publication",
+          "axis_b": "one committed pack published as live pages",
+          "value": {
+            "maturity": "declared built (meta.measured_status=built); ten project documents recorded",
+            "evidence": "artefacts.json documents; docs/evidence/rework/DESIGN-PUBLISH.md"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Evidence generation",
+          "axis_b": "an evidence page and an acceptance record per project",
+          "value": {
+            "maturity": "declared built",
+            "evidence": "Evidence document 01a1e686-6efd-7683-9d5a-27e5b05081de; docs/evidence/rework/DESIGN-PUBLISH.json"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Closure governance",
+          "axis_b": "a one-gate closure with a distinct approver",
+          "value": {
+            "maturity": "declared built",
+            "evidence": "closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 decided by a distinct approver"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase b, plateau hld, kind diagram. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe map carries three capabilities: design publication (one committed pack published as live pages); evidence generation (an evidence page and an acceptance record per project); and closure governance (a one-gate closure with a distinct approver). Each row carries the maturity the record declares and the document or gate that evidences it.\n\n## Links\n\nThe artefact carries two typed edges: Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26) and Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the publication exercises and their recorded maturity. Scope: design publication, evidence generation and closure governance. The map is retrospective and dated 2026-11-26; it records the declared built state and does not upgrade it, and it names the 165-to-102 window gap as a capability shortfall rather than a completed capability."
+    },
+    {
+      "title": "Data Entity / Data Component Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the record entities the publication is proved from.",
+      "scope": "Documents, baselines and benefit profiles in the snapshot.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "runtime operators",
+          "auditors",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "document",
+          "axis_b": "a published page or artefact document",
+          "value": {
+            "kind": "entity",
+            "definition": "one row per published document in the snapshot, carrying its category, project and status",
+            "key": "id and project_id"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "the approved scope baseline",
+          "value": {
+            "kind": "entity",
+            "definition": "the baseline the close gate reads; approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545 and taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+            "key": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "benefit_profile",
+          "axis_b": "the B4 public collaboration benefit",
+          "value": {
+            "kind": "entity",
+            "definition": "the benefit profile the pack's publication serves",
+            "key": "01a1e9df-1592-79a5-839e-037d8fe4251b"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase c, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries three entities: document (one row per published document, keyed by id and project_id); project_baseline (the approved scope baseline 01a1ff3e-51c4-75b1-9db1-a2f729dd10b8); and benefit_profile (the B4 public collaboration profile 01a1e9df-1592-79a5-839e-037d8fe4251b). Each row records the key the snapshot actually uses.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26) and Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: name the record entities the publication is proved from. Scope: documents, baselines and benefit profiles in the snapshot. It was authored retrospectively on 2026-11-26; the definitions come from the snapshot's own rows, so the catalogue does not invent a table or a key the record does not carry."
+    },
+    {
+      "title": "Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the record formats the publication and its checks rely on.",
+      "scope": "The JSON snapshot, the Markdown documents and the TOML acceptance manifest.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "runtime operators",
+          "auditors",
+          "the programme office"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "JSON snapshot",
+          "axis_b": "the record store the checks read",
+          "value": {
+            "usage": "verify-project.py and rework-content-check.py read the snapshot's JSON files; the acceptance record carries schema project-acceptance/v1"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Markdown documents",
+          "axis_b": "the published pack pages",
+          "value": {
+            "usage": "each artefact document carries the Metadata, Entries, Links and Document sections the artifact standard requires"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "TOML acceptance manifest",
+          "axis_b": "acceptance/programme/DESIGN-PUBLISH.toml",
+          "value": {
+            "usage": "the manifest the acceptance record names and the closure gate reads"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity / Data Component Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase d, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries three standards: the JSON snapshot that the checks read, whose acceptance records carry schema project-acceptance/v1; the Markdown documents that carry the Metadata, Entries, Links and Document sections; and the TOML acceptance manifest acceptance/programme/DESIGN-PUBLISH.toml that the closure gate reads.\n\n## Links\n\nThe artefact carries one typed edge: Data Entity / Data Component Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that each entity is stored in one of these formats.\n\n## Document\n\nPurpose: name the record formats the publication and its checks rely on. Scope: the JSON snapshot, the Markdown documents and the TOML acceptance manifest as the 2026-11-21 record carries them. Authored retrospectively on 2026-11-26, it names only formats the snapshot and the scripts actually use."
+    },
+    {
+      "title": "Candidate Solutions Matrix — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "matrix",
+      "purpose": "Compare the two publication routes the record names.",
+      "scope": "Committed-pack publication against live-row republication.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later-tranche delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "publish from the committed pack",
+          "axis_b": "165 outputs in the pack",
+          "value": {
+            "note": "the route the record describes; the seven A–D documents were published 2026-11-22 and the pack carries 165 outputs"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "republish from live rows",
+          "axis_b": "102 outputs live",
+          "value": {
+            "note": "recorded as U7's work and not executed at the 2026-11-21 rework note"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase e, plateau hld, kind matrix. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe matrix carries two candidate routes. Publishing from the committed pack yields 165 outputs and is the route the record describes; the seven A–D documents were published 2026-11-22. Republishing from live rows yields the 102 outputs currently live; the rework note assigns that work to U7 and records it as not executed.\n\n## Links\n\nThe artefact carries two typed edges: Requirements Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) and Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26), both as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: compare the two publication routes the record names. Scope: committed-pack publication against live-row republication. The record carries no wider option appraisal, and this matrix does not invent one; it was authored retrospectively on 2026-11-26 from the 165-to-102 measurement and the U7 assignment."
+    },
+    {
+      "title": "Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the candidate publication routes and their status.",
+      "scope": "The committed pack and the live-row republish.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later-tranche delivery teams",
+          "runtime operators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "committed-pack publication",
+          "axis_b": "the pack as authored",
+          "value": {
+            "status": "recorded and published; 165 outputs"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "live-row republish",
+          "axis_b": "the live rows as the source",
+          "value": {
+            "status": "assigned to U7; not executed at the 2026-11-21 record"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Candidate Solutions Matrix — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase e, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries two candidates: committed-pack publication, recorded and published with 165 outputs; and live-row republish, assigned to U7 and not executed at the 2026-11-21 record. Each row carries the status the record gives it, and no candidate is described beyond what the snapshot supports.\n\n## Links\n\nThe artefact carries two typed edges: Candidate Solutions Matrix — DESIGN-PUBLISH (retrospective, 2026-11-26) and Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the candidate publication routes and their status. Scope: the committed pack and the live-row republish. Authored retrospectively on 2026-11-26; it lists the two routes the record names and deliberately does not add an option the record never considered."
+    },
+    {
+      "title": "Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Place the publication in its consuming and producing context.",
+      "scope": "The programme office, the public reader and the U7 republish.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "readers of the published design pack",
+          "runtime operators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the programme office",
+          "axis_b": "consumes the closure record",
+          "value": {
+            "kind": "actor",
+            "note": "reads the acceptance record and the closure gate of the project"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the public reader",
+          "axis_b": "reads the live pages",
+          "value": {
+            "kind": "actor",
+            "note": "the live window carries 102 outputs and the project-brief URL returns 404 live until U7 republishes"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "U7 republish",
+          "axis_b": "restores the live window from live rows",
+          "value": {
+            "kind": "external system",
+            "note": "named as the owner of the republish in the rework note's residuals"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase e, plateau hld, kind diagram. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe diagram carries three context actors: the programme office, which consumes the closure record; the public reader, who reads the live pages and meets a 404 project-brief URL until the republish runs; and U7's republish, which restores the live window from live rows. Each row names a boundary crossing the record supports.\n\n## Links\n\nThe artefact carries two typed edges: Stakeholder Map — DESIGN-PUBLISH (retrospective, 2026-11-26) and Solution Concept Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: place the publication in its consuming and producing context. Scope: the programme office, the public reader and the U7 republish. Authored retrospectively on 2026-11-26 from the rework note's residuals; the 404 and the 102-versus-165 window are recorded as measured, not as remedied."
+    },
+    {
+      "title": "Benefits Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Link the published pack to the benefit the programme records.",
+      "scope": "The B4 public collaboration benefit and the pack output it depends on.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "readers of the published design pack"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Public collaboration",
+          "axis_b": "the studio design is publicly readable",
+          "value": {
+            "kind": "benefit",
+            "note": "benefit profile 01a1e9df-1592-79a5-839e-037d8fe4251b carries the benefit in the snapshot"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the published pack",
+          "axis_b": "165 outputs committed and 102 live",
+          "value": {
+            "kind": "output",
+            "note": "the pack is the output the benefit depends on; the window gap is the measured shortfall"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase e, plateau hld, kind diagram. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe diagram carries two rows: the Public collaboration benefit, which benefit profile 01a1e9df-1592-79a5-839e-037d8fe4251b carries; and the published pack as its output, with 165 outputs committed and 102 live. The pair records the dependency from benefit to output, and the live window is shown as the measured shortfall.\n\n## Links\n\nThe artefact carries two typed edges: Business Capability Map — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation and Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as realization. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: link the published pack to the benefit the programme records. Scope: the B4 public collaboration benefit and the pack output it depends on. Authored retrospectively on 2026-11-26; it does not restate benefit measures the snapshot does not carry and does not claim the benefit realised while the window remains narrower than the pack."
+    },
+    {
+      "title": "Implementation and Migration Plan Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "f",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the work packages that published the pack and the one still open.",
+      "scope": "Artefact publication, output publication and the live-row republish.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "later-tranche delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "WP1 publish the A–D artefacts",
+          "axis_b": "completed 2026-11-22",
+          "value": {
+            "status": "done",
+            "evidence": "the seven artefact documents in artefacts.json"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "WP2 publish the declared outputs",
+          "axis_b": "project-brief and evidence",
+          "value": {
+            "status": "done",
+            "evidence": "Project Brief 01a1ff3e-b21f-7453-aec6-03779a26bda0 and Evidence 01a1e686-6efd-7683-9d5a-27e5b05081de"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "WP3 republish from live rows",
+          "axis_b": "the 102-to-165 window gap",
+          "value": {
+            "status": "open",
+            "evidence": "docs/evidence/rework/DESIGN-PUBLISH.md records the residual and assigns it to U7"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase f, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries three work packages: WP1 publishes the seven A–D artefacts and completed 2026-11-22; WP2 publishes the declared project-brief and evidence outputs and is done; and WP3 republishes from live rows, which is open and assigned to U7 against the 102-to-165 gap.\n\n## Links\n\nThe artefact carries two typed edges: Candidate Solutions Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation and Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as dependency. Every edge names another artefact this pack creates, so the set has no orphan.\n\n## Document\n\nPurpose: record the work packages that published the pack and the one still open. Scope: artefact publication, output publication and the live-row republish. Authored retrospectively on 2026-11-26; WP1 and WP2 are recorded as done because their documents exist, and WP3 stays open because the rework note records it as unexecuted."
+    },
+    {
+      "title": "Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "g",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the compliance verdicts the project carries.",
+      "scope": "The Phase-G review and the mandatory artefact packages.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "the sponsoring group"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Phase-G review",
+          "axis_b": "compliant",
+          "value": {
+            "result": "compliant",
+            "evidence": "review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c cites delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "mandatory artefact packages",
+          "axis_b": "red at the 2026-11-25 acceptance record",
+          "value": {
+            "result": "open",
+            "evidence": "12 packages open; 4 unresolved P0/P1: benefits-diagram, candidate-solutions, phase-h and project-context-diagram"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Implementation and Migration Plan Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase g, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries two assessments. The Phase-G review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c is compliant and cites the standing delegation. The mandatory artefact packages are open at the 2026-11-25 acceptance record: 12 packages open, of which four are unresolved P0/P1 — benefits-diagram, candidate-solutions, phase-h and project-context-diagram.\n\n## Links\n\nThe artefact carries two typed edges: Technology Standards Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation and Implementation and Migration Plan Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the compliance verdicts the project carries. Scope: the Phase-G review and the mandatory artefact packages. Authored retrospectively on 2026-11-26; it reports the red package state rather than softening it, and the content this pack authors is the remediation the batch will apply, not a verdict already earned."
+    },
+    {
+      "title": "Architecture Change Request Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the change requests that shaped the current state.",
+      "scope": "The #526 reopen and the completion of the mandatory artefact set.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "CR1 reopen for the #526 retrospective rework",
+          "axis_b": "accepted 2026-11-21",
+          "value": {
+            "status": "accepted",
+            "evidence": "decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the row records reopened_at 2026-11-21T17:51:30Z"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CR2 complete the mandatory artefact set",
+          "axis_b": "this content pack",
+          "value": {
+            "status": "in progress",
+            "evidence": "12 packages open at the 2026-11-25 acceptance record"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase h, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe catalog carries two change requests: CR1, the reopen for the #526 retrospective rework, accepted on 2026-11-21 under decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; and CR2, the completion of the mandatory artefact set this content pack authors, in progress because 12 packages were open at the 2026-11-25 record.\n\n## Links\n\nThe artefact carries one typed edge: Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) as derivation. Every edge names another artefact this pack creates, so the set has no orphan, and the edge records that the change requests respond to the assessment findings.\n\n## Document\n\nPurpose: record the change requests that shaped the current state. Scope: the #526 reopen and the completion of the mandatory artefact set. Authored retrospectively on 2026-11-26; CR1 is accepted on the record and CR2 is honestly in progress, since the packages close only when the batch runs against this pack."
+    },
+    {
+      "title": "Architecture Change Register — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Track the state of each change the project carries.",
+      "scope": "The #526 reopen and the live-window republish.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "runtime operators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "the #526 reopen",
+          "axis_b": "accepted",
+          "value": {
+            "state": "accepted",
+            "note": "the project re-closed through the one gate with a distinct approver"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "the live-window republish",
+          "axis_b": "open",
+          "value": {
+            "state": "open",
+            "note": "U7 owns it; the live window is 102 outputs against 165 in the pack"
+          },
+          "position": 2
+        }
+      ],
+      "links": [
+        {
+          "to": "Architecture Change Request Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalog artefact for DESIGN-PUBLISH, authored 2026-11-26 from the snapshot and the rework note. Phase h, plateau hld, kind catalog. The owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the Architecture Board reviews.\n\n## Entries\n\nThe register carries two changes: the #526 reopen, accepted, after which the project re-closed through the one gate with a distinct approver; and the live-window republish, open, owned by U7, with the live window at 102 outputs against 165 in the pack. Each row carries the state the record supports.\n\n## Links\n\nThe artefact carries two typed edges: Architecture Change Request Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26) and Compliance Assessment Catalog — DESIGN-PUBLISH (retrospective, 2026-11-26), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: track the state of each change the project carries. Scope: the #526 reopen and the live-window republish. Authored retrospectively on 2026-11-26; it keeps the republish open because the rework note records it as U7's unexecuted residual, and it does not close a change the record has not closed."
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for DESIGN-PUBLISH is fifteen deliverables on the programme track: the seven A–D artefacts published on 2026-11-22, and the eight E–H artefacts created in this rework on 2026-11-26. Each is an approved row carrying its standard key and a published body; the owner is the programme architect under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThe catalogue is the project's approved artefact rows: the stakeholder map, the driver/goal/objective catalog, the requirements catalog, the solution concept, the business capability map, the data entity catalog, the technology standards catalog, the gap analysis, the candidate solutions matrix and catalog, the project context diagram, the benefits diagram, the implementation and migration plan catalog, the compliance assessment catalog, and the architecture change catalog and register. Each row names its kind — matrix, catalog or diagram — and its ADM phase.\n\n## Links\n\nThe artefact links are the typed edges the pack declares: solution concept to requirements catalog, business capability map to solution concept, candidate solutions to gap analysis and to the benefits diagram, and the implementation and migration plan to the candidate solutions. They are written by architecture.artifacts_link and read back through architecture.artifacts_links; an artefact with no link is refused as an orphan.\n\n## Document\n\nEvery artefact's body is published as a document of category architecture-artifact-instance — fifteen rows dated 2026-11-26 — and the four TOGAF deliverables (benefits diagram, candidate solutions, project context diagram and gap analysis) are also published under their own category. This index is the document the standard's architecture-artifact package reads; the artefact rows above are its entries.\n"
+    },
+    {
+      "category": "benefits-diagram",
+      "title": "Benefits Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "body": "# Benefits Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Goals and outcomes\n\nThe project serves one goal: the SPEC_V2 studio design is publicly readable, so a decision can be reviewed outside the office that made it. The measurable outcome is the published pack — 165 outputs authored, of which the live public window served 102 on 2026-11-25. Closing the 63-output shortfall is the outcome the benefit depends on.\n\n## Measures\n\nThe measure is the count of outputs the public site serves against the pack index, read from the published-outputs projection rather than counted by hand. On 2026-11-25 the index held 165 rows and the site served 102, so the outcome stands at 62% complete; the same instrument reports the value at every tranche review.\n\n## Benefits and sub-benefits\n\nThe benefit is Public collaboration (profile 01a1e9df-1592-79a5-839e-037d8fe4251b): a reader outside the programme follows the design without a briefing. It decomposes into the A–D design documents published 2026-11-22, the E–H architecture deliverables authored in this rework on 2026-11-26, and the declared closure outputs. The first is realised, the second is realised here, and the third waited on the six mandatory documents this pack now carries.\n"
+    },
+    {
+      "category": "candidate-solutions",
+      "title": "Candidate Solutions — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "body": "# Candidate Solutions — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Candidates\n\nTwo routes were considered for publishing the pack. The first publishes from the committed pack: the 165 outputs as authored in the repository, served through the pack's output index. The second republishes from the live rows, regenerating the public window from the database so that the site matches the estate as it actually runs.\n\n## Criteria\n\nThe routes were judged on three criteria: fidelity to the record, meaning a published body matches an approved row; reproducibility, meaning the same output can be regenerated from the repository alone; and completeness of the public window, meaning how many of the pack's 165 outputs are actually served to a reader.\n\n## Options rejected\n\nThe live-row route was not executed in this unit. It is assigned to U7 and had not run at the 2026-11-21 record, which is why the public window stood at 102 of 165. This rework therefore took the committed-pack route and records the shortfall as measured rather than glossing it. The live-row route is deferred on its dependency, not rejected as a design.\n"
+    },
+    {
+      "category": "project-context-diagram",
+      "title": "Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "body": "# Project Context Diagram — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Context\n\nThe work package is DESIGN-PUBLISH's retrospective rework: the project that publishes the SPEC_V2 studio design. Its boundary is the programme record — projects, artefacts, documents, registers, baselines and contracts — together with the published-output index the public site reads. Runtime infrastructure belongs inside the boundary only where that index depends on it.\n\n## Affected organisation\n\nThe programme office consumes the closure record and decides the closure gate. The programme architect owns the artefact set under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The public reader is an external actor who reads the live pages and never touches the record. The Architecture Board reviews the artefact set and the delivery contract.\n\n## Affected systems\n\nThe record database (PostgreSQL 18, migration 0107 on this lane) holds the projects, artefacts, documents, registers and baselines. The document store (MinIO at minio.example.com:8389) backs published bodies; this box cannot reach it, so the replay base keeps the bodies in the database. The snapshot projection is the read model every receipt measures.\n"
+    },
+    {
+      "category": "gap-analysis",
+      "title": "Gap Analysis — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+      "body": "# Gap Analysis — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Baseline\n\nThe baseline is the acceptance state recorded on 2026-11-25: the project is closed, its Phase-G review is compliant, and its receipt is red on the mandatory artefact standard with eleven packages open. On the same date the public window served 102 of the pack's 165 outputs.\n\n## Target\n\nThe target is a green receipt: sixteen checks pass, no package the project owns stays open on the standard, and the public window either reaches 165 outputs or carries its shortfall with a named owner. The rework's own scope is the mandatory artefact set — the record, not the republication.\n\n## Gaps and work packages\n\nTwo gaps are measured. The eleven open packages close from records the factory writes (architecture-artifact and project-registers) and from the four category documents this pack now carries (benefits-diagram, candidate-solutions, project-context-diagram and gap-analysis). The 63-output public shortfall stays U7's: it is recorded with an owner here, not closed by this rework.\n"
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The live public window is narrower than the committed pack",
+        "body": "The rework note records 102 outputs live against 165 in the committed pack at 2026-11-21, and the project-brief URL returns 404 live until the republish from live rows runs. This retrospective row, dated 2026-11-26, records the measured gap and assigns no fix to this project; U7 owns the republish.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/DESIGN-PUBLISH.md — the live window residual"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The 2026-11-25 acceptance record is red on the mandatory artefact standard",
+        "body": "The acceptance record generated 2026-11-25T10:37:50Z at 37f99108 reports 12 mandatory artefact packages open and the project closed on a red manifest. This retrospective row records the state before the batch runs; the content pack authored 2026-11-26 supplies the missing E–H artefact bodies and does not itself clear the red.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/DESIGN-PUBLISH.json — the 2026-11-25 acceptance record"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "Four mandatory packages remain unresolved P0/P1 at the 2026-11-25 record",
+        "body": "The acceptance record names std-togaf-benefits-diagram-design-publish, std-togaf-candidate-solutions-design-publish, std-togaf-phase-h-design-publish-h and std-togaf-project-context-diagram-design-publish as the unresolved P0/P1 packages, part of the 12 mandatory packages open. Recorded retrospectively on 2026-11-26.",
+        "status": "open",
+        "severity": "high",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/DESIGN-PUBLISH.json — the failures array"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The republish from live rows restores the public window",
+        "body": "This retrospective assumption, recorded 2026-11-26, is that U7's republish from live rows closes the 102-to-165 gap and makes the project-brief URL resolve. If it does not, the benefit profile Public collaboration stays unrealised on the live estate and the risk above stands.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "The live window depends on U7's republish",
+        "body": "The public window depends on U7, which the rework note names as the owner of the republish from live rows. This project does not attempt the republish; its closure record and its benefit claim both depend on U7 completing it. Recorded retrospectively on 2026-11-26.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Public collaboration: the studio design is publicly readable",
+        "body": "The benefit profile 01a1e9df-1592-79a5-839e-037d8fe4251b records Public collaboration. The pack publishes the studio design as documents and pages so it can be read outside the repository; this retrospective row, dated 2026-11-26, links the benefit to the published pack without claiming realisation while the window is 102 against 165.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "01a1e9df-1592-79a5-839e-037d8fe4251b"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — DESIGN-PUBLISH (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Publish the studio design pack live: the Project Brief, Evidence and Closure review outputs and the seven A–D artefact documents, together with the eight E–H artefacts and the records this pack authors. The committed pack carries 165 outputs and the live window carries 102 at the 2026-11-21 record; the project re-closes through the one gate with an approver distinct from the requester.",
+      "compliance": "The Phase-G review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c records the level compliant and cites the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; no active waiver exists. The 2026-11-25 acceptance record docs/evidence/rework/DESIGN-PUBLISH.json at 37f99108 is red on the artefact standard, with 12 packages open and 4 unresolved P0/P1; this pack is the remediation for that artefact set.",
+      "approval": "The delivery contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8 is board-approved by decision 01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597; the approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 is distinct from the requester 01a1e607-17d9-77d3-98d3-a43a87c4633d. The closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 was likewise decided by an approver other than its requester.",
+      "capacity": "The unit is one WBS deliverable, 01a1ff3e-50d7-74e4-bf2c-5e866b75cc86 'Publish the studio design pack and its retrospective closure record', accepted with WSJF inputs business value 8, time criticality 5, risk reduction 8 and job size 3. Its evidence is the acceptance manifest acceptance/programme/DESIGN-PUBLISH.toml, the acceptance record and the acts file.",
+      "acceptance": "Acceptance is executable: python3 scripts/verify-project.py --project DESIGN-PUBLISH --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry. The closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 is decided by an approver distinct from its requester.",
+      "evidence": "docs/evidence/rework/DESIGN-PUBLISH.md is the rework note; docs/evidence/rework/DESIGN-PUBLISH.json is the 2026-11-25 acceptance record; docs/evidence/rework/DESIGN-PUBLISH/acts.md records the 37 acts whose transcript is transcript.jsonl; acceptance/programme/DESIGN-PUBLISH.toml is the manifest the gate reads.",
+      "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "Publish the studio design pack and its retrospective closure record",
+    "business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction": 8,
+    "job_size": 3
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live delivery contract review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c is compliant and cites the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, and no active waiver exists. The closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 was decided by an approver distinct from its requester, and the scope baseline is approved. Against that, the 2026-11-25 acceptance record at 37f99108 is red: 12 mandatory artefact packages are open, four of them unresolved P0/P1 (benefits-diagram, candidate-solutions, phase-h, project-context-diagram), and the project is closed on a red manifest. The finding of this review is that the governance record is sound while the artefact set is incomplete; this content pack authors the missing E–H bodies and the delivery records, and it does not claim the red is cleared until the batch re-runs.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
+      "acceptance_record": "docs/evidence/rework/DESIGN-PUBLISH.json — generated 2026-11-25T10:37:50Z at 37f99108",
+      "live_review": "01a1ff3f-2d51-7091-bacb-e7a5cb7b016c",
+      "delivery_contract": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+      "scope_baseline": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
+      "closure_gate": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
+      "rework_note": "docs/evidence/rework/DESIGN-PUBLISH.md"
+    }
+  },
+  "project_brief_output": "# Project brief — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Outcome\n\nDESIGN-PUBLISH publishes the SPEC_V2 studio design pack live. The project delivers the Project Brief, Evidence and Closure review outputs and the seven Phase A–D artefact documents dated 2026-11-22. The committed pack carries 165 outputs; the live public window carries 102 at the 2026-11-21 record. This brief is retrospective and dated 2026-11-26: it records the outcome the rework note describes, not a newly claimed delivery.\n\n## Boundary\n\nOut of scope is the republish from live rows, which the rework note assigns to U7, and any change to the live public window by this project. The project also does not re-author the seven A–D artefact documents, which were published on 2026-11-22; it adds the Phase E–H artefact content and the governance records the retro pack requires, including this brief.\n\n## Reuse sources\n\nThe record reuses the snapshot's own rows: artefacts.json documents for the ten project documents, msp.json for the WBS deliverable 01a1ff3e-50d7-74e4-bf2c-5e866b75cc86 and the benefit profile 01a1e9df-1592-79a5-839e-037d8fe4251b, and programme.json for the project's meta. The rework note docs/evidence/rework/DESIGN-PUBLISH.md supplies the residuals, and docs/evidence/rework/DESIGN-PUBLISH.json supplies the acceptance state.\n\n## Inception units\n\nThe project carries GitHub issues 32, 33, 36, 37, 89, 97, 103 and 149 in its meta, and it sits in tranche 0 under PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70. The retrospective reconstitution of the lifecycle is the #526 unit; its 37 acts are the record of the work, read back one write at a time.\n\n## Dependencies\n\nThe public window depends on U7's republish from live rows, and the project depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for its approvals. The benefit depends on the published pack, and the artefact packages depend on this content pack being applied by the rework batch before their red state can clear.\n\n## Acceptance\n\nscripts/verify-project.py --project DESIGN-PUBLISH --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry for the project. The closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 is decided by an approver distinct from its requester. The later 2026-11-25 acceptance record is red on the artefact standard, which this pack addresses.\n\n## Capabilities\n\nThe project exercises three capabilities: design publication, which turns the committed pack into live pages; evidence generation, which produces an evidence page and an acceptance record per project; and closure governance, which re-closes through the one gate with an approver distinct from the requester. Each is declared built in the record, and each names the document or gate that evidences it.\n\n## Plan\n\nThe retrospective plan runs charter, Statement of Architecture Work, the seven A–D artefacts, the delivery contract and board decision, the WBS deliverable, the Phase-G review and the two declared outputs, then closure. This content pack extends the plan with the eight Phase E–H artefacts and the registers; it is authored on 2026-11-26 and is applied by scripts/rework-batch.py --tranche 0.",
+  "evidence_output": "# Evidence — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Claim\n\nThe claim is that DESIGN-PUBLISH published the SPEC_V2 studio design pack live and re-closed through the reconstituted lifecycle. The record carries ten project documents, a board-approved delivery contract, an approved scope baseline, a compliant Phase-G review and a closure gate decided by an approver other than its requester. The claim is retrospective and dated 2026-11-26; the live window remains 102 outputs against 165 in the pack.\n\n## Evidence\n\nThe ten documents are the Project Brief 01a1ff3e-b21f-7453-aec6-03779a26bda0, Evidence 01a1e686-6efd-7683-9d5a-27e5b05081de, Closure review 01a1ff3e-7ef1-717a-8854-c5883a8b68f5, and the seven A–D artefact documents dated 2026-11-22. The governance record carries the scope baseline 01a1ff3e-51c4-75b1-9db1-a2f729dd10b8, the contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8 with board decision 01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597, the review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c and the closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13.\n\n## Verification\n\nscripts/verify-project.py --project DESIGN-PUBLISH --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, and the strict audit on the same snapshot carries no P0/P1 entry. The 37 acts are in transcript.jsonl and each write was read back by programme-record.py. The 2026-11-25 acceptance record generated at 37f99108 is red on 12 mandatory packages and on the closed-on-red check; that red is the artefact-standard finding this pack remediates, not a contradiction of the verification above.\n\n## Links\n\ndocs/evidence/rework/DESIGN-PUBLISH.md is the rework note with the residuals; docs/evidence/rework/DESIGN-PUBLISH.json is the 2026-11-25 acceptance record; docs/evidence/rework/DESIGN-PUBLISH/acts.md records the delegation and the 37 acts; acceptance/programme/DESIGN-PUBLISH.toml is the manifest; docs/evidence/rework/tranche-0/rework-content-DESIGN-PUBLISH.json is this content pack.\n\n## Gap\n\nTwo gaps are recorded and neither is closed by this pack: the live public window is 102 outputs against 165 in the committed pack, and the project-brief URL returns 404 live until U7's republish from live rows runs. Separately, the 2026-11-25 acceptance record is red on the mandatory artefact standard; the pack authors the missing content, but the packages clear only when scripts/rework-batch.py --tranche 0 applies it and the acceptance record is regenerated.",
+  "closure": "# Closure — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\nThe project DESIGN-PUBLISH is re-closed through the one gate on the record the snapshot carries: the board-approved delivery contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8, the approved scope baseline 01a1ff3e-51c4-75b1-9db1-a2f729dd10b8, the compliant Phase-G review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c and the closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 decided by an approver distinct from its requester. This closure statement is retrospective and dated 2026-11-26. It records the closure and keeps two items open: the 102-to-165 live-window gap, which belongs to U7's republish, and the mandatory artefact packages that were red at the 2026-11-25 acceptance record and that this content pack supplies the content for.",
+  "closure_review": "# Closure review — DESIGN-PUBLISH (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the published studio design pack with its governance records, and the acceptance the record carries matches it: scripts/verify-project.py --project DESIGN-PUBLISH --snapshot <fresh> is green with 11 checks and 0 failures at d7293f96, the closure gate 01a1ff3f-cc40-7000-bce5-85f41c4c0b13 was decided by an approver distinct from its requester, and the strict audit carries no P0/P1 entry. Against that acceptance, the 2026-11-25 acceptance record at 37f99108 is red on the artefact standard; this review records both states.\n\n## Evidence\n\nThe evidence is the ten recorded project documents, the scope baseline 01a1ff3e-51c4-75b1-9db1-a2f729dd10b8, the delivery contract 01a1ff3c-7aad-7dda-820e-1c7d85fe70a8 with board decision 01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597, the Phase-G review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c citing the delegation, and the 37 acts in transcript.jsonl read back by programme-record.py. The acceptance record docs/evidence/rework/DESIGN-PUBLISH.json and the rework note supply the failures and residuals verbatim.\n\n## Open items\n\nThe live public window remains 102 outputs against 165 in the committed pack, and the project-brief URL returns 404 live until U7's republish from live rows runs; that item is U7's and does not close here. The mandatory artefact standard was red at the 2026-11-25 acceptance record: 12 packages open, four unresolved P0/P1, which this content pack addresses but does not itself clear. No active waiver exists.\n\n## Decision\n\nThe retrospective decision is to close on the record the snapshot carries while stating both open items, and to let the rework batch apply this content pack so the artefact packages can clear on a regenerated acceptance record. The decision level is compliant, as the Phase-G review 01a1ff3f-2d51-7091-bacb-e7a5cb7b016c records; it is dated 2026-11-26 and does not assert that the live window or the red package state is repaired."
+}

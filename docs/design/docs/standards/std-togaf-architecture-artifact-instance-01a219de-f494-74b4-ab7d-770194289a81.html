@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor generate-standards.py" />
+    <meta name="description" content="TOGAF artefact generated from the published record." />
+    <title>Architecture Artifact Instance — T19 — Requirements catalog · conveyor standards</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+    <style>
+      .std-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }
+      .std-meta div { border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }
+      .std-meta dt { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.65; }
+      .std-meta dd { margin:.15rem 0 0; }
+      .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
+      .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
+      .std-source { font-size:.85rem; opacity:.8; }
+      .std-index { list-style:none; padding:0; }
+      .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <span class="doc-sep">/</span>
+      <a href="index.html">Standards</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="../../data/standards.json">data</a>
+    </header>
+    <main class="doc-body">
+      <h1>Architecture Artifact Instance — T19 — Requirements catalog</h1>
+      <dl class="std-meta">
+        <div><dt>Standard</dt><dd>TOGAF</dd></div>
+        <div><dt>Level</dt><dd>project</dd></div>
+        <div><dt>Subject</dt><dd>T19 — Requirements catalog</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>SPEC</dt><dd>§8.1</dd></div>
+        <div><dt>Gate</dt><dd>approved</dd></div>
+        <div><dt>Package</dt><dd><code>std-togaf-architecture-artifact-instance-01a219de-f494-74b4-ab7d-770194289a81:T19</code></dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+      </dl>
+      <h2>Metadata</h2>
+<p class="std-intent">The artefact&#x27;s type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.</p>
+<p class="std-source">Source: <code>artifact_metadata</code> — 1 row(s)</p>
+<ul>
+<li>T19 — Requirements catalog <span class="std-state">approved</span></li>
+</ul><h2>Entries</h2>
+<p class="std-intent">The catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.</p>
+<p class="std-source">Source: <code>artifact_entries</code> — 12 row(s)</p>
+<ul>
+<li>meeting_type is a tenant-scoped, versioned policy row: agenda_sources, required_participation, quorum, decision_rule (unanimous|majority|chair), evidence_minimum, decision_window, timebox and allowed_outcomes; a version is immutable once a meeting pins it</li>
+<li>a meeting is a card owned by its chair under WIP limits and DoD, with one live instance per cadence slot (uq_meeting_live)</li>
+<li>the agenda is an L0 query over agenda_sources plus explicit meetings.agenda_add actions; a deciding item names exactly one approval with its evidence</li>
+<li>attendance covers job_binding and app_user seats (chair, member, presenter, observer, delegate) with department, invitation and response state; delegation only where the type allows</li>
+<li>one live position per participant per item: stance (approve|approve_with_conditions|reject|abstain|request_evidence), rationale, conditions, optional commitment, surface and time; immutable once the item closes</li>
+<li>close_item derives the outcome by arithmetic: meeting rule and quorum first, then the approval&#x27;s policy; the stricter wins; observers never count; a conflict-excluded participant is excluded by P4; a tie defers</li>
+<li>the closed outcome set is decision|commitment|action|information|deferred; commitments become project dependencies or cards and actions become cards</li>
+<li>minutes are a governed_asset(kind=&#x27;minutes&#x27;) drafted from the typed rows and published behind the chair&#x27;s gate; dissent is kept verbatim and every action becomes a card</li>
+<li>a human, including the owner, holds an ordinary seat and participates live in the room or asynchronously over web, Telegram or MCP; the first decision across surfaces is recorded once and via records the surface</li>
+<li>participant-hours derive from attendance and duration as the third D52 metering source; a meeting_type with no decision over a cycle is flagged for retirement</li>
+<li>the /meetings console lists invitations and seats, the room with agenda, evidence, participants and live positions, the asynchronous queue, minutes and actions, and forum history and load</li>
+<li>no chat, transcript store or AV product; no calendar dependency (ICS is a read of attendance); no LLM selects items, decides, infers a position or marks attendance; no second decision store</li>
+</ul><h2>Links</h2>
+<p class="std-intent">What this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository&#x27;s trace; an artefact with no link is an orphan.</p>
+<p class="std-source">Source: <code>artifact_links</code> — 4 row(s)</p>
+<ul>
+<li>dependency: 01a219de-eed4-7eba-baf5-a00c8f2262bc → 01a219de-f494-74b4-ab7d-770194289a81</li>
+<li>derivation: 01a219de-f494-74b4-ab7d-770194289a81 → 01a219de-f1b3-76f8-bd02-ae06a87fba0a</li>
+<li>derivation: 01a219de-fa3d-76ee-b559-329c67cf3a95 → 01a219de-f494-74b4-ab7d-770194289a81</li>
+<li>realization: 01a219de-f76a-7e5c-bcd2-0f4250bd0d2a → 01a219de-f494-74b4-ab7d-770194289a81</li>
+</ul><h2>Document</h2>
+<p class="std-intent">The published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.</p>
+<p class="std-source">Source: <code>artifact_document</code> — 1 row(s)</p>
+<ul>
+<li>T19 — Requirements catalog</li>
+</ul>
+    </main>
+  </body>
+</html>

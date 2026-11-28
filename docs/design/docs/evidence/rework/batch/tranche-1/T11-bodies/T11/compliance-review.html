@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Compliance Review — Metrics, metering and maturity · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/T11-bodies/T11/compliance-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="compliance-review--metrics-metering-and-maturity">Compliance Review — Metrics, metering and maturity</h1>
+<h2 id="relationship">Relationship</h2>
+<p>Exactly one of irrelevant, consistent, compliant, conformant, fully conformant or non-conformant.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a1ff8f-08ee-7bc5-bb39-81304d03c4ef&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;sha&quot;: &quot;d367a4a992ca5338c82466e9d6ef308e62b01ba6&quot;
+      },
+      &quot;findings&quot;: &quot;1. Mandatory A\u2013D artefacts: the 2026-11-21 conformance pass records T11 as missing all seven (stakeholder_map, driver_goal_objective, requirements_catalog, solution_concept, business_capability_map, data_entity_catalog, technology_standards). This rework produces and approves the set, so the P1 `mandatory_artefacts` finding is closed.\n\n2. Contracts: T11 closed with neither a statement_of_architecture_work nor a delivery_contract. This rework records and approves both; the delivery contract commits to acceptance/programme/T11.toml, so the P1 `contract_missing` finding is closed.\n\n3. Closure record: T11 closed without a published closure review, project brief or evidence page (the P0 `closed_without_closure_review` and P1 `unpublished_declared_output` findings). This rework publishes all three retrospectively.\n\n4. Delivery evidence: issue #84 merged 2026-11-19 (commit 183f5111, PR #404) and delivered migration 0059_metrics.sql, the domain rules, the store read models, the eight metrics actions and eight integration tests; the coverage row is `built` at 8/8 actions, 3/3 modules and 2/2 tables (commit f7062f35, PR #429). Issue #458 landed 2026-11-20 (commit 0a8a6e95, PR #499) and made the Metering screen read measure.inference from the snapshot. The claims in this record are made against those committed files and tests.\n\n5. Provenance: no contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review is recoverable; the project row is closed at the 2026-11-21 snapshot while its outputs are absent. This review is recorded retrospectively under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and does not attest contemporaneous intent.&quot;,
+      &quot;id&quot;: &quot;01a1ff90-4e19-7bcf-acbf-3f29d980572e&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;contract_id&quot;: &quot;01a217e9-c5e2-7b32-a26a-99228c84199e&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;delivery_contract&quot;: &quot;01a1ff8f-08ee-7bc5-bb39-81304d03c4ef&quot;,
+        &quot;live_review&quot;: &quot;01a1ff90-4e19-7bcf-acbf-3f29d980572e&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;rework_note&quot;: &quot;docs/evidence/rework/T11/transcript.jsonl&quot;,
+        &quot;scope_baseline&quot;: &quot;01a1ff8f-47cb-78cf-9db8-d98d863e7dd0&quot;,
+        &quot;sha&quot;: &quot;b0449db045a18004c19bbfbd87dd39acedad85a8&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff90-4e19-7bcf-acbf-3f29d980572e is compliant against the delivery contract 01a1ff8f-08ee-7bc5-bb39-81304d03c4ef, the contract sits under its approval 01a1ff8f-1c44-749c-ac12-c067de253ee7, the Statement of Architecture Work 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f sits under its approval 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd, and the scope baseline 01a1ff8f-47cb-78cf-9db8-d98d863e7dd0 is kind scope, taken 2026-11-21. The delivery is the merged metrics capability: migration 0059_metrics.sql, the pure rules in crates/domain/src/metrics.rs, the read models in crates/store/src/metrics.rs, the eight actions in crates/actions/src/metrics/mod.rs, the eight integration tests and the tenant-isolation test. The SPEC_V2 \u00a712 gate is met on that evidence: every metric and every metering level recomputes from rows, the reconciliation matches at six decimals or opens an incident, a C0\u2013C5 level moves only across recorded threshold versions, and a gate with no refusal is flagged. The console unit #458 reads measure.inference from the published snapshot and borrows no fixture. Against that, the rework receipt was red on the A\u2013D artefact set, the scope baseline, the registers and the delivery contract; this pack supplies the seven artefacts, the registers and the contract, and the baseline the factory reconstitutes from the WBS deliverable. Three limits are stated rather than waived: the original governance record was never authored, the eval- and benchmark-backed quality metrics remain with S17\u2013S20, and no live tenant C0\u2013C5 threshold row is asserted by the 2026-11-21 snapshot.&quot;,
+      &quot;id&quot;: &quot;01a217e9-df2d-7df3-ac63-82ea8bdbf7a1&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="findings">Findings</h2>
+<p>The evidence for each finding, against the contract.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 2,
+  &quot;rows&quot;: [
+    {
+      &quot;contract_id&quot;: &quot;01a1ff8f-08ee-7bc5-bb39-81304d03c4ef&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;sha&quot;: &quot;d367a4a992ca5338c82466e9d6ef308e62b01ba6&quot;
+      },
+      &quot;findings&quot;: &quot;1. Mandatory A\u2013D artefacts: the 2026-11-21 conformance pass records T11 as missing all seven (stakeholder_map, driver_goal_objective, requirements_catalog, solution_concept, business_capability_map, data_entity_catalog, technology_standards). This rework produces and approves the set, so the P1 `mandatory_artefacts` finding is closed.\n\n2. Contracts: T11 closed with neither a statement_of_architecture_work nor a delivery_contract. This rework records and approves both; the delivery contract commits to acceptance/programme/T11.toml, so the P1 `contract_missing` finding is closed.\n\n3. Closure record: T11 closed without a published closure review, project brief or evidence page (the P0 `closed_without_closure_review` and P1 `unpublished_declared_output` findings). This rework publishes all three retrospectively.\n\n4. Delivery evidence: issue #84 merged 2026-11-19 (commit 183f5111, PR #404) and delivered migration 0059_metrics.sql, the domain rules, the store read models, the eight metrics actions and eight integration tests; the coverage row is `built` at 8/8 actions, 3/3 modules and 2/2 tables (commit f7062f35, PR #429). Issue #458 landed 2026-11-20 (commit 0a8a6e95, PR #499) and made the Metering screen read measure.inference from the snapshot. The claims in this record are made against those committed files and tests.\n\n5. Provenance: no contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review is recoverable; the project row is closed at the 2026-11-21 snapshot while its outputs are absent. This review is recorded retrospectively under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and does not attest contemporaneous intent.&quot;,
+      &quot;id&quot;: &quot;01a1ff90-4e19-7bcf-acbf-3f29d980572e&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T19:23:29.375604+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;contract_id&quot;: &quot;01a217e9-c5e2-7b32-a26a-99228c84199e&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;evidence&quot;: {
+        &quot;acceptance_manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;delivery_contract&quot;: &quot;01a1ff8f-08ee-7bc5-bb39-81304d03c4ef&quot;,
+        &quot;live_review&quot;: &quot;01a1ff90-4e19-7bcf-acbf-3f29d980572e&quot;,
+        &quot;manifest&quot;: &quot;acceptance/programme/T11.toml&quot;,
+        &quot;rework_note&quot;: &quot;docs/evidence/rework/T11/transcript.jsonl&quot;,
+        &quot;scope_baseline&quot;: &quot;01a1ff8f-47cb-78cf-9db8-d98d863e7dd0&quot;,
+        &quot;sha&quot;: &quot;b0449db045a18004c19bbfbd87dd39acedad85a8&quot;
+      },
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff90-4e19-7bcf-acbf-3f29d980572e is compliant against the delivery contract 01a1ff8f-08ee-7bc5-bb39-81304d03c4ef, the contract sits under its approval 01a1ff8f-1c44-749c-ac12-c067de253ee7, the Statement of Architecture Work 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f sits under its approval 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd, and the scope baseline 01a1ff8f-47cb-78cf-9db8-d98d863e7dd0 is kind scope, taken 2026-11-21. The delivery is the merged metrics capability: migration 0059_metrics.sql, the pure rules in crates/domain/src/metrics.rs, the read models in crates/store/src/metrics.rs, the eight actions in crates/actions/src/metrics/mod.rs, the eight integration tests and the tenant-isolation test. The SPEC_V2 \u00a712 gate is met on that evidence: every metric and every metering level recomputes from rows, the reconciliation matches at six decimals or opens an incident, a C0\u2013C5 level moves only across recorded threshold versions, and a gate with no refusal is flagged. The console unit #458 reads measure.inference from the published snapshot and borrows no fixture. Against that, the rework receipt was red on the A\u2013D artefact set, the scope baseline, the registers and the delivery contract; this pack supplies the seven artefacts, the registers and the contract, and the baseline the factory reconstitutes from the WBS deliverable. Three limits are stated rather than waived: the original governance record was never authored, the eval- and benchmark-backed quality metrics remain with S17\u2013S20, and no live tenant C0\u2013C5 threshold row is asserted by the 2026-11-21 snapshot.&quot;,
+      &quot;id&quot;: &quot;01a217e9-df2d-7df3-ac63-82ea8bdbf7a1&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d36-782b-8b18-ff07a64dedbe&quot;,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;architecture.json#/compliance_reviews&quot;
+}</code></pre>
+<h2 id="waivers">Waivers</h2>
+<p>Each accepted deviation with its owner, reason, cost, risk and reassessment date.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;kind&quot;: &quot;waiver_status&quot;,
+      &quot;title&quot;: &quot;None recorded \u2014 0 waivers for this project&quot;,
+      &quot;waivers&quot;: 0
+    }
+  ],
+  &quot;source&quot;: &quot;computed:waiver_status&quot;
+}</code></pre>
+<h2 id="decision">Decision</h2>
+<p>The outcome and the conditions that attach to it.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;compliance-review&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;conditions&quot;: null,
+      &quot;findings&quot;: &quot;This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live Phase-G review 01a1ff90-4e19-7bcf-acbf-3f29d980572e is compliant against the delivery contract 01a1ff8f-08ee-7bc5-bb39-81304d03c4ef, the contract sits under its approval 01a1ff8f-1c44-749c-ac12-c067de253ee7, the Statement of Architecture Work 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f sits under its approval 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd, and the scope baseline 01a1ff8f-47cb-78cf-9db8-d98d863e7dd0 is kind scope, taken 2026-11-21. The delivery is the merged metrics capability: migration 0059_metrics.sql, the pure rules in crates/domain/src/metrics.rs, the read models in crates/store/src/metrics.rs, the eight actions in crates/actions/src/metrics/mod.rs, the eight integration tests and the tenant-isolation test. The SPEC_V2 \u00a712 gate is met on that evidence: every metric and every metering level recomputes from rows, the reconciliation matches at six decimals or opens an incident, a C0\u2013C5 level moves only across recorded threshold versions, and a gate with no refusal is flagged. The console unit #458 reads measure.inference from the published snapshot and borrows no fixture. Against that, the rework receipt was red on the A\u2013D artefact set, the scope baseline, the registers and the delivery contract; this pack supplies the seven artefacts, the registers and the contract, and the baseline the factory reconstitutes from the WBS deliverable. Three limits are stated rather than waived: the original governance record was never authored, the eval- and benchmark-backed quality metrics remain with S17\u2013S20, and no live tenant C0\u2013C5 threshold row is asserted by the 2026-11-21 snapshot.&quot;,
+      &quot;id&quot;: &quot;01a217e9-df2d-7df3-ac63-82ea8bdbf7a1&quot;,
+      &quot;kind&quot;: &quot;governing_review&quot;,
+      &quot;level&quot;: &quot;compliant&quot;,
+      &quot;outcome&quot;: null,
+      &quot;reviewed_at&quot;: &quot;2026-11-26T12:52:12.712373+00:00&quot;,
+      &quot;reviewed_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;title&quot;: &quot;governing review 01a217e9-df2d-7df3-ac63-82ea8bdbf7a1: compliant / no outcome&quot;
+    }
+  ],
+  &quot;source&quot;: &quot;computed:governing_review&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/T11-bodies/T11/compliance-review.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

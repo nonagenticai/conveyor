@@ -1,0 +1,20 @@
+{
+ "id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "closure": "# T3 \u2014 Closure review (record completed, 2026-11-22)\n\nProject: T3 \u2014 PM job \u00b7 Tranche 3 \u00b7 Plan: SPEC_V2 \u00a712 \u00b7 Issue #74\nPublished closure review: `01a20530-98db-73bd-88cf-144c5f140c19`.\n\n## Outcome vs acceptance\n\nThe T3 gate \u2014 PM runs a request end to end; cannot approve its own gate; a baseline change\nrequires a change request \u2014 is met by the live rows: charter `01a2052d-d77d\u2026` approved by a\ndistinct approver, scope baseline `01a2052e-061f\u2026` frozen and approved by a taker-distinct actor,\nfive accepted deliverables with WSJF inputs, acceptance authorised by change `01a2052e-5648\u2026`,\ndelivery contract `01a2052f-29da-76c4-9bda-e45e0f408fe8` live with Board decision `01a2052f-5a18\u2026`, Phase-G review\n`01a2052f-cc4e\u2026` conformant and citing the published delegation, and five demo credits.\n\n## Evidence\n\nThe published closure review `01a20530-98db-73bd-88cf-144c5f140c19` carries the full evidence list; the manifest\n`acceptance/programme/T3.toml` executed against this record is the gate.\n\n## Open items\n\nNone owned by T3; the programme-level B3 benefit waits on T6's approved baseline.\n\n## Decision\n\nClose.\n",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+ "evidence": [
+  {
+   "kind": "document",
+   "ref": "01a20530-98db-73bd-88cf-144c5f140c19"
+  },
+  {
+   "kind": "baseline",
+   "ref": "01a2052e-061f-7570-b780-d94101449bef"
+  },
+  {
+   "kind": "contract",
+   "ref": "01a2052f-29da-76c4-9bda-e45e0f408fe8"
+  }
+ ],
+ "reason": "The record is complete against the manifest; the project was reopened from a vacuous closure and this closes it with the rows, not a waiver."
+}

@@ -18,9 +18,10 @@
 
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, SchemaRef,
+    Scope, Tenancy,
 };
+use std::borrow::Cow;
 
 /// Every Lean read carries the integrations read scope.
 const READ: &[Scope] = &[Scope::IntegrationsRead];
@@ -51,12 +52,12 @@ const fn spec(
     input: fn() -> Schema,
 ) -> ActionSpec {
     ActionSpec {
-        name,
+        name: Cow::Borrowed(name),
         version: 1,
         kind: ActionKind::External,
-        input,
-        output: passthrough_output,
-        scopes: READ,
+        input: SchemaRef::Compiled(input),
+        output: SchemaRef::Compiled(passthrough_output),
+        scopes: Cow::Borrowed(READ),
         idempotent: true,
         timeout_ms,
         effect: Effect::Read,
@@ -71,10 +72,10 @@ const fn spec(
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service: SERVICE,
-            method: "POST",
-            path,
-            auth: Some(LEAN4_TOKEN_SECRET),
+            service: Cow::Borrowed(SERVICE),
+            method: Cow::Borrowed("POST"),
+            path: Cow::Borrowed(path),
+            auth: Some(Cow::Borrowed(LEAN4_TOKEN_SECRET)),
             auth_optional: false,
             upload: None,
         },

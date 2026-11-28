@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact-instance" data-provenance-version="1" data-provenance-hash="64b5d642f5119dc3d86ce98c6c99b50a8ca125d2427b8be80ac6dbbab3c78e55" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact-instance</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>64b5d642f5119dc3d86ce98c6c99b50a8ca125d2427b8be80ac6dbbab3c78e55</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)</h1>
+<h2>Metadata</h2>
+<p>Type catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</p>
+<h2>Entries</h2>
+<p>Twelve rows: the four tables document, repository, project_repository and secret, the ArtifactRef value, the MinIO object key, the purge job, the event outbox, run.external_ref, the app_licence read model, the sealed strata token and the billing source tables. Each names its owner and the one invariant that keeps the boundary intact.</p>
+<h2>Links</h2>
+<p>Derives from 02-DATA-ARCHITECTURE section 2.10 and the slice plan sections 5.2 to 5.7; realizes the Phase C data view; reuses the S03 tenant, trace_link and revision and the S02 event and job primitives. The four-table cap is the plan's own rule.</p>
+<h2>Document</h2>
+<p>The artefact sits under the slice plan and migrations/0013_documents.sql. The snapshot records the migration's existence through the plan but no applied run or catalog read; the entity set is the designed record, and the plan section 7 gate is its verification.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

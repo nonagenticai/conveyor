@@ -134,6 +134,31 @@ pub async fn tenant_actor(pool: &PgPool, tenant: TenantId) -> Result<Option<Uuid
     Ok(id)
 }
 
+/// The first active member of `tenant` other than `excluded` — the distinct approver §5.4
+/// requires. `None` means the tenant has no second member, and the caller must report that
+/// rather than relaxing the exclusion (ledger v1-w4b-4).
+pub async fn tenant_actor_excluding(
+    pool: &PgPool,
+    tenant: TenantId,
+    excluded: Uuid,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT m.user_id
+           FROM membership m
+           JOIN app_user u ON u.id = m.user_id
+          WHERE m.tenant_id = $1 AND m.user_id <> $2 AND u.status = 'active'
+          ORDER BY (m.role = 'admin') DESC, m.created_at, m.id
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(excluded)
+    .fetch_optional(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(id)
+}
+
 /// Whether `user_id` is an **active** member of `tenant`.
 ///
 /// The operator CLI's `--actor-id` names the user a governance act is performed BY; the id is

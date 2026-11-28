@@ -196,7 +196,6 @@ struct GateRow {
     required_decisions: i32,
     meta: Value,
     requested_by: Option<Uuid>,
-    gate: String,
     card_assignee: Option<Uuid>,
     card_job: Option<Uuid>,
     run_job: Option<Uuid>,
@@ -2272,7 +2271,6 @@ struct ApprovalGate {
     required_decisions: i32,
     meta: Value,
     requested_by: Option<Uuid>,
-    gate: String,
     card_assignee: Option<Uuid>,
     card_job: Option<Uuid>,
     run_job: Option<Uuid>,
@@ -2417,12 +2415,11 @@ pub async fn close_item_tx(
     } else {
         None
     };
-    let self_approval_allowed = match &gate {
-        Some(gate) => crate::approval_policy::allows_self_approval(&mut *conn, tenant, &gate.gate)
-            .await
-            .unwrap_or(false),
-        None => false,
-    };
+    // P4 (§5.4, ledger v1-w4b-4): self-approval is never allowed. The lane removed the
+    // permission reader deliberately — no decision path may turn a stored row into a
+    // permission — so the meeting excludes the requester's seat here unconditionally, and the
+    // decision writer refuses the requester's own decision regardless.
+    let self_approval_allowed = false;
     let mut decisions: Vec<SeatDecision> = Vec::new();
     let mut cast_approve = 0_i32;
     let mut cast_reject = 0_i32;
@@ -2747,7 +2744,7 @@ async fn load_gate_tx(
     approval_id: Uuid,
 ) -> Result<ApprovalGate> {
     let row: Option<GateRow> = sqlx::query_as(
-        "SELECT a.id, a.status, a.required_decisions, a.meta, a.requested_by, a.gate,
+        "SELECT a.id, a.status, a.required_decisions, a.meta, a.requested_by,
                 c.assignee_id AS card_assignee, c.job_binding_id AS card_job,
                 r.job_binding_id AS run_job
            FROM approval a
@@ -2766,7 +2763,6 @@ async fn load_gate_tx(
         required_decisions: row.required_decisions,
         meta: row.meta,
         requested_by: row.requested_by,
-        gate: row.gate,
         card_assignee: row.card_assignee,
         card_job: row.card_job,
         run_job: row.run_job,
@@ -2774,8 +2770,8 @@ async fn load_gate_tx(
 }
 
 /// P4: the executor never approves its own work. A human seat is excluded when it is the card's
-/// assignee; a job seat when it is the card's or run's binding; and (unless the approval policy
-/// allows self-approval) a human who requested the gate is excluded.
+/// assignee; a job seat when it is the card's or run's binding; and a human who requested the
+/// gate is always excluded (P4: self-approval is never allowed, §5.4 / v1-w4b-4).
 fn participant_excluded(
     position: &PositionRecord,
     _seat: &AttendanceRecord,

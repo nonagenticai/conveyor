@@ -36,6 +36,8 @@ use uuid::Uuid;
 
 const ALICE: &str = "dev:alice";
 const REVIEWER: &str = support::REVIEWER;
+/// The second distinct human a §6.5 dual-control gate needs.
+const REVIEWER_TWO: &str = support::REVIEWER_TWO;
 /// The owner's delegated rule approver: a service principal (`app_user.kind='service'`) that
 /// holds the acting role. Its board decisions are recorded as `decided_by_kind='rule'`.
 const DELEGATE: &str = "dev:delegate";
@@ -114,17 +116,50 @@ async fn decide(h: &Harness, approval_id: &str) -> Value {
 }
 
 /// Open one approval for exactly this action call and decide it as the reviewer.
+///
+/// §5.4: a destructive action's gate names live typed evidence, and these actions are
+/// destructive. The evidence is the fixture's own approved project baseline — a real row this
+/// tenant holds, not an empty list and not a waiver.
 async fn approved_gate(h: &Harness, action: &str, input: &Value) -> String {
+    let evidence_id: Uuid = sqlx::query_scalar(
+        "SELECT id FROM project_baseline
+          WHERE tenant_id = $1 AND approved_by IS NOT NULL
+          ORDER BY created_at DESC, id DESC LIMIT 1",
+    )
+    .bind(h.anchor.seeded.tenant_id)
+    .fetch_one(&h.pg.super_pool)
+    .await
+    .expect("the fixture's approved baseline");
     let gate = ok(
         h,
         ALICE,
         "approvals.request",
-        json!({"gate": action, "kind": "action", "action": action, "input": input}),
+        json!({
+            "gate": action,
+            "kind": "action",
+            "action": action,
+            "input": input,
+            // T7 / v1-w1b-4: these are ops-controlled actions, so the gate carries §6.5's
+            // two-decision quorum and two distinct humans decide it.
+            "required_decisions": 2,
+            "evidence": [{"kind": "baseline", "id": evidence_id}],
+        }),
     )
     .await;
     let id = id_of(&gate, "id");
     let decided = decide(h, &id).await;
-    assert_eq!(decided["status"], "approved", "{decided}");
+    assert_eq!(
+        decided["status"], "pending",
+        "one decision leaves the quorum open: {decided}"
+    );
+    let second = ok(
+        h,
+        REVIEWER_TWO,
+        "approvals.decide",
+        json!({"approval_id": id, "decision": "approve"}),
+    )
+    .await;
+    assert_eq!(second["status"], "approved", "{second}");
     id
 }
 
@@ -662,6 +697,10 @@ struct Coach {
     signature: String,
     coach_card_id: Uuid,
     escalation_approval: Option<Uuid>,
+    /// The instrument a systemic class pinned; its kata measures against it.
+    instrument: Option<support::kata::Instrument>,
+    /// The measured kata a systemic class opened, when the policy pinned one.
+    kata_id: Option<Uuid>,
 }
 
 async fn fail_run(h: &Harness, card_id: Uuid, error_class: &str) -> Uuid {
@@ -729,8 +768,8 @@ async fn publish_coach_process(h: &Harness) {
     .await;
 }
 
-/// Publish the one process the coach's systemic remedy starts. It is content, not a new stage:
-/// the coach only needs the target process to exist and be published.
+/// Publish the kata process an incident postmortem's systemic marker starts
+/// (`ops.postmortem`, `KATA_PROCESS`). It is content, not a new stage.
 async fn publish_kata_process(h: &Harness) {
     let sop = created(
         h,
@@ -780,11 +819,54 @@ async fn publish_kata_process(h: &Harness) {
     assert_eq!(status, 200, "publish the kata process: {body}");
 }
 
+/// The coach's tenant policy: `conveyor_defect` is systemic, and the pin §6.3 requires — the
+/// instrument, its locked split and the pre-registered prediction — is what turns the class into
+/// a measured kata rather than a human escalation.
+async fn seed_coach_policy(h: &Harness) -> support::kata::Instrument {
+    let instrument = support::kata::instrument(
+        &h.pg,
+        &h.anchor.seeded,
+        &[0.9, 0.9],
+        &[0.0, 0.0],
+        &[0.4, 0.4],
+        &[0.9, 0.9],
+    )
+    .await;
+    let pin = json!({
+        "systemic_classes": ["conveyor_defect"],
+        "kata": {
+            "instrument_kind": "eval",
+            "instrument_id": instrument.version_id,
+            "instrument_version": "eval@1",
+            "split": "test",
+            "split_sha256": "a".repeat(64),
+            "prediction": {
+                "statement": "the coach removes the systemic class",
+                "threshold": 0.1,
+            },
+            "base_ref": {"kind": "fixture", "version": 1},
+        },
+    });
+    sqlx::query(
+        "INSERT INTO decision_policy (tenant_id, kind, threshold, fail_policy, action, meta)
+         VALUES ($1, 'coach.window', 0.5, 'open', 'block', $2)",
+    )
+    .bind(h.anchor.seeded.tenant_id)
+    .bind(&pin)
+    .execute(&h.pg.super_pool)
+    .await
+    .expect("the coach policy");
+    instrument
+}
+
 async fn coach_interruption(h: &Harness, card_id: Uuid, triage_class: &str, repeat: bool) -> Coach {
     publish_coach_process(h).await;
+    let mut instrument = None;
     if triage_class == "conveyor_defect" {
-        // The systemic class starts the kata process; the coach only needs it to exist.
-        publish_kata_process(h).await;
+        // A systemic class opens a MEASURED kata: the policy pins the instrument, the locked
+        // split and the pre-registered prediction. Without the pin the class escalates the
+        // candidate to a person instead of opening an unmeasurable kata.
+        instrument = Some(seed_coach_policy(h).await);
     }
     let failed = fail_run(h, card_id, "tool_error").await;
     let first = created(h, ALICE, "coach.interrupt", json!({"run_id": failed})).await;
@@ -858,11 +940,16 @@ async fn coach_interruption(h: &Harness, card_id: Uuid, triage_class: &str, repe
             .fetch_one(&h.pg.super_pool)
             .await
             .expect("read the interruption's signature");
+    let kata_id = remedied["kata_id"]
+        .as_str()
+        .map(|raw| Uuid::parse_str(raw).expect("a kata id"));
     Coach {
         interruption_id,
         signature,
         coach_card_id,
         escalation_approval,
+        instrument,
+        kata_id,
     }
 }
 
@@ -938,42 +1025,25 @@ struct MeasuredKata {
     kata_id: Uuid,
 }
 
-async fn measured_kata(h: &Harness, signature: &str) -> MeasuredKata {
+async fn measured_kata(h: &Harness, coach: &Coach) -> MeasuredKata {
     let anchor = &h.anchor;
-    let instrument = support::kata::instrument(
-        &h.pg,
-        &anchor.seeded,
-        &[0.9, 0.9],
-        &[0.0, 0.0],
-        &[0.4, 0.4],
-        &[0.9, 0.9],
-    )
-    .await;
-    let opened = created(
-        h,
-        ALICE,
-        "kata.open",
-        json!({
-            "job_binding_id": anchor.binding_id,
-            "signature": signature,
-            "title": "The delivery defect is systemic",
-            "target_surface": "procedure",
-            "target_ref": "process:delivery-loop",
-            "instrument_version_id": instrument.version_id,
-            "threshold": 0.1,
-        }),
-    )
-    .await;
-    let kata_id = uuid_of(&opened, "id");
+    let instrument = coach
+        .instrument
+        .as_ref()
+        .expect("the systemic class pinned an instrument");
+    let kata_id = coach
+        .kata_id
+        .expect("the coach's remedy opened the measured kata");
 
-    // A second kata for the same open signature is refused and names the first.
+    // P4.2: a second kata for the same open signature is refused and names the first. The
+    // coach's systemic remedy already opened this signature's kata.
     let (status, body) = call(
         h,
         ALICE,
         "kata.open",
         json!({
             "job_binding_id": anchor.binding_id,
-            "signature": signature,
+            "signature": coach.signature,
             "title": "A second kata for one signature",
             "target_surface": "procedure",
             "target_ref": "process:delivery-loop",
@@ -1053,7 +1123,8 @@ async fn coach_escalation_opens_kata() {
     let card_id = open_delivery_card(&h, board_id, lane_id).await;
     let coach = coach_interruption(&h, card_id, "conveyor_defect", false).await;
 
-    // The systemic remedy started the kata process and recorded its run on the interruption.
+    // The systemic remedy started the measured kata and recorded its candidate on the
+    // interruption.
     let candidate: Option<Uuid> =
         sqlx::query_scalar("SELECT kata_candidate_id FROM coach_interruption WHERE id = $1")
             .bind(coach.interruption_id)
@@ -1062,7 +1133,7 @@ async fn coach_escalation_opens_kata() {
             .expect("read the kata candidate");
     assert!(candidate.is_some(), "the systemic class names its kata run");
 
-    let kata = measured_kata(&h, &coach.signature).await;
+    let kata = measured_kata(&h, &coach).await;
     created(
         &h,
         ALICE,
@@ -2076,7 +2147,7 @@ async fn every_loop_transition_audited() {
     let (board_id, lane_id) = board_lanes(&h, g.project_id).await;
     let card_id = open_delivery_card(&h, board_id, lane_id).await;
     let coach = coach_interruption(&h, card_id, "conveyor_defect", false).await;
-    let kata = measured_kata(&h, &coach.signature).await;
+    let kata = measured_kata(&h, &coach).await;
     created(
         &h,
         ALICE,
@@ -2091,6 +2162,8 @@ async fn every_loop_transition_audited() {
     support::set_env("OPS_TOKEN", "loop-token");
     let incident = open_incident(&h, board_id, lane_id).await;
     mitigate(&h, incident.card_id, &patches).await;
+    // A systemic postmortem opens a kata run, which needs the kata process published (§9.2).
+    publish_kata_process(&h).await;
     systemic_postmortem(&h, incident.card_id).await;
     let lesson = created(
         &h,
@@ -2630,14 +2703,32 @@ async fn architecture_and_benefits_acceptance() {
         }),
     )
     .await;
+    // The profile covers Preliminary–H, so it must retain every row the standard marks
+    // mandatory in those phases: the gate joins those rows into each phase's set.
     let requirements = json!({
-        "preliminary": {"psa": ["principles_catalog"]},
-        "a": {"psa": ["stakeholder_map"]},
+        "preliminary": {"psa": [
+            "principles_catalog",
+            "principle_derivation",
+            "principle_realization"
+        ]},
+        "a": {"psa": [
+            "stakeholder_map",
+            "driver_goal_objective",
+            "requirements_catalog",
+            "solution_concept"
+        ]},
         "b": {"hld": ["business_capability_map"]},
         "c": {"hld": ["data_entity_catalog"]},
         "d": {"hld": ["technology_standards"]},
-        "e": {"sd": ["project_context", "benefits_diagram"]},
-        "f": {"sd": ["implementation_roadmap", "migration_plan"]},
+        "e": {"hld": [
+            "gap_analysis",
+            "candidate_solutions",
+            "project_context_diagram",
+            "benefits_diagram"
+        ]},
+        "f": {"hld": ["implementation_migration_plan"]},
+        "g": {"hld": ["compliance_review"]},
+        "h": {"hld": ["architecture_change_request", "architecture_requirement"]},
     });
     let contracts = json!({
         "a": "statement_of_architecture_work",
@@ -2743,47 +2834,52 @@ async fn architecture_and_benefits_acceptance() {
     )
     .await;
     let architecture_id = uuid_of(&architecture, "id");
-    let phases: [(&str, &str, &str, &str); 7] = [
+    // The phase gate joins the standard's mandatory rows into the profile's set, so every
+    // mandatory artefact of a phase must be approved before the phase advances.
+    // One (artefact kind, artefact type) pair a phase's profile requires.
+    type PhaseArtefact = (&'static str, &'static str);
+    // (phase code, plateau, the phase's mandatory artefacts).
+    type Phase = (&'static str, &'static str, &'static [PhaseArtefact]);
+    let phases: [Phase; 7] = [
         (
             "preliminary",
-            "principles_catalog",
             "psa",
-            "principles_catalog",
+            &[
+                ("principles_catalog", "principles_catalog"),
+                ("principle_derivation", "diagram"),
+                ("principle_realization", "diagram"),
+            ],
         ),
-        ("a", "stakeholder_map", "psa", "matrix"),
-        ("b", "business_capability_map", "hld", "diagram"),
-        ("c", "data_entity_catalog", "hld", "catalog"),
-        ("d", "technology_standards", "hld", "catalog"),
-        ("e", "project_context", "sd", "diagram"),
-        ("f", "implementation_roadmap", "sd", "catalog"),
+        (
+            "a",
+            "psa",
+            &[
+                ("stakeholder_map", "matrix"),
+                ("driver_goal_objective", "catalog"),
+                ("requirements_catalog", "catalog"),
+                ("solution_concept", "diagram"),
+            ],
+        ),
+        ("b", "hld", &[("business_capability_map", "diagram")]),
+        ("c", "hld", &[("data_entity_catalog", "catalog")]),
+        ("d", "hld", &[("technology_standards", "catalog")]),
+        (
+            "e",
+            "hld",
+            &[
+                ("gap_analysis", "matrix"),
+                ("candidate_solutions", "catalog"),
+                ("project_context_diagram", "diagram"),
+                ("benefits_diagram", "diagram"),
+            ],
+        ),
+        ("f", "hld", &[("implementation_migration_plan", "catalog")]),
     ];
-    for (phase, key, plateau, kind) in phases {
+    for (phase, plateau, artifacts) in phases {
         // E's contract and artefacts are both required at E; F has its own set. Every phase
         // after Preliminary names a live contract in the tailored profile.
-        approved_artifact(&h, ALICE, architecture_id, key, phase, plateau, kind).await;
-        if phase == "e" {
-            approved_artifact(
-                &h,
-                ALICE,
-                architecture_id,
-                "benefits_diagram",
-                "e",
-                "sd",
-                "diagram",
-            )
-            .await;
-        }
-        if phase == "f" {
-            approved_artifact(
-                &h,
-                ALICE,
-                architecture_id,
-                "migration_plan",
-                "f",
-                "sd",
-                "catalog",
-            )
-            .await;
+        for &(key, kind) in artifacts {
+            approved_artifact(&h, ALICE, architecture_id, key, phase, plateau, kind).await;
         }
         let contract_kind = match phase {
             "preliminary" => None,
@@ -2831,7 +2927,8 @@ async fn architecture_and_benefits_acceptance() {
     .fetch_one(&h.pg.super_pool)
     .await
     .expect("count the approved artefacts");
-    assert_eq!(approved, 9, "each phase's mandatory set is approved");
+    // Preliminary 3 + A 4 + B–D 3 + E 4 + F 1: every mandatory row of every advanced phase.
+    assert_eq!(approved, 15, "each phase's mandatory set is approved");
 
     // A delivery project without its contract is refused at design, and writes no approval.
     let delivery = created(
@@ -2882,6 +2979,8 @@ async fn architecture_and_benefits_acceptance() {
             "kpis": ["cycle time"],
             "baseline": {"value": 10.0, "unit": "hours"},
             "target": {"value": 15.0, "unit": "hours"},
+            // A benefit profile names the capabilities it improves (v1-p83-6's completeness rule).
+            "capabilities": ["governed delivery loop"],
             "measurement_method": "the monthly operational report",
             "owner_job_id": h.delivery_job,
             "benefit_owner_job_id": h.delivery_job,
@@ -2890,6 +2989,38 @@ async fn architecture_and_benefits_acceptance() {
     )
     .await;
     let benefit_id = uuid_of(&benefit, "id");
+    // The transition's timestamps claim readings exist; record them through the product action
+    // first (a post reading must be taken AFTER enactment — 2026-11-10).
+    created(
+        &h,
+        ALICE,
+        "benefits.measure",
+        json!({
+            "benefit_id": benefit_id,
+            "kind": "baseline",
+            "actual_value": 10.0,
+            "unit": "hours",
+            "method": "the monthly operational report",
+            "measured_at": "2026-11-01T00:00:00Z",
+            "evidence": {"report": "2026-10"}
+        }),
+    )
+    .await;
+    created(
+        &h,
+        ALICE,
+        "benefits.measure",
+        json!({
+            "benefit_id": benefit_id,
+            "kind": "post",
+            "actual_value": 14.0,
+            "unit": "hours",
+            "method": "the monthly operational report",
+            "measured_at": "2026-12-01T00:00:00Z",
+            "evidence": {"report": "2026-11"}
+        }),
+    )
+    .await;
     // A post-transition measurement without a baseline is refused.
     let (status, body) = call(
         &h,
@@ -3012,14 +3143,32 @@ async fn the_buildout_runs_under_the_capability() {
         }),
     )
     .await;
+    // The profile covers Preliminary–H, so it must retain every row the standard marks
+    // mandatory in those phases: the gate joins those rows into each phase's set.
     let requirements = json!({
-        "preliminary": {"psa": ["principles_catalog"]},
-        "a": {"psa": ["stakeholder_map"]},
+        "preliminary": {"psa": [
+            "principles_catalog",
+            "principle_derivation",
+            "principle_realization"
+        ]},
+        "a": {"psa": [
+            "stakeholder_map",
+            "driver_goal_objective",
+            "requirements_catalog",
+            "solution_concept"
+        ]},
         "b": {"hld": ["business_capability_map"]},
         "c": {"hld": ["data_entity_catalog"]},
         "d": {"hld": ["technology_standards"]},
-        "e": {"sd": ["project_context"]},
-        "f": {"sd": ["implementation_roadmap"]},
+        "e": {"hld": [
+            "gap_analysis",
+            "candidate_solutions",
+            "project_context_diagram",
+            "benefits_diagram"
+        ]},
+        "f": {"hld": ["implementation_migration_plan"]},
+        "g": {"hld": ["compliance_review"]},
+        "h": {"hld": ["architecture_change_request", "architecture_requirement"]},
     });
     let profile = ok(
         &h,

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T14 live gate — measured 2026-11-25, executed 2026-11-26 · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t14/live-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t14-live-gate--measured-2026-11-25-executed-2026-11-26">T14 live gate — measured 2026-11-25, executed 2026-11-26</h1>
+<p>The gate (<code>acceptance/programme/T14.toml</code>, SPEC_V2 §12 T14) requires, for each published toolkit, a probe and one live call; a <code>scientific_processor</code> scale-up/scale-back receipt; a zero-use report; and a backend outage that unbinds new runs while in-flight runs finish.</p>
+<h2 id="2026-11-26-execution--all-four-clauses">2026-11-26 execution — all four clauses</h2>
+<p>Destinations were reached from m4 over ssh port-forwards (<code>:22</code> is the only port the tailnet admits): media-2 tts <code>:9202</code> / asr <code>:9201</code>, media-1 image <code>:9204</code>, MinIO on storage-1 <code>:8389</code>, and the in-cluster <code>scientific-processor</code> <code>:8808</code>, <code>coding</code> <code>:8687</code>, <code>strata-rag</code> <code>:8092</code> and <code>licences</code> <code>:8544</code> through <code>kubectl port-forward</code> on strato. The branch binary ran locally against the replay record (tenant <code>nonagentic</code>); every call below is a real HTTP call to the estate service and leaves a <code>tool_call</code> row.</p>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Result</th>
+<th>Receipts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>probe per published toolkit</td>
+<td><strong>PASS</strong> — coding, speech, transcription, image_gen, retrieval, scientific all <code>live</code> (200)</td>
+<td><code>2026-11-26/01-probe.json</code></td>
+</tr>
+<tr>
+<td>one live call per published toolkit</td>
+<td><strong>PASS</strong> — six calls, each a destination answer (below)</td>
+<td><code>2026-11-26/14-call-*.json</code></td>
+</tr>
+<tr>
+<td><code>scientific_processor</code> scaled up for its probe and call, then back</td>
+<td><strong>PASS</strong> — the drill recorded 2026-11-25 against the same deployment; after restore the probe is live and the call reached the service</td>
+<td><code>23-scale-zero.log</code>, <code>24-scale-up.log</code>, <code>26-scale-outage.log</code>, <code>29-scale-restore.log</code>, <code>31-scale-outage-2.log</code>, <code>34-scale-restore-2.log</code>, <code>36-probe-restored-final.json</code></td>
+</tr>
+<tr>
+<td>a zero-use report exists</td>
+<td><strong>PASS</strong> — <code>tools.usage</code>, 30-day window, one row per published tool version</td>
+<td><code>2026-11-26/02b-zero-use-after.json</code> (pre-call: <code>02-zero-use.json</code>)</td>
+</tr>
+<tr>
+<td>an outage unbinds new runs and in-flight runs finish</td>
+<td><strong>PASS</strong> — with the scientific pods gone the probe reported <code>unreachable</code>, two bindings were disabled, and <code>tools.call</code> was refused <code>409</code> before any network call; the in-flight half is the Rust test</td>
+<td><code>32-probe-outage-2.json</code>, <code>33-call-outage-2.json</code>, <code>crates/actions/tests/estate_toolkits.rs::an_in_flight_run_finishes_after_the_unbind</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-six-live-calls">The six live calls</h3>
+<table>
+<thead>
+<tr>
+<th>Toolkit</th>
+<th>Tool</th>
+<th>Run</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>speech</td>
+<td><code>speech.synthesize</code></td>
+<td><code>01a21a03-69b2-71d3-930f-ac6d5bec70d7</code></td>
+<td>320 KB WAV, document <code>01a21a03-711d-727f-a796-7c42d3543f7a</code></td>
+</tr>
+<tr>
+<td>transcription</td>
+<td><code>media.transcribe</code></td>
+<td><code>01a21a03-7d75-7ad3-94de-ec38ea8ad4ca</code></td>
+<td>the transcript text, from the speech document</td>
+</tr>
+<tr>
+<td>coding</td>
+<td><code>coding.jobs_create</code></td>
+<td><code>01a21a03-f612-75c9-9fa2-12a6b0c2b95b</code></td>
+<td>job <code>7104f3e6-f814-4f91-a1e0-8a1c6bc30285</code> queued</td>
+</tr>
+<tr>
+<td>image_gen</td>
+<td><code>image_gen.generate</code></td>
+<td><code>01a21a04-03b3-7f69-9a7c-f570fb0fe8e5</code></td>
+<td>512×512 PNG, document <code>01a21a05-1955-711a-897b-8d67ce3fb741</code></td>
+</tr>
+<tr>
+<td>scientific</td>
+<td><code>scientific_stats.meta_analysis</code></td>
+<td><code>01a21a05-2417-7472-9e2a-aaf4c3a88770</code></td>
+<td>pooled effect 0.3</td>
+</tr>
+<tr>
+<td>retrieval</td>
+<td><code>retrieval.query</code></td>
+<td><code>01a21a06-aea7-7f8a-9d81-c4b02971fa4b</code></td>
+<td>a real strata_rag answer (routing hybrid; zero hits — this tenant has no indexed leaves)</td>
+</tr>
+</tbody>
+</table>
+<p>Each binding and its effect ceiling is in <code>2026-11-26/13-bind-&lt;toolkit&gt;.json</code>; each request body is in the matching <code>-input.json</code>. The publication wave is <code>00-publish.json</code>: six published, two draft (webscraper, lean4).</p>
+<h3 id="what-had-to-be-true-to-get-there--measured-not-assumed">What had to be true to get there — measured, not assumed</h3>
+<ul>
+<li><strong>Reachability.</strong> All four hosts were up the whole time; the 2026-11-25 note "unreachable" was the ssh invocation, not an outage. <code>id_ed25519_mini</code> and <code>id_ed25519_mini2</code> are passphrase-protected and <code>-o UseKeychain=yes</code> is what unseals them. The tailnet ACL admits only <code>:22</code> from m4, so every service was reached through a tunnel.</li>
+<li><strong>Spend budget.</strong> A <code>spend</code>-class tool is refused <code>429</code> unless the run declares <code>limits.cost_budget_usd</code>. A plain run has no job binding, so the run's inputs are written by the operator (the agent runtime is the production writer); the write and the read-back are in <code>2026-11-26/11b-budget-*.json</code>.</li>
+<li><strong>Coding contract drift.</strong> The coding service requires an <code>Idempotency-Key</code> on the call (the broker claims it) and its current create body is <code>input.source = {kind:"inline", files:[{path,text}]}</code>; the older <code>files</code> map is a <code>422</code>.</li>
+<li><strong>Retrieval's schema.</strong> <code>retrieval.query</code> had an empty input schema, so the published tool could only send <code>{}</code>; it now declares a closed <code>{query, top_k}</code> body.</li>
+<li><strong>Credentials.</strong> The tenant's sealed <code>licence.token</code> is admitted by the TTS gate (its <code>W2V_LICENSE_GATE_TOKEN_APP_KEYS</code> is <code>speech</code>), by ASR (its entitlement gate is dormant, so any active licence is admitted) and by scientific (introspection only). <code>strata_rag</code> accepts only app <code>strata-rag</code>. The licences bundle-token mint was refused <code>403 Role required: bundle-token-minter</code> — a Keycloak realm role the conveyor's secure-apps client does not hold (the #776 gap). The owner chose the strata-rag service token instead: the <code>*:&lt;token&gt;</code> entry of <code>STRATA_API_TOKENS</code>, sealed as <code>strata.token</code> and never printed; the binding sends it as the Authorization bearer with the bare <code>X-Tenant-Id</code>. The refusal is kept at <code>2026-11-26/03-mint-strata.err</code>.</li>
+<li><strong>Object storage.</strong> Speech, transcription and image_gen store documents; the local engine used the deployment's MinIO bucket (<code>conveyor-documents</code>) through an storage-1 tunnel, with the S3 keys read from the deployment's SOPS secret.</li>
+</ul>
+<h2 id="2026-11-25-measurement-history">2026-11-25 measurement (history)</h2>
+<p>The first run of the gate found the code defects below and classified four calls as blocked: speech/transcription <code>503</code> (the staging copy carried no sealed <code>licence.token</code>), scientific <code>401</code> (the action sent no licence header), image_gen <code>503</code> (no object storage in the local engine). Those classes were real; the estate was not down. The 2026-11-26 execution above resolves them.</p>
+<h2 id="product-defects-the-live-gate-found">Product defects the live gate found</h2>
+<ol type="1">
+<li><strong>The outbound Idempotency-Key was never forwarded</strong> (2026-11-25). The coding service refuses a create without it; the engine claimed the key for its own dedupe and sent nothing. The external dispatcher now forwards the caller's key, and the admin CLI can carry one.</li>
+<li><strong><code>scientific</code> was not publishable</strong> (2026-11-25). Its manifest status was <code>draft</code> while the gate named its probe; it is published.</li>
+<li><strong><code>retrieval.query</code> could not carry a query</strong> (2026-11-26). The action's input was empty while strata_rag requires <code>query</code>; the schema now declares <code>{query, top_k}</code>.</li>
+<li><strong>The scientific and retrieval actions sent no credential</strong> (2026-11-26). Their toolkits now declare the <code>sealed-profile</code> adapter and their bindings carry the tenant secret, so the dispatcher sends <code>Authorization: Bearer &lt;secret&gt;</code> with the bare <code>X-Tenant-Id</code>.</li>
+</ol>
+<h2 id="open-not-gate-blocking">Open, not gate-blocking</h2>
+<ul>
+<li>Retrieval returns zero hits for this tenant: it has no indexed leaves. The call reached the service and was ledgered; an empty corpus is not a failed call.</li>
+<li>Issue 561 (research and Lean toolkits, first wave) remains open; <code>webscraper</code> and <code>lean4</code> are draft and outside the published-toolkit clause.</li>
+<li>T14 stays <code>active</code> by its acceptance manifest; closure is not part of this gate.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t14/live-gate.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

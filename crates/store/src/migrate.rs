@@ -305,7 +305,8 @@ mod tests {
                 (62, "s21 prompt selection".to_owned()),
                 // #579: the async invocation record, so a caller behind the CDN's ~100 s cap
                 // can submit and poll instead of holding one response open
-                // (0063_async_invocation.sql).
+                // (0063_async_invocation.sql). Adopted from main unchanged: production has
+                // applied this checksum, so its bytes never change.
                 (63, "async invocation".to_owned()),
                 // T17 (#87): the tenant asset authoring intake, drafts, review gate and the
                 // one-published-row-per-(kind, key) catalogue (0064_authoring.sql, SPEC_V2 §5.7).
@@ -332,10 +333,12 @@ mod tests {
                 // binding-scoped subset, the ledger's binding pin, the promotion record and the
                 // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
                 (70, "tool authoring".to_owned()),
+                // S21 step 10 (#656): the authored option set and the policy's `fire_when`
+                // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3). Main's row stays verbatim;
+                // #526's 0103 evolves the tables into the lane's model.
+                (71, "ladder option sets".to_owned()),
                 // S21 step 10 (#656): the authored option set and the policy's fire_when
                 // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3).
-                (71, "ladder option sets".to_owned()),
-                // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
                 (72, "tool meta".to_owned()),
                 (73, "meeting bindings".to_owned()),
                 // S21 step 11 (#697): the release knowledge layers the compiler resolves
@@ -355,11 +358,110 @@ mod tests {
                 // Delivery proofs (#836): the unit-ledger subject type
                 // (0079_lean_proof_unit_ledger.sql).
                 (79, "lean proof unit ledger".to_owned()),
-                // #842: the tenant's feedback about the platform (0080_feedback.sql).
+                // ── The lane's reserved block (0080+), after main's 0066–0078; the block's SQL is unchanged, only its version
+                // moved. The kata union (the lane's candidate/propagation records and
+                // pre-registration fields on main's 0066/0067) sits at 94, after the block,
+                // because main took 70.
+                // #842 (main): the tenant's feedback about the platform, its triage columns
+                // and the tenant-isolation policy (0080_feedback.sql).
                 (80, "feedback".to_owned()),
-                // Delivery proofs (#837): the engine-derived unit subject and its policy
+                // #859 (main): the unit proof policy the engine derives facts under
                 // (0081_unit_proof_policy.sql).
-                (81, "unit proof policy".to_owned())
+                (81, "unit proof policy".to_owned()),
+                // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
+                // (0082_cadence_state.sql, SPEC_V2 §8.2).
+                (82, "cadence state".to_owned()),
+                // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
+                // scope/schedule/cost/risk (0083_change_impact_keys.sql, SPEC_V2 §5.5).
+                (83, "change impact keys".to_owned()),
+                // v1-p82-3 (#526): `programme.shared_config` — the programme's shared values and
+                // the keys it locks against per-project override
+                // (0085_programme_shared_config.sql, SPEC_V2 §8.2).
+                (85, "programme shared config".to_owned()),
+                // v1-w1c-3 (#526): an L1 decision names the verified `laya.classify`
+                // invocation behind its answer and the request/response hashes it was
+                // verified against (0086_ladder_laya_provenance.sql, SPEC_V2 §7.2).
+                (86, "ladder laya provenance".to_owned()),
+                // (0088): a register row belongs to a project OR a programme, and carries its
+                // next review date and response (0088_programme_risk_register.sql, SPEC_V2
+                // §8.3–§8.4).
+                (88, "programme risk register".to_owned()),
+                // (0089): the baseline/interim/post readings a benefit's evaluation reads, and
+                // the seven programme strategy/plan asset kinds
+                // (0089_benefit_measurement.sql, SPEC_V2 §8.3).
+                (89, "benefit measurement".to_owned()),
+                // SPEC_V2 §11.3 (T13, v1-w4a-5): a call that exceeds the tool's own
+                // `timeout_secs` is `pending`; the resume token travels with the pending row
+                // (0090_tool_call_resume.sql).
+                (90, "tool call resume".to_owned()),
+                // SPEC_V2 §6.2 (T4, v1-p6-5): an interruption records which input opened it —
+                // a failed run, a WIP breach, a stale lease, a gate timeout or a board event
+                // (0091_coach_interruption_trigger.sql).
+                (91, "coach interruption trigger".to_owned()),
+                // (0092_benefit_measurement_typed.sql): the typed baseline/interim/post readings
+                // a benefit's evaluation reads.
+                (92, "benefit measurement typed".to_owned()),
+                // (0093_approval_policy_approver_kind.sql): who may decide a gate, as tenant data.
+                (93, "approval policy approver kind".to_owned()),
+                // #526 (the kata union): the lane's candidate and propagation records on main's
+                // kata loop — the columns the coach/ops/architecture `kata_candidate_id`s need —
+                // and the pre-registration fields (0094_kata_union.sql).
+                (94, "kata union".to_owned()),
+                // #526 (v1-w1b-5): the tenant's meta-role × action authority matrix; an absent
+                // row is the compiled §6.7 default (0095_job_authority.sql).
+                (95, "job authority".to_owned()),
+                // #526 (v1-w1a-5): the run kind, and the CHECK that a job run carries its binding
+                // and release pin (0096_run_kind.sql).
+                (96, "run kind".to_owned()),
+                // #526 (v1-p5-5): the work-package card CHECK and the job-run card CHECK
+                // (0097_work_package_card.sql).
+                (97, "work package card".to_owned()),
+                // #526 (v1-p55-1): the declared register links shape and its default
+                // (0098_register_links_shape.sql).
+                (98, "register links shape".to_owned()),
+                // #526 (v1-p101-1): the decision row's run/step links (0099_step_decisions.sql).
+                (99, "step decisions".to_owned()),
+                // #526 (v1-p102-1): the laya config default and its hard-budget check
+                // (0100_laya_timeout_default.sql).
+                (100, "laya timeout default".to_owned()),
+                // #526 (v1-p61-2): the status_report governed-asset kind
+                // (0101_status_report_asset_kind.sql).
+                (101, "status report asset kind".to_owned()),
+                // #526 (§8.1, owner tailoring 2026-11-24): the ADM phases E–H in the artefact
+                // standard, so a phase-E/F/H requirement can resolve to a typed row
+                // (0102_phase_e_h_artifacts.sql).
+                (102, "phase e h artifacts".to_owned()),
+                // #526 (v1-w1c-4): the option-set union on main's 0071 — the set's origin and
+                // lifecycle, one 1-based entry store with criteria, per-entry tenant
+                // refinements, and the decision's set/refinement pins
+                // (0103_ladder_option_set_union.sql, SPEC_V2 §7.2). The lane-only 0087 is
+                // retired; production never applied it.
+                (103, "ladder option set union".to_owned()),
+                // #526 (v1-w1c-6): the knowledge-retrieval ledger behind the flow's pack-hit
+                // rate (0104_knowledge_retrieval_ledger.sql, SPEC_V2 §11.9).
+                (104, "knowledge retrieval ledger".to_owned()),
+                // #526 (v1-w4b-5): the refusal ledger behind the "gate that never refused"
+                // flag (0105_gate_refusal_ledger.sql, SPEC_V2 §7.5).
+                (105, "gate refusal ledger".to_owned()),
+                // #526 (v1-s07-1): the terminal `expired` status behind
+                // `project_request.timeout` (0106_project_request_expired.sql, S06 §5.3).
+                (106, "project request expired".to_owned()),
+                // #526 (architecture findings): the adoption FK/CHECK and the one-outcome
+                // phase-H index (0107_architecture_integrity.sql).
+                (107, "architecture integrity".to_owned()),
+                // T4 spot-audit (2026-11-27): the repair for a `continue` review that closed a
+                // tranche without copying its date onto `programme_tranche.review_at`
+                // (0108_tranche_review_at.sql).
+                (108, "tranche review at".to_owned()),
+                // v1-w1a-2 (#526): the release's layered kind store — base → industry →
+                // department archetype → department → job — and `department.archetype`
+                // (0109_release_layers.sql, renumbered from 0080 because main's #842 took 80;
+                // SPEC_V2 §4.1).
+                (109, "release layers".to_owned()),
+                // v1-w4a-2 (#526): the write tool's declared verification path on the version
+                // it was published with (0110_tool_verify.sql, renumbered from 0081 because
+                // main's #859 took 81; SPEC_V2 §11.3).
+                (110, "tool verify".to_owned()),
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -1,0 +1,101 @@
+{
+  "body_sha256": "de28d26b43e42806855bf884bec165abf25f5b01a158612ef79b786a59ddb434",
+  "category": "project-registers",
+  "headings": [
+    {
+      "heading": "Risks",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Issues",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 3,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Assumptions",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Dependencies",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Benefits",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Changes",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "30e438c3340c062dd1d9f892bc2bd0f5e842ba820cbc12b7696079fdb98e5be6",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+    "key": "S03",
+    "kind": "project",
+    "title": "Domain and schema \u2014 aggregates, state machines, baseline domain migration"
+  },
+  "title": "Project Registers \u2014 Domain and schema \u2014 aggregates, state machines, baseline domain migration"
+}

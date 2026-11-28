@@ -1,0 +1,20 @@
+{
+ "input": {
+  "run_id": "01a21a03-f612-75c9-9fa2-12a6b0c2b95b",
+  "tool": "coding.jobs_create",
+  "input": {
+   "kind": "check",
+   "input": {
+    "source": {
+     "kind": "inline",
+     "files": [
+      {
+       "path": "README.md",
+       "text": "# t14 live call 2026-11-26\n"
+      }
+     ]
+    }
+   }
+  }
+ }
+}

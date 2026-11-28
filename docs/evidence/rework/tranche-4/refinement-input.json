@@ -1,0 +1,104 @@
+{
+ "id": "01a202a2-2705-7392-a2d1-03ca2b3a174e",
+ "meta": {
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "tranche_id": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+  "tranche_number": 4,
+  "refinement": {
+   "period": "tranche-4",
+   "reordered": [
+    {
+     "item": "T9 and T10 first",
+     "from": "WSJF score 4.1 (third)",
+     "to": "committed first",
+     "why": "the plan and objectives the other members' evidence reads; the ART commits this order over the computed score"
+    }
+   ],
+   "reestimate": {
+    "T9": "23 open packages (0 P0, 5 P1, 18 P2)",
+    "T10": "22 open packages (0 P0, 3 P1, 19 P2)",
+    "T4": "22 open packages (0 P0, 5 P1, 17 P2)",
+    "T14": "10 open packages (2 P0, 5 P1, 3 P2)",
+    "T16": "14 open packages (0 P0, 1 P1, 13 P2)",
+    "T18": "5 open packages (2 P0, 1 P1, 2 P2)",
+    "T19": "24 open packages (2 P0, 9 P1, 13 P2)",
+    "S05": "8 open packages (2 P0, 4 P1, 2 P2)",
+    "S07": "10 open packages (2 P0, 6 P1, 2 P2)",
+    "S09": "8 open packages (2 P0, 4 P1, 2 P2)"
+   },
+   "wsjf_inputs": {
+    "T9": {
+     "business_value": 10,
+     "time_criticality": 13,
+     "risk_reduction": 10,
+     "job_size": 8,
+     "objective": "O1"
+    },
+    "T10": {
+     "business_value": 10,
+     "time_criticality": 13,
+     "risk_reduction": 10,
+     "job_size": 8,
+     "objective": "O1"
+    },
+    "T4": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 9,
+     "job_size": 13,
+     "objective": "O1"
+    },
+    "T14": {
+     "business_value": 10,
+     "time_criticality": 9,
+     "risk_reduction": 10,
+     "job_size": 8,
+     "objective": "O1+O2"
+    },
+    "T16": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 7,
+     "job_size": 8,
+     "objective": "O1"
+    },
+    "T18": {
+     "business_value": 9,
+     "time_criticality": 7,
+     "risk_reduction": 10,
+     "job_size": 5,
+     "objective": "O2"
+    },
+    "T19": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 10,
+     "job_size": 13,
+     "objective": "O1"
+    },
+    "S05": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 10,
+     "job_size": 5,
+     "objective": "O1"
+    },
+    "S07": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 10,
+     "job_size": 8,
+     "objective": "O1"
+    },
+    "S09": {
+     "business_value": 10,
+     "time_criticality": 8,
+     "risk_reduction": 10,
+     "job_size": 5,
+     "objective": "O1"
+    }
+   },
+   "evidence": "docs/evidence/rework/tranche-4/refinement-wsjf.json"
+  }
+ }
+}

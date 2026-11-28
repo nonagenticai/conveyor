@@ -104,8 +104,8 @@ async fn the_external_fixtures_behave_exactly_as_the_plan_states() {
             .unwrap_or_else(|| panic!("{} is not compiled", action.name));
         assert_eq!(
             action.method,
-            match compiled.handler {
-                conveyor_actions::HandlerRef::External { method, .. } => method,
+            match &compiled.handler {
+                conveyor_actions::HandlerRef::External { method, .. } => method.as_ref(),
                 _ => panic!("{} is not external", action.name),
             }
         );

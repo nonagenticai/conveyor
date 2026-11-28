@@ -1,0 +1,20 @@
+{
+  "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+  "baseline": {
+    "definition": "no outside author in the merged PRs at 2026-11-22",
+    "value": 0,
+    "unit": "outside contributions",
+    "measured_at": "2026-11-22",
+    "method": "merged PR authors outside the org",
+    "evidence": {
+      "detail": {
+        "outside_authors": 0,
+        "repo": "nonagenticai/conveyor"
+      },
+      "instrument": "merged PR authors outside the org",
+      "reference": "B4",
+      "value": 0.0
+    }
+  },
+  "change_id": "01a2076b-1186-7347-b957-a100218ae577"
+}

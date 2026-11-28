@@ -1,0 +1,48 @@
+{
+ "action": "approvals.request + approvals.decide",
+ "board_id": "01a1d3e7-ac57-7bd7-aa75-86287fa0c395",
+ "card_id": "01a20e94-c4bb-78de-a8ea-b733228371b7",
+ "decision": {
+  "decision": "approve",
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+  "note": "Rule approval under the standing delegation: the package finding is resolved in the checked-in ledger; the gate carries the waiver reason"
+ },
+ "finding": {
+  "id": "v1-w4a-2",
+  "resolved_by": {
+   "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+   "evidence": "cargo test -p conveyor-actions --lib --test tool_platform: 158 lib + 13 integration passed. Manifest validation refuses a write tool with no verification path; a failing verdict or a missing declared verdict is 422 write_not_verified with exactly one check_failed ledger row; a passing verdict + checks is ok. The declaration is stored on the tool version (0063).",
+   "test": "crates/actions/tests/tool_platform.rs"
+  },
+  "severity": "P0",
+  "title": "Write-verify is unenforced: no checks[]/verdict at call time and no publication gate for a write tool without verification"
+ },
+ "gate": {
+  "evidence_waiver_reason": "the rework package v1-w4a-2:T13 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done",
+  "gate": "card_done",
+  "kind": "card_dod",
+  "require_evidence": true
+ },
+ "read_back": {
+  "decide": {
+   "action": "approvals.list",
+   "input": {
+    "card_id": "01a20e94-c4bb-78de-a8ea-b733228371b7"
+   },
+   "match": [
+    "status=approved"
+   ]
+  },
+  "request": {
+   "action": "approvals.list",
+   "input": {
+    "card_id": "01a20e94-c4bb-78de-a8ea-b733228371b7"
+   },
+   "match": [
+    "gate=card_done",
+    "status=pending"
+   ]
+  }
+ },
+ "schema": "conveyor-record-act/v1"
+}

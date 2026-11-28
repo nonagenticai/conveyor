@@ -1,0 +1,73 @@
+{
+  "body_sha256": "add34d6003d81864d87541b23bec44b3f76ed2a5267cbc4d754ba5a2446356a5",
+  "category": "compliance-review",
+  "headings": [
+    {
+      "heading": "Relationship",
+      "required": true,
+      "sources": [
+        {
+          "category": "compliance-review",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/compliance_reviews"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Findings",
+      "required": true,
+      "sources": [
+        {
+          "category": "compliance-review",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/compliance_reviews"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Waivers",
+      "required": true,
+      "sources": [
+        {
+          "category": "compliance-review",
+          "count": 1,
+          "file": "waiver_status",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decision",
+      "required": true,
+      "sources": [
+        {
+          "category": "compliance-review",
+          "count": 1,
+          "file": "governing_review",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "ad31aeb3edf2d0ea42ef77dd0e6ad0cbe7c97605edf80b23113f06914aebfece",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+    "key": "S09",
+    "kind": "project",
+    "title": "Documents, repositories, secrets, workers UI, reports/metrics, billing display"
+  },
+  "title": "Compliance Review \u2014 Documents, repositories, secrets, workers UI, reports/metrics, billing display"
+}

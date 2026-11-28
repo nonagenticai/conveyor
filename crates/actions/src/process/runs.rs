@@ -161,6 +161,68 @@ async fn resolve_start_context(
     })
 }
 
+/// The executor a run records when it names a job binding (SPEC_V2 §4.4; v1-p44-1).
+///
+/// An `internal_agent` binding pins the one agent that may run its work. That pin is
+/// authoritative: the run records it, and a process that resolves a different executor — a
+/// step's `process_agent_id` (D29), or the capability's single active agent — is refused
+/// `409 job_binding_executor_mismatch` rather than recording the binding's agent while executing
+/// the process's. A binding that pins no agent (a `procedure` executor) keeps the start context's
+/// own resolution.
+///
+/// The process's resolved executors are its bound step agents when it binds any, and the
+/// capability's single active agent otherwise. `Unresolved` means no capability was declared,
+/// but the process may still name step agents; they are read directly.
+async fn binding_executor_tx(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    process_id: Uuid,
+    start_context: &StartContext,
+    binding_id: Uuid,
+    pinned: Option<Uuid>,
+) -> Result<Option<Uuid>, ActionError> {
+    let Some(pinned) = pinned else {
+        return Ok(start_context.capability_agent_id());
+    };
+    let process_agents: Vec<Uuid> = match start_context {
+        StartContext::Resolved {
+            capability_agent_id,
+            bound_agents,
+            ..
+        } => {
+            if bound_agents.is_empty() {
+                capability_agent_id.iter().copied().collect()
+            } else {
+                bound_agents.to_vec()
+            }
+        }
+        StartContext::Unresolved => {
+            store::process::process_agent_ids_tx(&mut *tx, tenant, process_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, action = ACTION, "read the process's bound agents");
+                    ActionError::internal()
+                })?
+        }
+    };
+    if let Some(other) = process_agents
+        .iter()
+        .copied()
+        .find(|agent| *agent != pinned)
+    {
+        return Err(ActionError::new(
+            409,
+            "job_binding_executor_mismatch",
+            format!(
+                "the job binding {binding_id} pins capability agent {pinned}, but the process \
+                 resolves executor {other}; a binding's executor is authoritative, so the run is \
+                 refused rather than executing a different agent"
+            ),
+        ));
+    }
+    Ok(Some(pinned))
+}
+
 /// The pre-run readiness guard (D22 / CONTRACT §17).
 ///
 /// Runs after resolution and **before** the run row, the `run_step` rows or the first job commit:
@@ -181,23 +243,16 @@ async fn ensure_start_ready(
     else {
         return Ok(());
     };
-    let readiness = crate::capability::readiness::capability_readiness_tx(
+    // The guard itself is shared with every other run-start seam; this seam only maps its
+    // resolved context onto it.
+    crate::capability::readiness::ensure_run_start_ready_tx(
         &mut *tx,
         tenant,
-        *capability_id,
+        Some(*capability_id),
         bound_agents,
+        ACTION,
     )
-    .await?;
-    if readiness.is_ready() {
-        Ok(())
-    } else {
-        Err(ActionError::new(
-            409,
-            "capability_not_ready",
-            format!("{ACTION}: the capability is not ready to run"),
-        )
-        .with_errors(crate::capability::readiness::readiness_fields(&readiness)))
-    }
+    .await
 }
 
 fn capability_error(error: conveyor_store::capability::CapabilityStoreError) -> ActionError {
@@ -378,7 +433,10 @@ pub(crate) async fn process_runs_start(
     };
     // T16 P4: a run that names a binding must name the binding that pins THIS process. The
     // store refuses a retired/draft binding and a stale release hash; this refuses a binding for
-    // some other procedure, which no release-hash check could catch.
+    // some other procedure, which no release-hash check could catch. v1-p44-1: the binding also
+    // pins the executor, so the run records ITS agent and refuses a process that resolves
+    // another one — the record and the execution may never name different agents.
+    let mut run_capability_agent_id = start_context.capability_agent_id();
     if let Some(binding_id) = input.job_binding_id {
         let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
             .await
@@ -401,7 +459,21 @@ pub(crate) async fn process_runs_start(
                 ),
             ));
         }
-        // #526: an internal-agent binding must declare its spend ceiling before the run starts.
+        // A CHILD's binding is its parent's — `insert_child_run_tx` ignores this input and pins
+        // the parent's row — so only a ROOT run's own binding chooses its executor.
+        if input.parent_run_id.is_none() {
+            run_capability_agent_id = binding_executor_tx(
+                &mut *tx,
+                ctx.tenant,
+                process.id,
+                &start_context,
+                binding_id,
+                binding.capability_agent_id,
+            )
+            .await?;
+        }
+        // #526 / D45: an internal-agent run cannot start without a declared spend ceiling; the
+        // run may declare one in its own inputs, otherwise the binding must carry it.
         crate::invoke::ensure_binding_budget(&mut *tx, ctx.tenant, binding_id, &inputs).await?;
     }
     let new_run = store::run::NewRun {
@@ -412,7 +484,7 @@ pub(crate) async fn process_runs_start(
         process_id: Some(process.id),
         inputs,
         capability_id: start_context.capability_id(),
-        capability_agent_id: start_context.capability_agent_id(),
+        capability_agent_id: run_capability_agent_id,
         parent_run_id: input.parent_run_id,
         step_id: input.step_id,
         workflow_step_id: input.workflow_step_id,
@@ -420,6 +492,8 @@ pub(crate) async fn process_runs_start(
         depth: 0,
         // The run pins the process version it executes (CONTRACT §21).
         process_version: process.version,
+        // A process run is typed as such: it may be bound (T16) or run unbound.
+        kind: store::run::RunKind::Process,
         // T16: the caller may pin the run to its organisation binding. The store resolves the
         // pin (a retired/draft binding or a stale hash refuses before the INSERT); the handler
         // has already required that the binding names THIS published process.

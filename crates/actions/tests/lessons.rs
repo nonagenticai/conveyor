@@ -76,6 +76,7 @@ fn engine_request(
         role,
         policy: Default::default(),
         authority: Authority::Internal,
+        credential_alias: None,
         request_id: Some(format!("rid-{action}")),
         trace_id: Some(format!("trace-{action}")),
         depth: 0,

@@ -1,0 +1,96 @@
+{
+  "schema": "conveyor-benefit-baseline/v1",
+  "benefit": "token spend per accepted deliverable",
+  "tenant": "nonagentic",
+  "authored_at": "2026-11-22T06:36:51Z",
+  "measured_at": "2026-11-21T23:27:35.116199Z",
+  "snapshot": {
+    "kind": "full-fidelity snapshot of the restored production copy, built by the branch binary",
+    "git_sha": "ec799ee1ae5418d1b89445ca12c8e61ca09de640",
+    "generated_at": "2026-11-21T23:27:35.116199Z",
+    "migration": 67,
+    "path": "/tmp/snap-526-0734/data",
+    "files": [
+      "measure.json",
+      "artefacts.json",
+      "programme.json",
+      "work.json"
+    ]
+  },
+  "engine": {
+    "revision": "ec799ee1ae5418d1b89445ca12c8e61ca09de640",
+    "pre_transition": true,
+    "note": "T5 (kata) landed on issue/526-u5a on 2026-11-22 but is not deployed; the snapshot is a read-only projection of the restored production copy, so this is the pre-transition baseline."
+  },
+  "definition": {
+    "accepted_deliverable": "a published output document attached to a project: artefacts.json.documents entry with publishable=true",
+    "unit_count": 145,
+    "window": "all tenant inference calls and all publishable outputs present in the snapshot",
+    "attribution": "portfolio-level ratio, not a per-run causal attribution; project_id attribution exists for only 3 projects and card_id for 5 cards, so the ratio is not a complete per-project cost"
+  },
+  "measurements": {
+    "inference": {
+      "calls": 609,
+      "prompt_tokens": 9374195,
+      "completion_tokens": 84273,
+      "total_tokens": 9458468,
+      "cost_usd": 1.318791,
+      "tool_cost_usd": 0,
+      "priced_calls": 528,
+      "unpriced_calls": 81,
+      "cache_miss_calls": 606,
+      "cache_hit_calls": 0,
+      "unknown_cache_calls": 3,
+      "non_ok_calls": 0,
+      "by_caller": {
+        "agent_run": {"calls": 604, "total_tokens": 9457017},
+        "other": {"calls": 5, "total_tokens": 1451}
+      },
+      "attribution_rows": {"by_project": 3, "by_card": 5}
+    },
+    "deliverables": {
+      "published_outputs": 145,
+      "closed_projects": 26,
+      "active_projects": 23,
+      "archived_projects": 1,
+      "cards": 101,
+      "runs": 371,
+      "runs_failed": 366,
+      "runs_succeeded": 2,
+      "runs_cancelled": 3
+    },
+    "ratios": {
+      "tokens_per_published_output": 65231,
+      "cost_usd_per_published_output": 0.0091,
+      "tokens_per_closed_project": 363787,
+      "tokens_per_run": 25495,
+      "tokens_per_succeeded_run": 4729234,
+      "run_failure_rate": 0.9865
+    }
+  },
+  "comparison_basis": {
+    "unit": "tokens per published output, portfolio-level; cost is secondary because 81 calls are unpriced",
+    "post_transition": "same tenant, same definition, a window at least as long as the baseline window, measured from the inference ledger and the published outputs at the post-transition revision",
+    "secondary": "run failure rate and tokens per succeeded run, to expose whether a per-deliverable improvement is bought by rejecting more work"
+  },
+  "target": {
+    "status": "proposed; owner confirmation required",
+    "tokens_per_published_output": 52185,
+    "reduction": 0.20,
+    "run_failure_rate_max": 0.20,
+    "note": "the target is not yet a live row; U6 records it on the benefit profile at the same measured_at as this baseline"
+  },
+  "caveats": [
+    "366 of 371 runs failed (98.65%); the token spend is dominated by failed runs, so 65,231 tokens per output is a ceiling, not an efficient cost.",
+    "The frozen a33e6562 pack reported 165 outputs; the fresh snapshot reports 145. The fresh snapshot is authoritative; the pack's outputs projection was incomplete.",
+    "Only 2 runs succeeded and 1 approval exists; the accepted-deliverable count is the published outputs, not approved cards.",
+    "The six live benefit profiles all say 'not measured - no instrument exists'; the token KPI is not yet one of them, so U6 must add or amend a profile before this baseline can be marked measured.",
+    "The benefit row and this file must keep the same measured_at; the lane owner will announce the row date."
+  ],
+  "sources": [
+    "/tmp/snap-526-0734/data/measure.json (tokens stored; cost derived from the pinned price version; 81 calls unpriced)",
+    "/tmp/snap-526-0734/data/programme.json",
+    "/tmp/snap-526-0734/data/artefacts.json",
+    "/tmp/snap-526-0734/data/work.json"
+  ]
+}

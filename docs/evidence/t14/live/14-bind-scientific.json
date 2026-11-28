@@ -1,0 +1,10 @@
+{
+ "effect_ceiling": "read",
+ "enabled": true,
+ "id": "01a21277-780d-798b-89d9-c1eeef697d9c",
+ "run_id": "01a21277-77e8-75d0-8711-26e51ddc6705",
+ "toolkit_id": "01a21275-830a-7b75-bbad-db58d15a70e0",
+ "toolkit_key": "scientific",
+ "toolkit_version": 1,
+ "version": 1
+}

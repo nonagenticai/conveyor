@@ -296,6 +296,11 @@ pub struct ApprovalDecideIn {
     /// Per-item decisions, when the gate covers several items.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item_decisions: Option<Value>,
+    /// A delegated decision is recorded as `decided_by_kind='rule'` with the reference in
+    /// `via`, never as a human decision: the audit says a policy acted under a named decision,
+    /// and a gate that requires a person accepts it only by naming its delegation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delegation_ref: Option<Uuid>,
 }
 
 /// `approvals.request` — a question posed for a human to decide (S06b §5).
@@ -332,6 +337,12 @@ pub struct ApprovalRequestIn {
     /// The answer the requester proposes; stored in `meta.proposed_answer`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// The change request this gate decides (the `change` gate), stored in `meta.change_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
+    /// A free-text question sets this; the decision writer refuses an empty note on such a gate.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requires_answer: Option<bool>,
     /// The decisions a responder may give; stored in `meta.allowed_decisions`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
@@ -376,6 +387,10 @@ pub struct ApprovalRequestIn {
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,
+    /// A non-empty reason opens an evidence-less gate (stored in `meta.evidence_waiver`); an
+    /// empty reason is not a waiver, so a gate that requires evidence is refused.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver_reason: Option<String>,
     /// Evidence kinds this gate refuses to open without (#746).
     ///
     /// `require_evidence` only refuses an *empty* list, so a caller that omits the proof is still
@@ -453,6 +468,9 @@ pub struct ApprovalOut {
     /// The answer the requester proposed (`meta.proposed_answer`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note (`meta.requires_answer`).
+    #[serde(default)]
+    pub requires_answer: bool,
     /// The decisions a responder may give (`meta.allowed_decisions`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
@@ -866,7 +884,8 @@ pub struct ApprovalPolicyOut {
     /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
     pub self_approval: String,
     /// `human` — a person decides the gate (the default); `auto` — the tenant's earned
-    /// auto-merge policy decides when its conditions hold (§6.4).
+    /// auto-merge policy decides when its conditions hold (§6.4); or the lane's explicit
+    /// non-governance kinds `triage_agent`, `rule`, `agent`, `service` (§5.4).
     pub approver_kind: String,
     /// The typed conditions an auto policy carries; empty for a human policy.
     pub conditions: Value,
@@ -898,8 +917,9 @@ pub struct ApprovalPolicySetIn {
     pub approval: String,
     /// `forbidden` or `allowed`.
     pub self_approval: String,
-    /// `human` (default) or `auto`. `auto` is accepted only for a development gate and requires
-    /// typed conditions and a future expiry.
+    /// `human` (default), `auto`, or the explicit non-governance kinds `triage_agent`, `rule`,
+    /// `agent`, `service`. `auto` is accepted only for a development gate and requires typed
+    /// conditions and a future expiry.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub approver_kind: Option<String>,
     /// The typed auto-merge conditions (consecutive green runs, revert count, path scope,

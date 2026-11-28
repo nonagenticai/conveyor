@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::a_bound_job_runs_the_pddl_steps"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::an_unreviewed_source_cannot_bind"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::a_false_precondition_stops_the_run"
+  }
+ ],
+ "id": "01a20a84-b2fe-7fda-99c6-84f8e5a42b34",
+ "status": "accepted"
+}

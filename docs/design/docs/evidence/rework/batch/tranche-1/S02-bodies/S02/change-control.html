@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Change Control — Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-1/S02-bodies/S02/change-control.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="change-control--skeleton--workspace-tenancy-auth-jobs-sse">Change Control — Skeleton — workspace, tenancy, auth, jobs, SSE</h1>
+<h2 id="change-requests">Change requests</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;change-control&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S02&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S02 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="impact">Impact</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;change-control&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S02&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+      &quot;impact&quot;: {
+        &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+        &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+        &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+        &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+      },
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S02 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;computed:change_impact&quot;
+}</code></pre>
+<h2 id="decisions">Decisions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;change-control&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a1ff85-faae-7c2e-b897-fe957985ca78&quot;,
+      &quot;body&quot;: &quot;Change request: rebuild S02&#39;s record under the owner&#39;s 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project&#39;s record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner&#39;s standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.&quot;,
+      &quot;code&quot;: &quot;U5-CHG-S02&quot;,
+      &quot;created_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;id&quot;: &quot;01a20200-d8b6-77fc-a176-76d4ea3f4567&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          {
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;number&quot;: 526
+          },
+          {
+            &quot;id&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+            &quot;kind&quot;: &quot;delegation&quot;
+          }
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;change_request&quot;: &quot;the retrospective rework of S02 under #526&quot;,
+        &quot;decision&quot;: {
+          &quot;decided_at&quot;: &quot;2026-11-21&quot;,
+          &quot;decided_by&quot;: &quot;the programme owner&#39;s standing delegation&quot;,
+          &quot;decision&quot;: &quot;accepted&quot;,
+          &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+          &quot;record&quot;: &quot;#526&quot;
+        },
+        &quot;impact&quot;: {
+          &quot;cost&quot;: &quot;no separate cost baseline; the rework runs inside the existing programme tranche&quot;,
+          &quot;quality&quot;: &quot;every owned finding executed or waived by a named owner; manifest re-run at the closing head&quot;,
+          &quot;schedule&quot;: &quot;no change to the delivery tranche; the work runs in its rework batch&quot;,
+          &quot;scope&quot;: &quot;the record and declared outputs are rebuilt and republished&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d27-7b45-abb5-bf851a4c3d4a&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-22T06:45:38.446695+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-1/S02-bodies/S02/change-control.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

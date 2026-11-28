@@ -1,0 +1,2034 @@
+{
+  "charter": "# Charter — SPEC-V2 (retrospective, 2026-11-26)\n\n- **Project:** SPEC-V2 'SPEC V2 — the organisational operating model', project `01a1d039-0d39-7f3b-bd04-211f7dfe1e50`, track programme, ADM phase Preliminary, plateau definition, tranche 0. The facts brief records the project closed; the rework note records the closure on 2026-11-17. It was reopened for the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526), and this pack re-closes it through the one gate. Plan `docs/SPEC_V2.md`, active; the row's measured status is `built` and its viability is `rework`.\n- **Mandate:** give the conveyor an organisation it owns — industry → department(s) → job, an immutable job release, a tenant-scoped binding and a recorded decision trail — and publish it as the `spec` output, with the seven Phase A–D artefacts approved by the Architecture Board and one accepted WBS deliverable.\n- **Scope:** the plan and its decision set, the seven A–D artefacts, the delivery contract, the scope baseline, the Phase-G review and the closure record. Out of scope: V1's S-slices (not re-opened), the V2 delivery slices T0–T19 and T19F (their own projects), and `docs/SPEC_LEGACY_KAG.md` (D54).\n- **Delegation and date:** authored retrospectively on 2026-11-26 under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. It records a completed lifecycle; it authorises no new work and claims no certification (§8.6).\n- **Honest residual:** who closed the project on 2026-11-17 and why is not recoverable — no approval row and no closure asset survive — so this charter states the closure without inventing a decision-maker, and it does not restate the contemporaneous WSJF inputs as if they had been recovered.",
+  "soaw": {
+    "title": "Statement of Architecture Work — SPEC-V2 (retrospective, 2026-11-26)",
+    "body": {
+      "assignment": "Rework SPEC-V2 by the reconstituted TOGAF/MSP lifecycle: author the charter, this Statement of Architecture Work, the seven Phase A–D artefacts and the eight Phase E–H artefacts, the delivery contract, the WBS deliverable and the Phase-G review, and publish the `spec` output. The plan is `docs/SPEC_V2.md` — the organisational operating model that gives the conveyor its own industry → department(s) → job spine, work hierarchy, decision ladder and executable rigour. The work is retrospective and dated 2026-11-26; the live statement it re-versions is `01a1ff41-19f9-77bb-aa4a-f416f0d758e3`.",
+      "scope": "The V2 document and its decisions, together with the architecture artefacts the delivery contract governs: the stakeholder map, the driver/goal/objective catalogue, the requirements catalogue and the solution concept (phase A); the business capability map (phase B); the data entity/data component catalogue (phase C); the technology standards catalogue (phase D); and the eight E–H deliverables this pack authors. Not in scope: V1's S-slices, the V2 delivery slices T0–T19 and T19F, and `docs/SPEC_LEGACY_KAG.md` (D54).",
+      "responsibilities": "The programme architect authors the pack under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the Architecture Board — chair, the programme owner, with the programme architect, domain architect and delivery lead as positions — reviews the A–D set. The live delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` is approved by `01a1ff42-9127-7cad-b611-c1ebf1006b0a`; the approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545` is distinct from the requester `01a1e607-17d9-77d3-98d3-a43a87c4633d`.",
+      "acceptance_criteria": "python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh> is green with 11 checks and 0 failures at `d7293f96`, and the strict audit on the same snapshot carries no P0/P1 entry for the project. The acceptance manifest `acceptance/programme/SPEC-V2.toml` is green: the closure review exists, the declared `spec` output is published, and the project re-closes through the one gate decided by an approver other than its requester. The seven A–D artefacts are approved rows with their entries; the live Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` records exactly one level, compliant, against the delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356`.",
+      "contract": "This statement sits on the approved scope baseline `01a1ff42-ba64-7670-b694-99bb4b1354e5` — taken by `01a1e607-17d9-77d3-98d3-a43a87c4633d`, approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545`, carrying one WBS deliverable at WSJF inputs 13, 8, 13 and 20 — and is complemented by the live delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356`. Both are retrospective: the project's contemporaneous contract was never recorded.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder map — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Place the actors who hold the operating model and fix the engagement each needs.",
+      "scope": "The programme owner, the Board, the tenant's jobs, the maintainers, the departments, the front end and the tenants the plan scopes.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the tenant's delivery jobs"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Programme owner / sponsor",
+          "axis_b": "The model is adopted and its gates hold",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "Contracts and artefacts conform (D63, §8.1)",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "The tenant's jobs (the organisation)",
+          "axis_b": "Positions are catalogued, released and bound (D28, D38)",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Maintainer sessions (AI)",
+          "axis_b": "The conveyor develops and operates itself under its own gates (D34, P7)",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Delivery, verification, operations, project office and improvement departments",
+          "axis_b": "The first IT department set (§4.6)",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "The agent platform",
+          "axis_b": "A user-interaction front end over MCP — not a catalogue, executor or system of record (D33, D59)",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "inform"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "AHTAPol and w2v tenants",
+          "axis_b": "Each its own tenant and industry — health-technology-assessment and media (D60)",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Independent reviewers and the public reader",
+          "axis_b": "Evidence, not claims; a published design pack (§8.6)",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "monitor"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan `docs/SPEC_V2.md` and the rework note `docs/evidence/rework/SPEC-V2.md`. Phase a, plateau psa, kind matrix. Owner: the programme architect under the #526 rework delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board; consumers: the sponsoring group, the programme office and the tenant's delivery jobs.\n\n## Entries\n\nThe matrix carries eight positions. The programme owner and sponsor decides whether the model is adopted and its gates hold. The Architecture Board approves contracts and artefacts (D63, §8.1). The tenant's jobs are informed that positions are catalogued, released and bound (D28, D38). The maintainer sessions are consulted because the conveyor develops and operates itself under its own gates (D34, P7). The five first departments — delivery, verification, operations, project office and improvement — are consulted (§4.6). The agent platform is informed that it is a front end over MCP (D33, D59); AHTAPol and w2v are consulted as separate tenants and industries (D60); independent reviewers and the public reader monitor the published design (§8.6).\n\n## Links\n\nThe artefact carries one typed edge: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) as dependency. Every edge names another artefact of this pack, so the set has no orphan, and the edge records that the requirements bind the actors named here.\n\n## Document\n\nPurpose: place the actors who hold the operating model so each concern has a named engagement. Scope: the roles the plan itself names — the programme owner, the Board, the departments, the maintainers, the tenants and the front end. The map was reconstructed on 2026-11-26 from §4.6, §8.1 and D33/D59/D60 rather than from a live elicitation; like the Board's charter it lists positions, not persons."
+    },
+    {
+      "title": "Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "Trace why the conveyor needs an organisation model and what the model is meant to achieve.",
+      "scope": "The drivers the plan states in §1, the goals they imply and the objectives each goal decomposes into.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the delivery slices T0–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 V1 answers how work is carried, not who the organisation is (§1.1)",
+          "axis_b": "G1 The organisation is a set of configured positions",
+          "value": {
+            "objective": "O1 A job is a capability, a procedure, an inference configuration and an authority in one catalogue, with an immutable release and a tenant-scoped binding (D28, D38)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 The field builds agent conversations; organisations run on positions, work products, gates, baselines and evidence (§1.3)",
+          "axis_b": "G2 The rigour is executable",
+          "value": {
+            "objective": "O2 TOGAF, SAFe, PMP and MSP artefacts are rows, gates and evidence, and every decision row names its option, confidence and policy (D32, D30)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 A job is only as capable as what it may call (§11)",
+          "axis_b": "G3 Every tool a job may call is versioned, bound and ledgered",
+          "value": {
+            "objective": "O3 Tool and toolkit versions, one effect ceiling per binding and one `tool_call` row per call; the broker is the only call path (D41, D45)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 The v4 lesson: the right roles on the wrong substrate (§1.4)",
+          "axis_b": "G4 The system builds and operates itself",
+          "value": {
+            "objective": "O4 Development projects change the conveyor and its dependency repos through lane, PR, CI, review, merge, deploy and verify, and cannot change the gates that judge them (D34, P7, §9.3)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 Three independently built things arrived at the same shape (§1.2)",
+          "axis_b": "G5 The conveyor owns its whole model and is self-contained",
+          "value": {
+            "objective": "O5 One model, one store: the catalogue, release, binding and decision rows are conveyor rows, the agent platform is a front end, and no manifest is imported from another system (D33, D44)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 The improvement loop exists but nothing staffs it (§1.1)",
+          "axis_b": "G6 PM, coach, kata, development and operations are ordinary jobs",
+          "value": {
+            "objective": "O6 The meta-jobs use the same catalogue, card, run and approval primitives as any other job, and the authority matrix is data rather than hard-coded role logic (D31, P6)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "D7 High-level decisions appear as approvals without the meeting that produced them (§13)",
+          "axis_b": "G7 Meetings are the decision forum",
+          "value": {
+            "objective": "O7 A meeting is a card whose agenda items resolve existing approvals, with typed positions, quorum, a decision rule and minutes as a governed asset (D66, §6.8)."
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase a, plateau psa, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries seven driver-to-goal rows. D1 records that V1 answers how work is carried, not who the organisation is; G1 makes the organisation a set of configured positions. D2 records the field's gap; G2 makes the rigour executable. D3 makes tool capability a governed surface; G3 versions, binds and ledgers every call. D4 is the v4 lesson; G4 gives the system its own build and operate path. D5 is the three convergences; G5 keeps the conveyor self-contained. D6 is the unstaffed improvement loop; G6 makes the meta-jobs ordinary. D7 is the missing meeting; G7 makes meetings the decision forum, a ruling dated 2026-11-22.\n\n## Links\n\nThe artefact carries one typed edge: Stakeholder map — SPEC-V2 (retrospective, 2026-11-21) as derivation. Every edge names another artefact of this pack, so the set has no orphan, and the edge places each driver with the actor who holds it.\n\n## Document\n\nPurpose: trace why the conveyor needs an organisation model and what the model is meant to achieve. Scope: the drivers, goals and objectives the plan states in §1 and §13, as the approved 2026-11-21 row carries them. Authored retrospectively on 2026-11-26; the seventh row records the meeting ruling of 2026-11-22, which the earlier row could not carry."
+    },
+    {
+      "title": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements the operating model must meet, typed as the standard requires.",
+      "scope": "The invariants of §3, the binding decisions D28–D66 and the amendments V2 makes to V1.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery slices T0–T19",
+          "independent reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1",
+          "axis_b": "One record per fact",
+          "value": {
+            "acceptance": "No concept is stored in two systems; systems join by pinned reference (P1, §10.1).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2",
+          "axis_b": "No work without a card",
+          "value": {
+            "acceptance": "No work without a card; no transition without an action; no completion without evidence (P3).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3",
+          "axis_b": "The executor never approves its own work",
+          "value": {
+            "acceptance": "Dual control on gates, `decided_by_kind`, and an approver who is neither the assignee nor the executor (P4).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4",
+          "axis_b": "Fail closed on missing configuration",
+          "value": {
+            "acceptance": "An unresolved binding, pack, prompt source or tool refuses `409 *_not_ready` with `blocking[]` before the first model call or action (P8).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5",
+          "axis_b": "Every model call is ledgered and budgeted",
+          "value": {
+            "acceptance": "`inference_call` rows with per-run and per-tenant budgets; exceeding a budget is a refusal before the next call (P9, §7.5).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6",
+          "axis_b": "No speculative aggregates",
+          "value": {
+            "acceptance": "A table exists because a named procedure uses it and a metric reads it; an unused aggregate is removed, not defended (P10, D40).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7",
+          "axis_b": "Tenant configuration over code",
+          "value": {
+            "acceptance": "Every policy, threshold, limit, gate condition and approval kind is a versioned tenant-scoped row with a platform default; code implements mechanisms, never policy values (P11, D50).",
+            "priority": "must",
+            "type": "constraint"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8",
+          "axis_b": "Immutable releases; a stale binding refuses",
+          "value": {
+            "acceptance": "A binding pins `job_key` + `release_hash` + an immutable `release_snapshot`; a run against a retired binding refuses `409 job_binding_stale` before any model call (D38).",
+            "priority": "must",
+            "type": "condition"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9",
+          "axis_b": "Tool effects are typed",
+          "value": {
+            "acceptance": "Every tool declares one of read, write, destructive or spend; a binding's ceiling narrows only; a destructive call needs a dry-run and the tenant's configured approvals (D45, §11.4).",
+            "priority": "must",
+            "type": "condition"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10",
+          "axis_b": "A benefit is measurable",
+          "value": {
+            "acceptance": "A benefit without baseline, target, method and owner is refused; the benefits map names output → capability → operational outcome → benefit → objective (D62, §8.3).",
+            "priority": "must",
+            "type": "condition"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "R11",
+          "axis_b": "A delivery project needs its governing contract",
+          "value": {
+            "acceptance": "A delivery project cannot pass design without the live contract that governs it; a Phase-G review records exactly one of the six standard levels (D63, §8.1).",
+            "priority": "must",
+            "type": "condition"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "R12",
+          "axis_b": "The agent platform is a front end",
+          "value": {
+            "acceptance": "It is a conversation surface over MCP with its own autonomy configuration — not a catalogue, an executor or a system of record for conveyor work (D33, D59).",
+            "priority": "must",
+            "type": "assumption"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "R13",
+          "axis_b": "laya answers inside the seam budget",
+          "value": {
+            "acceptance": "`POST /v1/systemone`, with the fail policy owned by the decision policy; a timeout never becomes an LLM decision (§7.2, §10.2).",
+            "priority": "must",
+            "type": "assumption"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "R14",
+          "axis_b": "V1 is amended, not replaced",
+          "value": {
+            "acceptance": "V1 D1–D27 stand except D14 and D22, which V2 amends through D57 and D46/D61; no V1 S-slice is re-opened (Appendix B).",
+            "priority": "must",
+            "type": "delta"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "R15",
+          "axis_b": "Procedural knowledge has no ontology store",
+          "value": {
+            "acceptance": "Amended 2026-11-19: RDF/OWL/Turtle is imported as a strata knowledge pack named by the procedure's `knowledge_pack_ref`; the conveyor runs no RDF store, no graph store and no reasoner (D53, §5.6).",
+            "priority": "must",
+            "type": "delta"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "R16",
+          "axis_b": "Requirements management is continuous",
+          "value": {
+            "acceptance": "Every requirement is typed condition, constraint, assumption or delta, and every requirement, principle and ADR is a governed asset trace-linked to the artefacts, contracts, cards, runs and evidence that realise it (D63, §8.1, §8.5).",
+            "priority": "must",
+            "type": "delta"
+          },
+          "position": 16
+        }
+      ],
+      "links": [
+        {
+          "to": "Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase a, plateau psa, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries sixteen requirements. R1–R7 state the invariants P1 to P11 as constraints. R8–R11 are conditions the model cannot run without: an immutable release, a typed tool effect, a measurable benefit and a governing contract. R12 and R13 are assumptions about the front end and the laya seam. R14–R16 are deltas: V1 amended rather than replaced, the procedural-knowledge amendment of 2026-11-19, and continuous requirements management with the four standard types.\n\n## Links\n\nThe artefact carries one typed edge: Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21) as derivation. Every edge names another artefact of this pack, so the set has no orphan, and the edge traces each requirement to the goal it serves.\n\n## Document\n\nPurpose: state the requirements the operating model must meet, typed as the standard requires. Scope: the invariants of §3, the binding decisions D28–D66 and the amendments V2 makes to V1. Authored retrospectively on 2026-11-26 from the approved 2026-11-21 row; each acceptance line names a check or a refusal the plan defines, so a requirement with no verifiable answer would be visible."
+    },
+    {
+      "title": "Solution concept — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "Show the building blocks of the operating model and how a decision and a unit of work pass through them.",
+      "scope": "Jobs, releases and bindings, cards and runs, approvals, the decision ladder, the work hierarchy, the broker, the rigour, storage and the executor seam.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the delivery slices T0–T3",
+          "the programme office",
+          "runtime operators"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Job (position)",
+          "axis_b": "organisation",
+          "value": {
+            "kind": "component",
+            "note": "A capability, a procedure, an inference configuration and an authority — a configured position, not a loop (§2, D28)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Job release and job binding",
+          "axis_b": "organisation",
+          "value": {
+            "kind": "component",
+            "note": "The immutable compiled release with a content hash; the binding pins job_key + release_hash + release_snapshot (D38, §4.4)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Card and run",
+          "axis_b": "work",
+          "value": {
+            "kind": "component",
+            "note": "The unit of assigned work and one recorded attempt; the card and run are the units, not the conversational turn (§2)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Approval",
+          "axis_b": "governance",
+          "value": {
+            "kind": "component",
+            "note": "The one human-escalation primitive — a question is an approval; dual control is two or more distinct approvers (§5.4)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Decision ladder",
+          "axis_b": "decisions",
+          "value": {
+            "kind": "flow",
+            "note": "Rule → laya → generation → human; an LLM never selects, routes, classifies or approves, and a generated draft has no path to a state transition (D30, P2, §7.1)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Work hierarchy",
+          "axis_b": "programme",
+          "value": {
+            "kind": "flow",
+            "note": "Tenant → portfolio (a computed read model, never a row) → programme (shared_config + project dependency graph) → project → WBS → card → run → step (D29, D49, §5.1)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Tool broker",
+          "axis_b": "tooling",
+          "value": {
+            "kind": "flow",
+            "note": "Resolve the binding and version, check the effect, validate the closed schema, resolve the credential by alias, call the registered destination, normalise and redact, record one tool_call (§11.3)."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Architecture capability",
+          "axis_b": "rigour",
+          "value": {
+            "kind": "component",
+            "note": "The Preliminary phase establishes the principles, tailored ADM, board, repository and baselines; phases A–H are WBS nodes that close on an approved architecture contract (D63, §8.1)."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Programme cadence and tranches",
+          "axis_b": "rigour",
+          "value": {
+            "kind": "component",
+            "note": "programme_cadence carries PI planning, refinement, demo and retro; programme_tranche is the management unit and its review is an approval (§8.2–§8.3)."
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Storage",
+          "axis_b": "platform",
+          "value": {
+            "kind": "component",
+            "note": "Document rows plus MinIO written directly under tenant prefixes with encryption, a content hash and a size cap; there is no artifact_service dependency (D57, §11.10)."
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Executor seam",
+          "axis_b": "platform",
+          "value": {
+            "kind": "component",
+            "note": "Two live kinds — procedure and internal_agent — behind one internal Executor contract with an extensible executor_kind; an external runtime is a non-goal until D61's four conditions hold."
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "Meeting (the decision forum)",
+          "axis_b": "governance",
+          "value": {
+            "kind": "component",
+            "note": "A card whose agenda items resolve existing approvals, with a meeting_type policy row for participation, quorum, decision rule and the closed outcome set; never a fifth unit and never a chat (D66)."
+          },
+          "position": 12
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase a, plateau psa, kind diagram. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe diagram carries twelve building blocks. Four are the units the plan allows — a job, a card and a run, an approval and the meeting that resolves approvals — and the rest configure or transport them: the release and binding, the decision ladder, the work hierarchy, the tool broker, the architecture capability, the programme cadence and tranches, direct storage and the executor seam. Each row names the decision or section that fixes it.\n\n## Links\n\nThe artefact carries one typed edge: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) as realization. Every edge names another artefact of this pack, so the set has no orphan, and the edge records which blocks realise the requirements.\n\n## Document\n\nPurpose: show the blocks of the operating model and how a decision and a unit of work pass through them. Scope: the four units and the components that configure them, as §2, §4 to §11 and D66 define them. It was drawn retrospectively on 2026-11-26 from the plan; the meeting block records the ruling of 2026-11-22, which post-dates the 2026-11-21 artefact it re-versions."
+    },
+    {
+      "title": "Business capability map — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Name the capabilities the model installs and record the maturity the plan supports for each.",
+      "scope": "Twelve capabilities from organisation management to organisational memory, with the rows and slices that evidence each.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the delivery slices T0–T19"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Organisation management",
+          "axis_b": "catalogue, release, binding",
+          "value": {
+            "maturity": "specified",
+            "evidence": "industry, department, job_catalogue, job_release and job_binding are T0's subject (D28, §12)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Work management",
+          "axis_b": "project lifecycle",
+          "value": {
+            "maturity": "partial",
+            "evidence": "V1 already ships programme and project.programme_id; wbs_node, project_baseline, project_register_item and project_dependency are T1 (§5.1, §5.3)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme management",
+          "axis_b": "SAFe cadence",
+          "value": {
+            "maturity": "built",
+            "evidence": "programme_cadence and WSJF recomputed from four typed integer inputs; T10 is measured built 2026-11-23 (§8.2, §12)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Benefits realization",
+          "axis_b": "MSP tranches",
+          "value": {
+            "maturity": "partial",
+            "evidence": "programme_tranche, benefit_profile, benefit_link and benefit_transition; a benefit without baseline, target, method and owner is refused (D62, §8.3)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Architecture management",
+          "axis_b": "TOGAF ADM A–H",
+          "value": {
+            "maturity": "built",
+            "evidence": "architecture_artifact, artifact_type, adm_profile, architecture_contract, compliance review and waiver; T9 is measured built 2026-11-23 (D63, §12)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Decision management",
+          "axis_b": "the ladder",
+          "value": {
+            "maturity": "specified",
+            "evidence": "decision, decision_option, decision_policy, decision_policy_refinement and laya_inference_config are T2's subject (D30, D51)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Tool governance",
+          "axis_b": "catalogue, broker, ledger",
+          "value": {
+            "maturity": "partial",
+            "evidence": "tool, toolkit, tool_binding and tool_call, effect classes and tools.probe; T13–T15 (§11)."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Measurement",
+          "axis_b": "metrics and metering",
+          "value": {
+            "maturity": "partial",
+            "evidence": "metrics read models, C0–C5 thresholds stored as configuration, and drill-down to run, step and call; T11 (D37, D52)."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Self-development",
+          "axis_b": "development projects",
+          "value": {
+            "maturity": "partial",
+            "evidence": "V1's lane, PR, CI, review and merge path stands; the development project type and the guardrails are T6 (D34, §9.1, §9.3)."
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Operations",
+          "axis_b": "incidents and runbooks",
+          "value": {
+            "maturity": "partial",
+            "evidence": "ops.incident, triage, mitigate, resolve and postmortem, read-first with a gated write set; T7 (D35)."
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "Authoring",
+          "axis_b": "SOP and tenant assets",
+          "value": {
+            "maturity": "partial",
+            "evidence": "procedures.ingest_sop, ingest_process and ingest_rdf; authoring.intake, draft, review and publish; every output a draft behind a gate; T16 and T17 (D47, D55)."
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "Organisational memory",
+          "axis_b": "lessons",
+          "value": {
+            "maturity": "partial",
+            "evidence": "lessons.propose, review and promote; two or more independent evidence references and a person's review; T8 (D36)."
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "Decision forums",
+          "axis_b": "meetings",
+          "value": {
+            "maturity": "built",
+            "evidence": "meeting_type, meetings.open, get and close_item, and the board macros over them; T19 is built and T19F is measured 2026-11-24 (D66, §6.8)."
+          },
+          "position": 13
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution concept — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase b, plateau hld, kind diagram. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe map carries thirteen capabilities. Organisation management and decision management are specified and land in T0 and T2. Work management is partial because V1 ships the programme and project spine but not the WBS, baseline, register and dependency rows. Programme management and architecture management are built: the plan records T9 and T10 measured built on 2026-11-23. Benefits realization, tool governance, measurement, self-development, operations, authoring and organisational memory remain partial. Decision forums are built, with T19F measured on 2026-11-24.\n\n## Links\n\nThe artefact carries two typed edges: Solution concept — SPEC-V2 (retrospective, 2026-11-21) and Requirements catalog — SPEC-V2 (retrospective, 2026-11-21), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: name the capabilities the model installs and record the maturity the plan supports for each. Scope: twelve capabilities plus the decision forums, with the rows and slices that evidence each. The earlier 2026-11-21 row recorded several capabilities as live; this re-version records the status §12 supports, because T0 is the slice that builds the organisation spine and the plan states T9 and T10 as the measured-built slices."
+    },
+    {
+      "title": "Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the entities the operating model stores and the owner of each.",
+      "scope": "Twenty-three entities across organisation, work, programme, governance, architecture, decisions, memory and tools.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the delivery slices T0–T3",
+          "runtime operators",
+          "auditors"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "industry_department",
+          "axis_b": "the organisation spine",
+          "value": {
+            "owner": "organisation",
+            "table": "industry / department"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "job_catalogue",
+          "axis_b": "the position: key, placement, status",
+          "value": {
+            "owner": "organisation",
+            "table": "job_catalogue"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "job_release",
+          "axis_b": "the immutable compiled release",
+          "value": {
+            "owner": "organisation",
+            "table": "job_release"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "job_binding",
+          "axis_b": "position to release, capability, procedure and executor",
+          "value": {
+            "owner": "organisation",
+            "table": "job_binding"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "approval_policy",
+          "axis_b": "per-gate approvals: decisions, approver kinds, expiry",
+          "value": {
+            "owner": "governance",
+            "table": "approval_policy"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "phase, deliverable, work package and milestone tree",
+          "value": {
+            "owner": "work",
+            "table": "wbs_node"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "project_baseline",
+          "axis_b": "frozen, approved scope, schedule and cost",
+          "value": {
+            "owner": "work",
+            "table": "project_baseline"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "PI, sprint, demo, retro and refinement",
+          "value": {
+            "owner": "programme",
+            "table": "programme_cadence"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "programme_tranche",
+          "axis_b": "the unit the programme manages and reviews together",
+          "value": {
+            "owner": "programme",
+            "table": "programme_tranche"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "programme_baseline",
+          "axis_b": "management, governance and boundary baselines",
+          "value": {
+            "owner": "programme",
+            "table": "programme_baseline"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "register",
+          "axis_b": "risk, issue, assumption, dependency, benefit and change",
+          "value": {
+            "owner": "work",
+            "table": "project_register_item"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "benefit",
+          "axis_b": "the measurable improvement and the benefits map",
+          "value": {
+            "owner": "programme",
+            "table": "benefit_profile / benefit_link / benefit_transition"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "stakeholder",
+          "axis_b": "concerns, influence, interest, exposure and engagement",
+          "value": {
+            "owner": "programme",
+            "table": "stakeholder_profile"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "architecture_artefact",
+          "axis_b": "typed artefact, entries and links",
+          "value": {
+            "owner": "architecture",
+            "table": "architecture_artifact / architecture_artifact_entry / architecture_artifact_link / artifact_type / adm_profile"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "architecture_governance",
+          "axis_b": "contracts, compliance reviews, waivers and the board",
+          "value": {
+            "owner": "architecture",
+            "table": "architecture_contract / architecture_compliance_review / architecture_waiver / governance_body"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "architecture_assessment",
+          "axis_b": "maturity on nine dimensions and skills on seven categories",
+          "value": {
+            "owner": "architecture",
+            "table": "architecture_maturity / architecture_skill_assessment"
+          },
+          "position": 16
+        },
+        {
+          "axis_a": "decision",
+          "axis_b": "the ladder's records, policies and refinements",
+          "value": {
+            "owner": "decisions",
+            "table": "decision / decision_option / decision_policy / decision_policy_refinement / laya_inference_config"
+          },
+          "position": 17
+        },
+        {
+          "axis_a": "lesson",
+          "axis_b": "organisational memory: evidence references and review state",
+          "value": {
+            "owner": "memory",
+            "table": "lesson"
+          },
+          "position": 18
+        },
+        {
+          "axis_a": "project_dependency",
+          "axis_b": "project-level edges: blocks, needs, supersedes and informs",
+          "value": {
+            "owner": "programme",
+            "table": "project_dependency"
+          },
+          "position": 19
+        },
+        {
+          "axis_a": "tool",
+          "axis_b": "the tool estate and its call ledger",
+          "value": {
+            "owner": "tools",
+            "table": "tool / toolkit / tool_binding / tool_call"
+          },
+          "position": 20
+        },
+        {
+          "axis_a": "programme",
+          "axis_b": "extended with shared_config",
+          "value": {
+            "owner": "programme",
+            "table": "programme (extended)"
+          },
+          "position": 21
+        },
+        {
+          "axis_a": "governed_asset",
+          "axis_b": "charter, closure, postmortem, SOP source and the MSP definition kinds",
+          "value": {
+            "owner": "project",
+            "table": "governed_asset (extended kind)"
+          },
+          "position": 22
+        },
+        {
+          "axis_a": "meeting",
+          "axis_b": "the decision forum: a card plus the meeting_type policy",
+          "value": {
+            "owner": "governance",
+            "table": "meeting_type; the meeting itself is a card and the minutes a governed_asset (D66, 2026-11-22)"
+          },
+          "position": 23
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase c, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries twenty-three entities. Four hold the organisation — industry and department, the job catalogue, the immutable release and the binding. Eleven carry work, the programme and governance: the WBS, the baseline, the cadence, the tranche, the programme baseline, the register, the benefit, the stakeholder, the approval policy, the project dependency and the extended programme. Six carry architecture, decisions, memory and tools, and one carries the meeting as a card with its meeting_type policy, added by the 2026-11-22 ruling.\n\n## Links\n\nThe artefact carries two typed edges: Business capability map — SPEC-V2 (retrospective, 2026-11-21) and Solution concept — SPEC-V2 (retrospective, 2026-11-21), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: name the entities the operating model stores and the owner of each. Scope: the twenty-three entities the plan adds or extends, taken from §4, §5, §7, §8, §10 and §11 and from D28/D29/D38/D49/D62/D63/D66. Authored retrospectively on 2026-11-26; each row records the table and the owner the plan names, and no entity is listed that no named procedure uses (P10)."
+    },
+    {
+      "title": "Technology standards — SPEC-V2 (retrospective, 2026-11-21)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Name the standards the model is built on and the exclusions it depends on.",
+      "scope": "The substrate, the store, the action interface, the seams, the knowledge and process formats, the methods and the deliberate exclusions.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "runtime operators",
+          "the delivery slices T0–T17",
+          "auditors"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Rust",
+          "axis_b": "the substrate",
+          "value": {
+            "usage": "One binary, typed actions and compiler-enforced crate boundaries; V2 keeps the Rust substrate V1 built and there is no flow generator (§1.4)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "PostgreSQL",
+          "axis_b": "the one store",
+          "value": {
+            "usage": "Same binary, same Postgres, same namespace and no new port (8930) (§10.6)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "ActionSpec",
+          "axis_b": "the interface",
+          "value": {
+            "usage": "One declaration serving HTTP, MCP, OpenAPI and a generated client (§10.4)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "MCP (/mcp)",
+          "axis_b": "the agent seam",
+          "value": {
+            "usage": "Agent to conveyor only; there is no conveyor-to-agent call, and the tool surface is versioned like an external API (§10.2, D33)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "JSON Schema Draft 2020-12 subset",
+          "axis_b": "tool input",
+          "value": {
+            "usage": "Closed schemas with additionalProperties false, enums, patterns and bounds (§11.3, §11.7)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "OpenAPI 3.1",
+          "axis_b": "BYO tool import",
+          "value": {
+            "usage": "A draft toolkit with per-operation effect classes and a registered destination alias (D42, §11.5)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "streamable-HTTP MCP",
+          "axis_b": "BYO remote server",
+          "value": {
+            "usage": "Binding-scoped discovery; only the bound subset is exposed to the tenant's jobs (§11.5)."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "MinIO (S3 API)",
+          "axis_b": "object storage",
+          "value": {
+            "usage": "Direct writes under a tenant prefix with server-side encryption, a content hash and a size cap; no artifact_service or storage-api dependency (D57, §11.10)."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "strata_ingest / strata_rag",
+          "axis_b": "knowledge",
+          "value": {
+            "usage": "Pinned-leaf retrieval, knowledge-pack import and cold digests; the conveyor never hosts embeddings (§5.6, §10.1)."
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "laya",
+          "axis_b": "the decision rung",
+          "value": {
+            "usage": "POST /v1/systemone behind a Jev-compatible bridge, measured at roughly 17 to 21 ms per request on 2026-10-10; the fail policy is the decision policy's (§7.2)."
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "PDDL",
+          "axis_b": "procedure steps",
+          "value": {
+            "usage": "The action space: preconditions and effects over typed facts; procedural knowledge is the published procedure itself (D53)."
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "RDF / OWL / Turtle",
+          "axis_b": "import only",
+          "value": {
+            "usage": "Imported into a strata knowledge pack named by the procedure's knowledge_pack_ref; no RDF store, no graph store and no reasoner (D53, amended 2026-11-19)."
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "BPMN 2.0 / Visio / draw.io",
+          "axis_b": "process-document import",
+          "value": {
+            "usage": "Activities become steps and gateways become gates; the result is a procedure draft behind a review gate (§5.6, D53)."
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "TOGAF ADM (tailored profile)",
+          "axis_b": "architecture method",
+          "value": {
+            "usage": "A lean profile with named artefacts and gates, nine maturity dimensions and seven skills categories; no certification claim (§8.1, §8.6)."
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "SAFe / MSP / PMP",
+          "axis_b": "programme method",
+          "value": {
+            "usage": "As rows and gates; no SAFe compliance badge, PMP certification or MSP conformance badge (§8.2 to §8.4, §8.6)."
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "ArchiMate 3.1 viewpoints",
+          "axis_b": "diagram metadata",
+          "value": {
+            "usage": "A viewpoint string on a typed artefact, not a live metamodel and no modelling tool (§8.6)."
+          },
+          "position": 16
+        },
+        {
+          "axis_a": "Kubernetes / GitHub / Flux / Prometheus-Loki-Grafana",
+          "axis_b": "operations tools",
+          "value": {
+            "usage": "Read verbs live; destructive verbs behind approval, a dry-run and dual control (§11.2, §11.4)."
+          },
+          "position": 17
+        },
+        {
+          "axis_a": "No Redis; no hosted model",
+          "axis_b": "exclusions",
+          "value": {
+            "usage": "The broker is in-process and the one internal agent loop is the only runtime (§10.6)."
+          },
+          "position": 18
+        },
+        {
+          "axis_a": "Leptos CSR in the same binary",
+          "axis_b": "the real UI",
+          "value": {
+            "usage": "Every V2 destination is a route in apps/web on port 8930; a mock page is evidence of intent, never of implementation (D64, D65)."
+          },
+          "position": 19
+        }
+      ],
+      "links": [
+        {
+          "to": "Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase d, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries nineteen standards. The substrate is Rust in one binary against one Postgres, with ActionSpec as the single interface and MCP as the agent seam. The tool and knowledge formats are closed JSON Schema, OpenAPI 3.1, remote MCP, MinIO, strata, laya, PDDL, RDF/OWL/Turtle as import only, and BPMN, Visio and draw.io as process-document imports. The methods are the tailored TOGAF ADM, SAFe, MSP and PMP as rows. The exclusions are Redis and a hosted model, and the UI standard is Leptos CSR in the same binary.\n\n## Links\n\nThe artefact carries one typed edge: Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21) as derivation. Every edge names another artefact of this pack, so the set has no orphan, and the edge records that each entity is stored in one of these formats.\n\n## Document\n\nPurpose: name the standards the model is built on and the exclusions it depends on. Scope: §1.4, §5.6, §7, §8, §10.6, §11 and D42/D53/D57/D64/D65 as the plan states them. Authored retrospectively on 2026-11-26; the catalogue names only formats the plan actually uses, and each deliberately weak method claim is matched by the §8.6 statement of what is not claimed."
+    },
+    {
+      "title": "Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "matrix",
+      "purpose": "Measure the distance between V1 as built and the V2 target, and name the slice that closes each gap.",
+      "scope": "Eight gaps from the absent organisation to the missing meeting record, each with its baseline, target and work package.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the delivery slices T0–T19F"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Organisation",
+          "axis_b": "baseline: no industry, department, job, release or binding (§1.1); target: industry to department(s) to job with immutable releases and tenant-scoped bindings (D28, D38)",
+          "value": {
+            "gap": "the organisation spine does not exist; V1 answers how work is carried but not who the organisation is",
+            "work_package": "T0"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Work hierarchy",
+          "axis_b": "baseline: programme and project.programme_id only (§5.1); target: WBS, baselines, registers, project dependency edges and a computed portfolio (D29, D49)",
+          "value": {
+            "gap": "no WBS node, baseline, register or dependency row exists in V2 form",
+            "work_package": "T1"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Decision trail",
+          "axis_b": "baseline: rules, agents and humans ad hoc (§13); target: rule to laya to generation to human, with every decision recorded (D30)",
+          "value": {
+            "gap": "a generated output has no typed boundary today, and the option set is not a row",
+            "work_package": "T2"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Meta-jobs",
+          "axis_b": "baseline: the improvement loop exists but nothing staffs it (§1.1); target: PM, coach, kata, development and operations as ordinary jobs (D31)",
+          "value": {
+            "gap": "no job catalogue, so no role can be a position with a charter and gates",
+            "work_package": "T3 to T7"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Executable rigour",
+          "axis_b": "baseline: requirements, ADRs and capabilities only (§13); target: TOGAF ADM, SAFe cadence, PMP artefacts and MSP benefits as rows and gates (D32, D62, D63)",
+          "value": {
+            "gap": "the method exists as prose, not as typed artefacts, contracts and gates",
+            "work_package": "T9 and T10"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Tool estate",
+          "axis_b": "baseline: 12 ad-hoc external actions (§13); target: versioned toolkits, bindings with an effect ceiling and one tool_call row per call (D41, D45)",
+          "value": {
+            "gap": "no catalogue, no broker and no ledger; calls leave the system unrecorded",
+            "work_package": "T13 to T15"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Meeting record",
+          "axis_b": "baseline: decisions appear as approvals without the meeting that produced them (§13); target: a meeting as a card whose items resolve approvals (D66)",
+          "value": {
+            "gap": "the forum that produced a decision is not on the record",
+            "work_package": "T19 and T19F"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Measurement",
+          "axis_b": "baseline: an inference ledger and budgets (§13); target: roll-ups at tenant, department, programme, project and job, drill-down to run, step and call, reconciled with billing_service (D37, D52)",
+          "value": {
+            "gap": "spend is visible per call but not attributed up the organisation",
+            "work_package": "T11"
+          },
+          "position": 8
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective matrix artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase e, plateau hld, kind matrix. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe matrix carries eight gaps. The organisation spine is absent and T0 builds it. The work hierarchy stops at programme and project, and T1 completes it. The decision trail is ad hoc and T2 types it. Nothing staffs the meta-jobs and T3 to T7 staff them. The rigour is prose rather than rows and T9 and T10 make it executable. The tool estate is twelve ad-hoc actions and T13 to T15 govern it. The meeting that produced a decision is missing and T19 with T19F records it. Spend is not attributed up the organisation and T11 meters it.\n\n## Links\n\nThe artefact carries two typed edges: Business capability map — SPEC-V2 (retrospective, 2026-11-21) as derivation and Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: measure the distance between V1 as built and the V2 target and name the slice that closes each gap. Scope: the eight areas §1.1, §5.1, §13 and D28 to D66 name. Authored retrospectively on 2026-11-26; the baseline column cites the plan's own measurement of V1, and the target column cites the decision that fixes it, so no gap is asserted without both ends."
+    },
+    {
+      "title": "Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the routes the plan considered and why the conveyor-owned model was selected.",
+      "scope": "Four candidates: V1 plus ad-hoc agents, a field framework, the conveyor-owned model and an external executor runtime.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery slices T0–T3",
+          "later-tranche delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Keep V1 and add ad-hoc agents",
+          "axis_b": "the do-minimum route",
+          "value": {
+            "status": "rejected",
+            "rationale": "V1 carries work but has no industry, department, job, cadence, meta-job, self-development or operations perspective, and the improvement loop has nothing staffing it (§1.1, §13)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Adopt a field framework",
+          "axis_b": "CrewAI, ChatDev/DevAll or n8n",
+          "value": {
+            "status": "rejected",
+            "rationale": "They build agent conversations; organisations run on positions, work products, gates, baselines and evidence. The measured n8n estate — 348 workflows, 280 of them the generated card-type by list matrix — is the caution, and the flow engine gives execution, not a process model (§1.3, §1.4)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "The conveyor-owned operating model",
+          "axis_b": "V2 as specified",
+          "value": {
+            "status": "selected",
+            "rationale": "Four units only — job, card, approval and run — with the organisation, work, decision, rigour, tool and measurement models owned by the conveyor and implemented as typed rows and gates (D28 to D33)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "An external executor runtime",
+          "axis_b": "a second runtime beside the internal one",
+          "value": {
+            "status": "deferred",
+            "rationale": "D61 makes an external runtime an explicit non-goal until four conditions hold — a generic work-packet ingress with per-step evidence, governance at the boundary, separate owners and roadmaps, and a win on the conveyor's own benchmark. The seam is built in T0 at near-zero cost."
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Stakeholder map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase e, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries four candidates. Keeping V1 and adding ad-hoc agents is rejected because the organisation layer, the cadence and the meta-jobs are absent. A field framework is rejected because CrewAI, ChatDev/DevAll and n8n build conversations rather than positions, gates and evidence, and the measured n8n matrix is the caution. The conveyor-owned model is selected: four units, typed rows and gates. An external executor runtime is deferred on D61's four conditions rather than rejected as a design.\n\n## Links\n\nThe artefact carries three typed edges: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) and Stakeholder map — SPEC-V2 (retrospective, 2026-11-21), both as dependency, and Gap Analysis — SPEC-V2 (retrospective, 2026-11-26) as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the routes the plan considered and why the conveyor-owned model was selected. Scope: the two rejected routes, the selected route and the deferred runtime, each with the measurement or decision that settles it. Authored retrospectively on 2026-11-26; the rejection of the field frameworks rests on the plan's own fetched sources of 2026-11-11, and the deferral is D61's, not this pack's judgement."
+    },
+    {
+      "title": "Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Place the project in its organisational and system context.",
+      "scope": "The programme, the affected organisation and the affected systems the plan names.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "runtime operators",
+          "the delivery slices T0–T17"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "The conveyor programme",
+          "axis_b": "tenant nonagentic, industry software",
+          "value": {
+            "kind": "context",
+            "note": "The first tenant and industry; AHTAPol and w2v are separate tenants with their own industries (D60, §4.6)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "The programme owner, the Architecture Board and the programme architect",
+          "axis_b": "the affected organisation",
+          "value": {
+            "kind": "actor",
+            "note": "The owner decides and chairs the Board; the architect authors under the #526 delegation; the Board approves contracts and artefacts (§8.1)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "The five first departments and their jobs",
+          "axis_b": "the affected organisation",
+          "value": {
+            "kind": "actor",
+            "note": "Delivery, verification, operations, project office and improvement; the first real job is conveyor maintenance, then feature delivery, then operations (§4.6)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "The conveyor application",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "system",
+            "note": "One binary on port 8930, 3 pods, with /health and /health/ready 200 on the V1 deploy record of 2026-11-10; V2 adds tables and actions and no new port (§1.1, §10.6)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "laya",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "external system",
+            "note": "Live on the DGX host behind a Jev-compatible bridge on :9210, roughly 17 to 21 ms per request measured 2026-10-10 (§7.2)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "strata_ingest and strata_rag",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "external system",
+            "note": "Knowledge-pack import, pinned-leaf retrieval and one cold digest per card; the conveyor never hosts embeddings (§7.6, §10.1)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "MinIO",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "external system",
+            "note": "Written directly under a tenant prefix with encryption, a content hash and a size cap; artifact_service and storage-api stay outside (D57, §11.10)."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "The agent platform over /mcp",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "external system",
+            "note": "A user-interaction front end over MCP with its own autonomy configuration; it is not a catalogue, an executor or a system of record (D33, D59)."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "billing_service",
+          "axis_b": "the affected system",
+          "value": {
+            "kind": "external system",
+            "note": "Remains the charging system; the conveyor's metering reconciles to it and a divergence opens an incident (D52, §7.5)."
+          },
+          "position": 9
+        }
+      ],
+      "links": [
+        {
+          "to": "Stakeholder map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution concept — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase e, plateau hld, kind diagram. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe diagram carries nine context rows. The programme sits in tenant nonagentic and industry software, with AHTAPol and w2v as separate tenants. The affected organisation is the owner, the Board, the architect, the five departments and their jobs. The affected systems are the conveyor binary on 8930, laya behind the bridge on 9210, strata for knowledge, MinIO for bytes, the agent platform over MCP and billing_service for charging. Each row names the boundary crossing the plan supports.\n\n## Links\n\nThe artefact carries two typed edges: Stakeholder map — SPEC-V2 (retrospective, 2026-11-21) and Solution concept — SPEC-V2 (retrospective, 2026-11-21), both as derivation. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: place the project in its organisational and system context. Scope: the programme, the affected organisation and the affected systems §1.1, §4.6, §7.2, §7.6, §10.1, §10.6, §11.10 and D33/D52/D57/D59/D60 name. Authored retrospectively on 2026-11-26 from the plan's own measurements, including the 2026-11-10 deploy record and the 2026-10-10 laya latency, rather than from a live draw."
+    },
+    {
+      "title": "Benefits Diagram — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "e",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "Link the model to the outcomes it is meant to produce and the measures that would show them.",
+      "scope": "Auditability at the level of a single decision, a staffed improvement loop, programme cadence, benefits realisation and the measures behind them.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the sponsoring group",
+          "the programme office",
+          "the benefit owners"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Auditability at the level of a single decision",
+          "axis_b": "the primary benefit",
+          "value": {
+            "kind": "benefit",
+            "note": "Which option, which confidence, which policy, which person and which evidence — the plan's unglamorous win (§13)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "A staffed improvement loop",
+          "axis_b": "sub-benefit",
+          "value": {
+            "kind": "sub-benefit",
+            "note": "Coach, kata, development, measurement and adoption as one loop rather than four disconnected instruments (§9.4, D31)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme cadence with tranche reviews",
+          "axis_b": "sub-benefit",
+          "value": {
+            "kind": "sub-benefit",
+            "note": "A PI is the delivery rhythm and a tranche is the management unit; the review is an approval with the baselines, benefit status and risk register as evidence (§8.2, §8.3, D62)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Executable rigour",
+          "axis_b": "sub-benefit",
+          "value": {
+            "kind": "sub-benefit",
+            "note": "TOGAF ADM, SAFe cadence, PMP artefacts and MSP benefits as rows and gates, with no certification claim (§8.1 to §8.6, D32)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "A measurable benefit",
+          "axis_b": "the condition of the benefit",
+          "value": {
+            "kind": "condition",
+            "note": "A benefit without baseline, target, method and owner is refused; a benefit whose baseline was never measured cannot claim an improvement (§8.3)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Metrics computed from rows",
+          "axis_b": "the measure",
+          "value": {
+            "kind": "measure",
+            "note": "Flow, quality, cost, governance and knowledge families computed from run, approval, event, inference_call and decision rows; a gate that never refused is flagged (§7.5, D37)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Metering at six levels",
+          "axis_b": "the measure",
+          "value": {
+            "kind": "measure",
+            "note": "Tenant, department, programme, project, job and run, drilling to step and call, reconciled with billing_service (D52, §7.5)."
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Business capability map — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "realization"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective diagram artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase e, plateau hld, kind diagram. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe diagram carries one benefit and three sub-benefits. The benefit is auditability at the level of a single decision — option, confidence, policy, person and evidence. The sub-benefits are a staffed improvement loop, a programme cadence with tranche reviews, and executable rigour. The two measures are the metric families computed from rows and the metering roll-ups reconciled with billing_service, and the condition is that a benefit without baseline, target, method and owner is refused.\n\n## Links\n\nThe artefact carries two typed edges: Business capability map — SPEC-V2 (retrospective, 2026-11-21) as derivation and Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26) as realization. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: link the model to the outcomes it is meant to produce and the measures that would show them. Scope: §13, §8.3, §9.4, D37 and D52. Authored retrospectively on 2026-11-26; it does not claim a benefit realised — the model is specified and partly built, and the measures are the ones the plan defines, not values observed."
+    },
+    {
+      "title": "Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "f",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the work packages that produced the definition set and the slices that carry the model into the estate.",
+      "scope": "Six work packages from the published definition set to the last delivery slice, with their recorded status.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery slices T0–T19F",
+          "later-tranche delivery teams"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "WP1 publish the definition set",
+          "axis_b": "docs/SPEC_V2.md as the spec output",
+          "value": {
+            "status": "done",
+            "evidence": "The `spec` output 01a1ff43-188d-77ce-be65-32154a1a16bf was published 2026-11-21T17:59:15Z; the rework note records the plan as the evidence found."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "WP2 create the governance records",
+          "axis_b": "charter, statement, contract, baseline, review and closure",
+          "value": {
+            "status": "done",
+            "evidence": "The seven A–D artefacts are approved rows dated 2026-11-22; the delivery contract 01a1ff42-7bd0-7d9e-883a-1059368cd356 and the baseline 01a1ff42-ba64-7670-b694-99bb4b1354e5 are live; the review 01a1ff43-a1bc-758d-89dc-c97d0fb0265a is compliant."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "WP3 the first three months of work",
+          "axis_b": "T0 to T3 plus T13",
+          "value": {
+            "status": "planned",
+            "evidence": "The organisation spine and the tool spine; everything else is a job that uses them (§12)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "WP4 the ADM capability and the programme cadence",
+          "axis_b": "T9 and T10",
+          "value": {
+            "status": "built",
+            "evidence": "The plan records T9 and T10 already built, measured 2026-11-23 (§12)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "WP5 the decision forums",
+          "axis_b": "T19 and the T19F follow-on",
+          "value": {
+            "status": "built, with a follow-on in flight",
+            "evidence": "T19 starts after T1 to T3 and its board convener is testable because T9 is built; T19F is measured 2026-11-24 (§12)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "WP6 the real V2 UI",
+          "axis_b": "T18",
+          "value": {
+            "status": "planned",
+            "evidence": "Every V2 destination is a route in apps/web with a Playwright spec, and a coverage verdict requires both (D64, D65, §12)."
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology standards — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "dependency"
+        },
+        {
+          "to": "Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase f, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries six work packages. WP1 publishes the definition set as the spec output on 2026-11-21. WP2 creates the governance records: the seven approved A–D artefacts dated 2026-11-22, the live contract and baseline, and the compliant review. WP3 is the first three months — T0 to T3 plus T13. WP4 is T9 and T10, measured built 2026-11-23. WP5 is T19 with the T19F follow-on measured 2026-11-24. WP6 is T18, planned.\n\n## Links\n\nThe artefact carries three typed edges: Candidate Solutions Catalogue — SPEC-V2 (retrospective, 2026-11-26) as derivation, and Technology standards — SPEC-V2 (retrospective, 2026-11-21) plus Gap Analysis — SPEC-V2 (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the work packages that produced the definition set and the slices that carry the model into the estate. Scope: the published definition set, the governance records and the delivery plan's T0 to T19F. Authored retrospectively on 2026-11-26; a slice is marked built only where §12 says so, and the rest stay planned, because the plan's sequencing is not this project's delivery record."
+    },
+    {
+      "title": "Compliance Review Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "g",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the compliance verdicts the project carries and the claims it deliberately does not make.",
+      "scope": "The Phase-G review, its level, the artefact set it assessed and the later decisions the record does not carry.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "the sponsoring group"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Phase-G review",
+          "axis_b": "the live review against the delivery contract",
+          "value": {
+            "result": "compliant",
+            "evidence": "Review 01a1ff43-a1bc-758d-89dc-c97d0fb0265a records exactly one level, compliant, and cites the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "The artefact set",
+          "axis_b": "the seven A–D artefacts",
+          "value": {
+            "result": "approved",
+            "evidence": "The stakeholder map, driver/goal/objective catalog, requirements catalog, solution concept, business capability map, data entity catalogue and technology standards are approved rows dated 2026-11-21, published 2026-11-22."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "What is not claimed",
+          "axis_b": "certification and conformance",
+          "value": {
+            "result": "not claimed",
+            "evidence": "No TOGAF certification, no SAFe compliance badge, no PMP certification, no MSP conformance badge, no full ADM conformance and no ArchiMate modelling tool (§8.6)."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "The closure gap",
+          "axis_b": "the 2026-11-17 closure",
+          "value": {
+            "result": "recorded",
+            "evidence": "The project closed on 2026-11-17 with no recoverable approval row or closure asset; the review and the closure record this pack carries are the retrospective replacements the rework note lists."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Proposed decisions",
+          "axis_b": "D61, D62 and D63",
+          "value": {
+            "result": "open, assessed as written",
+            "evidence": "D61 is proposed for acceptance; D62 and D63 are proposed 2026-11-16. Compliance is assessed against the document as written, including those statuses (§15.1)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Decisions after the record",
+          "axis_b": "D64 to D66",
+          "value": {
+            "result": "recorded",
+            "evidence": "D64 and D65 carry the real-UI rulings of 2026-11-22 and D66 the meeting ruling of the same date; the review record of 2026-11-21 predates them, and this pack names the difference rather than back-dating it."
+          },
+          "position": 6
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology standards — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase g, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries six assessments. The Phase-G review at 01a1ff43-a1bc-758d-89dc-c97d0fb0265a is compliant and cites the delegation. The seven A–D artefacts are approved and published on 2026-11-22. No certification or conformance is claimed. The 2026-11-17 closure left no recoverable approval row or closure asset, and the rework note records that residual. D61 to D63 remain proposed and are assessed as written. D64 to D66, dated 2026-11-22, post-date the review record and are named as such.\n\n## Links\n\nThe artefact carries two typed edges: Technology standards — SPEC-V2 (retrospective, 2026-11-21) as derivation and Implementation and Migration Plan Catalogue — SPEC-V2 (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the compliance verdicts the project carries and the claims it deliberately does not make. Scope: the Phase-G review, the artefact set, the closure gap, the proposed decisions and the later rulings. Authored retrospectively on 2026-11-26; it reports the compliant level the review records and, in the same breath, the residuals — proposed decisions and a closure no one can attribute — rather than smoothing them into a green claim."
+    },
+    {
+      "title": "Architecture Change Request Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "Record the changes that shaped the model and the ruling each one carries.",
+      "scope": "The #526 rework, the D53 amendment, the real-UI rulings and the meeting ruling, with their recorded impact.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "auditors",
+          "the delivery slices T16 and T19F"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "CR1 the #526 retrospective rework",
+          "axis_b": "the reconstituted lifecycle for tranche 0",
+          "value": {
+            "status": "accepted",
+            "evidence": "Delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14; the rework note records the 38 acts and the read-back of every write."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "CR2 the D53 amendment of 2026-11-19",
+          "axis_b": "the PKO store removed; RDF/OWL/Turtle becomes a strata knowledge-pack import",
+          "value": {
+            "status": "accepted",
+            "evidence": "The amendment is recorded in §5.6, §15.1 D53 and §15.2 #13, and it re-scopes T16; the conveyor runs no RDF store, no graph store and no reasoner."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "CR3 the real-UI rulings D64 and D65",
+          "axis_b": "the app is the UI; measure the real routes, not the mock",
+          "value": {
+            "status": "accepted 2026-11-22",
+            "evidence": "Every V2 destination is a route in apps/web; the coverage instrument requires the real route and its Playwright spec, and a V1 ancestor route may justify extend but never exists."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "CR4 the meeting ruling D66",
+          "axis_b": "meetings are the decision forum",
+          "value": {
+            "status": "accepted 2026-11-22",
+            "evidence": "A meeting is a card whose agenda items resolve approvals; the ruling adds T19 and the T19F follow-on, and the LLM drafts but never decides."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "CR5 the T16 re-scope",
+          "axis_b": "SOP, RDF/OWL and process-document ingestion",
+          "value": {
+            "status": "accepted",
+            "evidence": "T16 follows the tool spine, ingests a real SOP, an OWL file and a BPMN diagram, and publishes each draft behind a human gate (§12, D53)."
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Compliance Review Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase h, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries five change requests. CR1 is the #526 rework itself, accepted under the standing delegation and recorded in 38 acts. CR2 is the D53 amendment of 2026-11-19, which removed the PKO store and made RDF/OWL/Turtle a strata knowledge-pack import, re-scoping T16 as CR5. CR3 and CR4 are the 2026-11-22 rulings: the app is the UI and is measured on its real routes, and meetings are the decision forum. Each row names the recorded impact.\n\n## Links\n\nThe artefact carries two typed edges: Compliance Review Catalogue — SPEC-V2 (retrospective, 2026-11-26) as derivation and Gap Analysis — SPEC-V2 (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: record the changes that shaped the model and the ruling each one carries. Scope: the retrospective rework, the two spec amendments and the two later rulings, as §5.6, §15.1, §15.2 and §12 record them. Authored retrospectively on 2026-11-26; the phase-H rule the plan states is that a review produces exactly one typed outcome, and this catalogue keeps each change separate rather than merging them into a single narrative."
+    },
+    {
+      "title": "Architecture Requirement Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+      "phase_code": "h",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "State the requirements that constrain the architecture itself, and their types.",
+      "scope": "Seven architecture requirements drawn from the plan's hard invariants and its guardrails, each typed condition or constraint.",
+      "stakeholders": {
+        "owner": "the programme architect under the #526 rework delegation",
+        "reviewer": "the Architecture Board",
+        "consumers": [
+          "the programme office",
+          "the delivery slices T0–T19F",
+          "independent reviewers"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "AR1 one record per fact",
+          "axis_b": "no concept is stored twice; systems join by pinned reference",
+          "value": {
+            "type": "constraint",
+            "evidence": "P1 and the ownership matrix at §10.1; a contract test per seam."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "AR2 no LLM selects, routes, classifies or approves",
+          "axis_b": "the generated result has no path to a state transition",
+          "value": {
+            "type": "constraint",
+            "evidence": "P2 and §7.1; the generation result type is not accepted by any transition function."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "AR3 tenant configuration over code",
+          "axis_b": "policies, thresholds, limits and approval kinds are versioned rows",
+          "value": {
+            "type": "constraint",
+            "evidence": "P11 and D50; a hard-coded policy value is a review finding."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "AR4 no speculative aggregate",
+          "axis_b": "a table exists because a named procedure uses it and a metric reads it",
+          "value": {
+            "type": "constraint",
+            "evidence": "P10 and D40; an unused aggregate is removed rather than defended."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "AR5 fail closed on missing configuration",
+          "axis_b": "an unresolved binding, pack, prompt source or tool refuses before the first call",
+          "value": {
+            "type": "condition",
+            "evidence": "P8; the refusal is 409 with blocking[]."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "AR6 the system cannot change the gates that judge it",
+          "axis_b": "the merge and deploy decisions stay separate and human",
+          "value": {
+            "type": "constraint",
+            "evidence": "D34 and §9.3; a development project cannot modify its gate set, approval policy, eval instrument or benchmark suite."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "AR7 every artefact is a typed row",
+          "axis_b": "metadata, entries and typed links, with the requirements catalogue continuous",
+          "value": {
+            "type": "constraint",
+            "evidence": "D63 and §8.1; a catalog, matrix or diagram carries common metadata, entries as rows and links of four kinds, and each phase closes on an approved architecture contract."
+          },
+          "position": 7
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Architecture Change Request Catalogue — SPEC-V2 (retrospective, 2026-11-26)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "## Metadata\n\nRetrospective catalogue artefact for SPEC-V2, authored 2026-11-26 from the facts brief, the plan and the rework note. Phase h, plateau hld, kind catalog. Owner: the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; reviewer: the Architecture Board.\n\n## Entries\n\nThe catalogue carries seven architecture requirements. AR1 to AR4 and AR6 to AR7 are constraints: one record per fact, no LLM transition path, tenant configuration over code, no speculative aggregate, gates that the system cannot change, and every artefact a typed row with entries and typed links. AR5 is a condition: the system fails closed on missing configuration. Each row names the principle and the enforcement the plan states.\n\n## Links\n\nThe artefact carries two typed edges: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) as derivation and Architecture Change Request Catalogue — SPEC-V2 (retrospective, 2026-11-26) as dependency. Every edge names another artefact of this pack, so the set has no orphan.\n\n## Document\n\nPurpose: state the requirements that constrain the architecture itself, and their types. Scope: P1, P2, P8, P10, P11, D34, D40, D50 and D63 as §3, §7.1, §8.1, §9.3 and §10.1 state them. Authored retrospectively on 2026-11-26; the requirements are typed with the four standard types, and each names the refusal or the review rule that would make it fail, so none is a statement of intent."
+    }
+  ],
+  "documents": [
+    {
+      "category": "project-brief",
+      "title": "Project Brief — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Project Brief — SPEC-V2 (retrospective, 2026-11-26)\n\n## Outcome\n\nSPEC-V2 delivers `docs/SPEC_V2.md`, the conveyor's organisational operating model, and publishes it as the `spec` output: an organisation spine of industry → department(s) → job with an immutable release and a tenant-scoped binding, a work hierarchy from programme to run, a four-rung decision ladder, and TOGAF, SAFe, PMP and MSP implemented as rows and gates rather than documents. The outcome the plan states in §13 is that the organisation's work becomes auditable at the level of a single decision — which option, which confidence, which policy, which person, which evidence.\n\n## Boundary\n\nOut of scope are V1's S-slices, which are not re-opened; the V2 delivery slices T0–T19 and T19F, which are their own projects; and `docs/SPEC_LEGACY_KAG.md`, which owns the legacy-kag and w2v rewrites (D54). The model explicitly does not do customer care (D48), does not import a manifest from another system (D33), and does not claim TOGAF certification, SAFe compliance, PMP certification, MSP conformance or full ADM conformance (§8.6).\n\n## Reuse sources\n\nThe plan reuses the ideas of the agent platform's KH model (D106–D115) and reimplements them, so there is no runtime import (D33). It reuses V1's Rust substrate, its capability → procedure → step → action or gate knowledge, its run, approval, action_invocation and event memory, its capability_agent executor configuration, its inference ledger and its eval and benchmark instruments. The retrospective record reuses the snapshot's approved A–D rows and the rework note's residuals.\n\n## Inception units\n\nThe delivery units are the V2 slices: T0 to T3 and T13 in the first three months, T4 to T12 and T14 to T19 as the following work, and T19F as the measured follow-on (§12). The retrospective reconstitution of this project's own lifecycle is the #526 unit, whose 38 acts are recorded in `transcript.jsonl` and read back one write at a time by `programme-record.py`. Units T9 and T10 are measured built on 2026-11-23, and T19F on 2026-11-24.\n\n## Dependencies\n\nEvery delivery slice depends on the T0 spine and, from T6 and T7 onward, on the T13 tool spine (§12). The decision ladder depends on laya, live on the DGX behind a Jev-compatible bridge on :9210 at roughly 17 to 21 ms per request measured 2026-10-10. Knowledge depends on strata_ingest and strata_rag; bytes depend on MinIO; metering depends on billing_service as the charging system. The project's approvals depend on the standing #526 delegation, and its closure depends on the one gate with an approver other than its requester.\n\n## Acceptance\n\n`python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh>` is green with 11 checks and 0 failures at `d7293f96`, and the strict audit on the same snapshot carries no P0/P1 entry for the project; the rework note records both. The acceptance manifest `acceptance/programme/SPEC-V2.toml` is the gate's evidence. The seven A–D artefacts are approved rows, the Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` records level compliant, and the WBS deliverable is accepted.\n\n## Capabilities\n\nThe project installs thirteen capabilities: organisation management, work management, programme management, benefits realization, architecture management, decision management, tool governance, measurement, self-development, operations, authoring, organisational memory and the decision forums. Organisation management and decision management are specified and land in T0 and T2; programme management, architecture management and decision forums are built; the rest are partial. Each is recorded with its evidence in the capability map.\n\n## Plan\n\nThe retrospective plan runs charter, Statement of Architecture Work, the seven A–D artefacts, the delivery contract and its approval, the scope baseline with one WBS deliverable, the Phase-G review and the `spec` output, then closure through the one gate. The forward plan is §12: T0 to T3 plus T13 in the first three months, then the remaining slices, with T9 and T10 built, T19 built and T19F measured. The plan is `docs/SPEC_V2.md`, active, and it remains the source the tranche reviews read."
+    },
+    {
+      "category": "benefits-diagram",
+      "title": "Benefits Diagram — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Benefits Diagram — SPEC-V2 (retrospective, 2026-11-26)\n\n## Goals and outcomes\n\nThe goal is an organisation the conveyor owns and can prove: positions that are catalogued, released and bound; work that moves from programme to run with a baseline, a register and evidence; and decisions that pass rule → laya → generation → human with every step recorded. The measurable outcome is auditability at the level of a single decision — which option, which confidence, which policy, which person, which evidence (§13). The plan calls this the unglamorous win, and it is the outcome the benefit depends on.\n\n## Measures\n\nThe measures are computed read models, never stored opinions (D37): flow (lead time, cycle time, queue time, block time, flow efficiency, WIP, throughput), quality (first-pass yield, rework rate, defect escapes, eval score, benchmark delta), cost from the ledger, governance (gate latency, approval rate, override rate, evidence completeness, never-refused gates) and knowledge (pack hit rate, citation rate, readiness blocks, lesson promotion). Metering rolls up at tenant, department, programme, project and job and drills to run, step and call, reconciled with billing_service (D52). A gate that never refused in a full cycle is flagged as broken.\n\n## Benefits and sub-benefits\n\nThe benefit is auditability at the level of a single decision. Its sub-benefits are a staffed improvement loop — coach, kata, development, measurement and adoption as one loop (§9.4); a programme cadence in which a PI is the delivery rhythm and a tranche is the managed unit, with the review an approval carrying baselines, benefit status and the risk register (§8.2, §8.3); and executable rigour, with TOGAF, SAFe, PMP and MSP as rows and gates and no certification claim (§8.6). A benefit without baseline, target, method and owner is refused, so no sub-benefit can be claimed on a wish.\n"
+    },
+    {
+      "category": "candidate-solutions",
+      "title": "Candidate Solutions — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Candidate Solutions — SPEC-V2 (retrospective, 2026-11-26)\n\n## Candidates\n\nFour routes were considered. The first keeps V1 and adds ad-hoc agents, which preserves the working machine and leaves the organisation, cadence and meta-jobs absent. The second adopts a field framework — CrewAI, ChatDev/DevAll or n8n — and inherits their conversation model. The third is V2 as specified: the conveyor owns the whole model in four units, with typed rows and gates. The fourth adds an external executor runtime beside the internal one, and D61 defers it until four stated conditions hold.\n\n## Criteria\n\nThe routes are judged on five criteria the plan already fixes: one record per fact (P1), so no concept is stored twice; no speculative aggregate (P10), so a table exists only because a named procedure uses it and a metric reads it; tenant configuration over code (P11), so policies are versioned rows; self-containment (D33), so the conveyor owns its model and the agent platform is a front end; and measurement before adoption (P5), so a change is adopted because a held-out instrument moved. A sixth, narrower criterion is honesty of claim: no certification or conformance badge (§8.6).\n\n## Options rejected\n\nKeeping V1 and adding ad-hoc agents is rejected because the organisation spine, the programme cadence, the meta-jobs and the operations perspective do not exist, and the improvement loop has nothing staffing it. The field frameworks are rejected because they build agent conversations, while organisations run on positions, work products, gates, baselines and evidence; the measured n8n estate — 348 workflows, 280 of them the generated card-type by list matrix, each with its own error exits — is the plan's own caution (§1.3, §1.4). The external runtime is deferred, not rejected: D61 names the four conditions, and the seam in T0 preserves the option at near-zero cost.\n"
+    },
+    {
+      "category": "project-context-diagram",
+      "title": "Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Project Context Diagram — SPEC-V2 (retrospective, 2026-11-26)\n\n## Context\n\nThe work package is the SPEC-V2 definition set: the plan `docs/SPEC_V2.md`, its decisions and the architecture artefacts it governs. Its boundary is the model the conveyor owns — organisation, work, decisions, programme cadence, architecture, tools and measurement — together with the rows, contracts and gates that make each one executable. The context is the first tenant `nonagentic`, industry `software`, with AHTAPol and w2v as separate tenants and industries (D60), and with the delivery slices T0 to T19F as the work that carries the model into the estate.\n\n## Affected organisation\n\nThe programme owner and sponsor decides and chairs the Architecture Board; the programme architect authors under the #526 delegation; the Board approves contracts and artefacts. The first departments are delivery, verification, operations, project office and improvement, and their jobs are the first positions the model must staff — conveyor maintenance first, then feature delivery, then operations (§4.6). Development projects act as the system's own capacity to change its substrate, and the agent platform is a front end whose users reach the same work over MCP. Independent reviewers and the public read the published design.\n\n## Affected systems\n\nThe conveyor application is one binary on port 8930 with no new port (V2 adds tables and actions), live on 3 pods with `/health` and `/health/ready` 200 on the 2026-11-10 deploy record. laya answers on :9210 behind a Jev-compatible bridge. strata_ingest and strata_rag hold knowledge packs and one cold digest per card. MinIO holds bytes directly under tenant prefixes, with no artifact_service or storage-api dependency. The agent platform reaches the conveyor over `/mcp`; billing_service remains the charging system the metering reconciles to.\n"
+    },
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Architecture Artefact Index — SPEC-V2 (retrospective, 2026-11-26)\n\n## Metadata\n\nThe artefact set for SPEC-V2 is fifteen deliverables on the programme track: the seven A–D artefacts the Architecture Board approved, published on 2026-11-22, and the eight E–H artefacts authored in this rework on 2026-11-26. Each is a row carrying its standard key, its phase and plateau and a published body; the owner is the programme architect under delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`, and the reviewer is the Architecture Board. The set covers the model `docs/SPEC_V2.md` specifies, not a design that was produced separately.\n\n## Entries\n\nThe catalogue is the project's fifteen artefact rows — the seven approved A–D rows and the eight E–H rows this pack authors: the stakeholder map, the driver/goal/objective catalogue, the requirements catalogue and the solution concept (phase A); the business capability map (phase B); the data entity catalogue (phase C); the technology standards (phase D); the gap analysis and candidate solutions, the project context and benefits diagrams (phase E); the implementation and migration plan (phase F); the compliance review (phase G); the architecture change requests and the architecture requirements (phase H). Each names its kind — matrix, catalogue or diagram — and the phase and plateau it occupies.\n\n## Links\n\nThe links are the typed edges the pack declares, in the four standard kinds: derivation, realization, reuse and dependency. The solution concept realises the requirements catalogue; the business capability map derives from the solution concept and the requirements; the data entity catalogue derives from the capability map; the gap analysis depends on the implementation plan, which depends on the technology standards; the benefits diagram realises the candidate solutions; and the compliance review derives from the technology standards. An artefact with no link would be an orphan and is refused before it is written.\n\n## Document\n\nEvery artefact body is published as a document, and this index is the document the standard's architecture-artifact package reads; the fifteen artefact rows are its entries. Each body carries the four sections — Metadata, Entries, Links and Document — that the standard requires, and each entry is a row with `axis_a`, `axis_b` and `value` so that a catalogue is queryable and a matrix is joinable. The index is dated 2026-11-26 and lists the set as it stands after this rework.\n"
+    },
+    {
+      "category": "gap-analysis",
+      "title": "Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Gap Analysis — SPEC-V2 (retrospective, 2026-11-26)\n\n## Baseline\n\nThe baseline is the closure the record carries, not the one the plan claims. SPEC-V2 was closed on 2026-11-17 with no surviving approval row and no closure asset, so the decision-maker is not recoverable. What the record does hold is the delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` approved by `01a1ff42-9127-7cad-b611-c1ebf1006b0a`, the approved scope baseline `01a1ff42-ba64-7670-b694-99bb4b1354e5`, the compliant Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a`, the seven A–D artefacts approved on 2026-11-22 and the `spec` output `01a1ff43-188d-77ce-be65-32154a1a16bf` published on 2026-11-21. Against that record the manifest was red: the closure outputs were undeclared, thirteen mandatory artefact packages were open and five P0/P1 packages were unresolved.\n\n## Target\n\nThe target is a green manifest re-closed through the one gate: the fifteen-artefact A–H set approved and bound to its standard types, the Phase-E category documents and this project's registers published, the closure outputs declared and the closure review published, and the close decided by an approver distinct from the requester.\n\n## Gaps and work packages\n\nThree gaps are measured and each is closed by this pack. The artefact gap closes from the eight E–H artefacts authored here, each bound to its standard type and approved; the document gap closes from the gap-analysis and project-registers documents this pack adds to the bodies it already carried; the closure gap closes from the declared `evidence` and `closure-review` outputs and the re-close through the gate. Two gaps are not closable and are stated rather than absorbed: who closed the project on 2026-11-17 is not recoverable, and the contemporaneous WSJF inputs — 13, 8, 13 and 20 are the recorded values — were not preserved."
+    },
+    {
+      "category": "project-registers",
+      "title": "Project Registers — SPEC-V2 (retrospective, 2026-11-26)",
+      "body": "# Project Registers — SPEC-V2 (retrospective, 2026-11-26)\n\n## Risks\n\nFour risks are recorded on the project: the organisation spine ships before any tenant uses it; gates that cannot fail; the decision trail drifts back into prompts; and meeting theatre after the 2026-11-22 ruling.\n\n## Issues\n\nTwo issues are recorded: D61, D62 and D63 remain proposed rather than accepted, and the spec grew after the rework record was written, so the text reviewed here is the 2026-11-26 revision rather than the one the plan originally fixed.\n\n## Assumptions\n\nTwo assumptions are recorded: the 2026-11-17 closure stays unattributed, and the plan remains the active plan the records cite.\n\n## Dependencies\n\nTwo dependencies are recorded: every meta-job depends on the organisation and tool spines, and the board and cadence binding to meetings depends on T19F.\n\n## Benefits\n\nTwo benefits are recorded: auditability at the level of a single decision, and a measurable benefit rather than a wished one.\n\n## Changes\n\nOne change is recorded: the retrospective MSP/TOGAF/SAFe rework of SPEC-V2 under the #526 scope change, which authorises this pack's writes and is cited by the WBS deliverable."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The organisation spine ships before any tenant uses it",
+        "body": "The plan names over-abstraction as R1: four wf_* types served nothing, the generator was deleted, and an aggregate with no caller is cost without benefit. This retrospective row, dated 2026-11-26, records the risk that the job catalogue, release and binding are built before a real tenant's jobs exercise them; P10 is the mitigation — a table exists because a named procedure uses it and a metric reads it, and an unused aggregate is removed rather than defended.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §14 R1 over-abstraction; P10 and D40"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Gates that cannot fail",
+        "body": "The plan names governance theatre as R5: a gate that has never refused anything in a full programme cycle is a broken gate, not a healthy one. This row records the risk that the model's gates are recorded without negative tests and pass by default, which would make the evidence a formality; the mitigation is a negative test per gate and the governance audit's never-refused flag.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §14 R5; §5.4 no gate that cannot fail"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The decision trail drifts back into prompts",
+        "body": "The plan names LLM decision creep as R4: routing or classification logic reappears in a prompt, and the recorded decision becomes a post-hoc narrative. This row records the risk against the four-rung ladder; the mitigation is the type boundary that gives a generation result no path to a state transition, a code-review rule per surface and a negative test that refuses the attempt.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §14 R4; P2 and §7.1"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Meeting theatre after the 2026-11-22 ruling",
+        "body": "The plan names meeting theatre as R20: the calendar grows, decisions are claimed in conversation, attendance is courtesy and the minutes do not match what was decided. This row records the risk against D66; the mitigations are that every agenda item resolves a typed object, the outcome set is closed, quorum and the decision rule are policy, a commitment needs an owner and a date, a minute line must match a recorded position, and a forum with no decision over a cycle is retired.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "meta": {
+          "owner": "the programme architect under the #526 rework delegation"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §14 R20; D66 and §6.8"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "D61, D62 and D63 are proposed, not accepted",
+        "body": "The plan states that D61 (executor seam; external runtime deferred), D62 (MSP programme definition and benefits realization) and D63 (TOGAF ADM as an artefact-typed capability) are proposed, not accepted, and that §15.2 #21 stays open until D61 is accepted. This retrospective row, recorded 2026-11-26, keeps the status visible: the seven A–D artefacts and this pack's E–H set are assessed against the document as written, including those proposed statuses.",
+        "status": "open",
+        "severity": "medium",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §15.1 D61, D62, D63; §15.2 #21"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The spec grew after the rework record",
+        "body": "The rework note is dated 2026-11-21 and records decisions D1–D63 as the evidence found. The plan now carries D64 and D65 (the real-UI rulings of 2026-11-22) and D66 (the meeting ruling of the same date). This row records the difference rather than back-dating it: the records of 2026-11-21 cannot have assessed decisions written the next day, and this pack of 2026-11-26 reads the plan as it stands.",
+        "status": "open",
+        "severity": "low",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/evidence/rework/SPEC-V2.md — the 2026-11-21 record",
+            "docs/SPEC_V2.md — §15.1 D64, D65, D66"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The 2026-11-17 closure stays unattributed",
+        "body": "The rework note records that who closed the project on 2026-11-17 and why is not recoverable, because no approval row and no closure asset survive. This retrospective assumption, recorded 2026-11-26, is that the absence is accepted: the closure is stated as a fact of the record without a named decision-maker, and no reconstruction is asserted in its place.",
+        "status": "open"
+      },
+      {
+        "title": "The plan remains the active plan the records cite",
+        "body": "The project row names `docs/SPEC_V2.md` as the plan with status active. This assumption, recorded 2026-11-26, is that the plan stays the source of truth for the A–D and E–H artefacts and for the slice sequence T0 to T19F, so a later revision that changed a decision would re-open the artefact that cites it rather than leaving the row stale.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "Every meta-job depends on the organisation and tool spines",
+        "body": "The plan's dependency chain puts T0 before T1 before T2 before T3, with T6 after T5 and T13, and T7 after T2, T4 and T13. This retrospective row, recorded 2026-11-26, records that no meta-job can run as a position until the job catalogue and binding exist and the tool broker is in place, so the first three months are the spine rather than a role.",
+        "status": "open"
+      },
+      {
+        "title": "The board and cadence binding to meetings depends on T19F",
+        "body": "T9 and T10 are measured built, and T19 starts after T1, T2 and T3 with its board convener testable because T9 is built. The explicit binding of the T9 board and the T10 cadence to T19's meeting types is T19F, measured 2026-11-24, and this row records that the remaining integration waits on that follow-on rather than on a rebuild of either slice.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Auditability at the level of a single decision",
+        "body": "The benefit the plan claims in §13 is that the organisation's work becomes auditable at the level of a single decision — which option, which confidence, which policy, which person, which evidence. This retrospective row, dated 2026-11-26, links the benefit to the model without claiming it realised: the decision ladder is specified in T2, and the measures that would show the benefit are computed from decision, approval and inference_call rows that the estate does not yet carry at scale.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §13; D30 and D37"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "A measurable benefit rather than a wished one",
+        "body": "The plan's MSP rule is that a benefit without baseline, target, method and owner is not a benefit but a wish, and a benefit whose baseline was never measured cannot claim an improvement. This row records the sub-benefit that the model makes that rule enforceable: benefit_profile is the mandatory measurement record and benefit_link carries output to capability to operational outcome to benefit to objective, so the claim is a row rather than a narrative.",
+        "status": "open",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/SPEC_V2.md — §8.3; D62"
+          ],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — SPEC-V2 (retrospective, 2026-11-26)",
+    "body": {
+      "commitments": "Produce and publish SPEC V2 as the programme's adopted operating model: the plan `docs/SPEC_V2.md` and its decision set, the seven Phase A–D artefacts approved by the Architecture Board, the eight Phase E–H artefacts this rework authors, the scope baseline with one WBS deliverable, the Phase-G review and the `spec` output, and re-close the project through the one gate. The live contract this restates is `01a1ff42-7bd0-7d9e-883a-1059368cd356`; the work is retrospective and dated 2026-11-26.",
+      "compliance": "Compliance is the Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a`, which records exactly one of the six standard levels — compliant — against this contract, and cites the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. No waiver exists. Compliance is assessed against the plan as written, including the proposed status of D61, D62 and D63 and the later rulings D64 to D66 dated 2026-11-22.",
+      "approval": "The live delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` is approved by `01a1ff42-9127-7cad-b611-c1ebf1006b0a`; the approver `01a1e8a7-8b23-76a9-9114-aafb95f7a545` is distinct from the requester `01a1e607-17d9-77d3-98d3-a43a87c4633d`. The Statement of Architecture Work `01a1ff41-19f9-77bb-aa4a-f416f0d758e3` carries the matching approval `01a1ff41-2c98-7646-b835-7c7a96e1ca6e` under the same two identities, so no gate is decided by the party that requested it.",
+      "capacity": "The unit is one WBS deliverable — 'SPEC V2 — the organisational operating model published and adopted (docs/SPEC_V2.md, D28–D63)' — with WSJF inputs business value 13, time criticality 8, risk reduction 13 and job size 20, the values the PI plan records for this pack. The rework note states that the contemporaneous WSJF inputs are not recoverable; this pack carries the recorded values and does not present them as a reconstruction of the original scoring.",
+      "acceptance": "Acceptance is executable: `python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh>` is green with 11 checks and 0 failures at `d7293f96`, and the strict audit on the same snapshot carries no P0/P1 entry for the project. The acceptance manifest `acceptance/programme/SPEC-V2.toml` is green, the seven A–D artefacts are approved rows with their entries, and the closure gate is decided by an approver other than its requester. No outcome-level claim substitutes for any of these.",
+      "evidence": "`docs/evidence/rework/SPEC-V2.md` is the rework note with its residuals; the published `spec` output `01a1ff43-188d-77ce-be65-32154a1a16bf` and the closure review output `01a1ff42-e535-700c-a69d-2eed86524486` are the project's declared outputs; the seven A–D artefact documents are published; the 38 acts are in `transcript.jsonl` and each write was read back by `programme-record.py`; `acceptance/programme/SPEC-V2.toml` is the manifest the gate reads.",
+      "manifest": "acceptance/programme/SPEC-V2.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "SPEC V2 — the organisational operating model published and adopted (docs/SPEC_V2.md, D28–D63)",
+    "business_value": 13,
+    "time_criticality": 8,
+    "risk_reduction": 13,
+    "job_size": 20
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review, dated 2026-11-26, carries the level the record supports: the live review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` is compliant against the delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` and cites the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`, and no active waiver exists. The scope baseline `01a1ff42-ba64-7670-b694-99bb4b1354e5` is approved by `01a1e8a7-8b23-76a9-9114-aafb95f7a545` and taken by `01a1e607-17d9-77d3-98d3-a43a87c4633d`; the seven A–D artefacts are approved rows; and `python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh>` is green with 11 checks and 0 failures at `d7293f96`, with no P0/P1 entry on the strict audit. The finding is that the definition set is published and its governance record is sound, while two honest limits remain: D61, D62 and D63 are proposed rather than accepted, and D64 to D66 were ruled on 2026-11-22, after the 2026-11-21 record this review rests on. The review therefore assesses the plan as it stands on 2026-11-26 and does not back-date the later rulings. It also records that who closed the project on 2026-11-17 and why is not recoverable, and that the contemporaneous WSJF inputs and B1's baseline value are not recoverable; neither gap is repaired by assertion.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "live_review": "01a1ff43-a1bc-758d-89dc-c97d0fb0265a",
+      "delivery_contract": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+      "scope_baseline": "01a1ff42-ba64-7670-b694-99bb4b1354e5",
+      "acceptance_manifest": "acceptance/programme/SPEC-V2.toml",
+      "rework_note": "docs/evidence/rework/SPEC-V2.md"
+    }
+  },
+  "spec_output": "# Spec — SPEC-V2 (retrospective, 2026-11-26)\n\n## Context\n\nV1 built one Rust application that carries work: projects, boards, lists, cards, runs, approvals, procedures, capabilities, capability agents, knowledge and memory bindings, an inference ledger, a native SWE-bench harness, evals and the compiled-prompt pipeline. Its last whole-tree checkpoint of 2026-11-09 measured 83 tables and 243 actions as a floor, and the app is live at `conveyor.nonagentic.ai` on main `85487a04`, 3 pods, with `/health` and `/health/ready` 200 on `:8930` (deploy record 2026-11-10). V1 answers how work is carried; it does not answer who the organisation is. Three independently built things — the `agent` platform as a user of the conveyor over MCP, the KH hierarchy proving positions, departments and immutable releases, and the conveyor's own work and proof rows — have arrived at the same shape, and the missing piece is the organisation. The field builds agent conversations; real organisations run on positions, work products, gates, baselines and evidence.\n\n## Requirements\n\nThe requirements are the plan's hard invariants and its binding decisions. One record per fact: no concept is stored in two systems, and systems join by pinned reference. No work without a card; no transition without an action; no completion without evidence. The executor never approves its own work, and dual control is two or more distinct approvers. Rule → laya → generation → human: an LLM never selects, routes, classifies or approves, and a generated output is a draft with no path to a state transition. Every model call is ledgered and budgeted; an unresolved binding, pack, prompt source or tool fails closed with `409 *_not_ready` before the first call. No speculative aggregate: a table exists because a named procedure uses it and a metric reads it. Tenant configuration over code: every policy, threshold, limit and approval kind is a versioned tenant-scoped row with a platform default. Requirements are typed condition, constraint, assumption or delta and are managed continuously, not by phase.\n\n## Design\n\nThe design has four units and nothing else: a job (a position — a capability, a procedure, an inference configuration and an authority), a card (a work package), an approval (the one human-escalation primitive, where a question is an approval) and a run (one recorded attempt). Departments, programmes and portfolios organise them; knowledge, memory and tools configure them; evals, benchmarks and the ledger measure them; a meeting is a decision forum over them. The organisation spine is industry → department(s), ordered → job, with knowledge layered base → industry → department archetype → each department in order → job, compiled into an immutable release; a binding pins `job_key`, `release_hash` and a `release_snapshot`, and a retired binding refuses `409 job_binding_stale` before any model call. The work hierarchy is tenant → portfolio (computed, never a row) / programme (shared_config plus project dependency edges) → project → WBS → card → run → step. TOGAF ADM, SAFe, PMP and MSP are rows and gates: phases are WBS nodes, artefacts are typed rows with entries and links, gates are approvals, tranches are the programme's management unit, and a benefit without baseline, target, method and owner is refused. The tool estate is a catalogue of immutable toolkit versions, a binding with an effect ceiling and one `tool_call` row per call, all through one in-process broker; bytes go directly to MinIO under tenant prefixes.\n\n## Acceptance\n\nThe acceptance is executable. `python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh>` is green with 11 checks and 0 failures at `d7293f96`, the strict audit on the same snapshot carries no P0/P1 entry, and the acceptance manifest `acceptance/programme/SPEC-V2.toml` is the gate's evidence. The seven A–D artefacts are approved rows published 2026-11-22 and the eight E–H artefacts are authored on 2026-11-26; the Phase-G review records level compliant; the project re-closes through the one gate with an approver other than its requester. The plan's own slice acceptance is narrower and testable: T0 proves that a job is created, a release published, a binding pinned and a run on a retired binding refused; later slices each carry a named refusal. No TOGAF certification, SAFe compliance badge, PMP certification, MSP conformance or full ADM conformance is claimed, and that restraint is part of the acceptance.\n",
+  "closure": "# Closure — SPEC-V2 (retrospective, 2026-11-26)\n\nThe project SPEC-V2 is re-closed through the one gate on the record the snapshot carries: the delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` with its approval `01a1ff42-9127-7cad-b611-c1ebf1006b0a`, the approved scope baseline `01a1ff42-ba64-7670-b694-99bb4b1354e5`, the Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` at level compliant, the seven A–D artefacts approved and published on 2026-11-22 and the `spec` output `01a1ff43-188d-77ce-be65-32154a1a16bf` published on 2026-11-21. The WBS deliverable is accepted. This statement is retrospective and dated 2026-11-26. It keeps the residual open rather than closing it by silence: who closed the project on 2026-11-17 and why is not recoverable, the contemporaneous WSJF inputs are not recoverable, and D61 to D63 remain proposed.",
+  "closure_review": "# Closure review — SPEC-V2 (retrospective, 2026-11-26)\n\n## Outcome vs acceptance\n\nThe outcome the charter records is the conveyor's organisational operating model, published as the `spec` output and proven through the programme's executable acceptance; the acceptance the record carries matches it. `python3 scripts/verify-project.py --project SPEC-V2 --snapshot <fresh>` is green with 11 checks and 0 failures at `d7293f96`, the strict audit on the same snapshot carries no P0/P1 entry, and the closure gate is decided by an approver other than its requester. The seven A–D artefacts are approved rows and the E–H set is authored here. Against that, the plan's own claims are narrower than its subject: T9 and T10 are built, T19 is built with T19F measured, and the rest of the delivery slices remain the plan's work rather than this project's delivery.\n\n## Evidence\n\nThe evidence is the plan `docs/SPEC_V2.md` at 170 KB as the rework note records it, published as the `spec` output `01a1ff43-188d-77ce-be65-32154a1a16bf` on 2026-11-21; the seven approved A–D artefacts published 2026-11-22; the delivery contract `01a1ff42-7bd0-7d9e-883a-1059368cd356` with its approval `01a1ff42-9127-7cad-b611-c1ebf1006b0a`; the scope baseline `01a1ff42-ba64-7670-b694-99bb4b1354e5`; the Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` citing the delegation; the closure review output `01a1ff42-e535-700c-a69d-2eed86524486`; and the 38 acts in `transcript.jsonl`, each write read back by `programme-record.py`.\n\n## Open items\n\nThree items are recorded and none is closed by this pack. Who closed the project on 2026-11-17 and why is not recoverable — no approval row and no closure asset survive — so the closure is stated without a decision-maker. The contemporaneous WSJF inputs and B1's baseline value are not recoverable; this pack carries the recorded 13, 8, 13 and 20 and says so. D61, D62 and D63 are proposed rather than accepted, and D64 to D66 were ruled on 2026-11-22, after the 2026-11-21 record; the review assesses the plan as it stands on 2026-11-26 and does not back-date the later rulings.\n\n## Decision\n\nThe retrospective decision is to close on the record the snapshot carries and to state the three open items rather than absorb them. The decision level is compliant, as the Phase-G review `01a1ff43-a1bc-758d-89dc-c97d0fb0265a` records, and the governing contract is `01a1ff42-7bd0-7d9e-883a-1059368cd356` with an approver distinct from its requester. The decision is dated 2026-11-26 and re-closes the project through the one gate; it does not assert that the proposal statuses are accepted, that the unrecoverable records have been reconstructed, or that the delivery slices beyond T9, T10, T19 and T19F are built."
+}

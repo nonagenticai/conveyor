@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Statement of Architecture Work",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "statement-of-architecture-work",
+ "body": "# S04 \u2014 Statement of Architecture Work\n\n## Assignment\n\nThe S04 slice (issue #3) under the programme's architecture governance; the live delivery\ncontract is `01a2054c-4cab-752d-a62d-9446c9274d70`.\n\n## Scope\n\nThe declaration, the registry, the served spec, the invocation path and the external ingest. Not\nin scope: screens, the board and the tool platform.\n\n## Responsibilities\n\nThe delivery team implements and proves the clauses; the programme manager routes the gates; the\nBoard approves the contract; the programme board reviews the tranche.\n\n## Acceptance criteria\n\nSPEC_V2 \u00a712 S04 and `acceptance/programme/S04.toml`; the manifest is the gate, not this document.\n\n## Contract\n\nThe live `delivery_contract` `01a2054c-4cab-752d-a62d-9446c9274d70`, approved by the Board under the standing delegation.\n",
+ "publishable": true,
+ "unit": "S04"
+}

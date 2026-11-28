@@ -30,6 +30,7 @@ struct Gate {
     job: Uuid,
     release: Uuid,
     binding: Uuid,
+    agent: Uuid,
     release_hash: String,
     binding_version: i64,
 }
@@ -200,6 +201,7 @@ async fn gate_fixture(db: &common::TestDb) -> Gate {
         job: job.id,
         release: release.id,
         binding: binding.id,
+        agent,
         release_hash: binding.release_hash.clone(),
         binding_version: binding.version,
     }
@@ -207,6 +209,7 @@ async fn gate_fixture(db: &common::TestDb) -> Gate {
 
 fn request(gate: &Gate, action: &str, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,
@@ -223,6 +226,78 @@ fn request(gate: &Gate, action: &str, input: Value) -> InvokeRequest {
         app_key: "conveyor-test".to_owned(),
         usage: None,
     }
+}
+
+/// v1-p44-1 (SPEC_V2 §4.4): `runs.create` records the agent its binding pins. A root run has no
+/// process to resolve an executor from, so the binding is authoritative — the recorded agent is
+/// never `None` behind a binding that names one.
+#[tokio::test]
+async fn a_run_on_an_internal_agent_binding_records_its_pinned_agent() {
+    let db = common::TestDb::fresh().await;
+    let gate = gate_fixture(&db).await;
+
+    let outcome = invoke(
+        &db.runtime,
+        registry(),
+        gate.tenant,
+        request(
+            &gate,
+            "runs.create",
+            json!({"card_id": gate.card, "job_binding_id": gate.binding}),
+        ),
+    )
+    .await
+    .expect("a run on an active internal-agent binding");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let run_id: Uuid = outcome.body["output"]["id"]
+        .as_str()
+        .expect("run id")
+        .parse()
+        .expect("uuid");
+
+    let recorded: Option<Uuid> =
+        sqlx::query_scalar("SELECT capability_agent_id FROM run WHERE tenant_id = $1 AND id = $2")
+            .bind(gate.tenant.as_uuid())
+            .bind(run_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the run");
+    assert_eq!(
+        recorded,
+        Some(gate.agent),
+        "the run records its binding's pinned agent"
+    );
+}
+
+/// v1-p44-1: a run that names no binding records no agent — there is no pin to copy.
+#[tokio::test]
+async fn a_run_without_a_binding_records_no_agent() {
+    let db = common::TestDb::fresh().await;
+    let gate = gate_fixture(&db).await;
+
+    let outcome = invoke(
+        &db.runtime,
+        registry(),
+        gate.tenant,
+        request(&gate, "runs.create", json!({"card_id": gate.card})),
+    )
+    .await
+    .expect("a run without a binding");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let run_id: Uuid = outcome.body["output"]["id"]
+        .as_str()
+        .expect("run id")
+        .parse()
+        .expect("uuid");
+
+    let recorded: Option<Uuid> =
+        sqlx::query_scalar("SELECT capability_agent_id FROM run WHERE tenant_id = $1 AND id = $2")
+            .bind(gate.tenant.as_uuid())
+            .bind(run_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the run");
+    assert_eq!(recorded, None, "no binding means no recorded agent");
 }
 
 #[tokio::test]

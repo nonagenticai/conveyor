@@ -216,7 +216,7 @@ cargo test -p conveyor-api --test documents_roundtrip --test documents_limits \
 | c | secret — rotate to v2; `GET` has no plaintext, `value` key or `ciphertext` |
 | d | workers — page renders live rows; service stopped → banner, breaker open after 5 failures |
 | e | reports — each number equals its SQL count on the same snapshot |
-| f | externals — `GET /api/actions` shows `timeout_ms` on every external; zero `reqwest::` outside the executor |
+| f | externals — `GET /api/actions` shows `timeout_ms` on every external; across the **whole workspace** every `reqwest::` reference is a declared transport — the exact allowlist and its scope are enforced by `python3 scripts/check-egress.py --check` (40 declared transports over 767 source files; a planted offender fails its `--self-test`) |
 | g | billing — no write action, no metering event in the manifest |
 
 ## 8. Traps

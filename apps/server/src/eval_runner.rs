@@ -305,6 +305,7 @@ async fn call_subject(
         registry(),
         tenant,
         InvokeRequest {
+            credential_alias: None,
             action: eval.entry_action.clone(),
             input: request.clone(),
             precondition: None,
@@ -1084,6 +1085,7 @@ async fn invoke_judge(
         registry(),
         tenant,
         InvokeRequest {
+            credential_alias: None,
             action: "completions.create".to_owned(),
             input: request,
             precondition: None,
@@ -1225,6 +1227,7 @@ fn service_ctx(tenant: TenantId, app_key: &str, action: &'static str) -> Handler
         action,
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 

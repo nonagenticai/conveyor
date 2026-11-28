@@ -529,6 +529,66 @@ pub async fn published_for_draft_tx(
     Ok(row)
 }
 
+/// One published tool resolved by its canonical name (`<toolkit>.<tool>`).
+///
+/// The pin fields are what a rebound procedure step records: the toolkit version is immutable,
+/// so the step's binding stays reproducible after later publications (§11.6 item 3).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublishedTool {
+    /// The `tool` row.
+    pub tool_id: Uuid,
+    /// The immutable `toolkit` version row.
+    pub toolkit_id: Uuid,
+    /// The toolkit's semantic version.
+    pub toolkit_version: i64,
+    /// The toolkit key (the first half of the canonical name).
+    pub toolkit_key: String,
+    /// The operation key inside the toolkit.
+    pub key: String,
+}
+
+impl PublishedTool {
+    /// The canonical name a caller uses: `<toolkit>.<operation>`.
+    pub fn canonical_name(&self) -> String {
+        format!("{}.{}", self.toolkit_key, self.key)
+    }
+}
+
+/// Resolve a published tool by canonical name or bare operation key, newest version first.
+///
+/// This is the read §11.6 item 3 turns on: a procedure step that needs an operation with no
+/// tool stays open until a publication satisfies it, and the resolution names the immutable
+/// version the step rebinds to. Retired tools and unpublished toolkits do not resolve.
+pub async fn published_tool_for_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    name: &str,
+) -> Result<Option<PublishedTool>, ToolAuthoringStoreError> {
+    let row: Option<(Uuid, Uuid, i64, String, String)> = sqlx::query_as(
+        "SELECT t.id, tk.id, tk.toolkit_version, tk.key, t.key
+           FROM tool t
+           JOIN toolkit tk ON tk.tenant_id = t.tenant_id AND tk.id = t.toolkit_id
+          WHERE t.tenant_id = $1
+            AND t.status = 'published' AND tk.status = 'published'
+            AND (t.key = $2 OR tk.key || '.' || t.key = $2)
+          ORDER BY tk.toolkit_version DESC, t.created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(name)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row.map(
+        |(tool_id, toolkit_id, toolkit_version, toolkit_key, key)| PublishedTool {
+            tool_id,
+            toolkit_id,
+            toolkit_version,
+            toolkit_key,
+            key,
+        },
+    ))
+}
+
 /// Insert one immutable toolkit version and its tool rows.
 pub async fn insert_published_toolkit_tx(
     conn: &mut PgConnection,

@@ -140,10 +140,16 @@ pub struct IncidentTriageIn {
 pub struct IncidentMitigateIn {
     /// The incident card.
     pub incident_id: Uuid,
-    /// One of the four §6.5 writes.
+    /// One of the four §6.5 writes, or `none` for a no-action mitigation.
     pub action: String,
     /// That write's own input document.
     pub input: Value,
+    /// Record a mitigation that needed no cluster write. `action` is `none`; `input` is ignored.
+    #[serde(default)]
+    pub no_action_required: bool,
+    /// Why no write was required; required when `no_action_required` is true.
+    #[serde(default)]
+    pub reason: Option<String>,
 }
 
 /// `ops.postmortem` input.
@@ -362,6 +368,8 @@ async fn ops_incident(
             name,
             description: None,
             card_type_code: INCIDENT_CARD_TYPE.to_owned(),
+            internal_coach_card: false,
+            internal_system_card: true,
             due_at: None,
             parent_card_id: None,
             job_binding_id: None,
@@ -372,6 +380,8 @@ async fn ops_incident(
                 META_RUN: input.run_id.map(|id| id.to_string()),
                 META_EVIDENCE: input.evidence,
             })),
+            // An incident card is a system record, not governed work.
+            trace_link: None,
         },
     )
     .await?
@@ -499,6 +509,9 @@ fn verb_version(action: &str) -> u32 {
 
 /// The composed approval target: this incident, mitigated by this exact verb and object.
 fn target_mitigation(input: &IncidentMitigateIn) -> Result<String, String> {
+    if input.no_action_required {
+        return Ok(format!("incident/{}/no-action-required", input.incident_id));
+    }
     let underlying = match input.action.as_str() {
         "ops.restart" => {
             let verb: RestartIn = serde_json::from_value(input.input.clone())
@@ -547,17 +560,6 @@ async fn ops_mitigate(
     ctx: HandlerCtx,
     input: IncidentMitigateIn,
 ) -> Result<HandlerOutput<IncidentOut>, ActionError> {
-    if !MITIGATION_ACTIONS.contains(&input.action.as_str()) {
-        return Err(invalid(
-            "action",
-            "invalid_value",
-            format!(
-                "{:?} is not one of {}",
-                input.action,
-                MITIGATION_ACTIONS.join(", ")
-            ),
-        ));
-    }
     let record = incident_card_tx(&mut *tx, ctx.tenant, input.incident_id).await?;
     let meta = meta_of(&record);
     if meta.get(META_TRIAGED_AT).is_none() {
@@ -579,6 +581,67 @@ async fn ops_mitigate(
             409,
             "ops.already_resolved",
             "a resolved incident is not mitigated again",
+        ));
+    }
+    if input.no_action_required {
+        let reason = input
+            .reason
+            .as_deref()
+            .map(str::trim)
+            .filter(|reason| !reason.is_empty())
+            .ok_or_else(|| {
+                invalid(
+                    "reason",
+                    "required",
+                    "a no-action mitigation records why no write was required",
+                )
+            })?;
+        let mitigated_at = Utc::now().to_rfc3339();
+        let mut next = meta.clone();
+        next[META_MITIGATED_AT] = json!(mitigated_at);
+        next[META_MITIGATION] = json!({
+            "action": "none",
+            "no_action_required": true,
+            "reason": reason,
+            "recorded_at": mitigated_at,
+            "approval_id": ctx.approval_id.map(|id| id.to_string()),
+        });
+        let updated = store::card::set_card_meta_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.incident_id,
+            &next,
+            record.card.version,
+        )
+        .await
+        .map_err(|error| store_failure("record the no-action mitigation", error))?
+        .ok_or_else(|| ActionError::new(412, "stale", "the incident changed; re-read and retry"))?;
+        emit(
+            &mut *tx,
+            &ctx,
+            "incident.mitigated",
+            input.incident_id,
+            json!({
+                "incident_id": input.incident_id,
+                "action": "none",
+                "no_action_required": true,
+                "reason": reason,
+                "approval_id": ctx.approval_id,
+                "mitigated_at": mitigated_at,
+            }),
+        )
+        .await?;
+        return Ok(HandlerOutput::ok(view(&updated)));
+    }
+    if !MITIGATION_ACTIONS.contains(&input.action.as_str()) {
+        return Err(invalid(
+            "action",
+            "invalid_value",
+            format!(
+                "{:?} is not one of {}",
+                input.action,
+                MITIGATION_ACTIONS.join(", ")
+            ),
         ));
     }
     // A mitigation is a write that happened. A dry run belongs on the verb, never here: recording

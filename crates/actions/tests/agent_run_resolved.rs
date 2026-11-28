@@ -604,8 +604,9 @@ async fn seed_bound_tool(
         .await
         .expect("a scoped write");
     let toolkit_id: Uuid = sqlx::query_scalar(
-        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
-         VALUES ($1, $2, 1, $3, $4, 'platform', 'published') RETURNING id",
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status,
+                              auth_adapter)
+         VALUES ($1, $2, 1, $3, $4, 'platform', 'published', 'none') RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(toolkit_key)
@@ -914,8 +915,11 @@ async fn a_bound_run_without_tools_call_gets_no_broker_tool() {
     );
 }
 
-/// P2.4 (S21 step 11, issue #697): an active executor with no prompt cannot buy a call. The row
-/// is the pre-guard shape — written before the create/activate refusal existed.
+/// P2.4 (S21 step 11, issue #697): an active executor with no prompt cannot buy a call. The
+/// prompt is removed AFTER the start so the run is the pre-guard shape the executor must refuse:
+/// the start-time readiness door is covered separately by
+/// `a_run_with_no_compiled_prompt_is_refused_at_start`, and this test keeps the second door —
+/// a run that started with a prompt and then lost it cannot reach the model.
 #[tokio::test]
 async fn a_run_with_no_compiled_prompt_makes_no_call() {
     let (pg, seeded, running) = fixture().await;
@@ -923,15 +927,16 @@ async fn a_run_with_no_compiled_prompt_makes_no_call() {
     let (base, models, _bodies) = stub_router().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
     let (_capability, agent) = seed_executor(&pg, &seeded).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+
     sqlx::query("UPDATE capability_agent SET prompt_ref = NULL WHERE tenant_id = $1 AND id = $2")
         .bind(seeded.tenant.as_uuid())
         .bind(agent)
         .execute(&pg.super_pool)
         .await
-        .expect("clear the prompt");
-    let workflow = published_agent_workflow(&running).await;
-    let project = project(&running).await;
-    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+        .expect("clear the prompt after the start");
 
     drive(&pg, &seeded, &run).await;
     assert_eq!(run_status(&pg, &seeded, &run).await, "failed");
@@ -941,4 +946,41 @@ async fn a_run_with_no_compiled_prompt_makes_no_call() {
         models.lock().expect("models").is_empty(),
         "zero model calls without compiled text"
     );
+}
+
+/// The first door: a root run whose bound agent has no prompt is refused at START, before any
+/// run row exists. The executor's second door is `a_run_with_no_compiled_prompt_makes_no_call`.
+#[tokio::test]
+async fn a_run_with_no_compiled_prompt_is_refused_at_start() {
+    let (pg, seeded, running) = fixture().await;
+    let (_capability, agent) = seed_executor(&pg, &seeded).await;
+    sqlx::query("UPDATE capability_agent SET prompt_ref = NULL WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(agent)
+        .execute(&pg.super_pool)
+        .await
+        .expect("clear the prompt");
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let input = json!({
+        "workflow_id": workflow,
+        "project_id": project,
+        "capability_agent_id": agent,
+        "inputs": {"limits": {"cost_budget_usd": 5.0}}
+    });
+    let (status, body) = running
+        .invoke("workflow_runs.start", "dev:alice", input, None, None, None)
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body.pointer("/errors/0/code").and_then(Value::as_str),
+        Some("prompt_not_configured"),
+        "the refusal names the missing prompt: {body}"
+    );
+    let runs: i64 = sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seeded.tenant.as_uuid())
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the runs");
+    assert_eq!(runs, 0, "a refused start writes no run row");
 }

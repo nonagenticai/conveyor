@@ -1,0 +1,59 @@
+{
+  "body_sha256": "5f948ae98fff7cffeafc399db0a9530262a02e79e1afb249edfca8189984eca2",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+    "key": "T19",
+    "kind": "project",
+    "title": "Decision forums (meetings)"
+  },
+  "title": "Change Control \u2014 Decision forums (meetings)"
+}

@@ -1,0 +1,69 @@
+{
+ "artifact_kind": "diagram",
+ "artifact_type_id": "01a1f2c1-143c-73a5-8820-83771e8602ca",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "Source",
+   "axis_b": "SOP / RDF-OWL / BPMN-Visio-draw.io",
+   "value": {
+    "kind": "component",
+    "note": "The three intake actions; no side channel."
+   }
+  },
+  {
+   "axis_a": "procedures capability",
+   "axis_b": "draft rows",
+   "value": {
+    "kind": "component",
+    "note": "Capability drafts, job drafts and PDDL procedure drafts in the one store."
+   }
+  },
+  {
+   "axis_a": "Knowledge pack",
+   "axis_b": "knowledge_pack_ref",
+   "value": {
+    "kind": "component",
+    "note": "RDF/OWL is bound to the procedure by reference, not copied."
+   }
+  },
+  {
+   "axis_a": "Publication gate",
+   "axis_b": "human approval",
+   "value": {
+    "kind": "component",
+    "note": "The drafting job cannot publish; a human decision does."
+   }
+  },
+  {
+   "axis_a": "Process engine",
+   "axis_b": "bound job",
+   "value": {
+    "kind": "component",
+    "note": "Runs the PDDL steps of a reviewed, bound procedure."
+   }
+  },
+  {
+   "axis_a": "Source \u2192 draft \u2192 published row",
+   "axis_b": "versioned",
+   "value": {
+    "kind": "edge",
+    "note": "A re-ingest versions the draft; the published row is stable."
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "a",
+ "plateau": "psa",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "The delivered architecture of the ingestion capability, as built.",
+ "scope": "T16",
+ "title": "Solution concept \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}

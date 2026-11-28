@@ -8,10 +8,11 @@
 //! The base URL is per service: `CONVEYOR_EXTERNAL_<SERVICE>_URL`. An unset service is `ActionError::unconfigured`
 //! — a visible refusal, never a call to a guessable default.
 //!
-//! Every destination left here is a Rust service: the coding fleet, a mac-mini model server (speech,
-//! transcription, images, model calls), the strata retriever, the third-party laya judge, and the
-//! local fixtures transport. The five V1 displays that named a Python destination or a service that
-//! no longer exists were moved onto conveyor state in #450 — see the note above `coding_jobs.create`.
+//! Every destination left here is a Rust service: the coding fleet, the billing shim, a mac-mini
+//! model server (speech, transcription, images, model calls), the strata retriever, the third-party
+//! laya judge, and the local fixtures transport. The five V1 displays that named a Python
+//! destination or a service that no longer exists were moved onto conveyor state in #450 — see the
+//! note above `coding_jobs.create`.
 //!
 //! ⚠️ **`HandlerRef` has no path templating**: the path is static and a `GET` carries no body. So `coding_jobs.get`
 //! is a POST with the id in the body against `/api/jobs/status`, and the coding gateway must serve that route.
@@ -20,9 +21,10 @@
 
 use crate::ActionRegistration;
 use crate::spec::{
-    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, Scope,
-    Tenancy,
+    ActionKind, ActionSpec, AgentHints, AgentTier, Confirm, Effect, HandlerRef, Schema, SchemaRef,
+    Scope, Tenancy,
 };
+use std::borrow::Cow;
 
 /// The scope every external read carries.
 const READ: &[Scope] = &[Scope::IntegrationsRead];
@@ -101,6 +103,26 @@ fn coding_job_get_input() -> Schema {
     schemars::schema_for!(CodingJobGetIn)
 }
 
+/// The body `billing.rollup` sends to the billing shim (SPEC §12 T11).
+///
+/// The engine passes an external action's input through **verbatim**, so this is the shim's own
+/// roll-up request document: the window and, optionally, the dimensions to group by.
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct BillingRollupIn {
+    /// First day of the window (inclusive).
+    since: chrono::NaiveDate,
+    /// Last day of the window (inclusive).
+    until: chrono::NaiveDate,
+    /// The fields the shim groups the rows by; absent means the shim's default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    group_by: Option<Vec<String>>,
+}
+
+fn billing_rollup_input() -> Schema {
+    schemars::schema_for!(BillingRollupIn)
+}
+
 /// One external target: where the call goes and what it is allowed to do.
 ///
 /// Bundled into a struct rather than passed as eight positional arguments — `name, service, method, path` reads
@@ -129,12 +151,12 @@ const fn spec(target: Target) -> ActionSpec {
         idempotent,
     } = target;
     ActionSpec {
-        name,
+        name: Cow::Borrowed(name),
         version: 1,
         kind: ActionKind::External,
-        input: empty_input,
-        output: passthrough_output,
-        scopes,
+        input: SchemaRef::Compiled(empty_input),
+        output: SchemaRef::Compiled(passthrough_output),
+        scopes: Cow::Borrowed(scopes),
         idempotent,
         timeout_ms,
         effect,
@@ -149,9 +171,9 @@ const fn spec(target: Target) -> ActionSpec {
         artefact: None,
         approval_target: None,
         handler: HandlerRef::External {
-            service,
-            method,
-            path,
+            service: Cow::Borrowed(service),
+            method: Cow::Borrowed(method),
+            path: Cow::Borrowed(path),
             auth: None,
             auth_optional: false,
             upload: None,
@@ -180,7 +202,7 @@ fn coding_jobs_create() -> ActionSpec {
     // The only two externals that are a *job submission* rather than a display: their bodies are
     // the coding service's own documents, so the manifest names the fields instead of saying
     // nothing.
-    action.input = coding_job_create_input;
+    action.input = SchemaRef::Compiled(coding_job_create_input);
     action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_create) }
@@ -199,14 +221,34 @@ fn coding_jobs_get() -> ActionSpec {
         effect: Effect::Read,
         idempotent: true,
     });
-    action.input = coding_job_get_input;
+    action.input = SchemaRef::Compiled(coding_job_get_input);
     action
 }
 inventory::submit! { ActionRegistration::new(coding_jobs_get) }
 
+/// The body `retrieval.query` sends to `strata_rag`.
+///
+/// The engine passes an external action's input through verbatim, so this is the retriever's own
+/// `QueryRequest` reduced to the two fields a conveyor caller sets. `query` has no default in the
+/// service, so a body without it is refused — the tool was published with an empty schema and
+/// could not carry a query at all until this pair existed (v1-w3c-2 / T14's live gate).
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct RetrievalQueryIn {
+    /// The text to retrieve for.
+    query: String,
+    /// How many hits to return; absent means the retriever's own default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    top_k: Option<u32>,
+}
+
+fn retrieval_query_input() -> Schema {
+    schemars::schema_for!(RetrievalQueryIn)
+}
+
 /// `retrieval.query` — a ranked retrieval over `strata_rag` (never a local index).
 fn retrieval_query() -> ActionSpec {
-    spec(Target {
+    let mut action = spec(Target {
         name: "retrieval.query",
         service: "strata_rag",
         method: "POST",
@@ -219,6 +261,58 @@ fn retrieval_query() -> ActionSpec {
         timeout_ms: 5_000,
         effect: Effect::Read,
         idempotent: true,
-    })
+    });
+    action.input = SchemaRef::Compiled(retrieval_query_input);
+    action
 }
 inventory::submit! { ActionRegistration::new(retrieval_query) }
+
+/// `billing.rollup` — the billing shim's usage roll-up for one period (SPEC §12 T11).
+///
+/// A read, and a passthrough: `metrics.reconcile` sums the returned `rows[].cost_usd`; the
+/// conveyor does not re-model the shim's document.
+fn billing_rollup() -> ActionSpec {
+    let mut action = spec(Target {
+        name: "billing.rollup",
+        service: "billing_shim",
+        method: "POST",
+        path: "/api/usage/rollup",
+        scopes: READ,
+        timeout_ms: 5_000,
+        effect: Effect::Read,
+        idempotent: true,
+    });
+    action.input = SchemaRef::Compiled(billing_rollup_input);
+    action
+}
+inventory::submit! { ActionRegistration::new(billing_rollup) }
+
+#[cfg(test)]
+mod tests {
+    use crate::registry::registry;
+
+    /// The live retrieval call cannot carry a query unless the published tool's schema requires
+    /// one: `strata_rag`'s `QueryRequest.query` has no default, so an empty body is a 422.
+    #[test]
+    fn retrieval_query_requires_the_query_string() {
+        let spec = registry()
+            .get("retrieval.query")
+            .expect("retrieval.query is registered");
+        let schema = spec.input_schema();
+        let required = schema
+            .get("required")
+            .and_then(serde_json::Value::as_array)
+            .cloned()
+            .unwrap_or_default();
+        assert!(
+            required.iter().any(|field| field == "query"),
+            "retrieval.query must require `query`; strata_rag refuses a body without it: {schema}"
+        );
+        let properties = schema
+            .get("properties")
+            .and_then(serde_json::Value::as_object)
+            .unwrap_or_else(|| panic!("retrieval.query has no properties: {schema}"));
+        assert!(properties.contains_key("query"), "{schema}");
+        assert!(properties.contains_key("top_k"), "{schema}");
+    }
+}

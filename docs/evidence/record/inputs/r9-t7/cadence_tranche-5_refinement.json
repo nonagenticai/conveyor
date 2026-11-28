@@ -1,0 +1,10 @@
+{
+ "kind": "refinement",
+ "meta": {
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "tranche_number": 5
+ },
+ "period": "tranche-5",
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"
+}

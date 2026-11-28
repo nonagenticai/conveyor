@@ -61,6 +61,62 @@ test("the registry, its schema, the audit trail, the licence and the honest exte
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
+test("an empty filter and an empty host registry say so", async ({ page }) => {
+  await page.goto("/settings/admin");
+  await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
+
+  // The filter's own empty line, never a bare table. The read is emptied at the seam because
+  // this workflow is not empty: web.yml starts `conveyor worker`, the seed's maintenance
+  // schedules queue `memory.consolidate`, and with no `strata_rag` credential here it exhausts
+  // its attempts and reaches the terminal `dead` state (measured: 10 dead rows before this
+  // spec runs). The property under test is the screen's — an empty page renders its empty
+  // line — so the page is the thing injected, exactly as the audit read is for the error panel.
+  await page.route("**/api/actions/jobs.list/invocations", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ output: { items: [], next_cursor: null } }),
+    }),
+  );
+  await page.getByRole("button", { name: "Jobs", exact: true }).click();
+  const status = page.getByLabel("Status");
+  await expect(status).toBeVisible();
+  await status.selectOption("dead");
+  await expect(page.getByText("No job matches this filter.")).toBeVisible();
+  await expect(page.locator("table.table tbody tr")).toHaveCount(0);
+
+  // The workers panel's host registry is a second, independently empty read — this one real:
+  // nothing in this suite registers a host (`host_registry` holds no row).
+  await page.getByRole("button", { name: "Workers", exact: true }).click();
+  await expect(page.getByText("No hosts are registered.")).toBeVisible();
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
+
+test("a tab whose action fails renders the screen's error panel", async ({ page }) => {
+  // The admin screen is read-only apart from `jobs.retry`, so no input the UI offers can be
+  // refused by the API. Its error state is the transport/bff failure path: `ErrorPanel`
+  // (`role=alert`, `.panel.problem`) replaces the tab body. The 503 below is injected at the
+  // network seam for that one call; every other request, and the boot, hit the real API.
+  await page.route("**/api/actions/audit.list/invocations", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/problem+json",
+      body: JSON.stringify({
+        type: "internal",
+        title: "Service Unavailable",
+        status: 503,
+        detail: "the audit store is unavailable",
+      }),
+    }),
+  );
+
+  await page.goto("/settings/admin");
+  await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
+  await page.getByRole("button", { name: "Audit", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "That did not load" })).toBeVisible();
+  await expect(page.locator(".panel.problem")).toContainText("the audit store is unavailable");
+});
+
 test("a second tenant reads its own manifest and its own audit trail", async ({ page }) => {
   // dev-b is a real tenant: the earlier specs wrote audit rows as bob, so the tab is a
   // tenant-scoped read rather than an empty page.

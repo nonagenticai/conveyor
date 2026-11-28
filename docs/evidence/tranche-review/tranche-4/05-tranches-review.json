@@ -1,0 +1,14 @@
+{
+  "authorisation_review_id": "01a216d0-d634-738e-985a-00a85cfd48d9",
+  "authorised_at": "2026-11-26T07:45:14.782950Z",
+  "baseline_ref": null,
+  "entry_criteria": "the tranche 3 review decides continue; its exit criteria are met",
+  "exit_criteria": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
+  "id": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+  "number": 4,
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "retired_reason": "",
+  "review_at": null,
+  "state": "closed",
+  "version": 3
+}

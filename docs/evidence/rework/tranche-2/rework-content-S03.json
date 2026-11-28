@@ -1,0 +1,1061 @@
+{
+  "charter": "# Charter — S03 Domain and schema (retrospective, 2026-11-21)\n\n- **Project:** S03 'Domain and schema — aggregates, state machines, baseline domain migration', track v1, ADM phase G, delivery plateau, tranche 2, project `01a1d039-0d28-743b-86c7-0d0698ed69c1`, plan `docs/plans/slices/S03-domain-schema.md`. The repository's public source snapshot commit `96a3d47b0e43ef871ae42c0bfafac6a677f7a418` (2026-11-12T22:38:46+01:00), subject 'conveyor: public source snapshot (2026-11-12)', carries the slice: `migrations/0002_domain.sql` (459 lines, 14 tables, 14 FORCE RLS policies), `crates/domain/src/board.rs` (629 lines) and `crates/store/tests/claim_race.rs` (134 lines). No dedicated S03 feature commit and no linked issue exist — the project row records `meta.issues: []` and its plan frontmatter still reads `status: planned`. This charter is written by the 2026-11-21 retrospective rework under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14` (the published decision 'Standing delegation extension — the U5 programme rework (2026-11-21)'); it does not attest contemporaneous intent.\n- **Mandate:** give the conveyor one stored domain behind every later slice — fourteen aggregates as total Rust functions, one baseline migration that owns the tables, indexes, partial uniques and row-level security, and one refusal vocabulary — so that a Rust case statement, a store transaction, an action and the database all refuse the same transition, and no later slice invents a table.\n- **Scope:** SPEC §5.3, §6, §8 S3 and §11 R8/R10; `migrations/0002_domain.sql` — programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision and andon_state; the `may_move` matrix and the run, approval and asset state machines; the store modules taking `TenantId` under `_tx`; and the `catalogue_entry.kind` vocabulary with the delivery matrix as one `project_type` row. Out of scope: every route and action (S04–S06), the board satellites label/comment/task/custom_field/board_membership/webhook (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents, repositories and secrets (S09), conversations (S10), procedures (S11), workflow (S13), and the capability columns of S15.\n- **Expected outputs:** `project-brief`, `evidence`. **Closure outputs:** `closure-review`.\n- **Deliverables:** the fourteen tenant-scoped tables with ENABLE and FORCE RLS and the `tenant_isolation` policy; `card`'s claim columns and the paired-null CHECK; the partial uniques `uq_run_live` and `uq_appr_pending`; the four gate properties (a) archive invariant, (b) claim exclusivity, (c) one pending approval per (run, gate), (d) terminal-run and revision invariants; the RLS proof; and the schema review against data-arch §2.3/§2.4.\n- **Acceptance:** the SPEC §8 S3 gate — 'proptest on transitions; schema review' — with each clause carried by a named real-Postgres test or proptest, and the slice plan §7's seven-command gate. The rework's acceptance instrument is `acceptance/programme/S03.toml`; the project re-closes through the one gate decided by an approver other than its requester, on the P0-only gate.\n- **Tranche and governance:** tranche 2 `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188` is `planned` at the 2026-11-21T19:24:46Z rework snapshot: created 2026-11-17T14:19:51Z, `authorised_at` null, `authorisation_review_id` null; its exit criteria name S03 and T2 and require a review recording continue, pause or stop. The project row reached `closed` at 2026-11-21T01:05:32Z and the register records the out-of-sequence closure as the accepted P0 issue `U3-EXC-S03` (`01a1fbac-8ec9-717c-be79-6d1b97980743`): 'Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.' The contemporaneous record is the published evidence document `01a1e686-d031-739d-ac30-9c0d4d8edffb` (2026-11-16T22:42:37Z, measured at main@cc88052), which inventories 0/0 actions, 2/2 modules and 14/14 tables and states that it does not re-run the acceptance suite. No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored; this set is retrospective.",
+  "soaw": {
+    "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)",
+    "body": {
+      "assignment": "Rework the V1 slice S03 (SPEC §6, §8 S3) by the reconstituted TOGAF/MSP lifecycle: produce and publish the seven mandatory Phase A–D artefacts, the charter and the delivery contract, take the project baseline with the one WBS deliverable, record the Phase-G compliance review, publish the project's expected outputs (`project-brief`, `evidence`) and the closure review, and re-close through the one gate on the P0-only gate.",
+      "scope": "the baseline domain of SPEC §5.3 and §6: the fourteen tables of migrations/0002_domain.sql (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state), the may_move matrix and the run/approval/asset state machines, the store `_tx` modules with TenantId, and the catalogue_entry.kind vocabulary. Out of scope: every route and action (S04–S06), the board satellites (S05), channels and delivery (S06), outlines, quality and project_request (S07), models, views and portfolio registers (S08), documents and secrets (S09), conversations (S10), procedures (S11), workflow (S13) and the capability columns (S15).",
+      "responsibilities": {
+        "approver": "conveyor-approver",
+        "architecture board": "conveyor-architecture-board",
+        "programme architect": "conveyor-e2e"
+      },
+      "acceptance_criteria": "The SPEC §8 S3 gate: proptest on transitions and schema review. Property (a) — no transition leaves list.kind and archived_at contradictory, proved by board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error. Property (b) — claim not granted twice without release or expiry, proved as tested by claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic, with the lease-exclusivity half recorded as the P1 package v1-s03-1. Property (c) — one pending approval per (run, gate), proved by approval_race.rs::sixteen_racers_create_exactly_one_pending_approval. Property (d) — terminal run and dense revision, proved by transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense. Tenant isolation is proved by rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema review against data-arch §2.3/§2.4 admits the P2 package v1-s03-2. The rework's acceptance instrument is acceptance/programme/S03.toml; the closure gate is decided by an approver other than its requester.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Who is affected by the baseline domain and its refusals, what each needs, and how the rework engages them.",
+      "scope": "the fourteen aggregates, the 0002_domain.sql migration, the claim/approval/archive invariants and the tranche-2 governance around them.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "the programme architect",
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "tranche-2 authorisation, its exit criteria and the re-close decision",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the domain capability and the tranche's outcome",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Programme architect (conveyor-e2e)",
+          "axis_b": "owns the fourteen aggregates, 0002_domain.sql and the schema review",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "responsible"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D set and the delivery contract",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "approve"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Independent schema reviewer",
+          "axis_b": "reads 0002_domain.sql against data-arch §2.3/§2.4 line by line",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Delivery teams S04–S06",
+          "axis_b": "register actions, routes and the control plane over these tables; they inherit the refusals",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "consult"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Later slices S07–S13",
+          "axis_b": "add tables and never re-invent one; S03 is the schema they inherit",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Operators and tenants",
+          "axis_b": "tenant isolation of every domain table; FORCE RLS is their guarantee",
+          "value": {
+            "influence": "low",
+            "interest": "high",
+            "engagement": "inform"
+          },
+          "position": 8
+        }
+      ],
+      "body": "# Stakeholder Map — S03 Domain and schema (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEight stakeholders on the influence/interest/engagement axes: the sponsoring group decides, the SRO is accountable, the programme architect is responsible, the Architecture Board approves, the schema reviewer and the S04–S06 teams are consulted, later slices and tenants are informed.\n\n## Links\n\nDerives from `docs/plans/slices/S03-domain-schema.md` (scope §3, build order §6) and SPEC §8 S3; realizes the Phase A stakeholder view for the tranche-2 domain capability; reuses the programme roles already recorded in the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan `docs/plans/slices/S03-domain-schema.md` and the project's architecture set; the published evidence record is document 01a1e686-d031-739d-ac30-9c0d4d8edffb."
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Requirements Catalog — S03 Domain and schema (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The drivers behind the baseline domain, the goal each serves and the objective the migration and the machines install.",
+      "scope": "one migration, list-as-state, claim and lease, approval uniqueness, FORCE RLS, the anti-accretion rule and the archive invariant.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the SRO",
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 Fourteen aggregates with no single owning schema",
+          "axis_b": "G1 One baseline migration owns the tables",
+          "value": {
+            "objective": "migrations/0002_domain.sql creates exactly 14 tables (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state); `grep -c 'CREATE TABLE'` returns 14; later slices add tables but never re-invent one (S3 mandate; plan §1)."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 A card carries its own status column, which drifts from its list",
+          "axis_b": "G2 list.kind is the only state",
+          "value": {
+            "objective": "`card` has no state or status column; `information_schema.columns` for card and (state,status) returns zero rows; `may_move` reads project_type.meta.matrix and an absent entry, card type or row denies (S3-D1, S3-D3; plan trap 1)."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 Two claims can grant the same card",
+          "axis_b": "G3 A conditional claim UPDATE with a fence",
+          "value": {
+            "objective": "claim_card_tx is one `UPDATE … WHERE tenant_id = $1 AND id = $2 AND version = $5 AND (lease_expires_at IS NULL OR lease_expires_at < now() OR assignee_id = $3) RETURNING claim_fence, version`; claim_fence rises on every grant and release is fenced. The lease arm also lets the current assignee renew, so the exclusive reading is the P1 package v1-s03-1."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 Two pending approvals per (run, gate)",
+          "axis_b": "G4 A partial unique index is the guarantee",
+          "value": {
+            "objective": "uq_appr_pending (tenant_id, run_id, gate) WHERE status='pending'; a duplicate is 23505 and maps to ApprovalConflict; sixteen concurrent inserts yield one pending row. A NULL run_id escapes the index; the card-level path is S06's (plan trap 5)."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "D5 ENABLE RLS still lets the table owner read everything",
+          "axis_b": "G5 FORCE RLS on all fourteen tables",
+          "value": {
+            "objective": "every table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; as conveyor_runtime scoped to A, B's rows are absent and a forged tenant_id=B insert fails WITH CHECK; the owner sees 0 and a superuser both (plan trap 7)."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "D6 Porting fr's 224-migration accretion is the largest failure mode",
+          "axis_b": "G6 The baseline is SPEC §6, not fr's history",
+          "value": {
+            "objective": "R10: a column enters only because §2.3/§2.4 names it; a deviation is a contract change; the schema-review step checks every table line by line and records a reviewed list rather than a silent drift (plan trap 10)."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "D7 Archive has two notions — a lane and a stamp — that can disagree",
+          "axis_b": "G7 One proptestable archive invariant",
+          "value": {
+            "objective": "archived_at IS NOT NULL implies list.kind='archive', proved by board.rs::archived_implies_the_card_sits_in_an_archive_list; restore off a non-archive list is an error. The stronger claim that every hot index filters archived cards is true only of the two board-scan indexes — the P2 package v1-s03-2."
+          },
+          "position": 7
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSeven driver/goal/objective rows: D1–D7 with G1–G7 and the objective each installs, naming the SQL object or Rust function that carries it.\n\n## Links\n\nDerives from the slice plan `docs/plans/slices/S03-domain-schema.md` §1, §3, §5, §8 and decisions S3-D1 to S3-D5, and from data-arch §2.3/§2.4; realizes the Phase A driver view; reuses SPEC §6 and §11 R8/R10.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; the admitted findings are recorded in the Phase-G review and the closure review."
+    },
+    {
+      "title": "Requirements Catalog — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S03 Domain and schema (Phase A)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The requirements the S03 gate and its contracts must satisfy, each with an executable acceptance.",
+      "scope": "the four gate properties, tenant isolation, migration idempotence, the card-state proof, the catalogue vocabulary and the schema review.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the SRO",
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1 Property (a)",
+          "axis_b": "No transition leaves list.kind and archived_at contradictory",
+          "value": {
+            "priority": "must",
+            "acceptance": "proptest ≥256 cases: archived_at.is_some() implies from_kind == Archive; restore off a non-archive list is Err. crates/domain/src/board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error."
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 Property (b)",
+          "axis_b": "A claim never succeeds twice without release or expiry",
+          "value": {
+            "priority": "must",
+            "acceptance": "crates/store/tests/claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic — exactly one Some, fence 1 then monotonic renewals, stale-fence completion writes nothing. Admitted limit (v1-s03-1): all 32 racers share seed.user and Version::INITIAL, so the version predicate decides the winner and the test would pass with the lease arm deleted."
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 Property (c)",
+          "axis_b": "One pending approval per (run, gate)",
+          "value": {
+            "priority": "must",
+            "acceptance": "approval_race.rs::sixteen_racers_create_exactly_one_pending_approval — one Ok, fifteen ApprovalConflict, pending count 1; uq_appr_pending is the guarantee."
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 Property (d)",
+          "axis_b": "Terminal-run and revision invariants",
+          "value": {
+            "priority": "must",
+            "acceptance": "transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense — a terminal run rejects every transition; revision seq is dense from 1; is_prunable('model') is true past 50 and false for 'requirement' at any depth."
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 Tenant isolation",
+          "axis_b": "All fourteen tables isolate runtime, owner and superuser",
+          "value": {
+            "priority": "must",
+            "acceptance": "rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser — runtime scoped to A sees none of B's rows; a forged tenant_id=B insert fails WITH CHECK; owner 0; superuser both."
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "R6 Migration idempotence",
+          "axis_b": "Two migrations, one embedded set, no IF NOT EXISTS",
+          "value": {
+            "priority": "must",
+            "acceptance": "fresh database applies 2; the second `cargo run -p conveyor-server -- migrate` exits 0 with _sqlx_migrations unchanged; store/src/migrate.rs asserts [(1,\"platform\"),(2,\"domain\")]; no `IF NOT EXISTS` in the file."
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "R7 Card-state proof",
+          "axis_b": "A card has no state or status column",
+          "value": {
+            "priority": "must",
+            "acceptance": "information_schema.columns for card and column_name in ('state','status') returns zero rows; an insta snapshot pins Card's field set; the plan's word-boundary grep returns 0."
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "R8 FORCE RLS count",
+          "axis_b": "Fourteen FORCE policies, no exception",
+          "value": {
+            "priority": "must",
+            "acceptance": "`grep -c 'FORCE ROW LEVEL SECURITY' migrations/0002_domain.sql` returns 14; every policy is FOR ALL USING (tenant_id = app_current_tenant()) WITH CHECK (the same)."
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "R9 Catalogue vocabulary",
+          "axis_b": "Eleven kinds and one delivery matrix row",
+          "value": {
+            "priority": "must",
+            "acceptance": "catalogue_entry.kind has no CHECK by design; S03 fixes the eleven labels (project_type, phase, recipe, wip_limit, gate, capability, deliverable_kind, milestone_kind, priority_level, board_template, architecture_standard); the delivery matrix is one project_type row with code='delivery' and meta.matrix (S3-D1)."
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "R10 Schema review",
+          "axis_b": "A second reader checks 14 tables against §2.3/§2.4",
+          "value": {
+            "priority": "must",
+            "acceptance": "a line-by-line review yielding 14 tables with zero deviations or a reviewed list. No contemporaneous review record exists; this retrospective review re-performs the check and admits v1-s03-2 (the archive-exclusion claim covers only the two board-scan indexes)."
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "R11 Move invariant",
+          "axis_b": "A move keeps the boards in agreement and refuses a stale version",
+          "value": {
+            "priority": "must",
+            "acceptance": "transitions.rs::a_move_keeps_the_boards_in_agreement_and_refuses_a_stale_version — card.board_id equals list.board_id in the same statement; a move from a stale version is refused (plan trap 8)."
+          },
+          "position": 11
+        }
+      ],
+      "body": "# Requirements Catalog — S03 Domain and schema (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven requirements: the four gate properties, tenant isolation, migration idempotence, the card-state proof, the FORCE-RLS count, the catalogue vocabulary, the schema review and the move invariant, each with its named test or SQL assertion.\n\n## Links\n\nDerives from SPEC §8 S3 and the slice plan §5, §6, §7 and §8; realizes the Phase A requirements view; reuses the S02 platform primitives (0001_platform.sql, begin_scoped, conveyor_runtime, TenantId/Id/Version).\n\n## Document\n\nThe artefact sits under the slice plan; the gate is run by `cargo test -p conveyor-domain` and `cargo test -p conveyor-store` and recorded in the Phase-G review and the acceptance manifest acceptance/programme/S03.toml."
+    },
+    {
+      "title": "Solution Concept Diagram — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Business Capability Map — S03 Domain and schema (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "The fourteen tables, the one migration, the state machines and the primitives that carry the domain's refusals.",
+      "scope": "migrations/0002_domain.sql, the Rust machines in crates/domain, the store `_tx` modules and the RLS policy.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the SRO",
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "migrations/0002_domain.sql",
+          "axis_b": "the one baseline migration",
+          "value": {
+            "kind": "component",
+            "note": "459 lines; 14 CREATE TABLE; 14 FORCE ROW LEVEL SECURITY; no CREATE TYPE; no IF NOT EXISTS"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "programme / project / board / list / card_type",
+          "axis_b": "the container rows",
+          "value": {
+            "kind": "component",
+            "note": "data-arch §2.3 verbatim; list.kind is text CHECK intake|active|waiting|done|archive, never a Postgres enum"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "the board card",
+          "value": {
+            "kind": "component",
+            "note": "claim columns assignee_id/lease_expires_at/lease_token/claim_fence; paired-null CHECK (lease_expires_at IS NULL) = (lease_token IS NULL); prev_list_id, list_changed_at, generated tsv, version; no state/status"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "card indexes",
+          "axis_b": "the hot paths",
+          "value": {
+            "kind": "component",
+            "note": "card_board_list_position_idx and card_board_position_idx carry WHERE archived_at IS NULL (lines 155–158); card_assignee_lease_idx is partial on assignee_id IS NOT NULL; card_tsv_idx is gin(tsv); later names add no archive predicate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "run",
+          "axis_b": "the run machine",
+          "value": {
+            "kind": "component",
+            "note": "status CHECK queued|running|waiting_approval|succeeded|failed|cancelled; 0002 ships the card-wide uq_run_live; the 2026-11-09 amendment rebuilds the tree in 0037_run_tree_workflow_step.sql around parent_run_id"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the gate row",
+          "value": {
+            "kind": "component",
+            "note": "status pending|approved|rejected|expired|voided; uq_appr_pending (tenant_id, run_id, gate) WHERE status='pending'"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "approval_decision",
+          "axis_b": "the immutable decision",
+          "value": {
+            "kind": "component",
+            "note": "decided_by_kind and via ported from §2.3; no version; immutable after insert (S3-D5)"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "governed_asset / revision",
+          "axis_b": "the governed asset and its history",
+          "value": {
+            "kind": "component",
+            "note": "transition Draft|InReview|Approved|Superseded|Archived; superseded implies superseded_by_id as an immediate CHECK; revision.seq = version from 1 (S3-D4)"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "trace_link / catalogue_entry",
+          "axis_b": "the trace and the vocabulary",
+          "value": {
+            "kind": "component",
+            "note": "typed trace edges; catalogue_entry.kind has no CHECK by design and S03 fixes the eleven labels; the delivery matrix is one project_type row"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "andon_state",
+          "axis_b": "the andon row",
+          "value": {
+            "kind": "component",
+            "note": "one lazily created row per tenant, pk tenant_id (S3-D5); engaged partial index"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "may_move",
+          "axis_b": "the one transition function",
+          "value": {
+            "kind": "component",
+            "note": "crates/domain/src/board.rs line 260; reads project_type.meta.matrix; absent entry, card type or row denies (S3-D3)"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "tenant_isolation policy",
+          "axis_b": "the tenancy primitive",
+          "value": {
+            "kind": "component",
+            "note": "FOR ALL USING (tenant_id = app_current_tenant()) WITH CHECK (the same), on all fourteen tables with ENABLE and FORCE"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "list",
+          "value": {
+            "kind": "edge",
+            "note": "card.board_id is denormalised and must equal list.board_id; move_card_tx and claim_card_tx join list in the same statement (plan trap 8)"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "claim_card_tx",
+          "value": {
+            "kind": "edge",
+            "note": "the version precondition and the lease arm decide the grant; claim_fence is monotonic; release and completion are fenced"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "uq_appr_pending",
+          "value": {
+            "kind": "edge",
+            "note": "the index, not the code, is the guarantee; 23505 maps to ApprovalConflict and a refused decision writes no row"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "governed_asset",
+          "axis_b": "revision",
+          "value": {
+            "kind": "edge",
+            "note": "transition_asset_tx writes the revision row with seq = version in the same transaction"
+          },
+          "position": 16
+        },
+        {
+          "axis_a": "project_type.meta.matrix",
+          "axis_b": "may_move",
+          "value": {
+            "kind": "edge",
+            "note": "the matrix is catalogue data on one project_type row; an absent entry denies rather than allows"
+          },
+          "position": 17
+        },
+        {
+          "axis_a": "S02 platform",
+          "axis_b": "0002_domain.sql",
+          "value": {
+            "kind": "edge",
+            "note": "0001_platform.sql, begin_scoped, the conveyor_runtime role and domain::{TenantId, Id, Version} are the base the domain rows and policies stand on"
+          },
+          "position": 18
+        },
+        {
+          "axis_a": "archived_at",
+          "axis_b": "the board scan",
+          "value": {
+            "kind": "edge",
+            "note": "the stamp excludes a card from the two board-scan indexes; the lease and search scans include stamped cards, so the absolute exclusion claim is the P2 package v1-s03-2"
+          },
+          "position": 19
+        }
+      ],
+      "body": "# Solution Concept Diagram — S03 Domain and schema (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNineteen rows: twelve components (the migration, the container rows, card and its indexes, run, approval, approval_decision, governed_asset/revision, trace_link/catalogue_entry, andon_state, may_move, the tenant policy) and seven edges (card-to-list, card-to-claim, approval-to-index, asset-to-revision, matrix-to-may_move, S02-to-0002, archive-to-board-scan).\n\n## Links\n\nDerives from the slice plan §5 (the envelope and the worked matrix row) and data-arch §2.3/§2.4/§4; realizes the Phase A solution concept; reuses the S02 platform primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the named test functions in crates/store/tests and crates/domain/src/board.rs are its executable counterpart, and the Phase-G review records the two admitted deviations."
+    },
+    {
+      "title": "Business Capability Map — S03 Domain and schema (Phase B)",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)",
+          "kind": "realization"
+        }
+      ],
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "The capabilities S03 installs and how far each is live at the 2026-11-21 rework.",
+      "scope": "domain persistence, claim, approval, run and card machines, asset governance, catalogue, migration discipline, schema review and archive exclusion.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Tenant-isolated domain persistence",
+          "axis_b": "fourteen tables every later slice writes through",
+          "value": {
+            "maturity": "live",
+            "evidence": "migrations/0002_domain.sql (14 CREATE TABLE, 14 FORCE RLS); rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Claim and lease discipline",
+          "axis_b": "one conditional UPDATE grants, renews and fences",
+          "value": {
+            "maturity": "live, exclusivity overstated",
+            "evidence": "crates/store/src/card.rs::claim_card_tx; claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic; the lease half is the P1 package v1-s03-1"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Approval dual control",
+          "axis_b": "one pending approval per gate and two distinct approvers",
+          "value": {
+            "maturity": "live",
+            "evidence": "uq_appr_pending; approval_race.rs::sixteen_racers_create_exactly_one_pending_approval, ::dual_control_needs_two_distinct_approvers_and_one_decision_each, ::a_refused_decision_writes_no_decision_row_even_when_committed"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Run and card state machines",
+          "axis_b": "terminal-wins run transitions and a matrix-governed move",
+          "value": {
+            "maturity": "live",
+            "evidence": "run status CHECK and domain::Run::transition; board.rs::may_move; transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense and ::a_move_keeps_the_boards_in_agreement_and_refuses_a_stale_version"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Asset governance and revisions",
+          "axis_b": "the asset lifecycle and a dense revision history",
+          "value": {
+            "maturity": "live",
+            "evidence": "governed_asset and revision; transition_asset_tx writes seq = version in the same transaction; the asset proptests in crates/domain"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Catalogue vocabulary and the delivery matrix",
+          "axis_b": "eleven kinds and one project_type row carrying meta.matrix",
+          "value": {
+            "maturity": "live",
+            "evidence": "catalogue_entry; the worked row in plan §5 (code='delivery'); S3-D1 and S3-D3"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Migration discipline",
+          "axis_b": "two numbered migrations, one embedded set, no IF NOT EXISTS",
+          "value": {
+            "maturity": "live",
+            "evidence": "store/src/migrate.rs asserts [(1,\"platform\"),(2,\"domain\")]; the second migrate run exits 0; plan gate §7"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Schema review against the data architecture",
+          "axis_b": "a second reader over §2.3/§2.4",
+          "value": {
+            "maturity": "partial",
+            "evidence": "the plan's build order step 13; no contemporaneous review record exists at the snapshot; this retrospective review admits v1-s03-2"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Archive exclusion across the hot indexes",
+          "axis_b": "the stamp removes a card from every hot scan",
+          "value": {
+            "maturity": "partial",
+            "evidence": "true of card_board_list_position_idx and card_board_position_idx only; card_assignee_lease_idx, card_tsv_idx and the later trgm/WBS indexes include stamped cards — v1-s03-2"
+          },
+          "position": 9
+        }
+      ],
+      "body": "# Business Capability Map — S03 Domain and schema (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine capabilities: seven live (domain persistence, claim, approval, the state machines, asset governance, the catalogue, migration discipline) and two partial (the schema review and the absolute archive-exclusion claim).\n\n## Links\n\nDerives from the Phase A solution concept and the slice plan §5–§8; realizes the Phase B capability view over the SPEC §6 domain; reuses the named tests as the maturity evidence.\n\n## Document\n\nThe artefact sits under the slice plan; the two partial capabilities correspond to the admitted packages v1-s03-1 and v1-s03-2 in the Phase-G review."
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S03 Domain and schema (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The entities S03 adds, each with its owner and its one invariant.",
+      "scope": "the fourteen tables of migrations/0002_domain.sql, the claim primitive and the tenant policy.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "programme",
+          "axis_b": "the programme row",
+          "value": {
+            "owner": "domain",
+            "table": "programme",
+            "note": "tenant-scoped with FORCE RLS; the name is the programme identity"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "project",
+          "axis_b": "the project row",
+          "value": {
+            "owner": "domain",
+            "table": "project",
+            "note": "belongs to a programme; carries project_type_code and status; FORCE RLS"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "board",
+          "axis_b": "the board",
+          "value": {
+            "owner": "domain",
+            "table": "board",
+            "note": "belongs to a project; position per project; FORCE RLS"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "list",
+          "axis_b": "the list lane",
+          "value": {
+            "owner": "domain",
+            "table": "list",
+            "note": "kind is text CHECK intake|active|waiting|done|archive; wip_limit is the instance, the catalogue row is the template; position per board"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "card_type",
+          "axis_b": "the card type and its rules",
+          "value": {
+            "owner": "domain",
+            "table": "card_type",
+            "note": "carries the rules/meta that may_move reads through project_type.meta.matrix; is_active index"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "the card",
+          "value": {
+            "owner": "domain",
+            "table": "card",
+            "note": "no state/status column; claim columns and paired-null CHECK; prev_list_id and list_changed_at; generated tsv; version; three partial indexes plus gin(tsv)"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "run",
+          "axis_b": "the run",
+          "value": {
+            "owner": "domain",
+            "table": "run",
+            "note": "status CHECK queued|running|waiting_approval|succeeded|failed|cancelled; 0002's uq_run_live is the card-wide form; the tree lands in 0037"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the approval",
+          "value": {
+            "owner": "domain",
+            "table": "approval",
+            "note": "status pending|approved|rejected|expired|voided; uq_appr_pending partial unique; pending-expiry index"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "approval_decision",
+          "axis_b": "the decision fact",
+          "value": {
+            "owner": "domain",
+            "table": "approval_decision",
+            "note": "decided_by_kind and via; no version; immutable after insert; approver index"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "governed_asset",
+          "axis_b": "the governed asset",
+          "value": {
+            "owner": "domain",
+            "table": "governed_asset",
+            "note": "kind is a column, not a fork; status Draft|InReview|Approved|Superseded|Archived; superseded implies superseded_by_id as an immediate CHECK"
+          },
+          "position": 10
+        },
+        {
+          "axis_a": "trace_link",
+          "axis_b": "the trace edge",
+          "value": {
+            "owner": "domain",
+            "table": "trace_link",
+            "note": "typed from/to edges with indexes in both directions"
+          },
+          "position": 11
+        },
+        {
+          "axis_a": "catalogue_entry",
+          "axis_b": "the catalogue row",
+          "value": {
+            "owner": "domain",
+            "table": "catalogue_entry",
+            "note": "kind has no CHECK by design; S03 fixes the eleven labels; the delivery matrix is a project_type row with meta.matrix"
+          },
+          "position": 12
+        },
+        {
+          "axis_a": "revision",
+          "axis_b": "the revision",
+          "value": {
+            "owner": "domain",
+            "table": "revision",
+            "note": "seq = governed_asset.version, both from 1 (S3-D4); pruning is a job-applied policy on entity_type, never a trigger"
+          },
+          "position": 13
+        },
+        {
+          "axis_a": "andon_state",
+          "axis_b": "the andon row",
+          "value": {
+            "owner": "domain",
+            "table": "andon_state",
+            "note": "one lazily created row per tenant; pk tenant_id; engaged partial index"
+          },
+          "position": 14
+        },
+        {
+          "axis_a": "claim_card_tx",
+          "axis_b": "the claim primitive",
+          "value": {
+            "owner": "store",
+            "component": "crates/store/src/card.rs",
+            "note": "one UPDATE with the version precondition and the lease arm; returns Option<ClaimGranted{claim_fence, version}>; the same assignee may renew"
+          },
+          "position": 15
+        },
+        {
+          "axis_a": "tenant_isolation",
+          "axis_b": "the tenancy policy",
+          "value": {
+            "owner": "domain",
+            "component": "migrations/0002_domain.sql and migrations/0001_platform.sql::app_current_tenant()",
+            "note": "FOR ALL USING and WITH CHECK on all fourteen tables; ENABLE and FORCE; the runtime role is scoped, the owner sees 0 and a superuser both"
+          },
+          "position": 16
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSixteen rows: the fourteen tables of migrations/0002_domain.sql in creation order, the claim primitive claim_card_tx, and the tenant_isolation policy that binds all fourteen.\n\n## Links\n\nDerives from data-arch §2.3/§2.4 and the slice plan §5–§7; realizes the Phase C data view; reuses the S02 tenancy primitive and the `_tx` store convention.\n\n## Document\n\nThe artefact sits under the slice plan and migrations/0002_domain.sql; the published evidence document 01a1e686-d031-739d-ac30-9c0d4d8edffb records the 14/14 table measurement."
+    },
+    {
+      "title": "Technology Standards Catalog — S03 Domain and schema (Phase D)",
+      "links": [
+        {
+          "to": "Stakeholder Map — S03 Domain and schema (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The standards S03's schema and store primitives fix for every later slice.",
+      "scope": "Postgres 18 and RLS, the migration set, the partial-index guarantee, time and position types, the `_tx` convention and the error vocabulary.",
+      "stakeholders": {
+        "owner": "programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the schema reviewer",
+          "the S04–S06 delivery teams",
+          "operators and tenants"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "PostgreSQL",
+          "axis_b": "18 with ENABLE and FORCE row-level security",
+          "value": {
+            "usage": "every domain table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY, and the tenant_isolation policy on app_current_tenant(); 14/14 in migrations/0002_domain.sql"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Enumeration storage",
+          "axis_b": "text + CHECK, never CREATE TYPE",
+          "value": {
+            "usage": "ALTER TYPE … ADD VALUE cannot share a transaction with an index on the new label, and each migration file is one transaction (data-arch §1.8); the file has zero CREATE TYPE"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Concurrency guarantee",
+          "axis_b": "a partial unique index, never check-then-insert",
+          "value": {
+            "usage": "uq_appr_pending and uq_run_live are the guarantee; 23505 maps to a stable conflict; a refused decision writes no row"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Time",
+          "axis_b": "timestamptz in UTC; lease tests in SQL",
+          "value": {
+            "usage": "every lease test is `lease_expires_at < now()` in SQL, never a Rust clock (plan trap 6); claim TTL is a store parameter, DEFAULT_CLAIM_TTL 900 s (S3-D5)"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Position",
+          "axis_b": "numeric midpoint, never double precision",
+          "value": {
+            "usage": "(a+b)/2 between neighbours and max+1024 on append; Planka's double precision loses precision after ~50 halvings; a move writes list_id, prev_list_id, list_changed_at and position in one statement (plan trap 2)"
+          },
+          "position": 5
+        },
+        {
+          "axis_a": "Store convention",
+          "axis_b": "`_tx` functions taking TenantId and a connection",
+          "value": {
+            "usage": "every store function takes TenantId and a PgConnection, never a pool; the caller owns the transaction; the stratum of tenant scope is begin_scoped"
+          },
+          "position": 6
+        },
+        {
+          "axis_a": "Migration set",
+          "axis_b": "forward-only, numbered, embedded, no IF NOT EXISTS",
+          "value": {
+            "usage": "store/src/migrate.rs asserts [(1,\"platform\"),(2,\"domain\")]; a file outside the embedded set is a silent no-op (plan trap 9); no IF NOT EXISTS masks failure as a no-op"
+          },
+          "position": 7
+        },
+        {
+          "axis_a": "Error vocabulary",
+          "axis_b": "stable refusals at the action boundary",
+          "value": {
+            "usage": "409 card-move-not-allowed for a refused matrix move; a stale version is refused; ApprovalConflict from 23505; the domain errors are typed in crates/domain and mapped once in the store"
+          },
+          "position": 8
+        },
+        {
+          "axis_a": "Rust domain crate",
+          "axis_b": "total functions, no I/O",
+          "value": {
+            "usage": "crates/domain depends on serde, uuid, time and thiserror only — no sqlx, tokio or axum; the machines are pure and the store carries the SQL"
+          },
+          "position": 9
+        },
+        {
+          "axis_a": "Verification",
+          "axis_b": "real Postgres, then the hosted preflight",
+          "value": {
+            "usage": "crates/store/tests run against real Postgres 18 on the plan's port 5439 (never 5432, never 8000); the compile/test verdict is preflight.yml; the local gate is cargo fmt --all -- --check and cargo metadata --locked --format-version 1"
+          },
+          "position": 10
+        }
+      ],
+      "body": "# Technology Standards Catalog — S03 Domain and schema (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: Postgres 18 FORCE RLS, text+CHECK enumeration, the partial-index guarantee, UTC lease time, numeric positions, the `_tx` convention, the embedded forward-only migration set, the error vocabulary, the pure domain crate and the verification route.\n\n## Links\n\nDerives from the slice plan §5–§8 and data-arch §1.8; realizes the Phase D standards view; reuses the repository's delivery contract and the GitHub-hosted preflight.\n\n## Document\n\nThe artefact sits under the slice plan; the standards are exercised by migrations/0002_domain.sql and the store test suite, and the gate is recorded in acceptance/programme/S03.toml."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1)",
+        "code": "R-S03-01",
+        "body": "claim_card_tx lets the same assignee re-claim an unexpired lease through its third arm (OR assignee_id = $3), and the 32-racer test shares seed.user and Version::INITIAL, so the version predicate decides the winner and the test would pass with the lease arm deleted. Property (b) is therefore overstated for the lease half.",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-05",
+        "links": {
+          "requirements": [
+            "R2"
+          ],
+          "decisions": [
+            "S3-D5"
+          ],
+          "cards": []
+        },
+        "meta": {
+          "owner": "programme architect (conveyor-e2e)"
+        },
+        "status": "admitted"
+      },
+      {
+        "title": "The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2)",
+        "code": "R-S03-02",
+        "body": "Only card_board_list_position_idx and card_board_position_idx carry WHERE archived_at IS NULL; card_assignee_lease_idx and card_tsv_idx include stamped cards, and the later card_name_trgm_idx and card_wbs_node_idx add no predicate. A later slice inheriting the schema could read the claim as absolute.",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-05",
+        "links": {
+          "requirements": [
+            "R10"
+          ],
+          "decisions": [
+            "S3-D1"
+          ],
+          "cards": []
+        },
+        "meta": {
+          "owner": "programme architect (conveyor-e2e)"
+        },
+        "status": "admitted"
+      }
+    ],
+    "issue": [
+      {
+        "title": "S03 closed out of sequence before the tranche-2 review (U3-EXC-S03)",
+        "code": "I-S03-01",
+        "body": "The project row reached closed at 2026-11-21T01:05:32Z in an unauthorised tranche before the tranche review; the delegate accepted it as a retrospective exception under the standing delegation, and this rework re-closes the project through the one gate.",
+        "status": "accepted"
+      },
+      {
+        "title": "No contemporaneous schema review or Phase A-D artefact set existed at the snapshot",
+        "code": "I-S03-02",
+        "body": "The plan requires a second reader over data-arch §2.3/§2.4 and the mandatory artefacts; none existed at the 2026-11-21T19:24:46Z snapshot. This retrospective batch authors the seven artefacts and re-performs the review, admitting two packages.",
+        "status": "closed"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "S02's platform primitives stay stable under the domain",
+        "code": "A-S03-01",
+        "body": "0001_platform.sql, begin_scoped, the conveyor_runtime role and domain::{TenantId, Id, Version} are the base the fourteen tables and the tenant_isolation policy stand on; a change to the runtime role or to app_current_tenant() would invalidate the RLS proof."
+      },
+      {
+        "title": "Postgres 18 enforces FORCE RLS for the owner and scopes the runtime role",
+        "code": "A-S03-02",
+        "body": "The RLS proof assumes the runtime role is scoped to one tenant per transaction and that ENABLE plus FORCE leaves the table owner with zero rows under the app_current_tenant() policy; rls_domain.rs checks runtime, owner and superuser."
+      }
+    ],
+    "dependency": [
+      {
+        "title": "S02 platform migration and tenancy primitives land first",
+        "code": "D-S03-01",
+        "body": "S03 is blocked by S02: migrations/0002_domain.sql builds on 0001_platform.sql, begin_scoped, the conveyor_runtime role and TenantId, Id and Version."
+      },
+      {
+        "title": "Later slices add tables and never re-invent one",
+        "code": "D-S03-02",
+        "body": "S04–S13 register actions, board satellites, channels, outlines and workflow over these fourteen tables and may add tables, but the baseline domain, the may_move matrix and the catalogue vocabulary are inherited, not replaced."
+      }
+    ],
+    "benefit": [
+      {
+        "title": "One stored domain behind every later slice",
+        "code": "B-S03-01",
+        "body": "Fourteen tenant-isolated tables in one baseline migration mean a later slice reaches for an existing table instead of inventing one, and the anti-accretion rule (R10) keeps fr's 224-migration history out of the baseline."
+      },
+      {
+        "title": "The database and Rust refuse the same transition",
+        "code": "B-S03-02",
+        "body": "The may_move matrix, the run, approval and asset state machines and the partial uniques give one refusal vocabulary: a terminal run rejects every transition, one pending approval exists per (run, gate), and a claim is granted once per version."
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)",
+    "body": {
+      "compliance": "S03 is assessed clause by clause against the SPEC §8 S3 gate and the slice plan §7 gate. The four gate properties are carried by named tests: board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error (a), claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic (b), approval_race.rs::sixteen_racers_create_exactly_one_pending_approval (c), transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense (d). Tenant isolation is rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema-review clause is met with two admitted packages: v1-s03-1 (P1) records that property (b)'s lease-exclusivity half is not exercised, and v1-s03-2 (P2) records that the archive-exclusion claim covers only the two board-scan indexes. The Phase-G review records the compliance level against this contract; the rework's acceptance instrument is acceptance/programme/S03.toml, and the closure gate is decided by an approver other than its requester on the P0-only gate.",
+      "acceptance_at": "the live record at the rework snapshot 2026-11-21T19:24:46Z and the delivery commit 96a3d47b (2026-11-12)",
+      "manifest": "acceptance/programme/S03.toml",
+      "retrospective": true,
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "commitments": "S03 commits to one domain and schema foundation every later slice builds on: the aggregate tables and their forced row-level security, the migration chain that owns them, and the typed store surface that reads and writes them. The delivery is the schema delta and its policies, not a parallel store; a later slice extends the catalogue rather than re-declaring tenancy. The contract closes on the acceptance manifest acceptance/programme/S03.toml and on the published evidence, and it does not claim the action registry (S04) or the board endpoints (S03-S06) that consume it."
+    }
+  },
+  "wbs_deliverable": {
+    "title": "The domain and schema — aggregates, state machines, leases and the baseline domain migration",
+    "business_value": 8,
+    "time_criticality": 5,
+    "risk_reduction": 8,
+    "job_size": 8
+  },
+  "review": {
+    "level": "compliant",
+    "findings": "This retrospective Phase-G review records the compliance level compliant for S03 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (the published decision 'Standing delegation extension — the U5 programme rework (2026-11-21)'). The close carried a mandatory_artefacts gap: at the 2026-11-21T19:24:46Z rework snapshot the seven Phase A–D artefacts, the Statement of Architecture Work and the delivery contract were absent, and the architecture compliance-review list was empty. This rework produces and publishes stakeholder_map, driver_goal_objective, requirements_catalog and solution_concept (Phase A), business_capability_map (Phase B), data_entity_catalog (Phase C) and technology_standards (Phase D), and records this review. Two findings are admitted by this batch. v1-s03-1 (P1): property (b) claims claim-exclusivity, but claim_card_tx lets the same assignee re-claim an unexpired lease through its third arm (OR assignee_id = $3), and the 32-racer test in crates/store/tests/claim_race.rs shares one user (let who = seed.user) and one version (Version::INITIAL), so the one-winner assertion is decided by the version predicate and the test would pass with the lease arm deleted. v1-s03-2 (P2): the plan's claim that every hot index filters archived cards is true only of the two board-scan indexes, card_board_list_position_idx and card_board_position_idx; card_assignee_lease_idx and card_tsv_idx include stamped cards, and the later card_name_trgm_idx and card_wbs_node_idx add no predicate. Both findings are packages owned by S03. A P1 does not block closure under this programme's manifest: the closure is on the P0-only gate of acceptance/programme/S03.toml, and neither finding is a P0. No original Phase-G review existed; this one is retrospective and does not attest contemporaneous intent. The live project had no WBS node and no project baseline at the snapshot; this rework takes the scope baseline from the one WBS deliverable, and the frozen-snapshot behaviour is proved elsewhere by T1's baseline test.",
+    "evidence": {
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "acceptance_manifest": "acceptance/programme/S03.toml"
+    }
+  },
+  "project_brief_output": "# Project brief — S03 Domain and schema (retrospective, 2026-11-21)\n\n## Outcome\n\nThe conveyor has one stored domain: fourteen tenant-isolated tables created by `migrations/0002_domain.sql`, Rust state machines that refuse the same transitions the database refuses, a claim primitive with a monotonic fence, one pending approval per (run, gate), and one catalogue vocabulary for the flows every later slice builds on.\n\n## Boundary\n\nS03 owns the tables, the machines, the store `_tx` functions and the baseline migration. Every route and action is out (S04–S06); board satellites (labels, comments, tasks, custom fields, memberships, webhooks) are S05; channels and delivery are S06; outlines, quality and project_request are S07; models, views and portfolio registers S08; documents, repositories and secrets S09; conversations S10; procedures S11; workflow S13; capability columns S15. The run tree is later than `0002`: the 2026-11-09 amendment rebuilds it in `0037_run_tree_workflow_step.sql`, and `run.procedure_id` and `run.capability_id` never land here.\n\n## Reuse sources\n\n- `agent@83b8de7` — `crates/agent-api/src/{lease,tenancy}.rs` and `migrations/0190_b8_worker_lease.sql`: the conditional `UPDATE … RETURNING`, the paired-null CHECK and the tx-local `set_config` behind `begin_scoped`.\n- `strata_rag@b9426c3` `store_providers.rs`: the `put_store_providers_tx` convention that becomes the store's `_tx` functions.\n- `fr@6f7c509` `100_card_phase_lease.sql` §3.4 and the card satellites: the closed-degradation argument and the sprawl to avoid — not the lease table.\n- S02: `0001_platform.sql` (11 tables), `begin_scoped`, the `conveyor_runtime` role and `domain::{TenantId, Id, Version}`.\n\n## Inception units\n\nThe published evidence document `01a1e686-d031-739d-ac30-9c0d4d8edffb` (2026-11-16T22:42:37Z, measured at main@cc88052, generated by `scripts/build-coverage.py`) records 0/0 actions, 2/2 modules and 14/14 tables and states that it does not re-run the acceptance suite. No inception analysis or architecture design document for S03 exists in the snapshot; the plan's decisions S3-D1 to S3-D5 are the design record.\n\n## Dependencies\n\n- blocked-by: S02 — the platform migration, the runtime role, `begin_scoped` and `TenantId`/`Id`/`Version`.\n- blocks: S04 (action registry) and S05/S06 (board and control plane) register over these tables; S07–S13 add tables and never re-invent these.\n- related: the tranche-2 sibling T2 (decision ladder).\n\n## Acceptance\n\nThe SPEC §8 S3 gate — 'proptest on transitions; schema review'. The plan §7 gate runs `cargo test -p conveyor-domain`, `cargo test -p conveyor-store`, migrates twice, asserts at least two migrations, zero `card` state/status columns and 14 FORCE RLS policies. The four gate properties are (a) the archive invariant, (b) claim exclusivity, (c) one pending approval per (run, gate), and (d) the terminal-run and revision invariants. Each has a named test; the rework's acceptance instrument is `acceptance/programme/S03.toml`.\n\n## Capabilities\n\nTenant-isolated domain persistence; claim and lease discipline; approval dual control; run and card state machines; asset governance and revisions; the catalogue vocabulary and the delivery matrix; migration discipline. The schema review and the absolute archive-exclusion claim are recorded as partial (packages v1-s03-1 and v1-s03-2).\n\n## Plan\n\nHeld to `docs/plans/slices/S03-domain-schema.md` — the plan frontmatter still reads `status: planned` and the project row echoes `meta.plan_status: \"planned\"` although `meta.measured_status` is `built`. Delivered in the public source snapshot `96a3d47b` (2026-11-12); reworked retrospectively on 2026-11-21.\n",
+  "evidence_output": "# Evidence — S03 Domain and schema (retrospective, 2026-11-21)\n\n## Claim\n\nS03 delivered the conveyor's baseline domain: fourteen tenant-isolated tables in one migration, four Rust state machines and the store primitives that carry the claim, approval, revision and archive invariants, with the SPEC §8 S3 gate proved by named real-Postgres tests and proptests — and with two admitted packages recording where the claims run ahead of the tests.\n\n## Evidence\n\n- **Delivery:** commit `96a3d47b0e43ef871ae42c0bfafac6a677f7a418`, 2026-11-12T22:38:46+01:00, 'conveyor: public source snapshot (2026-11-12)'. No dedicated S03 feature commit and no linked issue exist; the repository enters history with this snapshot, which adds `migrations/0002_domain.sql` (459 lines), `crates/domain/src/board.rs` (629 lines) and `crates/store/tests/claim_race.rs` (134 lines).\n- **Schema:** `migrations/0002_domain.sql` creates exactly 14 tables — programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state; `grep -c 'CREATE TABLE'` = 14; `grep -c 'FORCE ROW LEVEL SECURITY'` = 14; zero `CREATE TYPE`. Card indexes at lines 155–161: `card_board_list_position_idx` and `card_board_position_idx` carry `WHERE archived_at IS NULL`; `card_assignee_lease_idx` is partial on `assignee_id IS NOT NULL`; `card_tsv_idx` is `gin(tsv)`.\n- **Machines:** `crates/domain/src/board.rs` — `may_move` at line 260, `Card::archive`/`restore`; proptests `archived_implies_the_card_sits_in_an_archive_list` and `restore_off_a_non_archive_list_is_an_error`.\n- **Tests:** `crates/store/tests/claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic`; `approval_race.rs::sixteen_racers_create_exactly_one_pending_approval`, `::dual_control_needs_two_distinct_approvers_and_one_decision_each`, `::a_refused_decision_writes_no_decision_row_even_when_committed`; `transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense`, `::a_move_keeps_the_boards_in_agreement_and_refuses_a_stale_version`, `::the_store_create_paths_round_trip_every_module`, `::a_project_execution_is_create_or_return_and_the_index_refuses_a_second_live_run`; `rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser`.\n- **Claim primitive:** `crates/store/src/card.rs::claim_card_tx` — one `UPDATE … WHERE tenant_id = $1 AND id = $2 AND version = $5 AND (lease_expires_at IS NULL OR lease_expires_at < now() OR assignee_id = $3) RETURNING claim_fence, version`; the same assignee may renew an unexpired lease.\n- **Published evidence:** document `01a1e686-d031-739d-ac30-9c0d4d8edffb`, 2026-11-16T22:42:37Z, measured at main@cc88052: 0/0 actions, 2/2 modules, 14/14 tables; it records the inventory and does not re-run the acceptance suite.\n- **Governance:** project row `01a1d039-0d28-743b-86c7-0d0698ed69c1` closed at 2026-11-21T01:05:32Z; tranche 2 `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188` is `planned` (created 2026-11-17T14:19:51Z, `authorised_at` null, `authorisation_review_id` null); the accepted P0 issue `U3-EXC-S03` (`01a1fbac-8ec9-717c-be79-6d1b97980743`) records the out-of-sequence closure.\n- **Admitted findings:** v1-s03-1 (P1) — property (b) is overstated, the 32 racers share one user and one version, and the test would pass with the lease arm deleted; v1-s03-2 (P2) — the 'every hot index filters archived cards' claim is true only of the two board-scan indexes. Both are packages owned by S03.\n\n## Verification\n\nAn independent reader can run `cargo test -p conveyor-domain` and `cargo test -p conveyor-store` against a real Postgres 18 database (the plan uses port 5439, never 5432 and never 8000), then run `cargo run -p conveyor-server -- migrate` twice and the four SQL assertions of plan §7: at least two rows in `_sqlx_migrations`; zero `card` state/status columns; zero `CREATE TYPE`; exactly 14 `FORCE ROW LEVEL SECURITY`. The compile/test verdict is the repository's GitHub-hosted `preflight.yml`; the local gate is `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1`. The rework's acceptance instrument is `acceptance/programme/S03.toml`.\n\n## Links\n\n- Plan: `docs/plans/slices/S03-domain-schema.md`\n- Commit: `96a3d47b0e43ef871ae42c0bfafac6a677f7a418`\n- Schema: `migrations/0002_domain.sql`\n- Published evidence document: `01a1e686-d031-739d-ac30-9c0d4d8edffb`\n- Programme: `01a1d039-0d24-7d16-ae52-4841e96ccfac`; project: `01a1d039-0d28-743b-86c7-0d0698ed69c1`; tranche 2: `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`\n- Acceptance instrument: `acceptance/programme/S03.toml`\n\n## Gap\n\n- No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review existed; this set is retrospective and does not attest contemporaneous intent.\n- No dedicated S03 feature commit and no linked issue: the slice enters history in the 2026-11-12 public source snapshot.\n- Property (b) is overstated (v1-s03-1): the 32 racers share `seed.user` and `Version::INITIAL`, so the version predicate decides the winner and no test shows a live lease blocking a different claimant.\n- The archive-exclusion claim is true only of the two board-scan indexes (v1-s03-2); `card_assignee_lease_idx`, `card_tsv_idx`, `card_name_trgm_idx` and `card_wbs_node_idx` include stamped cards.\n- No project-brief document existed at the snapshot; this rework publishes one. The published evidence document records inventory only.\n- Tranche 2 is `planned` and unauthorised at the 2026-11-21T19:24:46Z snapshot; the closure rests on the standing delegation and the accepted P0 exception U3-EXC-S03, not on a tranche-2 review.\n- The run-tree amendment the plan places in migration 0033 lands in `0037_run_tree_workflow_step.sql` (with `workflow_step_id` rather than the plan's `step_id`); the plan text is stale.\n",
+  "closure_review": "# Closure review — S03 Domain and schema (retrospective, 2026-11-21)\n\n## Outcome vs acceptance\n\nThe SPEC §8 S3 gate, clause by clause:\n\n- **Proptest on transitions (property a).** Pass. `board.rs::archived_implies_the_card_sits_in_an_archive_list` and `::restore_off_a_non_archive_list_is_an_error`: `archived_at.is_some()` implies the card sits in an archive list; restore off a non-archive list is `Err`.\n- **Claim (property b).** Pass as tested, with the P1 package recorded. `claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic` produces exactly one grant, fence 1 then strictly increasing renewals, and a stale-fence completion writes nothing. The lease-exclusivity half is not exercised: all 32 racers use `seed.user` and `Version::INITIAL`, and `claim_card_tx` lets the same assignee re-claim an unexpired lease, so the test would pass with the lease arm deleted (v1-s03-1, P1).\n- **One pending approval per (run, gate) (property c).** Pass. `approval_race.rs::sixteen_racers_create_exactly_one_pending_approval` — one `Ok`, fifteen `ApprovalConflict`, pending count 1; the partial unique `uq_appr_pending` is the guarantee, and `dual_control_needs_two_distinct_approvers_and_one_decision_each` adds the two-approver rule.\n- **Terminal-run and revision invariants (property d).** Pass. `transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense`; `is_prunable('model')` is true past 50 and false for `requirement` at any depth.\n- **Schema review.** Pass with two admitted findings. The 14 tables are §2.3/§2.4 column-for-column, with 14 FORCE RLS policies and no `CREATE TYPE`. The archive-exclusion statement over-reaches: only `card_board_list_position_idx` and `card_board_position_idx` carry `archived_at IS NULL`; `card_assignee_lease_idx` and `card_tsv_idx` include stamped cards, and later `card_name_trgm_idx` and `card_wbs_node_idx` add no predicate (v1-s03-2, P2).\n- **Tenant isolation.** Pass. `rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser`: runtime scoped to A sees no B rows; a forged `tenant_id=B` insert fails `WITH CHECK`; owner 0; superuser both.\n- **Migrations.** Pass. A fresh database applies 2; the second run exits 0 with `_sqlx_migrations` unchanged; no `IF NOT EXISTS`; `migrate.rs` asserts `[(1,\"platform\"),(2,\"domain\")]`.\n- **Card-state proof.** Pass. `information_schema.columns` for `card` and `(state,status)` returns zero rows; the `insta` snapshot pins `Card`'s field set; the word-boundary grep returns 0.\n\n## Evidence\n\n- Commit `96a3d47b0e43ef871ae42c0bfafac6a677f7a418` (2026-11-12T22:38:46+01:00), 'conveyor: public source snapshot (2026-11-12)' — `migrations/0002_domain.sql` (459 lines, 14 tables, 14 FORCE RLS), `crates/domain/src/board.rs` (629 lines), `crates/store/src/card.rs`, and `crates/store/tests/{claim_race,approval_race,transitions,rls_domain}.rs`.\n- Published evidence document `01a1e686-d031-739d-ac30-9c0d4d8edffb` (2026-11-16T22:42:37Z, main@cc88052): 0/0 actions, 2/2 modules, 14/14 tables; inventory only, not an acceptance run.\n- Project `01a1d039-0d28-743b-86c7-0d0698ed69c1`; programme `01a1d039-0d24-7d16-ae52-4841e96ccfac`; tranche 2 `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188`.\n- Accepted P0 issue `U3-EXC-S03` (`01a1fbac-8ec9-717c-be79-6d1b97980743`): 'Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.'\n- The snapshot's only tranche review is `01a1ed84-e111-7082-9fa8-7fe77ccc9024` (2026-11-18T07:17:50Z, decision `continue`) for tranche `01a1e9e0-ced2-7769-b12f-f6fba0997914`; no tranche-2 review exists.\n- This rework records the charter, the Statement of Architecture Work, the delivery contract, the seven A–D artefacts, the scope baseline, the Phase-G review and this closure review; it declares the closure output `closure-review` and publishes the expected outputs `project-brief` and `evidence`.\n\n## Open items\n\n- **v1-s03-1 (P1, package owned by S03).** Either add a race of 32 distinct `app_user`s against one live lease and assert exactly one grant, or remove the same-assignee arm from `claim_card_tx`; restate property (b) to match the renewal semantics. A P1 does not block closure under this programme's manifest.\n- **v1-s03-2 (P2, package owned by S03).** Restate the archive claim to name the two board-scan indexes and list the lease and search indexes that deliberately include stamped cards; add `archived_at IS NULL` only where exclusion is intended.\n- **The run-tree amendment is later than the plan says.** The 2026-11-09 amendment places the tree in migration 0033; the repository settles it in `0037_run_tree_workflow_step.sql` around `parent_run_id` with `workflow_step_id` rather than the plan's `step_id`.\n- **No contemporaneous schema-review record.** The plan requires a second reader against §2.3/§2.4; none exists at the snapshot. This retrospective review re-performs the check and admits the two findings.\n- **Tranche 2 is `planned` and unauthorised** at the 2026-11-21T19:24:46Z snapshot (`authorised_at` null, `authorisation_review_id` null). The closure stands on the standing delegation and the accepted P0 exception U3-EXC-S03, not on a tranche-2 review.\n- **No project-brief document existed**; this rework publishes it. The plan frontmatter remains `status: planned` although `meta.measured_status` is `built`.\n\n## Decision\n\nRecord the compliance level **compliant** and close S03 under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14` on the P0-only gate of `acceptance/programme/S03.toml`. The two admitted findings are packages owned by S03; a P1 is not a P0 and does not block closure. Re-close the project through the one gate with the closure output `closure-review` and the expected outputs `project-brief` and `evidence`, decided by an approver other than its requester. This is a retrospective record: it states the evidence that exists and does not claim a contemporaneous review that was never written.\n",
+  "closure": "# Closure — S03 Domain and schema (retrospective, 2026-11-21)\n\n- **Delivered:** the baseline domain in commit `96a3d47b0e43ef871ae42c0bfafac6a677f7a418` (2026-11-12T22:38:46+01:00), 'conveyor: public source snapshot (2026-11-12)' — `migrations/0002_domain.sql` (459 lines, 14 tables: programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state; 14 FORCE RLS policies), `crates/domain` (the machines and `may_move`), `crates/store` (the `_tx` modules and `claim_card_tx`), and the gate tests in `claim_race.rs`, `approval_race.rs`, `transitions.rs`, `rls_domain.rs` plus the board proptests.\n- **Measured evidence:** the published evidence document `01a1e686-d031-739d-ac30-9c0d4d8edffb` (2026-11-16T22:42:37Z, main@cc88052; 0/0 actions, 2/2 modules, 14/14 tables) and the named test functions in the repository. The evidence document records inventory only and does not re-run the acceptance suite.\n- **Admitted findings:** v1-s03-1 (P1 — property (b) is overstated; the 32-racer test shares one user and one version and would pass with the lease arm deleted) and v1-s03-2 (P2 — the 'every hot index filters archived cards' claim is true only of the two board-scan indexes). Both are packages owned by S03; a P1 does not block closure, and this closure is on the P0-only gate.\n- **Gap closed here:** the project had no Phase A–D artefacts, no Statement of Architecture Work, no delivery contract, no Phase-G review and no closure review; this rework publishes them, the charter, the project brief and the evidence page, and records the scope baseline against the one WBS deliverable.\n- **Closure outputs declared:** `closure-review`. **Expected outputs:** `project-brief`, `evidence`.\n- **Governance:** tranche 2 `01a1e9e0-e2ac-786b-ac48-3b8bcdf12188` is `planned` and unauthorised at the 2026-11-21T19:24:46Z snapshot; the accepted P0 issue `U3-EXC-S03` (`01a1fbac-8ec9-717c-be79-6d1b97980743`) records the out-of-sequence closure and the rework.\n- **Decision:** re-close S03 against `acceptance/programme/S03.toml` on the P0-only gate, with the closure gate decided by an approver other than its requester, under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Not recoverable:** no contemporaneous charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored; this closure is retrospective and does not attest contemporaneous intent.\n"
+}

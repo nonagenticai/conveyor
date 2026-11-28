@@ -2299,16 +2299,22 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
       );
     d.state = value;
     d.note = note;
+    // A decision is recorded even when the row it names has no project in this demo's data
+    // (the scope question names a project the fixture may not carry). The status refresh is a
+    // convenience, never a precondition: writing through an absent row threw and lost the
+    // answer the person had just given.
     const p = byId("projects", d.project);
     if (id === "review") {
-      p.status = value === "Approved" ? "Running" : "Changes requested";
-      p.tone = value === "Approved" ? "green" : "amber";
-      if (value === "Approved") p.phase = 5;
+      if (p) {
+        p.status = value === "Approved" ? "Running" : "Changes requested";
+        p.tone = value === "Approved" ? "green" : "amber";
+        if (value === "Approved") p.phase = 5;
+      }
       state.node = value === "Approved" ? 5 : 2;
       const c = byId("cards", "C-142");
-      c.list = value === "Approved" ? "Review" : "Build";
+      if (c) c.list = value === "Approved" ? "Review" : "Build";
     }
-    if (id === "scope") {
+    if (id === "scope" && p) {
       p.status = value === "Approved" ? "Running" : "Needs input";
       p.tone = value === "Approved" ? "green" : "amber";
     }

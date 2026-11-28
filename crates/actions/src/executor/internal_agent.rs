@@ -19,14 +19,17 @@ use std::pin::Pin;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_domain::executor::ExecutorKind;
-use conveyor_domain::ladder::{Outcome, unavailable};
+use conveyor_domain::ladder::{FailAction, FailPolicy, Outcome, unavailable};
 use conveyor_store as store;
 use conveyor_workflow::trace::hash_value;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::invoke::{ActionError, Authority, InvokeRequest, invoke};
+use crate::invoke::{
+    ActionError, Authority, GateUnavailable, InvokeRequest, invoke, invoke_with_timeout,
+    record_unavailable_decision,
+};
 use crate::process::judge;
 use crate::registry::registry;
 
@@ -383,6 +386,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
     )
     .await;
@@ -661,24 +665,6 @@ async fn decide(
         store::ladder::effective_policy_tx(&mut tx, tenant, GATE_KIND, anatomy.gate.as_deref())
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    // A declared `choice` gate answers from the authored menu; read it in the same transaction as
-    // the policy so the case the executor posts and the one the evaluator rebuilds use one set.
-    let option_set = match &policy {
-        Some(policy) if crate::ladder::case::question_is_choice(&policy.policy.meta) => Some(
-            store::ladder::effective_option_set_tx(
-                &mut tx,
-                tenant,
-                GATE_KIND,
-                anatomy.gate.as_deref(),
-            )
-            .await
-            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?
-            .ok_or_else(|| {
-                ExecutorFailure::permanent("a choice gate policy has no authored option set")
-            })?,
-        ),
-        _ => None,
-    };
     tx.commit()
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -718,25 +704,24 @@ async fn decide(
         ));
     };
 
-    let criteria = policy
-        .policy
-        .meta
-        .get("criteria")
-        .cloned()
-        .unwrap_or_else(|| json!("the draft satisfies the request"));
-    // The judge sees the same release Request the prompt rendered (S21 step 8, CONTRACT §26):
-    // one builder (`release_request`) feeds both, so L1 and L2 cannot disagree.
-    let case_input = json!({
+    // The ladder owns the case: it builds the wire document from the policy rows and, at
+    // `ladder.evaluate`, rebuilds that document from the same rows and requires the answer to
+    // come from a `laya.classify` replay of EXACTLY that body (S06's verified-answer rule).
+    // An executor-authored judge document can never hash to the ladder's, so the gate path is
+    // prepare → classify → evaluate, and the classify key is what evaluate verifies.
+    // The case also carries the same release Request the prompt rendered (S21 step 8, CONTRACT
+    // §26): one builder (`release_request`) feeds both, so L1 and L2 cannot disagree.
+    let case_facts = json!({
         "request": conveyor_domain::prompt::release_request(anatomy),
         "run_id": run.id,
         "card_id": run.card_id,
         "release_hash": binding.release_hash,
+        "output": out.output,
+        "turns": out.turns,
     });
-    let case_output = json!({ "output": out.output, "turns": out.turns });
-
     // `fire_when` decides whether the gate is asked at all. Not fired: no call, no decision, and
-    // the step proceeds — the policy said this case is not its business.
-    let facts = crate::ladder::case_facts(&case_output, &criteria, Some(&case_input));
+    // the step proceeds — the policy said this case is not its business. Its predicates address
+    // the same fact document `ladder.prepare` is handed, so both read one case.
     let fires = match &policy.policy.fire_when {
         None => true,
         Some(value) => conveyor_domain::ladder::FireWhen::parse(value)
@@ -745,7 +730,9 @@ async fn decide(
                     "the gate policy's fire_when is invalid: {error}"
                 ))
             })?
-            .is_none_or(|expression| expression.fires(GATE_KIND, anatomy.gate.as_deref(), &facts)),
+            .is_none_or(|expression| {
+                expression.fires(GATE_KIND, anatomy.gate.as_deref(), &case_facts)
+            }),
     };
     if !fires {
         return Ok(Gate {
@@ -760,56 +747,104 @@ async fn decide(
             apply: false,
         });
     }
-
-    // One builder (`crate::ladder::case::build`) makes the body the executor posts, its claim and
-    // the body `ladder.evaluate` re-derives — one authored menu, one case, one call.
-    let built = crate::ladder::case::build(
-        tenant,
-        GATE_KIND,
-        anatomy.gate.as_deref(),
-        Some(&laya_config.model_ref),
-        &case_output,
-        &criteria,
-        Some(&case_input),
-        option_set.as_ref().map(|set| set.options.as_slice()),
-    );
-    let request = built.body;
-    let call_key = built.call_key;
-    let started = std::time::Instant::now();
-    let judged = invoke(
+    let prepared = invoke(
         pool,
         registry(),
         tenant,
         InvokeRequest {
-            action: "ladder.precheck".to_owned(),
-            input: request,
+            action: "ladder.prepare".to_owned(),
+            input: json!({
+                "kind": GATE_KIND,
+                "gate": anatomy.gate,
+                "question": judge::JUDGE_QUESTION,
+                "input": case_facts,
+            }),
             precondition: None,
-            idempotency_key: Some(call_key.clone()),
+            idempotency_key: None,
             approval_id: None,
             actor_id,
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,
             policy: Default::default(),
             authority: Authority::Internal,
-            request_id: Some(format!("internal_agent:{}:judge", run.id)),
+            request_id: Some(format!("internal_agent:{}:prepare", run.id)),
             trace_id: Some(format!("run:{}", run.id)),
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
+    )
+    .await;
+    let request = match prepared {
+        Ok(outcome) if outcome.status == 200 || outcome.status == 201 => outcome
+            .body
+            .get("output")
+            .and_then(|output| output.get("request"))
+            .cloned()
+            .ok_or_else(|| {
+                ExecutorFailure::permanent("ladder.prepare answered no wire document")
+            })?,
+        Ok(outcome) => {
+            // A policy with no usable pins is a configuration fault, not a passing gate.
+            tracing::warn!(
+                status = outcome.status,
+                "internal_agent: the ladder could not prepare the case"
+            );
+            return Err(ExecutorFailure::permanent(
+                "ladder.prepare refused the gate case",
+            ));
+        }
+        Err(error) => {
+            return Err(ExecutorFailure::retryable(format!(
+                "ladder.prepare: {}: {}",
+                error.code, error.detail
+            )));
+        }
+    };
+    let classify_key = format!("{prefix}:classify");
+    // SPEC_V2 §10.2: the tenant's configured laya budget bounds this classify call; the
+    // invoker caps it at the action's own 3 s hard budget, so the override can only lower it.
+    let laya_timeout_ms = u64::try_from(laya_config.timeout_ms).ok();
+    let started = std::time::Instant::now();
+    let judged = invoke_with_timeout(
+        pool,
+        registry(),
+        tenant,
+        InvokeRequest {
+            action: "laya.classify".to_owned(),
+            input: request.clone(),
+            precondition: None,
+            idempotency_key: Some(classify_key.clone()),
+            approval_id: None,
+            actor_id,
+            actor_kind: "service".to_owned(),
+            role: Role::KataExecutor,
+            policy: Default::default(),
+            authority: Authority::Internal,
+            request_id: Some(format!("internal_agent:{}:classify", run.id)),
+            trace_id: Some(format!("run:{}", run.id)),
+            depth: 1,
+            app_key: app_key.to_owned(),
+            usage: None,
+            credential_alias: None,
+        },
+        laya_timeout_ms,
     )
     .await;
     let latency_ms = i32::try_from(started.elapsed().as_millis()).ok();
     let verdict = match judged {
         Err(error) if error.status >= 500 => None,
         Err(error) => {
-            // A 4xx from the judge is an outage too: only a readable verdict can decide.
-            tracing::warn!(code = %error.code, "internal_agent: the laya judge refused the request");
+            // A 4xx from laya is an outage too: only a readable verdict can decide.
+            tracing::warn!(code = %error.code, "internal_agent: the laya call refused the request");
             None
         }
         Ok(outcome) => {
             let answer = outcome.body.get("output").cloned().unwrap_or(Value::Null);
-            match judge::parse_verdict(&answer, Some(threshold)) {
+            // The ladder's parser, not the judge's: `ladder.prepare` keys its questions
+            // `decision` and `ladder.evaluate` re-reads the stored answer the same way.
+            match crate::ladder::laya::parse_answer(&request, &answer) {
                 Ok(verdict) => Some(verdict),
                 Err(error) => {
                     tracing::warn!(%error, "internal_agent: unreadable laya verdict");
@@ -821,6 +856,8 @@ async fn decide(
 
     let Some(verdict) = verdict else {
         let outcome = unavailable(fail_policy, action);
+        let note = (fail_policy == FailPolicy::Open && action == FailAction::Annotate)
+            .then(|| "laya unavailable: the laya judge did not decide".to_owned());
         let judge_doc = json!({
             "decision": "unavailable",
             "outcome": outcome_str(outcome),
@@ -831,6 +868,47 @@ async fn decide(
             "laya_config_id": laya_config.id.to_string(),
             "latency_ms": latency_ms,
         });
+        // §7.2 (v1-w1c-5): the outage is an outcome, not an absent decision. The ladder's own
+        // `ladder.evaluate` never runs on this path, so the row is recorded here — in its own
+        // transaction, with the same fail_policy/action/note payload the invocation boundary
+        // records for a refused `ladder.evaluate`.
+        let mut decision_meta = judge_doc.clone();
+        if let Some(meta) = decision_meta.as_object_mut() {
+            meta.insert("run_id".to_owned(), json!(run.id));
+            meta.insert("card_id".to_owned(), json!(run.card_id));
+            meta.insert("job_binding_id".to_owned(), json!(binding.id));
+            meta.insert("release_hash".to_owned(), json!(binding.release_hash));
+            meta.insert("draft_document_id".to_owned(), json!(document_id));
+            if let Some(note) = note.as_ref() {
+                meta.insert("note".to_owned(), json!(note));
+            }
+        }
+        let outage = GateUnavailable {
+            fail_policy,
+            action,
+            outcome,
+            note,
+            policy_id: policy.policy.id,
+            policy_version: Some(policy.policy.version),
+            policy_refinement_id: policy.refinement.as_ref().map(|row| row.id),
+            refinement_version: policy.refinement.as_ref().map(|row| row.version),
+            laya_config_id: Some(laya_config.id),
+            laya_config_version: Some(laya_config.version),
+            input_hash: hash_value(&request),
+        };
+        record_unavailable_decision(
+            pool,
+            tenant,
+            &outage,
+            GATE_KIND,
+            judge::JUDGE_QUESTION,
+            Some(run.project_id),
+            run.card_id,
+            decision_meta,
+            "service",
+            Some(actor_id),
+        )
+        .await;
         // An open gate whose configured action is handover parks the draft for a person; a
         // refused outcome (closed, or block) fails closed with `gate_unavailable`.
         let escalation = matches!(outcome, Outcome::Escalated).then_some(Escalation {
@@ -851,6 +929,8 @@ async fn decide(
         });
     };
 
+    let answer = verdict.answer.as_str();
+    let confidence = verdict.confidence;
     let evaluated = invoke(
         pool,
         registry(),
@@ -863,10 +943,8 @@ async fn decide(
                 "project_id": run.project_id,
                 "card_id": run.card_id,
                 "question": judge::JUDGE_QUESTION,
-                "output": case_output,
-                "criteria": criteria,
-                "facts": case_input,
-                "call_key": call_key,
+                "input": case_facts,
+                "laya_key": classify_key,
                 "meta": {
                     "run_id": run.id,
                     "job_binding_id": binding.id,
@@ -890,10 +968,11 @@ async fn decide(
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
     )
     .await;
-    let (decision_id, outcome, recorded_answer, recorded_confidence) = match evaluated {
+    let (decision_id, outcome) = match evaluated {
         Ok(outcome) => {
             let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
             let decision_id = output.get("id").and_then(Value::as_str).map(str::to_owned);
@@ -901,16 +980,7 @@ async fn decide(
                 .get("outcome")
                 .and_then(Value::as_str)
                 .map(str::to_owned);
-            let recorded_answer = output
-                .get("answer")
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_owned();
-            let recorded_confidence = output
-                .get("confidence")
-                .and_then(Value::as_f64)
-                .unwrap_or(0.0);
-            (decision_id, recorded, recorded_answer, recorded_confidence)
+            (decision_id, recorded)
         }
         Err(error) => {
             // The verdict was readable but the ladder refused to record it: an infrastructure
@@ -937,10 +1007,9 @@ async fn decide(
     let judge_doc = json!({
         "decision": outcome_str(outcome),
         "decision_id": decision_id,
-        "answer": recorded_answer,
-        "confidence": recorded_confidence,
+        "answer": answer,
+        "confidence": confidence,
         "threshold": threshold,
-        "reason": verdict.reason,
         "policy_id": policy.policy.id.to_string(),
         "laya_config_id": laya_config.id.to_string(),
         "latency_ms": latency_ms,
@@ -950,7 +1019,7 @@ async fn decide(
         Outcome::Refused => Some(Refusal {
             class: "laya_refused".to_owned(),
             detail: format!(
-                "the gate refused the draft (confidence {recorded_confidence:.3} < threshold {threshold:.3})"
+                "the gate refused the draft (confidence {confidence:.3} < threshold {threshold:.3})"
             ),
         }),
         Outcome::Escalated => None,

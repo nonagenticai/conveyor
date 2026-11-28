@@ -460,7 +460,7 @@ async fn a_machine_or_an_unscoped_human_cannot_decide_an_eval_gate() {
     let refused = record_decision_tx(&mut tx, tenant, approval, &machine, true)
         .await
         .expect_err("a machine cannot sign an eval gate");
-    assert!(matches!(refused, ApprovalStoreError::HumanOnlyGate));
+    assert!(matches!(refused, ApprovalStoreError::HumanOnlyGate { .. }));
     tx.rollback().await.expect("roll back");
 
     // A human without `evals:approve` is refused by the same boundary.

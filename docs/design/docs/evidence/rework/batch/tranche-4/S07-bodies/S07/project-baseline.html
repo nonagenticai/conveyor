@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Baseline — Requirements, catalogues, revisions, quality scoring, search · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-baseline.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-baseline--requirements-catalogues-revisions-quality-scoring-search">Project Baseline — Requirements, catalogues, revisions, quality scoring, search</h1>
+<h2 id="scope">Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:22.486358+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-5241-7d98-8c54-550959dc4138&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S07-B3&quot;,
+            &quot;id&quot;: &quot;01a219d9-51a2-7a77-ba70-e09fb54bde15&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;planned&quot;,
+            &quot;title&quot;: &quot;A measured relevance baseline over 40 human-labelled queries&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B2&quot;,
+            &quot;id&quot;: &quot;01a219d9-5110-7b35-aac4-b56d80ef5d59&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;Every mutation leaves an immutable revision with a Rust field-level compare&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B1&quot;,
+            &quot;id&quot;: &quot;01a219d9-507d-75f8-9bf9-73f4dda099e7&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;One governed_asset lifecycle replaces RM&#39;s 57 domain tables&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4fe6-7681-a1e9-5d7a9bbfc6fb&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4f53-7191-b52f-8becbdc4977b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S04 projects every S07 action through the registry&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ec1-72e1-a6de-b6538a702c09&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S03 keeps governed_asset, revision, catalogue_entry and trace_link&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4e09-747a-a808-68ae58bca75f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;S03 and S04 keep the surfaces S07 reuses&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4d74-78e7-a237-ef8f79d94942&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;The 2026-11-24 snapshot is the authoritative record for S07&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ce6-7807-b901-ad527ab2c609&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a710.3 open question still assumes outline and outline_node exist&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4c58-755f-98a5-dd6fad64f344&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The snapshot carries no linked issue and no baseline row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4bc9-7feb-a6f2-082b7e349ca2&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Both GIN indexes are dead if the trigram operators are not LEAKPROOF&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4b3a-73e3-9f52-6ce5536c9de7&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The \u00a75.6 relevance targets have no measured eval numbers&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4aaa-7180-8433-4eafaf4a3f49&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a77 functional gate has no recorded run&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S07&quot;,
+            &quot;id&quot;: &quot;01a1fbad-2d6e-7c68-9968-af101d0acb0c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S07)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 10,
+            &quot;id&quot;: &quot;01a219d9-523d-76df-8f8e-ca68a7fcc4f6&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 10,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;The requirements and search slice \u2014 one governed_asset lifecycle, one revision per mutation, the advisory quality rubric, FTS plus trigram search and its eval set, the catalogue seed and the project-request intake&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-26T21:53:22.486358+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="schedule">Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:22.661+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-530c-7706-ba33-28f4bfc62d8e&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S07-B3&quot;,
+            &quot;id&quot;: &quot;01a219d9-51a2-7a77-ba70-e09fb54bde15&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;planned&quot;,
+            &quot;title&quot;: &quot;A measured relevance baseline over 40 human-labelled queries&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B2&quot;,
+            &quot;id&quot;: &quot;01a219d9-5110-7b35-aac4-b56d80ef5d59&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;Every mutation leaves an immutable revision with a Rust field-level compare&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B1&quot;,
+            &quot;id&quot;: &quot;01a219d9-507d-75f8-9bf9-73f4dda099e7&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;One governed_asset lifecycle replaces RM&#39;s 57 domain tables&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4fe6-7681-a1e9-5d7a9bbfc6fb&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4f53-7191-b52f-8becbdc4977b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S04 projects every S07 action through the registry&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ec1-72e1-a6de-b6538a702c09&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S03 keeps governed_asset, revision, catalogue_entry and trace_link&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4e09-747a-a808-68ae58bca75f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;S03 and S04 keep the surfaces S07 reuses&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4d74-78e7-a237-ef8f79d94942&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;The 2026-11-24 snapshot is the authoritative record for S07&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ce6-7807-b901-ad527ab2c609&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a710.3 open question still assumes outline and outline_node exist&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4c58-755f-98a5-dd6fad64f344&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The snapshot carries no linked issue and no baseline row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4bc9-7feb-a6f2-082b7e349ca2&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Both GIN indexes are dead if the trigram operators are not LEAKPROOF&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4b3a-73e3-9f52-6ce5536c9de7&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The \u00a75.6 relevance targets have no measured eval numbers&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4aaa-7180-8433-4eafaf4a3f49&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a77 functional gate has no recorded run&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S07&quot;,
+            &quot;id&quot;: &quot;01a1fbad-2d6e-7c68-9968-af101d0acb0c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S07)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 10,
+            &quot;id&quot;: &quot;01a219d9-523d-76df-8f8e-ca68a7fcc4f6&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 10,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;The requirements and search slice \u2014 one governed_asset lifecycle, one revision per mutation, the advisory quality rubric, FTS plus trigram search and its eval set, the catalogue seed and the project-request intake&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-26T21:53:22.661+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="cost">Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:23.003305+00:00&quot;,
+      &quot;id&quot;: &quot;01a219d9-5443-7080-9cf2-0a7e914564ba&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S07-B3&quot;,
+            &quot;id&quot;: &quot;01a219d9-51a2-7a77-ba70-e09fb54bde15&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;planned&quot;,
+            &quot;title&quot;: &quot;A measured relevance baseline over 40 human-labelled queries&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B2&quot;,
+            &quot;id&quot;: &quot;01a219d9-5110-7b35-aac4-b56d80ef5d59&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;Every mutation leaves an immutable revision with a Rust field-level compare&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-B1&quot;,
+            &quot;id&quot;: &quot;01a219d9-507d-75f8-9bf9-73f4dda099e7&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;claimed&quot;,
+            &quot;title&quot;: &quot;One governed_asset lifecycle replaces RM&#39;s 57 domain tables&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4fe6-7681-a1e9-5d7a9bbfc6fb&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4f53-7191-b52f-8becbdc4977b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S04 projects every S07 action through the registry&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-D1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ec1-72e1-a6de-b6538a702c09&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;satisfied&quot;,
+            &quot;title&quot;: &quot;S03 keeps governed_asset, revision, catalogue_entry and trace_link&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4e09-747a-a808-68ae58bca75f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;S03 and S04 keep the surfaces S07 reuses&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-A1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4d74-78e7-a237-ef8f79d94942&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;held&quot;,
+            &quot;title&quot;: &quot;The 2026-11-24 snapshot is the authoritative record for S07&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4ce6-7807-b901-ad527ab2c609&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a710.3 open question still assumes outline and outline_node exist&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-I1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4c58-755f-98a5-dd6fad64f344&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The snapshot carries no linked issue and no baseline row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R3&quot;,
+            &quot;id&quot;: &quot;01a219d9-4bc9-7feb-a6f2-082b7e349ca2&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Both GIN indexes are dead if the trigram operators are not LEAKPROOF&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R2&quot;,
+            &quot;id&quot;: &quot;01a219d9-4b3a-73e3-9f52-6ce5536c9de7&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The \u00a75.6 relevance targets have no measured eval numbers&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S07-R1&quot;,
+            &quot;id&quot;: &quot;01a219d9-4aaa-7180-8433-4eafaf4a3f49&quot;,
+            &quot;impact&quot;: 4,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;high&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The plan \u00a77 functional gate has no recorded run&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S07&quot;,
+            &quot;id&quot;: &quot;01a1fbad-2d6e-7c68-9968-af101d0acb0c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S07)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 10,
+            &quot;id&quot;: &quot;01a219d9-523d-76df-8f8e-ca68a7fcc4f6&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 10,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 8,
+            &quot;title&quot;: &quot;The requirements and search slice \u2014 one governed_asset lifecycle, one revision per mutation, the advisory quality rubric, FTS plus trigram search and its eval set, the catalogue seed and the project-request intake&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-26T21:53:23.003305+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:22.486358+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a219d9-5245-707e-981e-103433ec240f&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a219d9-5241-7d98-8c54-550959dc4138&quot;,
+        &quot;description&quot;: &quot;Approve the scope baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:53:31.199573+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:22.661+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a219d9-5310-7959-8bd3-32d561e55205&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a219d9-530c-7706-ba33-28f4bfc62d8e&quot;,
+        &quot;description&quot;: &quot;Approve the schedule baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:53:22.845631+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-26T21:53:23.003305+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a219d9-5445-7c98-9b45-251cac05140f&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a219d9-5443-7080-9cf2-0a7e914564ba&quot;,
+        &quot;description&quot;: &quot;Approve the cost baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d2c-7322-b2f9-4dd041153894&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-26T21:53:23.154974+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;work.json#/approvals&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-4/S07-bodies/S07/project-baseline.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

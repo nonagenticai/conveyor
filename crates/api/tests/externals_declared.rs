@@ -3,9 +3,12 @@
 //! Two properties, both checked against the registry rather than against a service (which may be down, and whose
 //! unavailability must never be the reason a rule is not tested):
 //!
-//! - **No `reqwest::` outside the executor.** A handler that calls a service directly bypasses the timeout, the
-//!   breaker, the idempotency claim and the audit row — so the source is scanned for one, and the only permitted
-//!   file is `invoke.rs`, which owns the engine's call.
+//! - **No ad-hoc HTTP inside the actions crate.** A handler that calls a service directly bypasses the
+//!   timeout, the breaker, the idempotency claim and the audit row — so `crates/actions/src` is scanned
+//!   for one, and the only permitted files are the declared transports below. This test is the
+//!   actions-crate half of property f; the WORKSPACE-wide half (auth, api, server and every app) is
+//!   `scripts/check-egress.py --check`, run by `scripts/ci/gate.sh`, because this file's scan scope
+//!   never included those trees (v1-s09-1 measured exactly that gap).
 //! - **A display never writes.** `workers.*`, `providers.*`, `artifacts.*`, `billing.*` and
 //!   `retrieval.*` must all be `effect = read`. Absorption by accretion (S09 trap 4) starts with one
 //!   write. Since #450 the first four are internal reads of conveyor state; the rule is unchanged.
@@ -211,8 +214,10 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   tts                  /api     the narration route `tts_compat.rs` mounts: /api/tts/synthesize
     //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
     // #450 removed the `artifacts`, `billing_service` and `worker_management` rows: those actions
-    // are internal reads now, so no external path reaches those services.
-    const PREFIXES: [(&str, &str); 11] = [
+    // are internal reads now, so no external path reaches those services. SPEC §12 T11's
+    // reconciliation re-adds billing as a **Rust shim** destination (`billing_shim`), never the
+    // Python billing service directly (owner decision 2026-11-24).
+    const PREFIXES: [(&str, &str); 12] = [
         ("fixtures", ""),
         ("image_gen", ""),
         ("coding", "/api"),
@@ -224,7 +229,8 @@ fn every_external_action_declares_its_services_path_prefix() {
         // #560: the scientific router mounts /api/stats/* and /api/formal/*
         // (apps/scientific/src/router/mod.rs).
         ("scientific", "/api"),
-        // #561: the scraper mounts /api/scrape/* (apps/research/src/router.rs) and the Lean
+        // SPEC §12 T11: the shim serves POST /api/usage/rollup (apps/billing-shim).
+        ("billing_shim", "/api"), // #561: the scraper mounts /api/scrape/* (apps/research/src/router.rs) and the Lean
         // prover mounts /api/check|elaborate|prove (apps/lean4-prover/src/routes.rs).
         ("webscraper", "/api"),
         ("lean4", "/api"),
@@ -238,7 +244,7 @@ fn every_external_action_declares_its_services_path_prefix() {
         };
         let (_, prefix) = PREFIXES
             .iter()
-            .find(|(key, _)| key == service)
+            .find(|(key, _)| *key == service.as_ref())
             .unwrap_or_else(|| {
                 panic!(
                     "{service} has no declared path prefix: read the service's own router, add a \
@@ -246,7 +252,7 @@ fn every_external_action_declares_its_services_path_prefix() {
                 )
             });
         let prefix = *prefix;
-        seen.insert(*service);
+        seen.insert(service.as_ref());
         assert!(
             prefix.is_empty() || path.starts_with(&format!("{prefix}/")),
             "{} declares {path}, but {service} serves under {prefix:?}: the base URL names the \

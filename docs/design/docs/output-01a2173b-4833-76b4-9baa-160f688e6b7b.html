@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Statement Of Architecture Work — Usage inventory → parity/parity.yaml · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="statement-of-architecture-work" data-provenance-version="1" data-provenance-hash="c3baefa7793a6c8fbd217ef953b13e0ecef41443ddfc3fc39afe01c51f38e167" data-provenance-status="active" data-provenance-owner="georgiedekker" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>statement-of-architecture-work</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>c3baefa7793a6c8fbd217ef953b13e0ecef41443ddfc3fc39afe01c51f38e167</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>georgiedekker</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Statement Of Architecture Work — Usage inventory → parity/parity.yaml</h1>
+<h2>Assignment</h2>
+<p>What the architecture work is asked to deliver and for whom.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+      "approved_at": "2026-11-21T17:47:05.975622+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/S00.toml is green against the live record at the published SHA; the inventory's 244 dropped rows are the gate's evidence.",
+        "assignment": "Rework the usage inventory project by the reconstituted lifecycle (U5a, #526); the inventory itself was delivered 2026-11-07/08.",
+        "manifest": "acceptance/programme/S00.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "The 1,300-row parity inventory: 218 used, 295 rare, 543 unused, 244 dropped, across fr (798), RM (314), Planka (96) and n8n (92)."
+      },
+      "created_at": "2026-11-21T17:46:54.771712+00:00",
+      "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S00 (retrospective, 2026-11-21)",
+      "updated_at": "2026-11-21T17:47:05.975622+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Scope</h2>
+<p>The boundaries, the artefacts expected and the phase set.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+      "approved_at": "2026-11-21T17:47:05.975622+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/S00.toml is green against the live record at the published SHA; the inventory's 244 dropped rows are the gate's evidence.",
+        "assignment": "Rework the usage inventory project by the reconstituted lifecycle (U5a, #526); the inventory itself was delivered 2026-11-07/08.",
+        "manifest": "acceptance/programme/S00.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "The 1,300-row parity inventory: 218 used, 295 rare, 543 unused, 244 dropped, across fr (798), RM (314), Planka (96) and n8n (92)."
+      },
+      "created_at": "2026-11-21T17:46:54.771712+00:00",
+      "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S00 (retrospective, 2026-11-21)",
+      "updated_at": "2026-11-21T17:47:05.975622+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Responsibilities</h2>
+<p>Who does the work and who accepts it.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+      "approved_at": "2026-11-21T17:47:05.975622+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/S00.toml is green against the live record at the published SHA; the inventory's 244 dropped rows are the gate's evidence.",
+        "assignment": "Rework the usage inventory project by the reconstituted lifecycle (U5a, #526); the inventory itself was delivered 2026-11-07/08.",
+        "manifest": "acceptance/programme/S00.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "The 1,300-row parity inventory: 218 used, 295 rare, 543 unused, 244 dropped, across fr (798), RM (314), Planka (96) and n8n (92)."
+      },
+      "created_at": "2026-11-21T17:46:54.771712+00:00",
+      "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S00 (retrospective, 2026-11-21)",
+      "updated_at": "2026-11-21T17:47:05.975622+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Acceptance criteria</h2>
+<p>The conditions the architecture must meet to close Phase A.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+      "approved_at": "2026-11-21T17:47:05.975622+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/S00.toml is green against the live record at the published SHA; the inventory's 244 dropped rows are the gate's evidence.",
+        "assignment": "Rework the usage inventory project by the reconstituted lifecycle (U5a, #526); the inventory itself was delivered 2026-11-07/08.",
+        "manifest": "acceptance/programme/S00.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "The 1,300-row parity inventory: 218 used, 295 rare, 543 unused, 244 dropped, across fr (798), RM (314), Planka (96) and n8n (92)."
+      },
+      "created_at": "2026-11-21T17:46:54.771712+00:00",
+      "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S00 (retrospective, 2026-11-21)",
+      "updated_at": "2026-11-21T17:47:05.975622+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<h2>Contract</h2>
+<p>The contract record, its version and its approval.</p>
+<pre><code class="language-json">{
+  "category": "statement-of-architecture-work",
+  "count": 1,
+  "rows": [
+    {
+      "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+      "approved_at": "2026-11-21T17:47:05.975622+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "acceptance/programme/S00.toml is green against the live record at the published SHA; the inventory's 244 dropped rows are the gate's evidence.",
+        "assignment": "Rework the usage inventory project by the reconstituted lifecycle (U5a, #526); the inventory itself was delivered 2026-11-07/08.",
+        "manifest": "acceptance/programme/S00.toml",
+        "responsibilities": {
+          "approver": "conveyor-approver",
+          "architecture board": "conveyor-architecture-board",
+          "programme architect": "conveyor-e2e"
+        },
+        "retrospective": true,
+        "scope": "The 1,300-row parity inventory: 218 used, 295 rare, 543 unused, 244 dropped, across fr (798), RM (314), Planka (96) and n8n (92)."
+      },
+      "created_at": "2026-11-21T17:46:54.771712+00:00",
+      "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S00 (retrospective, 2026-11-21)",
+      "updated_at": "2026-11-21T17:47:05.975622+00:00",
+      "version": 2
+    }
+  ],
+  "source": "architecture.json#/contracts"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Usage inventory → parity/parity.yaml · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

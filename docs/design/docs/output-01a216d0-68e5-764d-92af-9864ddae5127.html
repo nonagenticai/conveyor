@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 — Project Brief (record completed, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="5faef6f52b6a13f25d3fb8faacd76f0ab9cb72a8218303a21e9522a480f6b044" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>5faef6f52b6a13f25d3fb8faacd76f0ab9cb72a8218303a21e9522a480f6b044</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — T3 PM job (retrospective, 2026-11-26)</h1>
+<h2>Outcome</h2>
+<p>T3 delivered the PM job of SPEC_V2 §12: a PM runs a project request end to end through charter, WBS, baseline, staffing, gate routing and closure; the PM cannot approve a gate it raised; and a baseline change requires a change request. The build is recorded as measured_status built under closed issue #74, and the 2026-11-26 rework completes the governance record around it — the seven A–D artefacts, the delivery contract, the WBS deliverable, the five register kinds, the Phase-G review, the project-brief, the evidence and the closure review.</p>
+<h2>Boundary</h2>
+<p>Out of scope: the T2 decision ladder's policy engine, which the PM job reads rather than re-implements; the T4 kanban coach, the T5 kata and the T13 tool platform; the T1 plan spine's implementation, which T1 owns; and every V1 slice, which the V2 plan does not re-open. The rework adds no feature: the tranche-3 review reopened the project to complete the contract, review and baseline record, and this pack stays inside that reason. A second PM job, a second baseline or a second policy engine would be a scope breach, not a rework.</p>
+<h2>Reuse sources</h2>
+<p>The PM job reuses the plan spine T1 establishes — wbs_node, project_baseline, project_register_item and project_dependency — and the decision records T2 produces rather than inventing a second approval store. It reuses the existing approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa and the published outputs the snapshot already carries: the evidence 01a1ee73-db2e-76b5-8c92-076f14dc94ec, the project brief 01a216d0-68e5-764d-92af-9864ddae5127, the closure review 01a216d0-6635-720e-84e9-005ba604d06f and the architecture artefact index 01a216d0-69ec-7512-85db-3a22b7b00241. The retrospective record also reuses the existing receipt docs/evidence/rework/T3.json as its honest statement of what was missing.</p>
+<h2>Inception units</h2>
+<p>The project is its own inception unit: the plan is docs/SPEC_V2.md#12, the T3 row is the analysis the work starts from, and issue #74 is the claim that closed with the build. The tranche-3 review 01a216d0-d634-738e-985a-00a85cfd48d9 decided continue on 2026-11-26, and the project was reopened the same day because the record lacked its live contract, its Phase-G review and its baseline. The retrospective reconstitutes the MSP/TOGAF lifecycle over that build — charter, Statement of Architecture Work, seven A–D artefacts, delivery contract, WBS deliverable, review, outputs and closure — rather than re-running the build itself.</p>
+<h2>Dependencies</h2>
+<p>The project meta records depends_on as T2 with kind needs and P0 with kind needs; the SPEC_V2 delivery sequence also places T1 beneath T3, because the PM job writes through the plan spine. Downstream, T4 depends on T3, T9 and T10 depend on T1 and T3, and T18 depends on T0, T1, T2 and T3, so a change to the PM job's gate vocabulary or closure outputs is felt by every consumer. In governance the project depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and on the approved scope baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa.</p>
+<h2>Acceptance</h2>
+<p>The gate in SPEC_V2 §12 is executable: a PM runs a request end to end; the PM cannot approve its own gate; a baseline change requires a change request. The close gate reads the declared outputs project-brief and evidence, the closure-review output, a live board-approved delivery contract, a Phase-G review citing the standing delegation, the approved baseline, the seven A–D artefacts, the five register kinds, WBS inputs 8, 8, 5, 3, a demo credit per accepted deliverable and a tranche lesson. The pre-rework receipt was red on contract, review, artefact standard and rework resolution; this pack is the authored record the factory writes to close those checks, and scripts/rework-content-check.py --project T3 checks it offline first.</p>
+<h2>Capabilities</h2>
+<p>The PM job exercises seven capabilities: chartered execution, sized decomposition with four WSJF inputs, a frozen scope baseline, staffed delivery with a named owner per deliverable, independent gate routing that keeps the approver distinct from the requester, controlled change through a change request, and complete closure on a live contract, a Phase-G review and the declared outputs. Each capability leaves a named record: the charter asset, the WBS node, the baseline, the staffing assignment, the gate decision, the change-control row and the published outputs.</p>
+<h2>Plan</h2>
+<p>The plan is docs/SPEC_V2.md#12. The build closed issue #74 with measured_status built; the tranche-3 review on 2026-11-26 reopened the project because the governance record lacked its contract, review and baseline; the 2026-11-26 retrospective rework authors this pack, and the factory writes the artefacts, registers, contract, review, baseline acceptance and closure from it. The brief records that sequence and does not claim a fresh implementation of the PM job or a re-measurement of its original runs.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

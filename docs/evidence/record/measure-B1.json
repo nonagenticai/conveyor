@@ -1,0 +1,21 @@
+{
+  "actual_value": 0.15861,
+  "benefit_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+  "evidence": {
+    "detail": {
+      "approval_decisions": 105,
+      "runs": 662
+    },
+    "instrument": "count approval_decision / count run",
+    "reference": "B1",
+    "value": 0.15861
+  },
+  "id": "01a204d3-87c0-736a-a0bf-a93aa2b638c0",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "count approval_decision / count run",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "decisions per run"
+}

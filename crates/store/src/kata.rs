@@ -25,7 +25,8 @@ use uuid::Uuid;
 const KATA_COLUMNS: &str = "id, tenant_id, job_binding_id, release_hash, signature, title, \
                             target_surface, target_ref, status, instrument_version_id, prediction, \
                             threshold, baseline_version_id, created_by, version, created_at, \
-                            updated_at";
+                            updated_at, project_id, instrument_kind, instrument_id, \
+                            instrument_version, split, split_sha256, prediction_payload, base_ref";
 
 /// The statuses that still own a signature (the partial unique index's predicate).
 const LIVE_STATUSES: &str =
@@ -55,6 +56,15 @@ pub struct KataRow {
     pub version: i64,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    // ── the union's fields (0094): the lane's pre-registration and project link.
+    pub project_id: Option<Uuid>,
+    pub instrument_kind: Option<String>,
+    pub instrument_id: Option<Uuid>,
+    pub instrument_version: Option<String>,
+    pub split: Option<String>,
+    pub split_sha256: Option<String>,
+    pub prediction_payload: Option<Value>,
+    pub base_ref: Option<Value>,
 }
 
 /// One immutable `kata_get` row.
@@ -69,15 +79,19 @@ pub struct KataGetRow {
 }
 
 /// One `kata_measurement` row — always a held-out number (`split = 'test'` by CHECK).
+///
+/// The eval columns are `Option` because the union's second instrument shape is a benchmark
+/// suite: its identity is `instrument_kind = 'benchmark'` plus `instrument_id`/`split_sha256`,
+/// and its runs are `*_benchmark_run_id` (`F-T5-1`).
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct KataMeasurementRow {
     pub id: Uuid,
     pub kata_id: Uuid,
-    pub instrument_version_id: Uuid,
+    pub instrument_version_id: Option<Uuid>,
     pub split: String,
-    pub metric_key: String,
-    pub candidate_run_id: Uuid,
-    pub baseline_run_id: Uuid,
+    pub metric_key: Option<String>,
+    pub candidate_run_id: Option<Uuid>,
+    pub baseline_run_id: Option<Uuid>,
     pub candidate_cases: i32,
     pub baseline_cases: i32,
     pub candidate_score: f64,
@@ -85,7 +99,30 @@ pub struct KataMeasurementRow {
     pub delta: f64,
     pub result: Value,
     pub created_at: DateTime<Utc>,
+    /// `eval` or `benchmark`; NULL on main's eval-only rows.
+    pub instrument_kind: Option<String>,
+    /// The pinned instrument id (a benchmark suite id).
+    pub instrument_id: Option<Uuid>,
+    /// The pinned instrument version (a benchmark suite's dataset revision).
+    pub instrument_version: Option<String>,
+    /// The split's locking sha (a benchmark suite's `seed_sha256`).
+    pub split_sha256: Option<String>,
+    /// The lane's metric document.
+    pub metric: Option<Value>,
+    /// The lane's noise band.
+    pub noise_band: Option<Value>,
+    /// The candidate's benchmark run.
+    pub candidate_benchmark_run_id: Option<Uuid>,
+    /// The baseline's benchmark run.
+    pub baseline_benchmark_run_id: Option<Uuid>,
 }
+
+/// The measurement columns both readers and the writer select, in one place.
+const MEASUREMENT_COLUMNS: &str = "id, kata_id, instrument_version_id, split, metric_key, \
+     candidate_run_id, baseline_run_id, candidate_cases, baseline_cases, candidate_score, \
+     baseline_score, delta, result, created_at, instrument_kind, instrument_id, \
+     instrument_version, split_sha256, metric, noise_band, candidate_benchmark_run_id, \
+     baseline_benchmark_run_id";
 
 /// The fields `kata.open` writes.
 pub struct NewKata {
@@ -101,6 +138,23 @@ pub struct NewKata {
     /// P2: the procedure version that is live when the kata opens.
     pub baseline_version_id: Option<Uuid>,
     pub created_by: Option<Uuid>,
+    // ── The lane's union fields (0070): the coach's pre-registration and project link.
+    /// The kata's project (the lane's design; the kata is a project type).
+    pub project_id: Option<Uuid>,
+    /// `eval` or `benchmark` (the lane's instrument kind; main's FK is eval-only).
+    pub instrument_kind: Option<String>,
+    /// The pinned instrument id (the lane's field; main's is instrument_version_id).
+    pub instrument_id: Option<Uuid>,
+    /// The pinned instrument version (the lane's field).
+    pub instrument_version: Option<String>,
+    /// The pinned held-out split.
+    pub split: Option<String>,
+    /// The split's locking sha.
+    pub split_sha256: Option<String>,
+    /// The lane's pre-registered prediction payload (main's text `prediction` stays free).
+    pub prediction_payload: Option<Value>,
+    /// The target version the kata is measured against (the lane's field).
+    pub base_ref: Option<Value>,
 }
 
 /// One kata's append-only revert (P2).
@@ -196,6 +250,16 @@ pub enum KataStoreError {
     NoHeldOutCases(Uuid),
     /// P2's revert cannot name the procedure versions to restore.
     RevertTarget(String),
+    /// The kata is not in a state this act can move (a closed or unknown status).
+    NotOpen { status: String },
+    /// A candidate needs a pre-registered prediction.
+    PredictionMissing,
+    /// A `reverted` close must name the version it restored.
+    RevertMissing,
+    /// The kata's pre-registered instrument is not the benchmark shape this measurement needs.
+    BenchmarkMismatch(String),
+    /// A named benchmark run cannot measure this kata's suite.
+    BenchmarkRunRefused { run_id: Uuid, detail: String },
 }
 
 impl From<sqlx::Error> for KataStoreError {
@@ -219,8 +283,11 @@ pub async fn open_tx(
     let sql = format!(
         "INSERT INTO kata
              (tenant_id, job_binding_id, release_hash, signature, title, target_surface,
-              target_ref, threshold, instrument_version_id, baseline_version_id, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+              target_ref, threshold, instrument_version_id, baseline_version_id, created_by,
+              project_id, instrument_kind, instrument_id, instrument_version, split,
+              split_sha256, prediction_payload, base_ref)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
+                 $17, $18, $19)
          RETURNING {KATA_COLUMNS}"
     );
     // The unique index is P4.2's guarantee. A failed INSERT aborts the caller's transaction,
@@ -242,6 +309,14 @@ pub async fn open_tx(
         .bind(new.instrument_version_id)
         .bind(new.baseline_version_id)
         .bind(new.created_by)
+        .bind(new.project_id)
+        .bind(&new.instrument_kind)
+        .bind(new.instrument_id)
+        .bind(&new.instrument_version)
+        .bind(&new.split)
+        .bind(&new.split_sha256)
+        .bind(&new.prediction_payload)
+        .bind(&new.base_ref)
         .fetch_one(&mut *conn)
         .await;
     match result {
@@ -318,17 +393,15 @@ pub async fn measurement_tx(
     tenant: TenantId,
     kata_id: Uuid,
 ) -> Result<Option<KataMeasurementRow>, KataStoreError> {
-    let row = sqlx::query_as::<_, KataMeasurementRow>(
-        "SELECT id, kata_id, instrument_version_id, split, metric_key, candidate_run_id,
-                baseline_run_id, candidate_cases, baseline_cases, candidate_score,
-                baseline_score, delta, result, created_at
-           FROM kata_measurement
-          WHERE tenant_id = $1 AND kata_id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(kata_id)
-    .fetch_optional(&mut *conn)
-    .await?;
+    let sql = format!(
+        "SELECT {MEASUREMENT_COLUMNS} FROM kata_measurement
+          WHERE tenant_id = $1 AND kata_id = $2"
+    );
+    let row = sqlx::query_as::<_, KataMeasurementRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .fetch_optional(&mut *conn)
+        .await?;
     Ok(row)
 }
 
@@ -345,14 +418,16 @@ pub async fn record_get_tx(
     content: Value,
     recorded_by: Option<Uuid>,
 ) -> Result<KataRow, KataStoreError> {
-    let current: Option<(String,)> =
-        sqlx::query_as("SELECT status FROM kata WHERE tenant_id = $1 AND id = $2 FOR UPDATE")
-            .bind(tenant.as_uuid())
-            .bind(kata_id)
-            .fetch_optional(&mut *conn)
-            .await?;
-    let current = match current {
-        Some((status,)) => status,
+    let current: Option<(String, Option<String>, Option<Uuid>)> = sqlx::query_as(
+        "SELECT status, instrument_kind, instrument_id FROM kata
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (current, instrument_kind, instrument_id) = match current {
+        Some(row) => row,
         None => return Err(KataStoreError::NotFound(kata_id)),
     };
     let required = get.requires_status().unwrap_or("open");
@@ -392,17 +467,26 @@ pub async fn record_get_tx(
         let Some(prediction) = content.get("prediction").and_then(Value::as_str) else {
             return Err(KataStoreError::HypothesisMalformed("prediction"));
         };
-        let Some(instrument) = content
-            .get("instrument_version_id")
-            .and_then(Value::as_str)
-            .and_then(|raw| Uuid::parse_str(raw).ok())
-        else {
-            return Err(KataStoreError::HypothesisMalformed("instrument_version_id"));
-        };
         if prediction.trim().is_empty() {
             return Err(KataStoreError::HypothesisMalformed("prediction"));
         }
-        (Some(prediction.to_owned()), Some(instrument))
+        // An eval kata names the version it pre-registers. A benchmark kata pinned its suite at
+        // open (`instrument_kind = 'benchmark'`, `instrument_id` set): the hypothesis confirms
+        // that instrument, so the content names no eval version.
+        match content
+            .get("instrument_version_id")
+            .and_then(Value::as_str)
+            .and_then(|raw| Uuid::parse_str(raw).ok())
+        {
+            Some(instrument) => (Some(prediction.to_owned()), Some(instrument)),
+            None if instrument_kind.as_deref() == Some("benchmark") && instrument_id.is_some() => {
+                // Main's `prediction` column CHECKs that a prediction names an eval version
+                // (0067); a benchmark kata's prediction is its pre-registered payload on the
+                // kata row and the Get's content, never that column.
+                (None, None)
+            }
+            None => return Err(KataStoreError::HypothesisMalformed("instrument_version_id")),
+        }
     } else {
         (None, None)
     };
@@ -585,31 +669,230 @@ pub async fn insert_measurement_tx(
         });
     }
 
-    let measurement = sqlx::query_as::<_, KataMeasurementRow>(
+    let sql = format!(
         "INSERT INTO kata_measurement
              (tenant_id, kata_id, instrument_version_id, metric_key, candidate_run_id,
               baseline_run_id, candidate_cases, baseline_cases, candidate_score,
               baseline_score, delta, result)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-         RETURNING id, kata_id, instrument_version_id, split, metric_key, candidate_run_id,
-                   baseline_run_id, candidate_cases, baseline_cases, candidate_score,
-                   baseline_score, delta, result, created_at",
+         RETURNING {MEASUREMENT_COLUMNS}"
+    );
+    let measurement = sqlx::query_as::<_, KataMeasurementRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.kata_id)
+        .bind(new.instrument_version_id)
+        .bind(&new.metric_key)
+        .bind(new.candidate_run_id)
+        .bind(new.baseline_run_id)
+        .bind(new.candidate_cases)
+        .bind(new.baseline_cases)
+        .bind(new.candidate_score)
+        .bind(new.baseline_score)
+        .bind(new.delta)
+        .bind(&new.result)
+        .fetch_one(&mut *conn)
+        .await?;
+
+    let sql = format!(
+        "UPDATE kata
+            SET status = 'measured', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {KATA_COLUMNS}"
+    );
+    let kata = sqlx::query_as::<_, KataRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.kata_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok((kata, measurement))
+}
+
+/// One benchmark run's identity and grader counts, as a kata measurement reads them.
+pub struct BenchmarkRunScore {
+    pub suite_id: Uuid,
+    pub status: String,
+    pub arm: String,
+    pub n_graded: i32,
+    pub n_resolved: i32,
+}
+
+/// Read one benchmark run's identity and counts in this tenant.
+pub async fn benchmark_run_score_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+) -> Result<Option<BenchmarkRunScore>, KataStoreError> {
+    let row: Option<(Uuid, String, String, i32, i32)> = sqlx::query_as(
+        "SELECT suite_id, status, arm, n_graded, n_resolved FROM benchmark_run
+          WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
-    .bind(new.kata_id)
-    .bind(new.instrument_version_id)
-    .bind(&new.metric_key)
-    .bind(new.candidate_run_id)
-    .bind(new.baseline_run_id)
-    .bind(new.candidate_cases)
-    .bind(new.baseline_cases)
-    .bind(new.candidate_score)
-    .bind(new.baseline_score)
-    .bind(new.delta)
-    .bind(&new.result)
-    .fetch_one(&mut *conn)
+    .bind(run_id)
+    .fetch_optional(&mut *conn)
     .await?;
+    Ok(row.map(
+        |(suite_id, status, arm, n_graded, n_resolved)| BenchmarkRunScore {
+            suite_id,
+            status,
+            arm,
+            n_graded,
+            n_resolved,
+        },
+    ))
+}
 
+/// The fields a benchmark measurement writes (the union's second instrument shape).
+pub struct NewBenchmarkMeasurement {
+    pub kata_id: Uuid,
+    /// The candidate's COMPLETE `benchmark_run` on the `conveyor` arm.
+    pub candidate_run_id: Uuid,
+    /// The baseline's COMPLETE `benchmark_run` on the `baseline` arm.
+    pub baseline_run_id: Uuid,
+    pub candidate_cases: i32,
+    pub baseline_cases: i32,
+    pub candidate_score: f64,
+    pub baseline_score: f64,
+    pub delta: f64,
+    pub result: Value,
+}
+
+/// Write a benchmark measurement and move the kata to `measured`, atomically.
+///
+/// The held-out wall here is the suite's locked dataset, not an eval split: the kata pinned
+/// `split_sha256 = benchmark_suite.seed_sha256` at open, and both runs must be COMPLETE runs of
+/// that same suite — the candidate on the `conveyor` arm, the baseline on the `baseline` arm.
+/// A control arm, another suite's run, or an unfinished run is refused (never silently scored).
+pub async fn benchmark_measurement_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: NewBenchmarkMeasurement,
+) -> Result<(KataRow, KataMeasurementRow), KataStoreError> {
+    let sql =
+        format!("SELECT {KATA_COLUMNS} FROM kata WHERE tenant_id = $1 AND id = $2 FOR UPDATE");
+    let kata: Option<KataRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.kata_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let kata = kata.ok_or(KataStoreError::NotFound(new.kata_id))?;
+    if kata.status != "proposed" {
+        return Err(KataStoreError::GetOutOfOrder {
+            current: kata.status,
+            required: "proposed".to_owned(),
+        });
+    }
+    if kata.instrument_kind.as_deref() != Some("benchmark") {
+        return Err(KataStoreError::BenchmarkMismatch(
+            "the kata did not pre-register a benchmark instrument".to_owned(),
+        ));
+    }
+    let (Some(suite_id), Some(pinned_seed)) = (kata.instrument_id, kata.split_sha256.clone())
+    else {
+        return Err(KataStoreError::BenchmarkMismatch(
+            "the kata carries no benchmark suite or locked seed".to_owned(),
+        ));
+    };
+    if kata.split.as_deref() != Some("test") {
+        return Err(KataStoreError::BenchmarkMismatch(
+            "a benchmark measurement is the suite's held-out number; split must be test".to_owned(),
+        ));
+    }
+    let suite: Option<(String,)> =
+        sqlx::query_as("SELECT seed_sha256 FROM benchmark_suite WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(suite_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let Some((seed,)) = suite else {
+        return Err(KataStoreError::BenchmarkMismatch(
+            "the pinned instrument is no benchmark suite in this tenant".to_owned(),
+        ));
+    };
+    if seed != pinned_seed {
+        return Err(KataStoreError::BenchmarkMismatch(format!(
+            "the kata pinned seed {pinned_seed}, but the suite's locked seed is {seed}"
+        )));
+    }
+    let mut scores = [0f64; 2];
+    let mut cases = [0i32; 2];
+    for (index, (run_id, arm)) in [
+        (new.candidate_run_id, "conveyor"),
+        (new.baseline_run_id, "baseline"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let run = benchmark_run_score_tx(&mut *conn, tenant, run_id).await?;
+        let Some(BenchmarkRunScore {
+            suite_id: run_suite,
+            status,
+            arm: run_arm,
+            n_graded,
+            n_resolved,
+        }) = run
+        else {
+            return Err(KataStoreError::BenchmarkRunRefused {
+                run_id,
+                detail: "no such benchmark run in this tenant".to_owned(),
+            });
+        };
+        if run_suite != suite_id {
+            return Err(KataStoreError::BenchmarkRunRefused {
+                run_id,
+                detail: "the run measured another suite".to_owned(),
+            });
+        }
+        if status != "succeeded" {
+            return Err(KataStoreError::BenchmarkRunRefused {
+                run_id,
+                detail: format!("the run is {status}; a measurement reads a complete run"),
+            });
+        }
+        if run_arm != arm {
+            return Err(KataStoreError::BenchmarkRunRefused {
+                run_id,
+                detail: format!(
+                    "the run is the {run_arm:?} arm; this side of the measurement is the                      {arm:?} arm"
+                ),
+            });
+        }
+        if n_graded <= 0 {
+            return Err(KataStoreError::BenchmarkRunRefused {
+                run_id,
+                detail: "the run graded no case".to_owned(),
+            });
+        }
+        cases[index] = n_graded;
+        scores[index] = f64::from(n_resolved) / f64::from(n_graded);
+    }
+    let sql = format!(
+        "INSERT INTO kata_measurement
+             (tenant_id, kata_id, candidate_cases, baseline_cases, candidate_score,
+              baseline_score, delta, result, instrument_kind, instrument_id, instrument_version,
+              split, split_sha256, metric, candidate_benchmark_run_id, baseline_benchmark_run_id,
+              metric_key)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'benchmark', $9, $10, 'test', $11, $12, $13,
+                 $14, $15)
+         RETURNING {MEASUREMENT_COLUMNS}"
+    );
+    let measurement = sqlx::query_as::<_, KataMeasurementRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.kata_id)
+        .bind(cases[0])
+        .bind(cases[1])
+        .bind(scores[0])
+        .bind(scores[1])
+        .bind(new.delta)
+        .bind(&new.result)
+        .bind(suite_id)
+        .bind(kata.instrument_version.clone())
+        .bind(&pinned_seed)
+        .bind(serde_json::json!({"key": "resolved_rate", "better": "higher"}))
+        .bind(new.candidate_run_id)
+        .bind(new.baseline_run_id)
+        .bind("resolved_rate")
+        .fetch_one(&mut *conn)
+        .await?;
     let sql = format!(
         "UPDATE kata
             SET status = 'measured', version = version + 1, updated_at = now()
@@ -855,4 +1138,307 @@ pub async fn adopt_tx(
         .fetch_one(&mut *conn)
         .await?;
     Ok((kata, adoption))
+}
+
+// ── The lane's candidate / propagation extension (union, 0070) ──────────────────────────
+//
+// The union keeps main's loop as the runtime (six Gets, the held-out measurement, the
+// adoption/revert evidence) and carries the lane's candidate and propagation records on the
+// same kata aggregate. The dependents (coach, ops, architecture) hold `kata_candidate_id`s,
+// so the candidate row is the record those columns name.
+
+const CANDIDATE_COLUMNS: &str = "id, kata_id, ordinal, title, rationale, target_ref, prediction, \
+    status, version, created_at, updated_at";
+
+const PROPAGATION_COLUMNS: &str =
+    "id, kata_id, target_ref, approval_id, status, version, created_at, updated_at";
+
+/// One candidate change under a kata (the lane's record; the union's candidate model).
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct CandidateRow {
+    pub id: Uuid,
+    pub kata_id: Uuid,
+    pub ordinal: i32,
+    pub title: String,
+    pub rationale: String,
+    pub target_ref: Value,
+    pub prediction: Option<Value>,
+    pub status: String,
+    pub version: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+/// One propagation target (the SPEC's propagation record; each target carries its own gate).
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct PropagationRow {
+    pub id: Uuid,
+    pub kata_id: Uuid,
+    pub target_ref: Value,
+    pub approval_id: Option<Uuid>,
+    pub status: String,
+    pub version: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+/// The kata's current status, locked for a state move.
+async fn lock_status_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+) -> Result<String, KataStoreError> {
+    sqlx::query_scalar("SELECT status FROM kata WHERE tenant_id = $1 AND id = $2 FOR UPDATE")
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(KataStoreError::NotFound(kata_id))
+}
+
+/// True when a prediction is a pre-registered hypothesis: a non-empty JSON object.
+fn has_prediction(prediction: Option<&Value>) -> bool {
+    prediction
+        .and_then(Value::as_object)
+        .is_some_and(|object| !object.is_empty())
+}
+
+/// Refuse an act on a terminal kata.
+fn ensure_movable(status: &str) -> Result<(), KataStoreError> {
+    if matches!(status, "closed" | "reverted") {
+        return Err(KataStoreError::NotOpen {
+            status: status.to_owned(),
+        });
+    }
+    Ok(())
+}
+
+/// Insert one candidate (the lane's proposal) under a non-closed kata.
+pub async fn insert_candidate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+    title: &str,
+    rationale: &str,
+    target_ref: &Value,
+    prediction: &Value,
+) -> Result<CandidateRow, KataStoreError> {
+    let status = lock_status_tx(&mut *conn, tenant, kata_id).await?;
+    ensure_movable(&status)?;
+    if !has_prediction(Some(prediction)) {
+        return Err(KataStoreError::PredictionMissing);
+    }
+    let ordinal: i32 = sqlx::query_scalar(
+        "SELECT coalesce(max(ordinal), 0) + 1 FROM kata_candidate
+          WHERE tenant_id = $1 AND kata_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let sql = format!(
+        "INSERT INTO kata_candidate
+             (tenant_id, kata_id, ordinal, title, rationale, target_ref, prediction)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING {CANDIDATE_COLUMNS}"
+    );
+    Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .bind(ordinal)
+        .bind(title.trim())
+        .bind(rationale)
+        .bind(target_ref)
+        .bind(prediction)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// Open a retro finding's systemic marker as a typed candidate.
+///
+/// The finding names the ACTIVE binding the kata would run on; the kata is opened once per
+/// signature (the same live-signature rule `open_tx` enforces), and one `kata_candidate` in
+/// `proposed` — the review state — is recorded under it. A re-close of the same retro finds both
+/// rows and writes nothing, so the pair is idempotent.
+#[allow(clippy::too_many_arguments)]
+pub async fn open_retro_candidate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    signature: &str,
+    title: &str,
+    rationale: &str,
+    target_ref: &Value,
+    prediction: &Value,
+    job_binding_id: Uuid,
+    threshold: Option<f64>,
+) -> Result<Uuid, KataStoreError> {
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM kata
+          WHERE tenant_id = $1 AND signature = $2
+            AND status IN ('open', 'observed', 'analysed', 'hypothesised', 'proposed', 'measured')
+          ORDER BY created_at, id LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(signature)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let kata_id = match existing {
+        Some(id) => id,
+        None => {
+            let binding: Option<(String, String)> = sqlx::query_as(
+                "SELECT release_hash, status FROM job_binding
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(job_binding_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+            let Some((release_hash, status)) = binding else {
+                return Err(KataStoreError::NotOpen {
+                    status: "no such binding".to_owned(),
+                });
+            };
+            if status != "active" {
+                return Err(KataStoreError::NotOpen { status });
+            }
+            let surface = target_ref
+                .get("kind")
+                .and_then(Value::as_str)
+                .filter(|kind| {
+                    matches!(
+                        *kind,
+                        "procedure" | "prompt" | "knowledge" | "tool" | "job_config" | "code"
+                    )
+                })
+                .unwrap_or("procedure")
+                .to_owned();
+            let target = target_ref
+                .get("id")
+                .or_else(|| target_ref.get("ref"))
+                .and_then(Value::as_str)
+                .unwrap_or(signature)
+                .to_owned();
+            open_tx(
+                &mut *conn,
+                tenant,
+                NewKata {
+                    job_binding_id,
+                    release_hash,
+                    signature: signature.to_owned(),
+                    title: title.to_owned(),
+                    target_surface: surface,
+                    target_ref: target,
+                    threshold,
+                    instrument_version_id: None,
+                    baseline_version_id: None,
+                    created_by: None,
+                    project_id: None,
+                    instrument_kind: None,
+                    instrument_id: None,
+                    instrument_version: None,
+                    split: None,
+                    split_sha256: None,
+                    prediction_payload: Some(prediction.clone()),
+                    base_ref: Some(target_ref.clone()),
+                },
+            )
+            .await?
+            .id
+        }
+    };
+    let exists: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM kata_candidate
+             WHERE tenant_id = $1 AND kata_id = $2 AND title = $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .bind(title.trim())
+    .fetch_one(&mut *conn)
+    .await?;
+    if !exists {
+        insert_candidate_tx(
+            &mut *conn, tenant, kata_id, title, rationale, target_ref, prediction,
+        )
+        .await?;
+    }
+    Ok(kata_id)
+}
+
+/// Register one propagation target; it starts `pending` and carries its own later gate.
+pub async fn propagate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+    target_ref: &Value,
+) -> Result<PropagationRow, KataStoreError> {
+    let status = lock_status_tx(&mut *conn, tenant, kata_id).await?;
+    ensure_movable(&status)?;
+    let sql = format!(
+        "INSERT INTO kata_propagation (tenant_id, kata_id, target_ref)
+         VALUES ($1, $2, $3)
+         RETURNING {PROPAGATION_COLUMNS}"
+    );
+    Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .bind(target_ref)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// Close a non-closed kata with its outcome; a `reverted` close must name the restore.
+pub async fn close_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+    outcome: &str,
+    reason: &str,
+    restored_ref: Option<&Value>,
+) -> Result<KataRow, KataStoreError> {
+    let status = lock_status_tx(&mut *conn, tenant, kata_id).await?;
+    ensure_movable(&status)?;
+    let restored = if outcome == "reverted" {
+        match restored_ref {
+            Some(value) if !value.is_null() => Some(value),
+            _ => return Err(KataStoreError::RevertMissing),
+        }
+    } else {
+        None
+    };
+    let sql = format!(
+        "UPDATE kata
+            SET status = 'closed', outcome = $3, outcome_reason = $4, restored_ref = $5,
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {KATA_COLUMNS}"
+    );
+    Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .bind(outcome)
+        .bind(reason.trim())
+        .bind(restored)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// List the tenant's katas, newest `updated_at` first, optionally filtered by exact status.
+pub async fn list_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    status: Option<&str>,
+) -> Result<Vec<KataRow>, KataStoreError> {
+    let sql = format!(
+        "SELECT {KATA_COLUMNS} FROM kata
+          WHERE tenant_id = $1
+            AND ($2::text IS NULL OR status = $2)
+          ORDER BY updated_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(status)
+        .fetch_all(&mut *conn)
+        .await?)
 }

@@ -17,7 +17,7 @@ mod support;
 
 use std::collections::HashMap;
 
-use conveyor_domain::AssetKind;
+use conveyor_domain::{AssetKind, AssetStatus, TenantId};
 use conveyor_store as store;
 use conveyor_store::governance::NewAsset;
 use serde_json::{Value, json};
@@ -130,11 +130,21 @@ async fn promote_request(running: &support::Running, id: &str, key: Option<&str>
 /// `projects.create` (which creates the board and its template lanes), then the board's lane
 /// ids keyed by `list.kind`.
 async fn make_board(running: &support::Running, title: &str) -> (String, HashMap<String, String>) {
+    make_board_of_type(running, title, "delivery").await
+}
+
+/// [`make_board`] with an explicit project type, so a test can create an
+/// `architecture`-governed project (TOGAF §8.5) as easily as a delivery one.
+async fn make_board_of_type(
+    running: &support::Running,
+    title: &str,
+    project_type_code: &str,
+) -> (String, HashMap<String, String>) {
     let (status, created) = running
         .invoke(
             "projects.create",
             "dev:alice",
-            json!({"title": title, "project_type_code": "delivery"}),
+            json!({"title": title, "project_type_code": project_type_code}),
             None,
             None,
             None,
@@ -516,6 +526,52 @@ async fn a_trace_link_is_visible_from_both_ends_and_never_across_tenants() {
     assert_eq!(status, 409, "{body}");
 }
 
+/// v1-w2c-5: the governance view takes exactly one root, and a root that does not resolve is
+/// a classified 404 rather than an empty chain.
+#[tokio::test(flavor = "multi_thread")]
+async fn trace_view_requires_exactly_one_root() {
+    let (_pg, running, _alice, _bob) = fixture(false).await;
+
+    // Neither root: the caller must name one.
+    let (status, body) = running
+        .invoke("trace_links.view", "dev:alice", json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert!(
+        body["errors"].to_string().contains("requirement_id"),
+        "the refusal names the field: {body}"
+    );
+
+    // Both roots: ambiguity is refused as well.
+    let (status, body) = running
+        .invoke(
+            "trace_links.view",
+            "dev:alice",
+            json!({
+                "requirement_id": uuid::Uuid::now_v7(),
+                "run_id": uuid::Uuid::now_v7(),
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+
+    // One root that does not exist in the tenant is a 404, not a schema error.
+    let (status, body) = running
+        .invoke(
+            "trace_links.view",
+            "dev:alice",
+            json!({"run_id": uuid::Uuid::now_v7()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
     let (pg, running, alice, _bob) = fixture(false).await;
@@ -655,7 +711,7 @@ async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
+async fn the_governance_actions_are_registered_with_their_scopes() {
     let (_pg, running, _alice, _bob) = fixture(false).await;
     let (status, body) = running
         .http(
@@ -673,6 +729,7 @@ async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
         ("trace_links.create", "governance:write"),
         ("trace_links.delete", "governance:write"),
         ("trace_links.list", "governance:read"),
+        ("trace_links.view", "governance:read"),
         ("catalogues.list", "catalogues:read"),
         ("catalogues.import", "catalogues:write"),
         ("project_requests.create", "requests:write"),
@@ -904,4 +961,167 @@ async fn every_request_mutation_announces_itself() {
         ],
         "the refused edit wrote no event"
     );
+}
+
+// ── v1-w2c-6: architecture-governed work is born traced (TOGAF §8.5) ──────────────────────
+
+/// An APPROVED governed asset written through the store: `requirements.create` is another
+/// test's surface, and this one is about the card's birth edge.
+async fn approved_asset(pg: &support::Pg, tenant: TenantId, key: &str) -> String {
+    let mut tx = store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("scoped tx");
+    let asset = store::governance::insert_asset_tx(
+        &mut tx,
+        tenant,
+        &NewAsset::new(AssetKind::Requirement, key, "The governed requirement"),
+    )
+    .await
+    .expect("insert the requirement");
+    // The lifecycle is draft → in_review → approved; there is no direct edge.
+    store::governance::transition_asset_tx(&mut tx, tenant, asset.id, AssetStatus::InReview, None)
+        .await
+        .expect("send the requirement to review");
+    store::governance::transition_asset_tx(&mut tx, tenant, asset.id, AssetStatus::Approved, None)
+        .await
+        .expect("approve the requirement");
+    tx.commit().await.expect("commit the requirement");
+    asset.id.to_string()
+}
+
+/// v1-w2c-6: an architecture-governed board refuses an orphan card (`409`), whether the
+/// request carries no link or a link to an asset that is not APPROVED, and writes nothing.
+#[tokio::test(flavor = "multi_thread")]
+async fn an_orphan_card_in_a_governed_project_is_refused_and_writes_nothing() {
+    let (pg, running, alice) = export_only_fixture().await;
+    let (board_id, lanes) = make_board_of_type(&running, "Governed board", "architecture").await;
+
+    // A draft requirement: it exists, but it is not an APPROVED target.
+    let draft_id = {
+        let mut tx = store::begin_scoped(&pg.owner, alice.tenant)
+            .await
+            .expect("scoped tx");
+        let asset = store::governance::insert_asset_tx(
+            &mut tx,
+            alice.tenant,
+            &NewAsset::new(AssetKind::Requirement, "REQ-DRAFT", "Draft requirement"),
+        )
+        .await
+        .expect("insert the draft requirement");
+        tx.commit().await.expect("commit the draft requirement");
+        asset.id.to_string()
+    };
+
+    for (trace, expected) in [
+        (serde_json::Value::Null, "card_trace_link_required"),
+        (
+            json!({"to_type": "governed_asset", "to_id": draft_id}),
+            "card_trace_link_unapproved",
+        ),
+    ] {
+        let mut input = json!({
+            "board_id": board_id,
+            "list_id": lanes["intake"],
+            "name": "Orphan",
+            "card_type_code": "architecture_task",
+        });
+        if !trace.is_null() {
+            input["trace_link"] = trace;
+        }
+        let (status, body) = running
+            .invoke("cards.create", "dev:alice", input, None, None, None)
+            .await;
+        assert_eq!(status, 409, "{body}");
+        assert_eq!(body["type"], expected, "{body}");
+    }
+
+    assert_eq!(
+        count(
+            &pg,
+            "SELECT count(*) FROM card WHERE tenant_id = $1 AND name = 'Orphan'",
+            alice.tenant_id
+        )
+        .await,
+        0,
+        "a refused create writes no card"
+    );
+    assert_eq!(
+        count(
+            &pg,
+            "SELECT count(*) FROM trace_link WHERE tenant_id = $1 AND from_type = 'card'",
+            alice.tenant_id
+        )
+        .await,
+        0,
+        "a refused create writes no edge"
+    );
+}
+
+/// v1-w2c-6: with an APPROVED requirement named, the card commits and its birth edge reads
+/// back from the card's own end.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_governed_card_created_with_an_approved_requirement_traces_to_it() {
+    let (pg, running, alice) = export_only_fixture().await;
+    let (board_id, lanes) = make_board_of_type(&running, "Governed board", "architecture").await;
+    let requirement_id = approved_asset(&pg, alice.tenant, "REQ-GOV-1").await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.create",
+            "dev:alice",
+            json!({
+                "board_id": board_id,
+                "list_id": lanes["intake"],
+                "name": "Governed work",
+                "card_type_code": "architecture_task",
+                "trace_link": {"to_type": "governed_asset", "to_id": requirement_id},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let card_id = id_of(output(&body), "id");
+
+    let forward = list_links(
+        &running,
+        "dev:alice",
+        json!({"from_type": "card", "from_id": card_id}),
+    )
+    .await;
+    assert_eq!(forward.len(), 1, "the birth edge is one row");
+    assert_eq!(forward[0]["to_type"], "governed_asset");
+    assert_eq!(forward[0]["to_id"], requirement_id);
+    assert_eq!(forward[0]["kind"], "traces");
+
+    // The reverse read is the SAME row (S07 §5.7), not a second edge.
+    let backward = list_links(
+        &running,
+        "dev:alice",
+        json!({"to_type": "governed_asset", "to_id": requirement_id}),
+    )
+    .await;
+    assert_eq!(backward.len(), 1);
+    assert_eq!(backward[0]["from_id"], card_id);
+    assert_eq!(backward[0]["id"], forward[0]["id"]);
+}
+
+/// v1-w2c-6: a non-governed project keeps working unchanged — no link is demanded or written.
+#[tokio::test(flavor = "multi_thread")]
+async fn an_ungoverned_project_creates_cards_without_a_trace_link() {
+    let (pg, running, alice, _bob) = fixture(true).await;
+    let (board_id, lanes) = make_board(&running, "Delivery board").await;
+    let card_id = create_card(&running, &board_id, &lanes["active"], "Ungoverned work").await;
+
+    let links: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM trace_link
+          WHERE tenant_id = $1 AND from_type = 'card' AND from_id = $2",
+    )
+    .bind(alice.tenant_id)
+    .bind(uuid::Uuid::parse_str(&card_id).expect("card id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the card's edges");
+    assert_eq!(links, 0, "an ungoverned card needs no edge and gets none");
 }
