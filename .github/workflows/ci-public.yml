@@ -217,9 +217,18 @@ jobs:
           # branch the event names — so the gate means the same thing on both events.
           range="$BASE_SHA..$HEAD_SHA"
           if [ "$EVENT_NAME" = "merge_group" ]; then
+            # `merge_group.head_ref` is the queue's synthetic ref
+            # (`refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>`), not the PR's branch, and the
+            # commits the queue squashes are published as `refs/pull/<n>/head`. Read the number
+            # from the synthetic ref and fetch that.
+            pr="$(printf '%s' "$MERGE_HEAD_REF" | sed -n 's|.*/pr-\([0-9][0-9]*\)-.*|\1|p')"
+            if [ -z "$pr" ]; then
+              echo "::error::DCO: cannot read the PR number from merge_group.head_ref=$MERGE_HEAD_REF"
+              exit 1
+            fi
             git fetch --no-tags origin \
               "+$MERGE_BASE_REF:refs/remotes/queue/base" \
-              "+refs/heads/$MERGE_HEAD_REF:refs/remotes/queue/head"
+              "+refs/pull/$pr/head:refs/remotes/queue/head"
             range="refs/remotes/queue/base..refs/remotes/queue/head"
           fi
           missing=""
