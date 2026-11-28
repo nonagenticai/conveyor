@@ -3,7 +3,8 @@
 //! The job is enqueued by `eval_audits.start`. It reads the frozen version and its cases, runs
 //! the `claude-api` `eval-audit` method's mechanical checks, runs the controls the method
 //! requires (the answer key through the instrument's own programmatic graders, an empty answer
-//! through the same, and — when a judge metric exists — the judge's three known negatives), and
+//! through the same, and — when a judge metric exists — the judge's three known negatives),
+//! reviews each case with the tier-3 model auditor (bounded, through the shared invocation), and
 //! writes the findings under the audit row.
 //!
 //! **The audit is not a second runner.** It grades *stored or constructed* answers with the same
@@ -21,8 +22,8 @@ use conveyor_actions::registry::registry;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::audit::{
-    CaseFacts, Controls, InstrumentFacts, MetricFacts, RunFacts, Severity, findings,
-    resolution_line, resolution_shortfall,
+    CaseFacts, Controls, FindingDraft, InstrumentFacts, MetricFacts, RunFacts, Section, Severity,
+    findings, resolution_line, resolution_shortfall,
 };
 use conveyor_domain::eval::{GraderKind, grade_programmatic};
 use conveyor_domain::inference::CallerKind;
@@ -39,6 +40,34 @@ const PAGE: i64 = 500;
 
 /// The three known-bad answers a judge must reject (the method's "tested on known negatives").
 const KNOWN_NEGATIVES: [&str; 3] = ["", "I don't know", "The result is correct; all tests pass."];
+
+/// How many cases the tier-3 auditor reviews in one audit.
+///
+/// One model call per case is the audit's only per-case spend, and a case set has no bound; the
+/// cap keeps a large instrument's audit from costing more than the run it audits.
+const TIER3_MAX_CASES: usize = 20;
+
+/// How many output tokens one tier-3 review may spend. Enough for a handful of findings — and
+/// small enough that a runaway reviewer fails fast rather than burning a run's budget.
+const TIER3_MAX_TOKENS: u32 = 320;
+
+/// The tier-3 per-case reviewer's system prompt (S19 Part C step 14; the `eval-audit` method's
+/// checklist applied one case at a time).
+///
+/// The auditor, unlike the subject, is shown the answer key and the stored result; it reviews the
+/// case and its grading as an instrument designer. The answer must be the declared JSON and
+/// nothing else, because one unescaped sentence would otherwise cost the whole review.
+const TIER3_PROMPT_V1: &str = "TIER3 — per-case instrument review.\n\n\
+You are reviewing one case of an evaluation instrument. You are shown the case input, the \
+answer key, and the stored result for that case (its status, grade and the grader's \
+explanation; the subject's raw answer is not stored). Review the case and the stored grading \
+as an instrument designer would: is the task ambiguous or under-specified, are the answer key \
+and grade misleading, would this case generalise beyond its exact wording?\n\n\
+Return STRICT JSON only, with no prose before or after:\n\
+{\"findings\":[{\"severity\":\"misleading|noise|generality\",\"observation\":\"...\",\"suggestion\":\"...\"}]}\n\n\
+severity is one of: misleading (the numbers are likely actively misleading), noise (adds noise \
+or limits generality without flipping a conclusion) or generality (the eval generalises less \
+than its author may think). Return {\"findings\":[]} when nothing is wrong.";
 
 /// Run one `eval.audit.run` job.
 pub async fn run(
@@ -176,13 +205,7 @@ async fn audit_work(
     tenant: TenantId,
     app_key: &str,
     audit: &AuditRow,
-) -> Result<
-    (
-        AuditNumbers,
-        Vec<conveyor_domain::eval::audit::FindingDraft>,
-    ),
-    JobFailure,
-> {
+) -> Result<(AuditNumbers, Vec<FindingDraft>), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
@@ -264,6 +287,18 @@ async fn audit_work(
         &expected,
     )
     .await?;
+    // ── the tier-3 per-case review: one model call per case, through the same bounded path ──
+    let tier3 = tier3_review(
+        pool,
+        tenant,
+        app_key,
+        audit.target_run_id,
+        &metrics,
+        &cases,
+        &expected,
+        &results,
+    )
+    .await?;
     let controls = Controls {
         oracle,
         null,
@@ -276,6 +311,7 @@ async fn audit_work(
     let (noise_floor, headroom) = resolution(&facts, &results, run.as_ref());
 
     let mut drafts = findings(&facts, &controls);
+    drafts.extend(tier3);
     if let Some(finding) = resolution_shortfall(noise_floor, headroom) {
         drafts.push(finding);
     }
@@ -615,6 +651,255 @@ async fn judge_controls(
         }
     }
     Ok((checked, accepted, problems, None))
+}
+
+/// The tier-3 per-case reviewer: one model call per case through the same bounded invocation the
+/// judge probe uses, writing findings and its ledger rows.
+///
+/// The auditor borrows the model of the first metric that names one; a version with no judge
+/// model anywhere has no tier-3 review to run. It is not a second scorer — it proposes findings
+/// and nothing it says is applied (D25). A call that fails or answers something other than the
+/// declared JSON becomes a `noise` finding rather than a job failure: the mechanical audit is
+/// complete without it, and an outage must not read as a broken instrument.
+#[allow(clippy::too_many_arguments)] // the task's signature: the audit's own read set, passed whole
+async fn tier3_review(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    eval_run_id: Option<Uuid>,
+    metrics: &[EvalMetric],
+    cases: &[EvalCase],
+    expected: &[Option<Value>],
+    results: &[ResultRow],
+) -> Result<Vec<FindingDraft>, JobFailure> {
+    let Some(auditor) = metrics
+        .iter()
+        .find_map(|metric| judge_model(&metric.grader))
+    else {
+        return Ok(Vec::new());
+    };
+
+    let mut drafts = Vec::new();
+    for (index, case) in cases.iter().take(TIER3_MAX_CASES).enumerate() {
+        let prompt_ref = format!("eval_audit:tier3:{}", case.id);
+        let stored = result_for(results, case.id);
+        let request = json!({
+            "model": auditor,
+            "messages": [
+                {"role": "system", "content": TIER3_PROMPT_V1},
+                {
+                    "role": "user",
+                    "content": tier3_case_message(
+                        case,
+                        expected.get(index).and_then(|expected| expected.as_ref()),
+                        stored,
+                    ),
+                },
+            ],
+            "max_tokens": TIER3_MAX_TOKENS,
+        });
+        let outcome = match invoke(
+            pool,
+            registry(),
+            tenant,
+            InvokeRequest {
+                credential_alias: None,
+                action: "completions.create".to_owned(),
+                input: request,
+                precondition: None,
+                idempotency_key: None,
+                approval_id: None,
+                actor_id: Uuid::nil(),
+                actor_kind: "service".to_owned(),
+                role: Role::KataExecutor,
+                policy: Default::default(),
+                authority: Authority::Internal,
+                request_id: Some(prompt_ref.clone()),
+                trace_id: None,
+                depth: 1,
+                app_key: app_key.to_owned(),
+                // S16 W7: the review is an eval call, attributed to the run the audit names.
+                usage: Some(UsageContext {
+                    caller_kind: CallerKind::Eval,
+                    run_id: None,
+                    run_step_id: None,
+                    conversation_turn_id: None,
+                    eval_run_id,
+                    prompt_ref: Some(prompt_ref.clone()),
+                    prompt_version: None,
+                    prompt_sha256: None,
+                    correlation_id: Some(prompt_ref),
+                }),
+            },
+        )
+        .await
+        {
+            Ok(outcome) => outcome,
+            Err(error) => {
+                drafts.push(tier3_noise(
+                    "tier3_unavailable",
+                    format!(
+                        "the auditor call for case {} failed: {}: {}",
+                        case.id, error.code, error.detail
+                    ),
+                    "check the auditor model's availability, then re-run the audit",
+                ));
+                continue;
+            }
+        };
+        if !(200..300).contains(&outcome.status) {
+            drafts.push(tier3_noise(
+                "tier3_unavailable",
+                format!(
+                    "the auditor call for case {} answered {}",
+                    case.id, outcome.status
+                ),
+                "check the auditor model's availability, then re-run the audit",
+            ));
+            continue;
+        }
+        drafts.extend(tier3_drafts(
+            &format!("tier3:{}", case.ordinal),
+            &outcome.body,
+        ));
+    }
+    // The cap is silent unless it is reported: a record that reviewed 20 of 21 cases must say
+    // so, or the reader cannot tell a complete review from a truncated one.
+    if cases.len() > TIER3_MAX_CASES {
+        drafts.push(tier3_noise(
+            "tier3_truncated",
+            format!(
+                "the first {TIER3_MAX_CASES} of {} cases were reviewed",
+                cases.len()
+            ),
+            "raise the case cap or review the remaining cases in a separate audit",
+        ));
+    }
+    Ok(drafts)
+}
+
+/// The user message one case is reviewed from: its input, the answer key (the auditor, unlike
+/// the subject, may see it) and the stored result when the audit names a run.
+fn tier3_case_message(
+    case: &EvalCase,
+    expected: Option<&Value>,
+    result: Option<&ResultRow>,
+) -> String {
+    let answer = match expected {
+        Some(Value::String(text)) => text.clone(),
+        Some(other) => conveyor_domain::compare::canonical_json(other),
+        None => "the case has no answer key".to_owned(),
+    };
+    let stored = match result {
+        Some(row) => format!(
+            "status: {}\ngrade: {}\nexplanation: {}\nmodel: {}",
+            row.status, row.grade, row.explanation, row.model
+        ),
+        None => "no stored result for this case".to_owned(),
+    };
+    format!(
+        "## Case input\n\n{}\n\n## Answer key\n\n{answer}\n\n## Stored result\n\n{stored}",
+        case.input
+    )
+}
+
+/// The row the auditor reviews for one case: the first graded row, else the first row there is.
+fn result_for(results: &[ResultRow], case_id: Uuid) -> Option<&ResultRow> {
+    let mut fallback = None;
+    for row in results.iter().filter(|row| row.case_id == case_id) {
+        if row.status == "ok" {
+            return Some(row);
+        }
+        fallback.get_or_insert(row);
+    }
+    fallback
+}
+
+/// The findings one tier-3 answer proposes, or the one finding that says why it could not be
+/// read. `item` names the case (`tier3:<ordinal>`).
+fn tier3_drafts(item: &str, body: &Value) -> Vec<FindingDraft> {
+    let content = body
+        .get("output")
+        .and_then(|output| output.get("choices"))
+        .and_then(Value::as_array)
+        .and_then(|choices| choices.first())
+        .and_then(|choice| choice.get("message"))
+        .and_then(|message| message.get("content"))
+        .and_then(Value::as_str);
+    let Some(content) = content else {
+        return vec![tier3_noise(
+            "tier3_unparsed",
+            format!("the auditor's answer for {item} has no choices[0].message.content"),
+            "check the auditor model's answer shape, then re-run the audit",
+        )];
+    };
+    let parsed: Value = match serde_json::from_str(content.trim()) {
+        Ok(parsed) => parsed,
+        Err(_) => {
+            let excerpt: String = content.trim().chars().take(120).collect();
+            return vec![tier3_unparsed(item, &format!("not JSON: {excerpt:?}"))];
+        }
+    };
+    let Some(entries) = parsed.get("findings").and_then(Value::as_array) else {
+        let excerpt: String = content.trim().chars().take(120).collect();
+        return vec![tier3_unparsed(
+            item,
+            &format!("no findings array: {excerpt:?}"),
+        )];
+    };
+    entries
+        .iter()
+        .map(|entry| tier3_finding(item, entry))
+        .collect()
+}
+
+/// One proposed finding. An unknown severity is `noise`; an empty observation or suggestion is
+/// replaced with a placeholder because the finding row requires both to be non-empty.
+fn tier3_finding(item: &str, entry: &Value) -> FindingDraft {
+    let severity = match entry.get("severity").and_then(Value::as_str) {
+        Some("misleading") => Severity::Misleading,
+        Some("generality") => Severity::Generality,
+        _ => Severity::Noise,
+    };
+    let observation = entry
+        .get("observation")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .unwrap_or("the auditor returned an empty observation");
+    let suggestion = entry
+        .get("suggestion")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .unwrap_or("review this case; the auditor gave no concrete change");
+    FindingDraft {
+        section: Section::Task,
+        item: item.to_owned(),
+        severity,
+        evidence: observation.to_owned(),
+        suggestion: suggestion.to_owned(),
+    }
+}
+
+/// A `noise` finding in the task section — how the auditor reports its own trouble.
+fn tier3_noise(item: &str, evidence: String, suggestion: &str) -> FindingDraft {
+    FindingDraft {
+        section: Section::Task,
+        item: item.to_owned(),
+        severity: Severity::Noise,
+        evidence,
+        suggestion: suggestion.to_owned(),
+    }
+}
+
+/// The one finding a reviewer's unreadable answer contributes, with a short excerpt as evidence.
+fn tier3_unparsed(item: &str, why: &str) -> FindingDraft {
+    tier3_noise(
+        "tier3_unparsed",
+        format!("the auditor's answer for {item} could not be read: {why}"),
+        "make the auditor answer the declared JSON, then re-run the audit",
+    )
 }
 
 /// The headline metric's noise floor and headroom, from the target run when there is one.

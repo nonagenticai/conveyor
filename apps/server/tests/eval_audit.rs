@@ -84,6 +84,21 @@ async fn findings(db: &common::TestDb, tenant: TenantId, audit_id: Uuid) -> Vec<
     rows.iter().map(|row| row.item.clone()).collect()
 }
 
+/// The full finding rows, for tests that assert on evidence and not only on item names.
+async fn finding_rows(
+    db: &common::TestDb,
+    tenant: TenantId,
+    audit_id: Uuid,
+) -> Vec<store::eval::FindingRow> {
+    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
+    let rows =
+        store::eval::list_findings_tx(&mut tx, tenant, Some(audit_id), None, None, None, 200)
+            .await
+            .expect("read the findings");
+    tx.commit().await.expect("commit");
+    rows
+}
+
 /// Run every case of the fixture through the real driver, so the audit has a measured run.
 async fn fill_run(db: &common::TestDb, fixture: &fx::Fixture) {
     let _ = fx::stub_base();
@@ -266,9 +281,12 @@ async fn the_judge_probe_is_an_eval_call_on_the_named_run() {
     assert_eq!(row.status, "succeeded", "error: {:?}", row.error);
 
     let rows: Vec<(String, Option<Uuid>, String)> = sqlx::query_as(
+        // The tier-3 reviewer's calls are eval calls too; this test is about the judge probe, and
+        // its own rows are asserted by `the_tier3_auditor_reviews_every_case_and_joins_the_ledger`.
         "SELECT caller_kind, eval_run_id, prompt_ref
            FROM inference_call
           WHERE prompt_ref LIKE 'eval_audit:%'
+            AND prompt_ref NOT LIKE 'eval_audit:tier3:%'
           ORDER BY created_at",
     )
     .fetch_all(&db.super_pool)
@@ -286,6 +304,143 @@ async fn the_judge_probe_is_an_eval_call_on_the_named_run() {
             "the probe joins the run the audit names: {prompt_ref}"
         );
     }
+}
+
+/// P6.1 — the tier-3 auditor reviews each case through the shared invocation and joins the
+/// eval's ledger rows, without disturbing the mechanical checklist.
+#[tokio::test]
+async fn the_tier3_auditor_reviews_every_case_and_joins_the_ledger() {
+    let db = common::TestDb::fresh().await;
+    let _ = fx::stub_base();
+    // The auditor borrows the model of the first metric that names one.
+    let judge_metric = fx::MetricSpec {
+        key: "quality",
+        grader_kind: "rubric",
+        grader: json!({"judge_model": "eval-model"}),
+        rubric: Some("score the candidate against the rubric"),
+    };
+    let fixture = fx::fixture_with(
+        &db,
+        &["classify: one", "classify: two"],
+        &[fx::exact_metric(), judge_metric],
+    )
+    .await;
+    fill_run(&db, &fixture).await;
+
+    let audit = insert_audit(&db, &fixture, Some(fixture.run_id)).await;
+    run_audit(&db, fixture.tenant, audit).await;
+
+    let row = read_audit(&db, fixture.tenant, audit).await;
+    assert_eq!(row.status, "succeeded", "error: {:?}", row.error);
+    let items = findings(&db, fixture.tenant, audit).await;
+
+    // The stub answers one well-formed finding per case.
+    let tier3 = items
+        .iter()
+        .filter(|item| item.starts_with("tier3:"))
+        .count();
+    assert_eq!(
+        tier3,
+        fixture.cases.len(),
+        "one tier-3 review per case: {items:?}"
+    );
+
+    // The mechanical checklist still fires: the auditor extends the findings, it does not
+    // replace them.
+    for expected in [
+        "single_tag",
+        "no_perf_metric",
+        "no_prices",
+        "split_unlocked",
+    ] {
+        assert!(
+            items.iter().any(|item| item == expected),
+            "the checklist must still report {expected}: {items:?}"
+        );
+    }
+
+    // The ledger: the auditor's calls are eval calls on the run the audit names.
+    let count: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM inference_call
+          WHERE tenant_id = $1 AND eval_run_id = $2 AND caller_kind = 'eval'",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("the eval ledger rows");
+    assert!(count > 0, "the eval's calls join the ledger: {count}");
+
+    let tier3_rows: Vec<(String, Option<Uuid>)> = sqlx::query_as(
+        "SELECT prompt_ref, eval_run_id FROM inference_call
+          WHERE tenant_id = $1 AND prompt_ref LIKE 'eval_audit:tier3:%'
+          ORDER BY created_at",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("the auditor's ledger rows");
+    assert_eq!(
+        tier3_rows.len(),
+        fixture.cases.len(),
+        "one auditor row per reviewed case: {tier3_rows:?}"
+    );
+    for (prompt_ref, eval_run_id) in &tier3_rows {
+        assert!(
+            prompt_ref.starts_with("eval_audit:tier3:"),
+            "the row names the reviewer: {prompt_ref}"
+        );
+        assert_eq!(
+            *eval_run_id,
+            Some(fixture.run_id),
+            "the row joins the run the audit names: {prompt_ref}"
+        );
+    }
+}
+
+/// P6.1 — a case set larger than the review cap is reported as truncated, not silently cut.
+#[tokio::test]
+async fn the_tier3_auditor_reports_a_case_cap_truncation() {
+    let db = common::TestDb::fresh().await;
+    let _ = fx::stub_base();
+    // The auditor borrows the model of the first metric that names one.
+    let judge_metric = fx::MetricSpec {
+        key: "quality",
+        grader_kind: "rubric",
+        grader: json!({"judge_model": "eval-model"}),
+        rubric: Some("score the candidate against the rubric"),
+    };
+    let inputs: Vec<String> = (0..21)
+        .map(|index| format!("classify: case {index}"))
+        .collect();
+    let cases: Vec<&str> = inputs.iter().map(String::as_str).collect();
+    let fixture = fx::fixture_with(&db, &cases, &[fx::exact_metric(), judge_metric]).await;
+    fill_run(&db, &fixture).await;
+
+    let audit = insert_audit(&db, &fixture, Some(fixture.run_id)).await;
+    run_audit(&db, fixture.tenant, audit).await;
+
+    let row = read_audit(&db, fixture.tenant, audit).await;
+    assert_eq!(row.status, "succeeded", "error: {:?}", row.error);
+    let rows = finding_rows(&db, fixture.tenant, audit).await;
+    let items: Vec<&str> = rows.iter().map(|row| row.item.as_str()).collect();
+
+    // The per-case items are `tier3:<ordinal>`; the cap reviews the first twenty cases.
+    let reviewed = items
+        .iter()
+        .filter(|item| item.starts_with("tier3:"))
+        .count();
+    assert_eq!(reviewed, 20, "the cap reviews 20 cases: {items:?}");
+
+    let truncated = rows
+        .iter()
+        .find(|row| row.item == "tier3_truncated")
+        .unwrap_or_else(|| panic!("the truncation must be reported: {items:?}"));
+    assert!(
+        truncated.evidence.contains("20") && truncated.evidence.contains("21"),
+        "the evidence names the reviewed and total cases: {:?}",
+        truncated.evidence
+    );
 }
 
 #[tokio::test]

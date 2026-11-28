@@ -99,6 +99,33 @@ async fn answer(State(state): State<Stub>, Json(body): Json<Value>) -> (StatusCo
     } else {
         "billing"
     };
+    // The tier-3 auditor (`eval_audit`'s per-case reviewer) asks for the declared JSON and names
+    // `TIER3` in its system prompt. This branch precedes the judge's `response_format` branch: a
+    // tier-3 request carries no `response_format`, but the marker must win if a rubric ever
+    // names it.
+    if text.contains("TIER3") {
+        let audit = json!({
+            "findings": [{
+                "severity": "noise",
+                "observation": "the stub's tier-3 observation",
+                "suggestion": "state the label set",
+            }],
+        });
+        return (
+            StatusCode::OK,
+            Json(json!({
+                "id": "chatcmpl-eval-tier3",
+                "object": "chat.completion",
+                "model": model,
+                "choices": [{
+                    "index": 0,
+                    "message": {"role": "assistant", "content": audit.to_string()},
+                    "finish_reason": "stop",
+                }],
+                "usage": {"prompt_tokens": 3, "completion_tokens": 12, "total_tokens": 15},
+            })),
+        );
+    }
     // A judge call asks for a structured verdict (`response_format`), and the audit's three
     // known negatives must be rejected through the real `grade_from_judge` parser. The rubric
     // text is the only per-test seam a judge request carries: a rubric containing `LENIENT`
