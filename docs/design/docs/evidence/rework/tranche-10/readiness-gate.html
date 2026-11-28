@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Tranche-10 readiness gate — measured 2026-11-28 · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/readiness-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tranche-10-readiness-gate--measured-2026-11-28">Tranche-10 readiness gate — measured 2026-11-28</h1>
+<p>snapshot: <code>/tmp/snap-10</code> — 15 data files, 987 published output pages, taken from <code>issue/964-tranche-10</code> at <code>5389ef2b6ae1a8e38767ce7bed16d629f5fb8eb8</code> (the commit that lands the readiness set, both packs and T5's pin). The manifest's <code>generated_at</code> is <code>2026-11-28T16:09:13.158006Z</code>; it is <strong>not</strong> the run clock — the product derives it from the newest <code>updated_at</code> among the <code>documents</code> artefacts (<code>crates/pack/src/snapshot.rs::snapshot_generated_at</code>), so it pins the artefact set, not the instant. The snapshot was taken after the commit, and every gate below was re-run against it.</p>
+<h2 id="content-packs">Content packs</h2>
+<pre><code>rework-content-check: S12 content is consistent with the facts
+exit=0
+rework-content-check: T5 content is consistent with the facts
+exit=0</code></pre>
+<p>Commands (all at the pinned snapshot):</p>
+<ul>
+<li><code>python3 scripts/rework-content-check.py --project S12 --content docs/evidence/rework/tranche-10/rework-content-S12.json --snapshot /tmp/snap-10/data --wsjf 8,7,6,8 --closes false</code></li>
+<li><code>python3 scripts/rework-content-check.py --project T5 --content docs/evidence/rework/tranche-10/rework-content-T5.json --snapshot /tmp/snap-10/data --wsjf 9,6,9,13 --closes true</code></li>
+</ul>
+<p>Each pack carries the seven A–D artefacts in the standard's order, the five registers, the charter, the Statement of Architecture Work, the delivery contract, the Phase-G review, both declared output bodies <strong>and the four delivery documents plus the four close-gate documents</strong> — nine documents each (the v4 set; tranche 9's packs carried only the architecture-artefact index, which the checker does not refuse and the receipt does). T5 carries <code>closure</code> and <code>closure_review</code>; S12 deliberately does not (see below).</p>
+<h2 id="s12s-gate--the-measured-state-half-and-the-deferred-closure">S12's gate — the measured state half and the deferred closure</h2>
+<p>S12's project gate is: every spec asserts empty state, error state and happy path — a spec that only asserts the happy path fails review — and the coverage table has no orphan. Measured on 2026-11-28 at <code>main@ea03b188a</code>:</p>
+<ul>
+<li><strong>Coverage half met.</strong> <code>python3 scripts/check-parity.py --require-native</code> → <code>parity: OK: 2d7b93c56a07 signed, 1300 rows (used 218, rare 295, unused 543, dropped 244); native map present</code>.</li>
+<li><strong>State half partial.</strong> 21 distinct screen specs exist for the 22 rows. Ten assert empty, error and happy; three are happy-path-only (<code>board</code>, <code>prompt-audit</code>, <code>eval-audit</code>); six miss an empty state (<code>shell-login</code>, <code>cockpit</code>, <code>benchmarks</code>, <code>improvement</code>, <code>eval-interop</code>, <code>process-map</code>); two render no refusal (<code>copilot</code>, <code>inference-usage</code>); screen 16 (eval run) has no dedicated spec.</li>
+</ul>
+<p>The full per-spec table is in #965, the test-only unit that closes the gap. Because the gate is not met at this snapshot, <strong>S12's pack is stay-active</strong>: it carries no <code>closure</code>/<code>closure_review</code> keys, the checker runs with <code>--closes false</code>, and the closure review and the declared closure outputs are authored after #965 lands. The preview receipt on this snapshot shows exactly that: the factory will clear the document and artefact packages, while <code>S12-closure-outputs</code>, <code>S12-closure-gate</code>, <code>S12-review</code> and the two closure P1s stay red until the closure is authored.</p>
+<h2 id="t5s-pin--the-one-acceptance-standard-change">T5's pin — the one acceptance-standard change</h2>
+<p>T5's record row is <code>closed</code> while <code>acceptance/programme/T5.toml</code> pinned <code>T5-project</code> <code>active</code>. That pin failed <code>verify-project.py::check_project</code> as P0 and made <code>rework-batch.py::closes_project</code> return false, so a closing pack could not preflight.</p>
+<p>The pin now states <code>closed</code>, the record's measured status. Verified two ways:</p>
+<ul>
+<li><code>python3 -c '&lt;manifest_status regex&gt;'</code> → <code>T5-project pin: closed</code></li>
+<li><code>importlib</code>-loaded <code>rework-batch.py</code> → <code>manifest_status('T5') == 'closed'</code>; <code>closes_project({"key":"T5","meta":{"issues":[77,653]}}, {77:"CLOSED",653:"CLOSED"}, content) == True</code>; <code>manifest_status('S12') == None</code> and <code>closes_project</code> for S12 also true on all-closed issues and closure content — S12 carries no pin, so its close is decided by the closure content it withholds.</li>
+</ul>
+<p>T5's three CODE packages (<code>v1-p119-1</code>, <code>v1-p93-1</code>, <code>v1-w1b-3</code>) are carried by #962; the receipt is green only when they land, and the pack does not pretend to clear them.</p>
+<h2 id="record-readiness-replay-record-schema-110">Record readiness (replay record, schema 110)</h2>
+<ul>
+<li>Four <code>programme_cadence</code> rows at <code>period='tranche-10'</code>: <code>pi</code> <code>01a222e3-61b5-75f3-b122-75c8af9d859d</code> (version 3), <code>refinement</code> <code>01a222e3-86d4-7812-9ab1-1f550a3c603c</code> (version 3), <code>demo</code> <code>01a222e3-8768-7b1b-8100-6ce2601faae2</code>, <code>retro</code> <code>01a222e3-87fb-72ce-b917-493ac7487a89</code>.</li>
+<li>The <code>pi</code> row carries <code>meta.pi_plan</code> (scope S12/T5, capacity, WIP limits, four objectives, four dependency edges) and <code>meta.documents</code>: <code>pi-plan</code> <code>01a222e3-9670-70fc-8280-50493a8dfbab</code>, <code>pi-objectives</code> <code>01a222e3-c641-7359-95fc-2faea4f9198d</code> — both published, <strong>P0-scoped</strong> (<code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>) and <code>unit</code> <code>tranche-10</code>, read back from <code>outputs.js</code>. Both were corrected after the spec audit moved S12's closure to #965; the corrected bodies name the gap and the unit.</li>
+<li>The <code>refinement</code> row carries <code>meta.refinement.wsjf_inputs</code> — S12 8/7/6/8, T5 9/6/9/13 — matching the two packs' WBS integers and the <code>--wsjf</code> each checker ran with.</li>
+<li>The PI-plan gate is <code>approved</code> (approval <code>01a222e4-408d-7d71-9931-913ecdfc054c</code>) as a <code>rule</code> decision under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the <code>pi</code> row's own state stays <code>awaiting_approval</code>, as tranche 9's does.</li>
+<li>The tranche lesson <code>01a222e4-bd0d-7bfb-b7de-976b5ee29493</code> is linked to the retro cadence with <code>independent_count=2</code> (anchors <code>scripts/rework-content-check.py</code> and <code>seed/output-standard.json</code>).</li>
+<li>Ten readiness acts are journaled (<code>docs/evidence/record/journal.jsonl</code>, 524 entries, <code>promote-record.py --check</code> green), with their inputs under <code>docs/evidence/record/inputs/tr10/</code>. The two PI-document corrections and the refinement re-write are updates to rows the journal already creates; they add no duplicate natural key.</li>
+</ul>
+<p>The snapshot assertion in the issue's P1.1 passes:</p>
+<pre><code>python3 -c &#39;… msp.json readiness assertion …&#39;
+tranche-10 readiness: ok</code></pre>
+<h2 id="the-open-packages-and-the-route-that-clears-each">The open packages and the route that clears each</h2>
+<table>
+<thead>
+<tr>
+<th>scope</th>
+<th>P0</th>
+<th>P1</th>
+<th>cleared by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S12</td>
+<td>1</td>
+<td>4</td>
+<td><code>project_in_unauthorised_tranche</code> by authorisation only; <code>unpublished_declared_output</code> and <code>mandatory_artefacts</code> by the pack's documents, outputs and close-gate set; <code>closed_without_closure_review</code> and <code>closure_outputs_undeclared</code> only after #965 lands and the closure review is authored</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>1</td>
+<td>5</td>
+<td><code>project_in_unauthorised_tranche</code> by authorisation only; <code>contract_missing</code> and <code>mandatory_artefacts</code> by the pack; <code>v1-p119-1</code>, <code>v1-p93-1</code>, <code>v1-w1b-3</code> by #962 only</td>
+</tr>
+<tr>
+<td><code>tranche-10</code></td>
+<td>0</td>
+<td>2</td>
+<td><code>pi_cadence_missing</code> and <code>backlog_refinement_missing</code> by the four cadence rows and the refinement record above</td>
+</tr>
+</tbody>
+</table>
+<p>The P0 is not a pack's to discharge: only the programme owner's gate decision authorises the tranche, and the package clears when the audit next reports on an authorised tranche.</p>
+<h2 id="batch-gate--the-expected-authorisation-precondition">Batch gate — the expected authorisation precondition</h2>
+<pre><code>$ python3 scripts/rework-batch.py --tranche 10 --snapshot /tmp/snap-10/data \
+    --content-dir docs/evidence/rework --journal docs/evidence/rework/batch/tranche-10.jsonl --dry-run
+tranche 10 is &#39;planned&#39;; only authorised/closed/in_review may be reworked
+exit=1</code></pre>
+<p>This is the <strong>only</strong> refusal: <code>rework-batch.py::ensure_authorised</code> refuses a <code>planned</code> tranche before it reads the roster or the packs. #755 records the tranche-9 review and authorises tranche 10; on a fresh snapshot after that, the same command must exit 0 with S12 and T5 <code>PREFLIGHTED</code>.</p>
+<h2 id="receipt-previews-at-the-pin">Receipt previews at the pin</h2>
+<p>Both previews were written with <code>--evidence-dir /tmp/tr10/verify</code> (never into the repo's evidence directory) and are the factory's to replace:</p>
+<ul>
+<li><strong>S12</strong> — red on <code>S12-baseline</code>, <code>S12-charter</code>, <code>S12-closure-outputs</code>, <code>S12-contract</code>, <code>S12-review</code>, <code>S12-closure-gate</code>, <code>S12-wsjf</code>, <code>S12-demo-credits</code>, <code>S12-artefact-standard</code>, <code>S12-rework</code> and the two gate rows. The pack clears the document, artefact, contract, review and WBS checks; the closure rows stay red until #965 and the closure review.</li>
+<li><strong>T5</strong> — red on <code>T5-baseline</code>, <code>T5-charter</code>, <code>T5-contract</code>, <code>T5-review</code>, <code>T5-wsjf</code>, <code>T5-demo-credits</code>, <code>T5-artefact-standard</code>, <code>T5-rework</code> and the two gate rows. <code>T5-project</code> now passes on the corrected pin. The pack clears everything except the three CODE packages until #962 lands.</li>
+</ul>
+<h2 id="delivery-gates">Delivery gates</h2>
+<pre><code>python3 docs/design/scripts/build-docs.py --check        -&gt; check-docs: 566 sources, 0 failure(s)
+node docs/design/scripts/check-docs.cjs                  -&gt; check-docs: 12 checks passed
+node docs/design/scripts/check-data.cjs                  -&gt; check-data: 48 checks passed
+python3 scripts/promote-record.py --check                -&gt; 524 entries; journal is well formed
+git diff --check                                         -&gt; clean</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-10/readiness-gate.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

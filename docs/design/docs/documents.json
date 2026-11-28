@@ -2936,6 +2936,105 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-1/acts.md"
     },
     {
+      "title": "Evidence — tranche-10 demo cadence",
+      "path": "docs/evidence/rework/tranche-10/evidence/demo-cadence.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/demo-cadence.md",
+      "section": "Evidence",
+      "sha256": "382904f906cb9f71c4078ad395449d75ba8bb0374fcda63be9cf09dd40b9788b",
+      "bytes": 343,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/demo-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-10 lesson",
+      "path": "docs/evidence/rework/tranche-10/evidence/lesson.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/lesson.md",
+      "section": "Evidence",
+      "sha256": "25977be2e429b6442cc0ae0eb62f723862532ae84e4d734e5ec0591d678dd28b",
+      "bytes": 597,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/lesson.md"
+    },
+    {
+      "title": "Evidence — tranche-10 PI plan approval",
+      "path": "docs/evidence/rework/tranche-10/evidence/pi-approval.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/pi-approval.md",
+      "section": "Evidence",
+      "sha256": "a0b3747de2c65a07ca0da0d4ad51af191291092d2cdc4e02f55ecd36fd466e78",
+      "bytes": 469,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/pi-approval.md"
+    },
+    {
+      "title": "Evidence — tranche-10 pi cadence",
+      "path": "docs/evidence/rework/tranche-10/evidence/pi-cadence.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/pi-cadence.md",
+      "section": "Evidence",
+      "sha256": "8409a8e8a2e1c81e62e566a81168659adade0f94e7e2ff5dba76bf9dfaae61a5",
+      "bytes": 522,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/pi-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-10 PI row plan",
+      "path": "docs/evidence/rework/tranche-10/evidence/pi-meta.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/pi-meta.md",
+      "section": "Evidence",
+      "sha256": "a0251ec6f70ec267c31453a642cc250eaa37443bd963b2abde70e75eb988859f",
+      "bytes": 523,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/pi-meta.md"
+    },
+    {
+      "title": "Evidence — tranche-10 PI objectives output",
+      "path": "docs/evidence/rework/tranche-10/evidence/pi-objectives.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/pi-objectives.md",
+      "section": "Evidence",
+      "sha256": "cfe252118ce139c48944ef39f8becb8d4bc885d656d0f895be9093c40de548d8",
+      "bytes": 432,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/pi-objectives.md"
+    },
+    {
+      "title": "Evidence — tranche-10 PI plan output",
+      "path": "docs/evidence/rework/tranche-10/evidence/pi-plan.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/pi-plan.md",
+      "section": "Evidence",
+      "sha256": "0d6c294410f6f3e41a60497632890a3f3ee82f10809711a67c81eaf76b5e88a9",
+      "bytes": 504,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/pi-plan.md"
+    },
+    {
+      "title": "Evidence — tranche-10 refinement cadence",
+      "path": "docs/evidence/rework/tranche-10/evidence/refinement-cadence.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/refinement-cadence.md",
+      "section": "Evidence",
+      "sha256": "c5ab10ff52f0e6aa1016c63ddb6bd01006318910c75c42ad5c488358d175be18",
+      "bytes": 462,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/refinement-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-10 refinement record",
+      "path": "docs/evidence/rework/tranche-10/evidence/refinement-wsjf.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/refinement-wsjf.md",
+      "section": "Evidence",
+      "sha256": "ec157d3147dd2c9103d13f44ef82bdf4d887e13a3900886185a314a874a10619",
+      "bytes": 452,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/refinement-wsjf.md"
+    },
+    {
+      "title": "Evidence — tranche-10 retro cadence",
+      "path": "docs/evidence/rework/tranche-10/evidence/retro-cadence.html",
+      "source": "docs/evidence/rework/tranche-10/evidence/retro-cadence.md",
+      "section": "Evidence",
+      "sha256": "aabd16af6c71b26e4648c0c8509242e535d8e59da23be297b81a46ac40d81dfb",
+      "bytes": 297,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/evidence/retro-cadence.md"
+    },
+    {
+      "title": "Tranche-10 readiness gate — measured 2026-11-28",
+      "path": "docs/evidence/rework/tranche-10/readiness-gate.html",
+      "source": "docs/evidence/rework/tranche-10/readiness-gate.md",
+      "section": "Evidence",
+      "sha256": "5963ec15ba0d99aa431f4d2b4aa1a15c3793b885f947934b09e2bd5527697ec9",
+      "bytes": 8938,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-10/readiness-gate.md"
+    },
+    {
       "title": "T2 — the superseding delivery contract and its Phase-G re-review",
       "path": "docs/evidence/rework/tranche-2/T2-recontract.html",
       "source": "docs/evidence/rework/tranche-2/T2-recontract.md",
