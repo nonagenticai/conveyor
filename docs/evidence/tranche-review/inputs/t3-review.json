@@ -1,0 +1,17 @@
+{
+  "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+  "contract_id": "<CONTRACT_ID>",
+  "level": "compliant",
+  "findings": [
+    {
+      "verdict": "pass",
+      "statement": "The T3 PM job is designed as its Statement of Architecture Work requires: the request-to-plan path, the dual-controlled charter, baseline and change gates, and closure against the frozen baseline are the delivery contract's scope, and the manifest's six PM checks (project, baseline, charter, contract, review, closure gate) prove the gate's three clauses — a request end to end, no self-approval, and a change request for a baseline change."
+    }
+  ],
+  "evidence": {
+    "manifest": "acceptance/programme/T3.toml",
+    "closure_review": "<CLOSURE_REVIEW_ID>",
+    "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+  },
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}
