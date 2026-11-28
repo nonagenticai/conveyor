@@ -40,6 +40,34 @@ export class Shell {
       return;
     }
     this.renderSession();
+    this.bindPaletteShortcut();
+  }
+
+  /**
+   * The Palette's keyboard path. The button's tooltip promises Ctrl/Cmd+K, so the shortcut and
+   * the tooltip are one thing (#914): remove this handler and the title goes with it.
+   *
+   * A field keeps its keystrokes: the shortcut is ignored while focus is in an input, a textarea,
+   * a select or anything contenteditable, so typing a literal "k" into a form is never a command.
+   * Bound once, on the signed-in path only — before the manifest loads the palette has nothing
+   * to list.
+   */
+  bindPaletteShortcut() {
+    if (this.paletteShortcutBound) return;
+    this.paletteShortcutBound = true;
+    window.addEventListener("keydown", (event) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+      if (event.key !== "k" && event.key !== "K") return;
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) {
+        const tag = active.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active.isContentEditable) {
+          return;
+        }
+      }
+      event.preventDefault();
+      this.openPalette();
+    });
   }
 
   /** The same shell, rebuilt after a tenant change or a return from a sheet. */
