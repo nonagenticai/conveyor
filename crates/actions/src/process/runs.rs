@@ -354,6 +354,17 @@ pub(crate) async fn process_runs_start(
     // published, cannot start a ROOT run. A child run is a step already executing inside a
     // started process; re-checking there would break a live run when a status moves.
     if input.parent_run_id.is_none() {
+        // SPEC_V2 §5.8 (D69): a ROOT run on a work package starts only from an INVEST-ready
+        // spec — the same gate `runs.create` and `cards.assign` take, so this seam cannot start
+        // what the explicit entry point refuses. It sits ahead of every write below, so a
+        // refusal leaves no run row, step or job. A CHILD is a step already executing inside a
+        // started process and is not re-gated.
+        crate::control::run_create::assert_work_package_ready_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.card_id,
+        )
+        .await?;
         // v1-p6-1: the coach's remedy was applied when it was recorded; the dispatch enforces
         // it. A block and a pending ask refuse the run.
         let refusal = store::coach::dispatch_refusal_tx(&mut *tx, ctx.tenant, input.card_id)

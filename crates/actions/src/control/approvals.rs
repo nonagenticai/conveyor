@@ -597,8 +597,9 @@ async fn approvals_request(
     .await?;
     // The typed resolution refuses only an empty typed list, so it is asked to require evidence
     // only when nothing else supplies it: scenario evidence counts, and a waiver excuses the
-    // requirement only when there is no evidence at all. `required_kinds` is enforced inside the
-    // resolver either way, so a scenario entry never substitutes for a required typed kind.
+    // requirement only when there is no evidence at all. Scenario evidence is appended to
+    // `meta.evidence` but is not a typed kind, so it never substitutes for a kind named in
+    // `required_kinds`; the typed resolver's presence rule is unchanged.
     let require_typed =
         require && input.evidence.is_empty() && scenario.is_empty() && waiver.is_none();
     let mut evidence = crate::pm::resolve_evidence(

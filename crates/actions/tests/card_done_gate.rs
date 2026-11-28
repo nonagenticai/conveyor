@@ -1095,3 +1095,70 @@ async fn a_non_delivery_card_may_be_created_in_a_done_lane() {
     assert_eq!(created.status, 201, "{}", created.body);
     assert_eq!(output(&created.body)["list_id"], done);
 }
+
+/// A duplicate is a birth too (§5.8): a work package cannot land in `done` by duplication,
+/// while a non-delivery copy and a work-package copy into an active lane keep their behaviour.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_work_package_duplicate_is_not_born_in_a_done_lane() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (delivery, _) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    let (feature, _) = create_card_of_type(&pg, &seeded, &board, &active, "feature").await;
+
+    let refused = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "cards.duplicate",
+            json!({ "id": delivery, "list_id": done }),
+        ),
+    )
+    .await
+    .expect_err("a work package cannot be duplicated into done");
+    assert_eq!(refused.status, 409, "{}", refused.detail);
+    assert_eq!(refused.code, "card-create-not-allowed");
+    assert!(
+        refused.detail.contains("card_done"),
+        "the refusal names the gate it would bypass: {}",
+        refused.detail
+    );
+
+    let cards: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM card WHERE tenant_id = $1 AND list_id = $2")
+            .bind(seeded.tenant_id)
+            .bind(Uuid::parse_str(&done).expect("the done lane id"))
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("count the done lane's cards");
+    assert_eq!(cards, 0, "a refused duplicate writes no card");
+
+    let copied = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "cards.duplicate",
+            json!({ "id": feature, "list_id": done }),
+        ),
+    )
+    .await
+    .expect("a non-delivery duplicate keeps its behaviour");
+    assert_eq!(copied.status, 201, "{}", copied.body);
+    assert_eq!(output(&copied.body)["list_id"], done);
+
+    let copied = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "cards.duplicate",
+            json!({ "id": delivery, "list_id": active }),
+        ),
+    )
+    .await
+    .expect("a work package may be duplicated into an active lane");
+    assert_eq!(copied.status, 201, "{}", copied.body);
+    assert_eq!(output(&copied.body)["list_id"], active);
+}

@@ -1049,8 +1049,10 @@ async fn cards_unarchive(
 
 /// Copy a card, its labels, its checklists and its field values — never its comments.
 ///
-/// The copy is born (not moved): the same rule as `cards.create` applies, so a target lane
-/// of the archive kind is refused. `list_id` absent means "the source card's lane".
+/// The copy is born (not moved): the same rules as `cards.create` apply, so a target lane of
+/// the archive kind is refused, and a `delivery` card is refused a `done` lane — a work package
+/// enters done only through the `card_done` gate. `list_id` absent means "the source card's
+/// lane".
 #[crate::action(
     name = "cards.duplicate",
     version = 1,
@@ -1085,6 +1087,16 @@ async fn cards_duplicate(
             409,
             "card-create-not-allowed",
             "a copy is a birth; the archive lane cannot receive one",
+        ));
+    }
+    // A copy is a birth, so the §5.8 rule follows it: a work package enters `done` only through
+    // the approved `card_done` gate, never as a duplicate that lands there already finished.
+    // Non-delivery copies keep their behaviour (`cards.create`'s rule, same code and message).
+    if source.card_type_code.as_str() == DELIVERY_CARD_TYPE && lane.list.kind == ListKind::Done {
+        return Err(ActionError::new(
+            409,
+            "card-create-not-allowed",
+            "a work package is not born in done; it moves through the card_done gate",
         ));
     }
 

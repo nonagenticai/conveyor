@@ -172,6 +172,17 @@ pub async fn start_published_tx(
         None => None,
     };
 
+    // SPEC_V2 §5.8 (D69): a ROOT run on a work package starts only from an INVEST-ready spec —
+    // the same gate `runs.create` and `cards.assign` take, so no seam can start what the
+    // explicit entry point refuses. A project-scoped run has no card and a child is a step
+    // already executing inside a started process; neither is re-gated.
+    if parent.is_none()
+        && let Some(card) = &card
+    {
+        crate::control::run_create::assert_work_package_ready_tx(&mut *tx, ctx.tenant, card.id)
+            .await?;
+    }
+
     let andon = store::andon::get_tx(&mut *tx, ctx.tenant)
         .await
         .map_err(|error| crate::control::store_error(error, action))?;

@@ -736,6 +736,198 @@ async fn seeded_tenant(pg: &support::Pg) -> Uuid {
         .expect("the fixture tenant")
 }
 
+// ── SPEC_V2 §5.8 (D69): the work-package gate on the ROOT start path ────────────────────────
+
+/// The two-scenario feature the work-package fixtures author; the keys are the stable ids
+/// evidence names.
+const WP_FEATURE: &str = r#"Feature: the work package
+
+  @verify=V1
+  Scenario: the first part
+    Given a work package
+    When the first part is executed
+    Then the first scenario passes
+
+  @verify=V2
+  Scenario: the second part
+    Given a work package
+    When the second part is executed
+    Then the second scenario passes
+"#;
+
+/// The six INVEST criteria, each met with evidence — an INVEST-ready definition of ready.
+fn ready_dor() -> Value {
+    json!({
+        "independent": {"met": true, "evidence": "no blocked-by link"},
+        "negotiable": {"met": true, "evidence": "outcome fixed; approach settled at delivery"},
+        "valuable": {"met": true, "evidence": "the story's so-that names the benefit"},
+        "estimable": {"met": true, "evidence": "baseline and every file are named"},
+        "small": {"met": true, "evidence": "one work package, one run"},
+        "testable": {"met": true, "evidence": "every scenario carries @verify"},
+    })
+}
+
+/// A structurally valid definition of ready with one criterion unmet: `cards.spec_put` stores
+/// it, and the run-start gate is where the unmet criterion refuses.
+fn unready_dor() -> Value {
+    let mut dor = ready_dor();
+    dor["small"] = json!({"met": false, "evidence": "two runs are planned"});
+    dor
+}
+
+/// A `delivery` card type, plus the matrix row that lets it move between lanes.
+///
+/// The dev catalogue seeds only `feature`/`bug`; both §5.8's scope predicate and the lane matrix
+/// key on the card type's code, so the fixture owns both.
+async fn seed_delivery_card_type(pg: &support::Pg, tenant: conveyor_store::TenantId) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope");
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label)
+         VALUES ($1, 'delivery', 'Delivery')
+         ON CONFLICT (tenant_id, code) DO NOTHING",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("the delivery card type");
+    sqlx::query(
+        "UPDATE catalogue_entry
+            SET meta = jsonb_set(meta, '{matrix,delivery}',
+                                 '{\"intake\": [\"active\"], \"active\": [\"done\"]}'::jsonb)
+          WHERE tenant_id = $1 AND kind = 'project_type' AND code = 'delivery'",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("the delivery matrix");
+    tx.commit().await.expect("commit");
+    conveyor_actions::board::matrix::clear_cache_for(tenant);
+}
+
+/// Author the card's work-package spec through the real writer, `cards.spec_put`.
+///
+/// `if_match` is the spec's own version: omit it for the card's first spec, pass the value
+/// `cards.spec_get` returns to rewrite an existing one.
+async fn put_spec(running: &support::Running, card: &str, dor: Value, if_match: Option<&str>) {
+    let (status, body) = running
+        .invoke(
+            "cards.spec_put",
+            TOKEN,
+            json!({
+                "card_id": card,
+                "story_persona": "a delivery team",
+                "story_action": "the work package to carry its acceptance",
+                "story_benefit": "done is judged per scenario, not by a checkbox",
+                "feature": WP_FEATURE,
+                "dor": dor,
+            }),
+            if_match,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+}
+
+/// SPEC_V2 §5.8 (D69): every ROOT start path reads the work-package spec, not only
+/// `runs.create` and `cards.assign`. A published process on a `delivery` card with no spec is
+/// refused exactly as `runs.create` refuses it — before any run row, step or job.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_root_process_start_on_a_work_package_with_no_spec_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, seeded.tenant).await;
+    let sop = support::publish_sop(&running, "process-start-wp-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane, "delivery").await;
+    let (_, process, _) = create_process(&running, "dev-wp-nospec", &sop, None, two_steps()).await;
+    publish(&running, &process).await;
+
+    let (status, _, body) = start(
+        &running,
+        json!({"card_id": card, "process_key": "dev-wp-nospec"}),
+        None,
+    )
+    .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(slug(&body), "work_package_dor_unmet", "{body}");
+
+    let runs: i64 = sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("run count");
+    let jobs: i64 = sqlx::query_scalar("SELECT count(*) FROM job WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("job count");
+    assert_eq!((runs, jobs), (0, 0), "a refused start writes no run state");
+}
+
+/// The §5.8 gate is a ROOT-run gate: a child run is a step already executing inside a started
+/// process. The work package's spec moves to unmet AFTER its root process started — the child
+/// must still start, exactly as a capability or pack change must not break a live run.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_child_process_run_on_a_work_package_is_not_re_gated() {
+    let (pg, running, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, seeded.tenant).await;
+    let sop = support::publish_sop(&running, "process-start-wp-child-sop").await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane, "delivery").await;
+
+    // The ready spec lets the ROOT start through the same gate `runs.create` uses.
+    put_spec(&running, &card, ready_dor(), None).await;
+    let (_, parent_process, _) =
+        create_process(&running, "dev-wp-parent", &sop, None, two_steps()).await;
+    publish(&running, &parent_process).await;
+    let (status, _, body) = start(
+        &running,
+        json!({"card_id": card, "process_key": "dev-wp-parent"}),
+        None,
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    let parent_run = text(output(&body), "id");
+
+    // The parent's first `process_step` is the child's edge.
+    let step: Uuid = sqlx::query_scalar(
+        "SELECT process_step_id FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&parent_run).expect("parent run id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the parent's first step");
+
+    // The spec is now unmet; the child is inside the already-started process.
+    put_spec(&running, &card, unready_dor(), Some("1")).await;
+    let (_, child_process, _) =
+        create_process(&running, "dev-wp-child", &sop, None, two_steps()).await;
+    publish(&running, &child_process).await;
+    let (status, _, body) = start(
+        &running,
+        json!({
+            "card_id": card,
+            "process_key": "dev-wp-child",
+            "parent_run_id": parent_run,
+            "step_id": step,
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    // The child carries the parent's step as its edge — it really is a child run, not a second
+    // root that happened to be allowed.
+    assert_eq!(
+        output(&body)["process_step_id"],
+        json!(step.to_string()),
+        "{body}"
+    );
+}
+
 /// The programme's order is enforced at the card start: a card on a project whose
 /// `meta.depends_on` names an open project is refused `409 blocked_by`, and closing the
 /// dependency lets the same start through. The dependency is named **P0** — the programme's
