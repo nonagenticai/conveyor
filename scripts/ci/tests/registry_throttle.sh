@@ -38,6 +38,25 @@ expect run workflow_dispatch 1000000 1000000
 # The daily schedule is throttled like any other non-dispatch trigger.
 expect skip schedule 1000000 999000
 
+# A five-event burst against one refreshed PR yields exactly one push: the first event finds the
+# PR stale and runs; the four that follow find it younger than the window and skip.
+burst_runs=0
+for offset in 0 60 120 180 240; do
+  if [ "$offset" -eq 0 ]; then
+    updated=$((1000000 - 2000))
+  else
+    updated=1000000
+  fi
+  if [ "$(bash "$script" issues $((1000000 + offset)) "$updated")" = "run" ]; then
+    burst_runs=$((burst_runs + 1))
+  fi
+done
+checks=$((checks + 1))
+if [ "$burst_runs" -ne 1 ]; then
+  echo "FAIL: a five-event burst produced $burst_runs pushes, want 1"
+  failures=$((failures + 1))
+fi
+
 # Invalid input is a hard error, never a silent "run".
 checks=$((checks + 1))
 if bash "$script" issues not-an-epoch "" >/dev/null 2>&1; then
