@@ -151,48 +151,35 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-u5-copilot-gate-quorum:S10 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "S10-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S10-rework' did not pass",
+      "detail": "gate discharged by executable checks: S10-project, S10-baseline, S10-charter, S10-closure-outputs, S10-contract, S10-review, S10-closure-gate, S10-waivers, S10-pi-cadence, S10-pi-plan, S10-pi-objectives, S10-wsjf, S10-demo-credits, S10-lessons, S10-product, S10-artefact-standard, S10-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S10-rework (P0): 1 unresolved P0/P1 package(s): v1-u5-copilot-gate-quorum:S10 (P1)",
-    "gate (P0): the gate check 'S10-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "S10 is accepted when a scripted agent session passes \u2014 the tool list is the projection of the ActionSpecs the caller's scopes admit, a destructive tool call becomes an S06 approval, and the conversation is two tables plus an SSE stream, not a second action system.",
-  "generated_at": "2026-11-28T07:30:27.487475+00:00",
+  "generated_at": "2026-11-28T07:42:44.577944+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S10.toml",
   "name": "Copilot / AG-UI \u2014 one action surface, proposals, conversations",
   "project": "S10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-28T07:30:00.600606+00:00",
-    "git_sha": "a38b80cdfca23097479d3c237c84e8d11f790a62",
-    "path": "retained-snapshot/a38b80cdfca23097479d3c237c84e8d11f790a62"
+    "generated_at": "2026-11-28T07:39:45.752107+00:00",
+    "git_sha": "fc7ede22413bf1a02c5f749eebf3eacc0978e281",
+    "path": "retained-snapshot/fc7ede22413bf1a02c5f749eebf3eacc0978e281"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
