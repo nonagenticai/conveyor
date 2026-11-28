@@ -63,8 +63,10 @@ PY
 done
 
 echo "== S04 closure outputs declaration =="
+# `closure_outputs` is a programme-owned meta key: `projects.update` refuses it (422
+# meta_key_protected). The programme's own write path is `projects.programme_meta`.
 CV=$(invoke projects.get <<<"{\"id\":\"$S04\"}" | jq_py "['project']['version']")
-invoke projects.update --if-match "$CV" <<<"{\"id\":\"$S04\",\"meta\":{\"closure_outputs\":[\"evidence\",\"closure-review\"]}}" \
+invoke projects.programme_meta --if-match "$CV" <<<"{\"id\":\"$S04\",\"meta\":{\"closure_outputs\":[\"evidence\",\"closure-review\"]}}" \
   | python3 -c "import json,sys; d=json.load(sys.stdin); print('S04 update', d.get('project',{}).get('version'))"
 
 python3 -c "import json; print(json.dumps({'S04':'$S04','T13':'$T13','T3':'$T3'}))" > /tmp/conv852-delivery-ids.json

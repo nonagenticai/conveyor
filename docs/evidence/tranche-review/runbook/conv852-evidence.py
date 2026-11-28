@@ -47,9 +47,10 @@ benefit_ids = [
     p['id'] for p in msp.get('benefit_profiles', [])
     if p.get('programme_id') == programme_id
 ]
+member_ids = {p['id'] for p in prog['projects'] if p['key'] in members}
 risk_ids = [
     r['id'] for r in msp.get('register_items', [])
-    if r.get('programme_id') == programme_id and r.get('kind') == 'risk'
+    if r.get('kind') == 'risk' and r.get('project_id') in member_ids
 ]
 for name, ids in (('baselines', baseline_ids), ('benefit_status', benefit_ids),
                   ('risk_register', risk_ids)):

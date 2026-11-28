@@ -129,6 +129,9 @@ PY
 fi
 
 echo "== 6. closes =="
+if [ -n "${SKIP_CLOSES:-}" ]; then
+  echo "(skipped: the closes run after the v4 documents exist — the close gate reads them)"
+fi
 close_project() {
   local P=$1 reason=$2
   local GATE ST
@@ -143,8 +146,12 @@ close_project() {
     | invoke projects.close --actor-id $APPROVER --approval-id "$GATE" \
     | python3 -c "import json,sys; print(json.load(sys.stdin)['project']['status'])"
 }
-close_project $T13 "Rework complete through tr3; the closure review is published and the schedule baseline approved; the open items are named, not waived."
-close_project $T3 "Rework complete through tr3; the closure review is published, the delivery contract and its Phase-G review are recorded, and the schedule baseline is approved; the open items are named, not waived."
+if [ -z "${SKIP_CLOSES:-}" ]; then
+  close_project $T13 "Rework complete through tr3; the closure review is published and the schedule baseline approved; the open items are named, not waived."
+  close_project $T3 "Rework complete through tr3; the closure review is published, the delivery contract and its Phase-G review are recorded, and the schedule baseline is approved; the open items are named, not waived."
+else
+  echo "close T13/T3: deferred (SKIP_CLOSES)"
+fi
 
 echo "== read-backs =="
 python3 - "$CONTRACT" "$BOARD" "$REVIEW" "$CLOSURE" "$OUT" <<'PY'
