@@ -13,6 +13,7 @@ use http::HeaderMap;
 use schemars::Schema;
 use serde::Deserialize;
 use serde_json::{Value, json};
+use uuid::Uuid;
 
 use super::{Capabilities, ConnectorSpec, Identity, Inbound, SendFuture, SendOutcome, SendRequest};
 
@@ -39,6 +40,10 @@ pub struct Config {
     /// The header the outbound secret is sent in (default `authorization`, as `Bearer <value>`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outbound_auth_header: Option<String>,
+    /// The binding's identity map: the envelope's `sender` to the tenant principal it stands
+    /// for. A decision from a sender not named here is refused (S06 §7 / W2).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub senders: BTreeMap<String, Uuid>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -118,6 +123,14 @@ fn parse(body: &[u8], _config: &Value) -> Option<Inbound> {
             .as_deref()
             .is_some_and(|text| !text.trim().is_empty())
     })
+}
+
+/// The binding's sender → tenant principal map, keyed by the envelope's `sender`. No map entry
+/// means no attributable person, and a decision-bearing command is refused.
+fn sender_principal(config: &Value, sender_ref: Option<&str>) -> Option<Uuid> {
+    let config = parse_config(config).ok()?;
+    let sender_ref = sender_ref?;
+    config.senders.get(sender_ref).copied()
 }
 
 fn send(request: SendRequest) -> SendFuture {
@@ -226,6 +239,7 @@ pub const SPEC: ConnectorSpec = ConnectorSpec {
     validate,
     authenticate,
     parse,
+    sender_principal,
     send,
 };
 
