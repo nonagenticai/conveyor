@@ -52,10 +52,18 @@ ${level} Dependencies
 | blocks | #782 | the site reads the register | open |
 
 ${level} Definition of ready
-- [x] Baseline recorded
+- [x] **Independent** — one unit
+- [x] **Negotiable** — the outcome is fixed
+- [x] **Valuable** — mapped to a benefit
+- [x] **Estimable** — the baseline is named
+- [x] **Small** — one issue, one PR
+- [x] **Testable** — a Verify per part
 
 ${level} Definition of done
-- [ ] One PR \`Closes #N\` merged
+
+| Acceptance scenario | Evidence at completion | Verify: |
+|---|---|---|
+| P1.1 | to fill | \`true\` |
 EOF
 }
 
@@ -134,6 +142,8 @@ awk '{print} /^  Verify: `true`$/ && !done {
   print ""; print "### P2 — the second part"
   print "- **P2.1** Given a state, when an act, then an outcome."
   print "  Verify: `true`"; done=1
+} /^\| P1\.1 \| to fill \|/ {
+  print "| P2.1 | to fill | `true` |"
 }' "$body" >"$body.new" && mv "$body.new" "$body"
 if out=$($B --contract-body "$body" 2>&1); then
   ok "a Verify line on every part passes"
