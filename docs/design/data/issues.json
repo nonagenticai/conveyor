@@ -1,11 +1,96 @@
 {
+  "schema": "issue-registry/v1",
+  "provenance": {
+    "tenant": "nonagentic",
+    "source": "github:nonagenticai/conveyor"
+  },
   "issues": [
     {
-      "number": 900,
-      "title": "bug: the benchmark producer's yield caps the improvement loop below the significance bar",
+      "number": 914,
+      "title": "fix(walk): the Palette's advertised Ctrl/Cmd+K shortcut has no handler",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/900",
-      "updatedAt": "2026-11-27T23:01:45Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/914",
+      "updatedAt": "2026-11-28T07:05:46Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 912,
+      "title": "walk: the board screen's seven missing write verbs",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/912",
+      "updatedAt": "2026-11-28T07:00:48Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 911,
+      "title": "ci: the code-gate suite partitions by the matrix size and runs four shards",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/911",
+      "updatedAt": "2026-11-28T07:01:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 910,
+      "title": "fix(walk): the sources catalogue's real field, the unbound query and the paging shape",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/910",
+      "updatedAt": "2026-11-28T06:56:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "GEMBA-WALK",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 908,
+      "title": "bug: the model emits malformed unified diffs, so produced patches are withheld as apply_failed",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/908",
+      "updatedAt": "2026-11-28T06:22:47Z",
       "labels": [
         {
           "name": "bug",
@@ -14,6 +99,44 @@
         {
           "name": "status:ready",
           "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 904,
+      "title": "ci: the DCO gate fails every merge-group run of a multi-commit PR",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/904",
+      "updatedAt": "2026-11-28T06:20:53Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 900,
+      "title": "bug: the benchmark producer's yield caps the improvement loop below the significance bar",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/900",
+      "updatedAt": "2026-11-28T06:24:02Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -124,9 +247,9 @@
     {
       "number": 888,
       "title": "walk: the post-freeze destinations \u2014 feedback, knowledge sources/memory, measure \u2014 and the census re-freeze",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/888",
-      "updatedAt": "2026-11-27T22:20:49Z",
+      "updatedAt": "2026-11-28T06:54:13Z",
       "labels": [
         {
           "name": "unit",
@@ -147,7 +270,7 @@
       "title": "walk: reconcile the project record to the delivered S1\u2013S3 (WBS, PI, parity matrix)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/886",
-      "updatedAt": "2026-11-27T23:06:23Z",
+      "updatedAt": "2026-11-28T06:03:38Z",
       "labels": [
         {
           "name": "unit",
@@ -491,15 +614,15 @@
       "title": "programme: promote the reworked record to production and record the tranche-3 review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/852",
-      "updatedAt": "2026-11-27T14:20:11Z",
+      "updatedAt": "2026-11-28T07:21:34Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -617,15 +740,15 @@
       "title": "programme: tranche 6 \u2014 S06b, S10, S11, T19F packs + S06a receipt, exit and review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/838",
-      "updatedAt": "2026-11-27T12:15:11Z",
+      "updatedAt": "2026-11-28T07:22:56Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -847,15 +970,15 @@
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/817",
-      "updatedAt": "2026-11-27T22:06:15Z",
+      "updatedAt": "2026-11-28T06:55:57Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "GEMBA-WALK",
@@ -3020,9 +3143,9 @@
     {
       "number": 526,
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-27T17:03:32Z",
+      "updatedAt": "2026-11-28T07:20:25Z",
       "labels": [
         {
           "name": "unit",
