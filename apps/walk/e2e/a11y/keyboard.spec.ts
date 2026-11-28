@@ -44,6 +44,12 @@ test("the advertised Ctrl/Cmd+K opens the Palette, and a field keeps its keystro
     { timeout: 20_000 },
   );
 
+  // The shortcut is deliberately ignored while a field has focus, and `focusFirst` may have put
+  // focus on a control inside the entrance. Blur first so this asserts the body-level path.
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
   const shortcut = process.platform === "darwin" ? "Meta+k" : "Control+k";
   await page.keyboard.press(shortcut);
   const dialog = page.getByRole("dialog", { name: "Palette" });
