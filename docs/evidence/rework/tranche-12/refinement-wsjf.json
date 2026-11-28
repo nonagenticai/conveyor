@@ -25,6 +25,6 @@
     }
   ],
   "reestimate": {
-    "T15": "10 open packages (1 P0: project_in_unauthorised_tranche; 2 P1: contract_missing, mandatory_artefacts; 7 P2: change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g)"
+    "T15": "3 open packages at the baseline (1 P0: project_in_unauthorised_tranche; 2 P1: contract_missing, mandatory_artefacts); the 2026-11-25 receipt's 7 P2 standard packages are no longer open"
   }
 }

@@ -48,13 +48,13 @@ authored record. Both are published, the newest is the pack's restatement, and n
 - Four `programme_cadence` rows at `period='tranche-12'`: `pi` `01a222e1-ece8-74d3-aa15-b2dd57f9be5f`,
   `refinement` `01a222e1-edb2-797f-9d93-80964422b34f`, `demo` `01a222e1-ee63-742d-a9ad-95624a5f87ea`,
   `retro` `01a222e1-ef0d-7bf9-8480-a0f4a64133ee`.
-- The `pi` row (version 2) carries `meta.pi_plan` (scope T15, capacity, WIP limits, objectives O1–O3,
+- The `pi` row (version 3) carries `meta.pi_plan` (scope T15, capacity, WIP limits, objectives O1–O3,
   the refinement cadence link and T15's three delivered dependency edges) and `meta.documents`:
   `pi-plan` `01a222e2-4939-767c-9536-4ca371526284`, `pi-objectives`
   `01a222e2-2b3e-72a8-b886-45d213dc0768` — both published, **P0-scoped**
   (`01a1dcb8-d24b-76de-b901-56fd56e001bc`) and `unit` `tranche-12`, read back from `documents.get`
   and carried by the snapshot's `outputs.js`.
-- The `refinement` row (version 2) carries `meta.refinement.wsjf_inputs` — T15 8/5/8/8 — matching
+- The `refinement` row (version 3) carries `meta.refinement.wsjf_inputs` — T15 8/5/8/8 — matching
   the pack's WBS integers and the `--wsjf` the checker ran with.
 - The PI-plan gate is `approved` (approval `01a222e2-a316-723c-afae-0fdde7df187a`) as a `rule`
   decision under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`; the `pi` row's own
@@ -65,8 +65,9 @@ authored record. Both are published, the newest is the pack's restatement, and n
 - Ten readiness acts are journaled (`docs/evidence/record/journal.jsonl`, 524 entries,
   `promote-record.py --check` green), with their inputs under `docs/evidence/record/inputs/tr12/`.
 - The two PI documents were composed with the title "Pi Plan"/"Pi Objectives" and corrected in place
-  by `documents.update` (same ids, version 2) to "PI plan"/"PI objectives"; the inputs and the
-  journal carry the corrected title. The body and the unit were unchanged.
+  by `documents.update` (same ids, version 2) to the house title, then their bodies were corrected
+  (version 3) to the baseline's 3-package count; the inputs, the mirrors and the journal carry the
+  final title and body. The unit was unchanged.
 
 The snapshot assertion in the issue's P1.1 passes:
 
@@ -75,11 +76,13 @@ python3 -c '… msp.json readiness assertion …'
 tranche-12 readiness: ok
 ```
 
-## The 10 open packages and the route that clears each
+## The open packages and the route that clears each
 
 | scope | P0 | P1 | P2 | cleared by |
 |---|---|---|---|---|
-| T15 | 1 | 2 | 7 | `project_in_unauthorised_tranche` by authorisation only (#755); `contract_missing` and `mandatory_artefacts` by the pack; the seven P2s by the pack's charter, baselines, registers, WBS, artefacts, contract, Phase-G review and closure |
+| T15 | 1 | 2 | 0 | `project_in_unauthorised_tranche` by authorisation only (#755); `contract_missing` by the delivery contract; `mandatory_artefacts` by the seven A–D artefacts, the SoAW, the charter and both declared output bodies |
+
+The register at the baseline (`generated_at` `2026-11-28T12:46:29Z`, `git_sha` `4f771d53`) carries these 3 open packages. The 2026-11-25 receipt named 10: its seven P2 standard packages (change-control, project-baseline, project-registers, project-wbs, architecture-artifact, compliance-review, phase-g) are no longer open at this baseline, and the pack still authors their subjects.
 
 The P0 is not a pack's to discharge: only the programme owner's gate decision authorises the
 tranche, and the package clears when the audit next reports on an authorised tranche. The dry-run
