@@ -3012,8 +3012,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/rework/tranche-12/evidence/refinement-cadence.html",
       "source": "docs/evidence/rework/tranche-12/evidence/refinement-cadence.md",
       "section": "Evidence",
-      "sha256": "21c3fa8ea0685b73520ee4fef82257fc2868d282fa204ee0bd80dcf4c5974b6b",
-      "bytes": 318,
+      "sha256": "cf75c5aff6ea7ffee0729feab2417f2457922edf9a03579f702b626e2ba6d1fb",
+      "bytes": 423,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-12/evidence/refinement-cadence.md"
     },
     {
@@ -3021,8 +3021,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/rework/tranche-12/evidence/refinement-wsjf.html",
       "source": "docs/evidence/rework/tranche-12/evidence/refinement-wsjf.md",
       "section": "Evidence",
-      "sha256": "fe838e58cab194d9994bd12179e4424ce9de8e0aac95b07cec6e238f2c924e2e",
-      "bytes": 328,
+      "sha256": "c524da8e7991185ded376a1e958be7ab61a313be2393136040754350ed2c144b",
+      "bytes": 413,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-12/evidence/refinement-wsjf.md"
     },
     {
