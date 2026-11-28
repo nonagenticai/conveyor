@@ -2918,6 +2918,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-6/T19F-bodies/T19F/statement-of-architecture-work.md"
     },
     {
+      "title": "Change Control — MCP tasks — a long-running project asks for input",
+      "path": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/change-control.md",
+      "section": "Evidence",
+      "sha256": "2032d1e944ab1ce4085d0b0bc584d58355707c08ec894b6c939b282be9fc84bb",
+      "bytes": 5609,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/change-control.md"
+    },
+    {
       "title": "Delivery Contract — MCP tasks — a long-running project asks for input",
       "path": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/delivery-contract.html",
       "source": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/delivery-contract.md",
@@ -2925,6 +2934,33 @@
       "sha256": "8b84ec3022fd7f3de16673ad5809d33a3e417dcf521bc786ae4131ecfdb4bedc",
       "bytes": 11007,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — MCP tasks — a long-running project asks for input",
+      "path": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "193f95a42ef2826ba7b8840bbf13c2876724fd6f0463609253975f8bef945267",
+      "bytes": 109465,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — MCP tasks — a long-running project asks for input",
+      "path": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-registers.md",
+      "section": "Evidence",
+      "sha256": "2023737793ceaa5d7f0ad07b0c8265b7c85e5074577420ab94d56e4a3a6cfb69",
+      "bytes": 22321,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — MCP tasks — a long-running project asks for input",
+      "path": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "632fa63c43c7a3195858e43ce7581d8c29e2be3076bec09a20684dd7f78b635f",
+      "bytes": 3222,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-wbs.md"
     },
     {
       "title": "Statement Of Architecture Work — MCP tasks — a long-running project asks for input",
@@ -2936,6 +2972,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/statement-of-architecture-work.md"
     },
     {
+      "title": "Change Control — Capability, knowledge and memory",
+      "path": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/change-control.md",
+      "section": "Evidence",
+      "sha256": "e997c0a3f8bc88045e7f839681a03f0d3766ba541573a8a4b5d3562587923224",
+      "bytes": 5590,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/change-control.md"
+    },
+    {
       "title": "Delivery Contract — Capability, knowledge and memory",
       "path": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/delivery-contract.html",
       "source": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/delivery-contract.md",
@@ -2943,6 +2988,33 @@
       "sha256": "cbf20cf98b69a64408d38216e45e3d00dd3937757e216a342e7b5e539da73ede",
       "bytes": 11111,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Capability, knowledge and memory",
+      "path": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "2fe5eecc2a5e579c83a5852b9f20148cfdbef2d11ed3664a50e3e20a087ae46d",
+      "bytes": 102920,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Capability, knowledge and memory",
+      "path": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-registers.md",
+      "section": "Evidence",
+      "sha256": "ec7b480707e989ea18aaa81c1e55f054465d44be1e49b3d552fedb52b23251ea",
+      "bytes": 20946,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Capability, knowledge and memory",
+      "path": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "68a97ea72d4e81319d9dab9bf8b644fc884f3ec9ccbe42e455487aeb0692cd4b",
+      "bytes": 3353,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-wbs.md"
     },
     {
       "title": "Statement Of Architecture Work — Capability, knowledge and memory",
@@ -2954,6 +3026,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/statement-of-architecture-work.md"
     },
     {
+      "title": "Change Control — Inference ledger and prompt audit",
+      "path": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/change-control.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/change-control.md",
+      "section": "Evidence",
+      "sha256": "bf8f59984253e607bff55d78dc036a16776ece815aa44604875ea3728faed0e4",
+      "bytes": 5591,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/change-control.md"
+    },
+    {
       "title": "Delivery Contract — Inference ledger and prompt audit",
       "path": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/delivery-contract.html",
       "source": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/delivery-contract.md",
@@ -2961,6 +3042,33 @@
       "sha256": "555df33a11095c4ab84457b658d46da789df7999dca8ac6cc98a90cd020bc317",
       "bytes": 10810,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/delivery-contract.md"
+    },
+    {
+      "title": "Project Baseline — Inference ledger and prompt audit",
+      "path": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-baseline.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-baseline.md",
+      "section": "Evidence",
+      "sha256": "51af225c68fd4471cb4a3ed58bfdedfb64787f4503abfde1d91ce42b3d11c778",
+      "bytes": 107425,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-baseline.md"
+    },
+    {
+      "title": "Project Registers — Inference ledger and prompt audit",
+      "path": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-registers.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-registers.md",
+      "section": "Evidence",
+      "sha256": "2f6ccdbd2e8ed5e1000e30d7d3902b0261385d6340e55f91a47c8dc41d2c5509",
+      "bytes": 22444,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-registers.md"
+    },
+    {
+      "title": "Project Wbs — Inference ledger and prompt audit",
+      "path": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-wbs.html",
+      "source": "docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-wbs.md",
+      "section": "Evidence",
+      "sha256": "f4d4408d2a865f22c3f267de909a0c82cd50af77accd499f1c8948160e223bd1",
+      "bytes": 3201,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-wbs.md"
     },
     {
       "title": "Statement Of Architecture Work — Inference ledger and prompt audit",

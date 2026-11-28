@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Inference ledger and prompt audit · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--inference-ledger-and-prompt-audit">Project Registers — Inference ledger and prompt audit</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The shipped capture test asserts the stored row against the router&#39;s usage schema, but it runs against a stub transport. The slice plan&#39;s live rehearsal, which needs a real router token, is marked ignored and has not been run. Until it is, the field-for-field property is evidenced for the schema and the seam, not for a live provider response.&quot;,
+      &quot;code&quot;: &quot;S16-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.236539+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Run the ignored live rehearsal against the estate router and attach its output to the project&#39;s evidence before any tranche review claims live capture.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.236539+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The capture is written inside the call&#39;s own transaction so that it can never fail the call. The consequence is the mirror image: a genuine database failure rolls the audit row back with the rest of the transaction, and a call that happened leaves no ledger trace. The trade is deliberate but it is not free, and a silent under-count is harder to notice than a failed call.&quot;,
+      &quot;code&quot;: &quot;S16-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.399981+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Alert on a router call count that exceeds the ledger row count over a window, so the rollback case surfaces as a discrepancy rather than as an absence.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.399981+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The joins to `procedure`, `procedure_step`, `run_step` and `conversation_turn` are integers rather than foreign keys, because database-level referential integrity runs outside row-level security and would let one tenant&#39;s check read another&#39;s rows. An orphaned ledger row is therefore permitted by construction, and the grouping report is the only thing between the design and a silently unattributed cost.&quot;,
+      &quot;code&quot;: &quot;S16-R3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.551344+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+      &quot;impact&quot;: 2,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#9&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Keep the report&#39;s group-by on the prompt sha, and treat an unattributed row count above zero as a finding rather than as noise.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;low&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.551344+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:18:01.784553+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:18:01.784553+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;At the 2026-11-28 snapshot the project row is closed and its product is in the tree, but the snapshot carries no charter asset, no approved baseline, no delivery contract, no Phase A\u2013D set and no compliance review. The gap is a record gap, not a product gap: this pack supplies the set and the receipt proves it.&quot;,
+      &quot;code&quot;: &quot;S16-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.698046+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Supplied by this pack and proved by the project&#39;s receipt at the pinned snapshot.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.698046+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The retention decision is ninety days and the report groups by prompt sha from day one, but the two prune schedule rows the decision needs are deferred to S17 and are not in the record. A declared retention with no executing schedule is a policy statement, not a control, and the tranche review should read it that way.&quot;,
+      &quot;code&quot;: &quot;S16-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.841432+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Carry the deferral into S17&#39;s acceptance and record it in the tranche-7 review&#39;s risk section rather than treating retention as delivered.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.841432+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The cache status is derived from the response, never the request, and falls to `unknown` when the provider omits the class. That is the right call for honesty and the wrong one for a savings report: an under-reported cache benefit looks like a system that caches badly. The row is correct; the report needs to separate `unknown` from `miss` before anyone reads a trend from it.&quot;,
+      &quot;code&quot;: &quot;S16-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:04.989063+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: &quot;Keep `unknown` as its own report bucket and refuse to fold it into `miss` in any downstream aggregate.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:04.989063+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. A row that changed after the snapshot is therefore out of scope for this pack by construction.&quot;,
+      &quot;code&quot;: &quot;S16-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.141453+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.141453+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The ledger stores what the provider returned rather than what the conveyor thinks it sent, so a disagreement between the two is a bug in the estimate and not a reason to prefer the local number. The field-for-field test encodes that preference.&quot;,
+      &quot;code&quot;: &quot;S16-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.285793+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.285793+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The retention decision assumes a review that starts within a quarter. A longer investigation would need the rows the prune removes, so the decision is revisited before the schedule is enabled rather than after the first gap.&quot;,
+      &quot;code&quot;: &quot;S16-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.431588+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.431588+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The audit grades findings and blocks only the high ones, with an explicit, logged acknowledgement as the override. The assumption is that medium findings are advice; if a medium class proves to be a real defect, the level moves and the publish path changes with it.&quot;,
+      &quot;code&quot;: &quot;S16-A4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.583971+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.583971+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row records the dependency edges. S02 and S03 supply the schema and the card model, S04 the action registry and the transport, S10 the conversation turn the audit joins to, and S11 the procedure and step tables the publish path reads.&quot;,
+      &quot;code&quot;: &quot;S16-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.731659+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.731659+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The chat action is S13&#39;s; until it declares the capture flag the ledger records the calls that exist but not the surface that will make most of them. The dependency is a declaration, not a build, so it does not block this pack.&quot;,
+      &quot;code&quot;: &quot;S16-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:05.872574+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:05.872574+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The two read surfaces and the two schedule rows are other projects&#39; deliverables by the slice plan&#39;s own boundary. Recording them here stops a later session reading their absence as an S16 gap.&quot;,
+      &quot;code&quot;: &quot;S16-D3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.012582+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:06.012582+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Before the ledger, a run&#39;s spend was inferred from a billing rollup; after it, each call carries its own token counts and the sum is a read. The benefit is declared at the capability level and is observable in the report, not in a saving that a retrospective pack could claim to have measured.&quot;,
+      &quot;code&quot;: &quot;S16-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.149623+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:06.149623+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A hit, a write and a miss spend differently, and the request does not say which happened. Recording the response&#39;s class turns cache efficiency from an assumption into a column, with `unknown` kept separate so a provider that omits the class cannot inflate the hit rate.&quot;,
+      &quot;code&quot;: &quot;S16-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.286692+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#9&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:06.286692+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The audit runs at publish rather than on a cadence, so a prompt that would fail the check never reaches a tenant without a logged acknowledgement. The benefit is preventive: it is measured by the refusals the publish path records, not by a finding count.&quot;,
+      &quot;code&quot;: &quot;S16-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.425256+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#9&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:06.425256+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Every external call is recorded by the same code path, so the ledger cannot be half-adopted: a new action that calls a model is captured or it does not call. The benefit is structural and is proved by the registry check that no prompt action holds a process write.&quot;,
+      &quot;code&quot;: &quot;S16-B4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.580232+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S16-inference-audit.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One engine seam writes every call&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:06.580232+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S16-5ed8d6&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:19.887058+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-39b4-7c91-9ca8-8d5ead5ed8d6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S16&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:20.256602+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,3079 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Baseline — Inference ledger and prompt audit · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-baseline.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-baseline--inference-ledger-and-prompt-audit">Project Baseline — Inference ledger and prompt audit</h1>
+<h2 id="scope">Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="schedule">Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="cost">Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+<h2 id="approval">Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a222a8-0655-779a-94f1-2c1b455984a6&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+        &quot;description&quot;: &quot;Approve the scope baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:19.563291+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ee-7ace-8e72-bcfeb499ca3d&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+        &quot;description&quot;: &quot;Approve the schedule baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:07.030406+00:00&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;card_id&quot;: null,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;expires_at&quot;: null,
+      &quot;gate&quot;: &quot;baseline&quot;,
+      &quot;id&quot;: &quot;01a222a8-0827-7658-90f9-8e32ed45aaba&quot;,
+      &quot;kind&quot;: &quot;pm&quot;,
+      &quot;meta&quot;: {
+        &quot;approver_kind&quot;: &quot;human&quot;,
+        &quot;baseline_id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+        &quot;description&quot;: &quot;Approve the cost baseline&quot;,
+        &quot;gate_policy&quot;: {
+          &quot;floor&quot;: 1,
+          &quot;source&quot;: &quot;default&quot;
+        }
+      },
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;requested_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;required_decisions&quot;: 1,
+      &quot;run_id&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:56:07.33995+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;work.json#/approvals&quot;
+}</code></pre>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-baseline&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0653-7520-a710-ad7f75d13e25&quot;,
+      &quot;kind&quot;: &quot;scope&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.729867+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-06ec-701a-8380-ce10a4bf6481&quot;,
+      &quot;kind&quot;: &quot;schedule&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:06.883946+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;approved_by_name&quot;: &quot;conveyor-approver&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a8-0821-7f9e-8718-f236fc124474&quot;,
+      &quot;kind&quot;: &quot;cost&quot;,
+      &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+      &quot;snapshot&quot;: {
+        &quot;frozen&quot;: true,
+        &quot;project_id&quot;: &quot;01a1d039-0d30-72a1-9bba-29fadf6170cf&quot;,
+        &quot;register&quot;: [
+          {
+            &quot;code&quot;: &quot;S16-B4&quot;,
+            &quot;id&quot;: &quot;01a222a8-05b7-7bd2-bd56-22e8c7c24ad0&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;One engine seam writes every call&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B3&quot;,
+            &quot;id&quot;: &quot;01a222a8-051c-79bd-9f31-3ace87713f6c&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high prompt-audit finding blocks the publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B2&quot;,
+            &quot;id&quot;: &quot;01a222a8-0491-7aed-9f04-5c7a6304b635&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cache behaviour is recorded in three states plus unknown&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-B1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0409-7017-a365-ba86b7c60129&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;benefit&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Cost becomes a query rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D3&quot;,
+            &quot;id&quot;: &quot;01a222a8-037f-7b83-8508-75c44b1c5663&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S12 builds both screens and S17 carries the prune schedules&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D2&quot;,
+            &quot;id&quot;: &quot;01a222a8-02f3-7bd5-9ef5-8b9bd9f2df45&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S13 declares captures_usage when it lands&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-D1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0266-786f-81ea-7736e0d20b7f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;dependency&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;S16 depends on S02, S03, S04, S10 and S11&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A4&quot;,
+            &quot;id&quot;: &quot;01a222a8-01d3-700e-a6ef-43b1c0bd49d4&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A high finding is the only severity that should block a publish&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A3&quot;,
+            &quot;id&quot;: &quot;01a222a8-013b-726c-bcaa-b162576f318f&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Ninety days is the horizon the incident review needs&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A2&quot;,
+            &quot;id&quot;: &quot;01a222a8-00a8-7e2a-965b-ed15d5d8c767&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The router&#39;s usage object is the single source of token truth&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-A1&quot;,
+            &quot;id&quot;: &quot;01a222a8-0018-7780-904d-a8f750abec69&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;assumption&quot;,
+            &quot;severity&quot;: null,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S16&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I3&quot;,
+            &quot;id&quot;: &quot;01a222a7-ff80-7859-b6d7-70d05d0c3372&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;A provider that omits the cache class records unknown rather than a guess&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I2&quot;,
+            &quot;id&quot;: &quot;01a222a7-feec-7963-937f-34fa00815231&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P2&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Retention is declared at ninety days but its prune schedules are S17&#39;s&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-I1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fe5d-76a9-a85c-a33a1a57e297&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P1&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R3&quot;,
+            &quot;id&quot;: &quot;01a222a7-fdca-7606-98c0-3ddca78900ef&quot;,
+            &quot;impact&quot;: 2,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;low&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R2&quot;,
+            &quot;id&quot;: &quot;01a222a7-fd32-7d8c-8210-020fdb25865c&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;Capture shares the call&#39;s transaction, so a database failure can roll back the ledger row&quot;
+          },
+          {
+            &quot;code&quot;: &quot;S16-R1&quot;,
+            &quot;id&quot;: &quot;01a222a7-fc8f-74b3-a2e5-ddc3361918f1&quot;,
+            &quot;impact&quot;: 3,
+            &quot;kind&quot;: &quot;risk&quot;,
+            &quot;severity&quot;: &quot;medium&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;title&quot;: &quot;The live-router rehearsal is pending, so the field-for-field claim is proved on a stub&quot;
+          },
+          {
+            &quot;code&quot;: &quot;U3-EXC-S16&quot;,
+            &quot;id&quot;: &quot;01a1fbae-890b-76fc-b665-8ad8d56ced7b&quot;,
+            &quot;impact&quot;: null,
+            &quot;kind&quot;: &quot;issue&quot;,
+            &quot;severity&quot;: &quot;P0&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S16)&quot;
+          }
+        ],
+        &quot;wbs&quot;: [
+          {
+            &quot;business_value&quot;: 9,
+            &quot;id&quot;: &quot;01a222a8-064f-7641-a92e-8b56891851bd&quot;,
+            &quot;job_size&quot;: 8,
+            &quot;kind&quot;: &quot;deliverable&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;position&quot;: 1.0,
+            &quot;risk_reduction&quot;: 9,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;time_criticality&quot;: 7,
+            &quot;title&quot;: &quot;A queryable cost record \u2014 one ledger row per model call carrying the prompt&#39;s identity, the token counts and both cache classes, with a blocking prompt audit&quot;
+          }
+        ]
+      },
+      &quot;taken_at&quot;: &quot;2026-11-28T14:56:07.19389+00:00&quot;,
+      &quot;taken_by&quot;: &quot;01a1e607-17d9-77d3-98d3-a43a87c4633d&quot;,
+      &quot;taken_by_name&quot;: &quot;conveyor-e2e&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/project_baselines&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-7/S16-bodies/S16/project-baseline.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
