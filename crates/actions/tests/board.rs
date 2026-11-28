@@ -900,3 +900,115 @@ async fn projects_execute_refuses_an_open_dependency() {
         .await;
     assert_eq!(status, 200, "{body}");
 }
+
+/// A live lane holding a card cannot be re-kinded `done`: its cards would enter finished work
+/// without passing their `card_done` gates. An empty lane may become done, and a populated
+/// lane may still change to another live kind.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn re_kinding_a_populated_lane_to_done_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+
+    let (status, project) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "Lane re-kind"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{project}");
+    let project_id = id_of(output(&project), "id");
+    let (status, view) = running
+        .invoke(
+            "projects.get",
+            "dev:alice",
+            json!({"id": project_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{view}");
+    let board_id = id_of(&output(&view)["boards"][0], "id");
+    let (active_id, active_version) = lane_by_kind(&running, &board_id, "active").await;
+
+    // A live card on the lane, and the lane may not become done.
+    let (status, card) = running
+        .invoke(
+            "cards.create",
+            "dev:alice",
+            json!({
+                "board_id": board_id,
+                "list_id": active_id,
+                "name": "Worked card",
+                "card_type_code": "feature"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{card}");
+    let if_match = format!("\"{active_version}\"");
+    let (status, refused) = running
+        .invoke(
+            "lists.update",
+            "dev:alice",
+            json!({"id": active_id, "kind": "done"}),
+            Some(&if_match),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(refused["type"], "list-kind-not-allowed", "{refused}");
+    assert!(
+        refused["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("gates"),
+        "the refusal names the gate the cards must pass: {refused}"
+    );
+
+    // Another live kind is allowed; the refused edit wrote nothing, so the version still holds.
+    let (status, waiting) = running
+        .invoke(
+            "lists.update",
+            "dev:alice",
+            json!({"id": active_id, "kind": "waiting"}),
+            Some(&if_match),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{waiting}");
+    assert_eq!(output(&waiting)["kind"], "waiting", "{waiting}");
+
+    // An empty active lane may become done.
+    let (status, empty) = running
+        .invoke(
+            "lists.create",
+            "dev:alice",
+            json!({"board_id": board_id, "name": "Empty active", "kind": "active"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{empty}");
+    let empty_id = id_of(output(&empty), "id");
+    let (status, done) = running
+        .invoke(
+            "lists.update",
+            "dev:alice",
+            json!({"id": empty_id, "kind": "done"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{done}");
+    assert_eq!(output(&done)["kind"], "done", "{done}");
+}

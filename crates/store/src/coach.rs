@@ -531,21 +531,29 @@ pub async fn apply_remedy_tx(
                         "a move remedy must name the destination lane in detail.list_id".to_owned(),
                     )
                 })?;
-            let on_board: bool = sqlx::query_scalar(
-                "SELECT EXISTS (
-                    SELECT 1 FROM list l
-                      JOIN card c ON c.tenant_id = l.tenant_id AND c.board_id = l.board_id
-                     WHERE l.tenant_id = $1 AND l.id = $2 AND c.id = $3
-                )",
+            // The lane must be on the card's own board, and it must be a lane a move may
+            // enter: `done` and `archive` are gate outcomes, not remedy destinations. A card
+            // reaches `done` only through its `card_done` gate, so placing it there with a raw
+            // UPDATE would bypass the gate the coach exists to protect.
+            let lane_kind: Option<String> = sqlx::query_scalar(
+                "SELECT l.kind FROM list l
+                   JOIN card c ON c.tenant_id = l.tenant_id AND c.board_id = l.board_id
+                  WHERE l.tenant_id = $1 AND l.id = $2 AND c.id = $3",
             )
             .bind(tenant.as_uuid())
             .bind(list_id)
             .bind(card_id)
-            .fetch_one(&mut *conn)
+            .fetch_optional(&mut *conn)
             .await?;
-            if !on_board {
+            let Some(lane_kind) = lane_kind else {
                 return Err(CoachStoreError::RemedyInvalid(
                     "a move remedy must name a lane on the card's own board".to_owned(),
+                ));
+            };
+            if lane_kind == "done" || lane_kind == "archive" {
+                return Err(CoachStoreError::RemedyInvalid(
+                    "a move remedy cannot target a done or archive lane; use the card_done gate"
+                        .to_owned(),
                 ));
             }
             sqlx::query(

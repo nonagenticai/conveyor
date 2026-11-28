@@ -42,6 +42,7 @@ pub mod read;
 pub mod tasks;
 pub mod views;
 pub mod webhooks;
+pub mod work_package_specs;
 
 pub use views::*;
 

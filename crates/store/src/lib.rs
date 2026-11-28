@@ -82,6 +82,9 @@ pub mod document;
 pub mod eval;
 pub mod feedback;
 pub mod governance;
+// SPEC_V2 §5.8 (D69, conveyor#935): the work-package spec — the card's story, Gherkin feature
+// and INVEST DoR, and the scope predicate that says which cards are work packages.
+pub mod work_package_spec;
 // #450: the host registry read — the inventory of hosts the conveyor may reach (§10.4.1).
 pub mod host;
 pub mod idempotency;

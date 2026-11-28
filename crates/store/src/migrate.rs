@@ -462,6 +462,9 @@ mod tests {
                 // it was published with (0110_tool_verify.sql, renumbered from 0081 because
                 // main's #859 took 81; SPEC_V2 §11.3).
                 (110, "tool verify".to_owned()),
+                // #935 (SPEC_V2 §5.8, D69): the work-package spec — one per card, with the
+                // story, Gherkin feature and INVEST readiness (0111_work_package_spec.sql).
+                (111, "work package spec".to_owned()),
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

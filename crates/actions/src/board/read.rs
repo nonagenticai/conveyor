@@ -33,6 +33,13 @@ pub async fn card_view_tx(
     let lists = store::task::list_task_lists_tx(&mut *conn, tenant, id).await?;
     let tasks = store::task::list_tasks_for_card_tx(&mut *conn, tenant, id).await?;
     let values = store::custom_field::list_values_tx(&mut *conn, tenant, id).await?;
+    // The spec is a satellite like the rest: read in this transaction so the document is one
+    // snapshot. Its store/parse refusals are already typed `ActionError`s; `cards.get` renders
+    // any store failure as a scrubbed `500`, so the read model carries it as a protocol error
+    // rather than widening this function's error type for every other satellite.
+    let work_package_spec = super::work_package_specs::card_spec_out_tx(&mut *conn, tenant, id)
+        .await
+        .map_err(|error| sqlx::Error::Protocol(format!("work-package spec: {error}")))?;
 
     let mut by_list: HashMap<Uuid, Vec<store::task::TaskRecord>> = HashMap::new();
     for task in tasks {
@@ -53,5 +60,6 @@ pub async fn card_view_tx(
         comments: comments.iter().map(comment_out).collect(),
         task_lists,
         custom_field_values: values.iter().map(custom_field_value_out).collect(),
+        work_package_spec,
     }))
 }

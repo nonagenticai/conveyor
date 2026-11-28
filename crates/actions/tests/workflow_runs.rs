@@ -32,8 +32,18 @@ async fn fixture() -> (support::Pg, support::Seeded, support::Running) {
     (pg, seeded, running)
 }
 
-/// Create a project (which creates its board and lists) and one card in its first lane.
+/// Create a project (which creates its board and lists) and one `feature` card in its second
+/// lane.
 async fn project_and_card(running: &support::Running) -> (String, String) {
+    project_and_card_of_type(running, "feature").await
+}
+
+/// Create a project (which creates its board and lists) and one card of `card_type_code` in its
+/// second lane.
+async fn project_and_card_of_type(
+    running: &support::Running,
+    card_type_code: &str,
+) -> (String, String) {
     let (status, created) = running
         .invoke(
             "projects.create",
@@ -81,7 +91,7 @@ async fn project_and_card(running: &support::Running) -> (String, String) {
                 "board_id": board_id,
                 "list_id": list_id,
                 "name": "First card",
-                "card_type_code": "feature"
+                "card_type_code": card_type_code
             }),
             None,
             None,
@@ -459,4 +469,189 @@ async fn cancel_stops_the_tick_without_advancing_the_run() {
     tx.commit().await.expect("commit");
     assert_eq!(rows, 0, "a cancelled run advances nothing");
     assert_eq!(run_status, "cancelled");
+}
+
+// ── SPEC_V2 §5.8 (D69): a ROOT workflow run on a work package reads the spec ────────────────
+
+/// The two-scenario feature the work-package fixtures author; the keys are the stable ids
+/// evidence names.
+const WP_FEATURE: &str = r#"Feature: the work package
+
+  @verify=V1
+  Scenario: the first part
+    Given a work package
+    When the first part is executed
+    Then the first scenario passes
+
+  @verify=V2
+  Scenario: the second part
+    Given a work package
+    When the second part is executed
+    Then the second scenario passes
+"#;
+
+/// The six INVEST criteria, each met with evidence — an INVEST-ready definition of ready.
+fn ready_dor() -> Value {
+    json!({
+        "independent": {"met": true, "evidence": "no blocked-by link"},
+        "negotiable": {"met": true, "evidence": "outcome fixed; approach settled at delivery"},
+        "valuable": {"met": true, "evidence": "the story's so-that names the benefit"},
+        "estimable": {"met": true, "evidence": "baseline and every file are named"},
+        "small": {"met": true, "evidence": "one work package, one run"},
+        "testable": {"met": true, "evidence": "every scenario carries @verify"},
+    })
+}
+
+/// A structurally valid definition of ready with one criterion unmet: `cards.spec_put` stores
+/// it, and the run-start gate is where the unmet criterion refuses.
+fn unready_dor() -> Value {
+    let mut dor = ready_dor();
+    dor["small"] = json!({"met": false, "evidence": "two runs are planned"});
+    dor
+}
+
+/// A `delivery` card type, plus the matrix row that lets it move between lanes.
+///
+/// The dev catalogue seeds only `feature`/`bug`; both §5.8's scope predicate and the lane matrix
+/// key on the card type's code, so the fixture owns both.
+async fn seed_delivery_card_type(pg: &support::Pg, seeded: &support::Seeded) {
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label)
+         VALUES ($1, 'delivery', 'Delivery')
+         ON CONFLICT (tenant_id, code) DO NOTHING",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("the delivery card type");
+    sqlx::query(
+        "UPDATE catalogue_entry
+            SET meta = jsonb_set(meta, '{matrix,delivery}',
+                                 '{\"intake\": [\"active\"], \"active\": [\"done\"]}'::jsonb)
+          WHERE tenant_id = $1 AND kind = 'project_type' AND code = 'delivery'",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("the delivery matrix");
+    conveyor_actions::board::matrix::clear_cache_for(seeded.tenant);
+}
+
+/// Author the card's work-package spec through the real writer, `cards.spec_put`.
+///
+/// `if_match` is the spec's own version: omit it for the card's first spec, pass the value
+/// `cards.spec_get` returns to rewrite an existing one.
+async fn put_spec(running: &support::Running, card: &str, dor: Value, if_match: Option<&str>) {
+    let (status, body) = running
+        .invoke(
+            "cards.spec_put",
+            "dev:alice",
+            json!({
+                "card_id": card,
+                "story_persona": "a delivery team",
+                "story_action": "the work package to carry its acceptance",
+                "story_benefit": "done is judged per scenario, not by a checkbox",
+                "feature": WP_FEATURE,
+                "dor": dor,
+            }),
+            if_match,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+}
+
+/// SPEC_V2 §5.8 (D69): `workflow_runs.start` is a ROOT start path too, so a card-scoped root
+/// run on a work package takes the same INVEST gate as `runs.create` — no spec and an unmet
+/// criterion are the same refusal, before the run row, its trace and its tick.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_root_workflow_run_on_an_unready_work_package_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (project_id, card_id) = project_and_card_of_type(&running, "delivery").await;
+    let workflow_id = published_workflow(&running).await;
+
+    // No spec at all: the work package is not ready to start.
+    let (status, body) = running
+        .invoke(
+            "workflow_runs.start",
+            "dev:alice",
+            json!({"workflow_id": workflow_id, "project_id": project_id, "card_id": card_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "work_package_dor_unmet", "{body}");
+
+    // A stored spec with an unmet INVEST criterion is the same refusal.
+    put_spec(&running, &card_id, unready_dor(), None).await;
+    let (status, body) = running
+        .invoke(
+            "workflow_runs.start",
+            "dev:alice",
+            json!({"workflow_id": workflow_id, "project_id": project_id, "card_id": card_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "work_package_dor_unmet", "{body}");
+
+    // Both refusals precede every write: no run row, no trace step and no tick.
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope");
+    let (runs,): (i64,) = sqlx::query_as("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("count runs");
+    let (steps,): (i64,) = sqlx::query_as("SELECT count(*) FROM run_step WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("count steps");
+    let (jobs,): (i64,) =
+        sqlx::query_as("SELECT count(*) FROM job WHERE tenant_id = $1 AND kind = 'workflow.node'")
+            .bind(seeded.tenant_id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("count ticks");
+    tx.commit().await.expect("commit");
+    assert_eq!(
+        (runs, steps, jobs),
+        (0, 0, 0),
+        "a refused workflow start wrote run state"
+    );
+}
+
+/// A project-scoped workflow run names no card, so §5.8 does not apply: it starts even though
+/// the project carries an unready work package.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_project_scoped_workflow_run_is_not_gated_by_a_work_package() {
+    let (pg, seeded, running) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (project_id, card_id) = project_and_card_of_type(&running, "delivery").await;
+    let workflow_id = published_workflow(&running).await;
+
+    // The project's only card is a work package with an unmet criterion...
+    put_spec(&running, &card_id, unready_dor(), None).await;
+
+    // ...but this run is scoped to the project, not the card, so no §5.8 gate applies.
+    let (status, body) = running
+        .invoke(
+            "workflow_runs.start",
+            "dev:alice",
+            json!({"workflow_id": workflow_id, "project_id": project_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(output(&body)["status"], "running");
 }

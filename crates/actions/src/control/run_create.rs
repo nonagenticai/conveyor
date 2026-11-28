@@ -8,6 +8,7 @@
 //! cord, the binding's pin or the event.
 
 use conveyor_domain::Card;
+use conveyor_domain::work_package_spec::readiness;
 use conveyor_store as store;
 use conveyor_store::run::{NewRun, RunRecord};
 use sqlx::PgConnection;
@@ -45,6 +46,51 @@ pub(crate) async fn ensure_andon_tx(
     Ok(())
 }
 
+/// Refuse a root run on a work package whose §5.8 definition of ready is unmet.
+///
+/// SPEC_V2 §5.8 (D69): a work package starts only from an INVEST-ready spec. This is the one
+/// gate: [`create_bound_run_tx`] takes it for `runs.create` and `cards.assign`, and every other
+/// entry point that creates a ROOT run on a card (`process_runs.start`, `workflow_runs.start`)
+/// calls it before its first write, so no seam can start what the explicit entry point refuses.
+/// An absent spec and an unmet criterion are the same refusal — the work is not ready to start —
+/// and a card that is not a work package is untouched. A refusal here adds no run row, no job and
+/// no event, because every caller runs it ahead of its writes.
+pub(crate) async fn assert_work_package_ready_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_store::TenantId,
+    card_id: Uuid,
+) -> Result<(), ActionError> {
+    let action = "work_package_dor";
+    if !store::work_package_spec::is_work_package_card_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| store_error(error, action))?
+    {
+        return Ok(());
+    }
+    let spec = store::work_package_spec::get_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| spec_store_error(error, action))?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "work_package_dor_unmet",
+                "the work package has no spec; a run starts only from its INVEST-ready \
+                 definition of ready",
+            )
+        })?;
+    let ready = readiness(&spec.dor)
+        .map_err(|error| ActionError::new(422, "work_package_dor_unmet", error.to_string()))?;
+    if !ready {
+        return Err(ActionError::new(
+            422,
+            "work_package_dor_unmet",
+            "the work package's definition of ready is unmet; every INVEST criterion must \
+             be met with evidence before a run starts",
+        ));
+    }
+    Ok(())
+}
+
 /// Insert the card's next root run, enqueue its driving job and announce it.
 ///
 /// `job_binding_id` is already resolved by the caller: `runs.create` applies the card-binding
@@ -70,6 +116,11 @@ pub(crate) async fn create_bound_run_tx(
     run: BoundRun,
     action: &str,
 ) -> Result<(RunRecord, RunOut), ActionError> {
+    // SPEC_V2 §5.8 (D69): a work package starts only from an INVEST-ready spec. The gate lives
+    // here, not in `runs.create`, because this is the one path both it and `cards.assign` take:
+    // a handoff must not be able to start a run the explicit entry point would refuse. It sits
+    // ahead of every write below, so a refusal adds no run row, no job and no event.
+    assert_work_package_ready_tx(&mut *tx, ctx.tenant, card.id).await?;
     let BoundRun {
         job_binding_id,
         correlation_id,
@@ -195,4 +246,26 @@ pub(crate) async fn create_bound_run_tx(
     .await?;
 
     Ok((record, out))
+}
+
+/// A work-package-spec read failure as the run-start refusal.
+///
+/// The card was resolved in this tenant before the spec read, so a parent refusal can only be a
+/// race; it still maps through the shared parent rule rather than inventing a `500`.
+fn spec_store_error(
+    error: store::work_package_spec::WorkPackageSpecStoreError,
+    action: &str,
+) -> ActionError {
+    match error {
+        store::work_package_spec::WorkPackageSpecStoreError::Parent(parent) => {
+            crate::board::parent_error(parent, action)
+        }
+        store::work_package_spec::WorkPackageSpecStoreError::Id(error) => {
+            tracing::error!(%error, action, "a stored work-package spec carries an undecodable id");
+            ActionError::internal()
+        }
+        store::work_package_spec::WorkPackageSpecStoreError::Database(error) => {
+            store_error(error, action)
+        }
+    }
 }

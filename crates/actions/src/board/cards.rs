@@ -13,6 +13,7 @@
 //! Every mutation writes exactly one `event` row in the same transaction (CONTRACT §7).
 
 use chrono::Utc;
+use conveyor_domain::work_package_spec::{Scenario, WorkPackageSpecIn, validate};
 use conveyor_domain::{
     ArchiveError, AssetKind, AssetStatus, Card, CardType, ListKind, TenantId, Version,
 };
@@ -39,6 +40,7 @@ use crate::spec::HandlerOutput;
 use crate::views::Page;
 
 use super::CARD_DONE_GATE;
+use super::work_package_specs::verified_dod_tx;
 
 /// The card type code that marks a handoff card: a `delivery` card enters a work lane only
 /// with a job binding (v1-p66-1). The marker is the card type's code, never the project type —
@@ -52,6 +54,14 @@ const DELIVERY_CARD_TYPE: &str = "delivery";
 /// (`meta.evidence`), or with the explicit waiver reason the approval stored
 /// (`meta.evidence_waiver`); a gate carrying neither is refused. The gate is card-scoped, so it
 /// cannot be borrowed from another card.
+///
+/// A work package (SPEC_V2 §5.8, D69) owes more: its spec must exist, its stored `feature` must
+/// parse into acceptance scenarios, and — unless the approval recorded a non-empty
+/// `evidence_waiver` — every scenario needs an evidence object that names its key and carries a
+/// `run_id` or `step_id` of *this* card. The spec is read first: a missing spec is the first
+/// §5.8 refusal, and a waiver excuses evidence, never the spec. The type-level acceptance
+/// remains the floor; the scenario rule is additional, and applies even when the type declares
+/// no acceptance.
 async fn assert_card_done_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -63,37 +73,144 @@ async fn assert_card_done_tx(
         .get("acceptance")
         .and_then(serde_json::Value::as_array)
         .map_or(0, Vec::len);
-    if acceptance == 0 {
+    let work_package =
+        store::work_package_spec::is_work_package_card_tx(&mut *conn, tenant, card.id)
+            .await
+            .map_err(|error| store_error(error, "cards.move"))?;
+    if acceptance == 0 && !work_package {
         return Ok(());
     }
+    let scenarios = if work_package {
+        Some(work_package_scenarios_tx(&mut *conn, tenant, card.id).await?)
+    } else {
+        None
+    };
     let meta =
         store::approval::approved_card_gate_meta_tx(&mut *conn, tenant, card.id, CARD_DONE_GATE)
             .await
             .map_err(|error| store_error(error, "cards.move"))?;
     let Some(meta) = meta else {
-        return Err(ActionError::new(
-            422,
-            "card_done_criteria_unmet",
-            "the card type declares a Definition of Done; entering done needs an approved card_done gate",
-        ));
+        let detail = if work_package {
+            "a work package enters done only with an approved card_done gate carrying \
+             per-scenario evidence"
+        } else {
+            "the card type declares a Definition of Done; entering done needs an approved \
+             card_done gate"
+        };
+        return Err(ActionError::new(422, "card_done_criteria_unmet", detail));
     };
     let evidence = meta
         .get("evidence")
         .and_then(serde_json::Value::as_array)
-        .map_or(0, Vec::len);
+        .cloned()
+        .unwrap_or_default();
     let waiver = meta
         .get("evidence_waiver")
         .and_then(serde_json::Value::as_str)
         .map(str::trim)
         .unwrap_or("");
-    if evidence == 0 && waiver.is_empty() {
+    match scenarios {
+        None => {
+            if evidence.is_empty() && waiver.is_empty() {
+                return Err(ActionError::new(
+                    422,
+                    "card_done_evidence_missing",
+                    "the Definition-of-Done gate carries no evidence and no waiver reason",
+                ));
+            }
+            Ok(())
+        }
+        Some(scenarios) => {
+            assert_work_package_done_tx(conn, tenant, card, &scenarios, &evidence, waiver).await
+        }
+    }
+}
+
+/// A work package's acceptance scenarios, re-parsed from its stored spec.
+///
+/// The spec is required before the gate is judged: a work package with no spec has nothing its
+/// `card_done` evidence could name, so the missing spec is the first §5.8 refusal. The stored
+/// `feature` was validated on write, but a document that no longer yields an acceptance
+/// scenario is a typed refusal too, because the gate would have nothing to judge.
+async fn work_package_scenarios_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+) -> Result<Vec<Scenario>, ActionError> {
+    let spec = store::work_package_spec::get_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| spec_store_error(error, "cards.move"))?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "work_package_evidence_unmet",
+                "the work package has no spec",
+            )
+        })?;
+    validate(&WorkPackageSpecIn {
+        story_persona: spec.story_persona,
+        story_action: spec.story_action,
+        story_benefit: spec.story_benefit,
+        feature: spec.feature,
+        dor: spec.dor,
+    })
+    .map_err(|error| {
+        ActionError::new(
+            422,
+            "work_package_scenarios_missing",
+            format!("the work package's stored feature yields no acceptance scenario: {error}"),
+        )
+    })
+}
+
+/// The work-package half of the `done` gate (SPEC_V2 §5.8, D69).
+///
+/// A non-empty waiver satisfies the per-scenario requirement (the governance audit reads the
+/// same `meta.evidence_waiver`); the spec is still required, and the caller has already refused
+/// a missing one. Otherwise every DoD row must be verified: the rows come from
+/// [`verified_dod_tx`], the same projection `cards.spec_get` returns, so a scenario is done only
+/// where the read model says it is, and evidence of another card's run or step never counts.
+async fn assert_work_package_done_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card: &Card,
+    scenarios: &[Scenario],
+    evidence: &[serde_json::Value],
+    waiver: &str,
+) -> Result<(), ActionError> {
+    if !waiver.is_empty() {
+        return Ok(());
+    }
+    let rows = verified_dod_tx(conn, tenant, card.id, scenarios, evidence).await?;
+    if let Some(row) = rows.iter().find(|row| !row.verified) {
         return Err(ActionError::new(
             422,
-            "card_done_evidence_missing",
-            "the Definition-of-Done gate carries no evidence and no waiver reason",
+            "work_package_evidence_unmet",
+            format!(
+                "the work package's scenario '{}' has no evidence naming it with a run or step \
+                 of this card",
+                row.scenario
+            ),
         ));
     }
     Ok(())
+}
+
+/// A work-package-spec store failure as an action refusal: the card was resolved in-tenant
+/// before this read, so a parent or id failure is a stored-row defect, not a caller error.
+fn spec_store_error(
+    error: store::work_package_spec::WorkPackageSpecStoreError,
+    action: &str,
+) -> ActionError {
+    match error {
+        store::work_package_spec::WorkPackageSpecStoreError::Database(error) => {
+            store_error(error, action)
+        }
+        other => {
+            tracing::error!(error = %other, action, "read the work-package spec");
+            ActionError::internal()
+        }
+    }
 }
 
 use super::events::card_event;
@@ -311,6 +428,17 @@ pub(crate) async fn cards_create(
                     "no card type with this code exists in this tenant",
                 )
             })?;
+
+    // A work package is not born in `done` (SPEC_V2 §5.8): its Definition of Done is judged only
+    // by the approved `card_done` gate at the `done` move, so a create already in that lane would
+    // enter finished work without ever passing it. Non-delivery cards keep their behaviour.
+    if card_type.code.as_str() == DELIVERY_CARD_TYPE && lane.list.kind == ListKind::Done {
+        return Err(ActionError::new(
+            409,
+            "card-create-not-allowed",
+            "a work package is not born in done; it moves through the card_done gate",
+        ));
+    }
 
     let job_binding_id = match input.job_binding_id {
         None => None,
@@ -921,8 +1049,10 @@ async fn cards_unarchive(
 
 /// Copy a card, its labels, its checklists and its field values — never its comments.
 ///
-/// The copy is born (not moved): the same rule as `cards.create` applies, so a target lane
-/// of the archive kind is refused. `list_id` absent means "the source card's lane".
+/// The copy is born (not moved): the same rules as `cards.create` apply, so a target lane of
+/// the archive kind is refused, and a `delivery` card is refused a `done` lane — a work package
+/// enters done only through the `card_done` gate. `list_id` absent means "the source card's
+/// lane".
 #[crate::action(
     name = "cards.duplicate",
     version = 1,
@@ -957,6 +1087,16 @@ async fn cards_duplicate(
             409,
             "card-create-not-allowed",
             "a copy is a birth; the archive lane cannot receive one",
+        ));
+    }
+    // A copy is a birth, so the §5.8 rule follows it: a work package enters `done` only through
+    // the approved `card_done` gate, never as a duplicate that lands there already finished.
+    // Non-delivery copies keep their behaviour (`cards.create`'s rule, same code and message).
+    if source.card_type_code.as_str() == DELIVERY_CARD_TYPE && lane.list.kind == ListKind::Done {
+        return Err(ActionError::new(
+            409,
+            "card-create-not-allowed",
+            "a work package is not born in done; it moves through the card_done gate",
         ));
     }
 

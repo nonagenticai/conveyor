@@ -241,6 +241,9 @@ async fn runs_create(
         (Some(requested), _) => Some(requested),
         (None, on_card) => on_card,
     };
+    // SPEC_V2 §5.8 (D69): the work-package Definition-of-Ready gate lives in
+    // `create_bound_run_tx`, the one path this action and `cards.assign` share, so a handoff
+    // cannot start a run this explicit entry point would refuse.
     let (run, out) = create_bound_run_tx(
         &mut *tx,
         &ctx,

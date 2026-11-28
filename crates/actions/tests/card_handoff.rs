@@ -1098,3 +1098,147 @@ async fn moving_an_unbound_delivery_card_into_active_is_refused() {
     assert_eq!(output(&view)["card"]["list_id"], intake.as_str(), "{view}");
     assert_eq!(output(&view)["card"]["version"], 1, "{view}");
 }
+
+// ── SPEC_V2 §5.8 (D69): a handoff cannot bypass the work-package DoR ─────────────────────────
+
+/// The two-scenario feature the handoff tests author; the keys are the stable ids evidence names.
+const WP_FEATURE: &str = r#"Feature: the work package
+
+  @verify=V1
+  Scenario: the first part
+    Given a work package
+    When the first part is executed
+    Then the first scenario passes
+
+  @verify=V2
+  Scenario: the second part
+    Given a work package
+    When the second part is executed
+    Then the second scenario passes
+"#;
+
+/// The six INVEST criteria, each met with evidence — an INVEST-ready definition of ready.
+fn ready_dor() -> Value {
+    json!({
+        "independent": {"met": true, "evidence": "no blocked-by link"},
+        "negotiable": {"met": true, "evidence": "outcome fixed; approach settled at delivery"},
+        "valuable": {"met": true, "evidence": "the story's so-that names the benefit"},
+        "estimable": {"met": true, "evidence": "baseline and every file are named"},
+        "small": {"met": true, "evidence": "one work package, one run"},
+        "testable": {"met": true, "evidence": "every scenario carries @verify"},
+    })
+}
+
+/// A `delivery` card in the active lane, created through the real writer.
+async fn create_delivery_card(running: &support::Running, board: &str, lane: &str) -> Uuid {
+    let (status, card) = running
+        .invoke(
+            "cards.create",
+            TOKEN,
+            json!({
+                "board_id": board,
+                "list_id": lane,
+                "name": format!("Work package {}", Uuid::now_v7().simple()),
+                "card_type_code": "delivery",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{card}");
+    Uuid::parse_str(&text(output(&card), "id")).expect("card id")
+}
+
+#[tokio::test]
+async fn assigning_a_work_package_with_no_spec_is_refused_by_the_shared_run_gate() {
+    let (pg, seeded, running) = fixture().await;
+    seed_delivery_card_type(&pg, seeded.tenant).await;
+    let (board, active) = board_and_lane(&running).await;
+    let (binding, _) = seed_binding(&pg, seeded.tenant, "wp-nospec", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
+    let card_id = create_delivery_card(&running, &board, &active).await;
+    let etag = etag_of_card(&running, card_id).await;
+
+    // No spec has been authored: the handoff must refuse exactly as `runs.create` would, even
+    // though it enters through a different action.
+    let (status, body) = running
+        .invoke(
+            "cards.assign",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "run the work package",
+                "acceptance": ["done is judged per scenario"],
+                "artifact_ids": [artifact],
+            }),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "work_package_dor_unmet", "{body}");
+
+    // The refusal precedes every write in the handoff's transaction: no binding, no run, no job
+    // and no memory row survive.
+    let (stored_binding, runs, jobs, memory) = stored(&pg, seeded.tenant, card_id).await;
+    assert!(stored_binding.is_none(), "the card names no binding");
+    assert_eq!(runs, 0, "no run row was written");
+    assert_eq!(jobs, 0, "no run.execute job was enqueued");
+    assert_eq!(memory, 0, "no handoff memory row was written");
+}
+
+#[tokio::test]
+async fn assigning_a_ready_work_package_starts_the_run() {
+    let (pg, seeded, running) = fixture().await;
+    seed_delivery_card_type(&pg, seeded.tenant).await;
+    let (board, active) = board_and_lane(&running).await;
+    let (binding, _) = seed_binding(&pg, seeded.tenant, "wp-ready", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
+    let card_id = create_delivery_card(&running, &board, &active).await;
+
+    // Author the spec through the real writer, then hand the card off.
+    let (status, spec) = running
+        .invoke(
+            "cards.spec_put",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "story_persona": "a delivery team",
+                "story_action": "the work package to carry its acceptance",
+                "story_benefit": "done is judged per scenario, not by a checkbox",
+                "feature": WP_FEATURE,
+                "dor": ready_dor(),
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{spec}");
+
+    let etag = etag_of_card(&running, card_id).await;
+    let (status, body) = running
+        .invoke(
+            "cards.assign",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "run the ready work package",
+                "acceptance": ["done is judged per scenario"],
+                "artifact_ids": [artifact],
+            }),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(output(&body)["run"]["status"], "queued", "{body}");
+    let (stored_binding, runs, _jobs, _memory) = stored(&pg, seeded.tenant, card_id).await;
+    assert_eq!(stored_binding, Some(binding), "the card names the binding");
+    assert_eq!(runs, 1, "exactly one run was started");
+}

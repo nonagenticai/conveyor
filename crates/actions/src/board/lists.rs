@@ -1,11 +1,13 @@
 #![forbid(unsafe_code)]
 //! `lists.create` · `.update` · `.move`.
 //!
-//! A lane is a place, and `kind` is the only lifecycle vocabulary (CONTRACT §4). Two rules
+//! A lane is a place, and `kind` is the only lifecycle vocabulary (CONTRACT §4). Three rules
 //! are enforced here rather than in the database:
 //!
 //! * a `kind` edit that would leave stamped cards on a non-archive lane is `409` — the
 //!   invariant `archived_at ⇒ list.kind = 'archive'` (S3-D2) cannot be broken by an update;
+//! * a re-kind to `done` is `409 list-kind-not-allowed` while the lane holds a live card: a
+//!   card reaches `done` only through its approved `card_done` gate;
 //! * positions are computed under the board's advisory lock and are never supplied by the
 //!   caller: `after_id` names a slot, the server computes the exact midpoint (trap 2).
 
@@ -139,6 +141,26 @@ async fn lists_update(
         Some(raw) => Some(parse_kind(raw, "kind")?),
         None => None,
     };
+    if let Some(new_kind) = kind
+        && new_kind == conveyor_domain::ListKind::Done
+        && new_kind != current.list.kind
+    {
+        // `done` is where finished work lives: a card reaches it only through its approved
+        // `card_done` gate, which a kind edit would skip. An empty lane may become done.
+        let live = store::card::count_live_cards_in_list_tx(&mut *tx, ctx.tenant, current.list.id)
+            .await
+            .map_err(|error| store_error(error, "lists.update"))?;
+        if live > 0 {
+            return Err(ActionError::new(
+                409,
+                "list-kind-not-allowed",
+                format!(
+                    "the lane holds {live} live card(s); move the lane's cards through their \
+                     gates before re-kinding it to done"
+                ),
+            ));
+        }
+    }
     if let Some(new_kind) = kind
         && new_kind != current.list.kind
         && new_kind != conveyor_domain::ListKind::Archive
