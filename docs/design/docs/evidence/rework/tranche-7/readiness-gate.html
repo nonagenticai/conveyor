@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Tranche-7 readiness gate — measured 2026-11-28 · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-7/readiness-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tranche-7-readiness-gate--measured-2026-11-28">Tranche-7 readiness gate — measured 2026-11-28</h1>
+<h2 id="pinned-snapshot">Pinned snapshot</h2>
+<ul>
+<li>Path: <code>/tmp/snap-7/data</code> (rendered outputs <code>/tmp/snap-7/docs</code>).</li>
+<li>Manifest <code>git_sha</code>: <code>7e93a325fe0176ba6e98ce47cae7e1ea2115543f</code> (the lane's claim commit).</li>
+<li><code>generated_at</code>: <code>2026-11-28T14:37:10.839603+00:00</code>; manifest sha256 <code>d0e81f9f5f2624b6674d53dc987da4c88505f64ea6a27d01d4222255dcbdec07</code>.</li>
+<li>931 data files; 913 rendered outputs.</li>
+</ul>
+<h2 id="content-checks-offline-against-the-pinned-snapshot">Content checks (offline, against the pinned snapshot)</h2>
+<pre><code>python3 scripts/rework-content-check.py --project S06c --content docs/evidence/rework/tranche-7/rework-content-S06c.json --snapshot /tmp/snap-7/data --wsjf 8,6,6,8 --closes true
+python3 scripts/rework-content-check.py --project S15 --content docs/evidence/rework/tranche-7/rework-content-S15.json --snapshot /tmp/snap-7/data --wsjf 10,8,7,13 --closes false
+python3 scripts/rework-content-check.py --project S16 --content docs/evidence/rework/tranche-7/rework-content-S16.json --snapshot /tmp/snap-7/data --wsjf 9,7,9,8 --closes true</code></pre>
+<pre><code>rework-content-check: S06c content is consistent with the facts   exit=0
+rework-content-check: S15 content is consistent with the facts   exit=0
+rework-content-check: S16 content is consistent with the facts   exit=0</code></pre>
+<h2 id="batch-dry-run-readiness-gate">Batch dry-run (readiness gate)</h2>
+<pre><code>python3 scripts/rework-batch.py --tranche 7 --snapshot /tmp/snap-7/data --content-dir docs/evidence/rework --journal docs/evidence/rework/batch/tranche-7.jsonl --dry-run
+exit=0</code></pre>
+<pre><code>rework-content-check: S06c content is consistent with the facts
+rework-content-check: S15 content is consistent with the facts
+rework-content-check: S16 content is consistent with the facts
+rework-batch: S06c DRY
+rework-batch: S15 DRY
+rework-batch: S16 DRY
+{&quot;blocked&quot;: 0, &quot;green&quot;: 0, &quot;red&quot;: 0}</code></pre>
+<p>The three <code>DRY</code> lines are the preflight verdicts. A dry run writes no journal, and the summary counts only real outcomes (<code>RECEIPT_GREEN</code>/<code>RECEIPT_RED</code>/<code>BLOCKED</code>); the zeros mean no member was blocked before the first act, not that the tranche has zero members. A real run journals <code>PREFLIGHTED</code> for each member before it acts.</p>
+<h2 id="record-readiness-replay-copy-conveyor-restore-12700155458-schema-110">Record readiness (replay copy <code>conveyor-restore</code>, <code>127.0.0.1:55458</code>, schema 110)</h2>
+<table>
+<thead>
+<tr>
+<th>Artefact</th>
+<th>Id</th>
+<th>Verified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tranche 7 <code>authorised</code></td>
+<td><code>01a1e9e1-0fab-7068-99f2-a233045b1276</code></td>
+<td><code>programme_tranche</code></td>
+</tr>
+<tr>
+<td>cadences pi / refinement / demo / retro</td>
+<td><code>01a22294-e13c…</code> / <code>…-e1da…</code> / <code>…-e26f…</code> / <code>…-e301…</code></td>
+<td><code>programme_cadence</code>, period <code>tranche-7</code></td>
+</tr>
+<tr>
+<td>refinement WSJF inputs</td>
+<td>in the refinement row's <code>meta.refinement</code></td>
+<td>matches the packs' <code>wbs_deliverable</code></td>
+</tr>
+<tr>
+<td>PI plan (published, P0)</td>
+<td><code>01a22295-ca02-71ab-bd1b-93d4b1ded72a</code>, <code>unit=tranche-7</code></td>
+<td><code>documents.get</code>; rendered <code>outputs.js</code></td>
+</tr>
+<tr>
+<td>PI objectives (published, P0)</td>
+<td><code>01a22295-cad4-741d-bf7d-7c6640125518</code>, <code>unit=tranche-7</code></td>
+<td><code>documents.get</code>; rendered <code>outputs.js</code></td>
+</tr>
+<tr>
+<td>PI plan approval</td>
+<td><code>01a22296-3270-76c3-be7e-77da477806ed</code>, <code>approved</code>, rule decision under delegation <code>01a1ff1f-e4ba…</code></td>
+<td><code>approval</code> + <code>approval_decision</code></td>
+</tr>
+<tr>
+<td>tranche-7 retro lesson</td>
+<td><code>01a222a4-22a7-7610-93a8-0ea3ae426be6</code>, <code>k1</code>, cadence <code>01a22294-e301…</code></td>
+<td><code>programme_lessons.list</code>; snapshot <code>msp.json</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fixes-made-at-evaluation-2026-11-28">Fixes made at evaluation (2026-11-28)</h3>
+<p>Two defects would have made every member's receipt red; both were measured and fixed before the factory run:</p>
+<ol type="1">
+<li><strong>PI documents had no <code>unit</code>.</strong> <code>verify-project.py::_published_for_period</code> matches the literal token <code>tranche-7</code> in title+unit; the two rows rendered <code>unit: null</code>. Both now carry <code>unit: "tranche-7"</code> (versions 3 and 2, still published). Evidence: <code>docs/evidence/rework/tranche-7/pi-documents-unit.json</code>.</li>
+<li><strong>No lesson on the tranche-7 retro cadence.</strong> <code>check_lessons</code> requires one; <code>k1</code> was proposed against <code>01a22294-e301…</code> with a statement and evidence, and journaled as <code>lesson:tranche-7:k1</code>. Evidence: <code>docs/evidence/rework/tranche-7/lesson.json</code>, <code>docs/evidence/record/inputs/tr7/lesson_tranche-7_k1.json</code>.</li>
+</ol>
+<p><code>python3 scripts/promote-record.py --check</code> is green with 499 entries.</p>
+<h2 id="result">Result</h2>
+<p>The tranche roster resolves (authorised), every content pack is consistent with the pinned snapshot, the PI readiness set and the lesson are on the record, and the dry run exits 0. The factory run, the three receipts and <code>check-tranche-exit.py --tranche 7</code> are the next acts on this lane (<code>issue/951-tranche-7</code>).</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-7/readiness-gate.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

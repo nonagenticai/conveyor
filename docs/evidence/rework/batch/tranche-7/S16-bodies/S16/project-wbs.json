@@ -1,0 +1,59 @@
+{
+  "body_sha256": "f4d4408d2a865f22c3f267de909a0c82cd50af77accd499f1c8948160e223bd1",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+    "key": "S16",
+    "kind": "project",
+    "title": "Inference ledger and prompt audit"
+  },
+  "title": "Project Wbs \u2014 Inference ledger and prompt audit"
+}

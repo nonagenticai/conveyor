@@ -44,7 +44,7 @@ What the architecture work is asked to deliver and for whom.
 ```json
 {
   "category": "statement-of-architecture-work",
-  "count": 38,
+  "count": 39,
   "rows": [
     {
       "approval_id": null,
@@ -1245,6 +1245,33 @@ What the architecture work is asked to deliver and for whom.
       "supersedes_id": null,
       "title": "Statement of Architecture Work \u2014 S15 Capability, Knowledge and Memory (retrospective, Phase A)",
       "updated_at": "2026-11-28T14:55:06.005722+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": "01a222a7-e337-7534-9b34-ce111b8b1f9f",
+      "approved_at": "2026-11-28T14:55:57.887266+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+        "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective \u2014 the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+        "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+        "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+        "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim \u2014 the shipped capture test runs against a stub and the live-router rehearsal is still pending \u2014 the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction.",
+        "scope": "In scope: the Phase A\u2013D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table."
+      },
+      "created_at": "2026-11-28T14:55:57.611397+00:00",
+      "id": "01a222a7-e2ad-7932-ab24-19c4497fb055",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+      "updated_at": "2026-11-28T14:55:57.887266+00:00",
       "version": 2
     }
   ],
@@ -1296,7 +1323,7 @@ The boundaries, the artefacts expected and the phase set.
 ```json
 {
   "category": "statement-of-architecture-work",
-  "count": 38,
+  "count": 39,
   "rows": [
     {
       "approval_id": null,
@@ -2497,6 +2524,33 @@ The boundaries, the artefacts expected and the phase set.
       "supersedes_id": null,
       "title": "Statement of Architecture Work \u2014 S15 Capability, Knowledge and Memory (retrospective, Phase A)",
       "updated_at": "2026-11-28T14:55:06.005722+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": "01a222a7-e337-7534-9b34-ce111b8b1f9f",
+      "approved_at": "2026-11-28T14:55:57.887266+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+        "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective \u2014 the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+        "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+        "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+        "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim \u2014 the shipped capture test runs against a stub and the live-router rehearsal is still pending \u2014 the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction.",
+        "scope": "In scope: the Phase A\u2013D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table."
+      },
+      "created_at": "2026-11-28T14:55:57.611397+00:00",
+      "id": "01a222a7-e2ad-7932-ab24-19c4497fb055",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+      "updated_at": "2026-11-28T14:55:57.887266+00:00",
       "version": 2
     }
   ],
@@ -2548,7 +2602,7 @@ Who does the work and who accepts it.
 ```json
 {
   "category": "statement-of-architecture-work",
-  "count": 38,
+  "count": 39,
   "rows": [
     {
       "approval_id": null,
@@ -3749,6 +3803,33 @@ Who does the work and who accepts it.
       "supersedes_id": null,
       "title": "Statement of Architecture Work \u2014 S15 Capability, Knowledge and Memory (retrospective, Phase A)",
       "updated_at": "2026-11-28T14:55:06.005722+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": "01a222a7-e337-7534-9b34-ce111b8b1f9f",
+      "approved_at": "2026-11-28T14:55:57.887266+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+        "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective \u2014 the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+        "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+        "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+        "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim \u2014 the shipped capture test runs against a stub and the live-router rehearsal is still pending \u2014 the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction.",
+        "scope": "In scope: the Phase A\u2013D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table."
+      },
+      "created_at": "2026-11-28T14:55:57.611397+00:00",
+      "id": "01a222a7-e2ad-7932-ab24-19c4497fb055",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+      "updated_at": "2026-11-28T14:55:57.887266+00:00",
       "version": 2
     }
   ],
@@ -3800,7 +3881,7 @@ The conditions the architecture must meet to close Phase A.
 ```json
 {
   "category": "statement-of-architecture-work",
-  "count": 38,
+  "count": 39,
   "rows": [
     {
       "approval_id": null,
@@ -5001,6 +5082,33 @@ The conditions the architecture must meet to close Phase A.
       "supersedes_id": null,
       "title": "Statement of Architecture Work \u2014 S15 Capability, Knowledge and Memory (retrospective, Phase A)",
       "updated_at": "2026-11-28T14:55:06.005722+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": "01a222a7-e337-7534-9b34-ce111b8b1f9f",
+      "approved_at": "2026-11-28T14:55:57.887266+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+        "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective \u2014 the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+        "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+        "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+        "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim \u2014 the shipped capture test runs against a stub and the live-router rehearsal is still pending \u2014 the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction.",
+        "scope": "In scope: the Phase A\u2013D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table."
+      },
+      "created_at": "2026-11-28T14:55:57.611397+00:00",
+      "id": "01a222a7-e2ad-7932-ab24-19c4497fb055",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+      "updated_at": "2026-11-28T14:55:57.887266+00:00",
       "version": 2
     }
   ],
@@ -5052,7 +5160,7 @@ The contract record, its version and its approval.
 ```json
 {
   "category": "statement-of-architecture-work",
-  "count": 38,
+  "count": 39,
   "rows": [
     {
       "approval_id": null,
@@ -6253,6 +6361,33 @@ The contract record, its version and its approval.
       "supersedes_id": null,
       "title": "Statement of Architecture Work \u2014 S15 Capability, Knowledge and Memory (retrospective, Phase A)",
       "updated_at": "2026-11-28T14:55:06.005722+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": "01a222a7-e337-7534-9b34-ce111b8b1f9f",
+      "approved_at": "2026-11-28T14:55:57.887266+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The manifest's six requirements, each with its own check: the three tables exist with row-level security forced; a real external call's stored row matches the router's own usage field for field; the cache constraint refuses a hit with no read tokens; the audit is deterministic and only a high finding blocks a publish; no prompt action holds a process write; and the OpenAPI lock stays current.",
+        "assignment": "Deliver the architectural record for an inference ledger: every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and both prompt-cache classes, with a prompt audit over the three prompt surfaces. The assignment is retrospective \u2014 the product shipped on 2026-11-09 and this statement records the architecture it was built to, not one requested in advance.",
+        "constraints": "No new technology and no second writer: the engine seam is the only place a call is recorded, and a handler that wrote its own row would make the fact exist twice. Join keys stay integers without foreign keys because database-level referential integrity bypasses row-level security. The capture must never fail the call it is recording, which constrains it to the call's own transaction.",
+        "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the cost-observability outcome; the platform engineer operates the capture seam and the ninety-day audit; the tenant admin consults on retention. The retrospective author is explicitly not the accepting role, so the separation of duties holds even though the same session wrote the product record.",
+        "retrospective": "This statement is written after the fact and says so. Where the product's proof is narrower than the claim \u2014 the shipped capture test runs against a stub and the live-router rehearsal is still pending \u2014 the gap is recorded in the evidence output and in the risk register rather than smoothed into a pass. The Phase-G review's level reflects that distinction.",
+        "scope": "In scope: the Phase A\u2013D artefact set, the data entities, the capture seam, the audit procedure and the retention decision. Out of scope: any screen (S12 builds both), the inference router and the billing service (this project reads their usage, it does not replace them), a tenant-authored prompt store, AI-driven prompt repair, kata tables and any cadence configuration table."
+      },
+      "created_at": "2026-11-28T14:55:57.611397+00:00",
+      "id": "01a222a7-e2ad-7932-ab24-19c4497fb055",
+      "kind": "statement_of_architecture_work",
+      "links": {},
+      "meta": {},
+      "phase_code": "a",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work \u2014 S16 Inference Ledger and Prompt Audit (retrospective, Phase A)",
+      "updated_at": "2026-11-28T14:55:57.887266+00:00",
       "version": 2
     }
   ],

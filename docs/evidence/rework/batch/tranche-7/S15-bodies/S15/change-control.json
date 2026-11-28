@@ -1,0 +1,66 @@
+{
+  "body_sha256": "e997c0a3f8bc88045e7f839681a03f0d3766ba541573a8a4b5d3562587923224",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2f-7ca0-9d3d-534ca7d673fb",
+    "key": "S15",
+    "kind": "project",
+    "title": "Capability, knowledge and memory"
+  },
+  "title": "Change Control \u2014 Capability, knowledge and memory"
+}

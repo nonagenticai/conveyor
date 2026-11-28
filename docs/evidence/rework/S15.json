@@ -151,14 +151,14 @@
   ],
   "failures": [],
   "gate": "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`.",
-  "generated_at": "2026-11-28T15:05:37.736940+00:00",
+  "generated_at": "2026-11-28T15:09:24.801441+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S15.toml",
   "name": "Capability, knowledge and memory",
   "project": "S15",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-28T15:05:17.458841+00:00",
+    "generated_at": "2026-11-28T15:09:17.943865+00:00",
     "git_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
     "path": "retained-snapshot/7e93a325fe0176ba6e98ce47cae7e1ea2115543f"
   },

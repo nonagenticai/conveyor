@@ -1,21 +1,15 @@
 {
-  "blocked": 2,
-  "generated_at": "2026-11-28T15:06:16+00:00",
-  "green": 1,
+  "blocked": 0,
+  "generated_at": "2026-11-28T15:10:19+00:00",
+  "green": 3,
   "members": [
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 17: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "S06c",
       "log": "docs/evidence/rework/batch/tranche-7/S06c.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
+      "state": "RECEIPT_GREEN"
     },
     {
       "factory_exit": 0,
@@ -26,18 +20,12 @@
       "state": "RECEIPT_GREEN"
     },
     {
-      "factory_exit": 1,
-      "gaps": [
-        {
-          "detail": "rework: projects.close refused at act 17: error: projects.close refused (409): project S16 cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)",
-          "gap": "instrument",
-          "id": null
-        }
-      ],
+      "factory_exit": 0,
+      "gaps": [],
       "key": "S16",
       "log": "docs/evidence/rework/batch/tranche-7/S16.log",
       "publish_exit": 1,
-      "state": "BLOCKED"
+      "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,

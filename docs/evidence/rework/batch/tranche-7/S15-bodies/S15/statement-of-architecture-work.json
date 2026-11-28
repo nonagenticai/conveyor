@@ -1,5 +1,5 @@
 {
-  "body_sha256": "ba73699a27db3931fdf60cac94aac2fedbe82b03531b3a5a1088f0e8a9f241b9",
+  "body_sha256": "5a7f485bc671fb41fcdd6f20edacbbe036e3b2169405fbd1ea0a6c4e5f809a76",
   "category": "statement-of-architecture-work",
   "headings": [
     {
@@ -15,7 +15,7 @@
         },
         {
           "category": "statement-of-architecture-work",
-          "count": 38,
+          "count": 39,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/contracts"
@@ -36,7 +36,7 @@
         },
         {
           "category": "statement-of-architecture-work",
-          "count": 38,
+          "count": 39,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/contracts"
@@ -57,7 +57,7 @@
         },
         {
           "category": "statement-of-architecture-work",
-          "count": 38,
+          "count": 39,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/contracts"
@@ -78,7 +78,7 @@
         },
         {
           "category": "statement-of-architecture-work",
-          "count": 38,
+          "count": 39,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/contracts"
@@ -99,7 +99,7 @@
         },
         {
           "category": "statement-of-architecture-work",
-          "count": 38,
+          "count": 39,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/contracts"

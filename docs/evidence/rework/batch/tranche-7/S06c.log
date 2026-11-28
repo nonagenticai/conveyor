@@ -19,18 +19,22 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
   document architecture-artifact: already present and published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
   08 documents.compose ok
   09 documents.publish ok
-  document user-stories: published
+  document architecture-analysis: published
   10 documents.compose ok
   11 documents.publish ok
-  document acceptance-criteria: published
+  document architecture-design: published
   12 documents.compose ok
   13 documents.publish ok
-  document definition-of-ready: published
+  document inception-analysis: published
   14 documents.compose ok
   15 documents.publish ok
-  document definition-of-done: published
+  document statement-of-architecture-work: published
   delivery contract: already live
   register risk: The live one-live-run property depends on a partial index, because the existing unique index does not dedupe nulls already present
   register risk: The reaper must skip project executions, and its correctness depends on that predicate already present
@@ -65,29 +69,205 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   closure gate: already approved
   destructive gate: already approved
 
-rework: projects.close refused at act 17: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)
+rework: projects.close refused at act 17: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
 FAILED: projects.close: transport exited 1
 
 [exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S06c --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-dh_9sce4/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-dh_9sce4/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S06c-bodies --local-bin /tmp/conv951-bin/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S06c --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-hegy4ls4/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-hegy4ls4/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S06c-bodies --local-bin /tmp/conv951-bin/conveyor
 
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "change-control",
+      "document_id": "01a222b3-4433-74b8-a112-3ddf5f53a28f",
+      "natural_key": "artefact:S06c:change-control:2032d1e944ab1ce4",
+      "body_sha256": "2032d1e944ab1ce4085d0b0bc584d58355707c08ec894b6c939b282be9fc84bb"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-baseline",
+      "document_id": "01a222b3-45e5-7429-8665-92296334b8f0",
+      "natural_key": "artefact:S06c:project-baseline:193f95a42ef2826b",
+      "body_sha256": "193f95a42ef2826ba7b8840bbf13c2876724fd6f0463609253975f8bef945267"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-registers",
+      "document_id": "01a222b3-47b9-7061-bea0-12aded6d5f02",
+      "natural_key": "artefact:S06c:project-registers:2023737793ceaa5d",
+      "body_sha256": "2023737793ceaa5d7f0ad07b0c8265b7c85e5074577420ab94d56e4a3a6cfb69"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-wbs",
+      "document_id": "01a222b3-4987-7317-aef4-3d0b15be95de",
+      "natural_key": "artefact:S06c:project-wbs:632fa63c43c7a319",
+      "body_sha256": "632fa63c43c7a3195858e43ce7581d8c29e2be3076bec09a20684dd7f78b635f"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "acceptance-criteria",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "definition-of-done",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "definition-of-ready",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "user-stories",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Waivers' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Deviation' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 7,
+    "present": 1,
+    "missing-edge": 0,
+    "stale": 1,
+    "ambiguous": 0,
+    "authored": 10
+  }
+}
 
-Traceback (most recent call last):
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 1275, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 849, in main
-    applied, skipped, refused = apply_rows(
-                                ~~~~~~~~~~^
-        rows, args=args, bodies_out=args.bodies_out, journal_path=args.journal,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 590, in apply_rows
-    summary = row["_summary"]
-              ~~~^^^^^^^^^^^^
-KeyError: '_summary'
 
 [exit 1]
 
@@ -116,6 +296,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   document acceptance-criteria: already present and published
   document definition-of-ready: already present and published
   document definition-of-done: already present and published
+  document architecture-analysis: already present and published
+  document architecture-design: already present and published
+  document inception-analysis: already present and published
+  document statement-of-architecture-work: already present and published
   delivery contract: already live
   register risk: The live one-live-run property depends on a partial index, because the existing unique index does not dedupe nulls already present
   register risk: The reaper must skip project executions, and its correctness depends on that predicate already present
@@ -149,9 +333,206 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   card discharge: no open rework card owned by the project
   closure gate: already approved
   destructive gate: already approved
+  09 projects.close ok
+  closed S06c: 01a1d039-0d2b-7542-9574-e961ffd1b597
+S06c: 9 acts recorded
 
-rework: projects.close refused at act 9: error: projects.close refused (409): project S06c cannot close until its mandatory artefacts exist (missing: architecture-analysis, architecture-design, inception-analysis, project-registers, project-wbs, statement-of-architecture-work)
-FAILED: projects.close: transport exited 1
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S06c --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-lbg5idpd/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06c-snap-lbg5idpd/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S06c-bodies --local-bin /tmp/conv951-bin/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "acceptance-criteria",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "definition-of-done",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "definition-of-ready",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "user-stories",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Waivers' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S06c",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Deviation' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 5,
+    "missing-edge": 0,
+    "stale": 1,
+    "ambiguous": 0,
+    "authored": 10
+  }
+}
+
 
 [exit 1]
 

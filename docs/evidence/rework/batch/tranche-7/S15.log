@@ -19,18 +19,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   06 architecture.artifacts_link ok
   07 architecture.artifacts_link ok
   document architecture-artifact: already present and published
-  08 documents.compose ok
-  09 documents.publish ok
-  document user-stories: published
-  10 documents.compose ok
-  11 documents.publish ok
-  document acceptance-criteria: published
-  12 documents.compose ok
-  13 documents.publish ok
-  document definition-of-ready: published
-  14 documents.compose ok
-  15 documents.publish ok
-  document definition-of-done: published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
   delivery contract: already live
   register risk: Cross-source dedupe on prune can delete a document two cards share already present
   register risk: Seven actions of step 5 are still open, so the surface the gate names is partly unbuilt already present
@@ -57,35 +49,21 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  16 cadences.credit_demo ok
+  08 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
   record fixes: none in the content
   card discharge: no open rework card owned by the project
   closure: not applicable (the project stays active)
-S15: 16 acts recorded
+S15: 8 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S15 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-97bqo11c/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-97bqo11c/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S15-bodies --local-bin /tmp/conv951-bin/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S15 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-1dedzfdu/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-1dedzfdu/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S15-bodies --local-bin /tmp/conv951-bin/conveyor
 
 
-Traceback (most recent call last):
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 1275, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 849, in main
-    applied, skipped, refused = apply_rows(
-                                ~~~~~~~~~~^
-        rows, args=args, bodies_out=args.bodies_out, journal_path=args.journal,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py", line 590, in apply_rows
-    summary = row["_summary"]
-              ~~~^^^^^^^^^^^^
-KeyError: '_summary'
+{"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 637461 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}
 
 [exit 1]
 
