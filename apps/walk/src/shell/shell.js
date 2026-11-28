@@ -38,6 +38,7 @@ export class Shell {
     try {
       this.manifest = await this.api.manifest();
     } catch (error) {
+      this.renderGeneration += 1;
       this.renderHud();
       this.renderMap();
       clear(this.screen);
@@ -49,6 +50,7 @@ export class Shell {
 
   /** The same shell, rebuilt after a tenant change or a return from a sheet. */
   renderSession() {
+    this.renderGeneration += 1;
     document.getElementById("world")?.classList.remove("hidden");
     this.renderHud();
     this.renderMap();
@@ -58,6 +60,7 @@ export class Shell {
   }
 
   renderSignIn() {
+    this.renderGeneration += 1;
     document.getElementById("world")?.classList.add("hidden");
     clear(this.hud);
     this.hud.append(
