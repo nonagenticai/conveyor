@@ -1,0 +1,125 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/rework-project.py --project S06b --content /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/tranche-6/rework-content-S06b.json --tranche-label tranche 6 --demo-cadence 01a21c62-6aeb-764e-af16-44eefdee7186
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S06b Agent Interface (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A) already present
+  artefact: Requirements Catalog — S06b Agent Interface (Phase A) already present
+  artefact: Solution Concept Diagram — S06b Agent Interface (Phase A) already present
+  artefact: Business Capability Map — S06b Agent Interface (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S06b Agent Interface (Phase C) already present
+  artefact: Technology Standards Catalog — S06b Agent Interface (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The deployed agent-app task is S14's gate, so the consumer path is proven locally only already present
+  register risk: Licence introspection is on the request path, so a licences outage refuses every machine call already present
+  register issue: The record claimed built but carried no charter, baseline, contract or Phase-G review already present
+  register issue: The agent app's own importer is not executed in this repository already present
+  register assumption: The 2026-11-27 rework snapshot is the authoritative record for S06b already present
+  register assumption: The licences service's introspection endpoint behaves as the S02 contract declares already present
+  register assumption: The agent principal's tool list is the compiled MCP_DEFAULT_ACTIONS already present
+  register dependency: S06b depends on S04, S05 and S06 already present
+  register dependency: S06b blocks S10's copilot surface and S14's deployed task already present
+  register benefit: One agent interface replaces a second signed channel already present
+  register benefit: Machine decisions become attributable already present
+  register benefit: Escalation no longer needs a running run already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  08 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 9: error: projects.close refused (409): project S06b cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/publish-artefact-bodies.py --apply --project S06b --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06b-snap-bobohi6u/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06b-snap-bobohi6u/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/batch/tranche-6/S06b-bodies --local-bin /tmp/issue838-bin/conveyor
+
+
+{"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 544526 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/rework-project.py --project S06b --content /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/tranche-6/rework-content-S06b.json --tranche-label tranche 6 --demo-cadence 01a21c62-6aeb-764e-af16-44eefdee7186
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S06b Agent Interface (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A) already present
+  artefact: Requirements Catalog — S06b Agent Interface (Phase A) already present
+  artefact: Solution Concept Diagram — S06b Agent Interface (Phase A) already present
+  artefact: Business Capability Map — S06b Agent Interface (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S06b Agent Interface (Phase C) already present
+  artefact: Technology Standards Catalog — S06b Agent Interface (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  delivery contract: already live
+  register risk: The deployed agent-app task is S14's gate, so the consumer path is proven locally only already present
+  register risk: Licence introspection is on the request path, so a licences outage refuses every machine call already present
+  register issue: The record claimed built but carried no charter, baseline, contract or Phase-G review already present
+  register issue: The agent app's own importer is not executed in this repository already present
+  register assumption: The 2026-11-27 rework snapshot is the authoritative record for S06b already present
+  register assumption: The licences service's introspection endpoint behaves as the S02 contract declares already present
+  register assumption: The agent principal's tool list is the compiled MCP_DEFAULT_ACTIONS already present
+  register dependency: S06b depends on S04, S05 and S06 already present
+  register dependency: S06b blocks S10's copilot surface and S14's deployed task already present
+  register benefit: One agent interface replaces a second signed channel already present
+  register benefit: Machine decisions become attributable already present
+  register benefit: Escalation no longer needs a running run already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  08 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+  09 projects.close ok
+  closed S06b: 01a1d039-0d2a-7ea9-b809-929452f221fd
+S06b: 9 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/scripts/publish-artefact-bodies.py --apply --project S06b --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06b-snap-wuhv23us/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S06b-snap-wuhv23us/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-838/docs/evidence/rework/batch/tranche-6/S06b-bodies --local-bin /tmp/issue838-bin/conveyor
+
+
+{"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 544526 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}
+
+[exit 1]
+

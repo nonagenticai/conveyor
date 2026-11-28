@@ -1,12 +1,10 @@
 {
  "cadence_id": "01a21c62-6b8c-73d2-a4cd-425f244cde36",
  "evidence": [
-  "docs/evidence/rework/tranche-6/cadences.json",
-  "docs/evidence/rework/tranche-6/refinement-wsjf.json",
-  "acceptance/programme/S06b.toml",
-  "docs/evidence/record/journal.jsonl"
+  {"kind": "card", "id": "01a20ec4-b1a7-7a73-bd5f-4366c08ba15a"},
+  {"kind": "card", "id": "01a20ecb-11a3-7236-bdcf-673ed61d4cd7"}
  ],
  "finding_key": "k1",
  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
- "statement": "A retrospective pack is not green until the tranche's own cadences are bound: the factory's default demo cadence credits tranche 0, and a tranche that proposes no lesson fails every member's lessons check. Pass the tranche's demo cadence to every apply and propose the tranche's lesson in the same unit."
+ "statement": "A retrospective project cannot close on the factory's own pass: the close gate reads published standard documents that only the artefact publisher composes, so clearing the register and WBS cards is not the same as satisfying closure. Run the publisher between factory passes, or the close is refused on documents the factory never writes."
 }

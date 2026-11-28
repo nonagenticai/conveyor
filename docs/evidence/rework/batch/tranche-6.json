@@ -1,0 +1,70 @@
+{
+  "blocked": 1,
+  "generated_at": "2026-11-28T07:31:52+00:00",
+  "green": 2,
+  "members": [
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S06b",
+      "log": "docs/evidence/rework/batch/tranche-6/S06b.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [
+        {
+          "detail": "1 unresolved P0/P1 package(s): v1-u5-copilot-gate-quorum:S10 (P1)",
+          "gap": "record",
+          "id": "S10-rework",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "the gate check 'S10-rework' did not pass",
+          "gap": "code",
+          "id": "gate",
+          "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
+        }
+      ],
+      "key": "S10",
+      "log": "docs/evidence/rework/batch/tranche-6/S10.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_RED"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S11",
+      "log": "docs/evidence/rework/batch/tranche-6/S11.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: architecture.contracts_approve refused at act 39: error: architecture.contracts_approve refused (409): the architecture contract: a live contract of this kind exists; supersede it first",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
+      "key": "T19F",
+      "log": "docs/evidence/rework/batch/tranche-6/T19F.log",
+      "publish_exit": null,
+      "state": "BLOCKED"
+    }
+  ],
+  "red": 1,
+  "snapshot_sha": "a38b80cdfca23097479d3c237c84e8d11f790a62",
+  "tranche": 6
+}

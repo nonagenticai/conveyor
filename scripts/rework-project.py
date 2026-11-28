@@ -731,22 +731,36 @@ class Runner:
         self.ensure_documents()
 
         # 6. the delivery contract
-        contract = next(
-            (c for c in contracts
-             if c.get("kind") == "delivery_contract" and c.get("status") in ("live", "draft")),
-            None,
-        )
-        if contract is None:
-            for candidate in self._read(
-                "architecture.contracts_list", {"project_id": self.project_id}
-            ).get("items", []):
-                if candidate.get("kind") == "delivery_contract" and candidate.get("status") in (
-                    "live",
-                    "draft",
-                ):
-                    contract = candidate
-                    break
-        if contract is None:
+        delivery = [
+            c for c in contracts
+            if c.get("kind") == "delivery_contract" and c.get("status") in ("live", "draft")
+        ]
+        if not delivery:
+            delivery = [
+                candidate for candidate in self._read(
+                    "architecture.contracts_list", {"project_id": self.project_id}
+                ).get("items", [])
+                if candidate.get("kind") == "delivery_contract"
+                and candidate.get("status") in ("live", "draft")
+            ]
+        live = next((c for c in delivery if c.get("status") == "live"), None)
+        draft = next((c for c in delivery if c.get("status") == "draft"), None)
+        pack_body = self.content["delivery_contract"]["body"] or {}
+
+        def supersede_live() -> None:
+            # The store refuses to approve a draft while a live sibling of the same
+            # (project, kind, phase) exists, and an approved row is never edited: the replacement
+            # is a superseding revision (measured on T19F, whose live gate left a live delivery
+            # contract the factory's first pass could not revise).
+            self.invoke(
+                "architecture.contracts_supersede",
+                {"id": live["id"]},
+                if_match=live.get("version", 1),
+                read_action="architecture.contracts_get",
+                read_input={"id": live["id"]},
+            )
+
+        if live is None and draft is None:
             requested = self.invoke(
                 "architecture.contracts_request",
                 {
@@ -754,7 +768,7 @@ class Runner:
                     "kind": "delivery_contract",
                     "phase_code": "f",
                     "title": self.content["delivery_contract"]["title"],
-                    "body": self.content["delivery_contract"]["body"],
+                    "body": pack_body,
                 },
                 read_action="architecture.contracts_get",
                 read_id_from_output="id",
@@ -762,20 +776,29 @@ class Runner:
             contract = self.approve_contract(
                 requested["id"], "approve the delivery contract", version=1
             )
-        elif contract.get("status") == "draft":
+        elif live is not None and draft is not None:
+            # A refused first pass left its revision pending: supersede the live row and approve
+            # the draft it already created rather than authoring a second one.
+            supersede_live()
             contract = self.approve_contract(
-                contract["id"], "approve the delivery contract",
-                version=contract.get("version", 1),
+                draft["id"], "approve the delivery contract revision",
+                version=draft.get("version", 1),
+            )
+            print("  delivery contract: approved the pending revision over the superseded row")
+        elif draft is not None:
+            contract = self.approve_contract(
+                draft["id"], "approve the delivery contract",
+                version=draft.get("version", 1),
             )
         else:
             # A live contract whose body lacks a field the standard's page reads is repaired by
             # a superseding revision, never by editing an approved row: the packs author
             # commitments/compliance/approval, and the record's contract must carry them for the
             # page's sections to resolve (measured 2026-11-25: every member's Commitments empty).
-            pack_body = self.content["delivery_contract"]["body"] or {}
-            live_body = contract.get("body") or {}
+            live_body = live.get("body") or {}
             missing = [name for name in pack_body if name not in live_body]
             if missing:
+                supersede_live()
                 requested = self.invoke(
                     "architecture.contracts_request",
                     {
@@ -784,7 +807,7 @@ class Runner:
                         "phase_code": "f",
                         "title": self.content["delivery_contract"]["title"],
                         "body": pack_body,
-                        "supersedes_id": contract["id"],
+                        "supersedes_id": live["id"],
                     },
                     read_action="architecture.contracts_get",
                     read_id_from_output="id",
@@ -796,6 +819,7 @@ class Runner:
                 )
                 print("  delivery contract: revised to carry the authored body")
             else:
+                contract = live
                 print("  delivery contract: already live")
 
         # 6b. the six-section project register, before the baseline freezes it (§8.4)
