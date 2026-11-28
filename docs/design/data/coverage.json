@@ -285,8 +285,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 1,
-        "claimed": 1,
+        "blocked": 0,
+        "claimed": 4,
         "numbers": [
           792,
           806,
@@ -295,9 +295,11 @@
           815,
           816,
           817,
-          888
+          910,
+          912,
+          914
         ],
-        "open": 2,
+        "open": 4,
         "ready": 0,
         "unknown": 0
       }
@@ -390,7 +392,7 @@
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 1,
         "numbers": [
           16,
           17,
@@ -420,7 +422,7 @@
           803,
           819
         ],
-        "open": 9,
+        "open": 8,
         "ready": 4,
         "unknown": 0
       }
