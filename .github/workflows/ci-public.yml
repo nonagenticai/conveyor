@@ -406,14 +406,17 @@ jobs:
     if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' && needs.classify.outputs.checks_skip != 'true' && (github.event_name == 'push' || needs.classify.outputs.generated_only != 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    # TWO SHARDS, because the suite was 729 s of a 917 s job and a public repo's GitHub-hosted
-    # runner is free: splitting the tests shortens the WALL CLOCK, which caching alone does not.
-    # fmt, clippy, doctests, the audit and the contract fixtures stay on shard 1 — `nextest`
-    # cannot partition doctests, and running them on both would run them twice.
+    # FOUR SHARDS, because the slowest shard measured 16–24 min in the sampled runs of
+    # 2026-11-28 (run 46090095400: shard 1 19m13s, shard 2 14m20s; 46086727956: 19m13s /
+    # 17m14s; 46084488896: 16m09s / 13m50s) and a public repo's GitHub-hosted runner is free:
+    # splitting the tests shortens the WALL CLOCK, which caching alone does not. The partition
+    # denominator is the matrix size (`strategy.job-total`), so raising or lowering the matrix
+    # never re-runs a case. fmt, clippy, doctests, the audit and the contract fixtures stay on
+    # shard 1 — `nextest` cannot partition doctests, and running them on both would run them twice.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     env:
       CARGO_PROFILE_DEV_DEBUG: "0"
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
@@ -524,22 +527,24 @@ jobs:
         if: matrix.shard == 1
         run: cargo clippy --all-targets --locked -- -D warnings
 
-      - name: cargo nextest (0.9.150 pinned, sha256-verified; shard ${{ matrix.shard }} of 2)
+      - name: cargo nextest (0.9.150 pinned, sha256-verified; shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           # Through the environment, not interpolated into the script: `run:` text built from an
           # expression is zizmor's template-injection finding, and this workflow's own `lint` job
           # gates that at medium.
           SHARD: ${{ matrix.shard }}
+          SHARDS: ${{ strategy.job-total }}
         run: |
           set -euo pipefail
           curl -fsSL -o "$RUNNER_TEMP/nextest.tgz" \
             "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.150/cargo-nextest-0.9.150-x86_64-unknown-linux-gnu.tar.gz"
           echo "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f  $RUNNER_TEMP/nextest.tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/nextest.tgz" -C "$RUNNER_TEMP" cargo-nextest
-          # `count:M/N` partitions by TEST CASE, so both shards do real work; `--no-tests=fail`
-          # keeps a shard that selected nothing visible as a red rather than a silent pass.
+          # `count:M/N` partitions by TEST CASE, so every shard does real work; `--no-tests=fail`
+          # keeps a shard that selected nothing visible as a red rather than a silent pass. The
+          # denominator is the matrix size, so it cannot drift from the matrix.
           "$RUNNER_TEMP/cargo-nextest" nextest run --no-tests=fail --color never --locked \
-            --partition "count:${SHARD}/2"
+            --partition "count:${SHARD}/${SHARDS}"
 
       # Doctests are invisible to nextest, so they cannot be partitioned: shard 1 owns them.
       - name: cargo test --doc
