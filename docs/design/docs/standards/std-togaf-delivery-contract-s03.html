@@ -41,17 +41,12 @@
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-s03:S03</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Commitments</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>commitments: S03 commits to one domain and schema foundation every later slice builds on: the aggregate tables and their forced row-level security, the migration chain that owns them, and the typed store surface that reads and writes them. The delivery is the schema delta and its policies, not a parallel store; a later slice extends the catalogue rather than re-declaring tenancy. The contract closes on the acceptance manifest acceptance/programme/S03.toml and on the published evidence, and it does not claim the action registry (S04) or the board endpoints (S03-S06) that consume it.</li>
-</ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
-<ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">superseded</span></li>
 <li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
 </ul><h2>Compliance method</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
@@ -59,19 +54,17 @@
 <ul>
 <li>compliance: S03 is assessed clause by clause against the SPEC §8 S3 gate and the slice plan §7 gate. The four gate properties are carried by named tests: board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error (a), claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic (b), approval_race.rs::sixteen_racers_create_exactly_one_pending_approval (c), transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense (d). Tenant isolation is rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema-review clause is met with two admitted packages: v1-s03-1 (P1) records that property (b)&#x27;s lease-exclusivity half is not exercised, and v1-s03-2 (P2) records that the archive-exclusion claim covers only the two board-scan indexes. The Phase-G review records the compliance level against this contract; the rework&#x27;s acceptance instrument is acceptance/programme/S03.toml, and the closure gate is decided by an approver other than its requester on the P0-only gate.</li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">superseded</span></li>
 <li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
 </ul><h2>Approval</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>approval 01a217fb-2055-7497-9bfb-29877ff7bb4f — approved <span class="std-state">approved</span></li>
+<li>approval 01a20063-5009-7a66-aaa2-5f2876187e88 — approved <span class="std-state">approved</span></li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">superseded</span></li>
 <li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
 </ul>
     </main>

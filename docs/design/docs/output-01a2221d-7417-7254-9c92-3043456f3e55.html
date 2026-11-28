@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>&#39;Architecture analysis — T3 PM job (retrospective, 2026-11-28)&#39; · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-analysis" data-provenance-version="1" data-provenance-hash="580343f3cbb239e582217adab2f7ae09ba27f65f03642cc36aad4d9a2871d6a3" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-analysis</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>580343f3cbb239e582217adab2f7ae09ba27f65f03642cc36aad4d9a2871d6a3</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture analysis — T3 PM job (retrospective, 2026-11-28)</h1>
+<h2>Current state</h2>
+<p>Measured at the record, the PM job is one project run end to end: <code>projects.charter</code> records the
+charter and its gate, the WBS carries the typed WSJF inputs 8, 8, 5 and 3, <code>projects.baseline</code>
+freezes the scope, the staffing plan names an owner per deliverable, the gate router records every
+decision and refuses self-approval, a change request precedes any baseline change, and
+<code>projects.close</code> records the closure against the closure review. The record shows the project built
+under closed issue #74 and reopened for the #526 retrospective rework on 2026-11-26. The proof is
+executable: <code>crates/store/tests/programme_cadence.rs</code>, <code>refinement.rs</code>, <code>demo_gate.rs</code>, <code>retro.rs</code>,
+<code>tranche_review.rs</code> and <code>benefit_transition.rs</code>, with <code>crates/actions/tests/pi_plan_approval.rs</code>,
+<code>demo_credit.rs</code> and <code>apps/server/tests/cadence_jobs.rs</code>.</p>
+<h2>Options considered</h2>
+<ol>
+<li>A PM-specific workflow engine versus the existing action engine with a sequencer. The existing
+engine was chosen: the PM job is a sequence of governed writes, not a second engine.</li>
+<li>A per-project decision table versus the shared approval gate. The shared gate was chosen so the
+distinct-approver and delegation rules are enforced in one place and cannot be weaker for the PM
+job.</li>
+<li>A baseline edited in place versus an immutable baseline with a change request. Immutability was
+chosen: the change request is the audit trail, and the frozen scope stays citable.</li>
+<li>A closure decided by the PM versus a closure gate decided by a distinct approver. The distinct
+approver was chosen, and the record shows the closure gate decided by an approver other than
+its requester.</li>
+</ol>
+<h2>Risks</h2>
+<ul>
+<li>The PM job's value depends on the record it reads; an incomplete WBS or a missing demo credit is
+refused by the close gate by name, which keeps the closure honest.</li>
+<li>A change request that does not name the baseline would leave the change unanchored; the change
+carries the baseline reference and the registers carry the change.</li>
+<li>The cadence surfaces (PI plan, demo credits, retrospective) can drift from the project's own
+record; the tranche review reads both, and the tranche-review tests are the check.</li>
+<li>The retrospective itself is a risk: it reconstructs the record from the snapshot and the existing
+receipt rather than replaying every construction step, and it says so rather than claiming a
+fresh end-to-end run.</li>
+</ul>
+<h2>Dependency map</h2>
+<p>The record declares <code>meta.depends_on: [T2, P0]</code>: T2's store carries the project, WBS, approval and
+register rows the job writes, and P0 supplies the programme definition and the tranche row that
+authorises the work. The PM job is a dependency of every delivery project that uses the same
+charter, baseline and closure path, and of the programme's tranche machinery, which reads projects
+through the same rows. Inside the project the seven A–D artefacts run from the stakeholder map and
+the driver/goal catalogue through the requirements and the solution concept to the data entity and
+technology standards catalogues.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

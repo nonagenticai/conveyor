@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Acceptance Criteria — T13 Tool platform · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="acceptance-criteria" data-provenance-version="1" data-provenance-hash="1c3df1dd544657e10f10fed20bbc704b71106c6ffeb81b3702143ce580daf2f3" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>acceptance-criteria</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>1c3df1dd544657e10f10fed20bbc704b71106c6ffeb81b3702143ce580daf2f3</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Acceptance Criteria — T13 Tool platform</h1>
+<h2>Scenarios</h2>
+<ul>
+<li><strong>T13-1 broker path.</strong> Given a bound job, when it calls coding, then the declared
+<code>coding_jobs.create</code> destination is reached once and no ad-hoc backend call is made.</li>
+<li><strong>T13-2 ledger.</strong> Given a completed call, when the record is read, then exactly one <code>tool_call</code>
+row and one <code>tool.called</code> event exist.</li>
+<li><strong>T13-3 destructive gate.</strong> Given a destructive call without the tenant's approvals, when it is
+invoked, then 403 <code>approval_required</code> is returned with zero destination hits and no ledger row.</li>
+<li><strong>T13-4 schema.</strong> Given input violating a closed schema, when the tool is called, then 422
+<code>tool_input_invalid</code> is returned before the backend call (zero hits).</li>
+<li><strong>T13-5 storage.</strong> Given a job object, when it is put and read back, then the key is
+tenant-prefixed, the hash verifies, and the compiled prompt carries no S3 key (partial:
+adapter-level, in-memory by default).</li>
+</ul>
+<h2>Verify commands</h2>
+<ul>
+<li><code>python3 scripts/verify-project.py --project T13 --snapshot &lt;snap&gt;/data</code></li>
+<li><code>cargo test -p conveyor-actions --test tool_platform</code> (in CI)</li>
+<li><code>cargo test -p conveyor-actions --test s3_wire</code> (in CI)</li>
+</ul>
+<h2>Results</h2>
+<p>Measured at the tranche-3 review's snapshot: clauses 1-4 pass on merged tests; clause 5 is
+partial (adapter-level only, no job-facing action, static prompt proof). The verdicts are the
+closure review's table.</p>
+<h2>Status</h2>
+<p>Accepted and closed: issue #76 closed 2026-11-18 by PR #352 at <code>a409efe3</code>; the seven open items
+are recorded in the project register and carried by T14/T15 — none is treated as satisfied.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

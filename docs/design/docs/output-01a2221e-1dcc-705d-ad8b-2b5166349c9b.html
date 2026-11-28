@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>User Stories — T3 PM job · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="user-stories" data-provenance-version="1" data-provenance-hash="89b15cb5ffa7d5cf698f2d131fbde6fa717dccd79f166794797ccf14b6f295c4" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>user-stories</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>89b15cb5ffa7d5cf698f2d131fbde6fa717dccd79f166794797ccf14b6f295c4</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>User Stories — T3 PM job</h1>
+<h2>Personas</h2>
+<ul>
+<li><strong>The PM job</strong> requests and plans work: it opens the charter, plan, baseline, change and
+closure gates, and never decides one.</li>
+<li><strong>The approver job</strong> decides every PM gate, always as an actor distinct from the requester.</li>
+<li><strong>The programme manager</strong> owns delivery and reads the baselined plan, the change register and
+the closure.</li>
+<li><strong>The architecture Board</strong> approves the delivery contract the PM plans against, under the
+standing delegation.</li>
+</ul>
+<h2>Stories</h2>
+<ul>
+<li>As the PM job I can run a request end to end — charter, plan, scope, schedule and cost
+baselines — and read every row back.</li>
+<li>As the approver I decide the charter, baseline, change and closure gates, and the record
+shows a distinct approver on every one.</li>
+<li>As the programme manager I see a baseline change travel as a change request with an impact
+block and its own gate, never as a direct write.</li>
+<li>As the Board I approve the delivery contract the project is closed against.</li>
+<li>As the programme I close a project only against its frozen record: published outputs, an
+approved closure asset and gate, and the phase-G review.</li>
+</ul>
+<h2>Scenarios</h2>
+<ul>
+<li>Given a project with an approved charter, when the PM job calls <code>pm.plan</code> with WBS nodes,
+then the deliverable rows exist, the scope baseline is taken and its approval is open.</li>
+<li>Given an open gate, when an actor who requested it tries to decide it, then the action is
+refused and no decision row is written.</li>
+<li>Given an approved scope baseline, when a replacement is attempted without an approved change
+request, then the plan is refused before any WBS write.</li>
+<li>Given a closure request, when the published evidence is missing, then <code>projects.close</code>
+refuses and the project stays open.</li>
+<li>Given a closed project, when the record is read, then the closure review and the contract's
+phase-G review are published and cited.</li>
+</ul>
+<h2>Verify</h2>
+<ul>
+<li><code>acceptance/programme/T3.toml</code>: the manifest's checks execute against the live rows
+(<code>scripts/verify-project.py --project T3</code>).</li>
+<li><code>crates/actions/tests/spine_gates.rs</code>: evidence-less gates refused, change impacts enforced,
+self-declared approvals refused.</li>
+<li><code>crates/actions/tests/programme_baseline.rs</code>: the taker cannot approve their own baseline; a
+distinct reviewer approves once; all three baseline kinds read back.</li>
+<li><code>crates/actions/tests/closure_gate.rs</code>: a close on missing evidence is refused.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

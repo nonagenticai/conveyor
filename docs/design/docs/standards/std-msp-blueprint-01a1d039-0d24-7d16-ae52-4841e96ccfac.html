@@ -37,11 +37,11 @@
         <div><dt>Standard</dt><dd>MSP</dd></div>
         <div><dt>Level</dt><dd>programme</dd></div>
         <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.3</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Aggregates and services</h2>
 <p class="std-intent">The bounded contexts, their data ownership and the service boundaries.</p>
@@ -77,9 +77,10 @@
 <li>approval_policies.get</li>
 </ul><h2>Deployment estate</h2>
 <p class="std-intent">Where each service runs and what it depends on.</p>
-<p class="std-source">Source: <code>programme.json#/projects</code> — 51 row(s)</p>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 52 row(s)</p>
 <ul>
 <li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>The Gemba Walk — a separate game-style client <span class="std-state">active</span></li>
 <li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
 <li>CI, runners and platform <span class="std-state">active</span></li>
 <li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
@@ -87,10 +88,9 @@
 <li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">closed</span></li>
 <li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
 <li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">closed</span></li>
-<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
 <li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
 <li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
-<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
 </ul>
 <p class="std-source">Source: <code>organisation.json#/jobs</code> — 22 row(s)</p>
 <ul>
@@ -108,9 +108,10 @@
 <li>PM <span class="std-state">active</span></li>
 </ul><h2>The to-be the projects deliver</h2>
 <p class="std-intent">Each project&#x27;s contribution to this blueprint, and the gap it closes.</p>
-<p class="std-source">Source: <code>programme.json#/projects</code> — 51 row(s)</p>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 52 row(s)</p>
 <ul>
 <li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>The Gemba Walk — a separate game-style client <span class="std-state">active</span></li>
 <li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
 <li>CI, runners and platform <span class="std-state">active</span></li>
 <li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
@@ -118,10 +119,9 @@
 <li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">closed</span></li>
 <li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
 <li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">closed</span></li>
-<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
 <li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
 <li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
-<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
 </ul><h2>Organisation and skills</h2>
 <p class="std-intent">The organisation, roles and skills the target state requires.</p>
 <p class="std-source">Source: <code>organisation.json#/jobs</code> — 22 row(s)</p>
@@ -148,10 +148,7 @@
 <li>improvement</li>
 </ul><h2>Current, intermediate and target states</h2>
 <p class="std-intent">The current, intermediate and target states and what separates them.</p>
-<p class="std-source">Source: <code>artefacts.json#/governed_assets</code> — 1 row(s)</p>
-<ul>
-<li>Blueprint states <span class="std-state">approved</span></li>
-</ul>
+<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Current, intermediate and target states&#x27; (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p>
     </main>
   </body>
 </html>

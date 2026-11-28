@@ -312,8 +312,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "e60d72c3b9e4ef2226fe0bc2fe75d83a7e3cef2836727e1cd8a9557114e6a491",
-      "bytes": 13417,
+      "sha256": "58c9c21e63382919df5b381260e9cc6633040a1c9fb97f52d16ee9cf9d1663b3",
+      "bytes": 23313,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -708,8 +708,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "e60d72c3b9e4ef2226fe0bc2fe75d83a7e3cef2836727e1cd8a9557114e6a491",
-      "bytes": 13417,
+      "sha256": "58c9c21e63382919df5b381260e9cc6633040a1c9fb97f52d16ee9cf9d1663b3",
+      "bytes": 23313,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -3735,6 +3735,195 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "42811f947bca5b1e716cf6087092d73642fe97b9a1a94d654ee6cf7728b026a2",
       "bytes": 175,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
+    },
+    {
+      "title": "Acceptance Criteria — S04 Action registry",
+      "path": "docs/evidence/tranche-review/inputs/delivery/S04-acceptance-criteria.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/S04-acceptance-criteria.md",
+      "section": "Evidence",
+      "sha256": "51d0755a9281a31413d47a32157507d2050659f4a40062669b0d087f32f73d6b",
+      "bytes": 1530,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-acceptance-criteria.md"
+    },
+    {
+      "title": "Definition of Done — S04 Action registry",
+      "path": "docs/evidence/tranche-review/inputs/delivery/S04-definition-of-done.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/S04-definition-of-done.md",
+      "section": "Evidence",
+      "sha256": "64b2c294604f50af40a385ed1e87b13b4efb47ee81f7c2b512973e5ac9d9609c",
+      "bytes": 1061,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-definition-of-done.md"
+    },
+    {
+      "title": "Definition of Ready — S04 Action registry",
+      "path": "docs/evidence/tranche-review/inputs/delivery/S04-definition-of-ready.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/S04-definition-of-ready.md",
+      "section": "Evidence",
+      "sha256": "0a4d6f279dd0ec869b9112e3cd337aff292b4d51304d171dc3b503fe4a424bd9",
+      "bytes": 1314,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-definition-of-ready.md"
+    },
+    {
+      "title": "User Stories — S04 Action registry",
+      "path": "docs/evidence/tranche-review/inputs/delivery/S04-user-stories.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/S04-user-stories.md",
+      "section": "Evidence",
+      "sha256": "af79d3300dbf6b05cded3d3484a72f8c510d1265119d4e81bf7af43c22ffe38a",
+      "bytes": 1791,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-user-stories.md"
+    },
+    {
+      "title": "Acceptance Criteria — T13 Tool platform",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T13-acceptance-criteria.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T13-acceptance-criteria.md",
+      "section": "Evidence",
+      "sha256": "1c3df1dd544657e10f10fed20bbc704b71106c6ffeb81b3702143ce580daf2f3",
+      "bytes": 1589,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-acceptance-criteria.md"
+    },
+    {
+      "title": "Definition of Done — T13 Tool platform",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T13-definition-of-done.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T13-definition-of-done.md",
+      "section": "Evidence",
+      "sha256": "06ffb6370478fa5a3086bee91521bfb1b10b09120ee8e4b0fdbafd54b9ed1d66",
+      "bytes": 1182,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-definition-of-done.md"
+    },
+    {
+      "title": "Definition of Ready — T13 Tool platform",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T13-definition-of-ready.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T13-definition-of-ready.md",
+      "section": "Evidence",
+      "sha256": "67448e18dd5a7ddc39d15f99846b2841f05092a337463619d1f4c9d65d1e5f09",
+      "bytes": 1394,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-definition-of-ready.md"
+    },
+    {
+      "title": "User Stories — T13 Tool platform",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T13-user-stories.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T13-user-stories.md",
+      "section": "Evidence",
+      "sha256": "7dec81fda3bd8d4d2242c602f3903f59b7c174212596615d5be39d40dedf8ea8",
+      "bytes": 1981,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-user-stories.md"
+    },
+    {
+      "title": "Acceptance Criteria — T3 PM job",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T3-acceptance-criteria.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T3-acceptance-criteria.md",
+      "section": "Evidence",
+      "sha256": "6648e8c2e5294f6b4e488976890bb993f212b5ae58a1c31f6106d4c2e8600c86",
+      "bytes": 1762,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-acceptance-criteria.md"
+    },
+    {
+      "title": "Definition of Done — T3 PM job",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T3-definition-of-done.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T3-definition-of-done.md",
+      "section": "Evidence",
+      "sha256": "20434fba904fb6091237c9fb8284f1cdd59dd8db6f1d1e3b0e935fc701846013",
+      "bytes": 1535,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-definition-of-done.md"
+    },
+    {
+      "title": "Definition of Ready — T3 PM job",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T3-definition-of-ready.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T3-definition-of-ready.md",
+      "section": "Evidence",
+      "sha256": "8fe63d3bbb0f17e4994822ac8cac1ce1bc848f1d77e486db72145012504ccfab",
+      "bytes": 1477,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-definition-of-ready.md"
+    },
+    {
+      "title": "User Stories — T3 PM job",
+      "path": "docs/evidence/tranche-review/inputs/delivery/T3-user-stories.html",
+      "source": "docs/evidence/tranche-review/inputs/delivery/T3-user-stories.md",
+      "section": "Evidence",
+      "sha256": "89b15cb5ffa7d5cf698f2d131fbde6fa717dccd79f166794797ccf14b6f295c4",
+      "bytes": 2412,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-user-stories.md"
+    },
+    {
+      "title": "Architecture analysis — S04 action registry (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/analysis-S04.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/analysis-S04.md",
+      "section": "Evidence",
+      "sha256": "b73d49dd3dd3619fe2901f982a2d607d1d341ee15b9798009770778fe44d6b0f",
+      "bytes": 3141,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/analysis-S04.md"
+    },
+    {
+      "title": "Architecture analysis — T13 tool platform (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/analysis-T13.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/analysis-T13.md",
+      "section": "Evidence",
+      "sha256": "425ece79ff9bee6357298cfdde379a0578fa9663cc685647bafba29194065a86",
+      "bytes": 3312,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/analysis-T13.md"
+    },
+    {
+      "title": "Architecture analysis — T3 PM job (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/analysis-T3.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/analysis-T3.md",
+      "section": "Evidence",
+      "sha256": "580343f3cbb239e582217adab2f7ae09ba27f65f03642cc36aad4d9a2871d6a3",
+      "bytes": 3115,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/analysis-T3.md"
+    },
+    {
+      "title": "Architecture design — S04 action registry (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/design-S04.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/design-S04.md",
+      "section": "Evidence",
+      "sha256": "a9b8c0b659c7a860145a76e7021454c287ec84999a708cf14763b1c940f5ed59",
+      "bytes": 2696,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/design-S04.md"
+    },
+    {
+      "title": "Architecture design — T3 PM job (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/design-T3.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/design-T3.md",
+      "section": "Evidence",
+      "sha256": "99d88f95c84dba27f8d8a991a3070094b90b55a111a9cff04d82433d0e4a1bfc",
+      "bytes": 2853,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/design-T3.md"
+    },
+    {
+      "title": "Inception analysis — S04 action registry (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/inception-S04.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/inception-S04.md",
+      "section": "Evidence",
+      "sha256": "e0e7031eb7d2a76bba1d71e87ee53aebd5f8a6cce9baa7e72e70482570e5d78a",
+      "bytes": 3007,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/inception-S04.md"
+    },
+    {
+      "title": "Inception analysis — T3 PM job (retrospective, 2026-11-28)",
+      "path": "docs/evidence/tranche-review/inputs/v4/inception-T3.html",
+      "source": "docs/evidence/tranche-review/inputs/v4/inception-T3.md",
+      "section": "Evidence",
+      "sha256": "1c6286e1e093f388e612e21a7bdf36208214ca347909ddea51f82cb58df83562",
+      "bytes": 2657,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/inception-T3.md"
+    },
+    {
+      "title": "#852 production runbook — resume here",
+      "path": "docs/evidence/tranche-review/runbook/conv852-production-runbook.html",
+      "source": "docs/evidence/tranche-review/runbook/conv852-production-runbook.md",
+      "section": "Evidence",
+      "sha256": "ea69848016f31ce7c080d7d25633c13582c243151e3387105b6ab5e38fefce71",
+      "bytes": 5856,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/runbook/conv852-production-runbook.md"
+    },
+    {
+      "title": "Tranche 3 review — receipt",
+      "path": "docs/evidence/tranche-review/tranche-3.html",
+      "source": "docs/evidence/tranche-review/tranche-3.md",
+      "section": "Evidence",
+      "sha256": "fe136377aacaa2b6ed76583c2dffaaa0ceb9d410e1017aa3ca1deb22f7d80883",
+      "bytes": 14954,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/tranche-3.md"
     },
     {
       "title": "Tranche-4 review receipt — 2026-11-26",

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Definition of Done — S04 Action registry · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-definition-of-done.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="definition-of-done--s04-action-registry">Definition of Done — S04 Action registry</h1>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The <code>acceptance/programme/S04.toml</code> gate executes green: the ActionSpec derive crate exists and registers its actions; the registry and spec vocabularies are generated; HTTP and MCP parity holds; the served-spec lock matches; the external ingest fold round-trips.</p>
+<h2 id="evidence-at-completion">Evidence at completion</h2>
+<p>The acceptance receipt (<code>verify-project.py --project S04</code>) at the deployed sha; the published project brief, evidence and closure review; the two deliverables accepted under change <code>01a2054b-3f86-7959-b2ad-f1edc5b0bb55</code>; the tranche-3 demo credits on the tranche-3 cadence.</p>
+<h2 id="repo-gate">Repo gate</h2>
+<p><code>cargo fmt --all -- --check</code>, <code>cargo metadata --locked</code>, and the repository's preflight are the compile verdict; the PR's CI and its merge are the final gate. No local compile.</p>
+<h2 id="merge-and-closure">Merge and closure</h2>
+<p>One issue (#3), one branch, one PR that closes it; merged only on the full suite; the closure gate decided by an actor other than its requester; the tranche review reads the receipt at the snapshot's head sha.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/S04-definition-of-done.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

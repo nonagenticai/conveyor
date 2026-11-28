@@ -23,16 +23,59 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="reuse-map" data-provenance-version="2" data-provenance-hash="79fa2b0160aef21899f35bfbe318d6c30f0927c9c46a47c83579abe4f2b6486b" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>reuse-map</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>79fa2b0160aef21899f35bfbe318d6c30f0927c9c46a47c83579abe4f2b6486b</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Reuse map — P0 (retrospective, 2026-11-26)</h1>
-<h2>Reuse candidates</h2>
-<p>The reuse map published on 2026-11-18 at 08:18:25 (<code>01a1e006-fa29-756e-a710-90db4a232343</code>) names the candidates plan §3 item 11 sets out: the conveyor V1 tree of tables, actions, modules and processes, including the 25 measured-built slices; the estate's absorbed services and modules; the seeded catalogues; and the upstream crates. Each candidate is recorded with the question the project's analysis unit must answer.</p>
-<h2>Boundary</h2>
-<p>The boundary of reuse is the repository and the public capability, not a private host or URL: plan §5 requires an analysis citation of <code>path:symbol</code> inside the repo and only the capability name outside it. Reuse must not fork an existing surface, and a project that deviates from the blueprint records a decision rather than a silent fork. P0 itself reuses the V1 aggregates and the existing seed rather than rebuilding them.</p>
-<h2>Licence and contract constraints</h2>
-<p>Each reuse candidate carries its licence or contract constraint in the map, and the programme's public/opt-in licensing frame is a condition of the benefits rather than a footnote. A delivery project operates under a live <code>architecture_contract</code>; a design gate without one is refused. What is measurable now is that the constraints are recorded per candidate. No licence negotiation or contract change appears in the P0 record dated 2026-11-26, so none is claimed.</p>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="reuse-map" data-provenance-version="1" data-provenance-hash="52fa56a9435c1974b419f721172fe6a0bca1ca91a8c33b3919c390a1b6d51421" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>reuse-map</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>52fa56a9435c1974b419f721172fe6a0bca1ca91a8c33b3919c390a1b6d51421</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Reuse map</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15
+<strong>Authority above this file:</strong> <code>docs/decisions/0005</code>–<code>0007</code>, <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code></p>
+<p>The programme reuses <strong>code, ideas and services</strong>, never a runtime dependency it does not own. For
+each source: what is reusable, the boundary, and the question the inception analysis must answer.</p>
+<h2>1. The conveyor's own V1 tree</h2>
+<table><thead><tr><th>Source</th><th>Reuse candidate</th><th>Boundary</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>crates/domain</code>, <code>crates/store</code>, <code>crates/actions</code>, <code>crates/api</code>, <code>crates/auth</code>, <code>crates/bus</code>, <code>crates/render</code>, <code>crates/workflow</code>, <code>crates/pack</code></td><td>The aggregates, state machines, action registry, tenancy, outbox, renderer and public pack</td><td>V2 extends the model; it does not fork an aggregate or re-open a V1 slice</td><td>Which existing table/action/symbol does this project extend, and which must it not duplicate?</td></tr>
+<tr><td><code>migrations/</code> (83+ tables, 290+ served operations)</td><td>Schema patterns: RLS, version/ETag, outbox, named constraints</td><td>A new table is owned by exactly one slice; no cross-service FK</td><td>Is the table new, or does an existing row already hold the fact?</td></tr>
+<tr><td><code>docs/plans/slices/S00–S21</code></td><td>The built design record and each slice's gate</td><td>A V2 project cites the slice it builds on; it does not rewrite it</td><td>Which slice's gate is the prerequisite, and what evidence proves it still holds?</td></tr>
+<tr><td><code>docs/SPEC_V2.md</code></td><td>The V2 model, the T0–T17 plan, the decisions D28–D61</td><td>The spec is the plan, not the build record; a deviation is a decision record</td><td>Which SPEC section is the contract, and which decision pins it?</td></tr>
+<tr><td><code>apps/server</code>, <code>apps/licenses</code>, <code>apps/lean4-prover</code></td><td>The one-binary composition, the service conventions, the app patterns</td><td>Each is its own service, database and user</td><td>Is this a new service or an action inside the conveyor?</td></tr>
+</tbody></table>
+<h2>2. The estate's absorbed services</h2>
+<p>State is measured in <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> §1; "merged" and "live" are different
+claims.</p>
+<table><thead><tr><th>Group</th><th>State</th><th>Reuse candidate</th><th>Boundary</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>apps/scientific</code> (scientific research, evidence review)</td><td>absorbed, not deployed; live deployment still the Python image at zero replicas</td><td>The Rust contract and its operations</td><td>It is a toolkit, not a second copy of the conveyor's knowledge model</td><td>Which operation is called, with what effect class and approval?</td></tr>
+<tr><td><code>apps/research</code> (web scraper, media discovery)</td><td>in flight (#117 merged, #118 in flight)</td><td>The static fetch path and the discovery contract</td><td>The backend stays a toolkit; no crawl policy leaks into a job</td><td>Which probe proves it, and what is the zero-use retirement rule?</td></tr>
+<tr><td><code>apps/media</code> (browser-rendered and ffmpeg producers, speech, video publish)</td><td>decided, unclaimed (#139); ADR 0007 keeps it as two executor images</td><td>The producer contracts and the <code>analyse.*</code> library</td><td>It is not a service the conveyor re-implements; it is a bound tool</td><td>Which deliverable vocabulary does it produce, and which caller owns the output?</td></tr>
+<tr><td><code>apps/lean4-prover</code></td><td>absorbed, not deployed; pre-absorption image live</td><td>The prover contract and toolchain pin</td><td>A separate deployable for its toolchain, not a conveyor aggregate</td><td>Is the proof a tool call with a recorded result, and who judges it?</td></tr>
+<tr><td><code>apps/coding</code></td><td>the <code>coding-*</code> fleet; the Python fleet is still deployed; ADR 0006 says join the existing Rust repo</td><td>The coding action surface and the workspace model</td><td>One Rust repository; no second rewrite; no direct shell from a procedure</td><td>Which coding operation is a governed tool call, and what is its effect ceiling?</td></tr>
+<tr><td><code>strata_ingest</code>, <code>strata_rag</code></td><td>done (ADR 0005 §2)</td><td>Shared ingest and retrieval as tools</td><td>External members of the tool estate, not repository scope</td><td>Which retrieval result is cited as evidence, and how is it redacted?</td></tr>
+<tr><td>The model servers (speech, transcription, image, vision)</td><td>remote HTTP hosts bound as toolkits</td><td>The pinned toolkit contract</td><td>They stay remote; no model weights or GPU runtime enter the conveyor</td><td>Which model/version is pinned, and what is the fallback on outage?</td></tr>
+</tbody></table>
+<h2>3. The eighteen stage directories are a vocabulary</h2>
+<p><code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> §2 records the correction: the "w2v stages" are not
+services. Two are libraries (<code>primitives</code>, <code>shared</code>); the other sixteen are <strong>deliverable
+blueprints</strong> — a kind of output and the sequence that produces it. They are the conveyor's
+project-type vocabulary, not a deployment plan. A project that needs one names the blueprint and
+the output, not a service to build.</p>
+<h2>4. Upstream crates and patterns</h2>
+<table><thead><tr><th>Source</th><th>Reuse candidate</th><th>Boundary</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>sqlx</code>, <code>axum</code>, <code>tokio</code>, <code>serde</code>, <code>uuid</code>, <code>chrono</code></td><td>The V1 stack</td><td>Pin the workspace versions; no second HTTP or DB stack</td><td>Does the new code need a crate the workspace does not already carry?</td></tr>
+<tr><td>The action-spec derive (<code>crates/actions-derive</code>)</td><td>One spec per operation, projected to HTTP/OpenAPI/MCP/CLI</td><td>A new action is a spec, never a hand-written route</td><td>Is the operation an action, a job, or a UI-only read?</td></tr>
+<tr><td>The public pack (<code>crates/pack</code>)</td><td>One published-set reader for live routes and export</td><td>No second renderer; redaction is shared</td><td>Does the output need a new page or a new entry in the existing contract?</td></tr>
+<tr><td>The estate's CI archetype (<code>gitops-production</code>)</td><td>The shared Rust workflow and the runner pools</td><td>A public repo may only call public reusable workflows; this repo's <code>ci-public.yml</code> is self-contained</td><td>Which gate belongs in the archetype, and which is repo-specific?</td></tr>
+</tbody></table>
+<h2>5. Explicit non-reuse</h2>
+<ul>
+<li><strong>The agent platform is a front end over MCP</strong>, not a runtime dependency; the conveyor owns its
+model (D33, <code>docs/SPEC_V2.md</code> §1.2).</li>
+<li><strong>fr and care-bus are not imported</strong>: fr is the project of record in the old estate; the conveyor
+replaces its work surfaces; care-bus stays a standalone demo (D48).</li>
+<li><strong>Archived kag components</strong> (<code>kag_graph</code>, <code>karma</code>, <code>hirag</code>, <code>kag_orchestrator</code>) must not be bound
+as tools; a function that needs one is re-homed per <code>docs/SPEC_LEGACY_KAG.md</code> first
+(<code>docs/SPEC_V2.md</code> §14, R19).</li>
+<li><strong>No private host, path or credential</strong> enters a published output or the public repository; the
+reuse map names capabilities and boundaries, never infrastructure.</li>
+</ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-28T12:46:29.116452+00:00</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

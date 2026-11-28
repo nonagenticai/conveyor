@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Acceptance Criteria — T3 PM job · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-acceptance-criteria.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="acceptance-criteria--t3-pm-job">Acceptance Criteria — T3 PM job</h1>
+<h2 id="scenarios">Scenarios</h2>
+<ul>
+<li><strong>T3-1 request end to end.</strong> Given an approved charter, when the PM runs <code>pm.plan</code> and takes the scope baseline, then the WBS, baseline and approval rows exist and read back.</li>
+<li><strong>T3-2 no self-approval.</strong> Given a gate the PM requested, when the same actor decides it, then the decision is refused and no approval_decision row is written.</li>
+<li><strong>T3-3 change request.</strong> Given an approved baseline, when a replacement is attempted without an approved change request carrying an impact block, then the plan is refused before any write.</li>
+<li><strong>T3-4 change gate.</strong> Given a change request, when its gate is approved by a distinct approver, then the baseline can advance and the change reads back as approved.</li>
+<li><strong>T3-5 closure on the record.</strong> Given a closure request, when any required row is missing (published output, approved asset, baselines, contract, Phase-G review), then <code>projects.close</code> refuses and the project stays open.</li>
+</ul>
+<h2 id="verify-commands">Verify commands</h2>
+<ul>
+<li><code>python3 scripts/verify-project.py --project T3 --snapshot &lt;snap&gt;/data</code></li>
+<li><code>cargo test -p conveyor-actions --test spine_gates</code> (in CI)</li>
+<li><code>cargo test -p conveyor-actions --test programme_baseline</code> (in CI)</li>
+<li><code>cargo test -p conveyor-actions --test closure_gate</code> (in CI)</li>
+</ul>
+<h2 id="results">Results</h2>
+<p>Measured at the tranche-3 review's snapshot: the manifest's checks execute against the live rows; the receipt's per-check verdicts are the record. The closure is the live occurrence of scenario T3-5 against the full record.</p>
+<h2 id="status">Status</h2>
+<p>Accepted and closed: the five deliverables were accepted under change <code>01a2052e-5648…</code> and credited at the tranche-3 demo; the project closed against its frozen baseline with the retrospective ADM artefacts and the register rows in place.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/T3-acceptance-criteria.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

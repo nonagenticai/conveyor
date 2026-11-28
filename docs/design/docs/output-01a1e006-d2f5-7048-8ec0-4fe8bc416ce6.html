@@ -23,18 +23,72 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="vision" data-provenance-version="2" data-provenance-hash="770323fb99e5399431fce0c6e4706db715e67f95fe6df62daeb71d31f1b3dbdc" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>vision</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>770323fb99e5399431fce0c6e4706db715e67f95fe6df62daeb71d31f1b3dbdc</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Vision and mandate — P0 (retrospective, 2026-11-26)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="vision" data-provenance-version="1" data-provenance-hash="697551cb10008241ed18426dc2a92c220a4285adf48be5660d1e52143661b53a" data-provenance-status="active" data-provenance-owner="unrecorded" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>vision</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>697551cb10008241ed18426dc2a92c220a4285adf48be5660d1e52143661b53a</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>unrecorded</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Vision and mandate</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Owner:</strong> George · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
 <h2>Purpose</h2>
-<p>P0 is the programme-definition project of the programme it defines (<code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>). Its purpose, recorded in <code>docs/plans/P0-programme-definition.md</code> §1, was to design the programme that delivers the full conveyor under MSP's <em>Defining a Programme</em> and <em>Realizing the Benefits</em>, and to adopt SPEC_V2 §8.2–8.4 as the programme's cadence, definition and benefit track. The vision was published as "Vision and mandate" on 2026-11-18 at 08:18:36 under <code>01a1e006-d2f5-7048-8ec0-4fe8bc416ce6</code>.</p>
+<p>The conveyor is the operating model for an organisation's work. It carries work as positions,
+projects, boards, cards, runs and approvals; it carries proof as runs, evidence, decisions and
+instruments; and it makes the organisation itself explicit as industry → department → job, with
+immutable releases and tenant-scoped bindings. It is one Rust application, not a fleet of
+services that each know a fragment of the model (<code>docs/SPEC_V2.md</code> §1, §2).</p>
+<p>The programme exists to finish that model and to run it. V1 built the machine that carries work;
+V2 adds the organisation that works the machine. The last whole-tree V1 checkpoint measured 83
+tables and 243 actions, with the registry past 290 served operations as S19–S21 landed
+(<code>docs/SPEC_V2.md</code> §1.1). Those are a floor, not a live figure.</p>
 <h2>Outcomes</h2>
-<p>What is measurable now is the definition set itself: the plan measured 20 of the 21 output categories published on 2026-11-17, and the twenty-first, <code>tranche-review</code>, was published at 20:00:13 that day; tranche 1 was then authorised on 2026-11-21 at 01:11:46. The outcome P0 defined is a programme whose delivery projects are held to briefs and whose benefits are held to profiles. Benefit realisation is not claimed.</p>
+<ol>
+<li><strong>One model, one store.</strong> A programme, its projects, their work, their decisions and their
+evidence are rows in one Postgres database with one action registry, not concepts imported from
+other applications (<code>docs/SPEC_V2.md</code> §10).</li>
+<li><strong>Jobs, not code paths.</strong> PM, kanban coach, kata, development and operations are configured
+positions that receive cards, decide with rules and laya, and generate with LLMs behind gates
+(<code>docs/SPEC_V2.md</code> §6).</li>
+<li><strong>Every decision is auditable.</strong> A rule, a laya choice and a human decision produce the same
+decision row, pinned to the policy, refinement and configuration versions that produced it
+(<code>docs/SPEC_V2.md</code> §7).</li>
+<li><strong>Every tool is governed.</strong> Each cluster service a job may call is a versioned, bound, audited
+toolkit; every call is ledgered; a destructive call without the tenant's configured approvals is
+refused (<code>docs/SPEC_V2.md</code> §11).</li>
+<li><strong>The conveyor develops and operates itself</strong> under the gates it imposes on any work — with the
+gates that judge it outside its own reach (<code>docs/SPEC_V2.md</code> §9).</li>
+<li><strong>The public can see and challenge the design.</strong> The repository is public, the programme site
+reads Postgres, and every published output has a stable URL; input arrives as GitHub issues and
+design pull requests, never as an in-app public account.</li>
+</ol>
 <h2>Boundary</h2>
-<p>P0 defines the programme and does not deliver T1–T19. The plan states that no V2 delivery project starts before the definition set is accepted, and that T1–T17 were proposed and blocked by their SPEC_V2 §12 edges at the baseline. The typed rows behind the architecture categories are T9's (#81), so P0's claim stops at the published documents and records this brief lists, and it does not extend to the typed store.</p>
+<ul>
+<li><strong>Not a conversational agent.</strong> The agent platform is a user-interaction front end over MCP; it
+holds no runtime dependency and is not a second system of record (<code>docs/SPEC_V2.md</code> §1.2, D33).</li>
+<li><strong>Not customer care.</strong> <code>care-bus-agents</code> stays a standalone demo; the conveyor is for project,
+continuous-line and line-management work (<code>docs/SPEC_V2.md</code> §1.2, D48).</li>
+<li><strong>Not a document manager.</strong> The public outputs are the programme's intermediate work products;
+engineering documentation stays beside the code in <code>docs/</code>.</li>
+<li><strong>Not a rewrite of V1.</strong> V1's built slices are not re-opened; V2 extends them (<code>docs/SPEC_V2.md</code>,
+preamble).</li>
+<li><strong>Not an in-app community.</strong> Comments, accounts and moderation are out of frame; the public
+conversation is GitHub.</li>
+</ul>
 <h2>Who it serves</h2>
-<p>The vision serves the sponsoring group, the SRO and programme board, the programme office, and the delivery projects that consume the brief template and blueprint. It also serves the six stakeholder groups whose profiles were published on 2026-11-18 at 08:17:48 (<code>01a1e9e1-d583-74cc-bc8c-097fbe79c1ed</code>), and the public/opt-in licence holders made a condition of the benefits rather than an afterthought.</p>
+<p>First, the organisation that builds it: the owner, the maintainer sessions and outside
+contributors working the programme in this repository. Then, opt-in tenants: a tenant that does not
+use a V2 aggregate does not ship it (<code>docs/SPEC_V2.md</code> §12, P10). The licensing frame is per-tenant
+and opt-in; there is no per-app delegation.</p>
+<h2>Mandate and success</h2>
+<p>P0's definition set is the programme's mandate: the programme does not start T1–T17 until this set
+is accepted and its briefs are the contracts those projects are held to
+(<code>docs/plans/P0-programme-definition.md</code> §1, §6).</p>
+<p>The programme is succeeding when:</p>
+<ul>
+<li>T12's one-organisation loop runs end to end, audited and within budget (<code>docs/SPEC_V2.md</code> §12);</li>
+<li>a gate that never refuses is flagged as a defect, not celebrated (<code>docs/SPEC_V2.md</code> §14, R5);</li>
+<li>every V1 and V2 project has a brief, a published inception analysis and architecture, and its
+build evidence is recorded on the project;</li>
+<li>the programme site shows the measured truth — projects, expected outputs, published outputs and
+gaps — without a hand-maintained status.</li>
+</ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-28T12:46:29.116452+00:00</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

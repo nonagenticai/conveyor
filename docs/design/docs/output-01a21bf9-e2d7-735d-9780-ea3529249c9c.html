@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>ADR 0024 — The Gemba Walk is served at game.nonagentic.ai with its own public client · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="decision" data-provenance-version="1" data-provenance-hash="a18935c8d89553cec96d7c61aff57b7321aa203466a1db2122b775339e0c1e97" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>decision</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>a18935c8d89553cec96d7c61aff57b7321aa203466a1db2122b775339e0c1e97</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>0024 — The Gemba Walk is served at <code>game.nonagentic.ai</code> with its own public client</h1>
+<p><strong>Status:</strong> Accepted · 2026-11-27 · <strong>Approved:</strong> delegated rule decision under the published
+delegation of 2026-11-22 (reference <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; expiry 2027-02-18) —
+not a human signature · <strong>Owner direction:</strong> 2026-11-27 · <strong>Change request:</strong> CR-WALK-001
+(<code>docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md</code>)
+<strong>Supersedes in part:</strong> ADR 0021 decision 1 (the <code>/walk/</code> sub-site on the operator origin) and
+decision 4's "same public client" default; SPEC_V2 D67 in part.</p>
+<h2>Context</h2>
+<p>ADR 0021 authorised a separate game-style client but placed it at <code>/walk/</code> on the operator origin,
+using the <code>conveyor-web</code> public client and deferring production sign-in to an external redirect-URI
+registration. That was the conservative first step: one image, one origin, one client, no identity
+work.</p>
+<p>The owner has now directed (2026-11-27) that the game is a secondary UI that <strong>may become the
+primary UI</strong>, that it must have <strong>its own Keycloak setup</strong> and <code>https://game.nonagentic.ai</code>, and
+that the UI must work first time. A sub-path on the operator origin cannot be that product URL, and
+a production sign-in that waits on an external registration is not a working identity.</p>
+<p>The estate has the pieces to do this without a second runtime: <code>conveyor-public-vs</code> is an Istio
+VirtualService behind the <code>cloudflared-apps</code> tunnel; the gateway already carries the
+<code>*.nonagentic.ai</code> wildcard and the origin certificate is not verified; DNS is derived from the
+tunnel ConfigMap by the <code>dns-ensure</code> CronJob; the conveyor realm <code>conveyor</code> already holds the
+<code>conveyor-web</code> public client with PKCE S256 and a <code>conveyor</code> audience mapper; clients are managed by
+a git-driven, idempotent realm-patch ConfigMap and a manual Job; and the realm already carries the
+E2E principal <code>conveyor-e2e</code>. The API is a single axum service that already serves both the operator
+SPA and a static tree; the walk is a static ESM tree plus an optional wasm module.</p>
+<h2>Decision</h2>
+<ol>
+<li><strong>The canonical URL is <code>https://game.nonagentic.ai/</code>, served at the root.</strong> The walk's paths
+are the <code>apps/web</code> paths (<code>/portfolio</code>, <code>/board/:board_id</code>), so parity is an equality, not a
+prefix mapping. The <code>/walk</code> prefix retires in production. <code>conveyor.nonagentic.ai/walk</code> and
+<code>/walk/*</code> return a 308 to the game host with the prefix stripped; the sub-site path remains only
+as the no-host dev/CI shape so the existing spike and local workflow keep a shape.</li>
+<li><strong>One image, one service, two hosts.</strong> <code>game.nonagentic.ai</code> is added to <code>conveyor-public-vs</code> and
+routes to the existing <code>conveyor</code> service. The API is same-origin on both hosts: no CORS, the
+same SSE transport, the same dev cookie in development. No second deployment, port, database or
+runtime.</li>
+<li><strong>The game host is a hard boundary.</strong> The server dispatches on the normalised <code>Host</code>; on a game
+host it serves only the walk tree, <code>/config.json</code> and the API, and it refuses the operator
+surfaces (<code>/mcp</code>, <code>/design</code>) and never serves the operator index or a directory index. The gate
+is a router-level middleware, because axum routes pre-empt the fallback and <code>/mcp</code> is a real
+route; a check inside the fallback alone would leak it. <code>/config.json</code> returns the game client id
+on the game host. The <code>/walk</code> redirect target is configuration (<code>CONVEYOR_GAME_PUBLIC_URL</code>),
+never the request <code>Host</code>, so the redirect cannot be pointed at an attacker's host.</li>
+<li><strong>The game has its own public Keycloak client, <code>conveyor-game</code>, in the existing realm
+<code>conveyor</code>.</strong> It is a public client with the standard flow, PKCE S256, redirect
+<code>https://game.nonagentic.ai/*</code>, web origin <code>https://game.nonagentic.ai</code> (the token endpoint's
+CORS), the same default/optional scopes, and the <code>conveyor</code> audience mapper. It is managed by the
+realm-patch ConfigMap with its own create-or-refuse convergence and drift preflight; the manual
+Job is run as part of the unit.</li>
+<li><strong>A new realm is rejected.</strong> A realm per surface would duplicate the user set, break single
+sign-on and create a second identity boundary to operate. The realm is already per app
+(<code>conveyor</code>); the game's isolation is a client, not a realm. If realm-level isolation is ever
+required, it is a separate change with a user-migration cost.</li>
+<li><strong>The API accepts an <code>azp</code> allowlist of exactly <code>{conveyor-web, conveyor-game}</code>.</strong> The configured
+audience remains <code>conveyor</code>. Both are first-party browser clients of the same principal set; the
+replay guard stays "one of our two clients", not "any realm client". The game client id is an
+explicit optional configuration value, never defaulted from the audience.</li>
+<li><strong>Deployment order is part of the decision.</strong> The conveyor image (host-aware, walk tree, config
+per host) is deployed first with the game host configured but <strong>not routed</strong>; then the gitops
+change routes the host and sets the env; then the realm Job runs; then the live proof. This
+guarantees the operator app is never served at the game host.</li>
+<li><strong>The live proof is a real sign-in.</strong> A deployed Playwright spec signs in as <code>conveyor-e2e</code>
+through the game client, captures the memory-only token from the first <code>/api</code> request, and
+asserts the Portfolio read and <code>/api/me</code>. It reuses the established <code>apps/web/e2e/oidc.setup.ts</code>
+pattern; credentials are env-only and never committed. A redirect that merely reaches Keycloak is
+not acceptance.</li>
+<li><strong>The P6 primacy decision is unchanged.</strong> <code>apps/web</code> remains normative until the measured parity
+gate and the owner's decision. This ADR makes the walk first-class; it does not promote it.</li>
+</ol>
+<h2>Why</h2>
+<ul>
+<li>The owner named the URL and the identity isolation. Both are product decisions the architecture
+must express, not defer.</li>
+<li>The same image and service keeps the blast radius and the operations surface unchanged; the
+second host is a routing and identity change, not a platform.</li>
+<li>Same-origin keeps the browser contract simple: no CORS layer, the same SSE implementation, the
+same cookie discipline in development, and no token in a cross-origin URL.</li>
+<li>A dedicated client gives the game its own redirect set, web origin and session policy without
+duplicating users; the <code>azp</code> allowlist keeps the API's replay guard meaningful.</li>
+<li>Root paths make the parity instrument an equality and remove a prefix that would otherwise have
+to be migrated at primacy.</li>
+</ul>
+<h2>Alternatives considered</h2>
+<ul>
+<li><strong>Keep the <code>/walk/</code> sub-site and add a redirect URI to <code>conveyor-web</code>.</strong> Rejected: it does not
+give the game its own URL or client, and it leaves the production sign-in dependent on widening
+the operator client's redirect set — the opposite of isolation.</li>
+<li><strong>A new Keycloak realm for the game.</strong> Rejected: user duplication, two sign-on boundaries, two
+sets of realm settings and secrets, for no capability. The estate's policy is a realm per app.</li>
+<li><strong>A second deployment or image for the walk.</strong> Rejected: doubles the runtime, probes, secrets,
+image pipeline and CI for a static tree that is already served by the existing service. It would
+also need CORS or a second API origin.</li>
+<li><strong>A CDN or a new port.</strong> Rejected: the tunnel and the Istio host already provide the edge; a new
+port is operational surface with no benefit. Port 8000 is never used.</li>
+<li><strong>Deriving the redirect target from the request <code>Host</code>.</strong> Rejected: an open redirect. The target
+is configuration.</li>
+</ul>
+<h2>Consequences</h2>
+<ul>
+<li><code>crates/auth</code> gains an optional game client id and a two-id <code>azp</code> allowlist; <code>crates/api</code> gains
+the game hosts, the game public URL, the router-level host gate and host-aware static/config
+serving. Tests cover the host matrix, the boundary and the redirect.</li>
+<li><code>apps/walk</code> is served from <code>/srv/site/walk</code> on the game host; assets are relative so the same tree
+also works under the no-host sub-site. The wasm build runs in the image stage and CI, never on a
+developer machine.</li>
+<li>The gitops repo gains the client definition, the tunnel ingress, the VirtualService host and the
+deployment env; the realm Job is re-run and read back.</li>
+<li>The census's <code>walk</code> paths become host-rooted; the W0 record is re-baselined with a signed commit
+and the 52/598 counts recorded.</li>
+<li>ADR 0021's parity goal, the action registry, the data model, the no-fixture rule and the P6 gate
+are unchanged.</li>
+<li>Rollback: remove the host from the VirtualService and the tunnel ingress and drop the env; the
+client stays inert, the operator is unaffected, and no data was migrated.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Host matrix: <code>crates/api/src/web.rs</code> tests and <code>crates/api/tests/web_hosts.rs</code> (game entry, deep
+link, asset, missing asset 404, config client id, no operator/design/MCP, operator unchanged,
+308 with query, hostile-Host redirect).</li>
+<li>Client: the realm Job log plus an admin-API read of <code>conveyor-game</code>, its redirect URIs, web
+origins, PKCE attribute and <code>conveyor</code> audience mapper.</li>
+<li>Live: <code>https://game.nonagentic.ai/</code>, <code>/portfolio</code>, <code>/config.json</code>, a missing asset 404, <code>/mcp</code>
+and <code>/design/*</code> 404, the operator origin unchanged, and the deployed OIDC sign-in as
+<code>conveyor-e2e</code> landing on the Portfolio read.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Change request: <code>docs/plans/inception/GEMBA-WALK/08-change-request-001-host-and-identity.md</code></li>
+<li>ADR 0021: <code>0021-gemba-walk-client.md</code></li>
+<li>ADR 0022: <code>0022-bevy-ecs-world-layer.md</code></li>
+<li>ADR 0023: <code>0023-gemba-walk-renderer.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> §4, §5, §9, §10, §11</li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code> §7, §8, §10</li>
+<li>Register: <code>docs/plans/inception/GEMBA-WALK/03-artifact-register.md</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

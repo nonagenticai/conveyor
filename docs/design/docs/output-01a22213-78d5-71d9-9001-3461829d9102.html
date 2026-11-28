@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 — Candidate solutions (retrospective, 2026-11-23) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="candidate-solutions" data-provenance-version="1" data-provenance-hash="be56a61da3da6e21ea23908ba349183d61eb3c37c238f609c936b3155532e559" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>candidate-solutions</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>be56a61da3da6e21ea23908ba349183d61eb3c37c238f609c936b3155532e559</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T16 — Candidate solutions (retrospective, 2026-11-23)</h1>
+<h2>Candidates</h2>
+<ul>
+<li><strong>C1 — Extend the one procedures capability.</strong> <code>procedures.ingest_sop</code>, <code>ingest_rdf</code> and
+<code>ingest_process</code> write typed drafts into the one store; a human gate publishes; bound jobs run
+the PDDL steps. <strong>Chosen.</strong></li>
+<li><strong>C2 — A separate ingestion service with its own store.</strong> Rejected.</li>
+<li><strong>C3 — Vendor SOP tooling with no record rows.</strong> Rejected.</li>
+<li><strong>C4 — Ungated knowledge upload.</strong> Rejected.</li>
+</ul>
+<h2>Criteria</h2>
+<p>One model and one store; a human publication gate; versioned re-ingest; multi-format intake
+(SOP, RDF/OWL, BPMN/Visio/draw.io); bound PDDL execution; audit rows for every write.</p>
+<h2>Options rejected</h2>
+<ul>
+<li><strong>C2</strong> forks truth into a second store and puts the programme's blast radius across two systems;
+it also has no single audit trail.</li>
+<li><strong>C3</strong> creates bespoke tooling with no action registry row, so no gate and no evidence.</li>
+<li><strong>C4</strong> lets an unreviewed source bind a job — exactly what SPEC_V2 §12 T16 forbids. The delivered
+gate refuses it in <code>an_unreviewed_source_cannot_bind</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

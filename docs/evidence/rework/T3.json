@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a216d0-9c9b-7c8c-a6ef-0d9365632efa approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen",
+      "detail": "baseline 01a2220d-cf67-7aeb-ac42-16d238a32b24 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen",
       "id": "T3-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a217fb-a475-7824-b01c-bfcfcb4680d3 approved by board decision 01a217fb-a503-7db9-b47b-55a111c1c8de about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a2222b-0b2a-7638-a518-6f9bdce87ca6 approved by board decision 01a2222b-1386-7d23-b073-6b3dd4d7a2f7 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T3-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a217fb-d7aa-7e7e-afea-b1ad8dfef42f (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a2222d-92b1-79f6-8bda-562ea44260e7 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T3-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a216d1-3447-7994-9a41-5386c02e2bd0 decided by a distinct approver",
+      "detail": "latest closure gate 01a22214-f70a-7747-bbe9-0f712f7cf144 decided by a distinct approver",
       "id": "T3-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a216d0-d273-76e3-981f-989be9f580f1 carries a statement and evidence from the tranche-3 retro",
+      "detail": "lesson 01a22210-371f-727c-b652-c4668587b45a carries a statement and evidence from the tranche-3 retro",
       "id": "T3-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -169,16 +169,16 @@
   ],
   "failures": [],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-26T13:12:10.680953+00:00",
+  "generated_at": "2026-11-28T12:48:52.730899+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
   "project": "T3",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-26T13:11:47.607618+00:00",
-    "git_sha": "c1a1a0eadefe8e261dce88855c1c28b9b76f9c79",
-    "path": "retained-snapshot/c1a1a0eadefe8e261dce88855c1c28b9b76f9c79"
+    "generated_at": "2026-11-28T12:46:29.116452+00:00",
+    "git_sha": "e6c36e664ad071a144491b8537be162efd4cd8e0",
+    "path": "retained-snapshot/e6c36e664ad071a144491b8537be162efd4cd8e0"
   },
   "verdict": "green",
   "warnings": []

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Architecture design — S04 action registry (retrospective, 2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/design-S04.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="architecture-design--s04-action-registry-retrospective-2026-11-28">Architecture design — S04 action registry (retrospective, 2026-11-28)</h1>
+<h2 id="context-and-boundary">Context and boundary</h2>
+<p>This design owns the action declaration and its four projections, the invocation path and the external-action ingest. It must not duplicate the store, the tenancy model, the router or the auth path; it sits above them and consumes them. The blueprint it fits is the one the requirements catalogue and the solution concept diagram name: one declaration, one resolver, one audit ledger.</p>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<ul>
+<li>Aggregates: the action specification (name, version, kind, scopes, effect, confirm, timeout and tenancy) and the invocation and audit rows it writes.</li>
+<li>Tables: the registry and audit rows created by <code>migrations/0003_action_registry.sql</code>; the invocation ledger is the same ledger every governed call uses.</li>
+<li>Actions: <code>actions.list</code> and <code>actions.describe</code> for reading the registry; every internally declared action reaches its operation through the resolver; an ingested external action is invoked through the same surface once its binding exists.</li>
+<li>Events: one audit row per invocation; the lock check at build; the boot-time collision refusal.</li>
+</ul>
+<h2 id="decisions">Decisions</h2>
+<ul>
+<li>One <code>spec_hash</code> per action across the manifest, the OpenAPI operation and the MCP tool; a mismatch fails the boot rather than publishing a divergent projection.</li>
+<li>Names fail closed: duplicate names, MCP collisions and out-of-charset names are refused at boot.</li>
+<li>A schema-invalid input returns RFC 9457 with a populated <code>errors[]</code> and never a 500.</li>
+<li>An idempotent replay yields one invocation row: the idempotency key is a property of the call, not of the payload.</li>
+<li><code>served-spec.lock.json</code> catches drift; a hand-edited OpenAPI document fails the check.</li>
+</ul>
+<h2 id="acceptance">Acceptance</h2>
+<p><code>acceptance/programme/S04.toml</code> carries the gate. The proof is <code>crates/actions/tests/parity_http_mcp.rs</code> (20 actions identical over HTTP and MCP), <code>crates/actions/tests/action_resolution.rs</code> (resolution and refusal), the served-spec lock check and the external fixtures under <code>crates/actions/tests/fixtures/external/</code>. The close gate reads the declared outputs project-brief and evidence, the closure review, the live delivery contract and its Phase-G review, the approved scope baseline and the seven A–D artefacts.</p>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
+<p>The design's record is the seven Phase A–D artefacts: the stakeholder map, the driver, goal and objective catalogue, the requirements catalogue, the solution concept diagram, the business capability map, the data entity catalogue and the technology standards catalogue. Each is a typed row with its entries and links, and each is published as its own page by the artefact standard.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/v4/design-S04.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

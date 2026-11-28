@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Definition of Ready — T3 PM job · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T3-definition-of-ready.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="definition-of-ready--t3-pm-job">Definition of Ready — T3 PM job</h1>
+<h2 id="independent">Independent</h2>
+<p>The PM request-to-plan path ships alone: <code>pm.plan</code>, the four PM gates, the change path and the closure. Project creation and the board surfaces (S05) are a declared boundary, not a dependency.</p>
+<h2 id="negotiable">Negotiable</h2>
+<p>The scope is SPEC_V2 §12 T3's three clauses; the implementation shape of each gate is the PM job's, and the manifest — not this document — is the gate.</p>
+<h2 id="valuable">Valuable</h2>
+<p>A governed project lifecycle: a request becomes a planned, baselined project; every gate is dual-controlled; a change travels as a change request; a project closes only on its record.</p>
+<h2 id="estimable">Estimable</h2>
+<p>Bounded by <code>acceptance/programme/T3.toml</code>'s checks (project, baseline, charter, closure outputs, contract, review, closure gate, waivers, PI cadence/plan/objectives, WSJF, demo credits, lessons, product, artefact standard, rework).</p>
+<h2 id="small">Small</h2>
+<p>One project, one path, one manifest; the programme surfaces and the slice's UI are out of scope.</p>
+<h2 id="testable">Testable</h2>
+<p>Every clause names its proof: the manifest checks, <code>crates/actions/tests/spine_gates.rs</code>, <code>programme_baseline.rs</code>, <code>closure_gate.rs</code>, <code>pm_gate_proof.rs</code>.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>issue #74; tranche 3 authorised; the delivery contract and its Phase-G review (this unit); the frozen scope baseline <code>01a2052e-061f-7570-b780-d94101449bef</code>, the schedule and cost baselines, and the charter gate. The B3 benefit profile's T6 dependency is recorded on the programme benefit evaluation — it is not T3's.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/T3-definition-of-ready.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

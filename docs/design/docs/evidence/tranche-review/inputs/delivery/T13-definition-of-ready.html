@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Definition of Ready — T13 Tool platform · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-definition-of-ready.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="definition-of-ready--t13-tool-platform">Definition of Ready — T13 Tool platform</h1>
+<h2 id="independent">Independent</h2>
+<p>The governed call path ships alone: the broker, the ledger, the destructive gate, the schema validation and the storage adapter are one slice. The catalogue actions and the published toolkits are named as carried by T14/T15, not designed here.</p>
+<h2 id="negotiable">Negotiable</h2>
+<p>The scope is the five gate clauses SPEC_V2 §12 T13 names; the storage clause is scoped to the adapter and its proof, not to a job-facing action (recorded as that clause's partial verdict).</p>
+<h2 id="valuable">Valuable</h2>
+<p>One governed path from a job to a backend: bound, broker-mediated, schema-checked, approval-gated, ledgered, with a keyless tenant-prefixed object store.</p>
+<h2 id="estimable">Estimable</h2>
+<p>Bounded by the manifest <code>acceptance/programme/T13.toml</code> and the seven scenarios in <code>crates/actions/tests/tool_platform.rs</code>.</p>
+<h2 id="small">Small</h2>
+<p>One project, five gate clauses, one proving suite; the catalogue and toolkit waves are separate projects (T14 import, T15 authoring/publication).</p>
+<h2 id="testable">Testable</h2>
+<p>Every clause has a named test and the manifest's check; the close review records the verdicts including the partial storage clause.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>S02 (the skeleton), S04 (the action registry the broker dispatches through) and the tranche-3 authorisation. The close depends on the Phase-G review and the closure gate; the open items are recorded in the project register (R-T13-1..3, A-T13-1, D-T13-1).</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/T13-definition-of-ready.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Acceptance Criteria — T3 PM job · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="acceptance-criteria" data-provenance-version="1" data-provenance-hash="6648e8c2e5294f6b4e488976890bb993f212b5ae58a1c31f6106d4c2e8600c86" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>acceptance-criteria</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>6648e8c2e5294f6b4e488976890bb993f212b5ae58a1c31f6106d4c2e8600c86</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Acceptance Criteria — T3 PM job</h1>
+<h2>Scenarios</h2>
+<ul>
+<li><strong>T3-1 request end to end.</strong> Given an approved charter, when the PM runs <code>pm.plan</code> and takes
+the scope baseline, then the WBS, baseline and approval rows exist and read back.</li>
+<li><strong>T3-2 no self-approval.</strong> Given a gate the PM requested, when the same actor decides it, then
+the decision is refused and no approval_decision row is written.</li>
+<li><strong>T3-3 change request.</strong> Given an approved baseline, when a replacement is attempted without an
+approved change request carrying an impact block, then the plan is refused before any write.</li>
+<li><strong>T3-4 change gate.</strong> Given a change request, when its gate is approved by a distinct approver,
+then the baseline can advance and the change reads back as approved.</li>
+<li><strong>T3-5 closure on the record.</strong> Given a closure request, when any required row is missing
+(published output, approved asset, baselines, contract, Phase-G review), then <code>projects.close</code>
+refuses and the project stays open.</li>
+</ul>
+<h2>Verify commands</h2>
+<ul>
+<li><code>python3 scripts/verify-project.py --project T3 --snapshot &lt;snap&gt;/data</code></li>
+<li><code>cargo test -p conveyor-actions --test spine_gates</code> (in CI)</li>
+<li><code>cargo test -p conveyor-actions --test programme_baseline</code> (in CI)</li>
+<li><code>cargo test -p conveyor-actions --test closure_gate</code> (in CI)</li>
+</ul>
+<h2>Results</h2>
+<p>Measured at the tranche-3 review's snapshot: the manifest's checks execute against the live rows;
+the receipt's per-check verdicts are the record. The closure is the live occurrence of scenario
+T3-5 against the full record.</p>
+<h2>Status</h2>
+<p>Accepted and closed: the five deliverables were accepted under change <code>01a2052e-5648…</code> and
+credited at the tranche-3 demo; the project closed against its frozen baseline with the
+retrospective ADM artefacts and the register rows in place.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

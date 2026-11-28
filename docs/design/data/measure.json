@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-11-27T12:10:18.740973+00:00",
+  "generated_at": "2026-11-28T12:46:29.116452+00:00",
   "inference": {
     "by_caller": [
       {
         "caller_kind": "agent_run",
-        "calls": 632,
-        "total_tokens": 9548085
+        "calls": 663,
+        "total_tokens": 9718403
       },
       {
         "caller_kind": "other",
-        "calls": 20,
+        "calls": 19,
         "total_tokens": 2718
       }
     ],
@@ -35,38 +35,8 @@
         "unpriced_calls": 0
       },
       {
-        "calls": 1,
-        "card_id": "01a21a03-6978-7489-b190-a76941e9efb1",
-        "completion_tokens": 0,
-        "cost_usd": "0.001200",
-        "priced_calls": 1,
-        "prompt_tokens": 0,
-        "total_tokens": 0,
-        "unpriced_calls": 0
-      },
-      {
-        "calls": 1,
-        "card_id": "01a21a03-7d39-75a5-852b-922683fa63a6",
-        "completion_tokens": 0,
-        "cost_usd": "0.000499",
-        "priced_calls": 1,
-        "prompt_tokens": 0,
-        "total_tokens": 0,
-        "unpriced_calls": 0
-      },
-      {
         "calls": 0,
-        "card_id": "01a21a03-aedb-7a90-a1ad-f66d00df01a3",
-        "completion_tokens": 0,
-        "cost_usd": "0",
-        "priced_calls": 0,
-        "prompt_tokens": 0,
-        "total_tokens": 0,
-        "unpriced_calls": 0
-      },
-      {
-        "calls": 0,
-        "card_id": "01a21a03-f5d1-7578-82a3-91bf5694449c",
+        "card_id": "01a21bab-7756-766b-a55e-4d8059825076",
         "completion_tokens": 0,
         "cost_usd": "0",
         "priced_calls": 0,
@@ -76,30 +46,10 @@
       },
       {
         "calls": 1,
-        "card_id": "01a21a04-0374-7a02-b825-374d59fcddce",
+        "card_id": "01a21d45-03b9-7f59-a878-1ac06399d7d5",
         "completion_tokens": 0,
-        "cost_usd": "0.040000",
+        "cost_usd": "0.000360",
         "priced_calls": 1,
-        "prompt_tokens": 0,
-        "total_tokens": 0,
-        "unpriced_calls": 0
-      },
-      {
-        "calls": 0,
-        "card_id": "01a21a05-23dd-794d-b2a0-b486d52c581b",
-        "completion_tokens": 0,
-        "cost_usd": "0",
-        "priced_calls": 0,
-        "prompt_tokens": 0,
-        "total_tokens": 0,
-        "unpriced_calls": 0
-      },
-      {
-        "calls": 0,
-        "card_id": "01a21a06-ae6c-7457-848e-68acaa5626ad",
-        "completion_tokens": 0,
-        "cost_usd": "0",
-        "priced_calls": 0,
         "prompt_tokens": 0,
         "total_tokens": 0,
         "unpriced_calls": 0
@@ -108,7 +58,7 @@
     "by_model": [
       {
         "cache_hits": 0,
-        "calls": 2,
+        "calls": 1,
         "completion_tokens": 0,
         "model": "asr",
         "prompt_tokens": 0,
@@ -124,7 +74,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 6,
+        "calls": 5,
         "completion_tokens": 0,
         "model": "image_gen",
         "prompt_tokens": 0,
@@ -132,11 +82,11 @@
       },
       {
         "cache_hits": 0,
-        "calls": 558,
-        "completion_tokens": 118281,
+        "calls": 589,
+        "completion_tokens": 162362,
         "model": "local-llm",
-        "prompt_tokens": 8461543,
-        "total_tokens": 8579824
+        "prompt_tokens": 8587780,
+        "total_tokens": 8750142
       },
       {
         "cache_hits": 0,
@@ -156,7 +106,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 2,
+        "calls": 3,
         "completion_tokens": 0,
         "model": "tts",
         "prompt_tokens": 0,
@@ -187,15 +137,15 @@
     ],
     "totals": {
       "cache_hit_calls": 0,
-      "cache_miss_calls": 644,
+      "cache_miss_calls": 674,
       "cache_write_calls": 0,
-      "calls": 652,
-      "completion_tokens": 127874,
-      "cost_usd": 1.459623,
+      "calls": 682,
+      "completion_tokens": 171955,
+      "cost_usd": 1.448556,
       "non_ok_calls": 0,
-      "prompt_tokens": 9422929,
-      "tool_cost_usd": 0.041699,
-      "total_tokens": 9550803,
+      "prompt_tokens": 9549166,
+      "tool_cost_usd": 0.00036,
+      "total_tokens": 9721121,
       "unknown_cache_calls": 8,
       "unpriced_calls": 84
     }

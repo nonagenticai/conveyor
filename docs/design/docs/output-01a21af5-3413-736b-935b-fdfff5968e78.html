@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>GEMBA-WALK — Project brief · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="fd4469bfe3877c16accacf40ad848414058a988c786d0b03ed1aee25783009f6" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>fd4469bfe3877c16accacf40ad848414058a988c786d0b03ed1aee25783009f6</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><hr />
+<h2>document: GEMBA-WALK/project-brief
+version: 2
+status: draft
+project: GEMBA-WALK
+category: project-brief
+owner: business-analyst
+reviewer: SRO
+review_date: 2026-12-03</h2>
+<h1>GEMBA-WALK — Project brief</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The client is served at
+<code>https://game.nonagentic.ai/</code> at the root, with its own public client <code>conveyor-game</code> in the
+<code>conveyor</code> realm; the operator origin's <code>/walk/*</code> 308s to it, and <code>/walk/</code> remains only the
+no-host dev/CI shape. The action count is 598 (572 attributes + 26 manual registrations). Read
+"<code>/walk/X</code>" in the analysis sections below as the app path <code>/X</code> on the game host.</p>
+</blockquote>
+<h2>Outcome</h2>
+<p>A signed-in tenant member can complete every operator task in a separate, game-style client at
+<code>https://game.nonagentic.ai/</code> — the same reads, writes, gates and refusals as <code>apps/web</code> — and the parity is measured by
+an instrument, so the owner can decide whether the walk becomes the primary UI on evidence rather
+than on a mock.</p>
+<h2>Boundary</h2>
+<p><strong>In:</strong> a static client at <code>https://game.nonagentic.ai/</code> (same image and service, a second host;
+the operator origin's <code>/walk/*</code> redirects to it); route parity with the 52 <code>apps/web</code> route patterns
+at the host root; reachability and schema-rendering of the 598 registered actions; the
+seven wings and their rooms; seats as view presets; DOM sheets as the only work surface; the
+<code>WorldView</code> port and the canvas-2D baseline; the parity instrument and its frozen census; Playwright
+specs per destination; the host dispatch, the <code>/walk</code> 308 and the game-host boundary; its own
+public Keycloak client <code>conveyor-game</code> and the live sign-in proof; accessibility and performance
+budgets; deployment; the P6 primacy runbook.</p>
+<p><strong>Out:</strong> no table, action, event, port or decision store; no second backend or read model; no SSR;
+no native mobile, chat, audio or video; no calendar/AV dependency; no fixture or embedded snapshot;
+the mock is not committed and never the client's source; the design pack at <code>/design/</code> is unchanged;
+<code>apps/web</code> is not retired before the P6 gate; primacy is not claimed from prose.</p>
+<p><strong>It must not fork:</strong> the action registry, the decision store, the read models, the auth flow's
+identity provider, or the Playwright contract. A capability the server does not expose is an honest
+gate, exactly as in <code>apps/web</code>.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Path:symbol</th><th>Question the analysis answers</th></tr></thead><tbody>
+<tr><td>Auth flow</td><td><code>apps/web/src/auth.rs</code> (PKCE S256, token in memory, dev cookie)</td><td>can the same public client mint a session for <code>/walk/</code>, or does it need its own redirect URI?</td></tr>
+<tr><td>Action client</td><td><code>apps/web/src/api.rs</code> (<code>actions.describe</code>, <code>POST /api/actions/{name}/invocations</code>)</td><td>is the client thin enough to share the envelope and header contract?</td></tr>
+<tr><td>Events</td><td><code>apps/web/src/sse.rs</code> (fetch stream, <code>Last-Event-ID</code>, resync)</td><td>can a second client subscribe without a new server surface?</td></tr>
+<tr><td>Route table</td><td><code>apps/web/src/app.rs</code> (<code>&lt;Router&gt;</code>)</td><td>what exactly is the frozen census, and how is it parsed?</td></tr>
+<tr><td>Static serving</td><td><code>crates/api/src/web.rs</code> (static sub-site, SPA fallback)</td><td>does a <code>/walk/*</code> fallback exist, and what does a deep link do today?</td></tr>
+<tr><td>Action registry</td><td><code>crates/actions/src/**</code>, <code>docs/design/data/actions.json</code></td><td>are all 598 actions schema-described, and which are destructive or approval-gated?</td></tr>
+<tr><td>Specs</td><td><code>apps/web/e2e/**</code></td><td>which behaviours must the walk's specs assert, and which are contract tests?</td></tr>
+<tr><td>Design pack</td><td><code>docs/design/README.md</code> (serving, auth, console)</td><td>what serving and auth pattern is already proven for a static sub-site?</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<p>The analysis and architecture outputs are published with this brief:
+<code>01-inception-analysis.md</code> and <code>02-architecture-design.md</code>, with the typed set in
+<code>03-artifact-register.md</code>. Both are documents on the project and carry the standard's metadata.</p>
+<h2>Dependencies</h2>
+<table><thead><tr><th>Relation</th><th>Issue</th><th>Why</th></tr></thead><tbody>
+<tr><td>related</td><td>#792</td><td>this inception unit (the procedural set and the live publication)</td></tr>
+<tr><td>related</td><td>#120, #121, #122</td><td>the P0 definition set and the per-project inception standard (closed)</td></tr>
+<tr><td>related</td><td>#395</td><td>one live architecture contract per delivery project; the SoAW is this project's Phase-A subject</td></tr>
+<tr><td>related</td><td>#526</td><td>the programme rework/publish lane whose transport this unit reuses</td></tr>
+<tr><td>blocks</td><td>G0 (to create)</td><td>the build unit is not claimed until the three inception documents are published</td></tr>
+<tr><td>blocks</td><td>the gitops-production change</td><td>the <code>conveyor-game</code> client, the tunnel ingress, the VirtualService host and the deployment env; delivered in the same unit (CR-WALK-001)</td></tr>
+</tbody></table>
+<h2>Acceptance</h2>
+<p>Each part carries a BDD scenario with its <code>Verify:</code> command; the plan's stage gates are the build's
+acceptance.</p>
+<ul>
+<li><strong>Foundation (P1).</strong> Given the merged seed and the dev server, when a signed-in member opens
+<code>https://game.nonagentic.ai/</code>, then the entrance renders the Portfolio reads and one real write round-trips.
+Verify: <code>npx playwright test -c apps/walk/playwright.config.ts --grep foundation</code> (to create).</li>
+<li><strong>Read parity (P2).</strong> Given every §10.5 destination, when it loads, then loading, empty, partial,
+error and denied states render with the honest gate.
+Verify: <code>npx playwright test -c apps/walk/playwright.config.ts --grep reads</code> (to create).</li>
+<li><strong>Write parity (P3).</strong> Given a write action, when it is submitted, then the envelope, <code>If-Match</code>,
+<code>Idempotency-Key</code> and approval are sent, and a refusal is shown verbatim with no optimistic
+mutation. Verify: the contract test per action family (to create).</li>
+<li><strong>Retained V1 (P4).</strong> Given the frozen census, when the instrument runs, then every route has a
+walk route and a spec, and every action is reachable and schema-rendered.
+Verify: <code>python3 scripts/build-walk-coverage.py --check</code> (to create at P0).</li>
+<li><strong>P6 gate.</strong> Given the instrument green, when the accessibility, performance and primacy checks
+run, then the owner signs the primacy decision — or the walk stays an alternative client.
+Verify: the P6 runbook (to create).</li>
+</ul>
+<h2>Capabilities</h2>
+<p>The owner/sponsoring group (primacy decision), the programme manager (tranche and issue queue), the
+programme architect (ADM and contract), the delivery seats (Product owner, Programme, Owner,
+Reviewer presets), platform/security (serving, identity, headers), and accessibility/UX (keyboard
+and contrast). The customer is not a seat: the external stakeholder reads the public pack (D48).</p>
+<h2>Plan</h2>
+<p><code>docs/plans/GEMBA-WALK.md</code> — stages P0–P6, work packages W0–W8, the approved five-issue build split
+(G0 + S1–S4). Implementation issues are created only after this inception is published.</p>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Posture</th></tr></thead><tbody>
+<tr><td>598 actions and 52 routes is multi-session</td><td>the schema-driven action sheet gives early reachability; the frozen census and per-destination specs make gaps visible</td></tr>
+<tr><td>A second shell/auth/test harness drifts from the app</td><td>one contract, one census, behavioural trace parity on named flows, a contract test per write</td></tr>
+<tr><td>Bevy on the web misses the budgets</td><td>canvas-2D baseline first; the P0 spike measures both; ADR 0022 decides</td></tr>
+<tr><td>No local Rust builds</td><td>wasm builds on GitHub preflight; the baseline needs no Rust</td></tr>
+<tr><td>Deep links render the operator app</td><td>the scoped <code>web.rs</code> fallback and its Rust test land in P1, before any link is published</td></tr>
+<tr><td>The game host leaks an operator surface</td><td>a router-level host gate, a host-aware static dispatch and <code>app()</code> matrix tests; <code>/mcp</code> and <code>/design</code> are refused on the game host</td></tr>
+<tr><td>The mock's fixtures leak into the client</td><td>the Do-Not list; a test asserts no snapshot URL is fetched by a signed-in walk</td></tr>
+<tr><td>Accessibility regresses under a game UI</td><td>DOM-only work surfaces; keyboard-only spec; canvas is decorative and duplicated by the map</td></tr>
+</tbody></table>
+<h2>Gaps</h2>
+<p>At this brief's date the live register has no GEMBA-WALK row (<code>seed/programme.json</code> has 50 projects,
+none of them GEMBA-WALK); there is no <code>/walk</code> route, app or spec in the tree. The three inception
+documents are authored here and published by this unit (#792); the build units G0 and S1–S4 do not
+exist until then. The game host and its client are delivered by CR-WALK-001; there is no external identity gap.</p>
+<h2>Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code></li>
+<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+<li>Analysis: <code>01-inception-analysis.md</code></li>
+<li>Architecture: <code>02-architecture-design.md</code></li>
+<li>Register: <code>03-artifact-register.md</code></li>
+<li>MSP: <code>04-msp-profile.md</code></li>
+<li>SAFe: <code>05-safe-epic.md</code></li>
+<li>SoAW: <code>06-statement-of-architecture-work.md</code></li>
+<li>Governance: <code>07-governance-and-evidence.md</code></li>
+<li>Spec reference: <code>docs/SPEC_V2.md</code> §10.5, §10.5.11, D64/D66/D67</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

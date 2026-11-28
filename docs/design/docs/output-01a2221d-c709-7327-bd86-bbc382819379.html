@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Definition of Done — S04 Action registry · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="definition-of-done" data-provenance-version="1" data-provenance-hash="64b2c294604f50af40a385ed1e87b13b4efb47ee81f7c2b512973e5ac9d9609c" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>definition-of-done</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>64b2c294604f50af40a385ed1e87b13b4efb47ee81f7c2b512973e5ac9d9609c</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Definition of Done — S04 Action registry</h1>
+<h2>Acceptance criteria</h2>
+<p>The <code>acceptance/programme/S04.toml</code> gate executes green: the ActionSpec derive crate exists and
+registers its actions; the registry and spec vocabularies are generated; HTTP and MCP parity
+holds; the served-spec lock matches; the external ingest fold round-trips.</p>
+<h2>Evidence at completion</h2>
+<p>The acceptance receipt (<code>verify-project.py --project S04</code>) at the deployed sha; the published
+project brief, evidence and closure review; the two deliverables accepted under change
+<code>01a2054b-3f86-7959-b2ad-f1edc5b0bb55</code>; the tranche-3 demo credits on the tranche-3 cadence.</p>
+<h2>Repo gate</h2>
+<p><code>cargo fmt --all -- --check</code>, <code>cargo metadata --locked</code>, and the repository's preflight are the
+compile verdict; the PR's CI and its merge are the final gate. No local compile.</p>
+<h2>Merge and closure</h2>
+<p>One issue (#3), one branch, one PR that closes it; merged only on the full suite; the closure
+gate decided by an actor other than its requester; the tranche review reads the receipt at the
+snapshot's head sha.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -3,6 +3,24 @@
   "standard": "governance/conformance.json",
   "entries": [
     {
+      "rule": "closed_without_closure_review",
+      "subject": "T12",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S06b",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
       "rule": "project_in_unauthorised_tranche",
       "subject": "S06c",
       "severity": "P0",
@@ -19,6 +37,33 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S08",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S10",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S11",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -49,7 +94,34 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
+      "subject": "S17",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
       "subject": "S20",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S21",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T12",
       "severity": "P0",
       "disposition": "rework",
       "owner": "programme owner",
@@ -64,6 +136,15 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T17",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -82,6 +163,15 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T7",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -130,6 +220,15 @@
     },
     {
       "rule": "backlog_refinement_missing",
+      "subject": "tranche 6",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "backlog_refinement_missing",
       "subject": "tranche 7",
       "severity": "P1",
       "disposition": "rework",
@@ -156,6 +255,33 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     },
     {
+      "rule": "benefit_baseline_placeholder",
+      "subject": "B8",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "benefit_profile_incomplete",
+      "subject": "B8",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S05",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
       "rule": "closed_without_closure_review",
       "subject": "S06b",
       "severity": "P1",
@@ -181,6 +307,33 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S07",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S08",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S09",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "closed_without_closure_review",
@@ -229,12 +382,84 @@
     },
     {
       "rule": "closed_without_closure_review",
+      "subject": "S17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closed_without_closure_review",
       "subject": "S20",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S21",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "P0",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S00",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S01",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S02",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S03",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S05",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -262,6 +487,33 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S07",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S08",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S09",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -310,12 +562,39 @@
     },
     {
       "rule": "closure_outputs_undeclared",
+      "subject": "S17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
       "subject": "S20",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S21",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "SPEC-V2",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "contract_missing",
@@ -328,12 +607,48 @@
     },
     {
       "rule": "contract_missing",
+      "subject": "T14",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "contract_missing",
       "subject": "T15",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "contract_missing",
+      "subject": "T16",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "contract_missing",
+      "subject": "T17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "contract_missing",
+      "subject": "T18",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "contract_missing",
@@ -355,12 +670,66 @@
     },
     {
       "rule": "contract_missing",
+      "subject": "T7",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "contract_missing",
       "subject": "T8",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S00",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S01",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S02",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S05",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S06",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "mandatory_artefacts",
@@ -388,6 +757,33 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S07",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S08",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "S09",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "mandatory_artefacts",
@@ -454,6 +850,15 @@
     },
     {
       "rule": "mandatory_artefacts",
+      "subject": "S17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
       "subject": "S18",
       "severity": "P1",
       "disposition": "rework",
@@ -490,6 +895,33 @@
     },
     {
       "rule": "mandatory_artefacts",
+      "subject": "T0",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T1",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T11",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
       "subject": "T12",
       "severity": "P1",
       "disposition": "rework",
@@ -499,12 +931,48 @@
     },
     {
       "rule": "mandatory_artefacts",
+      "subject": "T14",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
       "subject": "T15",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T18",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T2",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "mandatory_artefacts",
@@ -523,6 +991,15 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "mandatory_artefacts",
+      "subject": "T7",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "mandatory_artefacts",
@@ -571,6 +1048,15 @@
     },
     {
       "rule": "pi_cadence_missing",
+      "subject": "tranche 6",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "pi_cadence_missing",
       "subject": "tranche 7",
       "severity": "P1",
       "disposition": "rework",
@@ -595,6 +1081,150 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:acceptance-criteria",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:architecture-artifact",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:architecture-design",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:change-control",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:compliance-review",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:definition-of-done",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:definition-of-ready",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:delivery-contract",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:inception-analysis",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:project-baseline",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:project-brief",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:project-registers",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:project-wbs",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:statement-of-architecture-work",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "programme_outputs",
+      "subject": "P0:user-stories",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S06",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -634,21 +1264,39 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
-      "subject": "S21",
+      "subject": "T19F",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T12",
+      "rule": "unpublished_declared_output",
+      "subject": "GEMBA-WALK",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "S05",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "S06",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "unpublished_declared_output",
@@ -676,6 +1324,33 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "S07",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "S08",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "S09",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     },
     {
       "rule": "unpublished_declared_output",
@@ -742,6 +1417,15 @@
     },
     {
       "rule": "unpublished_declared_output",
+      "subject": "S17",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
       "subject": "S18",
       "severity": "P1",
       "disposition": "rework",
@@ -775,17 +1459,44 @@
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "T12",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "T14",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
+    },
+    {
+      "rule": "unpublished_declared_output",
+      "subject": "T18",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "standard v4 evidence set (#930); accepted 2026-11-28 under the standing delegation; the ratchet (#928) forbids growth"
     }
   ],
-  "accepted_at": "2026-11-27T12:53:56.389114+00:00",
+  "accepted_at": "2026-11-28T12:47:29.428863+00:00",
   "accepted_by": "conveyor-e2e",
   "approver": "conveyor-approver",
-  "acceptance_ref": "01a21ce9-c68e-761c-94af-3b0b140ef00c",
+  "acceptance_ref": "01a22231-f3ba-720c-b0e2-59b1ae1f4bd7",
   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
   "snapshot": {
-    "git_sha": "d1d023cc930dd6a3fce459979b4a1a82a16f815e",
-    "generated_at": "2026-11-27T12:10:18.740973+00:00",
-    "manifest_sha256": "cb68b2206451d5151bd62a0b3e2264b62e974835b00808a48418f83a09e810c0",
-    "outputs": 846
+    "git_sha": "4f771d537181b44a69d4291e239eee2d436b734e",
+    "generated_at": "2026-11-28T12:46:29.116452+00:00",
+    "manifest_sha256": "9ca193f91730c47f73079cfb89fc857f472b7eed6483129c08f204c044e5120c",
+    "outputs": 415
   }
 }

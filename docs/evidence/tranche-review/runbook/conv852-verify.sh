@@ -19,9 +19,11 @@ if [ "$MODE" = "restore" ]; then
   docker cp conv852-bin:"$ROOT/data" "$ROOT/data"
   docker cp conv852-bin:"$ROOT/docs" "$ROOT/docs"
 elif [ "$MODE" = "prod" ]; then
-  POD=$(ssh -i ~/.ssh/strato-vps -o ConnectTimeout=10 admin@100.81.177.99 "sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n conveyor get pods -l app=conveyor -o jsonpath='{.items[0].metadata.name}'" 2>/dev/null)
-  ssh -i ~/.ssh/strato-vps -o ConnectTimeout=10 admin@100.81.177.99 "sudo bash -c 'set -a; . /tmp/conv852-live.env; set +a; /tmp/conveyor-probe snapshot --tenant nonagentic --git-sha $SHA --out $ROOT/data --outputs-dir $ROOT/docs --issues /tmp/conv852-issues.json'"
-  mkdir -p "$ROOT"; scp -i ~/.ssh/strato-vps -qr admin@100.81.177.99:"$ROOT/data" "$ROOT/data"; scp -i ~/.ssh/strato-vps -qr admin@100.81.177.99:"$ROOT/docs" "$ROOT/docs"
+  # The host, login and key are the private estate's; never commit them.
+  HOST=${CONVEYOR_HOST:?set CONVEYOR_HOST}; KEY=${CONVEYOR_SSH_KEY:?set CONVEYOR_SSH_KEY}
+  POD=$(ssh -i "$KEY" -o ConnectTimeout=10 "$HOST" "sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n conveyor get pods -l app=conveyor -o jsonpath='{.items[0].metadata.name}'" 2>/dev/null)
+  ssh -i "$KEY" -o ConnectTimeout=10 "$HOST" "sudo bash -c 'set -a; . /tmp/conv852-live.env; set +a; /tmp/conveyor-probe snapshot --tenant nonagentic --git-sha $SHA --out $ROOT/data --outputs-dir $ROOT/docs --issues /tmp/conv852-issues.json'"
+  mkdir -p "$ROOT"; scp -i "$KEY" -qr "$HOST:$ROOT/data" "$ROOT/data"; scp -i "$KEY" -qr "$HOST:$ROOT/docs" "$ROOT/docs"
 fi
 test -f "$ROOT/data/manifest.json" && test -f "$ROOT/docs/outputs.js"
 

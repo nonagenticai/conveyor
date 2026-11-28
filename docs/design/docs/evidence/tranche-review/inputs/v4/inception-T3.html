@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Inception analysis — T3 PM job (retrospective, 2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/inception-T3.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="inception-analysis--t3-pm-job-retrospective-2026-11-28">Inception analysis — T3 PM job (retrospective, 2026-11-28)</h1>
+<h2 id="current-state">Current state</h2>
+<p>Before the PM job's own build, projects existed as rows and their lifecycle actions existed separately: a charter here, a baseline there, a closure gate whose requester could also decide it. There was no single end-to-end path a PM could run from a request to a closure, and no executable refusal of self-approval. The receipt <code>docs/evidence/rework/T3.json</code> recorded the project as closed without its live delivery contract and its Phase-G review, which is what the retrospective completes.</p>
+<h2 id="reuse-sources">Reuse sources</h2>
+<ul>
+<li>The approval and gate machinery (<code>approvals.request</code>, <code>approvals.decide</code>, the distinct-approver rule and the published-delegation rule) was reused as the PM job's decision surface; the job added no second approval store.</li>
+<li>The tenant-scoped project rows and the store were reused for the charter, the WBS, the baseline and the closure.</li>
+<li>The programme cadence surfaces were reused for the PI plan, the demo credits and the retrospective, rather than a PM-specific cadence.</li>
+<li>The register rows (risk, issue, assumption, dependency, change) were reused as the project's governance record; a baseline change is a change row, not a new mechanism.</li>
+</ul>
+<h2 id="build-vs-reuse">Build vs reuse</h2>
+<p>Built: the PM job's sequence — charter, WBS with its typed WSJF inputs, scope baseline, staffing, gate routing, change control and closure — together with the refusals that make it executable: the approver cannot be the requester, a baseline is changed through a change request and never edited in place, and a closure reads the project's declared outputs, its closure review, its live delivery contract and Phase-G review, its approved baseline, its artefacts and registers, and a demo credit per accepted deliverable. Reused: the gate engine, the store, the cadence and the registers. The line was drawn at "the PM job sequences what the engine already enforces", so the job adds no new persistence and no second decision path.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>Self-approval is the central risk; the gate refuses when the requester and the approver are the same person, and the test record carries a distinct-approver closure.</li>
+<li>A baseline edited in place would void the frozen scope; the change request is the only path, and the registers record it.</li>
+<li>A closure over missing declared outputs would close a project on an incomplete record; the close gate reads the declared outputs and refuses by name.</li>
+<li>The PM job is only as good as its record: a project can still be chartered with a vague mandate, which is why the charter gate and the reviewed artefacts exist rather than a single approval.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/v4/inception-T3.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

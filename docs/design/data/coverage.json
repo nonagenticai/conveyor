@@ -297,7 +297,7 @@
           817,
           910,
           912,
-          914
+          916
         ],
         "open": 4,
         "ready": 0,
@@ -729,8 +729,8 @@
           4,
           604
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1314,7 +1314,7 @@
           9
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1442,10 +1442,11 @@
         "claimed": 1,
         "numbers": [
           12,
-          30
+          30,
+          938
         ],
-        "open": 1,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2879,8 +2880,8 @@
       },
       "total": 52,
       "uncovered": [],
-      "with_open_units": 7,
-      "without_open_units": 45
+      "with_open_units": 6,
+      "without_open_units": 46
     },
     "screens": {
       "actions_invoked": 39,

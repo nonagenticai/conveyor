@@ -13,10 +13,11 @@ cat > /tmp/conv852-bin.sh <<'EOF'
 #!/bin/bash
 exec docker exec -i conv852-bin /usr/local/bin/conveyor "$@"
 EOF
-# production: the deployed pod's own binary
+# production: the deployed pod's own binary. The host, login and key are the private estate's:
+# supply them in the environment (CONVEYOR_HOST, CONVEYOR_SSH_KEY); never commit the address.
 cat > /tmp/conv852-pod-bin.sh <<'EOF'
 #!/bin/bash
-exec ssh -i ~/.ssh/strato-vps -o ConnectTimeout=10 admin@100.81.177.99 \
+exec ssh -i "${CONVEYOR_SSH_KEY:?set CONVEYOR_SSH_KEY}" "${CONVEYOR_HOST:?set CONVEYOR_HOST}" \
   "sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n conveyor exec -i deploy/conveyor -- /usr/local/bin/conveyor $(printf '%q ' "$@")"
 EOF
 ```

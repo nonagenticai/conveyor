@@ -23,26 +23,26 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="2" data-provenance-hash="688cfbd22b8fcc7432158e1ec5171df92360f86d305a4225b2138a657f9f1149" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>688cfbd22b8fcc7432158e1ec5171df92360f86d305a4225b2138a657f9f1149</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S01 UI spike (retrospective, 2026-11-26)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-brief" data-provenance-version="1" data-provenance-hash="71598109bdddf92f6747a340cdede74232f154ebd6703ff2cb3f8057421080ba" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-brief</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>71598109bdddf92f6747a340cdede74232f154ebd6703ff2cb3f8057421080ba</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project brief — S01 UI spike</h1>
 <h2>Outcome</h2>
-<p>ADR 0001 decides the stack by measurement: S12 builds conveyor's UI as Leptos CSR/WASM. At median n=5 the interaction TTI is CSR 5,426 ms against SSR 5,736 ms under 4× CPU and Slow 4G, the ranges do not overlap, and neither auth flow forces cookie-based SSR, so the prior holds. SSR renders 500 cards faster (1,444 ms against 4,726 ms), but that win does not survive hydration. This brief is retrospective and dated 2026-11-26; it records the decision and the lifecycle, not a new measurement.</p>
+<p>The UI stack is decided by measurement: Leptos CSR/WASM, recorded in ADR 0001.</p>
 <h2>Boundary</h2>
-<p>Out of scope: the production UI (S12), the real Keycloak and the conveyor realm (S2, D13), authz beyond one logged-in gate, styling fidelity and layout below 1,280 px, every screen other than the board and the chat, i18n, any drag-and-drop or virtual-list library, Dioxus, and any change to the workspace, apps/web or crates. The spike workspace spikes/web was deleted after the ADR, so no second run of the harness is possible and none is claimed here.</p>
+<p>The spike only; the production UI is S12. The spike workspace (<code>spikes/web</code>) was deleted after the ADR.</p>
 <h2>Reuse sources</h2>
-<p>The slice plan docs/plans/slices/S01-ui-spike.md; SPEC §5.7 for the CSR prior and the two forcing conditions; ADR 0001 docs/decisions/0001-ui-stack.md for the measured table; the fr frontend at 6f7c509792b3ca1fc1fb00c198aebcec83f0af29 for the board, card and chat shapes, read for requirements and not ported; template-rust-service at 0c7396a0130b3ed27904c03cce49d5415648f66f for the axum wiring behind SSR; and S00 for the parity ids the UI build consumes.</p>
+<p><code>docs/decisions/0001-ui-stack.md</code>; SPEC §5.7; <code>docs/plans/slices/S01-ui-spike.md</code>.</p>
 <h2>Inception units</h2>
-<p>The project row links no GitHub issues, and its expected outputs are project-brief and evidence with no declared closure outputs. The inception record is the retrospective itself: the #526 rework under decision 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the 41 acts in transcript.jsonl, the seven Phase A–D artefacts and the one WBS deliverable, 'The UI-stack decision record', accepted with WSJF inputs 3, 5, 3 and 13.</p>
+<p>None — the project is a decision spike, closed on the ADR.</p>
 <h2>Dependencies</h2>
-<p>S01 depends on S00 for the parity ids; the plan's frontmatter carries parity_ids: PENDING-S0 and the project brief records the same dependency. The record also depends on the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 for its approvals and on the acceptance manifest acceptance/programme/S01.toml for its gate. S12 is downstream: it consumes ADR 0001 and builds apps/web on it.</p>
+<p>S00 (the parity ids the UI build consumes).</p>
 <h2>Acceptance</h2>
-<p>The plan's §7 gate is executable and its criteria hold: ADR 0001 carries 16 measured rows (8 metrics × 2 stacks), the spike is gone, apps/web is still absent and ports 8791, 8801 and 8802 are free. The decision is CSR because SSR did not beat it on interaction TTI (5,426 ms against 5,736 ms, median n=5) and auth did not force cookies. Metrics 5–7 are marked not recoverable with their own n. python3 scripts/verify-project.py --project S01 --snapshot &lt;fresh&gt; is green with 12 checks and 0 failures at d7293f96, and the review is compliant.</p>
+<p>The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.</p>
 <h2>Capabilities</h2>
-<p>Three capabilities were built twice, in both stacks. The board loads 500 cards in 10 lists, accepts pointer and keyboard drag between lists and applies a live SSE move without losing scroll or an in-flight drag. The chat streams tokens at 25 ms, renders a tool-call card with a collapsed result and keeps 50 messages of history. Auth is auth-code + PKCE S256 on CSR and HttpOnly session + CSRF on SSR; both pass three login to board to logout cycles, and neither forces the SSR option.</p>
+<p>Board (drag + SSE), chat (streaming + tool card) and auth (PKCE), each built twice.</p>
 <h2>Plan</h2>
-<p>The original plan ran fourteen steps from toolchain and ports through the fixture, the board and the chat in each stack, the auth fixture, five timed runs per stack and the ADR, then deleted the spike and confirmed apps/web was still absent; it was delivered on 2026-11-08. The retrospective reconstituted the lifecycle on 2026-11-21 and is re-authored here on 2026-11-26: charter, Statement of Architecture Work, seven Phase A–D artefacts, delivery contract, WBS deliverable, review and the two outputs, then closure through the one gate.</p>
+<p>Delivered 2026-11-08; reworked retrospectively 2026-11-21.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · conveyor-e2e</code> at publish time.</span>
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

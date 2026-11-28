@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>CR-WALK-001 — Change request: the game host and its own identity · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="change-control" data-provenance-version="2" data-provenance-hash="d2ff4e28b67e4e509641e167a11ea40f2a19f3d466a932aadb04257276a4a631" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>change-control</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>d2ff4e28b67e4e509641e167a11ea40f2a19f3d466a932aadb04257276a4a631</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><hr />
+<h2>document: GEMBA-WALK/change-request-001
+version: 1
+status: proposed
+project: GEMBA-WALK
+category: change-request
+owner: programme-architect
+reviewer: Architecture Board
+review_date: 2026-11-27
+change: CR-WALK-001</h2>
+<h1>GEMBA-WALK — Change request 001: the game host and its own identity</h1>
+<h2>Change requests</h2>
+<p>Change the accepted delivery architecture for the Gemba Walk from <strong>a <code>/walk/</code> sub-site on the
+operator origin using the <code>conveyor-web</code> client, with production sign-in deferred</strong>, to <strong>a
+first-class client served at <code>https://game.nonagentic.ai/</code> with its own public Keycloak client
+<code>conveyor-game</code></strong>, while keeping one image, one service, one API and one principal set.</p>
+<p>The owner's direction of 2026-11-27 is the driver: the game is a secondary UI that may become the
+primary UI, it needs its own Keycloak setup and its own URL, and the UI must work first time.</p>
+<p>This request changes the scope of G0 (#813), the frozen route model (W0), the serving architecture
+(SPEC §4/§10), the identity contract (ADR 0021 decision 4), and the governing decisions D67 and
+§10.5.11. It does <strong>not</strong> change the parity goal, the action registry, the data model, the
+<code>apps/web</code> client, or the primacy decision (P6).</p>
+<h2>2. Why the accepted design no longer meets the direction</h2>
+<table><thead><tr><th>Accepted position</th><th>Source</th><th>Why it falls short</th></tr></thead><tbody>
+<tr><td>static sub-site at <code>/walk/</code>, same image and origin</td><td>ADR 0021 decision 1; SPEC §4, §10</td><td>a sub-path on the operator origin cannot be the game's own product URL; a later promotion would require a second move</td></tr>
+<tr><td>the same public client with a <code>/walk/</code> redirect URI, or a dedicated client "if the identity operator prefers isolation"</td><td>ADR 0021 decision 4; SPEC §10</td><td>leaves the identity question open; the owner has now chosen isolation; a production sign-in is not provable on the operator client's redirect set</td></tr>
+<tr><td>production sign-in is <code>acceptance-blocked-by</code> an external redirect registration</td><td>issue #813; plan §7</td><td>the owner has made the identity setup part of the work; an acceptance-blocked scenario is not "works first time"</td></tr>
+<tr><td>the walk path is <code>/walk</code> + app path</td><td>plan §4; census</td><td>a game host at the root makes parity an equality; keeping the prefix on the new host would ship an artificial URL</td></tr>
+</tbody></table>
+<h2>3. Options considered</h2>
+<table><thead><tr><th>Option</th><th>Shape</th><th>Assessment</th></tr></thead><tbody>
+<tr><td><strong>A. Keep the sub-site; add a redirect URI</strong></td><td><code>https://conveyor.nonagentic.ai/walk/</code>, <code>conveyor-web</code></td><td>Rejected. It does not give the game its own URL or its own client, and the owner's direction names both. It also makes a later primacy move a second migration.</td></tr>
+<tr><td><strong>B. New realm, new deployment, new host</strong></td><td>realm <code>game</code>, its own service and image, <code>game.nonagentic.ai</code></td><td>Rejected. A second realm duplicates the user set and breaks single sign-on; a second deployment doubles the runtime, secrets, probes, image and CI surface for no capability. The estate's realm policy is one realm per app, and <code>conveyor</code> already is that realm.</td></tr>
+<tr><td><strong>C. Same image and service, second host, dedicated client in the same realm</strong></td><td><code>conveyor-public-vs</code> gains <code>game.nonagentic.ai</code>; the server dispatches on <code>Host</code>; Keycloak gains public client <code>conveyor-game</code> in realm <code>conveyor</code>; the API accepts the two-client <code>azp</code> allowlist</td><td><strong>Chosen.</strong> It gives the game its own URL, session client and redirect policy with no new runtime, no CORS (the API is same-origin on both hosts), no duplicated users and a reversible rollout.</td></tr>
+</tbody></table>
+<h2>Impact</h2>
+<h3>4.1 Scope</h3>
+<ul>
+<li><strong>W0 (census and instrument)</strong> is amended: the census's <code>walk</code> field becomes the host-rooted app
+path (<code>/portfolio</code>, not <code>/walk/portfolio</code>; the entrance is <code>/</code>). The route and action counts stay
+52 / 598 at the re-baseline. The instrument's claim checks are unchanged; only the key changes.</li>
+<li><strong>W2 is split</strong> into W2a (serving and identity), W2b (the client), W2c (tests and CI). G0's
+parts gain the host matrix, the identity acceptance and the live proof.</li>
+<li><strong>A second repository change</strong> is part of the unit: <code>gitops-production</code> gains the Keycloak client,
+the tunnel ingress, the VirtualService host and the deployment env. It is one PR in that repo,
+delivered with the same evidence discipline.</li>
+<li><strong>Out of scope remains</strong>: S1–S4, any new table/action/event/read route, a second realm, a second
+deployment, a new port, primacy, and any production data write.</li>
+</ul>
+<h3>4.2 Schedule</h3>
+<p>No calendar change. The stage order changes: the change record and the delegated decision are
+recorded <strong>before</strong> the build; the conveyor image is deployed <strong>before</strong> the game host is routed;
+the realm Job runs <strong>before</strong> the live sign-in proof.</p>
+<h3>4.3 Cost</h3>
+<table><thead><tr><th>Item</th><th>Cost</th></tr></thead><tbody>
+<tr><td>Runtime</td><td>none: the same process, image, service and database; the second host is another VirtualService host</td></tr>
+<tr><td>Keycloak</td><td>one public client and one audience mapper in an existing realm; the manual realm Job re-run</td></tr>
+<tr><td>Build/CI</td><td>one wasm build in the existing image stage and the walk workflow; no new runner class</td></tr>
+<tr><td>Test</td><td>the host matrix (Rust integration) and one deployed OIDC spec; the dev suite is unchanged</td></tr>
+<tr><td>Operations</td><td>one more hostname in the tunnel ConfigMap and one more line in the dns-ensure-derived DNS; no cert or gateway change</td></tr>
+</tbody></table>
+<h3>4.4 Benefit</h3>
+<p>B8 remains the project's enabling benefit; this change does not claim a measured benefit. The
+enabling effects are concrete: a product URL the owner named; a separate client session and
+redirect policy; a production sign-in that can be proven; and a first-class path to the P6 primacy
+decision without a later migration.</p>
+<h3>4.5 Risk</h3>
+<table><thead><tr><th>Change to the register</th><th>Detail</th></tr></thead><tbody>
+<tr><td>R-WALK-4 closed</td><td>the OIDC redirect/client is no longer external; it is delivered and proven in this unit</td></tr>
+<tr><td>R-WALK-6 added</td><td>the game host could serve an operator surface (MCP, design, operator index); controlled by a router-level host gate, a host-aware static dispatch, <code>app()</code> integration tests and live 404 probes</td></tr>
+<tr><td>R-WALK-7 added</td><td>the <code>azp</code> allowlist could widen the replay guard or default the game id from the audience; controlled by an explicit optional field, a two-id allowlist and rejection tests</td></tr>
+<tr><td>R-WALK-8 added</td><td>the Keycloak client could drift or the manual Job could be skipped; controlled by a git-managed rep, a create-or-refuse preflight and an admin-API read-back</td></tr>
+<tr><td>R-WALK-9 added</td><td>DNS, tunnel or VirtualService lag could make the host unavailable after the merge; controlled by the dns-ensure read-back and the live probes</td></tr>
+</tbody></table>
+<h3>4.6 Affected contracts and decisions</h3>
+<ul>
+<li><strong>SoAW v2</strong> — the Phase-A assignment now includes the host and the production identity; the
+contract is superseded, not edited in place.</li>
+<li><strong>Delivery contract (Phase F)</strong> — created with the amended commitments and the host/identity
+evidence method.</li>
+<li><strong>SPEC_V2 D68</strong> — supersedes D67 in part; §10.5.11's serving sentence is amended with a pointer.</li>
+<li><strong>Typed artefacts</strong> — <code>solution_concept</code>, <code>requirements_catalog</code> and <code>technology_standards</code>
+supersede to v3; <code>data_entity_catalog</code> is unchanged (no new entity).</li>
+<li><strong>ADR 0021 decisions 1 and 4</strong> — superseded in part by ADR 0024; the rest stands.</li>
+</ul>
+<h2>Decisions</h2>
+<p><strong>Approved as a delegated rule decision under the published delegation of 2026-11-22 (reference
+<code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; expiry 2027-02-18) — not a human signature.</strong> The
+Architecture Board decision is recorded live with that reference; the SoAW v2 and the delivery
+contract are approved by a distinct approver. The owner's direction is the request's driver; the
+delegation is what permits the routine gate to be decided without a human signature.</p>
+<h2>6. Implementation order</h2>
+<ol>
+<li>This request and ADR 0024 are committed; the affected documents are versioned.</li>
+<li>The live <code>changes.request</code>, Board decision, SoAW v2 supersession and delivery contract are
+recorded and read back.</li>
+<li>The gitops change is prepared and reviewed; it is <strong>not merged</strong> yet.</li>
+<li>The conveyor service and identity code and the walk client are built, tested and merged; the
+image is deployed with the game host configured but <strong>not routed</strong>.</li>
+<li>The gitops change is merged; Flux applies the env, the tunnel ingress and the VirtualService
+host; the realm Job is run; the client and mapper are read back from the admin API.</li>
+<li>The live host and the real sign-in are proven; the evidence is recorded; the issue closes.</li>
+</ol>
+<h2>7. Acceptance evidence</h2>
+<table><thead><tr><th>Scenario</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>The census is re-keyed and the instrument still checks claims</td><td><code>python3 scripts/build-walk-coverage.py --check</code> + <code>--self-test</code> + the re-frozen census</td></tr>
+<tr><td>The game host serves only the walk and the API</td><td>Rust host-matrix tests through <code>app()</code>, including <code>/mcp</code> and <code>/design</code> 404</td></tr>
+<tr><td>The operator host is unchanged and redirects the legacy path</td><td>the operator tests + the <code>/walk/portfolio</code> 308</td></tr>
+<tr><td>The Keycloak client exists and is correct</td><td>the realm Job log + an admin-API read of <code>conveyor-game</code>, its redirect URIs, web origins, PKCE and the <code>conveyor</code> audience mapper</td></tr>
+<tr><td>A real production sign-in works</td><td>the deployed Playwright OIDC spec as <code>conveyor-e2e</code>, the Portfolio read and <code>/api/me</code> 200</td></tr>
+<tr><td>The change is governed</td><td>the live change row, the Board decision, SoAW v2, the delivery contract and the document read-backs</td></tr>
+</tbody></table>
+<h2>8. Rollback</h2>
+<p>Remove <code>game.nonagentic.ai</code> from <code>conveyor-public-vs</code> and the cloudflared ingress, and drop the two
+deployment env values; the service and the operator origin are unaffected, and the Keycloak client
+stays inert. The walk tree and the <code>/walk/*</code> 308 can be removed in a follow-up if the direction is
+reversed; no data is migrated, so there is nothing to roll back in the database. A rollback is a
+change request with its own evidence.</p>
+<h2>9. Links</h2>
+<ul>
+<li>ADR 0024: <code>../../../decisions/0024-gemba-walk-host-and-identity.md</code></li>
+<li>ADR 0021: <code>../../../decisions/0021-gemba-walk-client.md</code></li>
+<li>Spec: <code>../../../design/GEMBA-WALK-SPEC.md</code> §4, §9, §10, §11</li>
+<li>Plan: <code>../../../plans/GEMBA-WALK.md</code> §7, §8, §10</li>
+<li>WBS/registers: <code>07-governance-and-evidence.md</code></li>
+<li>Artefact register: <code>03-artifact-register.md</code></li>
+<li>Issue: #813 (G0); S1–S4 #814–#817</li>
+<li>Delegation: <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code> (expiry 2027-02-18)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

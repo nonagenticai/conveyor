@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 — Closure review (record completed, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="c7f41e79a6392595fe34e27fabc5c578ef84c0d4304f38a02b87e2830c45cf5d" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>c7f41e79a6392595fe34e27fabc5c578ef84c0d4304f38a02b87e2830c45cf5d</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T3 — Closure review (record completed, 2026-11-22)</h1>
+<p>Project: T3 — PM job · Tranche 3 · Plan: SPEC_V2 §12 · Issue #74</p>
+<h2>Outcome vs acceptance</h2>
+<p>SPEC_V2 §12 T3's gate — "PM runs a request end to end; cannot approve its own gate; a baseline
+change requires a change request" — is met by the live rows: the charter was approved by a
+distinct approver; the five deliverables carry WSJF inputs and accepted status; the scope baseline
+is frozen at v1 and approved by an actor other than its taker; the acceptance of the deliverables
+travelled as an approved change request (<code>01a2052e-5648…</code>), not as a direct mutation; the delivery
+contract <code>01a2052f-29da-76c4-9bda-e45e0f408fe8</code> is live with a Board decision under the standing delegation; the Phase-G review
+(<code>01a2052f-cc4e…</code>) is conformant and cites the published delegation; and five demo credits were
+recorded at the tranche-3 demo.</p>
+<p>The project was reopened from a vacuous closure: it had no baseline, no contract and no review.
+The tr3 review recorded that condition; this closure closes it with the record, not with a waiver.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Scope baseline <code>01a2052e-061f-7570-b780-d94101449bef</code> (frozen, approved by <code>01a1e8a7…</code>,
+taken by <code>01a1efd4…</code> — distinct).</li>
+<li>Delivery contract <code>01a2052f-29da-76c4-9bda-e45e0f408fe8</code> (live), Board decision <code>01a2052f-5a18…</code> citing the standing
+delegation <code>01a2021d…</code>.</li>
+<li>Phase-G review <code>01a2052f-cc4e…</code> (conformant).</li>
+<li>Change <code>01a2052e-5648…</code> (approved) authorising the acceptance.</li>
+<li>Five accepted deliverables and five demo credits on cadence <code>01a20280-ef3f…</code>.</li>
+<li>Tests: <code>crates/actions/tests/spine_gates.rs</code>, <code>closure_gate.rs</code>, <code>programme_close.rs</code>.</li>
+<li><code>scripts/verify-project.py --project T3</code> at this snapshot: every check green except those this
+closure itself creates (the closure gate and the published output).</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>None owned by T3. The programme-level B3 benefit profile waits on T6's approved baseline (a T6
+dependency, recorded on the programme benefit evaluation); the tr4 review will read it.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close T3. The record is complete against its manifest; nothing is waived and no finding is
+deferred.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>GEMBA-WALK — Project WBS · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-wbs" data-provenance-version="1" data-provenance-hash="d396a46870747f01609dac7d307b526e45b9491ce82596c12f182a135fc4b0a8" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-wbs</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>d396a46870747f01609dac7d307b526e45b9491ce82596c12f182a135fc4b0a8</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><hr />
+<h2>document: GEMBA-WALK/governance-and-evidence
+version: 2
+status: draft
+project: GEMBA-WALK
+category: project-wbs
+phase: E–G
+plateau: HLD + capability
+owner: programme-manager
+reviewer: SRO
+review_date: 2026-12-03</h2>
+<h1>GEMBA-WALK — WBS, baseline, registers, change control and evidence</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> W2 is split into W2a (serving and identity),
+W2b (the client) and W2c (tests and CI); W0 is amended to host-rooted <code>walk</code> paths. R-WALK-4 is
+closed, R-WALK-6..9 are added, and the identity is owned delivery work.</p>
+</blockquote>
+<h2>Work packages</h2>
+<table><thead><tr><th>ID</th><th>Work package</th><th>Stage</th><th>Owner</th><th>Acceptance (the plan's <code>Verify:</code>)</th><th>Status</th></tr></thead><tbody>
+<tr><td>W0</td><td>Governance, census and parity instrument (host-rooted <code>walk</code> paths re-frozen at <code>01544010f</code>)</td><td>P0</td><td>programme-manager</td><td><code>python3 scripts/build-walk-coverage.py --check</code></td><td>done 2026-11-27 (#813)</td></tr>
+<tr><td>W1</td><td>Renderer spike: auth, SSE, schema forms, deep link, canvas-2D vs WebGL2; ADR 0023</td><td>P0</td><td>programme-architect</td><td><code>docs/evidence/walk-spike.md</code>; ADR 0023</td><td>done 2026-11-27 (run 45953201576)</td></tr>
+<tr><td>W1a</td><td><code>crates/walk-world</code>: entities, components, resources, schedules, projection (§1–§9 of the ECS design)</td><td>P1</td><td>delivery (G0)</td><td>the headless tests in <code>walk-world</code></td><td>done 2026-11-27 (#813)</td></tr>
+<tr><td>W1b</td><td>The command path and the wasm boundary: manifest, intents, receipts, deltas (§8, §11)</td><td>P1</td><td>delivery (G0)</td><td>refusal + same-frame ordering tests</td><td>done 2026-11-27 (#813)</td></tr>
+<tr><td>W1c</td><td>The replay/determinism harness and the ambiguity test (§10, §14)</td><td>P1</td><td>delivery (G0)</td><td><code>replay_is_deterministic</code>, <code>no_schedule_ambiguity</code></td><td>done 2026-11-27 (#813)</td></tr>
+<tr><td>W1d</td><td>The <code>FrameView</code> adapter and the canvas-2D renderer (§13)</td><td>P1</td><td>delivery (G0)</td><td>the world Playwright spec</td><td>done 2026-11-27 (#813); the browser golden spec is in the walk workflow</td></tr>
+<tr><td>W2a</td><td>Serving and identity: the host dispatch, the router-level game-host gate, <code>/config.json</code> per host, the <code>/walk</code> 308, the <code>azp</code> allowlist, the Keycloak client and its read-back</td><td>P1</td><td>delivery (G0)</td><td>the Rust host matrix; the admin-API read-back</td><td>done 2026-11-27 (#813; live matrix 14/14)</td></tr>
+<tr><td>W2b</td><td>The client: auth, API, forms, router, shell, world entrance, Portfolio read + create/update</td><td>P1</td><td>delivery (G0)</td><td><code>node --test</code>; <code>tsc</code>; the foundation Playwright spec</td><td>done 2026-11-27 (#813)</td></tr>
+<tr><td>W2c</td><td>Tests and CI: the walk workflow, the deployed OIDC spec, the Dockerfile/wasm build, the census re-key</td><td>P1</td><td>delivery (G0)</td><td>the walk workflow green; the deployed sign-in</td><td>done 2026-11-27 (#813; engine fix #839)</td></tr>
+<tr><td>W3</td><td>Read parity across the seven wings</td><td>P2</td><td>S1–S3</td><td>per-destination specs</td><td>done 2026-11-27 (#814/#877, #815/#874, #816/#880)</td></tr>
+<tr><td>W4</td><td>Write parity and gates</td><td>P3</td><td>S1–S3</td><td>contract tests per write</td><td>done 2026-11-27 (#814/#877, #815/#874, #816/#880)</td></tr>
+<tr><td>W5</td><td>Retained V1 surfaces</td><td>P4</td><td>S4</td><td>every retained route and spec</td><td>planned</td></tr>
+<tr><td>W6</td><td>Slice-dependent surfaces and gate audit</td><td>P5</td><td>S4</td><td>the gate audit matches <code>apps/web</code></td><td>planned</td></tr>
+<tr><td>W7</td><td>P6 parity gate and the primacy runbook</td><td>P6</td><td>programme-manager + owner</td><td>instrument green; a11y/perf; the owner's decision</td><td>planned</td></tr>
+<tr><td>W8</td><td>Hardening and the closure evidence</td><td>P6</td><td>delivery (S4)</td><td>the closure review</td><td>planned</td></tr>
+</tbody></table>
+<p>The WBS is the build order; the issue split is by file ownership: G0 = W0–W2 (with W2a–W2c),
+S1–S3 = W3–W4 by wing, S4 = W5–W8. The five build issues are created only after the inception set is published
+(#792); the split is the written exception approved for this plan.</p>
+<h2>Acceptance</h2>
+<p>A work package is accepted by its named instrument, never by prose: the WBS row's Acceptance
+column is the plan's <code>Verify:</code> and the evidence is the instrument's output at the delivery head.
+A row whose instrument fails is not accepted; a row whose evidence is a document is read back
+through the engine.</p>
+<h2>Status</h2>
+<table><thead><tr><th>Work package</th><th>State</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>W0–W2</td><td>done 2026-11-27</td><td>#813; the G0 evidence table above</td></tr>
+<tr><td>W3–W4</td><td>done 2026-11-27</td><td>#814/#877, #815/#874, #816/#880; the W3/W4 evidence table above</td></tr>
+<tr><td>W5–W8</td><td>planned</td><td>S4 (#817)</td></tr>
+</tbody></table>
+<h2>Baseline</h2>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Scope</td><td>the 52 <code>apps/web</code> route patterns, the 43 screens, the 46 specs and the 598 actions frozen in the 2026-11-27 census; the seven wings; the retained V1 surfaces; the game-host dispatch and boundary; the instrument; the P6 gate</td></tr>
+<tr><td>Schedule</td><td>stage order and gates, not calendar dates: P0 (census, spike, ADR 0022) → P1 (foundation + Portfolio) → P2 (reads) → P3 (writes) → P4 (V1) → P5 (slice-dependent) → P6 (gate). Each stage starts only when the previous gate is green.</td></tr>
+<tr><td>Cost</td><td>five build issues (G0 + S1–S4) plus the inception issue #792; one static tree, one browser suite, one instrument, one public Keycloak client and one host route. No new runtime or service cost. No token-spend KPI (owner decision 2026-11-25).</td></tr>
+<tr><td>Approval</td><td>this baseline is approved with the inception set; a scope change is a change request (§Change control), never a silent edit</td></tr>
+</tbody></table>
+<p>The baseline is re-measured only by a signed commit that states what changed; the census is the
+frozen comparator, not a live manifest.</p>
+<h2>Project registers</h2>
+<h3>Risks</h3>
+<table><thead><tr><th>ID</th><th>Risk</th><th>Owner</th><th>Appetite</th><th>Mitigation</th><th>Review</th></tr></thead><tbody>
+<tr><td>R-WALK-1</td><td>parity theatre: a client that looks finished while destinations/actions are omitted</td><td>programme architect</td><td>low</td><td>census + instrument + per-destination specs; no credit without a spec</td><td>each stage gate</td></tr>
+<tr><td>R-WALK-2</td><td>two clients drift; a contract change lands in one</td><td>programme architect</td><td>medium</td><td>one census; behavioural trace parity; a contract test per write</td><td>every contract change</td></tr>
+<tr><td>R-WALK-3</td><td>the engine misses bundle/startup/accessibility budgets</td><td>platform lead</td><td>low</td><td>canvas baseline; the P0 spike; ADR 0022</td><td>P0</td></tr>
+<tr><td>R-WALK-4</td><td><strong>closed 2026-11-27</strong> — the OIDC client is delivered (<code>conveyor-game</code>), not external</td><td>owner/ops</td><td>—</td><td>CR-WALK-001; the admin-API read-back</td><td>closed</td></tr>
+<tr><td>R-WALK-6</td><td>the game host leaks an operator surface (<code>/mcp</code>, <code>/design</code>, the operator index)</td><td>programme architect</td><td>low</td><td>a router-level host gate, a host-aware dispatch, <code>app()</code> matrix tests, live 404 probes</td><td>G0 and every serving change</td></tr>
+<tr><td>R-WALK-7</td><td>the <code>azp</code> allowlist widens the replay guard, or the game id is defaulted from the audience</td><td>platform lead</td><td>low</td><td>exactly two first-party ids; an explicit optional field; acceptance and rejection tests</td><td>every auth change</td></tr>
+<tr><td>R-WALK-8</td><td>the Keycloak client drifts or the manual Job is skipped</td><td>platform lead</td><td>low</td><td>a git-managed rep with a create-or-refuse preflight; the admin-API read-back</td><td>G0</td></tr>
+<tr><td>R-WALK-9</td><td>DNS, tunnel or VirtualService lag after the merge</td><td>platform lead</td><td>medium</td><td>Flux applied-revision and object read-back; dns-ensure; <code>getent</code>/<code>curl</code></td><td>G0</td></tr>
+<tr><td>R-WALK-5</td><td>no local Rust builds slow the wasm loop</td><td>platform lead</td><td>medium</td><td>GitHub preflight for the compile verdict; the baseline needs no Rust</td><td>each build issue</td></tr>
+</tbody></table>
+<h3>Issues</h3>
+<table><thead><tr><th>ID</th><th>Issue</th><th>Raised</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+<tr><td>I-WALK-1</td><td>the inception set is not live until #792 publishes it</td><td>2026-11-26</td><td>programme-manager</td><td>closed — published 2026-11-27 (#792)</td></tr>
+<tr><td>I-WALK-2</td><td><code>/walk/*</code> deep links currently render the operator app</td><td>2026-11-26</td><td>delivery (G0)</td><td>closed — the 308 serves the game host (#813 W2a)</td></tr>
+<tr><td>I-WALK-3</td><td>no walk route, app or spec exists</td><td>2026-11-26</td><td>delivery (G0)</td><td>closed — the client and its suite exist (#813 W2b/W2c)</td></tr>
+</tbody></table>
+<h3>Assumptions</h3>
+<table><thead><tr><th>ID</th><th>Assumption</th><th>Validation</th></tr></thead><tbody>
+<tr><td>A-WALK-1</td><td>the action registry and <code>actions.describe</code> are the sole authority for reachability</td><td>census + instrument at P0</td></tr>
+<tr><td>A-WALK-2</td><td>the same image and service can serve a second host and the walk tree at its root</td><td>met 2026-11-27: the host matrix in W2a, 14/14 live</td></tr>
+<tr><td>A-WALK-3</td><td>the git-managed realm patch can create <code>conveyor-game</code> idempotently, and the API can accept two first-party <code>azp</code> values</td><td>met 2026-11-27: the realm Job's second run read the client back and passed; the auth tests are green</td></tr>
+<tr><td>A-WALK-4</td><td>the Playwright harness can time the same scripted task in both clients</td><td>the P0 spike's trace</td></tr>
+</tbody></table>
+<h3>Dependencies</h3>
+<table><thead><tr><th>ID</th><th>Dependency</th><th>Type</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+<tr><td>D-WALK-1</td><td>#792 inception publication</td><td>blocked-by (build)</td><td>programme-manager</td><td>delivered 2026-11-27</td></tr>
+<tr><td>D-WALK-2</td><td>the game client and host (<code>conveyor-game</code>, <code>game.nonagentic.ai</code>)</td><td>blocked-by (delivery)</td><td>platform lead</td><td>delivered in this unit (CR-WALK-001)</td></tr>
+<tr><td>D-WALK-6</td><td>the gitops-production change: the realm patch, the tunnel ingress, the VirtualService host and the deployment env</td><td>related (delivery)</td><td>platform lead</td><td>closed — the PR merged and the realm Job ran (2026-11-27)</td></tr>
+<tr><td>D-WALK-3</td><td>#395 the live delivery contract for the design gate</td><td>related</td><td>programme-architect</td><td>open</td></tr>
+<tr><td>D-WALK-4</td><td>#526 the programme publish transport</td><td>related</td><td>programme-manager</td><td>open</td></tr>
+<tr><td>D-WALK-5</td><td>slice-dependent surfaces (T13–T15, T19, T7, T9, T17)</td><td>related (W6 audit)</td><td>the owning slices</td><td>planned</td></tr>
+</tbody></table>
+<h3>Benefits</h3>
+<table><thead><tr><th>ID</th><th>Benefit</th><th>Profile</th><th>Baseline</th><th>Status</th></tr></thead><tbody>
+<tr><td>B-WALK-1</td><td>faster, contract-faithful governance tasks in the operator surface</td><td><code>04-msp-profile.md</code> §2; live profile B8 <code>01a21af9-cfcd-73ab-8eff-39cab33f7525</code> (read back 2026-11-27)</td><td><code>value: null</code> — unmeasured until the P6 post-measurement; never zero</td><td>draft</td></tr>
+</tbody></table>
+<h3>Changes</h3>
+<table><thead><tr><th>ID</th><th>Change</th><th>Decision</th><th>Date</th></tr></thead><tbody>
+<tr><td>C-WALK-1</td><td>GEMBA-WALK admitted to the programme as a cross-cutting unit under tranche 0</td><td>ADR 0021 accepted; this inception (#792)</td><td>2026-11-26</td></tr>
+<tr><td>C-WALK-2</td><td>the five-issue build split approved as the written exception</td><td>ADR 0021 consequences; plan §8</td><td>2026-11-26</td></tr>
+<tr><td>C-WALK-3</td><td>the game host and its own public client replace the <code>/walk/</code> sub-site and the deferred sign-in</td><td>CR-WALK-001; ADR 0024; delegated Board decision</td><td>2026-11-27</td></tr>
+</tbody></table>
+<h2>Change control</h2>
+<p>A change to scope, baseline, the census or the architecture goes through the <code>change-control</code>
+template: the request, its impact (scope/schedule/cost/benefit/risk), the affected contract and the
+decision. A re-baseline is a signed commit stating what changed. A deviation from the architecture
+(a second backend, a fixture, a canvas-only work surface, a seat that grants authority) is a change
+request; a silent fork is refused. A change after the SoAW approval is a new contract version and
+re-opens the gate.</p>
+<h2>Evidence plan</h2>
+<table><thead><tr><th>Issue</th><th>Stage</th><th>Evidence (one row per scenario)</th><th>Record</th></tr></thead><tbody>
+<tr><td>#792</td><td>inception</td><td>document ids and hash-equal bodies; <code>contracts_get</code>; the 10 artefact rows; the benefit profile; the re-audit</td><td>this issue's <code>Evidence at completion</code></td></tr>
+<tr><td>G0 (<code>#813</code>)</td><td>P0–P1</td><td>the census reproduction (52/598); the instrument's four failure modes; the spike record; ADR 0022/0023/0024; the host matrix; the client read-back; the foundation Playwright spec; the deployed OIDC sign-in</td><td>recorded 2026-11-27 — see the evidence rows below</td></tr>
+<tr><td>S1–S3 (#814/#877, #815/#874, #816/#880)</td><td>P2–P3</td><td>per-destination specs (empty/error/happy/refusal/write); the contract tests; the instrument's rows</td><td>recorded 2026-11-27 — see the wing evidence below</td></tr>
+<tr><td>S4 (to create)</td><td>P4–P6</td><td>all 52 routes; the gate audit; the a11y/perf measurements; the P6 runbook; the owner's decision</td><td>the PR body + the closure review</td></tr>
+</tbody></table>
+<h3>G0 evidence, recorded 2026-11-27</h3>
+<table><thead><tr><th>Row</th><th>Result</th><th>Source</th></tr></thead><tbody>
+<tr><td>Deployed image</td><td><code>sha-5a7d02d</code> = digest <code>sha256:fbdfb090…</code>; Flux <code>ImagePolicy conveyor</code> applied; pods Ready</td><td>#813 and #839 close-outs</td></tr>
+<tr><td>Host matrix (live)</td><td>14/14: game <code>/</code> and <code>/portfolio</code> 200, <code>/config.json</code> <code>conveyor-game</code>, missing asset 404, <code>/mcp</code> 404, <code>/design/*</code> 404; operator unchanged, <code>/walk/portfolio</code> 308 with the query; game legacy <code>/walk</code> 308</td><td><code>bash /tmp/game-live-matrix.sh</code> (recorded on #813)</td></tr>
+<tr><td>Deployed identity</td><td>real <code>conveyor-e2e</code> sign-in on <code>https://game.nonagentic.ai/</code>; <code>/api/me</code> 200; Today rendered</td><td>the deployed OIDC setup, passing on #813</td></tr>
+<tr><td>Engine</td><td><code>#world-canvas</code> <code>data-engine="ecs"</code> after #839/#840; the suite now demands <code>ecs</code></td><td>#839 close-out, live digest <code>sha256:fbdfb090…</code></td></tr>
+<tr><td>Keycloak</td><td>client <code>conveyor-game</code> created, its second Job run's preflight passed; redirects, web origins, PKCE and the audience mapper read back</td><td>#813 close-out</td></tr>
+</tbody></table>
+<h3>W3/W4 evidence, recorded 2026-11-27</h3>
+<table><thead><tr><th>Wing</th><th>Delivery</th><th>Specs (the recorded proof)</th><th>Instrument</th></tr></thead><tbody>
+<tr><td>S1 — Portfolio &amp; plan + Organisation</td><td>#814 / PR #877, head <code>873b016fc</code>, merge <code>30b769b28</code>; deployed digest <code>0d4815eb…</code></td><td><code>e2e/portfolio/portfolio.spec.ts</code> and <code>e2e/portfolio-organisation/*.spec.ts</code> (12): programme, plan, validation, execution, decisions, runs, meetings, organisation, jobs, agents, tools, project-types</td><td>15/15 census rows registered; the walk workflow green at the merge head</td></tr>
+<tr><td>S2 — Procedures &amp; authoring + Govern &amp; design</td><td>#815 / PR #874, head <code>2db1bf76f</code>, merge <code>e6f4c3ac9</code></td><td><code>e2e/procedures-governance/*.spec.ts</code> (9): procedures, processes, process-map, authoring, adm, architecture, requirements, models, copilot</td><td>13/13 census rows registered; the walk workflow green at the merge head</td></tr>
+<tr><td>S3 — Knowledge + Measure &amp; improve + Operations + Utilities</td><td>#816 / PR #880, head <code>c21deb4be</code>, merge <code>a92565410</code></td><td><code>e2e/measure-operations-utilities/*.spec.ts</code> (12): knowledge, improve, evals, benchmarks, usage, prompt-audit, metering, operations, search, platform, settings, approvals</td><td>19/19 census rows registered; the committed record reads 50/52, the 2 absent are S4's</td></tr>
+</tbody></table>
+<p>The live-record read-backs this unit performed are in the register (<code>03-artifact-register.md</code>) and
+on #847.</p>
+<p>A live or end-to-end part is accepted only by a fresh verifier (<code>validator-deep</code>/<code>aa-pr-auditor</code>),
+never by the builder. The evidence table names the command and the SHA; a claim without a record is
+absent.</p>
+<h2>Closure review</h2>
+<p>The project closes only on the P6 gate, not on "the UI looks finished": the instrument green with
+no open exemption; every destination <code>verified</code>; the named flows round-trip; a11y and performance
+met; the owner's primacy decision recorded (or the walk recorded as an alternative client); the
+delivery contract's compliance review at one level; the benefit profile's post-measurement recorded
+or <code>unmeasured</code>. A closed project updates the slice's coverage row and the programme register; a
+retirement of <code>apps/web</code> is a separate, later decision.</p>
+<h2>Links</h2>
+<ul>
+<li>Brief: <code>00-project-brief.md</code></li>
+<li>Architecture: <code>02-architecture-design.md</code></li>
+<li>MSP: <code>04-msp-profile.md</code></li>
+<li>SAFe: <code>05-safe-epic.md</code></li>
+<li>SoAW: <code>06-statement-of-architecture-work.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code> §7–§8, §11</li>
+<li>ADR 0024: <code>docs/decisions/0024-gemba-walk-host-and-identity.md</code></li>
+<li>Change request: <code>08-change-request-001-host-and-identity.md</code></li>
+<li>Templates: <code>seed/output-standard.json</code> (<code>project-wbs</code>, <code>project-baseline</code>, <code>project-registers</code>, <code>change-control</code>, <code>evidence</code>, <code>closure-review</code>)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

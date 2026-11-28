@@ -23,26 +23,42 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="evidence" data-provenance-version="2" data-provenance-hash="439c6a24d5f18cae2a98b01486200773e5babda215cc2667d88810c80e941c86" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>evidence</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>439c6a24d5f18cae2a98b01486200773e5babda215cc2667d88810c80e941c86</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Evidence — T0 Model and contracts (retrospective, 2026-11-26)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="evidence" data-provenance-version="1" data-provenance-hash="2627048e1620dbe3de6eb234dff95add6a69b843215d4081fcfb276358fbf6e7" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>evidence</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>2627048e1620dbe3de6eb234dff95add6a69b843215d4081fcfb276358fbf6e7</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Evidence — T0 Model and contracts</h1>
+<p><strong>Project:</strong> T0 — Model and contracts · <strong>Track:</strong> v2 · <strong>Tranche:</strong> 0 · <strong>Measured status:</strong> built
+<strong>Plan:</strong> <code>docs/SPEC_V2.md#12</code> · <strong>Units:</strong> #34
+<strong>Measured at:</strong> <code>main@cc88052</code>, 2026-11-16</p>
 <h2>Claim</h2>
-<p>T0 installs the conveyor's organisation spine and its contracts: industry → ordered departments → job_catalogue, the immutable job_release, the tenant-scoped job_binding, the decision-ladder types and the internal Executor contract with two live kinds behind one trait and an extensible executor_kind. The action contracts are those the registry serves and served-spec.lock.json pins (version 1, 650 operations). The seven Phase A–D artefacts are approved and re-versioned by their exact titles. The lifecycle itself is reconstructed: the original charter, statement, delivery contract, Phase-G review and closure review were never authored, and this evidence does not present the reconstruction as contemporaneous intent.</p>
+<p>The V2 model is adopted: the ownership matrix, the organisation vocabulary, the decision-ladder types and the internal Executor contract are in the conveyor, with a job, an immutable release and a pinned binding proven.</p>
 <h2>Evidence</h2>
-<p>The project row 01a1d039-0d32-7734-98da-fb7f1e2386c7 records key T0, status closed, tranche 0, ADM phase G, track v2, plan docs/SPEC_V2.md#12 (draft), expected outputs project-brief and evidence, closure output closure-review, and a reopen at 2026-11-21T20:59:32Z for the retrospective rework (#526). The live Statement of Architecture Work 01a1ff45-b2ce-7276-8a88-cf3d744e7976 is approved by 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e; the delivery contract 01a1ff47-1159-707b-a737-582f894cc956 by 01a1ff47-24cb-7ffb-87a0-3097d55adb64; the scope baseline 01a1ff47-5043-73f7-b18d-2fc03832c96a was taken 2026-11-21T18:03:45Z. The Phase-G review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c records level compliant. The seven approved rows and documents are dated 2026-11-22; the project's one WBS deliverable is titled 'The model and contracts — organisation spine, decision-ladder types and the Executor seam' and carries WSJF inputs 8, 8, 8 and 5. The published evidence document is 01a1e688-678d-76fd-8ae7-6ca2712b64c2, the project brief 01a1ff47-af07-76e1-a28f-79397fc636cb and the closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92.</p>
+<table><thead><tr><th>Path</th><th>What it is</th></tr></thead><tbody>
+<tr><td><code>crates/domain/src/executor.rs</code></td><td>Rust source — 334 lines</td></tr>
+<tr><td><code>crates/domain/src/organisation.rs</code></td><td>Rust source — 118 lines</td></tr>
+<tr><td><code>crates/store/src/organisation.rs</code></td><td>Rust source — 1021 lines</td></tr>
+<tr><td><code>migrations/0040_organisation.sql</code></td><td>migration — 10 table(s): <code>industry</code>, <code>job_catalogue</code>, <code>job_department</code>, <code>job_release</code>, <code>job_binding</code>, <code>laya_inference_config</code>, <code>decision_policy</code>, <code>decision_policy_refinement</code>…</td></tr>
+</tbody></table>
+<p>The coverage row measures <strong>15/15 actions, 3/3 modules and 9/9 tables</strong> against the project's plan. Unit state at measurement: 0 open, 0 claimed, 0 blocked, 0 ready.</p>
 <h2>Verification</h2>
-<p>The governance instrument is python3 scripts/verify-project.py --project T0 against a fresh snapshot; the rework note records it green with 11 checks and 0 failures at d7293f96 on 2026-11-21, and the strict audit carries no P0/P1 entry. The current acceptance record docs/evidence/rework/T0.json, generated 2026-11-25T10:37:53Z at 37f99108, reports a red verdict: 12 of 16 checks pass and T0-artefact-standard, T0-rework, the gate aggregate and closed-on-red fail. The action contracts are verified by served-spec.lock.json and the --check-lock path in crates/actions/src/lock.rs. This content pack is verified offline by scripts/rework-content-check.py --project T0 with the facts snapshot and the recorded WSJF inputs; the Rust compile verdict is taken from the repository's GitHub-hosted preflight, never from a local cargo run.</p>
+<ul>
+<li>The row is generated by <code>scripts/build-coverage.py</code> from the plan frontmatter, the migrations, the compiled action-registry dump and the module tree at <code>main@cc88052</code>.</li>
+<li>Live tenant <code>nonagentic</code> at authoring: live image <code>sha256:46d78d2b…</code>, and the live snapshot reports <code>git_sha cc88052</code> (the measurement baseline). The public programme window serves this project's published outputs.</li>
+<li>This evidence row records the measured inventory; it does <strong>not</strong> re-run the project's acceptance suite. The suite remains the plan's own gate.</li>
+<li>Every path above was checked for presence in the repository at <code>main@cc88052</code>.</li>
+</ul>
 <h2>Links</h2>
 <ul>
-<li>SPEC_V2 §3 (P1–P11), §4.1–§4.6 (the organisation model and the executor seam), §10.1 (ownership matrix), §10.3 (data model additions) and §10.4 (action families); §12's T0 row and dependency line.</li>
-<li>served-spec.lock.json (version 1, 650 operations) and crates/actions/src/lock.rs.</li>
-<li>crates/domain/src/executor.rs, crates/actions/src/organisation.rs and crates/actions/tests/executor_runtime.rs.</li>
-<li>acceptance/programme/T0.toml, docs/evidence/rework/T0.md and docs/evidence/rework/T0.json.</li>
-<li>The seven approved A–D rows with their documents; the live statement, contract, baseline and review; the published evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2, project brief 01a1ff47-af07-76e1-a28f-79397fc636cb and closure review 01a1ff47-7d5c-7431-9a56-63b73c739d92.</li>
+<li>Plan: <code>docs/SPEC_V2.md#12</code></li>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-0d4f-7170-8a5e-0e89861340fe.html</li>
+<li>Units: #34</li>
+<li>Validation: the project's row on <code>/design/data/coverage.json</code>.</li>
 </ul>
 <h2>Gap</h2>
-<p>The 2026-11-25 acceptance record is red on six mandatory artefact packages (mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0 and std-togaf-phase-g-t0-g:T0), on the P1 package mandatory_artefacts:T0, on the gate aggregate and on closed-on-red; this pack supplies the content those packages read and does not claim the red is cleared. The original charter, Statement of Architecture Work, delivery contract, Phase-G review and closure review were never authored before T0 closed on 2026-11-14, so the contemporaneous record is the evidence document 01a1e688-678d-76fd-8ae7-6ca2712b64c2 and the git history. No fresh green verify-project run at the 2026-11-26 snapshot is claimed, and the execution behaviour behind the executor kinds remains T2's acceptance, not this slice's.</p>
+<ul>
+<li>No measured gap; the coverage row records none.</li>
+<li>Closure set: <code>closure-review</code> is outstanding. Closing the project is a separate owner decision, not part of this evidence row.</li>
+</ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

@@ -41,12 +41,15 @@
         <div><dt>SPEC</dt><dd>§8.4</dd></div>
         <div><dt>Gate</dt><dd>approved</dd></div>
         <div><dt>Package</dt><dd><code>std-pmp-project-registers-t13:T13</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Risks</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 6 row(s)</p>
 <ul>
+<li>The T13 catalogue actions and published toolkits are unbuilt: eleven of the design&#x27;s twelve catalogue actions and both toolkits are absent <span class="std-state">open</span></li>
+<li>Job-facing storage is unproven: no action calls JobStorage; the round trip is in-process and the prompt proof is a static compile <span class="std-state">open</span></li>
+<li>The governed call path&#x27;s guards stop at the handler boundary: direct external invocation remains possible, and the spend budget and rate limits are unenforced <span class="std-state">open</span></li>
 <li>The approved destructive execution path is not proved — only its refusal is <span class="std-state">open</span></li>
 <li>The storage round trip falls back to the in-memory store, so live MinIO stays unproved <span class="std-state">open</span></li>
 <li>The destination URL is process-global, so a parallel runner would produce false refusals <span class="std-state">open</span></li>
@@ -59,15 +62,17 @@
 <li>Catalogue actions and the estate import are deferred to T14 <span class="std-state">open</span></li>
 </ul><h2>Assumptions</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 4 row(s)</p>
 <ul>
+<li>The close records the core the gate was written for: one governed call path, a ledger, a data ceiling, a pre-dispatch refusal and a keyless storage adapter <span class="std-state">open</span></li>
 <li>The six §12 proofs are sufficient evidence of the gate <span class="std-state">open</span></li>
 <li>No destructive call is bound before its tenant configures approvals <span class="std-state">open</span></li>
 <li>Directly written test rows exercise the same resolution the broker performs in production <span class="std-state">open</span></li>
 </ul><h2>Dependencies</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 2 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
 <ul>
+<li>T14 carries the import wave and T15 the authoring/publication of the catalogue actions and toolkits that T13 did not land <span class="std-state">open</span></li>
 <li>T13 needs T2&#x27;s run and queue, and T14 needs T13 <span class="std-state">open</span></li>
 <li>Calls depend on a reviewed destination alias, never a caller-supplied URL <span class="std-state">open</span></li>
 </ul><h2>Benefits</h2>
