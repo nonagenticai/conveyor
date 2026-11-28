@@ -1,0 +1,905 @@
+{
+ "charter": "# Charter — S10 Copilot / AG-UI (retrospective, 2026-11-27)\n\n- **Project:** S10 'Copilot / AG-UI — one action surface, proposals, conversations', track v1, ADM phase G, delivery plateau, tranche 6, plan `docs/plans/slices/S10-copilot-ag-ui.md`.\n- **Sponsor:** the programme's sponsoring group, through the tranche-6 PI plan and the standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`.\n- **Authority:** SPEC §8 S10 sets the gate: a scripted agent session passes. SPEC D14 keeps inference-router outside the conveyor, and D17 makes the web, MCP and messaging channels equivalent over one action and one approval row. The slice's own decisions S10-D1 to S10-D7 are recorded in the plan.\n- **Objective:** an agent operates the app through the S04 registry. The tool list is a projection of `ActionSpec`s filtered by the caller's scopes; a destructive tool call becomes an S06 approval; the conversation is two tables plus an SSE stream; and the copilot does not grow a second action system.\n- **Scope in:** `conversation` and `conversation_turn`; the turn runner; the agent-surface projection and its coverage test; proposals as `approval(kind='copilot.action')`; the execution claim and sweep; SSE `conversation:{id}` with `Last-Event-ID` replay; `completions.create` as a fail-closed external action; the AG-UI serializer; and the screens declared as data for S12.\n- **Scope out:** `inference-router` (D14), the `/mcp` transport and scope filtering (S04), the approval state machine (S06), fr's 34 `agui/actions` modules and `agent-core`, the agent's tool contract and principal (S06b), and chat UI rendering (S12).\n- **Constraints:** one registry, so `/api/copilot/actions` and `/mcp` `tools/list` are renderings of the same answer; a tool effect is an `action_invocation`; a proposal carries the exact input sealed under the tenant key and a redacted projection in the approval row; approvals never expire; execution uses a conditional claim and `Idempotency-Key: proposal:<approval_id>`; an unavailable model ends the turn `failed` with zero tool invocations; the only coverage exemption is the `copilot.chat` transport route.\n- **Retrospective status:** the capability is built in the tree. It is evidenced by fourteen `crates/api/tests/copilot_*.rs` suites, `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules named below. The project row was created on 2026-11-12, later closed, and measured `built`; the pre-pack receipt `docs/evidence/rework/S10.json` (2026-11-25) was red on the lifecycle and tranche checks. This charter and the set that follows are authored retrospectively at the 2026-11-27 snapshot and do not attest contemporaneous ceremonial review. No deployed copilot, chat UI or production router run is claimed; those stay S12 and S14 work.\n",
+ "soaw": {
+  "title": "Statement of Architecture Work — S10 Copilot / AG-UI (retrospective, 2026-11-27)",
+  "body": {
+   "assignment": "The architecture work assigns S10 the copilot's one action surface: project the S04 registry by principal, turn a destructive tool call into an S06 approval, run the conversation as two tables and an event stream, and keep model access outside the conveyor. This statement governs the retrospective record of work built in the S10 slice and re-read at the 2026-11-27 snapshot.",
+   "scope": "In scope are the `conversation` and `conversation_turn` tables with forced row-level security, the turn runner and its eight-round cap, the `agent_surface` projection over the action registry, proposals carried as `approval(kind='copilot.action')` with sealed inputs, the conditional execution claim and sweep, the SSE topic `conversation:{id}` with `Last-Event-ID` replay, `completions.create` as an external action with a 60-second timeout and breaker, the AG-UI serializer, and the screens declared as data for S12. Out of scope are inference-router (D14), the `/mcp` transport and scope filtering (S04), the approval state machine (S06), fr's 34 AG-UI action modules, the agent's principal and tool contract (S06b), and chat UI rendering (S12).",
+   "responsibilities": "The programme architect authors this retrospective statement; the delivery team (conveyor-e2e) is accountable for the evidence; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-6 review. S12 is consulted as the renderer of the declared screens, operations is consulted on model availability and key custody, and the tenant admin is consulted because the channel grants and the approval decision are the authorization surface.",
+   "acceptance_criteria": "The gate is a scripted session: open a conversation, ask for a card move, receive a proposal and one pending approval with zero action invocations; approve as an authorized member and see exactly one invocation, the card moved and the turn completed citing that invocation; reconnect with `Last-Event-ID` and receive the turn once; see a low-scope principal's two surfaces omit the same tool; see an unavailable router fail the turn with zero invocations; and see the coverage gate fail an unmapped operation by name. The local proofs are `crates/api/tests/copilot_session.rs`, `copilot_proposal.rs`, `copilot_approve.rs`, `copilot_replay.rs`, `copilot_surface.rs`, `copilot_turn.rs` and `crates/actions/tests/copilot_coverage.rs`.",
+   "constraints": "S10-D1 keeps the surface a query over `ActionSpec`, so no second registry or tool table exists. S10-D2 makes a proposal an approval created through S06's `insert_approval_tx`, with one pending proposal per turn enforced by the partial unique index on `(tenant_id, meta->>'turn_id')`. S10-D3 makes execution a job with a conditional claim, a 120-second lease, re-checked proposer scopes and the proposal idempotency key. S10-D4 makes only terminal turns durable, with the terminal meta, the proposal and the `conversation_turn.created` event committed together. S10-D5 makes `completions.create` fail closed: an outage, timeout or open breaker ends the turn `failed` and runs no tool. S10-D6 declares `copilot.chat` the only coverage exemption. S10-D7 keeps AG-UI as a serializer over the native stream.",
+   "retrospective": "This statement of architecture work is authored on 2026-11-27 for the tranche-6 rework. No contemporaneous SoAW exists; the S10 row was created on 2026-11-12 and the build was recorded in the slice plan and the receipt. The statement records what the tree and the suites prove today, names the pre-pack receipt as red on lifecycle checks, and leaves the deployed UI and router proof to S12 and S14 instead of implying it happened."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S10 Copilot / AG-UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-6 authorisation and the project's close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the copilot capability and the tranche outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Web copilot user",
+     "axis_b": "converses, reads a proposal and decides through the approval row",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Agent app and MCP consumer",
+     "axis_b": "machine consumer of the same projection; its licence principal is S06b's",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Tenant admin",
+     "axis_b": "channel grants and the approval decision; the authorization surface",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the artefact set and the retrospective Phase-G level",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S10 Copilot / AG-UI (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S10 Copilot / AG-UI (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix stakeholders on the influence, interest and engagement axes: the sponsoring group decides the tranche and the close, the SRO is accountable, the web user converses and decides proposals, the agent app consumes the same projection as a machine principal, the tenant admin owns the channel grants and the approval decision, and the Architecture Board approves the artefact set. S12 and S14 are informed through the capability map because they carry the rendering and the deployed proof.\n\n## Links\n\nDerives from `docs/plans/slices/S10-copilot-ag-ui.md` sections 1, 3 and 9; realizes the Phase A stakeholder view for the copilot capability; depends on the Business Capability Map for the value each group receives. The programme roles are those already recorded for the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project has no contemporaneous architecture publication of its own; this retrospective artefact is published as its own architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-27 snapshot carries for S10.\n"
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S10 Copilot / AG-UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "D1 One action surface, not a second registry",
+     "axis_b": "G1 The copilot surface is a query over ActionSpec; O1 scope, kind and tenancy filters",
+     "value": {
+      "measure": "/api/copilot/actions equals /mcp tools/list",
+      "owner": "the programme architect"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 Destructive calls are questions",
+     "axis_b": "G2 A proposal is an approval; O2 one pending proposal per turn in the same transaction",
+     "value": {
+      "measure": "approval row with zero action_invocation before decide",
+      "owner": "conveyor-e2e"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Execution is exactly-once",
+     "axis_b": "G3 Conditional claim, idempotency key and re-checked proposer scopes; O3 sealed input replay",
+     "value": {
+      "measure": "one invocation after a crash or a second decision",
+      "owner": "conveyor-e2e"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Durable conversations, ephemeral deltas",
+     "axis_b": "G4 Terminal turn and event commit together; O4 replay after Last-Event-ID",
+     "value": {
+      "measure": "the turn arrives once on reconnect",
+      "owner": "conveyor-e2e"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 A model failure must not fabricate work",
+     "axis_b": "G5 completions.create is external and fail-closed; O5 outage, truncation and round cap end the turn",
+     "value": {
+      "measure": "turn failed with zero tool invocations",
+      "owner": "the operations lead"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 Coverage is a build gate",
+     "axis_b": "G6 Every mutating screen operation maps to an action or the declared transport exemption",
+     "value": {
+      "measure": "an unmapped operation fails by name",
+      "owner": "the programme architect"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S10 Copilot / AG-UI (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S10 Copilot / AG-UI (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. The drivers are read from the slice plan's objective, gate and traps, not invented for the retrospective.\n\n## Entries\n\nSix driver, goal and objective rows: one action surface rather than a second registry, destructive calls as questions, exactly-once execution, durable conversations with replay, fail-closed model access, and a coverage gate. Each row names the measure the tree proves and the owner accountable for it; the measures are the suites and record fields the Requirements Catalog pairs with each objective.\n\n## Links\n\nDerives from `docs/plans/slices/S10-copilot-ag-ui.md` sections 1, 7 and 9; each objective is realized by a requirement in the Requirements Catalog. D1 carries S10-D1 and the surface equality suite, D2 carries S10-D2 and the proposal suite, D3 carries S10-D3 and the crash and approval suites, and D5 carries S10-D5 and the turn suite.\n\n## Document\n\nThe catalog is the retrospective statement of why S10 exists. It is published as an architecture-artifact-instance by the rework factory and is read together with the Requirements Catalog: the drivers justify the sixteen requirements, and the requirements carry the test targets that prove them at the snapshot.\n"
+  },
+  {
+   "title": "Requirements Catalog — S10 Copilot / AG-UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "R-1 Scripted session",
+     "axis_b": "A read tool call runs and the turn completes",
+     "value": {
+      "test": "crates/api/tests/copilot_session.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-2 Surface equality and omission",
+     "axis_b": "The copilot route and /mcp tools/list return the same set; a known omitted name is 403 action-forbidden",
+     "value": {
+      "test": "crates/api/tests/copilot_surface.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-3 One pending proposal per turn",
+     "axis_b": "A must-approve tool call becomes one pending approval with no invocation",
+     "value": {
+      "test": "crates/api/tests/copilot_proposal.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-4 Approval gates execution",
+     "axis_b": "An authorised decision runs the action once; a second decision changes nothing",
+     "value": {
+      "test": "crates/api/tests/copilot_approve.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-5 Destructive target binds",
+     "axis_b": "The proposal records the target its gate compares; a rejected or foreign approval executes nothing",
+     "value": {
+      "test": "crates/api/tests/copilot_destructive.rs"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-6 Crash replay",
+     "axis_b": "A crashed execution replays on the proposal key and runs nothing twice",
+     "value": {
+      "test": "crates/api/tests/copilot_crash_replay.rs"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-7 Reconnect replay",
+     "axis_b": "A reconnect after the cursor receives the turn exactly once",
+     "value": {
+      "test": "crates/api/tests/copilot_replay.rs"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R-8 Reap",
+     "axis_b": "A streaming turn older than the window is interrupted once",
+     "value": {
+      "test": "crates/api/tests/copilot_reap.rs"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R-9 Router outage",
+     "axis_b": "An unavailable router fails the turn and runs no tool",
+     "value": {
+      "test": "crates/api/tests/copilot_turn.rs"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R-10 Bounded retry",
+     "axis_b": "A transient router failure is retried and three failures in a row are not",
+     "value": {
+      "test": "crates/api/tests/copilot_retry.rs"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "R-11 Round cap",
+     "axis_b": "A turn that never stops calling tools is refused at the round cap",
+     "value": {
+      "test": "crates/api/tests/copilot_rounds.rs"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "R-12 Truncated answer",
+     "axis_b": "An answer truncated at the token cap fails the turn",
+     "value": {
+      "test": "crates/api/tests/copilot_truncated.rs"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "R-13 Malformed arguments",
+     "axis_b": "A tool call with malformed arguments fails the turn",
+     "value": {
+      "test": "crates/api/tests/copilot_bad_args.rs"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "R-14 Coverage gate",
+     "axis_b": "Every mutating action is in the surface; an unmapped operation fails by name; the transport exemption is declared",
+     "value": {
+      "test": "crates/actions/tests/copilot_coverage.rs"
+     },
+     "position": 14
+    },
+    {
+     "axis_a": "R-15 Recipe identity and ledger",
+     "axis_b": "The copilot records the compiled recipe identity and a model-call tool reaches the inference ledger",
+     "value": {
+      "test": "crates/api/tests/copilot_identity.rs"
+     },
+     "position": 15
+    },
+    {
+     "axis_a": "R-16 AG-UI wire parity",
+     "axis_b": "A completed turn serializes to the golden frames and every frame type is one of fr's eight",
+     "value": {
+      "test": "crates/api/tests/agui_parity.rs"
+     },
+     "position": 16
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S10 Copilot / AG-UI (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — S10 Copilot / AG-UI (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. Each requirement maps to a named suite in the tree; the plan's section 7 property table is the source for the gate properties, and the extra rows record suites that the build order does not name.\n\n## Entries\n\nSixteen requirements: the scripted session, surface equality and omission, the one-pending-proposal rule, approval-gated execution, the destructive target binding, crash and reconnect replay, the reaper, router outage, bounded retry, the round cap, truncation, malformed arguments, the coverage gate, recipe identity and ledger, and AG-UI wire parity. Each row names a file that exists at the snapshot; the identity rows belong to S16 W7 work carried under the copilot prefix and are recorded as they are, not re-scoped to S10.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram. The plan's section 7 properties supply R-1 to R-9 and R-14; the seven extra suites were added after the plan and are recorded from the tree. The migration `migrations/0018_copilot.sql` supplies the table and index names the requirements exercise.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It bridges the drivers and the tests: a reader can move from a driver to its requirement to the suite that proves it without relying on the plan's prose alone, and can see which suites grew beyond the plan's eight named files.\n"
+  },
+  {
+   "title": "Solution Concept Diagram — S10 Copilot / AG-UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Web chat route",
+     "axis_b": "POST /api/copilot/conversations, POST /{id}/turns, GET /{id}/turns; SSE conversation:{id}",
+     "value": {
+      "shape": "route",
+      "exemption": "copilot.chat"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Action projection",
+     "axis_b": "GET /api/copilot/actions over ActionSpec, filtered by scopes, kind and tenancy",
+     "value": {
+      "module": "crates/actions/src/agent_surface.rs",
+      "equality": "/mcp tools/list"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "/mcp transport",
+     "axis_b": "S04's machine channel; tools/list and invocation over the same registry",
+     "value": {
+      "owner": "S04"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Turn runner",
+     "axis_b": "model, validate, invoke or propose, repeat to the eight-round cap",
+     "value": {
+      "module": "crates/api/src/copilot/turns.rs",
+      "history": "last 20 turns"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "completions.create",
+     "axis_b": "external inference action: 60-second timeout, breaker, model:write scope",
+     "value": {
+      "module": "crates/actions/src/integrations/inference.rs",
+      "failure": "turn failed, zero tools"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Action registry and invoke",
+     "axis_b": "one handler path; each executed tool leaves an action_invocation",
+     "value": {
+      "owner": "S04"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Proposal",
+     "axis_b": "approval(kind='copilot.action'); sealed exact input, redacted projection, approval target",
+     "value": {
+      "module": "crates/api/src/copilot/proposal.rs",
+      "index": "uq_approval_copilot_turn"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Execution claim",
+     "axis_b": "conditional claim with a 120-second lease, scope re-check and proposal idempotency key",
+     "value": {
+      "module": "crates/store/src/copilot.rs",
+      "effect": "exactly once"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Conversation tables",
+     "axis_b": "conversation and conversation_turn with forced row-level security",
+     "value": {
+      "migration": "migrations/0018_copilot.sql"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Outbox and SSE",
+     "axis_b": "conversation_turn.created committed with the terminal turn; Last-Event-ID replay",
+     "value": {
+      "replay": "event.seq greater than last"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "AG-UI serializer",
+     "axis_b": "turn meta rendered into fr's eight snake_case frame types",
+     "value": {
+      "module": "crates/api/src/copilot/agui.rs",
+      "proof": "crates/api/tests/agui_parity.rs"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "Sweeps",
+     "axis_b": "copilot.turn.reap and copilot.proposal.sweep on the schedule",
+     "value": {
+      "module": "crates/store/src/schedule.rs"
+     },
+     "position": 12
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S10 Copilot / AG-UI (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S10 Copilot / AG-UI (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so the nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nTwelve nodes and edges: the web chat routes, the action projection, the S04 `/mcp` transport, the turn runner, the external `completions.create` action, the registry and its invocation path, the proposal, the execution claim, the two conversation tables, the outbox and SSE, the AG-UI serializer, and the two scheduled sweeps. The entries name each node's module, its contract and its refusal behaviour; the proposal node records the sealed input and the per-turn unique index.\n\n## Links\n\nDerives from the requirements and realizes them on one wire. The source is `docs/plans/slices/S10-copilot-ag-ui.md` section 5 and the modules named in the entries: `crates/actions/src/agent_surface.rs`, `crates/api/src/copilot/turns.rs`, `crates/api/src/copilot/proposal.rs`, `crates/api/src/copilot/agui.rs`, `crates/store/src/copilot.rs` and `migrations/0018_copilot.sql`.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows the chat transport as a route with the declared exemption, because S10-D6 is the reason the coverage gate does not demand an action for streaming; a reader sees the seam rather than reconstructing it from the plan.\n"
+  },
+  {
+   "title": "Business Capability Map — S10 Copilot / AG-UI (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Durable conversation",
+     "axis_b": "A user turn and a terminal assistant turn per conversation, replayable by event sequence",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/api/src/copilot/turns.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Scoped tool surface",
+     "axis_b": "The same action set rendered for the web copilot and for /mcp by principal",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/agent_surface.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Proposal and approval gate",
+     "axis_b": "A must-decide tool call becomes one approval with a redacted projection and a sealed input",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/api/src/copilot/proposal.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Exactly-once execution",
+     "axis_b": "An approved proposal runs once under a claim, a scope re-check and an idempotency key",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/store/src/copilot.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Fail-closed model access",
+     "axis_b": "An external completion that is unavailable ends the turn without a tool invocation",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/integrations/inference.rs"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Coverage and evidence",
+     "axis_b": "Every mutating operation resolves to an action or the one declared exemption",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/tests/copilot_coverage.rs"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S10 Copilot / AG-UI (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S10 Copilot / AG-UI (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. The capability levels are the retrospective reading: each capability is delivered by a named module and is proven by a named suite, not by an aspiration.\n\n## Entries\n\nSix capabilities: durable conversation, scoped tool surface, the proposal and approval gate, exactly-once execution, fail-closed model access, and coverage with evidence. Each entry pairs the capability with its delivering module and names the level the tree supports; the level is 2 because the capability exists and is tested at the store and loopback HTTP boundary.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity catalog carries the rows each capability writes. The source is the plan's section 5 deliverable table and section 7 property table, corrected against the tree for the migration number and the module locations the retrospective found.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome, a person deciding a destructive action in conversation, to the components that deliver it without reading the crate tree first.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S10 Copilot / AG-UI (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "conversation",
+     "axis_b": "per user, optional project, status active or archived, forced RLS",
+     "value": {
+      "writer": "crates/store/src/copilot.rs",
+      "table": "migrations/0018_copilot.sql"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "conversation_turn",
+     "axis_b": "seq allocated under SELECT FOR UPDATE; meta carries status, model, tool_calls and error",
+     "value": {
+      "writer": "append_turn_tx and finish_turn_tx",
+      "backstop": "unique (conversation_id, seq)"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "approval(kind='copilot.action')",
+     "axis_b": "the proposal row: run_id NULL, requested_by the proposer, one pending per turn",
+     "value": {
+      "writer": "insert_approval_tx",
+      "index": "uq_approval_copilot_turn"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Sealed input and redacted projection",
+     "axis_b": "meta.sealed_input holds the exact input sealed with the tenant key; meta.input and meta.diff are redacted",
+     "value": {
+      "owner": "crates/api/src/copilot/proposal.rs",
+      "marker": "<redacted>"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "approval_decision",
+     "axis_b": "the decision that unlocks execution; decide_via admits web, telegram and mcp",
+     "value": {
+      "owner": "S06"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "action_invocation",
+     "axis_b": "the row each executed tool call leaves; the turn meta cites its id",
+     "value": {
+      "writer": "the invoke path",
+      "owner": "S04"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "conversation_turn.created",
+     "axis_b": "the outbox event committed with the terminal turn on topic conversation:{id}",
+     "value": {
+      "writer": "crates/api/src/copilot/turns.rs"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Scheduled sweep rows",
+     "axis_b": "copilot.turn.reap and copilot.proposal.sweep on the every-minute schedule",
+     "value": {
+      "owner": "crates/store/src/schedule.rs"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S10 Copilot / AG-UI (Phase D)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S10 Copilot / AG-UI (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. The entities are the rows the copilot path writes or reads; the sealer and the schedule are listed as components because they sit on the execution and recovery paths.\n\n## Entries\n\nEight data entities and components: the conversation, its turns, the proposal approval, the sealed input and redacted projection, the decision, the invocation audit row, the terminal outbox event, and the two scheduled sweeps. Each names its writer and the module that owns it; the proposal row records that a copilot proposal has a NULL run_id and is made unique per turn by a partial index.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage and wire standards. The source is `migrations/0018_copilot.sql` for the tables and index, `crates/store/src/copilot.rs` for the writers, `crates/store/src/schedule.rs` for the sweeps, and `crates/api/src/copilot/proposal.rs` for the seal and redaction rule.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the copilot: the rows an auditor would read after a proposed and executed action, and the component that writes each one, including the seal that keeps a secret-bearing input out of the member-readable approval row.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — S10 Copilot / AG-UI (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "Postgres 18 with forced RLS",
+     "axis_b": "conversation and conversation_turn carry tenant_id and a forced tenant policy",
+     "value": {
+      "rule": "ENABLE and FORCE row-level security",
+      "source": "migrations/0018_copilot.sql"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Scoped store transactions",
+     "axis_b": "the copilot store functions run inside tenant-scoped transactions",
+     "value": {
+      "rule": "begin_scoped",
+      "source": "crates/store/src/copilot.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "One ActionSpec registry",
+     "axis_b": "the copilot route and /mcp render the same registry answer",
+     "value": {
+      "rule": "no second tool table",
+      "source": "crates/actions/src/agent_surface.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "RFC 9457 problem+json",
+     "axis_b": "a failed turn records type, status and detail and answers with the same problem",
+     "value": {
+      "rule": "failed turn is durable and reported",
+      "source": "crates/domain/src/copilot.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Outbox and SSE replay",
+     "axis_b": "conversation_turn.created on topic conversation:{id}; Last-Event-ID replays event.seq",
+     "value": {
+      "rule": "only committed turns are durable",
+      "source": "crates/api/src/copilot/turns.rs"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "External completion",
+     "axis_b": "completions.create is an external action with a 60-second timeout and a breaker",
+     "value": {
+      "rule": "fail closed, no heuristic substitute",
+      "source": "crates/actions/src/integrations/inference.rs"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "AG-UI frame vocabulary",
+     "axis_b": "eight snake_case frame types serialized from the terminal turn meta",
+     "value": {
+      "rule": "serializer, not a second protocol",
+      "source": "crates/api/src/copilot/agui.rs"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Approvals never expire",
+     "axis_b": "the owner ruling of 2026-11-09 keeps expires_at NULL on a copilot proposal",
+     "value": {
+      "rule": "time does not kill a gate",
+      "source": "crates/api/tests/copilot_proposal.rs"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S10 Copilot / AG-UI (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S10 Copilot / AG-UI (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S10; tranche 6; retrospective under the standing delegation. The standards are the ones the tree actually uses; the catalog is a reading of the workspace, not a wish list.\n\n## Entries\n\nEight technology standards: Postgres with forced row-level security, scoped store transactions, the one action registry, RFC 9457 problems, the outbox and SSE replay rule, the external completion action, the AG-UI frame vocabulary, and the no-expiry approval ruling. Each names the rule that makes it safe and the file that carries it; the AG-UI row records a serializer over the native stream rather than a second protocol.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is `migrations/0018_copilot.sql`, `crates/store/src/copilot.rs`, `crates/actions/src/agent_surface.rs`, `crates/actions/src/integrations/inference.rs`, `crates/api/src/copilot/agui.rs` and `crates/api/src/copilot/turns.rs`.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which standards the copilot rests on, which one is an explicit owner ruling, and where the external model boundary refuses rather than substitutes.\n"
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S10 (retrospective, 2026-11-27)",
+   "body": "# Architecture Artefact Index — S10 (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for S10 is the seven mandatory Phase A to D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-27; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S10 Copilot / AG-UI (Phase A); a/catalog — Driver/Goal/Objective Catalog — S10 Copilot / AG-UI (Phase A); a/catalog — Requirements Catalog — S10 Copilot / AG-UI (Phase A); a/diagram — Solution Concept Diagram — S10 Copilot / AG-UI (Phase A); b/diagram — Business Capability Map — S10 Copilot / AG-UI (Phase B); c/catalog — Data Entity/Data Component Catalog — S10 Copilot / AG-UI (Phase C); d/catalog — Technology Standards Catalog — S10 Copilot / AG-UI (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four section 8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree. The Requirements Catalog is the only artefact whose links also name the sixteen suites that carry the proof.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S10-R1",
+    "title": "The model boundary is external, so a router outage stops every turn",
+    "body": "The copilot does not absorb inference-router (D14). `completions.create` is an external action with a 60-second timeout and a process-local breaker; an outage, a timeout or an open breaker ends the turn `failed` with zero tool invocations. The fail-closed rule is deliberate, but it makes the conversation unavailable whenever the router is, and the suite proves the refusal rather than a fallback.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Track the router's availability with the estate's external probe and record any outage during a delivery window; if the failure rate is material, revisit the retry budget with S14 rather than adding a heuristic substitute.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S10-copilot-ag-ui.md#5"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S10-R2",
+    "title": "Exactly-once execution depends on the claim lease and the idempotency key together",
+    "body": "Execution takes a conditional claim with a 120-second lease, re-checks the proposer's scopes and invokes under the proposal idempotency key. The crash-replay and double-decision suites prove the tested cases, but a live estate with concurrent workers and long-running actions can still exercise lease expiry and worker replacement in ways a single-process suite does not measure. The risk is a duplicated effect, not a lost approval.",
+    "probability": "low",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "At S14, run the proposal execution with two workers against the deployed queue, record the invocation count for a forced kill between claim and invoke, and re-read this risk against that receipt.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S10-copilot-ag-ui.md#7"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the release manager (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S10-R3",
+    "title": "A sealed proposal input depends on the tenant key being available at execution",
+    "body": "A secret-bearing action's exact input is sealed with the tenant key in the approval row and only the redacted projection is readable by members. Execution refuses when the seal cannot be opened, which is the safe outcome, but a key rotation or a missing KEK during a delivery window can strand an approved proposal until operations restores the key. The risk is availability of a pending decision, not exposure of the secret.",
+    "probability": "low",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Include proposal execution in the key-rotation runbook, alert on the refusal path, and record the tenant key id on the approval row so a restored key can be matched to the pending proposal.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "crates/api/src/copilot/proposal.rs"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S10-R4",
+    "title": "The AG-UI adapter's live consumer is not proven by the golden-frame suite",
+    "body": "The plan keeps AG-UI only if S0 parity evidence shows a live consumer, and the tree keeps `agui.rs` as a serializer over the native stream. `agui_parity.rs` proves that a completed turn serializes to the golden frames and that every frame type is one of fr's eight; it does not prove that a deployed consumer reads them. The adapter could be dead weight, and the open question in the plan remains open.",
+    "probability": "medium",
+    "impact": 2,
+    "review_at": "2026-12-11",
+    "severity": "low",
+    "status": "open",
+    "response": "At S14, measure `/api/agui*` ingress before and after cutover; if no live consumer appears, record the dropped rows in `parity.yaml` and remove the adapter rather than carrying it on faith.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S10-copilot-ag-ui.md#5"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S10-I1",
+    "title": "The record was closed with no charter, baseline, contract, artefact set or Phase-G review",
+    "body": "At the 2026-11-27 snapshot the project row records status closed and measured_status built, while the pre-pack receipt `docs/evidence/rework/S10.json` (2026-11-25) is red on the baseline, charter, closure-output, contract, review, closure-gate, PI, WSJF, demo, lessons, artefact-standard and rework checks. The capability and its suites exist; the lifecycle record did not. This pack supplies the missing set retrospectively and records the deferred deployed proof explicitly.",
+    "severity": "medium",
+    "status": "open",
+    "response": "This pack is the repair: the lifecycle set, the receipt and the Phase-G review are authored and content-checked at the pinned snapshot; the deployed UI and router proof stay S12 and S14 work."
+   },
+   {
+    "code": "S10-I2",
+    "title": "The slice plan's deliverable paths have drifted from the tree",
+    "body": "The plan lists `migrations/0011_copilot.sql` and `crates/store/src/jobs/kind/copilot.rs`; neither file exists at the snapshot. The built tables are in `migrations/0018_copilot.sql`, the sweeps are scheduled in `crates/store/src/schedule.rs`, and the behaviour lives in the `crates/api/src/copilot` modules. The plan is still the authoritative scope statement, but a reader following its file list would look in the wrong places.",
+    "severity": "low",
+    "status": "open",
+    "response": "Record the built paths in this pack and correct the plan's deliverable block on the next non-retrospective edit; do not renumber or move the migration, which is forward-only."
+   },
+   {
+    "code": "S10-I3",
+    "title": "The agent-surface module header contradicts the suite on the omitted-call refusal",
+    "body": "The header of `crates/actions/src/agent_surface.rs` says an action outside the surface is `action-not-found`, never `403`. The plan's section 5.2, the S04-D6 note added on 2026-11-21 and `copilot_surface.rs` all assert `403 action-forbidden` for a known but omitted name. The code and the suite agree with the plan; the comment is stale, and a reader who trusts it would misdescribe the refusal.",
+    "severity": "low",
+    "status": "open",
+    "response": "Correct the module header to the tested refusal when the file is next edited; the pack records the suite's behaviour and does not restate the stale comment as fact."
+   },
+   {
+    "code": "S10-I4",
+    "title": "The suite set has grown beyond the plan's eight named API suites",
+    "body": "The plan's build order names eight API suites; the tree carries fourteen `copilot_*.rs` suites plus `agui_parity.rs`. The extra suites cover retry, round cap, truncation, malformed arguments, crash replay, a destructive-target regression and the S16 W7 recipe identity and ledger. The pack records them as found; it does not re-scope S10 to absorb S16, and it does not claim the plan anticipated them.",
+    "severity": "low",
+    "status": "open",
+    "response": "Keep the extra suites in the evidence set and name their provenance in the evidence output; reconcile the plan's build order only if a future slice edits that section."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S10-A1",
+    "title": "The 2026-11-27 rework snapshot is the authoritative record for S10",
+    "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot; the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S10 the pack's facts and any re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S10-A2",
+    "title": "The suites are the proof boundary; no deployed copilot run is claimed",
+    "body": "The fourteen copilot suites and `agui_parity.rs` exercise the routes against the test store and loopback HTTP. They are not a deployed chat UI, a production inference router or a live MCP consumer. The pack treats the suite assertions as the local proof and leaves the deployed paths to S12 and S14, so no sentence in the pack depends on a run that does not exist.",
+    "status": "held"
+   },
+   {
+    "code": "S10-A3",
+    "title": "Approvals never expire is the owner ruling the proposal rows follow",
+    "body": "The proposal tests assert `expires_at IS NULL`, and the turn runner passes no expiry when it creates the approval. The assumption is that the owner ruling of 2026-11-09 still stands: a tenant that refuses to answer stalls its own project, and time must not silently kill a gate. If that ruling changes, the proposal creation and the test must change together.",
+    "status": "held"
+   },
+   {
+    "code": "S10-A4",
+    "title": "The tenant key used to seal a proposal input is available to the executing process",
+    "body": "A secret-bearing proposal stores the exact input sealed with the tenant key and replays only the sealed value. The suite runs with the sealer configured. The assumption is that the deployed process has the same key material and key id when the proposal executes; if it does not, execution refuses rather than running the redacted projection, which is the designed failure but still a stalled decision.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S10-D1",
+    "title": "S10 depends on S02, S03, S04 and S06",
+    "body": "The project row records depends_on needs S02, needs S03, needs S04 and needs S06. S02 supplies the event and audit substrate, S03 the approval storage and tenant row-level security, S04 the action registry, the `/mcp` transport and the invocation path, and S06 the approval state machine and decision route. All four are recorded at the same snapshot and the copilot suites exercise the resulting seams.",
+    "status": "met"
+   },
+   {
+    "code": "S10-D2",
+    "title": "S12 renders the declared screens and S14 carries the deployed proof",
+    "body": "S10 declares the conversation stream, the proposal card and the read models as data; it does not build the chat UI. The plan assigns rendering to S12 and the deployed cutover evidence to S14. Until those runs exist the copilot's user-facing behaviour is evidenced at the route and test-database boundary only, and the pack keeps this as an open dependency rather than a delivered outcome.",
+    "status": "open"
+   },
+   {
+    "code": "S10-D3",
+    "title": "S06b's agent principal is the machine consumer of the same projection",
+    "body": "The plan's section 5.5 says one MCP surface serves machine consumers by principal, and S06b supplies the licence-bearer principal and the agent tool list. S06b is not one of the four depends_on edges the project row records, so the pack states the seam without rewriting the row: the copilot route and `/mcp` render the same ActionSpec set, and the agent's own deployed task remains S14's gate.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S10-B1",
+    "title": "One action surface replaces a second copilot registry",
+    "body": "The surface is a query over the same `ActionSpec` set that HTTP and `/mcp` serve, so a change to an action changes every rendering or none. The benefit is structural: fr's 46-file AG-UI surface and its 34 action modules are not carried, and the surface equality suite is the evidence that the two renderings cannot drift silently.",
+    "status": "open"
+   },
+   {
+    "code": "S10-B2",
+    "title": "A destructive tool call becomes a decidable approval",
+    "body": "A call whose effect is destructive, whose confirmation is not none or whose hints require a proposal is not executed; it creates one `approval(kind='copilot.action')` in the same transaction as the terminal turn, with the exact input sealed and the approval target recorded. The benefit is an auditable question before the effect, proven by the proposal, approval and destructive-target suites.",
+    "status": "open"
+   },
+   {
+    "code": "S10-B3",
+    "title": "Conversations are durable and replayable without a second execution log",
+    "body": "The two conversation tables record the dialogue, while tool calls remain `action_invocation` rows cited from the turn meta. The terminal turn and its event commit together, so a reconnect replays the turn once and a crash leaves an interrupted turn rather than a claimed effect. The benefit is a record that can be audited without reconstructing a parallel log.",
+    "status": "open"
+   },
+   {
+    "code": "S10-B4",
+    "title": "The coverage gate fails by name rather than widening an exemption",
+    "body": "`copilot_coverage.rs` asserts that every mutating action is in the surface, that an injected unmapped operation is returned by name, and that the one transport exemption is declared. The benefit is preventive: a new screen element that forgets its action fails the build instead of silently joining an allowlist, which is the failure the plan's trap 1 names.",
+    "status": "open"
+   },
+   {
+    "code": "S10-B5",
+    "title": "A proposal does not expose a secret-bearing input to approvers",
+    "body": "The approval row is readable by every member who may list approvals, so the exact input is sealed under the tenant key and the visible input and diff redact every `x-secret` property at any depth. Execution replays only the sealed value and refuses when the seal cannot be opened. The benefit is that a person can decide a secret-bearing action without the secret becoming conversation content.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — S10 Copilot / AG-UI (retrospective, 2026-11-27)",
+  "body": {
+   "commitments": "S10 delivers the copilot's one action surface: `/api/copilot/actions` and `/mcp` `tools/list` are projections of the same `ActionSpec` set; a must-decide tool call becomes one `approval(kind='copilot.action')` in the same transaction as the terminal turn; an approved proposal executes exactly once under a claim, a scope re-check and a proposal idempotency key; the conversation is two tables plus an outbox event with `Last-Event-ID` replay; `completions.create` fails closed; and `copilot.chat` is the only declared coverage exemption. The project also records what it does not deliver: the chat UI, a deployed copilot run and a production router proof stay S12 and S14 work.",
+   "compliance": "Compliance is evidenced by `crates/api/tests/copilot_*.rs` (fourteen suites), `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, `migrations/0018_copilot.sql` and the modules the artefact set names. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, while naming the pre-pack receipt `docs/evidence/rework/S10.json` as red on lifecycle checks. The pack is content-checked at the pinned snapshot; the repository's preflight and CI are the compile-and-run gate, and this retrospective does not claim a fresh local run.",
+   "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.",
+   "manifest": "acceptance/programme/S10.toml — 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence, the PI plan, the PI objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.",
+   "acceptance_at": "2026-11-27",
+   "retrospective": "This delivery contract is authored retrospectively for the tranche-6 rework. The S10 row was created on 2026-11-12 and closed without a contemporaneous contract; the pre-pack receipt was generated on 2026-11-25. The commitments are read from the tree and the suites at the 2026-11-27 snapshot and are not presented as an earlier agreement.",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The copilot as one action surface — proposals, durable conversations and replay",
+  "business_value": 9,
+  "time_criticality": 8,
+  "risk_reduction": 8,
+  "job_size": 9
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. The capability was measured and re-read at the 2026-11-27 snapshot: the action projection is a query over `ActionSpec` and `copilot_surface.rs` asserts equality with `/mcp` `tools/list`; a must-decide call becomes one pending approval with zero invocations in `copilot_proposal.rs`; `copilot_approve.rs` shows the approval gates execution and a second decision changes nothing; `copilot_destructive.rs` binds the approval target; `copilot_crash_replay.rs` and `copilot_replay.rs` cover exactly-once replay; `copilot_reap.rs` interrupts a stale streaming turn; `copilot_turn.rs`, `copilot_retry.rs`, `copilot_rounds.rs`, `copilot_truncated.rs` and `copilot_bad_args.rs` cover the fail-closed model boundary; `copilot_coverage.rs` is the coverage gate; `copilot_identity.rs` records the S16 W7 recipe identity and ledger; and `agui_parity.rs` pins the eight AG-UI frames. The pre-pack receipt `docs/evidence/rework/S10.json` is red because no lifecycle set existed, and this pack is the repair rather than a claim that the receipt was green. No deployed copilot, chat UI or production router run is claimed; those are S12 and S14 work and are recorded as deferred. The stale plan paths and the module-header contradiction are carried as open issue rows, not waived.",
+  "evidence": {
+   "manifest": "acceptance/programme/S10.toml",
+   "session_suite": "crates/api/tests/copilot_session.rs",
+   "surface_suite": "crates/api/tests/copilot_surface.rs",
+   "proposal_suite": "crates/api/tests/copilot_proposal.rs",
+   "approval_suite": "crates/api/tests/copilot_approve.rs",
+   "coverage_suite": "crates/actions/tests/copilot_coverage.rs",
+   "agui_suite": "crates/api/tests/agui_parity.rs",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "project_brief_output": "# Project Brief — S10 Copilot / AG-UI (retrospective, 2026-11-27)\n\n## Outcome\n\nA person or an agent operates the app through one action surface: the tool list is the projection of the registry the caller's scopes admit, a destructive tool call becomes an approval a person can decide, and the conversation is recorded as two tables plus an event stream. The outcome is true in the tree at the route and test-database boundary and is exercised by the copilot suites; a deployed chat UI and a production router run are not claimed.\n\n## Boundary\n\nS10 owns the conversation tables, the turn runner, the agent-surface projection, proposals as copilot approvals, the execution claim and sweep, SSE replay, the external completion action and the AG-UI serializer. It does not own the `/mcp` transport or scope filtering (S04), the approval state machine (S06), the agent's principal and tool contract (S06b), inference-router (D14), or the chat UI rendering (S12, contract section 11).\n\n## Reuse sources\n\nThe plan's source table names what S10 reads from S04, S06 and the fr AG-UI surface. The build reuses the `ActionSpec` registry and `invoke`, the `approval` and `approval_decision` rows, `insert_approval_tx`, the outbox event and SSE replay, and the S16 prompt-audit identity for the copilot system message. Nothing from fr's 34 action modules or `HeuristicIntentResolver` is carried.\n\n## Inception units\n\nThe plan's build order is the inception sequence: preflight, the parity check, the copilot migration, the domain and store functions, the agent surface, the actions route, the external completion, the turn runner, the proposal path, execution and sweep, SSE and the reaper, the coverage test, the AG-UI adapter, and the gate. The tree shows the sequence landed; the extra suites record the defects found after it, including the destructive-target regression and the crash replay case.\n\n## Dependencies\n\nS02 supplies the event and audit substrate; S03 the approval storage and tenant row-level security; S04 the registry, the `/mcp` transport and the invocation path; S06 the approval state machine and decision route. S12 renders the declared screens and S14 carries the deployed cutover proof. S06b's agent principal is the machine consumer of the same projection, recorded as a seam because the project row's depends_on list does not include it.\n\n## Acceptance\n\nThe plan's section 7 property table is the acceptance: the scripted session, approval-gated execution, a second decision, reconnect replay, the scope-absent tool, the inference outage and the coverage gate. The local proofs are the fourteen copilot suites and `agui_parity.rs`; the project manifest `acceptance/programme/S10.toml` carries the seventeen record checks. The content is accepted when the pack is consistent at the pinned snapshot and the suite assertions stand; the factory's manifest re-run is the close gate.\n\n## Capabilities\n\nA scoped tool surface, a durable conversation, a proposal and approval gate, exactly-once execution, fail-closed model access, and a coverage gate that fails by name. Each is delivered by a named module in the Phase C catalog and proven by a named suite; the proposal path additionally seals a secret-bearing input and records the target the invocation boundary will compare.\n\n## Plan\n\nThe plan is `docs/plans/slices/S10-copilot-ag-ui.md`. Its build order is complete in the tree, with the migration renumbered to `0018_copilot.sql` and the extra suites added after the plan. This brief is the retrospective reading of it; the chat UI, the deployed copilot run and the live AG-UI consumer question stay S12 and S14 work, and the tranche-6 review is the project's closure forum.\n",
+ "evidence_output": "# Evidence — S10 Copilot / AG-UI (retrospective, 2026-11-27)\n\n## Claim\n\nS10 delivers the copilot's one action surface. A scripted session opens a conversation and runs a read tool; a must-decide tool call becomes one pending `approval(kind='copilot.action')` with zero invocations; an authorised decision executes the action once and the second decision changes nothing; a reconnect replays the turn once; a low-scope principal sees the same omitted tools on `/api/copilot/actions` and `/mcp`; an unavailable router fails the turn with zero tool invocations; and every mutating operation resolves to an action or the declared `copilot.chat` exemption.\n\n## Evidence\n\n`crates/api/tests/copilot_session.rs` runs the read-tool session. `copilot_surface.rs` asserts the two surfaces are the same set, that a low-scope principal omits the tool, and that the known omitted name is `403 action-forbidden` on HTTP and an `isError` tool result on `/mcp`. `copilot_proposal.rs` asserts one pending approval with no invocation and the per-turn unique index. `copilot_approve.rs` asserts one invocation after approval and no second effect. `copilot_destructive.rs` asserts the recorded target, the rejected proposal and the foreign-approval refusal. `copilot_crash_replay.rs`, `copilot_replay.rs` and `copilot_reap.rs` cover replay and interruption. `copilot_turn.rs`, `copilot_retry.rs`, `copilot_rounds.rs`, `copilot_truncated.rs` and `copilot_bad_args.rs` cover the fail-closed model boundary. `copilot_identity.rs` is the S16 W7 recipe identity and ledger proof. `agui_parity.rs` pins the eight golden frames. `crates/actions/tests/copilot_coverage.rs` is the coverage gate, including the secret-redaction projection test.\n\n## Verification\n\nThe plan's gate commands are `cargo test -p conveyor-api --test copilot_session --test copilot_surface --test copilot_replay --test copilot_turn`, `cargo test -p conveyor-api --test copilot_proposal --test copilot_approve --test copilot_reap --test agui_parity`, and `cargo test -p conveyor-actions --test copilot_coverage`, followed by clippy on the workspace. This retrospective pack does not claim a fresh local compile or test run; the repository's preflight and the PR's CI are the compile-and-run gate, and the content checker verifies the pack against the pinned snapshot. The pre-pack receipt is `docs/evidence/rework/S10.json` and is red on lifecycle checks; the pack supplies the missing set.\n\n## Links\n\nThe plan is `docs/plans/slices/S10-copilot-ag-ui.md`; the migration is `migrations/0018_copilot.sql`; the modules are `crates/actions/src/agent_surface.rs`, `crates/api/src/copilot/turns.rs`, `crates/api/src/copilot/proposal.rs`, `crates/api/src/copilot/agui.rs`, `crates/store/src/copilot.rs` and `crates/actions/src/integrations/inference.rs`. The record's manifest is `acceptance/programme/S10.toml`; its PI cadence, PI plan and PI objectives checks are the programme-level records it reads, and the tranche-6 review is the closure forum.\n\n## Gap\n\nNo deployed copilot, chat UI or production router run is claimed; those are S12 and S14 work. The AG-UI adapter's live consumer is not proven by the golden-frame suite and stays an open risk. The plan's `0011_copilot.sql` and `crates/store/src/jobs/kind/copilot.rs` paths do not exist in the tree; the built migration is 0018 and the sweeps live in `crates/store/src/schedule.rs`. The identity suites are S16 W7 work carried under the copilot prefix and are not re-scoped to S10. No other gap is claimed closed.\n",
+ "closure": "S10 is re-closed through the one gate the record carries: the project row is closed only after its charter, baseline, artefacts, registers, contract, WBS, Phase-G review, outputs and closure review exist, and the receipt on `acceptance/programme/S10.toml` is re-run at the pinned snapshot. The close records the deferred chat UI and deployed router proof as open items, not as a pass, and it carries the plan-path drift and the stale module header as issue rows rather than waiving them.",
+ "closure_review": "# Closure Review — S10 Copilot / AG-UI (retrospective, 2026-11-27)\n\n## Outcome vs acceptance\n\nThe outcome is a copilot that operates the app through one action surface, turns a destructive call into a decidable approval, records a durable conversation and replays it without a second effect. Against the plan's section 7 properties, the local proof covers the scripted session, approval-gated execution, the second decision, reconnect replay, the scope-absent tool, the inference outage and the coverage gate. The chat UI rendering and the deployed copilot and router runs are S12 and S14 work and are recorded as deferred rather than met. The retrospective level is compliant for the record set because the pack supplies the lifecycle and the suites carry the local proof.\n\n## Evidence\n\nThe evidence is the fourteen `crates/api/tests/copilot_*.rs` suites, `crates/api/tests/agui_parity.rs`, `crates/actions/tests/copilot_coverage.rs`, the migration `migrations/0018_copilot.sql`, the pre-pack receipt `docs/evidence/rework/S10.json` generated on 2026-11-25, and the seventeen checks in `acceptance/programme/S10.toml`. The Phase-G review records the same set, names the pre-pack receipt as red on lifecycle checks, and names the deferred items explicitly.\n\n## Open items\n\nThe chat UI, the deployed copilot run and the production router proof are S12 and S14 work. The AG-UI adapter's live consumer remains an open question and is registered as S10-R4. The plan's stale deliverable paths and the agent-surface module header contradiction are carried as S10-I2 and S10-I3. The extra suites, including the S16 W7 identity tests, are recorded in S10-I4 and are not re-scoped to this project.\n\n## Decision\n\nThe project is closed. The closure is taken by an approver other than the requester under the standing delegation, the closure review is recorded in the same pack, and the tranche-6 review is the forum that accepts it. No waiver is claimed, and no check in the manifest is weakened to reach this decision.\n"
+}

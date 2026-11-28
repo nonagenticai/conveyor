@@ -1,0 +1,12 @@
+{
+ "cadence_id": "01a21c62-6b8c-73d2-a4cd-425f244cde36",
+ "evidence": [
+  "docs/evidence/rework/tranche-6/cadences.json",
+  "docs/evidence/rework/tranche-6/refinement-wsjf.json",
+  "acceptance/programme/S06b.toml",
+  "docs/evidence/record/journal.jsonl"
+ ],
+ "finding_key": "k1",
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "statement": "A retrospective pack is not green until the tranche's own cadences are bound: the factory's default demo cadence credits tranche 0, and a tranche that proposes no lesson fails every member's lessons check. Pass the tranche's demo cadence to every apply and propose the tranche's lesson in the same unit."
+}

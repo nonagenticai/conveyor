@@ -1,0 +1,786 @@
+{
+ "charter": "# Charter — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)\n\n- **Project:** S11 'Processes, steps and SOPs — executable documentation', track v1, ADM phase G, delivery plateau, tranche 6, plan `docs/plans/slices/S11-procedures.md`.\n- **Sponsor:** the programme's sponsoring group, through the tranche-6 PI plan and the standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`.\n- **Authority:** SPEC §3 D10 and §8 S11 make an authored, published, executable procedure the delivery gate; the 2026-11-09 amendment splits the sequence (a process of steps) from the standard each step is judged against (a procedure, the SOP).\n- **Objective:** a published process drives one card. Its ordered steps each name a registry action and a resolved input template, optionally parked behind an approval gate, and execute as a `run` plus one immutable `run_step` per attempt. A published SOP supplies the definition of ready, definition of done, acceptance criteria, inspection and outputs that the step is judged against.\n- **Scope in:** the `process`, `process_step`, `procedure` (SOP), `process_map` and `run_step` tables; the registered `processes.*`, `procedures.*`, `process_maps.*` and `process_runs.start` actions; publish validation; one template resolver; the `process.step` job; and the worker's `process_step` executor.\n- **Scope out:** matrix legality (S03), approval transport (S06), sub-processes and the run tree beyond depth 3, the engine and editor (S13), screens (S12), PDL (never), and the default 280-flow catalogue, whose seed George deferred on 2026-11-09.\n- **Constraints:** one published row and at most one draft per (tenant_id, key); an edit forks v+1 and never mutates a published step; publish validates against the live action manifest in one transaction; a retry appends an attempt and never overwrites the trace; a gate parks a step before execution, never after; the executor runs as an internal service principal with the `kata_executor` tenant-admin role.\n- **Retrospective status:** built 2026-11-09 (build steps 1–12) and amended the same day for the process/step/SOP split. It is evidenced by the suites named in the Requirements Catalog and by `migrations/0015_s11_procedure.sql` through `migrations/0035_process_tree.sql`. This charter and the lifecycle set that follows are authored retrospectively under the standing delegation; they do not attest contemporaneous ceremonial review. The plan's §7 two-process gate, the zero procedure seed and the S15 executor seam are recorded as deferred or open, not claimed.\n",
+ "soaw": {
+  "title": "Statement of Architecture Work — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)",
+  "body": {
+   "assignment": "The architecture work assigns S11 the executable-documentation capability: define a versioned process as an ordered list of steps, give each step a registry action and a resolved input template, attach a versioned SOP to each step, validate the whole draft at publish, and execute a published process as a run with one immutable run_step per attempt. This statement governs the retrospective record of work built on 2026-11-09 and re-read at the 2026-11-27 snapshot.",
+   "scope": "In scope are migrations 0015 (procedure, procedure_step, run_step), 0016 (the draft index), 0017 (lock_version), 0021 (the run capability seam), 0022 (the kata_executor role) and 0035 (the rename to process/process_step, the SOP table and process_map); the process, procedure (SOP) and process_map actions; publish validation and the frozen revision; the resolver in crates/domain/src/template.rs; and the executor in crates/actions/src/process/step.rs dispatched as the process.step job. Out of scope are matrix legality (S03), approval transport (S06), sub-processes and the engine (S13), screens (S12), PDL (never) and the deferred default seed.",
+   "responsibilities": "The programme architect authors this retrospective statement; the delivery team (conveyor-e2e) is accountable for the store, resolver, actions and executor evidence; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-6 review. The process author is consulted because tenant authorship is the capability's consumer, and S13 and S12 are informed because they consume the run tree and the declared read models.",
+   "acceptance_criteria": "The gate is author → publish → execute a process run: an SOP and a three-step process are created and published, a card starts the run, the second step parks on an approval, the approval resumes it, and the run finishes with three succeeded run_step rows, non-empty input and output, and one approval. The negative proofs are an unresolved template (422 refusal, never an empty string), an unknown action refused at publish, and a retry that appends a second attempt row. The local proof is the suite set in crates/actions/tests plus the domain unit tests; the plan's §7 two-process rehearsal is the live gate and is recorded as not executed in this pack.",
+   "constraints": "The store forbids a second published or draft row per (tenant_id, key). Publish validates in one transaction against the live manifest and refuses an unknown action, a step naming process_runs.*, a forward step reference, a retry on a non-idempotent action, an unresolved gate kind and an SOP whose inspection is empty. The resolver is one pure function with the roots run, steps, card and procedure; an absent path refuses and a null resolves. The executor claims a queued step with a status-guarded update, persists the resolved input at claim, and re-invokes a replayed attempt under the same idempotency key derived from (run_id, position, attempt).",
+   "retrospective": "This statement of architecture work is authored on 2026-11-27 for the tranche-6 rework. No contemporaneous SoAW exists; the 2026-11-09 delivery was recorded in the slice plan and in the test tree. The statement records what the tree and the suites prove today and names the deferred live gate, the zero seed and the S15 seam instead of implying they happened."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S11 Processes, Steps and SOPs (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-6 authorisation and the S11 close",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the procedure capability and the tranche outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Delivery team (conveyor-e2e)",
+     "axis_b": "builds and proves the process store, resolver, actions and executor",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Process author (tenant admin)",
+     "axis_b": "authors processes and SOPs inside the tenant",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the artefact set and the retrospective Phase-G level",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S12 UI surface",
+     "axis_b": "consumes the declared process, SOP, process_step and run_step read models",
+     "value": {
+      "influence": "high",
+      "interest": "low",
+      "engagement": "inform"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "S13 process engine",
+     "axis_b": "consumes child_process_key, the run tree and the trace",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "inform"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S11 Processes, Steps and SOPs (Phase A)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S11 Processes, Steps and SOPs (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSeven stakeholders on the influence/interest/engagement axes: the sponsoring group decides the tranche and the close, the SRO is accountable, the delivery team collaborates on the build and its proofs, the process author consults because tenant authorship is the consumer, the Architecture Board approves the artefact set, and S12 and S13 are informed because they consume the declared read models and the run tree.\n\n## Links\n\nDerives from `docs/plans/slices/S11-procedures.md` §1–§3, §5.2 and §9; realizes the Phase A stakeholder view for the executable-documentation capability; depends on the Driver/Goal/Objective Catalog for what each group receives. The programme roles are those already recorded for the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. S11 has no contemporaneous architecture publication of its own; this retrospective artefact is published as its own architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-27 snapshot carries for S11.\n"
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S11 Processes, Steps and SOPs (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "D1 Executable documentation",
+     "axis_b": "G1 A published process is the unit of execution; O1 steps name registry actions and resolved templates",
+     "value": {
+      "measure": "one run per card, one run_step per attempt",
+      "owner": "the programme architect"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 An auditable trace",
+     "axis_b": "G2 every attempt is an immutable row; O2 the unique (run_id, position, attempt) makes a retry append",
+     "value": {
+      "measure": "retry inserts attempt 2 beside attempt 1",
+      "owner": "conveyor-e2e"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Publish is the control point",
+     "axis_b": "G3 nothing unvalidated executes; O3 manifest, gate, SOP, template and idempotency checks in one transaction",
+     "value": {
+      "measure": "revision content_hash frozen per version",
+      "owner": "conveyor-e2e"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Gates without a second machine",
+     "axis_b": "G4 a gate parks the step before it executes; O4 an S06 approval with kind='procedure'",
+     "value": {
+      "measure": "run parks in waiting_approval",
+      "owner": "conveyor-e2e"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Retry that preserves history",
+     "axis_b": "G5 fail, continue and retry are explicit; O5 the on_result field plus max_attempts with an application cap of 10",
+     "value": {
+      "measure": "attempt n+1 appended and the cap enforced",
+      "owner": "conveyor-e2e"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 Tenant authorship without a deploy",
+     "axis_b": "G6 a process is a version family per tenant; O6 draft, published and retired with one published row per key",
+     "value": {
+      "measure": "a second draft is 409 process.draft_exists",
+      "owner": "the process author"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S11 Processes, Steps and SOPs (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S11 Processes, Steps and SOPs (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. The drivers are read from the slice plan's objective, its 2026-11-09 amendment and its open questions, not invented for the retrospective.\n\n## Entries\n\nSix driver/goal/objective rows: executable documentation, an auditable trace, publish as the control point, gates without a second machine, retry that preserves history, and tenant authorship without a deploy. Each row names the measure the tree proves and the owner accountable for it.\n\n## Links\n\nDerives from `docs/plans/slices/S11-procedures.md` §1, §5.3, §5.5 and §9; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the suite or record field that carries it. D6 is the plan's recorded tenant-overridable catalogue decision, held back from the seed by the owner's 2026-11-09 deferral.\n\n## Document\n\nThe catalog is the retrospective statement of why S11 exists. It is published as an architecture-artifact-instance by the rework factory and is read together with the Requirements Catalog: the drivers justify the requirements, and the requirements carry the tests that prove them at the snapshot.\n"
+  },
+  {
+   "title": "Requirements Catalog — S11 Processes, Steps and SOPs (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "R-1 Process and SOP split",
+     "axis_b": "The sequence (process/process_step) is separate from the standard (procedure, the SOP), each a version family with one published row per key",
+     "value": {
+      "test": "crates/actions/tests/procedures.rs::create_update_publish_and_retire_over_http"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-2 One resolver",
+     "axis_b": "One pure function resolves the run, steps, card and procedure roots with typed whole-string substitution and scalar-only interpolation",
+     "value": {
+      "test": "crates/domain/src/template.rs (a_whole_string_reference_keeps_its_json_type, a_step_may_read_an_earlier_step_only, an_unknown_root_names_itself)"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-3 Publish validation",
+     "axis_b": "Publish refuses an unknown action, a self-referential step, a bad gate, a non-idempotent retry and an unresolved SOP, and freezes a revision",
+     "value": {
+      "test": "crates/actions/tests/procedures.rs::one_published_version_per_key_and_only_one_draft and process_step.rs::publishing_a_process_whose_sop_pins_a_missing_eval_is_refused"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-4 Start materialises a run",
+     "axis_b": "process_runs.start checks the card type and the published version, inserts the run, materialises one queued step per position and enqueues the first",
+     "value": {
+      "test": "crates/actions/tests/process_start.rs::start_materialises_the_run_and_enqueues_the_first_step"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-5 Executor and replay",
+     "axis_b": "The executor claims a queued step, resolves and validates its input, invokes, and records the result; a replayed terminal step is a no-op",
+     "value": {
+      "test": "crates/actions/tests/process_step.rs::a_step_claims_runs_and_records_its_resolved_input_and_output, a_terminal_replay_is_a_noop"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-6 Approval gate",
+     "axis_b": "A gated step parks in waiting_approval without invoking anything; approval records the step once, rejection and expiry apply on_result",
+     "value": {
+      "test": "crates/actions/tests/process_step.rs::a_gated_step_parks_on_an_approval_without_invoking_anything, an_approved_gate_records_the_step_once_without_invoking_an_action"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-7 Retry and continue",
+     "axis_b": "A retry appends the next attempt and stops at the cap; continue marks the step skipped and chains",
+     "value": {
+      "test": "crates/actions/tests/process_step.rs::retry_appends_a_new_attempt_and_stops_at_the_cap, continue_skips_the_step_and_chains"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R-8 Cancel",
+     "axis_b": "Cancel skips the queued steps and announces each; a pending gate is voided and cannot be answered",
+     "value": {
+      "test": "crates/actions/tests/process_cancel.rs::cancel_skips_the_remaining_steps_and_announces_each, cancel_voids_a_pending_gate_and_the_gate_can_no_longer_be_answered"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R-9 SOP inspection rules",
+     "axis_b": "An SOP refuses an empty inspection, a laya inspection without criteria, an eval threshold out of range, and an output that is not a dot path",
+     "value": {
+      "test": "crates/domain/src/procedure.rs (an_empty_inspection_is_refused, a_laya_sop_needs_criteria, an_eval_sop_needs_a_threshold_in_range, outputs_must_be_dot_paths)"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R-10 Process map authoring",
+     "axis_b": "A tenant authors, publishes and retires its own process map; a foreign project type and another tenant are refused",
+     "value": {
+      "test": "crates/actions/tests/process_maps.rs::a_tenant_authors_publishes_and_retires_its_own_map, a_foreign_project_type_is_refused"
+     },
+     "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S11 Processes, Steps and SOPs (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — S11 Processes, Steps and SOPs (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. Each requirement maps to a named suite or unit test in the tree, which is the evidence link the plan's build order and §7 property list carry.\n\n## Entries\n\nTen requirements: the process/SOP split and versioning, one resolver, publish validation, start materialisation, the executor and its replay rule, the gate, retry and continue, cancel, SOP inspection rules, and process-map authoring. Each row names the observable and the suite that exercises it; no row is a prose aspiration without a test target.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the plan's §5 and §6 are the source for the pairing of property and proof. The requirements are read at the 2026-11-27 snapshot and are unchanged by the retrospective: the tree is the built state the plan describes, with the plan-tree naming drift recorded as S11-I2.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the drivers and the tests: a reader can move from a driver to its requirement to the suite that proves it without relying on the plan's prose alone.\n"
+  },
+  {
+   "title": "Solution Concept Diagram — S11 Processes, Steps and SOPs (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Process author",
+     "axis_b": "creates, updates, publishes and retires processes, SOPs and maps over the action registry",
+     "value": {
+      "surface": "action registry"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Action registry",
+     "axis_b": "processes.*, procedures.*, process_maps.* and process_runs.start with JSON-Schema validation",
+     "value": {
+      "owner": "S04"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "store::process",
+     "axis_b": "create and fork, copy-forward, materialise the steps, claim and record an attempt",
+     "value": {
+      "tables": "process, process_step, run_step"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "domain::template::resolve",
+     "axis_b": "the single resolver over the run, steps, card and procedure roots",
+     "value": {
+      "shape": "pure function"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "process.step worker",
+     "axis_b": "claims, resolves, validates, invokes and records one attempt; dedupe key is run, position, attempt",
+     "value": {
+      "entry": "crates/actions/src/process/step.rs::execute_step"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S06 approval",
+     "axis_b": "a gated step parks as an approval with kind='procedure' and quorum from the gate catalogue",
+     "value": {
+      "outcome": "approve resumes, reject or expiry applies on_result"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "run and run_step",
+     "axis_b": "the run carries inputs and status; each attempt is its own row with resolved input and recorded output",
+     "value": {
+      "rule": "unique (run_id, position, attempt)"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "revision and event",
+     "axis_b": "publish freezes a revision with a content hash and appends the project's events",
+     "value": {
+      "events": "process.published, procedure.published, run_step.changed"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "S13 and S16 seams",
+     "axis_b": "sub-processes and the run tree stay S13's; the prompt audit changes the built publish action in S16",
+     "value": {
+      "state": "outside this project"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S11 Processes, Steps and SOPs (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S11 Processes, Steps and SOPs (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so the nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nNine nodes and edges: the process author over the action registry, the process and SOP stores, the pure resolver, the process.step worker executor, the S06 approval park, the run and run_step trace, the frozen revision and event bus, and the S13 and S16 seams that stay outside this project.\n\n## Links\n\nDerives from the requirements and realizes them on one path. The source is `docs/plans/slices/S11-procedures.md` §5.3–§5.5, whose model, resolver and execution subsections are the component map, and `crates/actions/src/process/step.rs`, whose execute_step entry point carries the claim, resolve, invoke and record sequence the diagram shows.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It shows the S13 and S16 seams as boundary nodes on purpose: the plan's traps warn that sub-processes need the run tree first and that the prompt audit changes a built publish action, so a reader sees the boundary rather than reconstructing it.\n"
+  },
+  {
+   "title": "Business Capability Map — S11 Processes, Steps and SOPs (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Process and SOP authoring",
+     "axis_b": "version families with draft, published and retired states and a frozen revision",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/process/processes.rs and crates/actions/src/procedure/procedures.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Executable step sequence",
+     "axis_b": "start materialises the run and steps; the executor chains position by position",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/process/runs.rs and step.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Checked SOP",
+     "axis_b": "definition of ready and done, acceptance criteria, inspection and outputs validated at creation",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/domain/src/procedure.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Approval-gated execution",
+     "axis_b": "the step parks on an S06 approval and resumes only on a decision",
+     "value": {
+      "level": 2,
+      "delivered_by": "apps/server/src/worker.rs and crates/actions/src/process/step.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Append-only run trace",
+     "axis_b": "each attempt is a row with resolved input, recorded output and a run_step.changed event",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/store/src/process.rs"
+     },
+     "position": 5
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S11 Processes, Steps and SOPs (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S11 Processes, Steps and SOPs (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. The capability levels are the retrospective reading: each capability is delivered by a named module and asserted by a named suite, not by an aspiration.\n\n## Entries\n\nFive capabilities: process and SOP authoring, an executable step sequence, a checked SOP, approval-gated execution and an append-only run trace. Each entry pairs the capability with its delivering module and names the level the tree supports; the level is 2 because the capability exists and is tested locally.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity catalog carries the rows each capability writes. The source is the plan's §5 deliverables and §6 build order, which map the capabilities to modules and to the proofs the suites run.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome (a tenant authors a process and a card runs it) to the components that deliver it, without reading the crate tree first.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S11 Processes, Steps and SOPs (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "process",
+     "axis_b": "the version family of an ordered step list, renamed from procedure by migration 0035",
+     "value": {
+      "writer": "crates/store/src/process.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "process_step",
+     "axis_b": "kind, actor, capability, the SOP reference and the child process key a call names",
+     "value": {
+      "writer": "crates/store/src/process.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "procedure (the SOP)",
+     "axis_b": "definition of ready and done, acceptance criteria, inspection and outputs, versioned per key",
+     "value": {
+      "writer": "crates/store/src/procedure.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "process_map",
+     "axis_b": "the user-facing map of processes; declarative, never the executor",
+     "value": {
+      "writer": "crates/store/src/process_map.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "run",
+     "axis_b": "the card's run with inputs jsonb, process_id and status",
+     "value": {
+      "writer": "crates/store/src/run.rs and process_runs.start"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "run_step",
+     "axis_b": "one row per position and attempt with status, resolved input, output and timestamps",
+     "value": {
+      "writer": "crates/actions/src/process/step.rs"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "revision",
+     "axis_b": "the frozen content and SHA-256 hash publish writes for the published version",
+     "value": {
+      "writer": "the publish transaction"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "approval (kind='procedure')",
+     "axis_b": "the gate a parked step opens, with quorum and expiry from the gate catalogue",
+     "value": {
+      "writer": "S06's approval writer"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "event",
+     "axis_b": "process.published, procedure.published, run_step.changed and the step announcements",
+     "value": {
+      "writer": "the outbox"
+     },
+     "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S11 Processes, Steps and SOPs (Phase D)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S11 Processes, Steps and SOPs (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. The entities are the rows the process author and the executor write or read; the revision and event rows are listed because they are the publish and trace contract.\n\n## Entries\n\nNine entities: process, process_step, procedure (the SOP), process_map, run with its inputs, run_step with its attempt, revision, the S06 approval a gate opens, and the event row each transition appends. Each names its writer and the module that owns it; the run and run_step rows carry the columns the plan's §5.1 checklist adds.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage and transaction standards. The source is `crates/store/src/process.rs` for the process and run_step writers, `crates/store/src/procedure.rs` for the SOP, `migrations/0015_s11_procedure.sql` and `migrations/0035_process_tree.sql` for the table shapes, and the plan's §5.1 table for the two run columns.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of executable documentation: the rows an auditor would read after a run, and the component that writes each one.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — S11 Processes, Steps and SOPs (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "Postgres 18 with RLS and FORCE",
+     "axis_b": "tenant_id on every row; partial unique indexes hold one published and one draft per key",
+     "value": {
+      "rule": "uq_process_published, uq_process_draft"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "sqlx transactions",
+     "axis_b": "one transaction per mutation; publish flips status, writes the revision and retires the previous row together",
+     "value": {
+      "rule": "no half-published key"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Action registry and JSON Schema",
+     "axis_b": "every computed or tool step names a registered action; the resolved input is validated against its schema",
+     "value": {
+      "owner": "S04"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "SHA-256 over canonical JSON",
+     "axis_b": "the revision stores the frozen steps and their content hash",
+     "value": {
+      "field": "revision.content_hash"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "problem+json refusals",
+     "axis_b": "an unresolved template or an unknown action refuses with a typed 4xx, never an empty value or a 500",
+     "value": {
+      "codes": "process.template_unresolved, process.action_unknown"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S06 approval state machine",
+     "axis_b": "the only gate machine: kind='procedure', quorum and expiry from the gate catalogue",
+     "value": {
+      "rule": "no second approval surface"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Deduplicating job queue",
+     "axis_b": "the process.step job carries run, position and attempt; a replay is a stored no-op",
+     "value": {
+      "key": "run_id:position:attempt"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "One-dot event naming",
+     "axis_b": "store::outbox::valid_event_type enforces aggregate.verb, so the step event is run_step.changed",
+     "value": {
+      "rule": "exactly one dot"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S11 Processes, Steps and SOPs (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S11 Processes, Steps and SOPs (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S11; tranche 6; retrospective under the standing delegation. The standards are the ones the tree actually uses; the catalog is a reading of the workspace, not a wish list.\n\n## Entries\n\nEight technology standards: Postgres 18 with row-level security and partial unique indexes; sqlx transactions with one transaction per mutation; the action registry and JSON-Schema validation; SHA-256 over canonical JSON for the revision; problem+json refusal codes; the S06 approval state machine as the only gate; a deduplicating job queue for process.step; and the one-dot event naming rule.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is migrations 0015, 0016, 0017, 0021, 0022 and 0035, `crates/domain/src/template.rs`, `crates/actions/src/process/step.rs`, `apps/server/src/worker.rs` and store::outbox::valid_event_type.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which standards the executable-documentation capability rests on and which one (the S15 capability arm) is deliberately left to a later project.\n"
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S11 (retrospective, 2026-11-27)",
+   "body": "# Architecture Artefact Index — S11 (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for S11 is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-27; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S11 Processes, Steps and SOPs (Phase A); a/catalog — Driver/Goal/Objective Catalog — S11 Processes, Steps and SOPs (Phase A); a/catalog — Requirements Catalog — S11 Processes, Steps and SOPs (Phase A); a/diagram — Solution Concept Diagram — S11 Processes, Steps and SOPs (Phase A); b/diagram — Business Capability Map — S11 Processes, Steps and SOPs (Phase B); c/catalog — Data Entity/Data Component Catalog — S11 Processes, Steps and SOPs (Phase C); d/catalog — Technology Standards Catalog — S11 Processes, Steps and SOPs (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S11-R1",
+    "title": "The plan's §7 two-process gate is the live acceptance and is not executed by this pack",
+    "body": "The executor proofs run in the integration harness against Postgres, with the API and worker driven in-process; the plan's §7 block starts a real server and worker under CONVEYOR_DEV_AUTH=1 and drives them with curl as dev:alice and dev:reviewer. The harness exercises the same execute_step path, but it is not the §7 rehearsal, and no run id from a two-process server session is recorded at this snapshot.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Run the §7 block against dev-a at the tranche-6 review, retain the run id and the three succeeded run_step rows, and re-read this risk against that capture.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S11-procedures.md#7"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the release manager (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S11-R2",
+    "title": "The procedure seed is zero by decision, so no default process or SOP exists",
+    "body": "The plan records George's 2026-11-09 deferral: S11 closes with zero seeded procedures, and build step 11 expects a tenant-scoped count of 0 published rows. A tenant must author and publish a process and an SOP before process_runs.start can succeed on a card. The default 280-flow catalogue is vocabulary data plus a follow-up derivation, not delivered state.",
+    "probability": "high",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Derive one process per S0-evidenced cap.* flow from parity/evidence/executions.tsv plus a read-only census of the n8n workflow_entity nodes, record the census in parity/evidence/cap-flow-census.tsv, import seed/procedures.json through migrate --seed, and seed no zero-evidence flow.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S11-procedures.md#5.6",
+      "docs/plans/slices/S11-procedures.md#6"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S11-R3",
+    "title": "The executor-scoping seam is unresolved until S15",
+    "body": "Migration 0021 adds capability_id and capability_agent_id to run without foreign keys, and process_runs.start calls one resolve_start_context plus ensure_start_ready pair before writing anything. Today the resolver returns StartContext::Unresolved because no capability schema exists, so readiness and allowed_actions are not enforced at start; the enum makes the skip explicit rather than silent.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "S15 fills the Resolved body (readiness, 409 capability_not_ready with blocking[], allowed_actions passed into the invocation) and must not add a second start path; re-read this risk when S15 closes.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S11-procedures.md#8"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S11-I1",
+    "title": "The project was closed with no lifecycle set and its receipt is red",
+    "body": "At the 2026-11-27 snapshot the project row is closed with meta.measured_status built and plan_status built, while the receipt docs/evidence/rework/S11.json is red on 14 of its 19 checks: baseline, charter, closure outputs, contract, review, closure gate, PI cadence, PI plan, PI objectives, WSJF, demo credits, lessons, artefact standard and rework. Only project, waivers and product pass. The rework packages are project_in_unauthorised_tranche, closed_without_closure_review, closure_outputs_undeclared, unpublished_declared_output and mandatory_artefacts. The capability and its suites exist; the lifecycle record did not.",
+    "severity": "high",
+    "status": "open",
+    "response": "This pack is the repair: it supplies the charter, the seven artefacts, five registers, the contract, the WBS, the Phase-G review, both declared outputs and the closure review; the factory re-runs the 17-check manifest in acceptance/programme/S11.toml after publishing."
+   },
+   {
+    "code": "S11-I2",
+    "title": "Plan and tree disagree on two names a reader would run",
+    "body": "The plan's §7 negative expectation names 422 procedure.template_unresolved and 422 procedure.action_unknown, while the tree's refusal codes are process.template_unresolved and process.action_unknown. The plan's frontmatter also names migration 0033 for the process/step/SOP split, but 0033 is the D23 eval caller and the rename lands in migrations/0035_process_tree.sql. Both are documentation drift, not runtime defects; the suites assert the tree's behaviour.",
+    "severity": "low",
+    "status": "open",
+    "response": "Amend the plan's §7 code names and its migration reference to match the tree; do not change running code to match a document."
+   },
+   {
+    "code": "S11-I3",
+    "title": "The pre-rework receipt carried a P0 unauthorised-tranche package from the pre-authorisation snapshot",
+    "body": "The 2026-11-25 receipt carried a P0 package project_in_unauthorised_tranche:S11 because tranche 6 was authorised only by the tranche-5 review on 2026-11-27. The programme record now carries tranche 6 authorised, and this project is one of its members; the package is expected to clear on the pinned post-authorisation snapshot, and this pack's receipt on that snapshot is the proof, not the older register's text.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Read the fresh receipt's rework_resolution check on the pinned snapshot; if the P0 package still appears there, the snapshot predates the authorisation and the receipt must be rebuilt."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S11-A1",
+    "title": "The 2026-11-27 rework snapshot is the authoritative record for S11",
+    "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot; the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S11 the pack's facts and any re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S11-A2",
+    "title": "The S06 approval state machine is the only gate machine for a process step",
+    "body": "A gated step parks as an S06 approval with kind='procedure', gate=gate_kind, meta carrying position, attempt and procedure_step_id, quorum from the gate catalogue and expires_at when present; approval resumes the step and rejection or expiry applies on_result. The assumption is that no second gate mechanism is introduced in the executor; the gate suite proves the park, the approve, the reject paths and the expiry path.",
+    "status": "held"
+   },
+   {
+    "code": "S11-A3",
+    "title": "A run step is only ever written by the executor",
+    "body": "process_runs.complete_step was dropped on 2026-11-09 because an external mark-complete would set a result without executing it; the executor claims a queued step with a status-guarded update and a terminal replay is a no-op. The assumption is that no consumer introduces a hand-write path; the suites assert that a terminal replay is a no-op and that a run cannot be finished by hand.",
+    "status": "held"
+   },
+   {
+    "code": "S11-A4",
+    "title": "Publish is the only path that creates an executable version",
+    "body": "A run starts only from a published process row, and a published step is immutable; an edit forks v+1 and publish re-reads nothing at step time because the resolver reads the run's frozen materialisation. The assumption is that no seed, migration or operator path writes a published process outside the action's publish transaction; the start suite refuses a draft and the store's partial unique indexes hold the one-published rule.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S11-D1",
+    "title": "S11 depends on S03, S04, S06 and S07",
+    "body": "The project row records depends_on needs S03, needs S04, needs S06 and needs S07. S03 supplies run, approval, card_type, catalogue_entry and revision plus run::transition; S04 the action registry and JSON-Schema validation; S06 runs.*, approvals.decide|list, the job runner and SSE run:{id}; S07 owns migrate --seed and the card_type and gate catalogue the publish check reads. All four are green at the same snapshot.",
+    "status": "met"
+   },
+   {
+    "code": "S11-D2",
+    "title": "S11 blocks S12's read models and S13's sub-process engine",
+    "body": "S12 consumes the declared processes, procedures (SOP), process_step and run_step read models and SSE run:{id}; S13 owns sub-processes, the run tree, the judge and the bus, and the plan caps call depth at 3 until those exist. Neither can be evidenced before the process actions and the executor exist, so both are carried as blocks rather than related work.",
+    "status": "open"
+   },
+   {
+    "code": "S11-D3",
+    "title": "S15 fills the executor-scoping arm and S16 changes the built publish action",
+    "body": "Migration 0021 adds the run capability columns and process_runs.start calls one resolve_start_context plus ensure_start_ready pair; S15 must fill the Resolved arm without adding a second start path. Decision 6 records that S16's prompt audit changes the built procedures.publish by adding an optional acknowledge_findings member and a 422 refusal, with the override written to the publish audit_event. Both are seams into built actions and are recorded as open because neither is evidenced in this pack.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S11-B1",
+    "title": "The 280 card-type by list flows become vocabulary data plus a few processes",
+    "body": "The plan's starting premise is that the per-type flows are not 280 programs: matrix legality is catalogue data, card types and gates are catalogue rows, and the executable part is a process of registry-action steps. The benefit is a structural reduction in code and configuration; it is declared, not measured, and the seed that would prove the default catalogue is deferred.",
+    "status": "open"
+   },
+   {
+    "code": "S11-B2",
+    "title": "Every attempt is an immutable, inspectable row",
+    "body": "A run keeps one run_step per position and attempt, with the resolved input persisted at claim and the output recorded after the call; a retry appends rather than overwrites. The benefit is an audit property: the run's history is read from the database, not reconstructed from logs, and process_trace and process_run_output read the same rows.",
+    "status": "open"
+   },
+   {
+    "code": "S11-B3",
+    "title": "A step is judged against a published SOP, not prose",
+    "body": "The SOP carries definition of ready, definition of done, acceptance criteria, inspection and declared outputs, and its inspection is validated at creation; a step names the published SOP it is judged against. The benefit is that the standard travels with the process and can be inspected by a checker, a laya judgement or an eval rather than living in a document nobody executes.",
+    "status": "open"
+   },
+   {
+    "code": "S11-B4",
+    "title": "A tenant authors its own process without a deploy",
+    "body": "A process is a version family per tenant with draft, published and retired states; a second draft is refused with 409 process.draft_exists and a re-publish returns the same version. The benefit is that a tenant can change how its cards move through work without a code release, while publish remains the single validation gate.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)",
+  "body": {
+   "commitments": "S11 delivers executable documentation on a card: a versioned process of ordered steps, each naming a registry action and a resolved input template, each judged against a versioned SOP, executed as a run with one immutable run_step per attempt, with gates, retry, continue and cancel. The project also records what it does not deliver — the default procedure seed, the plan's §7 live two-process rehearsal and the S15 executor-scoping arm — as deferred or open items.",
+   "compliance": "Compliance is evidenced by the suites in crates/actions/tests (procedures.rs, process_start.rs, process_step.rs, process_cancel.rs and process_maps.rs), the resolver and SOP unit tests in crates/domain/src/template.rs and crates/domain/src/procedure.rs, and migrations 0015 through 0035. The receipt docs/evidence/rework/S11.json at the pinned snapshot is red on 14 of 19 checks because the lifecycle set did not exist; after this pack is published the factory re-runs the 17-check manifest in acceptance/programme/S11.toml. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, with the deferred items carried as open rather than as passes.",
+   "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.",
+   "manifest": "acceptance/programme/S11.toml — 17 checks over the project row, the scope baseline, the charter, the closure outputs, the delivery contract, the Phase-G review, the closure gate, the waivers, the PI cadence, the PI plan, the PI objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.",
+   "acceptance_at": "2026-11-27",
+   "retrospective": "This delivery contract is authored retrospectively for the tranche-6 rework. The 2026-11-09 build carried no contemporaneous contract, so the commitments are read from the plan, the migrations and the suites at the 2026-11-27 snapshot and are not presented as a 2026-11-09 agreement.",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "Executable documentation — a published process of steps, a versioned SOP per step, and an immutable run trace",
+  "business_value": 8,
+  "time_criticality": 7,
+  "risk_reduction": 7,
+  "job_size": 8
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. The 2026-11-09 build was measured and re-read at the 2026-11-27 snapshot: the process and SOP tables exist with their partial unique indexes; publish validates the manifest, the gate catalogue, the SOP and the template rules in one transaction and freezes a revision; process_runs.start materialises a run and one queued run_step per step; the executor claims, resolves, validates, invokes and records each attempt with a replay rule; and the gate, retry, continue and cancel paths are each asserted by a named test. No contemporaneous lifecycle review or contract exists, and that absence is carried as the project's open record item S11-I1 rather than as non-conformance, because the pack supplies the set. The default seed is zero by George's 2026-11-09 decision, the plan's §7 two-process gate was not executed here, and the S15 executor-scoping arm is unresolved; all three are recorded as open.",
+  "evidence": {
+   "manifest": "acceptance/programme/S11.toml",
+   "suite": "crates/actions/tests/process_step.rs",
+   "start_suite": "crates/actions/tests/process_start.rs",
+   "resolver_suite": "crates/domain/src/template.rs",
+   "receipt": "docs/evidence/rework/S11.json",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "project_brief_output": "# Project Brief — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)\n\n## Outcome\n\nA published process drives one card: ordered steps, each a registry action with a resolved input template and an optional approval gate, execute as a run with one immutable run_step per attempt, and a published SOP supplies the criteria the step is judged against. The outcome is true in the tree today on the loopback harness and is exercised by the suites named under Acceptance; the plan's §7 two-process rehearsal is the live gate and is deferred.\n\n## Boundary\n\nS11 owns the process, process_step, procedure (SOP), process_map and run_step tables; the process, SOP and map actions; publish validation; one template resolver; the process.step job and its executor. It does not own matrix legality (S03), approval transport (S06), sub-processes, the run tree, engine and editor (S13), screens (S12) or PDL (never). The default 280-flow seed is deferred by the owner's 2026-11-09 decision and is not carried as delivered.\n\n## Reuse sources\n\nThe plan's source table names what S11 reads: S03's run, approval, card_type, catalogue_entry and revision rows with run::transition; S04's registry, GET /api/actions and JSON-Schema validation; S06's runs.*, approvals.decide|list, job runner and SSE run:{id}; and S07's migrate --seed for the card_type and gate catalogue. The resolver reuses the action schema validation rather than a second input grammar, and the executor reuses the action engine's invocation and idempotency path.\n\n## Inception units\n\nThe plan's build order is the inception sequence: migration 0015 and the run_step shape; the domain types and publish checks; the template resolver with its case table; the store create, fork, materialise, claim and record; the six SOP actions and problem+json codes; publish with the manifest, gate and revision freeze; start with card checks and materialisation; the executor and process.step job; gate, retry, continue and cancel; the served lock; the seed decision; and the gate rehearsal. Each step has a named test binary in the plan.\n\n## Dependencies\n\nS03 supplies run, approval, card_type, catalogue_entry and revision plus run::transition; S04 the registry and schema validation; S06 runs, approvals, the job runner and SSE; S07 the seed that writes card types and the gate catalogue the publish check reads. S11 in turn blocks S12's declared read models and S13's sub-processes and run tree. S15 fills the executor-scoping arm and S16 adds the prompt-audit member to procedures.publish. The project row records the first four edges, and all four upstream members are green at the same snapshot.\n\n## Acceptance\n\nThe plan's §7 block is the acceptance: create and publish an SOP, create a three-step process with a gated second step, start it on a card, observe waiting_approval, decide as a second admin, and finish with three succeeded run_step rows with non-empty input and output and one approval. The negatives are an unresolved variable (422 with a problem+json type, not an empty string), an unknown action refused at publish, and a retry that leaves two rows at the failed position. The local proof is crates/actions/tests/procedures.rs, process_start.rs, process_step.rs and process_cancel.rs plus the domain unit tests; the §7 live block is recorded as not executed.\n\n## Capabilities\n\nProcess and SOP authoring with version families; an executable ordered step sequence; a checked SOP carrying definition of ready, definition of done, acceptance criteria, inspection and outputs; approval-gated execution over the S06 state machine; and an append-only run trace. Each capability is delivered by a named module in the Phase C catalog and asserted by a named suite; none depends on a second gate machine or a second run state machine.\n\n## Plan\n\nThe plan is docs/plans/slices/S11-procedures.md, amended 2026-11-09 for the process/step/SOP split. Its build order is complete in the tree through step 12 except the seed, which the owner deferred. This brief is the retrospective reading of that plan at the 2026-11-27 snapshot, and the tranche-6 review is the project's closure forum.\n",
+ "evidence_output": "# Evidence — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)\n\n## Claim\n\nS11 delivers executable documentation: a published process drives one card through ordered steps, each a registry action with a resolved input template and an optional approval gate, and a published SOP supplies the definition of ready, definition of done, acceptance criteria, inspection and outputs each step is judged against. Every attempt is an immutable run_step row, and a retry appends a new attempt rather than overwriting the old one.\n\n## Evidence\n\nThe migrations create the tables and indexes: 0015 (procedure, procedure_step, run_step), 0016 (the draft index), 0017 (lock_version), 0021 (the run capability columns), 0022 (the kata_executor role) and 0035 (the rename to process/process_step, the SOP procedure table and process_map). The action tree carries processes.create|update|publish|retire|get|list, procedures.* for the SOP, process_maps.* and process_runs.start. The executor is crates/actions/src/process/step.rs::execute_step, dispatched by apps/server/src/worker.rs as the process.step job. The suites are procedures.rs (SOP CRUD, publish and versioning), process_start.rs (materialisation, idempotency and start refusals), process_step.rs (claim, record, replay, chain, template refusal, continue, retry, gate park, approve, reject and expire, publisher-action guard), process_cancel.rs (skip queued steps, void a pending gate, no hand finish) and process_maps.rs (map authoring and tenant isolation).\n\n## Verification\n\nThe commands are the plan's §6 filters: cargo test -p conveyor-actions --test procedures; --test process_start; --test process_step; --test process_cancel; --test process_maps; and cargo test -p conveyor-domain template, plus the procedure unit tests. The plan's §7 block is the live two-process rehearsal: it starts a server and worker under CONVEYOR_DEV_AUTH=1, drives the actions with curl as dev:alice and dev:reviewer, and asserts the run status, the three run_step rows and the approval. The receipt is docs/evidence/rework/S11.json, regenerated by the factory against acceptance/programme/S11.toml; the compiled checks are the repository's preflight and the PR's CI. This pack was drafted read-only and runs no cargo command, so the level rests on the assertions present in the tree and on the command list above, not on a fresh execution.\n\n## Links\n\nThe plan is docs/plans/slices/S11-procedures.md; the acceptance manifest is acceptance/programme/S11.toml with 17 checks; the pre-pack receipt is docs/evidence/rework/S11.json; the migrations are under migrations/; the store is crates/store/src/process.rs, procedure.rs and process_map.rs; the actions are under crates/actions/src/process and crates/actions/src/procedure; the resolver is crates/domain/src/template.rs; the worker is apps/server/src/worker.rs. The project row records tranche 6, phase G, the delivery plateau and the needs edges to S03, S04, S06 and S07.\n\n## Gap\n\nThe default procedure seed is zero by George's 2026-11-09 decision, so this pack does not claim a seeded catalogue and does not query the database for a count. The plan's §7 two-process block is not executed here; the suites drive the same executor path in the integration harness. The S15 executor-scoping arm returns StartContext::Unresolved today, so readiness and allowed_actions are not enforced at start. The plan's §7 names procedure.template_unresolved and procedure.action_unknown while the tree emits process.*, and its frontmatter names migration 0033 while the rename lands in 0035. The SOP ingestion actions and migration 0060 are in the tree beyond the plan's §5.2 list; this pack assesses the plan's actions and executor, not the ingestion surface. No gap above is claimed closed.\n",
+ "closure": "S11 is re-closed through the one gate the record carries: the project row is closed only after its charter, artefacts, registers, contract, WBS, Phase-G review, both declared outputs and closure review exist, and the 17-check receipt on acceptance/programme/S11.toml is regenerated at the pinned snapshot. The close records the deferred seed, the unexecuted §7 gate and the S15 seam as open items, not as passes.",
+ "closure_review": "# Closure Review — S11 Processes, Steps and SOPs (retrospective, 2026-11-27)\n\n## Outcome vs acceptance\n\nAgainst the plan's §7 gate, the tree covers the local path: an SOP and a process are created and published, a card starts the run, a step parks on an approval, the approval resumes it, and the run finishes with three succeeded run_step rows. The suites assert the same path in-process, plus the refusal cases (unresolved template, unknown action at publish) and the retry attempt rows. The live two-process §7 block is not executed in this pack and is recorded as S11-R1 rather than met. The level is compliant for the record set because the pack supplies the lifecycle and the suite tree carries the assertions.\n\n## Evidence\n\ncrates/actions/tests/procedures.rs (create, update, publish, retire, one published version per key, list pages), process_start.rs (materialisation, idempotency, one live root run per card, card-type mismatch, published-only start), process_step.rs (claim and record, replay, chaining, unresolved template, continue, retry, gate park, approve, reject and expire), process_cancel.rs (skip queued steps, void a pending gate), process_maps.rs (map authoring and tenant isolation); the resolver and SOP unit tests in crates/domain/src/template.rs and crates/domain/src/procedure.rs; migrations 0015, 0016, 0017, 0021, 0022 and 0035. The receipt docs/evidence/rework/S11.json records the pre-pack state: red on 14 of 19 checks.\n\n## Open items\n\nThe default procedure seed is zero under George's 2026-11-09 decision (S11-R2). The plan's §7 two-process gate is not executed here (S11-R1). The S15 executor-scoping arm is unresolved by design (S11-R3). The plan's §7 refusal-code names and its migration reference drift from the tree (S11-I2). Tranche 6's authorisation is carried by the standing delegation and the tranche review, not by a tranche approval in the record (S11-I3).\n\n## Decision\n\nThe project is closed. The closure is taken by an approver other than the requester under the standing delegation, the closure review is recorded in the same pack, and the tranche-6 review is the forum that accepts it. No waiver is claimed, no manifest check is weakened, and the open items above are carried into the project registers rather than closed by prose.\n"
+}
