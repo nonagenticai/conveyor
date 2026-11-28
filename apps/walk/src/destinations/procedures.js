@@ -147,7 +147,7 @@ export async function render(ctx) {
         ? await ctx.api.invoke("processes.list", { page: { limit: 50 } }).then((r) => rows(r.output))
         : [];
       const capabilities = ctx.hasAction("capabilities.list")
-        ? await ctx.api.invoke("capabilities.list", { page: { limit: 50 } }).then((r) => rows(r.output))
+        ? await ctx.api.invoke("capabilities.list", { limit: 50 }).then((r) => rows(r.output))
         : [];
       const approvals = ctx.hasAction("approvals.list")
         ? await ctx.api.invoke("approvals.list", { page: { limit: 50 } }).then((r) => rows(r.output))

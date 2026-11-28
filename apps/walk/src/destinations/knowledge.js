@@ -120,7 +120,7 @@ export async function render(ctx) {
     status.textContent = "Loading capabilities…";
     clear(capabilityProblem);
     try {
-      const result = await ctx.api.invoke("capabilities.list", { page: { limit: 100 } });
+      const result = await ctx.api.invoke("capabilities.list", { limit: 100 });
       const items = rows(result.output);
       const previous = selectedCapabilityId;
       clear(capabilitySelect);
