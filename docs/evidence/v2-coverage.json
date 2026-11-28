@@ -14,7 +14,7 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 64,
+    "exists": 65,
     "extend": 2,
     "new": 3
   },
@@ -426,6 +426,17 @@
         "actions: registers.* found (registers.create, registers.delete, registers.get…)",
         "actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)",
         "actions: wbs.* found (wbs.create, wbs.delete, wbs.get…)"
+      ]
+    },
+    {
+      "id": "actions:board",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "board",
+      "verdict": "exists",
+      "evidence": [
+        "actions: boards.* found (boards.get, boards.set_member)",
+        "actions: cards.* found (cards.add_label, cards.archive, cards.assign…)"
       ]
     },
     {
