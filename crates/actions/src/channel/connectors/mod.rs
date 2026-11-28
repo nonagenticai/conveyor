@@ -20,6 +20,7 @@ use http::HeaderMap;
 use schemars::Schema;
 use serde_json::Value;
 use sqlx::PgConnection;
+use uuid::Uuid;
 
 use super::MCP_DEFAULT_ACTIONS;
 
@@ -126,9 +127,18 @@ pub struct ConnectorSpec {
     pub authenticate: fn(&HeaderMap, &Value, &BTreeMap<String, String>) -> bool,
     /// Platform payload → [`Inbound`]. `None` is a consumed no-op.
     pub parse: fn(&[u8], &Value) -> Option<Inbound>,
+    /// The binding's sender → principal map, when its config declares one. `None` means the
+    /// connector cannot attribute a sender to a person, so a decision-bearing command is
+    /// refused rather than recorded as the service account (S06 §7 / W2).
+    pub sender_principal: fn(&Value, Option<&str>) -> Option<Uuid>,
     /// Platform call. The core resolved the named secrets and never passes a credential value
     /// to an action response.
     pub send: fn(SendRequest) -> SendFuture,
+}
+
+/// A connector with no sender → principal map: a decision-bearing command from it is refused.
+pub fn no_sender_principal(_config: &Value, _sender_ref: Option<&str>) -> Option<Uuid> {
+    None
 }
 
 /// The built-in registry. Adding a native connector is one module and one entry here.
@@ -243,6 +253,7 @@ mod web {
         validate,
         authenticate: never_authenticate,
         parse: never_parse,
+        sender_principal: no_sender_principal,
         send: never_send,
     };
 }
@@ -301,6 +312,7 @@ mod mcp {
         validate,
         authenticate: never_authenticate,
         parse: never_parse,
+        sender_principal: no_sender_principal,
         send: never_send,
     };
 }

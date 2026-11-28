@@ -2,9 +2,11 @@
 //!
 //! The route is a connector callback, so the assertions are about what the CALLBACK does with
 //! the per-binding secret and the update body: the same `approvals.decide` the web calls is
-//! what records the decision, the decision names the tenant's **service identity** (not a human),
-//! the transport and sender are recorded in `via`, and every well-formed-but-uninteresting
-//! update is acknowledged (`200`) instead of retried.
+//! what records the decision. A decision-bearing command is attributed to the sender's mapped
+//! tenant principal (the binding's `senders` identity map), never to the connector's service
+//! account; an unmapped or revoked sender is refused before any decision row exists. Every
+//! other command still acts as the service identity, and the transport + sender are recorded
+//! in `via`.
 
 #[path = "../../actions/tests/support/mod.rs"]
 mod support;
@@ -100,7 +102,8 @@ struct Fixture {
     tenant: TenantId,
     tenant_id: Uuid,
     binding_id: Uuid,
-    service_user: Uuid,
+    /// The seeded human the binding's `senders` map points `tg:99` at.
+    principal: Uuid,
     approval_id: Uuid,
     stub: Stub,
 }
@@ -145,16 +148,16 @@ async fn fixture(pg: &support::Pg) -> Fixture {
                 "bot_token_secret": BOT_TOKEN_SECRET,
                 "incoming_secret": INCOMING_SECRET,
                 "api_base": stub.base,
+                "senders": {"tg:99": seeded.user_id},
             }),
             active: true,
         },
     )
     .await
     .expect("bind the telegram route");
-    let service_user =
-        conveyor_store::channel::ensure_service_account_tx(&mut tx, seeded.tenant, "telegram")
-            .await
-            .expect("provision the connector identity");
+    conveyor_store::channel::ensure_service_account_tx(&mut tx, seeded.tenant, "telegram")
+        .await
+        .expect("provision the connector identity");
     tx.commit().await.expect("commit");
 
     let approval_id: Uuid = sqlx::query_scalar(
@@ -186,7 +189,7 @@ async fn fixture(pg: &support::Pg) -> Fixture {
         tenant: seeded.tenant,
         tenant_id: seeded.tenant_id,
         binding_id: binding.id,
-        service_user,
+        principal: seeded.user_id,
         approval_id,
         stub,
     }
@@ -211,15 +214,30 @@ async fn post(
     (status, body)
 }
 
-fn update(update_id: i64, text: String) -> Value {
+fn update_from(update_id: i64, from: i64, text: String) -> Value {
     json!({
         "update_id": update_id,
         "message": {
             "chat": {"id": CHAT_ID},
-            "from": {"id": 99},
+            "from": {"id": from},
             "text": text,
         }
     })
+}
+
+fn update(update_id: i64, text: String) -> Value {
+    update_from(update_id, 99, text)
+}
+
+/// The text of the last reply the connector sent to the chat.
+fn last_reply(fixture: &Fixture) -> String {
+    let bodies = fixture.stub.bodies.lock().expect("bodies");
+    bodies
+        .last()
+        .and_then(|body| body.get("text"))
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_owned()
 }
 
 async fn decisions(
@@ -239,7 +257,7 @@ async fn decisions(
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_reply_is_the_service_identitys_decision_recorded_with_its_transport() {
+async fn a_mapped_senders_reply_is_that_principals_decision_with_its_transport() {
     let pg = support::Pg::fresh().await;
     let fixture = fixture(&pg).await;
     let served = serve(&pg).await;
@@ -256,10 +274,10 @@ async fn a_reply_is_the_service_identitys_decision_recorded_with_its_transport()
     let rows = decisions(&pg, fixture.tenant_id, fixture.approval_id).await;
     assert_eq!(rows.len(), 1, "one reply is one decision");
     assert_eq!(
-        rows[0].0, fixture.service_user,
-        "the connector identity, not a human"
+        rows[0].0, fixture.principal,
+        "the mapped tenant principal, not the connector's service account"
     );
-    assert_eq!(rows[0].1, "service");
+    assert_eq!(rows[0].1, "human");
     assert_eq!(rows[0].2["channel"], "telegram");
     assert_eq!(rows[0].2["sender_ref"], "tg:99");
 
@@ -282,6 +300,85 @@ async fn a_reply_is_the_service_identitys_decision_recorded_with_its_transport()
     // The chat got an acknowledgement through the binding's own (DB-stored) token.
     assert!(fixture.stub.hits.load(Ordering::SeqCst) >= 1);
     let _ = fixture.tenant;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unmapped_sender_is_refused_and_writes_no_decision() {
+    let pg = support::Pg::fresh().await;
+    let fixture = fixture(&pg).await;
+    let served = serve(&pg).await;
+
+    // tg:100 is in the chat but not in the binding's identity map.
+    let (status, _) = post(
+        &served,
+        fixture.binding_id,
+        Some(INCOMING_VALUE),
+        update_from(11, 100, format!("approve {}", fixture.approval_id)),
+    )
+    .await;
+    assert_eq!(status, 200, "a refusal is acknowledged, not retried");
+    assert!(
+        decisions(&pg, fixture.tenant_id, fixture.approval_id)
+            .await
+            .is_empty(),
+        "an unmapped sender writes no decision row"
+    );
+    assert!(
+        last_reply(&fixture).contains("channel_sender_unmapped"),
+        "the transport-typed refusal reached the sender: {:?}",
+        last_reply(&fixture)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_mapped_sender_with_no_membership_is_refused_as_revoked() {
+    let pg = support::Pg::fresh().await;
+    let fixture = fixture(&pg).await;
+    let served = serve(&pg).await;
+
+    // The map now points tg:99 at a principal with no membership in this tenant.
+    let (_, binding) = conveyor_store::channel::find_binding_by_id(&pg.owner, fixture.binding_id)
+        .await
+        .expect("read the binding")
+        .expect("the binding exists");
+    let mut config = binding.config.clone();
+    config["senders"] = json!({"tg:99": Uuid::now_v7()});
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, fixture.tenant)
+        .await
+        .expect("scope");
+    conveyor_store::channel::upsert_binding_tx(
+        &mut tx,
+        fixture.tenant,
+        &conveyor_store::channel::NewChannelBinding {
+            channel_kind: "telegram".to_owned(),
+            route_key: binding.route_key.clone(),
+            config,
+            active: true,
+        },
+    )
+    .await
+    .expect("rebind with the revoked principal");
+    tx.commit().await.expect("commit");
+
+    let (status, _) = post(
+        &served,
+        fixture.binding_id,
+        Some(INCOMING_VALUE),
+        update(12, format!("approve {}", fixture.approval_id)),
+    )
+    .await;
+    assert_eq!(status, 200);
+    assert!(
+        decisions(&pg, fixture.tenant_id, fixture.approval_id)
+            .await
+            .is_empty(),
+        "a revoked sender writes no decision row"
+    );
+    assert!(
+        last_reply(&fixture).contains("channel_sender_revoked"),
+        "the refusal reached the sender: {:?}",
+        last_reply(&fixture)
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -433,16 +530,16 @@ async fn a_webhook_gateway_uses_the_shared_grammar_and_the_same_identity_model()
                 "endpoint_url": stub.base,
                 "incoming_secret": "hook-in",
                 "outbound_secret": "hook-out",
+                "senders": {"mailto:alice@example.invalid": seeded.user_id},
             }),
             active: true,
         },
     )
     .await
     .expect("bind the webhook");
-    let service_user =
-        conveyor_store::channel::ensure_service_account_tx(&mut tx, seeded.tenant, "webhook")
-            .await
-            .expect("provision the webhook identity");
+    conveyor_store::channel::ensure_service_account_tx(&mut tx, seeded.tenant, "webhook")
+        .await
+        .expect("provision the webhook identity");
     tx.commit().await.expect("commit");
 
     let approval_id: Uuid = sqlx::query_scalar(
@@ -454,21 +551,8 @@ async fn a_webhook_gateway_uses_the_shared_grammar_and_the_same_identity_model()
     .await
     .expect("approval");
 
-    // The webhook identity is a service principal; declare this gate service-decidable
-    // (SPEC_V2 §5.4 / migration 0093), as the fixture-based channel test does.
-    sqlx::query(
-        "INSERT INTO approval_policy
-             (tenant_id, action, approval, self_approval, approver_kind, conditions,
-              required_decisions, updated_by)
-         VALUES ($1, 'manual', 'required', 'forbidden', 'service', '{}'::jsonb, 1, $2)
-         ON CONFLICT (tenant_id, action) DO UPDATE
-            SET approver_kind = 'service', updated_by = excluded.updated_by",
-    )
-    .bind(seeded.tenant_id)
-    .bind(seeded.user_id)
-    .execute(&pg.super_pool)
-    .await
-    .expect("declare the manual gate service-decidable");
+    // The gate keeps the default human approver kind: the sender is mapped to a tenant
+    // principal, so the decision is a person's and needs no service-approver policy row.
 
     let served = serve(&pg).await;
     let client = reqwest::Client::new();
@@ -498,8 +582,11 @@ async fn a_webhook_gateway_uses_the_shared_grammar_and_the_same_identity_model()
     .await
     .expect("decisions");
     assert_eq!(rows.len(), 1);
-    assert_eq!(rows[0].0, service_user);
-    assert_eq!(rows[0].1, "service");
+    assert_eq!(
+        rows[0].0, seeded.user_id,
+        "the mapped sender's tenant principal, not the service account"
+    );
+    assert_eq!(rows[0].1, "human");
     assert_eq!(rows[0].2["channel"], "webhook");
     assert_eq!(rows[0].2["sender_ref"], "mailto:alice@example.invalid");
 }

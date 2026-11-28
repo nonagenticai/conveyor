@@ -78,6 +78,15 @@ is `active` at tranche 6 by the coverage graph (T19 tranche 4, T17 tranche 5); i
 defers closure to the tranche-6 review rather than manufacturing an unledgered P0, and the strict
 conformance remediation is the follow-on unit.
 
+**BDD-WORK-PACKAGE added 2026-11-28.** The delivery-item standard is `docs/SPEC_V2.md` §5.8
+(D69) and its implementation plan is [`07-BDD-DELIVERY.md`](07-BDD-DELIVERY.md): one BDD user
+story, Gherkin acceptance criteria with a `@verify` per scenario, an INVEST Definition of Ready
+and an acceptance-criteria-based Definition of Done, at the work package and below. The standard
+v4 catalogue and the unit contract landed in #920/#923; #928/#929 added the evidence ratchet;
+#933 carries the spec section, the plan and the four delivery units (the contract and skills, the
+app `work_package_spec`, the app screens, the public per-unit readiness). It is a cross-cutting
+plan under `SPEC-V2`, not a §12 `T##` slice.
+
 ## Programme `conveyor-buildout`
 
 The whole SPEC_V2 buildout is **one programme**. Every current plan is a **project** in it and the

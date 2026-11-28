@@ -9,7 +9,7 @@ is re-opened by this document.
 
 **Adoption record (2026-11-26).** This document is the adopted V2 operating model. It was reviewed in three
 sessions (the v1 review record lives in the archived v1 PRs: a deep adversarial audit returned NO with four
-findings, all fixed, and a fresh validator returned PASS); the decisions run to D66 as §15.1 records, and §15.2's
+findings, all fixed, and a fresh validator returned PASS); the decisions run to D69 as §15.1 records, and §15.2's
 open questions were resolved or renumbered by those decisions, so the current text is authoritative. The model is
 live: `apps/web` carries the §10.5 destinations as real routes with Playwright specs, the programme's
 TOGAF/SAFe/PMP/MSP artefacts are rows with gates and evidence, and the programme record is published at
@@ -358,7 +358,7 @@ and the project dependency graph.
 | **Programme** | a set of projects with shared config and project-level dependencies; carries the budget and cadence | `active \| paused \| closed` |
 | **Project** | a temporary endeavour with a charter and a baseline | `draft \| active \| paused \| closed \| archived` |
 | **WBS node** | phase, deliverable, work package or milestone; a tree under the project | open → accepted / cancelled |
-| **Work package** | the card: one assignment, one owner, one list | list + `archived_at` (V1: the list is the state) |
+| **Work package** | the card: one assignment, one owner, one list; its story, Gherkin acceptance, INVEST readiness and DoD are §5.8 | list + `archived_at` (V1: the list is the state) |
 | **Run** | one execution attempt | `queued → running → waiting_approval → running → succeeded \| failed \| cancelled` |
 
 - **Portfolio membership** is derived: a project or programme is in flight when its status is in the tenant's
@@ -421,7 +421,8 @@ Three separations are load-bearing and are the V1 fixes carried forward:
    change to scope/schedule/cost is a **change request** (`project_register_item.kind='change'`) with an impact
    analysis and a person's decision; existing runs keep their pins.
 3. **Plan ≠ evidence.** A WBS node is accepted when its acceptance criteria are met by an artefact/run, not when its
-   checkbox is ticked.
+   checkbox is ticked. A work package's acceptance criteria are its §5.8 Gherkin scenarios; a step that verifies
+   nothing is not evidence.
 
 ### 5.4 Gates, evidence and dual control
 
@@ -432,7 +433,8 @@ Three separations are load-bearing and are the V1 fixes carried forward:
 - **A gate with no evidence is refused** (`422 gate_evidence_missing`) unless the gate explicitly allows an override;
   the override is recorded on the approval and counted in the override metric.
 - **Definition of Done** lives on `card_type.definition` and is checked by the domain layer before a card can enter a
-  `done` list; an approval can override with a reason, which the coach reads.
+  `done` list; an approval can override with a reason, which the coach reads. For a work package the definition is the
+  §5.8 acceptance-criteria set, and the type-level definition is its floor, never a replacement.
 - **No gate that cannot fail.** Every gate ships with a negative test (a run that must be refused). A gate that has
   never refused anything in a full programme cycle is flagged by the governance audit — that is a broken gate, not a
   healthy one.
@@ -525,6 +527,85 @@ Rules:
 
 The detailed asset matrix, review depth per asset type and the first wave ship with T17; nothing above widens a tool
 grant or a gate policy without its own approval.
+
+### 5.8 The delivery-item standard — story, Gherkin acceptance, INVEST and acceptance DoD
+
+**Owner direction, 2026-11-28 (D69).** Every work package, and every run and step/attempt below it, is defined by a
+BDD user story, its Gherkin acceptance criteria, an INVEST Definition of Ready and an acceptance-criteria-based
+Definition of Done. The rule is the same for every project type, it is the unit contract of the conveyor's own
+buildout (`docs/plans/03-DELIVERY.md`), and the application carries it as rows — not as prose, and not as a second
+workflow.
+
+**Scope.** A **work package** is a card of the `delivery` card type (the marker the board already carries), or a card
+that a `wbs_node(kind='work_package')` links to. A meeting card (D66), a coach card and a system card are cards but not
+work packages; the standard does not apply to them. Every work package and every run and step/attempt that executes it
+is in scope. A card type may add criteria, never remove one, and the `card_type.definition.acceptance` floor is never
+weakened.
+
+**One spec per work package.** `work_package_spec` is the single home: `(card_id, story_persona, story_action,
+story_benefit, feature, definition_of_ready, version)`. A WBS work-package node resolves its spec through `card_id`; a
+procedure's `definition_of_ready`/`definition_of_done`/`acceptance_criteria` is the template, and the card's spec is the
+instance. Runs and steps reference the scenario keys they execute or verify; a second copy of the story or the
+scenarios on the WBS node, the run or the step is not a second home.
+
+**The user story.** Exactly one per work package: `As a <role>, I want <capability>, so that <value>`. All three
+clauses are non-blank; the role is a live actor (a job binding, a human seat or an external party), and the value is
+the observable benefit or the named gap the work removes — never a restatement of the implementation. A story missing a
+clause is not ready.
+
+**The acceptance criteria are Gherkin.** The spec's `feature` is a Gherkin feature document: one `Feature`, one or more
+`Scenario`s, `Given`/`When`/`Then` with `And`/`But`, and a `@verify=<id>` tag on every scenario. A tag cannot contain a
+space, so the id names the test (or the issue body's `Verify:` line); the command itself stays on that line. `Scenario
+Outline` is expanded when parsed, so each example is a scenario. A scenario with no observable outcome or no verification
+is a draft, not acceptance. The authored feature text is stored; the parsed form
+(`{key, name, given[], when[], then[], verify}`) is derived, and the scenario-name slug is the stable key. The media
+CDP runner (§10.5) is a restricted browser executor, not this parser.
+
+**The INVEST Definition of Ready.** A work package is pulled — a run starts, or a card is assigned — only when each
+criterion carries the issue's own evidence, not the template's restatement:
+
+| Criterion | The evidence |
+|---|---|
+| **Independent** | no `blocked-by`; the work package lands without another unit's files |
+| **Negotiable** | the outcome is fixed; the implementation approach is settled at delivery |
+| **Valuable** | the story's `so that` names a benefit or a named gap |
+| **Estimable** | the baseline and every file are named |
+| **Small** | one work package, one run scale |
+| **Testable** | every scenario carries `@verify` |
+
+A missing criterion is not "negotiable": it is not ready. The action refuses with `422 work_package_dor_unmet`.
+
+**The acceptance-based Definition of Done.** The DoD is derived, never authored: one row per scenario. A scenario is
+done only when the approved `card_done` gate's `meta.evidence[]` names its key and a run or step of that card; a card
+cannot enter a `done` list while any scenario is unverified (`422 work_package_evidence_unmet`). A waiver is an
+approval with a recorded reason; it is counted in the override metric and never edits a scenario. A step that verifies
+nothing is not evidence.
+
+**Gate order and refusal.** DoR at run start → work → DoD at done. The domain validator refuses first, the action
+returns the typed 422, and the database CHECK is the second door. The refusal codes are
+`work_package_story_incomplete`, `work_package_scenarios_missing`, `work_package_dor_unmet` and
+`work_package_evidence_unmet`.
+
+**Read and write surface.** `cards.spec_get` returns the spec with the parsed scenarios and the computed DoD;
+`cards.spec_put` writes it with the card's ETag/If-Match. `cards.get` carries the same read model. A scenario key is
+stable for the life of the spec; renaming a scenario invalidates the evidence that named the old key, which is the
+intended behaviour.
+
+**The buildout's instance.** The conveyor's own development process uses the same standard: every unit issue carries
+one `## User story`, Gherkin scenarios per part with a `Verify:`, the six INVEST rows with issue-specific evidence, and
+a DoD table with one row per scenario. `board.py --contract/--dor` is the claim gate; the unit certificate adds the
+story and scenario facts beside `verifyParts`. The issue is the work package for that process; the card is the work
+package for the application.
+
+**The public record.** The public progress record publishes a fixed-vocabulary readiness summary per unit — the story
+boolean, the part and scenario counts, the six DoR booleans and the DoD rows evidenced — and never an issue body. The
+standards catalogue's four Delivery categories (`user-stories`, `acceptance-criteria`, `definition-of-ready`,
+`definition-of-done`) are the project-level documents; this section is the work-package-level rule that gives them
+their meaning.
+
+**Non-goals.** No second workflow engine, no prose DoD, no scenario runner inside the conveyor, and no second store for
+the story or the scenarios. Execution is by the project's runner — the media CDP runner for browser flows, the
+project's test command for code.
 
 ---
 
@@ -907,6 +988,8 @@ the architecture contract it sits under. Type-specific metadata: a **catalog** n
 and description of use or structure; a **matrix** names its axes (usually two); a **diagram** names its building
 block/metamodel and viewpoint. The entries are rows (`architecture_artifact_entry`: `axis_a`, `axis_b`, `value`), so a
 catalogue is queryable and a matrix is joinable — an artefact is metadata plus entries plus a document, never a blob.
+The architecture artefact standard and the delivery-item standard (§5.8) are distinct: an architecture artefact is a
+typed row with entries, while a work package is a spec with Gherkin scenarios and an acceptance DoD.
 
 The standard groups artefacts into three **plateaus**: the **Project Start Architecture** (drivers/goals/objectives,
 principles, stakeholders, requirements, actors/roles, application portfolio, solution concept, benefits), the
@@ -1252,7 +1335,7 @@ the conversation, records only its own turns.
 | `job_release` | the immutable compiled release | content hash, snapshot, status; a change is a new release |
 | `job_binding` | the join of a position to its release/capability/procedure/executor | tenant-scoped, versioned; immutable `release_snapshot` + `release_hash`; `executor_kind` is to be extensible (D61, T0) |
 | `approval_policy` | per-gate approvals | required decisions, approver kinds, expiry, autonomy conditions; default human |
-| `wbs_node` | phase/deliverable/work package/milestone tree | `card_id` nullable; WSJF inputs; acceptance |
+| `wbs_node` | phase/deliverable/work package/milestone tree | `card_id` nullable; WSJF inputs; acceptance; a `work_package` node's acceptance is the card's §5.8 spec |
 | `project_baseline` | frozen, approved scope/schedule/cost | immutable; change requests reference it |
 | `programme_cadence` | PI/sprint/demo/retro/refinement | state machine; materialises cards |
 | `programme_tranche` | the unit the programme manages and reviews together | number, state, entry/exit criteria, baseline ref, review date; the review is an approval |
@@ -1302,6 +1385,7 @@ in §11.8.
 | Family | Examples |
 |---|---|
 | programme/plan | `programmes.*`, `programme_config.*`, `governed_assets.compose\|submit\|approve` (the MSP artefacts), `tranches.*`, `tranches.review`, `project_dependencies.*`, `cadences.*`, `wbs.*`, `baselines.*`, `registers.*` |
+| board | `cards.spec_get\|spec_put` — the §5.8 work-package spec — with the V1 board actions (`cards.*`, `boards.*`) |
 | benefits | `benefits.list\|get\|create\|update\|retire`, `benefits.link\|unlink`, `benefits.baseline\|transition\|measure\|close` |
 | architecture | `architecture.artifacts_list\|get\|entries\|links\|create\|update\|approve\|supersede\|link`, `architecture.repository_search` (reuse), `architecture.contracts_request\|get\|list\|approve\|supersede`, `architecture.phases_advance`, `architecture.reviews_record\|waive`, `architecture.board_open\|get\|decide`, `architecture.maturity_assess\|plan`, `architecture.skills_assess`, `architecture.profile_get\|tailor` — the action macro requires exactly one dot, so the family is `architecture.<noun>_<verb>`; the Board is a `governance_body` row, opened by `board_open`, read by `board_get` and decided by `board_decide` |
 | organisation | `industries.*`, `departments.*`, `jobs.create\|update\|release\|retire`, `job_releases.publish\|retire`, `job_bindings.create\|retire\|list` |
@@ -1366,7 +1450,7 @@ destinations below and rehomes the operator navigation around them.
 | **Meetings** | `/meetings`, `/meetings/:id` | my invitations and seats; the meeting room (agenda with pre-reads and evidence, participants by department and seat, live positions and the rule's outcome); the asynchronous decision queue; minutes and action items; forum history, decision latency and meeting load | T19 | `meetings.spec.ts` |
 | **Programme** | `/programme` | mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realised benefits | T10 | `programme.spec.ts` |
 | **Architecture** | `/design/adm` | Preliminary capability, ADM phases A–H with their artefact sets and contracts, the artefact repository, compliance reviews and waivers, the Statement of Architecture Work and the Request for Architecture Work | T9 | `adm.spec.ts` |
-| **Plan** | `/plan` (V1: `/boards`) | WBS, baseline vs forecast, registers, change control; the Boards tab joins the project's GitHub issues | T1 | `plan.spec.ts` |
+| **Plan** | `/plan` (V1: `/boards`) | WBS, baseline vs forecast, registers, change control, each work package's §5.8 spec; the Boards tab joins the project's GitHub issues | T1 | `plan.spec.ts` |
 | **Improve** | `/improve` (V1: `/evals/improvement`) | coach triage, the kata queue and six Gets, lessons, adoption | T4, T5 | `improve.spec.ts` |
 | **Operations** | `/operations` | incidents, on-call, runbooks, dry-run and gated writes, postmortems, andon | T7 | `operations.spec.ts` |
 | **Tools** | `/tools` | toolkit versions, bindings and grants, effect ceilings, the call ledger, probes, BYO, authoring, the MinIO adapter, credential profiles | T13–T15 | `tools.spec.ts` |
@@ -1458,7 +1542,7 @@ record is the programme's measure of the real routes; the PR's `web.yml` is the 
 The work model is drawn at four levels from one read model: **L1** the portfolio Gantt of
 programmes and standalone change initiatives, **L2** a programme's projects grouped by tranche with
 the benefit and capability rails, **L3** a project's kanban of work packages and loose cards, and
-**L4** a work package's own board (`/projects/:project_id/wp/:card_id`). A bar is **actuals** —
+**L4** a work package's own board (`/projects/:project_id/wp/:card_id`), with its §5.8 story, Gherkin scenarios, INVEST rows and derived DoD. A bar is **actuals** —
 first observed card or run activity to completion, or to the snapshot time while in flight — and a
 planned window is a dashed track only when the project records both dates; a row with no dated
 activity says so. Spend is the ledger's tokens plus the pinned commercial price; an unpriced row
@@ -1761,7 +1845,7 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | **T15** | **Tool authoring and BYO** — OpenAPI draft import, service-scaffold registration, remote-MCP binding, tenant binding, promotion path | a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling |
 | **T16** | **SOP, RDF/OWL and process-document ingestion** — SOP intake as a governed asset; RDF/OWL/Turtle imported as a strata knowledge pack; BPMN/Visio/draw.io conversion into PDDL procedure drafts; capability/agent/job design from an SOP; the source review and human publication gates; re-ingest versioning | a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds |
 | **T17** | **Tenant asset authoring** — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, packs, policies, templates, tool requests), the review queue, publication | a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant |
-| **T18** | **The real V2 UI** — every V2 destination is a route in `apps/web` with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference | a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture |
+| **T18** | **The real V2 UI** — every V2 destination is a route in `apps/web` with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference | a signed-in tenant drives portfolio → programme → project → work package (with its §5.8 story, scenarios, INVEST and DoD), organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture |
 | **T19** | **Decision forums (meetings)** — `meeting_type` policy, `meeting`, agenda items resolving approvals, attendance and positions, quorum and the three decision rules, the closed outcome set, commitments as dependencies or cards, minutes as a governed asset, human seats with live and asynchronous participation | a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged |
 | **T19F** | **Decision-forum governance (follow-on)** — the `meeting_type` authoring route through the tenant's authoring pipeline, and the explicit T9 board / T10 cadence binding to forum types | a reviewed policy asset publishes a new immutable `meeting_type` version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a sitting whose qualifying seats each write one `approval_decision` with `via='meeting'`; a cadence row names its type and materialises exactly one meeting; the direct board path is unchanged |
 
@@ -1838,9 +1922,9 @@ which confidence, which policy, which person, which evidence.
 
 ## 15. Decisions and open questions
 
-### 15.1 V2 decisions (D28–D66; D1–D27 of V1 stand, except D14 and D22 as amended below)
+### 15.1 V2 decisions (D28–D69; D1–D27 of V1 stand, except D14 and D22 as amended below)
 
-**D28–D66 are this spec's decisions.** They are written as answers because a spec that only lists questions is not
+**D28–D69 are this spec's decisions.** They are written as answers because a spec that only lists questions is not
 reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked
 with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and
 the scope that review produced; **D49–D55 carry the second review's owner rulings of 2026-11-11** (portfolio and
@@ -1855,7 +1939,7 @@ decision forum.
 | # | Decision | Answer |
 |---|---|---|
 | **D28** | Organisation model | **Industry → department(s), ordered → job** is first-class; a job is a configured position with a charter, capability binding, procedure, inference config, knowledge/memory pins, tool grants, decision options, limits and gates. Adopted from the agent platform's KH concepts (D106–D115) and **implemented by the conveyor** (D33); there is no external contract |
-| **D29** | Work hierarchy | **Tenant → portfolio (computed) / programme (shared config + project dependency graph) → project → WBS/deliverable → work package (card) → run → step/attempt** (D49 refines the portfolio/programme definition); project types select phase templates, gate sets and job families; programme cadence carries the SAFe rhythm |
+| **D29** | Work hierarchy | **Tenant → portfolio (computed) / programme (shared config + project dependency graph) → project → WBS/deliverable → work package (card) → run → step/attempt** (D49 refines the portfolio/programme definition); project types select phase templates, gate sets and job families; programme cadence carries the SAFe rhythm; a work package carries its §5.8 story, Gherkin acceptance, INVEST readiness and acceptance DoD |
 | **D30** | Decision ladder | **Rule → laya → generation → human.** An LLM never selects, routes, classifies or approves; a generated output is a draft and applying it is a gated action. Options and policies are rows; every L1 decision is recorded with its answer, probabilities where the type provides them, and confidence |
 | **D31** | Meta-jobs | **PM, kanban coach, kata, development and operations are ordinary jobs** in the same catalogue and use the same card/run/approval primitives; no hard-coded role logic; the authority matrix is data |
 | **D32** | Executable rigour | **TOGAF ADM, SAFe cadence and PMP artefacts are executable aggregates**, not documents: phases are WBS nodes, artefacts are governed assets, gates are approvals, evidence is traceable. A lean profile, not a certification claim |
@@ -1895,6 +1979,7 @@ decision forum.
 | **D66** | **Meetings are the decision forum** | Much of the organisation's high-level work — programme management, architecture, analysis, project management — is done in meetings between positions from different departments, and those meetings make the decisions. V2 models a meeting as a **card** (never a fifth unit and never a chat) whose agenda items resolve existing `approval` rows; `meeting_type` policy rows declare `agenda_sources[]`, required cross-department participation, quorum, the decision rule (`unanimous \| majority \| chair`), the evidence minimum, the decision window and the closed outcome set (`decision \| commitment \| action \| information \| deferred`); participants are `job_binding`s or humans with a typed position per item; each qualifying seat writes one `approval_decision` row (`via='meeting'`) on the linked approval, the item outcome derives from those rows by the type's rule, and the stricter of the meeting's rule and the approval's policy wins. Commitments become dependency edges or cards; actions become cards; minutes are a chaired `governed_asset(kind='minutes')` drafted from the rows. **The owner, and any human, holds a seat like any other** — invited, briefed, able to raise items, state positions, attach conditions, make a commitment for their seat, delegate it and record dissent, live in the meeting room or asynchronously from the web UI, Telegram or the agent front end over MCP. The LLM drafts agendas, pre-read packs and minutes; it never selects, decides, infers a position or marks attendance. Meetings are metered in participant-hours as a third D52 source, and a forum that produces no decision over a cycle is retired (owner, 2026-11-22) |
 | **D67** | **The Gemba Walk is a candidate primary client** | The owner directs (2026-11-26) that a separate, game-style client may become the primary UI. It is built at `/walk/` from the same image and origin, with **all features and all functionality** — every read and every write through the existing action registry, no new table, action, event or port, and no fixture data. It is not a §10.5 destination and does not change the V2 coverage record (D65). `apps/web` remains normative until a measured parity gate — every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip; accessibility and performance budgets are met — and the owner selects it. Primacy is then a runbook step with an old-route redirect map and a freeze/retirement path for `apps/web`; the surface is additive and the decision reverses without data loss until the app is deleted. **Supersedes in part** ADR 0013 decision 1 and D64 for this client only; the single action registry, the single decision store and the no-fixture rule are unchanged (owner, 2026-11-26) |
 | **D68** | **The Gemba Walk has its own host and its own public client** | The owner directs (2026-11-27) that the game is a secondary UI that may become primary and must have its own Keycloak setup and `https://game.nonagentic.ai`. The walk is served at the game host's root (`/portfolio`, `/board/:id`), from the same image and service as the API, so the API is same-origin and no CORS is added; the operator origin's `/walk/*` returns a 308 to the game host. The game host is a router-level boundary: it serves only the walk tree, `/config.json` and the API, and refuses the operator surfaces (`/mcp`, `/design`, the operator index). A dedicated **public client `conveyor-game`** lives in the existing `conveyor` realm (not a new realm: that would duplicate users and break single sign-on), with PKCE S256, redirect `https://game.nonagentic.ai/*`, its web origin and the `conveyor` audience mapper; the API accepts an `azp` allowlist of exactly `{conveyor-web, conveyor-game}` while the configured audience remains `conveyor`. Production sign-in is part of the delivery and is proven with a real `conveyor-e2e` sign-in, not deferred. **Supersedes D67 in part** (the `/walk/` sub-site and the same-client default) and ADR 0021 decisions 1 and 4 in part; the parity goal, the action registry, the data model, the no-fixture rule and the P6 primacy decision are unchanged (owner, 2026-11-27; ADR 0024; change request CR-WALK-001) |
+| **D69** | **The delivery-item standard** | Every work package, and every run and step/attempt below it, carries a BDD user story (`As a …, I want …, so that …`), Gherkin acceptance criteria with a `@verify` per scenario, an INVEST Definition of Ready with six evidenced criteria, and an acceptance-criteria-based Definition of Done derived from the `card_done` gate's evidence. `work_package_spec` is the single home on the card; `cards.spec_get\|spec_put` read and write it; the DoR is refused at run start and the DoD at the `done` list, with typed 422 codes. The buildout's unit-issue contract is the same standard, and the public record publishes fixed-vocabulary readiness counts, never bodies. A meeting, coach or system card is not a work package and is outside the rule; a card type may add criteria, never remove one (owner, 2026-11-28) |
 
 ### 15.2 Open questions at review
 

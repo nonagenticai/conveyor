@@ -141,20 +141,63 @@ pub async fn channel_inbound(
         Resolved::NoOp => return Ok(Json(ack(None))),
     };
 
-    // A provisioned connector acts as its tenant service account. A missing membership is an
-    // operator error: retrying cannot conjure it, but a 200 would silently drop the reply, so
-    // answer 503 and let the operator see it.
-    let Some(service_user) = store::channel::service_account(&state.pool, tenant, spec.kind)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, binding = %binding_id, "resolve the channel identity");
+    // S06 §7 (W2): a decision-bearing command is attributed to the sender's mapped tenant
+    // principal, never to the connector's service account — a machine named as the approver is
+    // the attribution gap this closes. An unmapped or revoked sender is refused BEFORE the
+    // invoke, so no decision row is written. Every other command still acts as the service
+    // account; the channel grant set and the machine floor are unchanged, and `ctx.channel`
+    // stays `Some` on this path, so an eval gate remains closed to every channel.
+    let (actor_id, actor_kind) = if action == "approvals.decide" {
+        let Some(principal) =
+            (spec.sender_principal)(&binding.config, inbound.sender_ref.as_deref())
+        else {
+            let text = "refused 403 channel_sender_unmapped: this sender is not mapped to a \
+                        tenant principal; no decision was recorded"
+                .to_owned();
+            reply(spec, &binding.config, &secrets, text, binding_id).await;
+            return Ok(Json(ack(None)));
+        };
+        let mut tx = store::begin_scoped(&state.pool, tenant)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "begin the sender membership read");
+                ApiError::internal("the channel identity could not be read")
+            })?;
+        let member = store::actions::member_get(&mut tx, principal)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the sender's membership");
+                ApiError::internal("the channel identity could not be read")
+            })?;
+        tx.commit().await.map_err(|error| {
+            tracing::error!(%error, "commit the sender membership read");
             ApiError::internal("the channel identity could not be read")
-        })?
-    else {
-        tracing::error!(binding = %binding_id, kind = %spec.kind, "the channel service identity is absent");
-        return Err(ApiError::service_unavailable(
-            "the channel service identity is not provisioned; re-bind the connector",
-        ));
+        })?;
+        if member.is_none() {
+            let text = "refused 403 channel_sender_revoked: this sender's tenant membership is \
+                        not active; no decision was recorded"
+                .to_owned();
+            reply(spec, &binding.config, &secrets, text, binding_id).await;
+            return Ok(Json(ack(None)));
+        }
+        (principal, "user".to_owned())
+    } else {
+        // A provisioned connector acts as its tenant service account. A missing membership is an
+        // operator error: retrying cannot conjure it, but a 200 would silently drop the reply, so
+        // answer 503 and let the operator see it.
+        let Some(service_user) = store::channel::service_account(&state.pool, tenant, spec.kind)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, binding = %binding_id, "resolve the channel identity");
+                ApiError::internal("the channel identity could not be read")
+            })?
+        else {
+            tracing::error!(binding = %binding_id, kind = %spec.kind, "the channel service identity is absent");
+            return Err(ApiError::service_unavailable(
+                "the channel service identity is not provisioned; re-bind the connector",
+            ));
+        };
+        (service_user, "service".to_owned())
     };
 
     let request = InvokeRequest {
@@ -167,8 +210,8 @@ pub async fn channel_inbound(
             .as_ref()
             .map(|key| format!("channel:{binding_id}:{key}")),
         approval_id: None,
-        actor_id: service_user,
-        actor_kind: "service".to_owned(),
+        actor_id,
+        actor_kind,
         role: Role::KataExecutor,
         policy: Default::default(),
         authority: Authority::Channel(authority),
