@@ -766,6 +766,58 @@ class Runner:
         self.ensure_artefact_links(artefact_ids)
         self.ensure_documents()
 
+        # 5b. every live row of a required standard type carries an instance document, not only
+        # the row this pack names: T19F's live gate created its seven artefacts under its own
+        # titles, so a title match documented the pack's row and left the original's package open.
+        # Repair each undocumented row with the pack's content for its type.
+        for index, artefact in enumerate(self.content["artifacts"]):
+            key = artefact_keys[index]
+            type_id = str(standard.get(key) or "")
+            for row in existing:
+                if (
+                    str(row.get("artifact_type_id") or "") != type_id
+                    or row.get("status") in ("superseded", "archived")
+                    or has_instance_document(row)
+                ):
+                    continue
+                content = dict(artefact, title=str(row.get("title") or artefact["title"]))
+                document_id = self.publish_artefact_document(content)
+                draft = self.invoke(
+                    "architecture.artifacts_supersede",
+                    {"id": row["id"]},
+                    read_action="architecture.artifacts_get",
+                    read_id_from_output="id",
+                    if_match=row.get("version", 1),
+                )
+                meta = dict(draft.get("meta") or {})
+                meta.update(
+                    {
+                        "retrospective": True,
+                        "delegation_ref": self.delegation,
+                        "artifact_key": key,
+                    }
+                )
+                draft = self.invoke(
+                    "architecture.artifacts_update",
+                    {
+                        "id": draft["id"],
+                        "artifact_type_id": type_id,
+                        "meta": meta,
+                        "document_id": document_id,
+                        "entries": artefact.get("entries") or [],
+                    },
+                    read_action="architecture.artifacts_get",
+                    read_input={"id": draft["id"]},
+                    if_match=draft.get("version", 1),
+                )
+                self.invoke(
+                    "architecture.artifacts_approve",
+                    {"id": draft["id"]},
+                    actor=APPROVER,
+                    if_match=draft.get("version", 1),
+                )
+                print(f"  artefact: documented the pre-rework row {row.get('title')}")
+
         # 6. the delivery contract
         delivery = [
             c for c in contracts
