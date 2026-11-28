@@ -1,0 +1,16 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a2229e-39c5-787f-9e98-8f148bc74ad2",
+ "finding_key": "k1",
+ "statement": "A closed project missing its closure review and missing its artefacts is one closure: the review is published only after the pack artefacts exist, so a tranche pack must carry both in one pass rather than closing twice.",
+ "evidence": [
+  {
+   "kind": "card",
+   "id": "01a20ea0-7dec-79d0-b350-e193e9778941"
+  },
+  {
+   "kind": "card",
+   "id": "01a20ec4-d2f2-7dbc-a0c7-417e484a32f0"
+  }
+ ]
+}

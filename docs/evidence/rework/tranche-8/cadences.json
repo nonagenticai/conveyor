@@ -1,0 +1,25 @@
+{
+  "schema": "conveyor-tranche-cadences/v1",
+  "tranche": 8,
+  "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "cadences": {
+    "pi": "01a2229e-29a7-7c97-82bb-07e11fd358dc",
+    "refinement": "01a2229e-3862-7591-9819-c009d7d9615b",
+    "demo": "01a2229e-391f-75c4-a165-d3af214b4989",
+    "retro": "01a2229e-39c5-787f-9e98-8f148bc74ad2"
+  },
+  "documents": {
+    "pi-plan": "01a2229e-663b-7081-816f-da0c5557549a",
+    "pi-objectives": "01a2229e-66df-7557-b881-9f29be775395"
+  },
+  "plan_approval": {
+    "approval_id": "01a2229e-bdf3-74ca-bf5f-17f28543c095",
+    "gate": "cadences.approve_plan",
+    "status": "approved",
+    "decided_by_kind": "rule",
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  },
+  "verified": "cadences.list on the replay record: all four rows at period tranche-8; the pi row carries meta.pi_plan and meta.documents; the refinement row carries meta.refinement.wsjf_inputs; the plan gate is approved as a rule under the delegation."
+}

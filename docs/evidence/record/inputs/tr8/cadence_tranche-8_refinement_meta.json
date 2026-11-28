@@ -1,0 +1,44 @@
+{
+ "id": "01a2229e-3862-7591-9819-c009d7d9615b",
+ "meta": {
+  "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+  "tranche_number": 8,
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "refinement": {
+   "period": "tranche-8",
+   "reordered": [
+    {
+     "item": "S19 first, then S06d, then S13",
+     "from": "the seed's membership order (S06d, S13, S19)",
+     "to": "S19, S06d, S13",
+     "why": "S19 is the only active member and its signed eval evidence is the acceptance bar's instrument; S06d is product-green and its pack re-closes it; S13 carries the tranche's only CODE package and the largest job size, so it goes last against a settled tranche."
+    }
+   ],
+   "reestimate": {
+    "S06d": "9 open packages (1 P1 closure review, 8 P2)",
+    "S13": "10 open packages (2 P1: the closure review and v1-s13-1 CODE; 8 P2)",
+    "S19": "7 open packages (all P2) plus the closure-output, declared-output and WBS cards"
+   },
+   "wsjf_inputs": {
+    "S19": {
+     "business_value": 8,
+     "time_criticality": 6,
+     "risk_reduction": 8,
+     "job_size": 8
+    },
+    "S06d": {
+     "business_value": 7,
+     "time_criticality": 6,
+     "risk_reduction": 7,
+     "job_size": 8
+    },
+    "S13": {
+     "business_value": 9,
+     "time_criticality": 7,
+     "risk_reduction": 9,
+     "job_size": 13
+    }
+   }
+  }
+ }
+}

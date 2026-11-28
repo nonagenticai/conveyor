@@ -1,0 +1,3 @@
+# Evidence — tranche-8 lesson
+
+Proposes the tranche-8 lesson against the `retro` cadence row. The lesson is that a closed project's missing closure review and its missing artefacts are one closure: the review is published only after the pack's artefacts exist, so the pack must carry both in one pass rather than closing twice. Its evidence is the two live S06d rework cards this tranche's pack discharges — the closure-review card 01a20ea0-7dec-79d0-b350-e193e9778941 and the project-registers card 01a20ec4-d2f2-7dbc-a0c7-417e484a32f0. `lessons.propose` resolves each ref to a live row and refuses fewer than two distinct anchors.

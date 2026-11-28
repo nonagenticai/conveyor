@@ -1,0 +1,126 @@
+{
+  "schema": "conveyor-tranche-cadences-plan/v1",
+  "tranche": 8,
+  "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "note": "The inputs for the tranche-8 readiness step, in order. Each is written through scripts/programme-record.py (write + read-back + evidence); the returned ids are recorded in cadences.json beside this file. The refinement row's meta is written after its create, because meta.refinement.wsjf_inputs is what rework-batch.py reads and what rework-content-check.py --wsjf must match. The tranche is `planned` until #755 records the tranche-7 review; these rows are construction, not authorisation.",
+  "creates": [
+    {
+      "kind": "pi",
+      "period": "tranche-8",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "pi",
+        "period": "tranche-8",
+        "meta": {
+          "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+          "tranche_number": 8,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "refinement",
+      "period": "tranche-8",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "refinement",
+        "period": "tranche-8",
+        "meta": {
+          "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+          "tranche_number": 8,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "demo",
+      "period": "tranche-8",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "demo",
+        "period": "tranche-8",
+        "meta": {
+          "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+          "tranche_number": 8,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "retro",
+      "period": "tranche-8",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "retro",
+        "period": "tranche-8",
+        "meta": {
+          "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+          "tranche_number": 8,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    }
+  ],
+  "refinement_update": {
+    "period": "tranche-8",
+    "meta": {
+      "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+      "tranche_number": 8,
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "refinement": {
+        "period": "tranche-8",
+        "reordered": [
+          {
+            "item": "S19 first, then S06d, then S13",
+            "from": "the seed's membership order (S06d, S13, S19)",
+            "to": "S19, S06d, S13",
+            "why": "S19 is the only active member and its signed eval evidence is the acceptance bar's instrument; S06d is product-green and its pack re-closes it; S13 carries the tranche's only CODE package and the largest job size, so it goes last against a settled tranche."
+          }
+        ],
+        "reestimate": {
+          "S06d": "9 open packages (1 P1 closure review, 8 P2)",
+          "S13": "10 open packages (2 P1: the closure review and v1-s13-1 CODE; 8 P2)",
+          "S19": "7 open packages (all P2) plus the closure-output, declared-output and WBS cards"
+        },
+        "wsjf_inputs": {
+          "S19": {
+            "business_value": 8,
+            "time_criticality": 6,
+            "risk_reduction": 8,
+            "job_size": 8
+          },
+          "S06d": {
+            "business_value": 7,
+            "time_criticality": 6,
+            "risk_reduction": 7,
+            "job_size": 8
+          },
+          "S13": {
+            "business_value": 9,
+            "time_criticality": 7,
+            "risk_reduction": 9,
+            "job_size": 13
+          }
+        }
+      }
+    }
+  },
+  "documents": [
+    {
+      "kind": "pi-plan",
+      "title": "PI plan — tranche 8 (retrospective, 2026-11-28)",
+      "category": "pi-plan",
+      "project_key": "P0",
+      "body_file": "pi-plan.json"
+    },
+    {
+      "kind": "pi-objectives",
+      "title": "PI objectives — tranche 8 (retrospective, 2026-11-28)",
+      "category": "pi-objectives",
+      "project_key": "P0",
+      "body_file": "pi-objectives.json"
+    }
+  ]
+}

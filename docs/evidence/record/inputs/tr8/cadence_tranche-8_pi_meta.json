@@ -1,0 +1,81 @@
+{
+ "id": "01a2229e-29a7-7c97-82bb-07e11fd358dc",
+ "meta": {
+  "tranche_id": "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+  "tranche_number": 8,
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "pi_plan": {
+   "scope": [
+    "S06d",
+    "S13",
+    "S19"
+   ],
+   "period": "tranche-8",
+   "capacity": {
+    "projects": [
+     "S06d",
+     "S13",
+     "S19"
+    ],
+    "read_agents_max": 6,
+    "build_concurrency": 1,
+    "live_record_writer": 1
+   },
+   "evidence": [
+    "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+    "01a1e9e1-183f-7433-bdf8-e264ca2320d4",
+    "docs/evidence/rework/tranche-8/refinement-wsjf.json",
+    "docs/evidence/rework-register.json"
+   ],
+   "wip_limit": {
+    "open_batches": 2,
+    "open_cards_per_writer": 1
+   },
+   "objectives": [
+    {
+     "id": "O1",
+     "committed": true,
+     "statement": "S06d is accepted: one connector class for web, Telegram and MCP, with its Phase-G review and closure complete.",
+     "business_value": 7
+    },
+    {
+     "id": "O2",
+     "committed": true,
+     "statement": "S13 is accepted and its reusable workflow catalogue is shipped or its built claim withdrawn, with v1-s13-1 resolved and the project re-closed.",
+     "business_value": 9
+    },
+    {
+     "id": "O3",
+     "committed": true,
+     "statement": "S19 is accepted and stays active: eval rows carry signed-off cases, a held-out wall and an audit, with its declared outputs published.",
+     "business_value": 8
+    },
+    {
+     "id": "O4",
+     "committed": false,
+     "statement": "The tranche-8 exit gate exits 0 on three fresh receipts and hands a green tranche to #755 review.",
+     "business_value": 8
+    }
+   ],
+   "refinement": {
+    "cadence_id": "01a2229e-3862-7591-9819-c009d7d9615b"
+   },
+   "dependencies": [
+    {
+     "to": "S16",
+     "from": "S19",
+     "note": "S19 open question 1: usage recording blocks on S16 (tranche 7)"
+    },
+    {
+     "to": "S13",
+     "from": "S19",
+     "note": "S19 open question 2: the agent_run subject is declared and refused until S13/S15"
+    }
+   ]
+  },
+  "documents": {
+   "pi-plan": "01a2229e-663b-7081-816f-da0c5557549a",
+   "pi-objectives": "01a2229e-66df-7557-b881-9f29be775395"
+  }
+ }
+}
