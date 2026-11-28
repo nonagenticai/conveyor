@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.19-labs@sha256:dce1c693ef318bca08c964ba3122ae6248e45a1b96d65c4563c8dc6fe80349a2
 # conveyor server image (template-rust-service shape, pinned at 0c7396a).
 #
 # Base images come from Docker Hub, pinned by digest: this repository is public, so a builder
@@ -26,7 +27,12 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     && rustc --version
 
 WORKDIR /src
-COPY . .
+# ⛔ A CACHE MOUNT DOES NOT SURVIVE BETWEEN GITHUB-HOSTED RUNS; a LAYER does. The workflow's
+# `cache-to: type=gha` exports layers, so the third-party compile must be a layer taken BEFORE
+# the first real `COPY . .`: the workspace manifests plus an empty target per member satisfy
+# `cargo build -p conveyor-server` (every crates.io dependency compiles; the members are
+# placeholders), and a source change then reuses it instead of re-paying the release compile
+# (#915, measured 19–25 min on the image job).
 # `-p conveyor-server` (not a bare workspace build): a broken sibling crate must not block
 # the service image, and the binary needs no other member's artifacts beyond its deps.
 # sqlx::migrate! embeds migrations/ into the binary, so the runtime image needs no SQL files.
@@ -36,8 +42,21 @@ COPY . .
 # one /src/target at the same time. A warm ARC builder hid this; the first cold GitHub-hosted
 # build failed deterministically: `failed to open …/tracing-subscriber-0.3.23/.cargo-ok:
 # File exists (os error 17)` in the web stage while the build stage unpacked the same crate.
+# Keep `/src/target` OUT of a cache mount here: a mount is excluded from the layer, so the
+# compiled dependencies would be discarded at the end of the step.
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+COPY --parents crates/*/Cargo.toml apps/*/Cargo.toml ./
+RUN set -eu; \
+    for manifest in crates/*/Cargo.toml apps/*/Cargo.toml; do \
+        dir="$(dirname "$manifest")"; \
+        mkdir -p "$dir/src"; \
+        printf '// dependency-layer placeholder\n' > "$dir/src/lib.rs"; \
+        printf 'fn main() {}\n' > "$dir/src/main.rs"; \
+    done
 RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build \
-    --mount=type=cache,target=/src/target,id=cargo-target-build \
+    cargo build --release --locked -p conveyor-server
+COPY . .
+RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build \
     cargo build --release --locked -p conveyor-server \
     && install -D -m 0755 target/release/conveyor /out/conveyor
 
@@ -60,21 +79,21 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     && rustup target add wasm32-unknown-unknown
 
 WORKDIR /src
-COPY . .
-# ⛔ The install and the build are ONE step on purpose. A `--mount=type=cache` survives
-# within a single RUN and is discarded after it, so installing into a cache-mounted root in
-# its own step left `cargo leptos` unavailable in the next one ("no such command: leptos",
-# measured on PR #9's first build). Both caches are still declared here, which is what keeps
-# the install warm across builds.
+# The two tool installs do not depend on the source, and a LAYER is what survives between
+# GitHub-hosted runs, so they are a pre-`COPY . .` layer and paid once per cache generation
+# (#915). The earlier one-step form existed because the install roots were cache MOUNTS, which
+# a later step cannot see ("no such command: leptos", measured on PR #9); installing into the
+# image's /opt removes that constraint. The registry mount only keeps the crate sources warm.
 RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
-    --mount=type=cache,target=/opt/cargo-leptos,id=cargo-leptos-web \
-    --mount=type=cache,target=/opt/wasm-bindgen,id=wasm-bindgen-web \
-    --mount=type=cache,target=/src/target,id=cargo-target-web \
     cargo install cargo-leptos --version 0.3.11 --locked --root /opt/cargo-leptos \
-    && cargo leptos build --release --frontend-only --cargo-locked \
-    # The Gemba Walk's wasm engine (ADR 0022/0023): built here, never committed. The CLI is
-    # pinned to the crate's wasm-bindgen version; a mismatch is a loader failure at runtime.
-    && cargo install wasm-bindgen-cli --version 0.2.130 --locked --root /opt/wasm-bindgen \
+    && cargo install wasm-bindgen-cli --version 0.2.130 --locked --root /opt/wasm-bindgen
+COPY . .
+RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-web \
+    --mount=type=cache,target=/src/target,id=cargo-target-web \
+    cargo leptos build --release --frontend-only --cargo-locked \
+    # The Gemba Walk's wasm engine (ADR 0022/0023): built here, never committed. The CLI was
+    # installed in the layer above, pinned to the crate's wasm-bindgen version; a mismatch is
+    # a loader failure at runtime.
     && cargo build --release --locked -p walk-world --features wasm \
          --target wasm32-unknown-unknown \
     && /opt/wasm-bindgen/bin/wasm-bindgen --target web --no-typescript \
