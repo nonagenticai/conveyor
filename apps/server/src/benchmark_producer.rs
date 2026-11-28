@@ -381,7 +381,7 @@ pub async fn produce(
         .await;
     }
     if let Err(shape) = unified_diff_shape(&text) {
-        return withhold(pool, tenant, run.id, &instance.instance_id, &text, &shape).await;
+        return withhold(pool, tenant, case_id, &text, &shape).await;
     }
     let hash = sha256_hex(&text);
     record(
@@ -643,7 +643,7 @@ async fn collect_process(
         .await;
     }
     if let Err(shape) = unified_diff_shape(text) {
-        return withhold(pool, tenant, run.id, &instance.instance_id, text, &shape).await;
+        return withhold(pool, tenant, case_id, text, &shape).await;
     }
     let hash = sha256_hex(text);
     record(pool, tenant, case_id, "ok", Some((text, hash.as_str())), "").await
@@ -892,8 +892,7 @@ async fn record(
 async fn withhold(
     pool: &PgPool,
     tenant: TenantId,
-    run_id: Uuid,
-    instance_id: &str,
+    case_id: Uuid,
     text: &str,
     shape: &str,
 ) -> Result<(), JobFailure> {
@@ -901,23 +900,16 @@ async fn withhold(
         .await
         .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
     let hash = sha256_hex(text);
-    let withheld = store::benchmark::withhold_malformed_tx(
-        &mut tx,
-        tenant,
-        run_id,
-        instance_id,
-        text,
-        &hash,
-        shape,
-    )
-    .await
-    .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-    if withheld {
+    let withheld =
+        store::benchmark::withhold_malformed_tx(&mut tx, tenant, case_id, text, &hash, shape)
+            .await
+            .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    if let Some((run_id, instance_id)) = withheld {
         store::benchmark::append_case_event_tx(
             &mut tx,
             tenant,
             run_id,
-            instance_id,
+            &instance_id,
             "apply_failed",
         )
         .await
@@ -928,11 +920,17 @@ async fn withhold(
         store::benchmark::append_run_event_tx(&mut tx, tenant, &refreshed, "benchmark_run.changed")
             .await
             .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+        tracing::info!(
+            case = %case_id,
+            run = %run_id,
+            %instance_id,
+            %shape,
+            "benchmark case withheld: malformed patch"
+        );
     }
     tx.commit()
         .await
         .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-    tracing::info!(run = %run_id, instance_id, shape, "benchmark case withheld: malformed patch");
     Ok(())
 }
 
