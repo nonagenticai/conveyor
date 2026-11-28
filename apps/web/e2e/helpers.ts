@@ -362,6 +362,45 @@ export async function getJson<T = unknown>(
   return response.json() as Promise<T>;
 }
 
+/**
+ * Wait until the run the eval report screen will render is `complete`; return its id (#733).
+ *
+ * The screen renders `eval_runs.list`'s first row (`apps/web/src/screens/evals.rs:712`, newest
+ * first). A run still `queued` has no report, so its tiles read "—" and the per-case table is
+ * empty — and the page does not refetch by itself, so a DOM wait alone cannot recover. The
+ * suite's earlier specs and the worker's drain are both slower under full-suite load, which is
+ * how a report spec read a queued run. This is the explicit status wait the issue asks for: no
+ * sleep, and the caller reloads afterwards as the screen read.
+ */
+export async function waitForReportRun(
+  request: APIRequestContext,
+  evalId: string,
+): Promise<string> {
+  let runId = "";
+  await expect
+    .poll(
+      async () => {
+        const page = await invoke<{ items: { id: string; status: string }[] }>(
+          request,
+          "eval_runs.list",
+          { eval_id: evalId, limit: 50 },
+        );
+        const newest = page.items[0];
+        runId = newest?.id ?? "";
+        if (newest && ["void", "cancelled"].includes(newest.status)) {
+          throw new Error(
+            `the eval's newest run ${newest.id} is ${newest.status}: a void or cancelled run has ` +
+              `no report, and it is terminal, so the screen this spec reads can never show one`,
+          );
+        }
+        return newest?.status ?? "none";
+      },
+      { timeout: 60_000, intervals: [500, 1000, 2000, 3000] },
+    )
+    .toBe("complete");
+  return runId;
+}
+
 export type Lane = { id: string; kind: string; name: string };
 
 export type BoardFixture = {
