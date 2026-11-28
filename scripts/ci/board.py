@@ -46,7 +46,9 @@ P (reports) a `unit` issue created on or after PROGRAMME_SINCE with no `## Progr
 Q (writes with --apply)
             the full issue content contract for one unit, on the event that changes the body:
             every contract section present, the Programme rows filled, and at least one
-            `Verify:` line. The `issue-dor` workflow runs it on `issues: opened, edited`; the
+            `Verify:` line. For a unit created on/after STORY_SINCE (minus STORY_EXEMPT) also
+            the `## User story`, a Gherkin `Scenario:` with `@verify` per part, and one DoD row
+            per scenario. The `issue-dor` workflow runs it on `issues: opened, edited`; the
             heading parser accepts `##` and `###`, because the GitHub issue form renders h3.
 
 A rule's evidence is always printed. A wrong fix is silent; a printed verdict is not, and
@@ -82,6 +84,12 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
+
+# The pure parser half of this instrument. A sibling module, so other readers (the proof
+# collector, the readiness derivation) parse a body exactly as the claim gate does.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import issue_contract as contract  # noqa: E402 — after the path insert
 
 READY = "status:ready"
 CLAIMED = "status:claimed"
@@ -89,46 +97,27 @@ BLOCKED = "status:blocked"
 NEEDS_HUMAN = "status:needs-human"
 UNIT = "unit"
 
-# `03-DELIVERY.md` § "Issue content contract": the programme context is required for issues
-# created on/after this date; an earlier issue gains it at its next claim. Keep the two in step.
-PROGRAMME_SINCE = dt.date(2026, 11, 18)
-PROGRAMME_FIELDS = ("Tranche", "Brief", "ADM phase/plateau", "Benefits")
-
-# The INVEST Definition of Ready and the acceptance-criteria Definition of Done (owner direction
-# 2026-11-28). Forward-only from the day the contract gained them: an issue created earlier is
-# never made unready retroactively.
-INVEST_SINCE = dt.date(2026, 11, 28)
-INVEST_CRITERIA = ("Independent", "Negotiable", "Valuable", "Estimable", "Small", "Testable")
-
-# The issue content contract's sections, in the template's order. Both `##` and `###` headings
-# count: the Markdown template and older issues use h2, and a GitHub issue form renders every
-# field as h3 (`### Goal`), so one parser must read both or the form could never satisfy it.
-CONTRACT_SECTIONS = (
-    "Goal",
-    "Programme",
-    "References",
-    "Baseline",
-    "Parts and acceptance criteria",
-    "Dependencies",
-    "Definition of ready",
-    "Definition of done",
-)
-SECTION_RE = re.compile(r"^(#{2,3})\s+(.*?)\s*#*\s*$")
-# A scenario's acceptance line, however it is emphasised: `Verify:` in the template, `**Verify:**`
-# in most authored bodies. The leading emphasis markers are not part of the token.
-VERIFY_RE = re.compile(r"^\s*[*_`]*verify\s*:", re.IGNORECASE)
-
-# Every heading the unit template (and so the form) can carry. A same-level heading in this set
-# ends the section it follows; any other same-level heading is an author's subheading.
-KNOWN_SECTIONS = tuple(name.lower() for name in CONTRACT_SECTIONS) + (
-    "plan / audit source",
-    "claim",
-    "current state (measured)",
-    "out of scope",
-    "deployment prerequisite",
-    "open questions",
-    "evidence at completion",
-)
+# The contract constants and pure parsers live in `issue_contract.py`. These aliases keep the
+# names this file, its CLI and its existing readers (`scripts/proof/collect_units.py`) already
+# use; the rules, their docstrings and the forward-only dates are in that module.
+PROGRAMME_SINCE = contract.PROGRAMME_SINCE
+PROGRAMME_FIELDS = contract.PROGRAMME_FIELDS
+INVEST_SINCE = contract.INVEST_SINCE
+INVEST_CRITERIA = contract.INVEST_CRITERIA
+STORY_SINCE = contract.STORY_SINCE
+STORY_EXEMPT = contract.STORY_EXEMPT
+CONTRACT_SECTIONS = contract.CONTRACT_SECTIONS
+SECTION_RE = contract.SECTION_RE
+VERIFY_RE = contract.VERIFY_RE
+KNOWN_SECTIONS = contract.KNOWN_SECTIONS
+section_lines = contract.section_lines
+programme_gaps = contract.programme_gaps
+invest_gaps = contract.invest_gaps
+story_gaps = contract.story_gaps
+scenario_gaps = contract.scenario_gaps
+dod_gaps = contract.dod_gaps
+contract_gaps = contract.contract_gaps
+story_required = contract.story_required
 
 # The label and the comment the event workflow applies (#780 P2). The marker makes the comment a
 # single, updatable record rather than one new comment per edit.
@@ -172,154 +161,6 @@ def blockers_of(body: str) -> list[int]:
             if value not in seen:
                 seen.append(value)
     return seen
-
-
-def section_lines(body: str, heading: str) -> list[str] | None:
-    """The lines under a `## Heading` or `### Heading`, or None when it is absent.
-
-    The section ends at the next heading of the same or a shallower level, so an h3 section ends
-    at the next `###` or `##`, and an h2 section ends at the next `##` or `#`.
-    """
-    lines = body.splitlines()
-    wanted = heading.strip().lower()
-    known = set(KNOWN_SECTIONS)
-    for index, line in enumerate(lines):
-        match = SECTION_RE.match(line)
-        if not match or match.group(2).strip().lower() != wanted:
-            continue
-        level = len(match.group(1))
-        content: list[str] = []
-        for following in lines[index + 1 :]:
-            next_match = SECTION_RE.match(following)
-            if next_match:
-                next_level = len(next_match.group(1))
-                next_name = next_match.group(2).strip().lower()
-                # A shallower heading always ends the section. A heading at the same level ends
-                # it only when it names another contract section: the issue form renders
-                # `### Parts…` and the author's `### P1 — …` subheadings inside it must stay.
-                if next_level < level or (next_level == level and next_name in known):
-                    break
-            content.append(following)
-        return content
-    return None
-
-
-def invest_gaps(body: str) -> list[str]:
-    """The INVEST criteria the `## Definition of ready` section does not name.
-
-    A missing section is the larger defect `contract_gaps` already reports; this names only the
-    criteria a present section omits.
-    """
-    content = section_lines(body, "Definition of ready")
-    if content is None:
-        return []
-    text = "\n".join(content)
-    missing = [
-        criterion
-        for criterion in INVEST_CRITERIA
-        if not re.search(rf"\b{criterion}\b", text, re.IGNORECASE)
-    ]
-    return [f"the DoR does not name INVEST: {', '.join(missing)}"] if missing else []
-
-
-def dod_gaps(body: str) -> list[str]:
-    """The acceptance-criteria rows the `## Definition of done` section is missing.
-
-    The DoD is an acceptance-criteria table: one row per `###` part, each with its `Verify:`.
-    A prose checklist is not the DoD the contract requires.
-    """
-    content = section_lines(body, "Definition of done")
-    if content is None:
-        return []
-    parts = section_lines(body, "Parts and acceptance criteria")
-    part_count = len(re.split(r"(?m)^###\s+", "\n".join(parts or []))[1:]) if parts else 0
-    rows = 0
-    header_seen = False
-    has_verify = False
-    for line in content:
-        stripped = line.strip()
-        if not stripped.startswith("|"):
-            continue
-        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
-        if cells and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
-            continue
-        if not header_seen:
-            header_seen = True
-            has_verify = any("verify" in cell.lower() for cell in cells)
-            continue
-        rows += 1
-    gaps: list[str] = []
-    if not has_verify:
-        gaps.append("the DoD table names no `Verify:` column")
-    if part_count and rows < part_count:
-        gaps.append(f"the DoD has {rows} acceptance row(s) for {part_count} part(s)")
-    return gaps
-
-
-def contract_gaps(body: str, require_invest: bool = False) -> list[str]:
-    """Every section or field the issue content contract requires and this body lacks.
-
-    A gap names the missing thing, not a rule number: the report is posted on the issue, where a
-    reader has the body in front of them.
-    """
-    gaps: list[str] = []
-    for name in CONTRACT_SECTIONS:
-        content = section_lines(body, name)
-        if content is None:
-            gaps.append(f"`{name}` section")
-        elif not "\n".join(content).strip():
-            gaps.append(f"`{name}` section is empty")
-    missing = programme_gaps(body)
-    if missing:
-        gaps.append(f"`Programme` rows: {', '.join(missing)}")
-    parts = section_lines(body, "Parts and acceptance criteria")
-    # One `Verify:` per `###` part — 03-DELIVERY's DoR says the acceptance is per part, and it
-    # is the rule `DeliveryModel.lean`'s `partsVerified` certifies. A body with no `###` part is
-    # measured as one block, so a single-part brief still needs its line; a body with no Parts
-    # section lacks it too (the section gap above names the larger defect).
-    if parts is None:
-        gaps.append("a `Verify:` line in every part of `Parts and acceptance criteria`")
-    else:
-        blocks = re.split(r"(?m)^###\s+", "\n".join(parts))[1:] or ["\n".join(parts)]
-        if not all(
-            any(VERIFY_RE.match(line) for line in block.splitlines()) for block in blocks
-        ):
-            gaps.append("a `Verify:` line in every part of `Parts and acceptance criteria`")
-    if require_invest:
-        gaps.extend(invest_gaps(body))
-        gaps.extend(dod_gaps(body))
-    return gaps
-
-
-def programme_gaps(body: str) -> list[str]:
-    """The programme fields this body is missing or leaves empty.
-
-    `[]` means the section is present and all four rows carry a value. A body with no Programme
-    heading returns every field name, so the report says what to add rather than only that
-    something is absent. A row value of `—` (the template's ready-state placeholder) counts as
-    empty: the template's own blank must not pass as a filled field.
-    """
-    content = section_lines(body, "Programme")
-    if content is None:
-        return list(PROGRAMME_FIELDS)
-    gaps: list[str] = []
-    found: set[str] = set()
-    for line in content:
-        # Template rows: `| Field | Value |`. The heading row and the separator are skipped by
-        # the field-name match; a value that is the placeholder or blank is a gap.
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if len(cells) != 2:
-            continue
-        field, value = cells
-        if field not in PROGRAMME_FIELDS:
-            continue
-        found.add(field)
-        if not value or value in {"—", "-"}:
-            gaps.append(field)
-    for field in PROGRAMME_FIELDS:
-        if field not in found:
-            gaps.append(field)
-    return gaps
 
 
 def branch_for(number: int, branches) -> str | None:
@@ -601,11 +442,12 @@ def blocker_states(repo: str):
 
 
 def check_dor(repo: str, number: int) -> int:
-    """`--dor N`: the Programme half of the Definition of ready, for the pickup gate.
+    """`--dor N`: the Definition-of-ready half of the contract, for the pickup gate.
 
     Exit 1 names the missing section/fields; exit 0 means the issue may be claimed on this
-    rule. Forward-only: an issue created before PROGRAMME_SINCE is exempt, and a non-unit
-    issue has no Programme requirement.
+    rule. Forward-only: an issue created before PROGRAMME_SINCE is exempt, the INVEST/DoD rows
+    start at INVEST_SINCE, and the story/Gherkin shape starts at STORY_SINCE (minus
+    STORY_EXEMPT); a non-unit issue has no requirement.
     """
     try:
         raw = json.loads(
@@ -630,10 +472,13 @@ def check_dor(repo: str, number: int) -> int:
     if created >= INVEST_SINCE:
         gaps.extend(invest_gaps(body))
         gaps.extend(dod_gaps(body))
+    if story_required(created, number):
+        gaps.extend(story_gaps(body))
+        gaps.extend(scenario_gaps(body))
     if gaps:
         print(f"#{number}: not ready — {', '.join(gaps)}")
         return 1
-    print(f"#{number}: Programme and the INVEST/acceptance contract complete; ready.")
+    print(f"#{number}: the Programme, INVEST, acceptance and story contract is complete; ready.")
     return 0
 
 
@@ -700,7 +545,8 @@ def check_contract(repo: str, number: int, apply: bool) -> int:
     Exit 1 names every missing section/field; exit 0 means the body satisfies the contract. With
     `--apply` it also sets `status:not-ready` and one marked comment on a gap, and clears both
     when the body is complete. Forward-only like `--dor`: an issue created before PROGRAMME_SINCE
-    is exempt, and a non-unit issue has no contract requirement.
+    is exempt, the story/Gherkin and INVEST halves start at their SINCE dates, and a non-unit
+    issue has no contract requirement.
     """
     try:
         raw = json.loads(
@@ -721,7 +567,9 @@ def check_contract(repo: str, number: int, apply: bool) -> int:
         print(f"#{number}: created {created}, before {PROGRAMME_SINCE}; exempt (forward-only).")
         return 0
     gaps = contract_gaps(
-        raw.get("body") or "", require_invest=created >= INVEST_SINCE
+        raw.get("body") or "",
+        require_invest=created >= INVEST_SINCE,
+        require_story=story_required(created, number),
     )
     if not gaps:
         if apply:
@@ -1046,16 +894,30 @@ def self_test() -> int:
             ("References", "| Kind | Reference | Resolves at |\n|---|---|---|"),
             ("Baseline", "- Code: `main@abc1234`, measured 2026-11-26"),
             (
+                "User story",
+                "As a delivery session, I want the unit contract enforced, so that a unit is "
+                "ready before it is claimed.",
+            ),
+            (
                 "Parts and acceptance criteria",
-                "### P1 — the part\n- **P1.1** Given a state, when an act, then an outcome.\n"
+                "### P1 — the part\n"
+                "- **P1.1** Given a state, when an act, then an outcome.\n"
+                "  @verify=P1.1\n"
+                "  Scenario: the part does its job\n"
+                "    Given a state\n"
+                "    When an act\n"
+                "    Then an outcome\n"
                 "  Verify: `true`",
             ),
             ("Dependencies", "| Relation | Issue | Why | State |\n|---|---|---|---|"),
             (
                 "Definition of ready",
-                "- [x] **Independent** — one unit\n- [x] **Negotiable** — the outcome is fixed\n"
-                "- [x] **Valuable** — mapped to a benefit\n- [x] **Estimable** — the baseline\n"
-                "- [x] **Small** — one issue, one PR\n- [x] **Testable** — a Verify per part",
+                "- [x] **Independent** — no `blocked-by`; the parser is one new file.\n"
+                "- [x] **Negotiable** — the card fixes the checker's shape.\n"
+                "- [x] **Valuable** — removes gap F2 in `07-BDD-DELIVERY.md`.\n"
+                "- [x] **Estimable** — four files named in the card; baseline `main@a037cd90`.\n"
+                "- [x] **Small** — four files and one PR for #934.\n"
+                "- [x] **Testable** — `P1.1` runs `board.py --self-test`.",
             ),
             (
                 "Definition of done",
@@ -1068,6 +930,33 @@ def self_test() -> int:
     contract_cases = [
         ("conforming h2 body", contract_body("##"), []),
         ("conforming issue-form body (h3)", contract_body("###"), []),
+        (
+            "the template's fenced Gherkin and @verify-keyed DoD",
+            contract_body("###")
+            .replace(
+                "- **P1.1** Given a state, when an act, then an outcome.\n"
+                "  @verify=P1.1\n"
+                "  Scenario: the part does its job\n"
+                "    Given a state\n"
+                "    When an act\n"
+                "    Then an outcome\n"
+                "  Verify: `true`",
+                "```gherkin\n"
+                "Feature: the part\n\n"
+                "  @verify=P1.1\n"
+                "  Scenario: the part does its job\n"
+                "    Given a state\n"
+                "    When an act\n"
+                "    Then an outcome\n"
+                "```\n\n"
+                "Verify: `true` — P1.1",
+            )
+            .replace(
+                "| P1.1 | to fill | `true` |",
+                "| `@verify=P1.1` | to fill | `true` |",
+            ),
+            [],
+        ),
         (
             "two parts, one Verify line",
             contract_body("###").replace(
@@ -1083,7 +972,13 @@ def self_test() -> int:
             .replace(
                 "  Verify: `true`",
                 "  Verify: `true`\n\n### P2 — the second part\n"
-                "- **P2.1** Given a state, when an act, then an outcome.\n  Verify: `true`",
+                "- **P2.1** Given a state, when an act, then an outcome.\n"
+                "  @verify=P2.1\n"
+                "  Scenario: the second part does its job\n"
+                "    Given a state\n"
+                "    When an act\n"
+                "    Then an outcome\n"
+                "  Verify: `true`",
             )
             .replace(
                 "| P1.1 | to fill | `true` |",
@@ -1119,6 +1014,25 @@ def self_test() -> int:
             ["the DoR does not name INVEST: Small"],
         ),
         (
+            "a generic INVEST restatement",
+            # The template's Small phrase keeps `PR` uppercase: the comparison is
+            # case-insensitive, so this fixture catches a case-sensitive regression.
+            contract_body("###").replace(
+                "- [x] **Small** — four files and one PR for #934.",
+                "- [x] **Small** — one issue, one branch, one PR.",
+            ),
+            ["the DoR row for Small is the template's restatement, not evidence"],
+        ),
+        (
+            "a copied template placeholder in the DoR",
+            contract_body("###").replace(
+                "- [x] **Independent** — no `blocked-by`; the parser is one new file.",
+                "- [x] **Independent** — <why this unit is independent: name its files, its "
+                "typed dependency, if any.>",
+            ),
+            ["the DoR row for Independent is the template's restatement, not evidence"],
+        ),
+        (
             "a DoD with no acceptance rows",
             contract_body("###").replace(
                 "| Acceptance scenario | Evidence at completion | Verify: |\n|---|---|---|\n"
@@ -1127,10 +1041,25 @@ def self_test() -> int:
             ),
             ["the DoD table names no `Verify:` column"],
         ),
+        (
+            "a missing user story",
+            contract_body("###").replace("### User story", "### Story"),
+            ["`User story` section"],
+        ),
+        (
+            "a scenario with no @verify tag",
+            contract_body("###").replace("  @verify=P1.1\n", ""),
+            ["the P1 part has no Gherkin scenario with @verify"],
+        ),
+        (
+            "a DoD without the scenario's row",
+            contract_body("###").replace("\n| P1.1 | to fill | `true` |", ""),
+            ["the DoD has no row for `P1.1`"],
+        ),
     ]
     for name, text, wanted in contract_cases:
         total += 1
-        gaps = contract_gaps(text, require_invest=True)
+        gaps = contract_gaps(text, require_invest=True, require_story=True)
         joined = "; ".join(gaps)
         if all(item in joined for item in wanted) and (wanted or not gaps):
             print(f"ok: contract — {name}")
@@ -1247,7 +1176,11 @@ def main() -> int:
     if args.contract_body is not None:
         try:
             with open(args.contract_body, encoding="utf-8") as handle:
-                gaps = contract_gaps(handle.read(), require_invest=True)
+                # Offline there is no creation date to apply the forward-only exemptions to, so
+                # the preview checks the full current contract: the shape a new unit must carry.
+                gaps = contract_gaps(
+                    handle.read(), require_invest=True, require_story=True
+                )
         except OSError as error:
             print(f"board: {error}", file=sys.stderr)
             return 2

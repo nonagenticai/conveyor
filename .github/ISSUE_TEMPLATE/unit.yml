@@ -84,18 +84,36 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: user_story
+    attributes:
+      label: User story
+      description: Exactly one per unit — all three clauses non-blank. The parts are its acceptance groups.
+      placeholder: "As a <role>, I want <capability>, so that <value>."
+    validations:
+      required: true
+
   # The id is load-bearing (`#780` P1.2): the form's Verify scenarios live in this field.
   - type: textarea
     id: verify
     attributes:
       label: Parts and acceptance criteria
-      description: One subsection per part. Every part needs at least one `Verify:` line.
+      description: One subsection per part, each with a Gherkin block; every scenario carries a `@verify=<id>` tag and a `Verify:` command.
       value: |
         ### P1 — <part name>
         Requirement: <one sentence.>
 
-        - **P1.1** Given <state>, when <action>, then <observable outcome>.
-          Verify: `<command>` or `path::test` (exists | to create at `path`)
+        ```gherkin
+        Feature: <the capability this part delivers>
+
+          @verify=P1.1
+          Scenario: <the observable outcome>
+            Given <state>
+            When <action>
+            Then <observable outcome>
+        ```
+
+        Verify: `<command>` or `path::test` (exists | to create at `path`)
     validations:
       required: true
 
@@ -136,13 +154,15 @@ body:
     id: definition_of_done
     attributes:
       label: Definition of done
-      description: What the closing PR must show.
+      description: What the closing PR must show — one evidence row per scenario, keyed by its `@verify` id.
       value: |
-        The DoD is an acceptance-criteria table — one row per part, filled at close.
+        The DoD is an acceptance-criteria table — one row per scenario, keyed by its `@verify` id,
+        filled at close with the command, result and SHA.
 
-        | Part / scenario | Evidence at completion | `Verify:` at the PR head |
+        | Scenario | Evidence at completion | Verify: |
         |---|---|---|
-        | P1.1 | to fill | to fill |
+        | `@verify=P1.1` | to fill | to fill |
+        | `@verify=P1.2` | to fill | to fill |
 
         - [ ] Every scenario passes at the PR head; the table has one row per scenario.
         - [ ] Repo gate green at the exact head (`preflight.yml`, then the PR's `ci-public`).

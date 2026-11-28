@@ -68,10 +68,16 @@ call `channels.*` — a grant change is a person's act, made once by the operato
    `{"issue_ref":"owner/name#N"}`. If a unit exists, resume it and go to step 3. Otherwise:
    ```json
    {"title":"…","repo":"owner/name","lane":"issue/<n>-<slug>","issue_ref":"owner/name#N",
-    "implementer_id":"<uuid>","acceptance_command":"<the issue's Verify command>"}
+    "implementer_id":"<uuid>","description":"<the unit's user story and its scenario count>",
+    "acceptance_command":"<the acceptance scenario's `Verify:` line, exactly as the issue states it>"}
    ```
    The same repo/lane/implementer/issue replays to the same row; a different one is refused
-   `409 charter_mismatch`. Read it back with `development_projects.get`.
+   `409 charter_mismatch`. Read it back with `development_projects.get`. The charter's
+   `description` carries the unit's story and its scenario count onto the project row, and
+   `acceptance_command` is the scenario's `Verify:` line — the live check runs that command, never
+   a paraphrase of it. Charter only a ready unit: the issue carries one `## User story`, a Gherkin
+   `@verify` scenario per part and the six INVEST rows with its own evidence (`bdd-delivery`); a
+   unit that fails its Definition of Ready is not chartered — its body is fixed first.
 
 3. **Record each step, in order, with its own evidence.** `record_step` takes
    `{"development_project_id":"…","step":"…","evidence":{…}}`:
@@ -106,8 +112,8 @@ call `channels.*` — a grant change is a person's act, made once by the operato
 
 7. **Deploy and prove it.** Record `deploy` with the digest and the max applied migration
    generation, then `live_verify` with `/health` = 200, `serving_digest` equal to the deploy's
-   digest, the project's acceptance command and its exit code 0. A different digest is a
-   refused live check, not a pass.
+   digest, the acceptance scenario's `Verify:` command and its exit code 0. A different digest is
+   a refused live check, not a pass.
 
 8. **Close and read back.** `close` requires `branch, pull_request, ci, merge, rollback_plan,
    deploy, live_verify` (`409 steps_missing` lists what is absent). The closure names

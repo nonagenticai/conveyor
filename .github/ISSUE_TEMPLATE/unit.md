@@ -64,18 +64,38 @@ line numbers only when re-verified at the baseline. A path this issue must creat
 <CARRIED-BY-#9 means the specific symbol/behaviour exists at the listed #9 sha; it is re-checked on
 merged main before this issue closes. Never mark a part DONE from the plan's prose.>
 
+## User story
+<Exactly one story for the unit: `As a <role>, I want <capability>, so that <value>` — all three
+clauses non-blank. The parts below are its acceptance groups.>
+
 ## Parts and acceptance criteria
 <One subsection per part of the plan — a Deliverable/Build-order item or an audit W/V id. One
-paraphrased requirement sentence; link the source. No scenario without a `Verify:` line.>
+paraphrased requirement sentence; link the source. Every part carries a Gherkin `Feature:`/`Scenario:`
+block; each scenario carries a `@verify=<id>` tag and a `Verify:` line. No scenario without a
+`Verify:`.>
 
 ### P1 — <part name>
 `S##-*.md` §… · audit §W…
 Requirement: <one sentence.>
 
-- **P1.1** Given <state>, when <action>, then <observable outcome>.
-  Verify: `<command>` or `path::test` (exists | to create at `path`)
-- **P1.2** (live, deployment-gated by #N) Given …, when …, then ….
-  Verify: `<command on host>`
+```gherkin
+Feature: <the capability this part delivers>
+
+  @verify=P1.1
+  Scenario: <the observable outcome>
+    Given <state>
+    When <action>
+    Then <observable outcome>
+
+  @verify=P1.2
+  Scenario: <the live outcome, deployment-gated by #N>
+    Given <state>
+    When <action>
+    Then <observable outcome>
+```
+
+Verify: `<command>` or `path::test` (exists | to create at `path`) — P1.1
+Verify: `<command on host>` — P1.2 (live, deployment-gated by #N)
 
 ## Dependencies
 | Relation | Issue | Why (source) | State |
@@ -91,12 +111,12 @@ Requirement: <one sentence.>
 Blocker: #N — <a plain line, present iff this issue is `status:blocked`; say why.>
 
 ## Definition of ready
-- [ ] **Independent** — the unit lands without another unit's files; a real ordering is a typed dependency.
-- [ ] **Negotiable** — the outcome is fixed; the implementation is settled at delivery, not in the brief.
-- [ ] **Valuable** — the outcome maps to a benefit or removes a named gap.
-- [ ] **Estimable** — the baseline and every file are named.
-- [ ] **Small** — one issue, one branch, one PR.
-- [ ] **Testable** — every part has ≥1 BDD scenario with a `Verify:` command or test target.
+- [ ] **Independent** — <why this unit is independent: name its files, its typed dependency, if any.>
+- [ ] **Negotiable** — <why this unit's outcome is fixed and what delivery still decides.>
+- [ ] **Valuable** — <why this unit matters: the benefit profile or the named gap it closes.>
+- [ ] **Estimable** — <why this unit can be estimated: the measured baseline and every file it touches.>
+- [ ] **Small** — <why this unit is one deliverable, not a split.>
+- [ ] **Testable** — <why this unit is testable: its `@verify=<id>` scenarios and the `Verify:` command for each.>
 - [ ] Baseline named and the plan/audit blob shas recorded.
 - [ ] Every spec/plan/code/test reference resolves at its ref; every `#N` resolves.
 - [ ] Dependencies complete, typed and cited; `Blocker: #N` present iff `status:blocked`.
@@ -106,12 +126,13 @@ Blocker: #N — <a plain line, present iff this issue is `status:blocked`; say w
 
 ## Definition of done
 
-The DoD is an acceptance-criteria table — **one row per part**, filled at close with the command,
-result and SHA. A prose checklist does not satisfy it.
+The DoD is an acceptance-criteria table — **one row per scenario**, keyed by its `@verify` id,
+filled at close with the command, result and SHA. A prose checklist does not satisfy it.
 
-| Part / scenario | Evidence at completion | `Verify:` at the PR head |
+| Scenario | Evidence at completion | Verify: |
 |---|---|---|
-| P1.1 | to fill | to fill |
+| `@verify=P1.1` | to fill | to fill |
+| `@verify=P1.2` | to fill | to fill |
 
 - [ ] Every scenario passes at the PR head; the table has one row per scenario.
 - [ ] Repo gate green at the exact head (`preflight.yml` for the compile/lint verdict, the PR's
