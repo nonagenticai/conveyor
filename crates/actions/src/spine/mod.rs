@@ -18,7 +18,7 @@
 
 use chrono::{DateTime, NaiveDate, Utc};
 use conveyor_domain::spine::{PlanError, WbsKind, WsjfInputs, tranche_review_has_evidence, wsjf};
-use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
+use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind, ListKind};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -1467,6 +1467,39 @@ async fn wbs_change_guard(
     Ok(())
 }
 
+/// Refuse a work package whose card has already finished (SPEC_V2 §5.8, D69).
+///
+/// A card enters `done` only through its approved `card_done` gate and sits in `archive` only
+/// once stamped. A work package made after the fact would put delivered work back into the plan
+/// with its Definition of Done never judged, so the link is refused and the card must be moved
+/// through the gate first. A card in `intake`, `active` or `waiting` is still live.
+async fn ensure_card_linkable_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    card_id: Uuid,
+) -> Result<(), ActionError> {
+    let card = store::card::get_card_tx(&mut *tx, ctx.tenant, card_id)
+        .await
+        .map_err(|error| store_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such card"))?;
+    let lane = store::list::get_list_tx(&mut *tx, ctx.tenant, card.list_id)
+        .await
+        .map_err(|error| crate::board::list_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    if matches!(lane.kind, ListKind::Done | ListKind::Archive) {
+        return Err(ActionError::new(
+            422,
+            "work_package_link_done",
+            format!(
+                "card {card_id} sits in a `{}` lane; a card in a done lane cannot become a work \
+                 package after the fact; move it through the card_done gate",
+                lane.kind
+            ),
+        ));
+    }
+    Ok(())
+}
+
 /// Create a WBS node.
 #[crate::action(
     name = "wbs.create",
@@ -1495,11 +1528,13 @@ async fn wbs_create(
     // v1-p5-5 (SPEC_V2 §5.1): a work package's card is the path from the plan to the work, so the
     // node owes one; every other kind has no executor and stores none.
     let card_id = if parsed_kind == WbsKind::WorkPackage {
-        Some(
-            input
-                .card_id
-                .ok_or_else(|| spine_error(PlanStoreError::CardRequired, ctx.action))?,
-        )
+        let card_id = input
+            .card_id
+            .ok_or_else(|| spine_error(PlanStoreError::CardRequired, ctx.action))?;
+        // D69: a card already in `done`/`archive` has finished; it cannot be re-labelled a
+        // work package after the fact, which would skip the `card_done` gate.
+        ensure_card_linkable_tx(&mut *tx, &ctx, card_id).await?;
+        Some(card_id)
     } else {
         None
     };
@@ -1564,6 +1599,14 @@ async fn wbs_update(
         serde_json::json!({ "version": current.version }),
     )?;
     wbs_change_guard(&mut *tx, &ctx, current.project_id, input.change_id).await?;
+    // The patch cannot make a node a work package (`kind` is not in it), but it can re-point a
+    // work package's card; the replacement passes the same done-state guard as `wbs.create`.
+    if let Some(card_id) = input.card_id
+        && current.kind == WbsKind::WorkPackage.as_str()
+        && Some(card_id) != current.card_id
+    {
+        ensure_card_linkable_tx(&mut *tx, &ctx, card_id).await?;
+    }
     let inputs = match (
         input.business_value,
         input.time_criticality,

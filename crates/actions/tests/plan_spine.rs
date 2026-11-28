@@ -162,8 +162,12 @@ async fn create_wbs(running: &support::Running, project: &str, title: &str) -> S
     id_of(output(&body), "id")
 }
 
-/// The project's board and its active lane, as `projects.create` makes them.
-async fn board_and_lane(running: &support::Running, project: &str) -> (String, String) {
+/// The project's board and its lane of `kind`, as `projects.create` makes them.
+async fn board_and_lane_of_kind(
+    running: &support::Running,
+    project: &str,
+    kind: &str,
+) -> (String, String) {
     let (status, view) = running
         .invoke(
             "projects.get",
@@ -191,9 +195,14 @@ async fn board_and_lane(running: &support::Running, project: &str) -> (String, S
         .as_array()
         .expect("lists")
         .iter()
-        .find(|row| row["list"]["kind"] == "active")
-        .unwrap_or_else(|| panic!("no active lane in {board_view}"));
+        .find(|row| row["list"]["kind"] == kind)
+        .unwrap_or_else(|| panic!("no {kind} lane in {board_view}"));
     (board, id_of(&lane["list"], "id"))
+}
+
+/// The project's board and its active lane.
+async fn board_and_lane(running: &support::Running, project: &str) -> (String, String) {
+    board_and_lane_of_kind(running, project, "active").await
 }
 
 /// A `feature` card on the project's board — the work package's executor.
@@ -1660,6 +1669,105 @@ async fn a_work_package_names_its_card_and_run() {
     .expect("the node and its run");
     assert_eq!(stored.0, Some(card_id), "the node persists its card");
     assert_eq!(stored.1, Some(card_id), "the run carries the same card");
+}
+
+/// D69's done-state bypass, closed: a card already in a `done` lane cannot become a work
+/// package after the fact — the `card_done` gate is the only way into done, so the link is
+/// refused. A card still in a live lane links normally, and re-pointing an existing work
+/// package's card to a finished one is refused too.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_done_card_cannot_become_a_work_package() {
+    let (pg, running, _seeded) = fixture().await;
+    let project = create_project(&running, "Done card work package").await;
+    let (board, active) = board_and_lane(&running, &project).await;
+    let (_, done) = board_and_lane_of_kind(&running, &project, "done").await;
+
+    // A `feature` card may be born in done (a `delivery` card may not); it is the finished
+    // state the guard is about.
+    let (status, card) = running
+        .invoke(
+            "cards.create",
+            "dev:alice",
+            json!({
+                "board_id": board,
+                "list_id": done,
+                "name": "Already finished",
+                "card_type_code": "feature",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{card}");
+    let done_card = id_of(output(&card), "id");
+
+    let (status, refused) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "work_package",
+                "title": "Too late",
+                "card_id": done_card,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(refused["type"], "work_package_link_done", "{refused}");
+    assert!(
+        refused["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("done"),
+        "the refusal names the lane kind: {refused}"
+    );
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM wbs_node WHERE project_id = $1::uuid")
+        .bind(&project)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the project's nodes");
+    assert_eq!(rows, 0, "the refusal wrote a node");
+
+    // A live card still links, so the guard does not touch the normal path.
+    let active_card = create_card(&running, &board, &active).await;
+    let (status, created) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "work_package",
+                "title": "In time",
+                "card_id": active_card,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(output(&created)["card_id"], active_card, "{created}");
+
+    // `wbs.update` cannot set `kind`, but it can re-point the card; the replacement is
+    // refused by the same guard.
+    let node = id_of(output(&created), "id");
+    let (status, refused) = running
+        .invoke(
+            "wbs.update",
+            "dev:alice",
+            json!({"id": node, "card_id": done_card}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(refused["type"], "work_package_link_done", "{refused}");
 }
 
 /// v1-p55-1 — §5.5's links document is the declared shape, and the document round-trips.

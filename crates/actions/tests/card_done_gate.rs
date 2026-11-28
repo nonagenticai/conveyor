@@ -650,6 +650,12 @@ async fn a_work_package_with_every_scenario_evidenced_enters_done() {
     let verified = dod_verified(&spec.body);
     assert_eq!(verified.get("the-first-part"), Some(&true), "{spec:?}");
     assert_eq!(verified.get("the-second-part"), Some(&true), "{spec:?}");
+    // An evidenced gate records no waiver, so the field is absent rather than null.
+    assert!(
+        output(&spec.body).get("evidence_waiver").is_none(),
+        "no waiver was recorded: {}",
+        spec.body
+    );
 
     let moved = move_to_done(&pg, &seeded, &card, version, &done)
         .await
@@ -826,6 +832,43 @@ async fn a_waiver_moves_a_work_package_with_a_spec_to_done() {
     let moved = move_to_done(&pg, &seeded, &card, version, &done)
         .await
         .expect("a non-empty waiver excuses the per-scenario evidence");
+    assert_eq!(moved.status, 200, "{}", moved.body);
+    assert_eq!(output(&moved.body)["list_id"], done);
+}
+
+/// The waiver is part of the read model, not only of the gate: a waived `card_done` gate lets
+/// the move pass with every DoD row unverified, and `cards.spec_get` must name the recorded
+/// reason so a reader can tell why it passed. The rows stay as they are — the evidence is
+/// genuinely absent — and the read agrees with the gate's pass.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_waived_spec_reads_the_recorded_waiver_and_moves() {
+    let (pg, seeded) = fixture().await;
+    seed_delivery_card_type(&pg, &seeded).await;
+    let (board, active, done) = board_and_lanes(&pg, &seeded).await;
+    let (card, version) = create_card_of_type(&pg, &seeded, &board, &active, "delivery").await;
+    put_spec(&pg, &seeded, &card, ready_dor())
+        .await
+        .expect("a ready spec is stored");
+    let reason = "the acceptance was verified by inspection";
+    approve_gate(&pg, &seeded, &card, json!({ "evidence_waiver": reason })).await;
+
+    let spec = get_spec(&pg, &seeded, &card).await.expect("read the spec");
+    assert_eq!(spec.status, 200, "{}", spec.body);
+    assert_eq!(
+        output(&spec.body)["evidence_waiver"],
+        reason,
+        "{}",
+        spec.body
+    );
+    assert!(
+        dod_verified(&spec.body).values().all(|verified| !*verified),
+        "a waiver excuses evidence; the DoD rows stay unverified: {}",
+        spec.body
+    );
+
+    let moved = move_to_done(&pg, &seeded, &card, version, &done)
+        .await
+        .expect("the recorded waiver opens the done gate");
     assert_eq!(moved.status, 200, "{}", moved.body);
     assert_eq!(output(&moved.body)["list_id"], done);
 }
@@ -1025,6 +1068,12 @@ async fn cards_get_carries_the_spec_and_its_derived_dod() {
         .collect();
     assert_eq!(verified.get("the-first-part"), Some(&true), "{view:?}");
     assert_eq!(verified.get("the-second-part"), Some(&true), "{view:?}");
+    // No waiver was recorded, so the read model carries none: the field is absent, not null.
+    assert!(
+        spec.get("evidence_waiver").is_none(),
+        "an evidenced gate records no waiver: {}",
+        view.body
+    );
 }
 
 /// §5.8: a work package is not born in `done`; it moves there through the `card_done` gate, and a

@@ -116,6 +116,12 @@ pub struct WorkPackageSpecOut {
     pub scenarios: Vec<ScenarioOut>,
     /// One DoD row per scenario, from the approved `card_done` gate's evidence.
     pub dod: Vec<DodRowOut>,
+    /// The recorded `card_done` waiver reason, when the gate passed with one.
+    ///
+    /// A waiver excuses the per-scenario evidence, so the DoD rows stay unverified by design:
+    /// this field is what tells a reader why the move passed anyway.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver: Option<String>,
 }
 
 /// One card's work-package spec, with its parsed scenarios and the computed DoD.
@@ -143,9 +149,11 @@ pub(crate) async fn cards_spec_get(
         .map_err(|error| spec_store_error(error, "cards.spec_get"))?
         .ok_or_else(|| ActionError::resource_not_found("work-package spec"))?;
     let scenarios = parse_stored(&record)?;
-    let evidence = gate_evidence_tx(&mut *tx, ctx.tenant, record.card_id, "cards.spec_get").await?;
+    let meta = gate_meta_tx(&mut *tx, ctx.tenant, record.card_id, "cards.spec_get").await?;
+    let evidence = gate_evidence(meta.as_ref());
+    let waiver = gate_waiver(meta.as_ref());
     let rows = verified_dod_tx(&mut *tx, ctx.tenant, record.card_id, &scenarios, &evidence).await?;
-    let out = spec_out(&record, scenarios, rows);
+    let out = spec_out(&record, scenarios, rows, waiver);
     Ok(HandlerOutput::ok(out).with_etag(etag_of(record.version)))
 }
 
@@ -224,9 +232,11 @@ pub(crate) async fn cards_spec_put(
     .await
     .map_err(|error| spec_store_error(error, "cards.spec_put"))?;
 
-    let evidence = gate_evidence_tx(&mut *tx, ctx.tenant, saved.card_id, "cards.spec_put").await?;
+    let meta = gate_meta_tx(&mut *tx, ctx.tenant, saved.card_id, "cards.spec_put").await?;
+    let evidence = gate_evidence(meta.as_ref());
+    let waiver = gate_waiver(meta.as_ref());
     let rows = verified_dod_tx(&mut *tx, ctx.tenant, saved.card_id, &scenarios, &evidence).await?;
-    let out = spec_out(&saved, scenarios, rows);
+    let out = spec_out(&saved, scenarios, rows, waiver);
     Ok(HandlerOutput::ok(out).with_etag(etag_of(saved.version)))
 }
 
@@ -247,9 +257,11 @@ pub(crate) async fn card_spec_out_tx(
         return Ok(None);
     };
     let scenarios = parse_stored(&record)?;
-    let evidence = gate_evidence_tx(&mut *conn, tenant, record.card_id, "cards.get").await?;
+    let meta = gate_meta_tx(&mut *conn, tenant, record.card_id, "cards.get").await?;
+    let evidence = gate_evidence(meta.as_ref());
+    let waiver = gate_waiver(meta.as_ref());
     let rows = verified_dod_tx(&mut *conn, tenant, record.card_id, &scenarios, &evidence).await?;
-    Ok(Some(spec_out(&record, scenarios, rows)))
+    Ok(Some(spec_out(&record, scenarios, rows, waiver)))
 }
 
 /// The stored spec as the wire document returns it.
@@ -292,11 +304,13 @@ fn spec_out(
     record: &WorkPackageSpecRecord,
     scenarios: Vec<Scenario>,
     rows: Vec<DodRow>,
+    evidence_waiver: Option<String>,
 ) -> WorkPackageSpecOut {
     WorkPackageSpecOut {
         spec: spec_view(record),
         scenarios: scenarios.iter().map(scenario_out).collect(),
         dod: rows.iter().map(dod_out).collect(),
+        evidence_waiver,
     }
 }
 
@@ -320,23 +334,38 @@ fn parse_stored(record: &WorkPackageSpecRecord) -> Result<Vec<Scenario>, ActionE
     })
 }
 
-/// The approved `card_done` gate's `meta.evidence[]`, or an empty list when there is no gate yet.
+/// The approved `card_done` gate's whole `meta`, or `None` when no gate has been approved.
 ///
-/// This is the same evidence `assert_card_done_tx` judges at the `done` list; the DoD rows are a
-/// projection of it, so an author reads exactly what the close gate will read.
-async fn gate_evidence_tx(
+/// Both the evidence and the recorded waiver come from this one snapshot, so the read model
+/// cannot show a waiver from a different gate than the evidence it judges. This is the same meta
+/// `assert_card_done_tx` reads at the `done` list.
+async fn gate_meta_tx(
     tx: &mut PgConnection,
     tenant: TenantId,
     card_id: Uuid,
     action: &str,
-) -> Result<Vec<Value>, ActionError> {
-    let meta =
-        store::approval::approved_card_gate_meta_tx(&mut *tx, tenant, card_id, CARD_DONE_GATE)
-            .await
-            .map_err(|error| store_error(error, action))?;
-    Ok(meta
-        .and_then(|meta| meta.get("evidence").and_then(Value::as_array).cloned())
-        .unwrap_or_default())
+) -> Result<Option<Value>, ActionError> {
+    store::approval::approved_card_gate_meta_tx(&mut *tx, tenant, card_id, CARD_DONE_GATE)
+        .await
+        .map_err(|error| store_error(error, action))
+}
+
+/// The gate's `meta.evidence[]`, or an empty list when there is no gate or the gate carries none.
+fn gate_evidence(meta: Option<&Value>) -> Vec<Value> {
+    meta.and_then(|meta| meta.get("evidence").and_then(Value::as_array).cloned())
+        .unwrap_or_default()
+}
+
+/// The gate's recorded `meta.evidence_waiver` reason, when it is a non-blank string.
+///
+/// The `done` gate treats a trimmed reason as the waiver, so a blank string is not one; the read
+/// model filters it the same way and never reports a waiver the move would not honour.
+fn gate_waiver(meta: Option<&Value>) -> Option<String> {
+    meta.and_then(|meta| meta.get("evidence_waiver"))
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty())
+        .map(ToOwned::to_owned)
 }
 
 /// Derive one verified Definition-of-Done row per scenario from the gate's evidence.
