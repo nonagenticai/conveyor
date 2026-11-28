@@ -1,0 +1,643 @@
+{
+  "charter": "# Charter — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)\n\n- **Project:** S15 'Capability, Knowledge and Memory', track v1, ADM phase G, delivery plateau, tranche 7\n- **Delivered:** a capability is a persisted aggregate — executor spec, versioned knowledge binding and hot/cold memory — that a card's run resolves and readiness-checks before its first step. Migration 0020 introduced the five tables with row-level security forced and moved the catalogue's capability rows out; `seed/capability.json`, `domain::capability`, `store::capability` and `Parent::Capability` carry the model.\n- **Authority:** the tranche-7 authorisation recorded by the tranche-6 review, exercised under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n- **Acceptance:** `acceptance/programme/S15.toml`, whose gate is capability resolution, pre-run readiness, a pinned strata retrieval, a written and consolidated memory and a recall by `source_id`.\n- **Status:** the project stays active. Its seven remaining actions are step 5 of the slice plan and its pack-bound retrieval and run-transactional memory write are unproved; this pack records the architecture and the open work rather than claiming completion.\n",
+  "soaw": {
+    "title": "Statement of Architecture Work — S15 Capability, Knowledge and Memory (retrospective, Phase A)",
+    "body": {
+      "assignment": "Deliver the architectural record for a capability aggregate: a capability is a persisted thing with an executor spec, a versioned knowledge binding and memory, which a card's run resolves and readiness-checks before its first step. The assignment is retrospective — steps 1–4 shipped on 2026-11-09 and step 5's actions remain open — so this statement records the architecture and the remaining work together.",
+      "scope": "In scope: the Phase A–D artefact set, the capability tables and their versioning, the pre-run readiness check, the pinned retrieval binding, and the memory write, consolidation and recall. Out of scope: the model loop (S13's `agent.run`), the interactive copilot surface (S10), embeddings and answer generation (the executor's), a tenant-authored prompt store, KAG, and S08's dropped `project_capability` ledger.",
+      "responsibilities": "The programme architect authors the set under the standing delegation; the Architecture Board reviews it; the SRO is accountable for the capability model; the capability author writes the pack and its readiness declaration; the retrieval owner operates the strata pack. The retrospective author is not the accepting role, so the separation of duties holds.",
+      "acceptance_criteria": "The manifest's checks: the capability aggregate resolves with its executor and versioned binding; readiness refuses a run with `409 capability_not_ready` before the first step; a cited passage comes from a pinned strata pack; memory is written, consolidated into `strata_rag` and recalled by `source_id`; and a degraded source mid-run reports `knowledge_degraded`, not the pre-run refusal.",
+      "constraints": "No second loop and no second retrieval path. The conveyor owns the binding and strata owns retrieval, so a run that read knowledge by any route other than `knowledge.query` would make the pinned pack advisory. Every new table carries a tenant column with row-level security forced, and documents are immutable — ingest a new version and prune the old, never update in place.",
+      "retrospective": "This statement is written after the first four build steps and before the fifth, which makes it unusually literal: it records what exists and what does not rather than reconstructing a finished shape. The seven remaining actions, the unproved pack-bound retrieval and the unproved run-transactional memory write are named as open work."
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — S15 Capability, Knowledge and Memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "the tranche-7 authorisation",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "decide"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "SRO",
+          "axis_b": "accountable for the capability model",
+          "value": {
+            "influence": "high",
+            "interest": "high",
+            "engagement": "accountable"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Capability author",
+          "axis_b": "writes the pack and the readiness declaration",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "Retrieval owner",
+          "axis_b": "operates the strata pack and the consolidation",
+          "value": {
+            "influence": "medium",
+            "interest": "high",
+            "engagement": "collaborate"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "approves the Phase A–D set",
+          "value": {
+            "influence": "high",
+            "interest": "medium",
+            "engagement": "approve"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S15 Capability, Knowledge and Memory (Phase B)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Stakeholder Map — S15 Capability, Knowledge and Memory (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFive stakeholders. The sponsoring group decides the tranche; the SRO is accountable for the capability model; the capability author writes the pack and the readiness declaration; the retrieval owner operates the strata pack and its consolidation; the Architecture Board approves the set. The tenant admin is informed because the capability pack is tenant-scoped.\n\n## Links\n\nDerives from `docs/plans/slices/S15-capability-knowledge-memory.md` §1–§3 and §9; realizes the Phase A stakeholder view for the capability aggregate; depends on the Business Capability Map for the value each group receives. The roles are the programme's existing ones; S15 adds no new role, which is itself a decision worth recording.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. S15 has no contemporaneous architecture publication of its own; this retrospective artefact is published as an architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-28 snapshot carries for S15.\n"
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — S15 Capability, Knowledge and Memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "D1 Capability as a record",
+          "axis_b": "a run resolves what it is about to do",
+          "value": {
+            "goal": "a capability table",
+            "objective": "executor spec and binding stored"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "D2 Readiness first",
+          "axis_b": "a broken capability fails before the run starts",
+          "value": {
+            "goal": "409 capability_not_ready",
+            "objective": "checked pre-run"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "D3 Versioned knowledge",
+          "axis_b": "a cited passage is reproducible",
+          "value": {
+            "goal": "immutable pack versions",
+            "objective": "binding names a version"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "D4 Consolidating memory",
+          "axis_b": "a card's notes outlive the card",
+          "value": {
+            "goal": "write, consolidate, recall",
+            "objective": "recall by source_id"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Requirements Catalog — S15 Capability, Knowledge and Memory (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Driver/Goal/Objective Catalog — S15 Capability, Knowledge and Memory (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFour drivers. A capability must be a thing the record holds, not a word in a catalogue, or a run cannot be told what it is about to do. Readiness must be decided before a run starts, so a broken capability fails fast rather than half-way. Knowledge must be versioned, so a run's cited passage is reproducible. And memory must consolidate, so a card's working notes survive the card.\n\n## Links\n\nDerives from `docs/plans/slices/S15-capability-knowledge-memory.md` §1 and §9; feeds the Requirements Catalog; depends on the Stakeholder Map for ownership. The first driver is the one that changes the schema: it moves capability out of `catalogue_entry` and into its own table with its own versioning, which is a migration rather than a convention.\n\n## Document\n\nThe catalogue records why readiness is a pre-run decision rather than a runtime fallback. A readiness check that runs after the first step produces a half-built run and an error that names the wrong cause; the drivers make the ordering explicit so a later optimisation cannot move it.\n"
+    },
+    {
+      "title": "Requirements Catalog — S15 Capability, Knowledge and Memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "R1 capability aggregate",
+          "axis_b": "executor spec plus versioned binding",
+          "value": {
+            "check": "conveyor-domain capability / conveyor-store capability",
+            "state": "built"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "R2 readiness pre-run",
+          "axis_b": "409 capability_not_ready before the first step",
+          "value": {
+            "check": "conveyor-api --test capability_readiness",
+            "state": "built"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "R3 pinned retrieval",
+          "axis_b": "a cited passage from a pinned strata pack",
+          "value": {
+            "check": "conveyor-actions --test strata_live (--ignored)",
+            "state": "unproved"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "R4 memory consolidation",
+          "axis_b": "work-package memory into strata_rag",
+          "value": {
+            "check": "conveyor-server --test memory_consolidate",
+            "state": "built"
+          },
+          "position": 4
+        },
+        {
+          "axis_a": "R5 recall by source",
+          "axis_b": "memory recalled by source_id",
+          "value": {
+            "check": "conveyor-store --test memory",
+            "state": "built"
+          },
+          "position": 5
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A)",
+          "kind": "derivation"
+        }
+      ],
+      "body": "# Requirements Catalog — S15 Capability, Knowledge and Memory (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFive requirements. R1 a capability is a persisted aggregate with an executor spec and a versioned knowledge binding. R2 readiness is reported before the run starts and refuses with `409 capability_not_ready`. R3 a cited passage is retrieved from a pinned `strata` pack. R4 work-package memory is written and consolidated into `strata_rag`. R5 memory is recalled by `source_id`. A degraded knowledge source mid-run is `knowledge_degraded`, not the same refusal as R2.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog; realized by the Solution Concept Diagram; sourced from `docs/plans/slices/S15-capability-knowledge-memory.md` §7, which names the counted test target behind each requirement. The distinction between the two refusals is a requirement rather than an error-code detail: a pre-run refusal and a mid-run degradation have different remedies.\n\n## Document\n\nEach requirement names the target that proves it. The two refusals matter because collapsing them would tell a caller to fix a capability that is already fine and merely lost its retrieval mid-run. `knowledge.query` and `memory.recall` live in the actions crate, never in the API crate, so the requirement is a placement rule as well as a behaviour one.\n"
+    },
+    {
+      "title": "Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "capability row",
+          "axis_b": "the aggregate a run resolves",
+          "value": {
+            "holds": "executor spec, knowledge binding",
+            "versioned": true
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "readiness check",
+          "axis_b": "before the first step",
+          "value": {
+            "refusal": "409 capability_not_ready",
+            "seam": "ensure_start_ready"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "retrieval",
+          "axis_b": "the pinned strata pack",
+          "value": {
+            "action": "knowledge.query",
+            "crate": "conveyor-actions"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "memory",
+          "axis_b": "hot write, cold consolidation, recall",
+          "value": {
+            "actions": "memory.remember, memory.recall",
+            "store": "strata_rag"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Business Capability Map — S15 Capability, Knowledge and Memory (Phase B)",
+          "kind": "realization"
+        }
+      ],
+      "body": "# Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThe concept has three parts and one seam. A capability row carries the executor spec and a versioned knowledge binding; the run resolves it and checks readiness before its first step; retrieval goes to the strata pack the binding names, and memory is written hot, consolidated cold into `strata_rag`, and recalled by `source_id`. The seam is the start path, not a new scheduler.\n\n## Links\n\nRealizes the Requirements Catalog; depends on the Business Capability Map and the Data Entity catalog; reuses S11's `resolve_start_context` and `ensure_start_ready` seam and S09's ingest and retrieval actions. The diagram is prose because the artefact store holds text bodies; an image would be a second, unchecked source.\n\n## Document\n\nThe concept keeps the model loop out of scope: a capability names an executor, it does not implement one. That is why the diagram shows a binding and a readiness check rather than an agent loop. A reader who expects S15 to run the loop will find the loop belongs to S13 and the capability merely configures it.\n"
+    },
+    {
+      "title": "Business Capability Map — S15 Capability, Knowledge and Memory (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "entries": [
+        {
+          "axis_a": "Capability resolution",
+          "axis_b": "a run becomes a resolved executor and binding",
+          "value": {
+            "actions": "capability reads",
+            "requirement": "R1, R2"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "Grounded retrieval",
+          "axis_b": "a question becomes a cited passage",
+          "value": {
+            "actions": "knowledge.query",
+            "requirement": "R3"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "Memory",
+          "axis_b": "a run becomes a record that outlives it",
+          "value": {
+            "actions": "memory.remember, memory.recall",
+            "requirement": "R4, R5"
+          },
+          "position": 3
+        }
+      ],
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S15 Capability, Knowledge and Memory (Phase C)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Business Capability Map — S15 Capability, Knowledge and Memory (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThree capabilities. Capability resolution turns a card's run into a resolved executor and binding. Grounded retrieval turns a question into a cited passage from a pinned pack. Memory turns a run's work into a record that outlives it. Each names the action family it exposes and the requirement it satisfies.\n\n## Links\n\nDerives from the Solution Concept Diagram and the Requirements Catalog; feeds the Data Entity and Technology Standards catalogs. The capability view is the card author's: what can a card do with a capability that it cannot do with a bare prompt, and the answer is resolve, ground and remember.\n\n## Document\n\nThe map separates grounding from generation deliberately. The conveyor does not generate an answer from retrieved text; it hands the passage to the executor, which owns the answer. A capability map that implied otherwise would put the model's output inside the platform's contract, which the slice plan forbids.\n"
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — S15 Capability, Knowledge and Memory (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "capability",
+          "axis_b": "the aggregate with its executor spec",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "versions": "immutable"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "capability_agent / capability_relation",
+          "axis_b": "configuration and edges",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "role": "config"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "work_package_memory",
+          "axis_b": "the hot rows",
+          "value": {
+            "tenant": "required",
+            "rls": "forced",
+            "digests": "derived"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "strata_rag",
+          "axis_b": "the external retrieval store",
+          "value": {
+            "owner": "strata",
+            "role": "retrieval and consolidation"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S15 Capability, Knowledge and Memory (Phase D)",
+          "kind": "dependency"
+        }
+      ],
+      "body": "# Data Entity/Data Component Catalog — S15 Capability, Knowledge and Memory (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nThree conveyor entities and one external store. `capability` carries the executor spec and the version; `capability_agent` and `capability_relation` carry the configuration and the edges; `work_package_memory` carries the hot rows. The external store is `strata_rag`, which owns retrieval and receives the consolidated memory. Every new table carries `tenant_id` with row-level security forced.\n\n## Links\n\nDerives from the Business Capability Map; realizes all three capabilities; depends on the Technology Standards catalog for the RLS and immutability conventions. The split between the hot rows and the derived digests is the entity decision that makes consolidation possible without a second write path.\n\n## Document\n\nHot rows are the record and the digests are derived, so a consolidation failure loses a digest rather than the memory. Retrieval is `strata`'s: the conveyor owns the binding, and a run that retrieved by any path other than `knowledge.query` would make the pinned pack a suggestion rather than a contract.\n"
+    },
+    {
+      "title": "Technology Standards Catalog — S15 Capability, Knowledge and Memory (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "entries": [
+        {
+          "axis_a": "RLS forced",
+          "axis_b": "tenant column on every new table",
+          "value": {
+            "role": "security",
+            "failure_prevented": "a tenant reading another's memory"
+          },
+          "position": 1
+        },
+        {
+          "axis_a": "immutable documents",
+          "axis_b": "ingest-new and prune-old, never PUT",
+          "value": {
+            "role": "provenance",
+            "failure_prevented": "a rewritten citation"
+          },
+          "position": 2
+        },
+        {
+          "axis_a": "one retrieval path",
+          "axis_b": "a run uses knowledge.query only",
+          "value": {
+            "role": "contract",
+            "failure_prevented": "a second, unpinned source"
+          },
+          "position": 3
+        },
+        {
+          "axis_a": "actions-crate placement",
+          "axis_b": "knowledge.query and memory.recall never in the API crate",
+          "value": {
+            "role": "structure",
+            "failure_prevented": "a transport that owns behaviour"
+          },
+          "position": 4
+        }
+      ],
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A)",
+          "kind": "reuse"
+        }
+      ],
+      "body": "# Technology Standards Catalog — S15 Capability, Knowledge and Memory (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-28; project S15; tranche 7; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nFour standards. Row-level security forced with a tenant column on every new table. Immutable documents: ingest a new version and prune the old, never update in place. One retrieval path per run: `knowledge.query`. And the placement rule that ships both new actions in the actions crate, never in the API crate, so the surface stays a transport.\n\n## Links\n\nDerives from the Data Entity catalog; realizes the technology half of the Solution Concept Diagram; reuses the platform's existing RLS, ingest and registry conventions rather than adding one. Each standard names the failure it prevents, so the catalogue is enforceable in review rather than aspirational.\n\n## Document\n\nThe immutability entry is the one with a measured cost: a document updated in place would silently rewrite the passage a run cited, so the cited text would no longer be reproducible. The card-id header on ingested documents is the other half of the same guarantee, because cross-source dedupe on prune can otherwise delete a document two cards share.\n"
+    }
+  ],
+  "documents": [
+    {
+      "category": "architecture-artifact",
+      "title": "Architecture Artefact Index — S15 (retrospective, 2026-11-28)",
+      "body": "# Architecture Artefact Index — S15\n\n## Metadata\n\nThe seven Phase A–D artefacts for S15 Capability, Knowledge and Memory, tranche 7, authored retrospectively on 2026-11-28 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Phase A carries four, phase B one, phase C one and phase D one, which is the adopted delivery profile exactly; the architecture track's E–H set belongs to a programme or architecture pack and is correctly absent here.\n\n## Entries\n\n1. Stakeholder Map — S15 Capability, Knowledge and Memory (Phase A) — five stakeholders and what each decides.\n2. Driver/Goal/Objective Catalog — S15 Capability, Knowledge and Memory (Phase A) — four drivers, including the one that moved capability out of the catalogue.\n3. Requirements Catalog — S15 Capability, Knowledge and Memory (Phase A) — five requirements, with the two refusals kept distinct.\n4. Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A) — the three-part concept and its start-path seam.\n5. Business Capability Map — S15 Capability, Knowledge and Memory (Phase B) — three capabilities: resolve, ground, remember.\n6. Data Entity/Data Component Catalog — S15 Capability, Knowledge and Memory (Phase C) — three conveyor entities plus the external retrieval store.\n7. Technology Standards Catalog — S15 Capability, Knowledge and Memory (Phase D) — four standards, each naming the failure it prevents.\n\n## Links\n\nDerives from `docs/plans/slices/S15-capability-knowledge-memory.md` and its §7 gate. Each artefact links to another in this pack in the derivation, realization, dependency or reuse sense the record's link kinds allow; no edge names a title this pack does not create, so no artefact is an orphan.\n\n## Document\n\nThis index is the document of its own category: the close gate reads one published document per mandatory category and the four TOGAF categories resolve their headings from a document of their own category. Its entries name the same seven titles the artefacts carry, and it is published rather than described.\n"
+    },
+    {
+      "category": "user-stories",
+      "title": "User stories — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)",
+      "body": "# User stories — S15 Capability, Knowledge and Memory (retrospective, Phase G)\n\n## Personas\n\nA capability author who declares what a capability can do, which executor runs it and which pinned knowledge it may read; and an operator who needs a run to refuse before its first step when the capability is not ready, rather than degrade silently mid-run. Both read the capability row and the run record the conveyor already owns.\n\n## Stories\n\n- As a capability author, I want a capability to exist as a persisted aggregate with an executor spec and a versioned knowledge binding, so that a card's run resolves one capability rather than reconstructing intent from prompt text.\n- As an operator, I want readiness checked before the first step with `409 capability_not_ready`, so that an unready capability fails visibly instead of producing an ungrounded answer.\n- As a run, I want cited passages to come from a pinned `strata` pack and memory to be recalled by `source_id`, so that retrieval and memory are the same binding rather than two routes.\n\n## Scenarios\n\nS1 a run resolves capability, executor and binding; S2 readiness refuses before the first step; S3 a cited passage comes from the pinned pack; S4 memory is written, consolidated and recalled by `source_id`; S5 a degraded source mid-run reports `knowledge_degraded`. Steps 1–4 are delivered; step 5's actions and two gate properties remain open and are recorded as open, not as met.\n\n## Verify\n\n`python3 scripts/rework-content-check.py --project S15 --content docs/evidence/rework/tranche-7/rework-content-S15.json --snapshot /tmp/snap-7/data --wsjf 10,8,7,13 --closes false`, then the factory run with `--keep-active` and the receipt assertion; the review level is `consistent` because the open step-5 work is named rather than rounded up."
+    },
+    {
+      "category": "acceptance-criteria",
+      "title": "Acceptance criteria — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)",
+      "body": "# Acceptance criteria — S15 Capability, Knowledge and Memory (retrospective, Phase G)\n\n## Scenarios\n\nThe manifest `acceptance/programme/S15.toml` carries sixteen rows for an active project: the active row, the approved frozen scope baseline, the charter asset, the live board-approved contract, the Phase-G review citing the published delegation, the waivers, the PI cadence, the published PI plan and objectives, the WBS WSJF inputs, the demo credit, the tranche lesson, the product findings, the artefact standard and the rework resolution. There is no closure row: the manifest pins the project active.\n\n## Verify commands\n\n`python3 scripts/rework-content-check.py --project S15 --content docs/evidence/rework/tranche-7/rework-content-S15.json --snapshot /tmp/snap-7/data --wsjf 10,8,7,13 --closes false` proves the pack; the factory command in the unit issue applies it with `--keep-active`; `verify-project.py` renders `docs/evidence/rework/S15.json` from the post-write snapshot.\n\n## Results\n\nThe receipt is the result of record: one row per manifest check, rendered at the pinned snapshot `7e93a325f`. Its gate is green only when every row passes; the `consistent` review level and the open step-5 product findings are visible in the review evidence rather than hidden by the verdict.\n\n## Status\n\nActive by design. The project does not close in this tranche: step 5's seven actions and the pack-bound retrieval and run-transactional memory proofs are open work, and the slice lane #9 (PR #949) still moves the product. The receipt is the lifecycle record the product's own acceptance is re-read against when that lane settles."
+    },
+    {
+      "category": "definition-of-ready",
+      "title": "Definition of ready — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)",
+      "body": "# Definition of ready — S15 Capability, Knowledge and Memory (retrospective)\n\n## Independent\n\nThe pack writes only S15's record rows against the pinned snapshot. It shares the tranche's four cadence rows and the snapshot with S06c and S16, but its product lane (#9, PR #949) is separate, and the pack is authored so that the member stays active whatever the other two do.\n\n## Negotiable\n\nThe rework completes the lifecycle record for a capability that is partly built; the remaining product work is the slice plan's, not this pack's. The review level (`consistent`) is the negotiated honest position: the set is consistent with the plan and not yet compliant with the gate.\n\n## Valuable\n\nS15 is the tranche's largest bet: a capability aggregate that binds an executor and pinned knowledge to memory. A green receipt with an active row tells the review exactly what exists and what remains, which is worth more than a closed row that would hide step 5.\n\n## Estimable\n\nThe refinement record measures thirteen open packages for S15: the same record set as the closed members plus the unpublished declared output and the active-member checks. The WSJF job size (13) is the largest in the tranche for that reason.\n\n## Small\n\nOne pack, one factory run with `--keep-active`, one receipt; no product rebuild and no closure. The unit remains one branch and one pull request, and the pack is authored prose bound to the snapshot.\n\n## Testable\n\nThe offline content checker refuses any identifier absent from the snapshot; the factory's post-write receipt carries one row per manifest check; the tranche exit refuses a red or stale receipt. The review level is testable against the open findings, not against its own prose.\n\n## Dependencies\n\nS15 depends on S13's `agent.run`, S10's copilot surface, S09's strata ingest and retrieval, S11's start seam, S03's catalogue and S16's prompt-audit provenance; the product lane #9 (PR #949) remains open and is the acceptance block named in the issue."
+    },
+    {
+      "category": "definition-of-done",
+      "title": "Definition of done — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)",
+      "body": "# Definition of done — S15 Capability, Knowledge and Memory (retrospective)\n\n## Acceptance criteria\n\nThe manifest's sixteen checks are the acceptance criteria and each is a row in `docs/evidence/rework/S15.json`: the active project row, the approved baseline, the charter, the contract, the review, the waivers, the PI set, the WSJF, the demo credit, the lesson, the product findings, the artefact standard and the rework resolution. No closure row exists.\n\n## Evidence at completion\n\nThe receipt `docs/evidence/rework/S15.json` (verdict, per-check rows, `snapshot.git_sha = 7e93a325f`), the acts record and transcript under `docs/evidence/rework/S15/`, the batch journal, the tranche exit, and the review prose that names the open step-5 actions and the two unproved gate properties.\n\n## Repo gate\n\nThe unit's docs-only changes pass `git diff --check` and the design gates (`build-docs.py --check`, `check-docs.cjs`, `check-data.cjs`); the repository's GitHub preflight and `ci-public` are the compile/lint and final gates at the exact PR head.\n\n## Merge and closure\n\nOne pull request closes #951 and merges after the exit is green. S15 stays active: closure is the product lane's future act, not this pack's, and the pack deliberately carries no closure content so the factory cannot close it by accident."
+    }
+  ],
+  "registers": {
+    "risk": [
+      {
+        "code": "S15-R1",
+        "title": "Cross-source dedupe on prune can delete a document two cards share",
+        "body": "The consolidation store prunes document versions, and a document ingested by two cards is one document by content. A prune driven by one card's source can therefore remove a version another card's run cited. The card-id header on ingested documents is the defence: it makes the ingest attributable, so the prune can be scoped to the sources this card actually introduced.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-12",
+        "severity": "high",
+        "status": "open",
+        "response": "Keep the card-id header on every ingest and refuse a consolidation change that prunes by content without it.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#8"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S15-R2",
+        "title": "Seven actions of step 5 are still open, so the surface the gate names is partly unbuilt",
+        "body": "The slice plan's build record closes steps 1–4 and leaves step 5's seven actions open. The model, the tables and the seed exist; the action surface that exposes them does not yet. A pack that claimed completion would be describing a product the tree does not hold, so the risk is recorded at the level the plan states.",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-12",
+        "severity": "high",
+        "status": "open",
+        "response": "Drive step 5 to completion on the slice's own lane (#9) and re-read the receipt before any tranche review treats S15 as green on its live scenarios.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#11"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      },
+      {
+        "code": "S15-R3",
+        "title": "Pack-bound retrieval and the run-transactional memory write are unproved",
+        "body": "Two properties the gate depends on are not demonstrated: that a retrieval is bound to a pinned pack rather than to whatever the store currently holds, and that `memory.remember` joins the run's own transaction. Both are named as unproved in the build record, and an unproved property in a gate is a hypothesis.",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-12",
+        "severity": "medium",
+        "status": "open",
+        "response": "Prove both on the live strata path, which the `strata_live` suite carries as an ignored test, and record the output before the tranche review.",
+        "links": {
+          "cards": [],
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#7"
+          ],
+          "decisions": []
+        },
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "S15-I1",
+        "title": "The record carried no charter, baseline, contract or Phase-G review",
+        "body": "At the 2026-11-28 snapshot the project row is active and its model is in the tree, but the snapshot carries no charter asset, no approved baseline, no delivery contract, no Phase A–D set and no compliance review. The gap is a record gap rather than a product gap; this pack supplies the set.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Supplied by this pack and proved by the project's receipt at the pinned snapshot."
+      },
+      {
+        "code": "S15-I2",
+        "title": "A declared output was unpublished, so the pack surface and the record disagreed",
+        "body": "The project declares outputs it had not published, which is why the audit reports an unpublished declared output against S15 and not against its two siblings. The pack authors and publishes the declared outputs; the finding clears on the receipt rather than on an allowlist edit.",
+        "severity": "P1",
+        "status": "open",
+        "response": "Author and publish the declared outputs in this pack and read the finding off the receipt."
+      },
+      {
+        "code": "S15-I3",
+        "title": "The build record's grep exclusion was wrong and hid capability files",
+        "body": "Step 4's check excluded `capability.rs` by name, which is the very file the step creates, so the exclusion removed the evidence rather than the noise. The build record names it; the corrected check is what the manifest runs.",
+        "severity": "P2",
+        "status": "open",
+        "response": "Record the exclusion's correction in the evidence output so a later session does not restore the wider pattern."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "S15-A1",
+        "title": "The 2026-11-28 rework snapshot is the authoritative record for S15",
+        "body": "Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. A row that changes when the slice lane merges is out of scope until the pack is re-preflighted.",
+        "status": "open"
+      },
+      {
+        "code": "S15-A2",
+        "title": "A capability is tenant-scoped and versioned immutably",
+        "body": "The model assumes one capability pack per tenant with immutable versions, so a run's binding names a version rather than a mutable row. The assumption is what makes the cited passage reproducible after the capability is edited.",
+        "status": "open"
+      },
+      {
+        "code": "S15-A3",
+        "title": "Strata is the only retrieval store and the conveyor owns only the binding",
+        "body": "The conveyor writes the binding and strata answers the query. If a second store ever appeared, the pinned-pack guarantee would be per-store and the requirement would need restating rather than extending.",
+        "status": "open"
+      },
+      {
+        "code": "S15-A4",
+        "title": "Hot rows are the record and the digests are derived",
+        "body": "Consolidation derives digests from the hot rows, so a failed consolidation loses a digest rather than the memory itself. The assumption is that a rebuild is always possible, which is why the hot rows are never pruned by consolidation.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "S15-D1",
+        "title": "S15 depends on S13, S10, S09 and S11",
+        "body": "S13 supplies `agent.run`, which is the loop a capability merely configures; S10 the copilot surface that reads it; S09 the strata ingest and retrieval actions; and S11 the start seam whose `ensure_start_ready` is where readiness is decided.",
+        "status": "open"
+      },
+      {
+        "code": "S15-D2",
+        "title": "S16 supplies the prompt-audit provenance the binding cites",
+        "body": "A capability's prompt reference is audited by S16's procedure, so the binding's provenance depends on the ledger and the audit existing. S16 is in this tranche, which is why the two packs are authored together rather than a tranche apart.",
+        "status": "open"
+      },
+      {
+        "code": "S15-D3",
+        "title": "S19-B's lease and S20's reserved migration number constrain the lane",
+        "body": "The parity suite takes its lease from S19-B, and S20's reserved migration number moves to 0028 because this project's 0020 and 0027 land first. Both are ordering facts rather than build dependencies.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "S15-B1",
+        "title": "A capability is a record rather than a catalogue word",
+        "body": "Before the aggregate, a capability was a vocabulary row that a run could name but not resolve. After it, the run reads an executor spec and a versioned binding, so what a run is about to do is a fact in the record rather than a convention in code.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S15-B2",
+        "title": "Readiness fails before the run rather than during it",
+        "body": "A pre-run readiness check turns a broken capability into a refusal the caller can act on, instead of a half-built run whose error names the wrong cause. The benefit is measured by the two distinct refusals the gate keeps apart.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#7"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S15-B3",
+        "title": "A cited passage is reproducible from a pinned pack",
+        "body": "The binding names a pack version and documents are immutable, so the passage a run cited can be re-read after the pack is edited. The benefit is a provenance property, and it is the reason the pack-bound retrieval is recorded as unproved rather than assumed.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#7"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      },
+      {
+        "code": "S15-B4",
+        "title": "Work-package memory outlives the card",
+        "body": "Hot rows hold the working memory and consolidation derives digests into the retrieval store, so a card's notes are recallable by `source_id` after the card is done. The benefit is what makes a later run on the same work cheaper.",
+        "status": "open",
+        "links": {
+          "requirements": [
+            "docs/plans/slices/S15-capability-knowledge-memory.md#1"
+          ],
+          "cards": [],
+          "decisions": []
+        }
+      }
+    ]
+  },
+  "delivery_contract": {
+    "title": "Delivery Contract — S15 Capability, Knowledge and Memory (Phase F, retrospective)",
+    "body": {
+      "commitments": "The delivery commits to the five requirements the Requirements Catalog states, each with its owning check in `acceptance/programme/S15.toml`, and to the boundary the Statement of Architecture Work draws: no second loop, no second retrieval path, no answer generation and no tenant-authored prompt store. The seventh-step actions remain open and are declared as open.",
+      "compliance": "Compliance is demonstrated by running the manifest at the pinned snapshot and reading the receipt. Two properties — pack-bound retrieval and the run-transactional memory write — are recorded as unproved rather than passed, and the Phase-G level is set with that distinction in view.",
+      "approval": "The contract is approved under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The approving role is the Architecture Board and the accepting role is the SRO; the session that authored this pack is neither, and the record carries the approver's own decision rather than an inference from its silence.",
+      "manifest": "`acceptance/programme/S15.toml` is the manifest of record. Its gate checks name the baseline, the charter, the contract, the review, the waivers, the PI artefacts, the WBS deliverable, the demo credits, the lessons row, the product check, the artefact standard and the rework package count. It declares no closure checks because this project stays active.",
+      "acceptance_at": "2026-11-28",
+      "retrospective": "This contract is written after the first four build steps and before the fifth. It records the terms the project is being built to, reconstructed from the slice plan and the snapshot, and it explicitly does not claim those terms were agreed before the build.",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "wbs_deliverable": {
+    "title": "A resolved capability — one aggregate with an executor spec and a versioned knowledge binding, readiness checked before the run, with grounded retrieval and memory that consolidates and recalls by source_id",
+    "business_value": 10,
+    "time_criticality": 8,
+    "risk_reduction": 7,
+    "job_size": 13
+  },
+  "review": {
+    "level": "consistent",
+    "findings": "This retrospective Phase-G review records the level consistent, not compliant, for the record set it assesses under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The 2026-11-09 build closes steps 1–4 at the 2026-11-28 snapshot: the five tables exist with row-level security forced, the catalogue's capability rows moved, and the domain and store models with the seed are in the tree. Step 5's seven actions are open, and two gate properties — pack-bound retrieval and the run-transactional memory write — are unproved. The set is consistent with the plan and is not yet compliant with the gate, and the level says so rather than rounding up.",
+    "evidence": {
+      "manifest": "acceptance/programme/S15.toml",
+      "suite": "crates/store/tests/memory.rs",
+      "start_suite": "crates/api/tests/capability_readiness.rs",
+      "resolver_suite": "crates/actions/tests/strata_live.rs",
+      "receipt": "docs/evidence/rework/S15.json",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+    }
+  },
+  "project_brief_output": "# Project Brief — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)\n\n## Outcome\n\nA capability is a persisted aggregate — executor spec, versioned knowledge binding and hot/cold memory — that a card's run resolves, readiness-checks and records before any step runs, rather than a word in a catalogue that a run can name but not resolve.\n\n## Boundary\n\nS15 owns the capability model, its tables, its readiness check, the retrieval binding and the memory record. It does not own the model loop (S13's `agent.run`), the copilot surface (S10), embeddings, model hosting or answer generation, a tenant-authored prompt store, KAG, or S08's dropped `project_capability` ledger.\n\n## Reuse sources\n\nS03's `card_type`, `card`, `run`, `catalogue_entry` and `approval`; S11's `procedure`, `procedure_step` and the `resolve_start_context` / `ensure_start_ready` seam; S09's `documents.ingest` to `strata_ingest`, `retrieval.query` and the external-call breaker; and the nullable-`run_id` approval insert. `knowledge.query` and `memory.recall` ship in `conveyor-actions`, never in `conveyor-api`.\n\n## Inception units\n\nFour: the Phase A set (stakeholders, drivers, requirements, concept), the Phase B capability map, the Phase C data entities and the Phase D standards. Each is one authored artefact in this pack.\n\n## Dependencies\n\nS13 supplies `agent.run`, S10 the copilot surface, S09 the strata actions, S11 the start seam, S03 the catalogue and S16 the prompt-audit provenance. S19-B's lease and S20's reserved migration number constrain the lane rather than the build.\n\n## Acceptance\n\n`acceptance/programme/S15.toml` at the pinned snapshot. The gate is capability resolution, pre-run readiness, pinned retrieval, consolidated memory and recall by `source_id`; two of those properties are currently unproved and are recorded as open.\n\n## Capabilities\n\nThree: capability resolution (a run becomes a resolved executor and binding), grounded retrieval (a question becomes a cited passage from a pinned pack) and memory (a run becomes a record that outlives it).\n\n## Plan\n\nSteps 1–4 are built; step 5's seven actions are open and are the slice lane's next work. No part of this pack claims the product is finished: the pack records the architecture, the shipped model and the exact open work.\n",
+  "evidence_output": "# Evidence — S15 Capability, Knowledge and Memory (retrospective, 2026-11-28)\n\n## Claim\n\nS15 delivers a capability aggregate that a card's run resolves and readiness-checks before its first step, with a versioned knowledge binding for grounded retrieval and a memory record that consolidates and is recalled by `source_id`.\n\n## Evidence\n\nMigration 0020 with its five tables and forced row-level security, 0027's run foreign keys, `seed/capability.json`, `domain::capability`, `store::capability` and `Parent::Capability`; the suites `capability`, `memory`, `memory_consolidate`, `capability_readiness`, `registry`, `parity_http_mcp` and `strata_live`; and the receipt `docs/evidence/rework/S15.json` read at the 2026-11-28 snapshot.\n\n## Verification\n\n`python3 scripts/verify-project.py --project S15 --snapshot <pinned>/data` reproduces the receipt, and `cargo test -p conveyor-store --test memory` reproduces the hot-row checks. Every libtest filter in the manifest is listed before it is run, because a filter that selects zero tests exits 0.\n\n## Links\n\n`docs/plans/slices/S15-capability-knowledge-memory.md`, `acceptance/programme/S15.toml`, the Phase A–D artefacts in this pack's index document, and the tranche-7 exit record.\n\n## Gap\n\nStep 5's seven actions are unbuilt, so the action surface the gate names is partly absent. Pack-bound retrieval and the run-transactional memory write are unproved: the `strata_live` proof is marked ignored and has not been run. The build record's step-4 grep exclusion was corrected after it excluded the very file the step creates.\n"
+}

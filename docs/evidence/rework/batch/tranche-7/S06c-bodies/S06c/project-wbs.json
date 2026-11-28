@@ -1,0 +1,59 @@
+{
+  "body_sha256": "632fa63c43c7a3195858e43ce7581d8c29e2be3076bec09a20684dd7f78b635f",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+    "key": "S06c",
+    "kind": "project",
+    "title": "MCP tasks \u2014 a long-running project asks for input"
+  },
+  "title": "Project Wbs \u2014 MCP tasks \u2014 a long-running project asks for input"
+}

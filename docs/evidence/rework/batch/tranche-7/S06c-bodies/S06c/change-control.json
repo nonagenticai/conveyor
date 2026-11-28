@@ -1,0 +1,66 @@
+{
+  "body_sha256": "2032d1e944ab1ce4085d0b0bc584d58355707c08ec894b6c939b282be9fc84bb",
+  "category": "change-control",
+  "headings": [
+    {
+      "heading": "Change requests",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Impact",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "change_impact",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Decisions",
+      "required": true,
+      "sources": [
+        {
+          "category": "change-control",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "0fbb46efdabce37e8eafab771ea3d6619d6514999cd4ee301b9318ec6582b89e",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+    "key": "S06c",
+    "kind": "project",
+    "title": "MCP tasks \u2014 a long-running project asks for input"
+  },
+  "title": "Change Control \u2014 MCP tasks \u2014 a long-running project asks for input"
+}

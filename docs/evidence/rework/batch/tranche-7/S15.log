@@ -1,0 +1,69 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/rework-project.py --project S15 --content docs/evidence/rework/tranche-7/rework-content-S15.json --tranche-label tranche 7 --demo-cadence 01a22294-e26f-77e6-9424-3ae8e8c5eaa0 --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — S15 Capability, Knowledge and Memory (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S15 Capability, Knowledge and Memory (Phase A) already present
+  artefact: Requirements Catalog — S15 Capability, Knowledge and Memory (Phase A) already present
+  artefact: Solution Concept Diagram — S15 Capability, Knowledge and Memory (Phase A) already present
+  artefact: Business Capability Map — S15 Capability, Knowledge and Memory (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S15 Capability, Knowledge and Memory (Phase C) already present
+  artefact: Technology Standards Catalog — S15 Capability, Knowledge and Memory (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
+  delivery contract: already live
+  register risk: Cross-source dedupe on prune can delete a document two cards share already present
+  register risk: Seven actions of step 5 are still open, so the surface the gate names is partly unbuilt already present
+  register risk: Pack-bound retrieval and the run-transactional memory write are unproved already present
+  register issue: The record carried no charter, baseline, contract or Phase-G review already present
+  register issue: A declared output was unpublished, so the pack surface and the record disagreed already present
+  register issue: The build record's grep exclusion was wrong and hid capability files already present
+  register assumption: The 2026-11-28 rework snapshot is the authoritative record for S15 already present
+  register assumption: A capability is tenant-scoped and versioned immutably already present
+  register assumption: Strata is the only retrieval store and the conveyor owns only the binding already present
+  register assumption: Hot rows are the record and the digests are derived already present
+  register dependency: S15 depends on S13, S10, S09 and S11 already present
+  register dependency: S16 supplies the prompt-audit provenance the binding cites already present
+  register dependency: S19-B's lease and S20's reserved migration number constrain the lane already present
+  register benefit: A capability is a record rather than a catalogue word already present
+  register benefit: Readiness fails before the run rather than during it already present
+  register benefit: A cited passage is reproducible from a pinned pack already present
+  register benefit: Work-package memory outlives the card already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: not applicable (the project stays active)
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  08 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure: not applicable (the project stays active)
+S15: 8 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S15 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-1dedzfdu/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-1dedzfdu/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S15-bodies --local-bin /tmp/conv951-bin/conveyor
+
+
+{"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 637461 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}
+
+[exit 1]
+

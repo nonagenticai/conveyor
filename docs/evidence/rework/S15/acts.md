@@ -1,0 +1,10 @@
+# S15 — retrospective rework acts (2026-11-28)
+
+Delegation: `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`. Tranche 7.
+
+
+S15: 99 acts in `transcript.jsonl`; the last run recorded 99.
+
+S15: 122 acts in `transcript.jsonl`; the last run recorded 16.
+
+S15: 130 acts in `transcript.jsonl`; the last run recorded 8.

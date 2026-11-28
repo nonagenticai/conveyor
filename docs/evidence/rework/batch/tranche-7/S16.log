@@ -1,0 +1,538 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/rework-project.py --project S16 --content docs/evidence/rework/tranche-7/rework-content-S16.json --tranche-label tranche 7 --demo-cadence 01a22294-e26f-77e6-9424-3ae8e8c5eaa0
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C) already present
+  artefact: Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
+  08 documents.compose ok
+  09 documents.publish ok
+  document architecture-analysis: published
+  10 documents.compose ok
+  11 documents.publish ok
+  document architecture-design: published
+  12 documents.compose ok
+  13 documents.publish ok
+  document inception-analysis: published
+  14 documents.compose ok
+  15 documents.publish ok
+  document statement-of-architecture-work: published
+  delivery contract: already live
+  register risk: The live-router rehearsal is pending, so the field-for-field claim is proved on a stub already present
+  register risk: Capture shares the call's transaction, so a database failure can roll back the ledger row already present
+  register risk: Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it already present
+  register issue: The record claimed built while carrying no charter, baseline, contract or Phase-G review already present
+  register issue: Retention is declared at ninety days but its prune schedules are S17's already present
+  register issue: A provider that omits the cache class records unknown rather than a guess already present
+  register assumption: The 2026-11-28 rework snapshot is the authoritative record for S16 already present
+  register assumption: The router's usage object is the single source of token truth already present
+  register assumption: Ninety days is the horizon the incident review needs already present
+  register assumption: A high finding is the only severity that should block a publish already present
+  register dependency: S16 depends on S02, S03, S04, S10 and S11 already present
+  register dependency: S13 declares captures_usage when it lands already present
+  register dependency: S12 builds both screens and S17 carries the prune schedules already present
+  register benefit: Cost becomes a query rather than a guess already present
+  register benefit: Cache behaviour is recorded in three states plus unknown already present
+  register benefit: A high prompt-audit finding blocks the publish already present
+  register benefit: One engine seam writes every call already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  16 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 17: error: projects.close refused (409): project S16 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
+FAILED: projects.close: transport exited 1
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S16 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S16-snap-zsx8atp3/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S16-snap-zsx8atp3/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S16-bodies --local-bin /tmp/conv951-bin/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "change-control",
+      "document_id": "01a222b4-8f09-704b-954e-028e0c4c47c9",
+      "natural_key": "artefact:S16:change-control:bf8f59984253e607",
+      "body_sha256": "bf8f59984253e607bff55d78dc036a16776ece815aa44604875ea3728faed0e4"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-baseline",
+      "document_id": "01a222b4-90b8-754f-bccc-e980329c6f8f",
+      "natural_key": "artefact:S16:project-baseline:51af225c68fd4471",
+      "body_sha256": "51af225c68fd4471cb4a3ed58bfdedfb64787f4503abfde1d91ce42b3d11c778"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-registers",
+      "document_id": "01a222b4-9295-73d6-a867-5f1889dd939f",
+      "natural_key": "artefact:S16:project-registers:2f6ccdbd2e8ed5e1",
+      "body_sha256": "2f6ccdbd2e8ed5e1000e30d7d3902b0261385d6340e55f91a47c8dc41d2c5509"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-wbs",
+      "document_id": "01a222b4-9452-761c-a273-0e21492cb5a3",
+      "natural_key": "artefact:S16:project-wbs:f4d4408d2a865f22",
+      "body_sha256": "f4d4408d2a865f22c3f267de909a0c82cd50af77accd499f1c8948160e223bd1"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "acceptance-criteria",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "definition-of-done",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "definition-of-ready",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "user-stories",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Waivers' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Deviation' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 7,
+    "present": 1,
+    "missing-edge": 0,
+    "stale": 1,
+    "ambiguous": 0,
+    "authored": 10
+  }
+}
+
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/rework-project.py --project S16 --content docs/evidence/rework/tranche-7/rework-content-S16.json --tranche-label tranche 7 --demo-cadence 01a22294-e26f-77e6-9424-3ae8e8c5eaa0
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Requirements Catalog — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Solution Concept Diagram — S16 Inference Ledger and Prompt Audit (Phase A) already present
+  artefact: Business Capability Map — S16 Inference Ledger and Prompt Audit (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S16 Inference Ledger and Prompt Audit (Phase C) already present
+  artefact: Technology Standards Catalog — S16 Inference Ledger and Prompt Audit (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  document architecture-artifact: already present and published
+  document user-stories: already present and published
+  document acceptance-criteria: already present and published
+  document definition-of-ready: already present and published
+  document definition-of-done: already present and published
+  document architecture-analysis: already present and published
+  document architecture-design: already present and published
+  document inception-analysis: already present and published
+  document statement-of-architecture-work: already present and published
+  delivery contract: already live
+  register risk: The live-router rehearsal is pending, so the field-for-field claim is proved on a stub already present
+  register risk: Capture shares the call's transaction, so a database failure can roll back the ledger row already present
+  register risk: Join keys carry no foreign keys, so an orphaned row is possible and only the report catches it already present
+  register issue: The record claimed built while carrying no charter, baseline, contract or Phase-G review already present
+  register issue: Retention is declared at ninety days but its prune schedules are S17's already present
+  register issue: A provider that omits the cache class records unknown rather than a guess already present
+  register assumption: The 2026-11-28 rework snapshot is the authoritative record for S16 already present
+  register assumption: The router's usage object is the single source of token truth already present
+  register assumption: Ninety days is the horizon the incident review needs already present
+  register assumption: A high finding is the only severity that should block a publish already present
+  register dependency: S16 depends on S02, S03, S04, S10 and S11 already present
+  register dependency: S13 declares captures_usage when it lands already present
+  register dependency: S12 builds both screens and S17 carries the prune schedules already present
+  register benefit: Cost becomes a query rather than a guess already present
+  register benefit: Cache behaviour is recorded in three states plus unknown already present
+  register benefit: A high prompt-audit finding blocks the publish already present
+  register benefit: One engine seam writes every call already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  08 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+  09 projects.close ok
+  closed S16: 01a1d039-0d30-72a1-9bba-29fadf6170cf
+S16: 9 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S16 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S16-snap-63zyjzpu/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S16-snap-63zyjzpu/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S16-bodies --local-bin /tmp/conv951-bin/conveyor
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "acceptance-criteria",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "definition-of-done",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "definition-of-ready",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "present"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "user-stories",
+      "mandatory": true,
+      "trigger": null,
+      "state": "authored",
+      "authored": true
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Waivers' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S16",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Deviation' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 3,
+    "present": 5,
+    "missing-edge": 0,
+    "stale": 1,
+    "ambiguous": 0,
+    "authored": 10
+  }
+}
+
+
+[exit 1]
+

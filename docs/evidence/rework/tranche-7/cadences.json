@@ -1,0 +1,25 @@
+{
+  "schema": "conveyor-tranche-cadences/v1",
+  "tranche": 7,
+  "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "cadences": {
+    "pi": "01a22294-e13c-7314-879f-3e0399182587",
+    "refinement": "01a22294-e1da-741b-8df3-afc340915630",
+    "demo": "01a22294-e26f-77e6-9424-3ae8e8c5eaa0",
+    "retro": "01a22294-e301-72ed-b18c-ad4a66498b36"
+  },
+  "documents": {
+    "pi-plan": "01a22295-ca02-71ab-bd1b-93d4b1ded72a",
+    "pi-objectives": "01a22295-cad4-741d-bf7d-7c6640125518"
+  },
+  "plan_approval": {
+    "approval_id": "01a22296-3270-76c3-be7e-77da477806ed",
+    "gate": "cadences.approve_plan",
+    "status": "approved",
+    "decided_by_kind": "rule",
+    "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  },
+  "verified": "cadences.list on the replay record shows all four rows at period tranche-7 with the refinement row carrying meta.refinement.wsjf_inputs; documents.get reads both PI outputs back against P0; the plan gate is approved with a rule decision under the standing delegation"
+}

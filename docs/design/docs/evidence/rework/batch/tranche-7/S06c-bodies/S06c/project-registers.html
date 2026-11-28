@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — MCP tasks — a long-running project asks for input · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--mcp-tasks--a-long-running-project-asks-for-input">Project Registers — MCP tasks — a long-running project asks for input</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;`uq_run_live` permits two live rows when the discriminating column is null, so a check-then-insert in application code would let two live executions of the same project coexist under load. Migration 0023 adds a partial unique index. The risk that remains is a later migration dropping or widening it without knowing why it is partial.&quot;,
+      &quot;code&quot;: &quot;S06c-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:11.524831+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4448-79f1-ac11-3a908678ecee&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;Keep the index&#39;s comment and this risk row as the record of why it is partial, and refuse a migration that replaces it with a full unique index on the same columns.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The live one-live-run property depends on a partial index, because the existing unique index does not dedupe nulls&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:11.524831+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;`reap_dead_runs_tx` now requires `card_id IS NOT NULL`, which is what keeps the reaper from killing a task that is legitimately waiting on a human for a day. If a later change relaxes the predicate, long-running tasks are reaped and the surface reports a cancellation nobody asked for.&quot;,
+      &quot;code&quot;: &quot;S06c-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:11.665609+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-44d4-7638-85f5-f132b8e0bd72&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;Cover the reaper&#39;s project-execution exclusion with a test that fails if the predicate is widened, and treat the predicate as part of this project&#39;s contract rather than as an implementation detail.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The reaper must skip project executions, and its correctness depends on that predicate&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:11.665609+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A terminal run is surfaced as a completed result carrying `isError`, and the terminal check runs before the approval check. Reverse the order and a failed run with a stale pending approval reports `inputRequests` for a task that will never accept an answer; drop the terminal check entirely and the client polls a dead task forever.&quot;,
+      &quot;code&quot;: &quot;S06c-R3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:11.806622+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4562-7421-8a21-73815103546c&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;low&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;Assert both orderings in the contract suite: a failed run with a stale approval must terminate, not block.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The `failed` state must never reach the wire, which makes the terminal check ordering load-bearing&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:11.806622+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.&quot;,
+      &quot;code&quot;: &quot;U3-EXC-S06c&quot;,
+      &quot;created_at&quot;: &quot;2026-11-21T01:17:54.134569+00:00&quot;,
+      &quot;id&quot;: &quot;01a1fbae-6b35-7b52-a47a-43c0bf7199a3&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P0&quot;,
+      &quot;status&quot;: &quot;accepted&quot;,
+      &quot;title&quot;: &quot;Out-of-sequence closure accepted as a retrospective exception (S06c)&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-21T01:17:54.134569+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;At the 2026-11-28 snapshot the project row is closed and its product is in the tree, but the snapshot carries no charter asset, no approved baseline, no delivery contract, no Phase A\u2013D set and no compliance review. The gap is a record gap rather than a product gap; this pack supplies the set and the receipt proves it.&quot;,
+      &quot;code&quot;: &quot;S06c-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:11.951703+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-45f2-7cf2-93de-3d0d10bce1fa&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;Supplied by this pack and proved by the project&#39;s receipt at the pinned snapshot.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The record claimed built while carrying no charter, baseline, contract or Phase-G review&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:11.951703+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The plan&#39;s compiled-registry assertion originally grepped for `task_capable: true`, a flag carried by neither the admin action dump nor the committed action list. A filter that selects nothing exits 0, so a check that proved nothing read as a pass until the plan corrected it to read the compiled registry directly.&quot;,
+      &quot;code&quot;: &quot;S06c-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.094425+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4681-7353-9df6-3e5ee3f01bb8&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;The corrected assertion is the one the receipt runs; the mistake is recorded so the pattern is not reintroduced by a later zero-match filter.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The gate&#39;s first form could never match, and its zero-match run exited green&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.094425+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The task surface reports state transitions but no percentage and no server push; the client polls. Both absences are deliberate per the slice plan&#39;s boundary, but an MCP client author reading the protocol spec may expect them, so the absence needs a record rather than a silence.&quot;,
+      &quot;code&quot;: &quot;S06c-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.235715+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-470e-7d10-ad6c-f6062b3e728a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: &quot;Document the polling-only contract in the project brief and treat a push or percentage request as a new unit rather than a defect in this one.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A progress percentage and push delivery are absent by scope, not by omission&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.235715+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. A row that changed after the snapshot is out of scope for this pack by construction.&quot;,
+      &quot;code&quot;: &quot;S06c-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.376066+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-479b-7003-be9f-b9c09a148caa&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S06c&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.376066+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The protocol allows push; this implementation does not provide it. The assumption is that a conforming client treats push as optional, which the slice plan&#39;s decisions assert when they keep polling as the fallback.&quot;,
+      &quot;code&quot;: &quot;S06c-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.514844+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4825-7ce9-8ff4-1d6c4e084e09&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A conforming MCP client accepts polling as the only delivery mechanism&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.514844+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The partial unique index enforces it. The assumption is that a project is a single unit of concurrent work; if a project ever needs two live executions the index is the thing that will say so, loudly, at the second start.&quot;,
+      &quot;code&quot;: &quot;S06c-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.659124+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-48b6-720b-9a6a-8d01448f2048&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One live execution per project is the right cardinality&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.659124+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The task&#39;s `inputRequests` are the project&#39;s pending approvals, and there is no other kind of input the surface accepts. A future input type \u2014 a form, a selection \u2014 would need its own mapping rather than a widening of the approval path.&quot;,
+      &quot;code&quot;: &quot;S06c-A4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.797087+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4940-7157-b0be-46c3bb6c14c8&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The approval is a sufficient input request&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.797087+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project row records the edges. S04 supplies the action registry and the `/mcp` transport, S05 the project and card actions, and S06 the run and approval state machines together with the events the task surface reads.&quot;,
+      &quot;code&quot;: &quot;S06c-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:12.938383+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-49cd-72c8-bae0-e16625b9f1ac&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S06c depends on S04, S05 and S06&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:12.938383+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A task-capable call is still a licence-principal call; S06b&#39;s machine-auth resolution and tool list are what make the call attributable. Without that principal the task would be anonymous and the ownership failures would have nothing to compare.&quot;,
+      &quot;code&quot;: &quot;S06c-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.085386+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4a61-710f-be32-91a0f176862a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S06b supplies the licence principal the task surface authenticates&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.085386+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The task status text is S13&#39;s to fill and the agent&#39;s client-side task support against external servers is a separate plan with its own gate. Recording both stops a reader treating an empty status message as an S06c defect.&quot;,
+      &quot;code&quot;: &quot;S06c-D3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.2363+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4af7-715d-8cb9-485c4962babf&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S13 populates `statusMessage` and the agent&#39;s own task support is a separate plan&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.2363+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Before the task protocol a client that disconnected lost the ability to follow the project without re-deriving its state from the run table. After it, the run is the task and the client polls a standard surface. The benefit is structural and is proved by the contract suite rather than by a measurement.&quot;,
+      &quot;code&quot;: &quot;S06c-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.382553+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4b89-79d3-8a5e-27f3356984f7&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A long-running project becomes a durable task with no second store&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.382553+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The `inputRequests` listing and the `tasks/update` answer mean a client needs one surface, not two, to start work and to unblock it. The benefit is observed in the single round-trip test that starts a project, receives a task, answers the approval and reads a terminal result.&quot;,
+      &quot;code&quot;: &quot;S06c-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.521987+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4c15-71e8-8025-de6e156a2276&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A blocked project is answerable through the protocol that started it&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.521987+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;`projects.execute` is the only action that returns a task, asserted against the compiled registry. A surface where every action could be a task would make the client&#39;s lifecycle handling universal and the server&#39;s contract unprovable; one action keeps both bounded.&quot;,
+      &quot;code&quot;: &quot;S06c-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.662722+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4ca2-7021-b6ae-76f82a1be795&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;One task-capable action keeps the surface small&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.662722+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Every ownership failure returns the same `-32602`, so the endpoint cannot be used to probe which project ids exist. The benefit is a security property and is measured by the suite that asserts one code across the failure cases.&quot;,
+      &quot;code&quot;: &quot;S06c-B4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:13.805909+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-4d31-72d7-b58e-aa2a86424c68&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S06c-mcp-tasks.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Ownership failures are indistinguishable&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:13.805909+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a222a6-4dd7-71e2-b652-66d5f1b7a071&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S06c-03386b&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:54:27.125374+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a6-813c-736e-9930-8c3d2203386b&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2b-7542-9574-e961ffd1b597&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S06c&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:54:27.4928+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-7/S06c-bodies/S06c/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,126 @@
+{
+  "schema": "conveyor-tranche-cadences-plan/v1",
+  "tranche": 7,
+  "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "note": "The inputs for the tranche-7 readiness step, in order. Each is written through scripts/programme-record.py (write + read-back + evidence); the returned ids are recorded in cadences.json beside this file. The refinement row's meta is written last, because meta.refinement.wsjf_inputs is what rework-batch.py:134 reads and what rework-content-check.py:--wsjf must match.",
+  "creates": [
+    {
+      "kind": "pi",
+      "period": "tranche-7",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "pi",
+        "period": "tranche-7",
+        "meta": {
+          "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+          "tranche_number": 7,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "refinement",
+      "period": "tranche-7",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "refinement",
+        "period": "tranche-7",
+        "meta": {
+          "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+          "tranche_number": 7,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "demo",
+      "period": "tranche-7",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "demo",
+        "period": "tranche-7",
+        "meta": {
+          "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+          "tranche_number": 7,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    },
+    {
+      "kind": "retro",
+      "period": "tranche-7",
+      "input": {
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "retro",
+        "period": "tranche-7",
+        "meta": {
+          "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+          "tranche_number": 7,
+          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        }
+      }
+    }
+  ],
+  "refinement_update": {
+    "period": "tranche-7",
+    "meta": {
+      "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+      "tranche_number": 7,
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "refinement": {
+        "period": "tranche-7",
+        "reordered": [
+          {
+            "item": "S16 first, then S06c, then S15",
+            "from": "the seed's membership order (S06c, S15, S16)",
+            "to": "S16, S06c, S15",
+            "why": "S16's product is fully in-tree and its receipt is the cheapest of the three to make green; S15's slice lane #9 (PR #949) is still open, so placing it last avoids a re-authoring cycle rather than creating one."
+          }
+        ],
+        "reestimate": {
+          "S16": "8 open packages (0 P0, 8 P1): charter, baseline, contract, review, seven artefacts, closure set",
+          "S06c": "8 open packages (0 P0, 8 P1): the same closure set against a second closed member",
+          "S15": "13 open packages: the same set plus the unpublished declared output and the active-member checks"
+        },
+        "wsjf_inputs": {
+          "S16": {
+            "business_value": 9,
+            "time_criticality": 7,
+            "risk_reduction": 9,
+            "job_size": 8
+          },
+          "S06c": {
+            "business_value": 8,
+            "time_criticality": 6,
+            "risk_reduction": 6,
+            "job_size": 8
+          },
+          "S15": {
+            "business_value": 10,
+            "time_criticality": 8,
+            "risk_reduction": 7,
+            "job_size": 13
+          }
+        }
+      }
+    }
+  },
+  "documents": [
+    {
+      "kind": "pi-plan",
+      "title": "PI plan — tranche 7 (retrospective, 2026-11-28)",
+      "category": "pi-plan",
+      "project_key": "P0",
+      "body_file": "pi-plan.json"
+    },
+    {
+      "kind": "pi-objectives",
+      "title": "PI objectives — tranche 7 (retrospective, 2026-11-28)",
+      "category": "pi-objectives",
+      "project_key": "P0",
+      "body_file": "pi-objectives.json"
+    }
+  ]
+}

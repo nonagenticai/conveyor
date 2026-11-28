@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Project Registers — Capability, knowledge and memory · conveyor documents</title>
+    <link rel="icon" href="../../../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-registers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="project-registers--capability-knowledge-and-memory">Project Registers — Capability, knowledge and memory</h1>
+<h2 id="risks">Risks</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The consolidation store prunes document versions, and a document ingested by two cards is one document by content. A prune driven by one card&#39;s source can therefore remove a version another card&#39;s run cited. The card-id header on ingested documents is the defence: it makes the ingest attributable, so the prune can be scoped to the sources this card actually introduced.&quot;,
+      &quot;code&quot;: &quot;S15-R1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:12.378914+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-31fd-7e85-970e-59537fed5f01&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#8&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Keep the card-id header on every ingest and refuse a consolidation change that prunes by content without it.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Cross-source dedupe on prune can delete a document two cards share&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:12.378914+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The slice plan&#39;s build record closes steps 1\u20134 and leaves step 5&#39;s seven actions open. The model, the tables and the seed exist; the action surface that exposes them does not yet. A pack that claimed completion would be describing a product the tree does not hold, so the risk is recorded at the level the plan states.&quot;,
+      &quot;code&quot;: &quot;S15-R2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:12.526021+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3291-73f3-82f0-1684422ef2dd&quot;,
+      &quot;impact&quot;: 4,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#11&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;high&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Drive step 5 to completion on the slice&#39;s own lane (#9) and re-read the receipt before any tranche review treats S15 as green on its live scenarios.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;high&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Seven actions of step 5 are still open, so the surface the gate names is partly unbuilt&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:12.526021+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Two properties the gate depends on are not demonstrated: that a retrieval is bound to a pinned pack rather than to whatever the store currently holds, and that `memory.remember` joins the run&#39;s own transaction. Both are named as unproved in the build record, and an unproved property in a gate is a hypothesis.&quot;,
+      &quot;code&quot;: &quot;S15-R3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:12.668459+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-331f-7c58-a06f-d242b168041f&quot;,
+      &quot;impact&quot;: 3,
+      &quot;kind&quot;: &quot;risk&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {
+        &quot;owner&quot;: &quot;the programme architect (conveyor-e2e)&quot;
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: &quot;medium&quot;,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Prove both on the live strata path, which the `strata_live` suite carries as an ignored test, and record the output before the tranche review.&quot;,
+      &quot;review_at&quot;: &quot;2026-12-12&quot;,
+      &quot;severity&quot;: &quot;medium&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Pack-bound retrieval and the run-transactional memory write are unproved&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:12.668459+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="issues">Issues</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;At the 2026-11-28 snapshot the project row is active and its model is in the tree, but the snapshot carries no charter asset, no approved baseline, no delivery contract, no Phase A\u2013D set and no compliance review. The gap is a record gap rather than a product gap; this pack supplies the set.&quot;,
+      &quot;code&quot;: &quot;S15-I1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:12.807263+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-33aa-73b8-93b7-c4c9939b3ab8&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Supplied by this pack and proved by the project&#39;s receipt at the pinned snapshot.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The record carried no charter, baseline, contract or Phase-G review&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:12.807263+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The project declares outputs it had not published, which is why the audit reports an unpublished declared output against S15 and not against its two siblings. The pack authors and publishes the declared outputs; the finding clears on the receipt rather than on an allowlist edit.&quot;,
+      &quot;code&quot;: &quot;S15-I2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:12.949773+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3438-7c8e-98b9-31015859d742&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Author and publish the declared outputs in this pack and read the finding off the receipt.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P1&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A declared output was unpublished, so the pack surface and the record disagreed&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:12.949773+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Step 4&#39;s check excluded `capability.rs` by name, which is the very file the step creates, so the exclusion removed the evidence rather than the noise. The build record names it; the corrected check is what the manifest runs.&quot;,
+      &quot;code&quot;: &quot;S15-I3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.093004+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-34c8-71a3-9d16-8b80b59e8bc0&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;issue&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: &quot;Record the exclusion&#39;s correction in the evidence output so a later session does not restore the wider pattern.&quot;,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: &quot;P2&quot;,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The build record&#39;s grep exclusion was wrong and hid capability files&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.093004+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="assumptions">Assumptions</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Every judgement in this pack is read from the pinned snapshot, and the content checker refuses any identifier that appears nowhere in it. A row that changes when the slice lane merges is out of scope until the pack is re-preflighted.&quot;,
+      &quot;code&quot;: &quot;S15-A1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.24653+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3561-7817-a37a-2029b644b9f7&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;The 2026-11-28 rework snapshot is the authoritative record for S15&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.24653+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The model assumes one capability pack per tenant with immutable versions, so a run&#39;s binding names a version rather than a mutable row. The assumption is what makes the cited passage reproducible after the capability is edited.&quot;,
+      &quot;code&quot;: &quot;S15-A2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.390464+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-35f1-7c07-a17d-b64461249755&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A capability is tenant-scoped and versioned immutably&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.390464+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The conveyor writes the binding and strata answers the query. If a second store ever appeared, the pinned-pack guarantee would be per-store and the requirement would need restating rather than extending.&quot;,
+      &quot;code&quot;: &quot;S15-A3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.533667+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3680-79a1-99d3-853bb224190d&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Strata is the only retrieval store and the conveyor owns only the binding&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.533667+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Consolidation derives digests from the hot rows, so a failed consolidation loses a digest rather than the memory itself. The assumption is that a rebuild is always possible, which is why the hot rows are never pruned by consolidation.&quot;,
+      &quot;code&quot;: &quot;S15-A4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.670209+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3709-74d5-b676-b1144b76b191&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;assumption&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Hot rows are the record and the digests are derived&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.670209+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="dependencies">Dependencies</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 3,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;S13 supplies `agent.run`, which is the loop a capability merely configures; S10 the copilot surface that reads it; S09 the strata ingest and retrieval actions; and S11 the start seam whose `ensure_start_ready` is where readiness is decided.&quot;,
+      &quot;code&quot;: &quot;S15-D1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.809629+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3794-79d5-90be-5bf4ca73a4b6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S15 depends on S13, S10, S09 and S11&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.809629+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A capability&#39;s prompt reference is audited by S16&#39;s procedure, so the binding&#39;s provenance depends on the ledger and the audit existing. S16 is in this tranche, which is why the two packs are authored together rather than a tranche apart.&quot;,
+      &quot;code&quot;: &quot;S15-D2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:13.948298+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-381f-731c-ae3c-8997724b9ac5&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S16 supplies the prompt-audit provenance the binding cites&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:13.948298+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The parity suite takes its lease from S19-B, and S20&#39;s reserved migration number moves to 0028 because this project&#39;s 0020 and 0027 land first. Both are ordering facts rather than build dependencies.&quot;,
+      &quot;code&quot;: &quot;S15-D3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:14.107817+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-38be-7c2d-942f-ddc75a8e16b6&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;S19-B&#39;s lease and S20&#39;s reserved migration number constrain the lane&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:14.107817+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="benefits">Benefits</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 4,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Before the aggregate, a capability was a vocabulary row that a run could name but not resolve. After it, the run reads an executor spec and a versioned binding, so what a run is about to do is a fact in the record rather than a convention in code.&quot;,
+      &quot;code&quot;: &quot;S15-B1&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:14.247907+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-394a-7a33-9988-39e5bd5aa09d&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A capability is a record rather than a catalogue word&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:14.247907+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;A pre-run readiness check turns a broken capability into a refusal the caller can act on, instead of a half-built run whose error names the wrong cause. The benefit is measured by the two distinct refusals the gate keeps apart.&quot;,
+      &quot;code&quot;: &quot;S15-B2&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:14.389172+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-39d7-7c55-bd26-018e9b8f317a&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Readiness fails before the run rather than during it&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:14.389172+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;The binding names a pack version and documents are immutable, so the passage a run cited can be re-read after the pack is edited. The benefit is a provenance property, and it is the reason the pack-bound retrieval is recorded as unproved rather than assumed.&quot;,
+      &quot;code&quot;: &quot;S15-B3&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:14.526717+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3a61-70ac-bbb7-cdb06629bd7f&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#7&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;A cited passage is reproducible from a pinned pack&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:14.526717+00:00&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;baseline_ref&quot;: null,
+      &quot;body&quot;: &quot;Hot rows hold the working memory and consolidation derives digests into the retrieval store, so a card&#39;s notes are recallable by `source_id` after the card is done. The benefit is what makes a later run on the same work cheaper.&quot;,
+      &quot;code&quot;: &quot;S15-B4&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:14.664432+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-3aeb-7f2e-845c-135e797b86e9&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;benefit&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: [
+          &quot;docs/plans/slices/S15-capability-knowledge-memory.md#1&quot;
+        ]
+      },
+      &quot;meta&quot;: {},
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;open&quot;,
+      &quot;title&quot;: &quot;Work-package memory outlives the card&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:14.664432+00:00&quot;,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+<h2 id="changes">Changes</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre class="json"><code>{
+  &quot;category&quot;: &quot;project-registers&quot;,
+  &quot;count&quot;: 1,
+  &quot;rows&quot;: [
+    {
+      &quot;baseline_ref&quot;: &quot;01a222a7-3b8a-7019-b55c-353661b57c53&quot;,
+      &quot;body&quot;: &quot;The retrospective MSP/TOGAF/SAFe rework changed this project&#39;s record: its artefacts were re-versioned with documents and links, its register was written, and its schedule and cost baselines were taken. This change records that rework against the frozen scope baseline.&quot;,
+      &quot;code&quot;: &quot;CH-S15-799016&quot;,
+      &quot;created_at&quot;: &quot;2026-11-28T14:55:27.741056+00:00&quot;,
+      &quot;id&quot;: &quot;01a222a7-6e02-7840-b7bc-8f0716799016&quot;,
+      &quot;impact&quot;: null,
+      &quot;kind&quot;: &quot;change&quot;,
+      &quot;links&quot;: {
+        &quot;cards&quot;: [],
+        &quot;decisions&quot;: [],
+        &quot;requirements&quot;: []
+      },
+      &quot;meta&quot;: {
+        &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+        &quot;impact&quot;: {
+          &quot;scope&quot;: &quot;the retrospective rework&#39;s record acts&quot;
+        }
+      },
+      &quot;owner_job_id&quot;: null,
+      &quot;probability&quot;: null,
+      &quot;programme_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d2f-7ca0-9d3d-534ca7d673fb&quot;,
+      &quot;response&quot;: null,
+      &quot;review_at&quot;: null,
+      &quot;severity&quot;: null,
+      &quot;status&quot;: &quot;approved&quot;,
+      &quot;title&quot;: &quot;The retrospective rework of S15&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-28T14:55:28.113735+00:00&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;source&quot;: &quot;msp.json#/register_items&quot;
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/batch/tranche-7/S15-bodies/S15/project-registers.md</code> at build time.</span>
+      <a href="../../../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

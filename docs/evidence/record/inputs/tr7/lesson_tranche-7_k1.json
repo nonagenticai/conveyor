@@ -1,0 +1,10 @@
+{
+  "cadence_id": "01a22294-e301-72ed-b18c-ad4a66498b36",
+  "evidence": [
+    {"kind": "path", "value": "scripts/verify-project.py#_published_for_period"},
+    {"kind": "path", "value": "docs/evidence/rework/tranche-7/pi-documents-unit.json"}
+  ],
+  "finding_key": "k1",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "statement": "An output composed without `unit` is published but invisible to its period check: `documents.compose` carries the planning period in `unit`, and `verify-project.py::_published_for_period` reads the literal token `tranche-N` from the title or unit. Tranche 7's two PI rows were composed with a null unit and a title saying 'tranche 7', so every member's `pi_plan` and `pi_objectives` checks would have been red; every tranche 0-6 row carries `unit: tranche-N`. Compose the period into `unit` at creation, and verify the rendered `outputs.js` before the factory run."
+}

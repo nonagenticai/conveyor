@@ -1,0 +1,33 @@
+{
+ "schema": "tranche-exit/v1",
+ "tranche": 7,
+ "snapshot_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
+ "members": [
+  {
+   "key": "S06c",
+   "status": "closed",
+   "receipt_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
+   "verdict": "green",
+   "state": "green",
+   "reason": "18 checks"
+  },
+  {
+   "key": "S15",
+   "status": "active",
+   "receipt_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
+   "verdict": "green",
+   "state": "green",
+   "reason": "16 checks"
+  },
+  {
+   "key": "S16",
+   "status": "closed",
+   "receipt_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
+   "verdict": "green",
+   "state": "green",
+   "reason": "18 checks"
+  }
+ ],
+ "ready": true,
+ "blocking": []
+}

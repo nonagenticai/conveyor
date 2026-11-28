@@ -1,0 +1,19 @@
+{
+  "schema": "conveyor-pi-plan-approval/v1",
+  "tranche": 7,
+  "tranche_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "cadence_id": "01a22294-e13c-7314-879f-3e0399182587",
+  "approval_id": "01a22296-3270-76c3-be7e-77da477806ed",
+  "status": "approved",
+  "decision": "approve",
+  "decided_by_kind": "rule",
+  "decided_by_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "decided_at": "2026-11-28T14:36:38.370944Z",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "pi_plan": "01a22295-ca02-71ab-bd1b-93d4b1ded72a",
+  "pi_objectives": "01a22295-cad4-741d-bf7d-7c6640125518",
+  "refinement": "01a22294-e1da-741b-8df3-afc340915630",
+  "members": ["S06c", "S15", "S16"],
+  "note": "Approved under the standing delegation (a `rule` decision, not a person's signature). The WSJF ranking is S16, S06c, S15; the factory's execution order is the snapshot's key order (S06c, S15, S16). The PI plan states both, rather than implying the driver applies the ranking."
+}
