@@ -215,21 +215,38 @@ async fn an_in_flight_key_is_not_a_replay_and_an_expired_key_is_a_miss() {
 
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     assert!(
-        idempotency::begin(&mut tx, tenant, scope, "k", &hash)
-            .await
-            .expect("begin")
+        idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::hours(idempotency::TTL_HOURS)
+        )
+        .await
+        .expect("begin")
     );
     assert!(
-        !idempotency::begin(&mut tx, tenant, scope, "k", &hash)
-            .await
-            .expect("second begin"),
+        !idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::hours(idempotency::TTL_HOURS)
+        )
+        .await
+        .expect("second begin"),
         "a second in-flight request for the same key is not admitted"
     );
-    assert_eq!(
-        idempotency::lookup(&mut tx, tenant, scope, "k", &hash)
-            .await
-            .expect("lookup"),
-        Lookup::InFlight
+    assert!(
+        matches!(
+            idempotency::lookup(&mut tx, tenant, scope, "k", &hash)
+                .await
+                .expect("lookup"),
+            Lookup::InFlight { .. }
+        ),
+        "an unsettled row is in flight, and carries the moment it stops blocking"
     );
     tx.commit().await.expect("commit");
 
@@ -249,9 +266,16 @@ async fn an_in_flight_key_is_not_a_replay_and_an_expired_key_is_a_miss() {
     // key was permanently stuck between its TTL and the sweep — `lookup` said Miss while the
     // INSERT's conflict said "taken", and the caller answered a 409 it could never clear.
     assert!(
-        idempotency::begin(&mut tx, tenant, scope, "k", &hash)
-            .await
-            .expect("reclaim the expired key"),
+        idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::hours(idempotency::TTL_HOURS)
+        )
+        .await
+        .expect("reclaim the expired key"),
         "an expired key is reclaimable; a live one is not"
     );
     assert!(
@@ -277,6 +301,89 @@ async fn an_in_flight_key_is_not_a_replay_and_an_expired_key_is_a_miss() {
             response: json!({"ok": true}),
         },
         "the retry is stored and replays like any first request"
+    );
+    tx.commit().await.expect("commit");
+}
+
+/// An in-flight claim lives as long as the CALL that holds it, never as long as the replay window.
+///
+/// conveyor#900: a deploy SIGKILLed the worker mid-`inference.chat`; because the in-flight row
+/// carried the 24-hour contract TTL, every retry of that case answered `409 … still running` and
+/// the producer wrote a terminal `no_attempt`. The claim must instead stop blocking once the
+/// engine's own deadline has passed, because after that no legitimate holder can still be running.
+#[test]
+fn an_in_flight_ttl_is_the_calls_deadline_plus_a_margin() {
+    assert_eq!(
+        idempotency::in_flight_ttl(300_000).num_seconds(),
+        300 + idempotency::IN_FLIGHT_MARGIN_SECS,
+        "inference.chat declares a 300 s deadline; its claim may not outlive it by more than the \
+         bookkeeping margin"
+    );
+    assert_eq!(
+        idempotency::in_flight_ttl(0).num_seconds(),
+        idempotency::IN_FLIGHT_MARGIN_SECS,
+        "no call gets a claim that expires before it could finish"
+    );
+    assert!(
+        idempotency::in_flight_ttl(300_000) < chrono::Duration::hours(idempotency::TTL_HOURS),
+        "an in-flight claim is never the replay TTL"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_in_flight_claim_is_reclaimable_once_its_own_ttl_passes() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let scope = "inference.chat";
+    let hash = idempotency::request_hash(&json!({"model": "local-llm"}));
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    assert!(
+        idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::milliseconds(20)
+        )
+        .await
+        .expect("begin")
+    );
+    tx.commit().await.expect("commit");
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    assert!(
+        !idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::milliseconds(20)
+        )
+        .await
+        .expect("a live claim still refuses a replay"),
+        "a claim inside its own window still blocks"
+    );
+    tx.rollback().await.expect("rollback");
+
+    tokio::time::sleep(std::time::Duration::from_millis(80)).await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    assert!(
+        idempotency::begin(
+            &mut tx,
+            tenant,
+            scope,
+            "k",
+            &hash,
+            chrono::Duration::milliseconds(20)
+        )
+        .await
+        .expect("reclaim the dead holder's claim"),
+        "once the call's own deadline has passed, the claim is reclaimable — a killed holder must \
+         not refuse retries for the 24-hour replay TTL"
     );
     tx.commit().await.expect("commit");
 }

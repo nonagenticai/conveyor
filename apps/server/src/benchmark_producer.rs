@@ -60,6 +60,12 @@ const BASELINE_TIMEOUT_MS: i64 = 300_000;
 const MAX_SOURCE_FILES: usize = 8;
 const MAX_SOURCE_BYTES: usize = 64 * 1024;
 
+/// How long to wait when an in-flight conflict carries no usable hint.
+///
+/// The engine always sets one for a held key; this covers only a malformed/missing tip, and is
+/// the same order as the shortest claim an `inference.chat` call can hold.
+const IN_FLIGHT_WAIT_FALLBACK: std::time::Duration = std::time::Duration::from_secs(30);
+
 fn want_uuid(payload: &Value, field: &str) -> Result<Uuid, JobFailure> {
     payload
         .get(field)
@@ -159,7 +165,7 @@ pub async fn produce(
     };
     // Spend one attempt now, so a producer that dies mid-call still consumes its budget and the
     // driver can bound the run (a re-delivered job cannot loop for ever).
-    store::benchmark::begin_produce_tx(&mut tx, tenant, case_id)
+    let attempts = store::benchmark::begin_produce_tx(&mut tx, tenant, case_id)
         .await
         .map_err(db)?;
     tx.commit().await.map_err(db)?;
@@ -292,6 +298,29 @@ pub async fn produce(
 
     let out = match outcome {
         Ok(out) => out,
+        // The key is held by a call that has not settled: a WAIT, not a refusal. It is reachable
+        // when a holder dies without releasing — a deploy SIGKILLs the worker mid-call, and a
+        // killed process has no `Drop` to run `ClaimRelease` (measured 2026-11-28, #900: a deploy
+        // at 22:39:30Z lost three of twelve pipeline cases). Come back after the claim's own
+        // advertised lifetime, on the SAME job attempt, so the case's budget is spent on real
+        // production rather than on polling.
+        Err(error) if error.is_in_flight_conflict() => {
+            if attempts >= store::benchmark::MAX_PRODUCE_ATTEMPTS {
+                return record(
+                    pool,
+                    tenant,
+                    case_id,
+                    "no_attempt",
+                    None,
+                    &format!("agent.run: {error} (still held after {attempts} attempts)"),
+                )
+                .await;
+            }
+            return Err(JobFailure::deferred(
+                format!("agent.run: {error}; waiting for the claim to settle"),
+                error.retry_after.unwrap_or(IN_FLIGHT_WAIT_FALLBACK),
+            ));
+        }
         // A transport-level fault: the call may or may not have happened, so retry.
         Err(error) if error.status >= 500 => {
             return Err(JobFailure::retryable(format!("agent.run: {error}")));

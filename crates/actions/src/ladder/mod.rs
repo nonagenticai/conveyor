@@ -1114,7 +1114,7 @@ async fn ladder_evaluate(
         store::idempotency::Lookup::ConflictHash => {
             return Err(call_unverified("the claim names a different case"));
         }
-        store::idempotency::Lookup::Miss | store::idempotency::Lookup::InFlight => {
+        store::idempotency::Lookup::Miss | store::idempotency::Lookup::InFlight { .. } => {
             return Err(call_unverified("no completed call carries this claim"));
         }
     };
