@@ -12,41 +12,41 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a222a7-3b8a-7019-b55c-353661b57c53 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "S15-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2f-7ca0-9d3d-534ca7d673fb\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S15-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a222a7-17ec-751f-bc1c-9e932f9b4763 approved by board decision 01a222a7-1881-7d2e-a3b5-928c86cb2b76 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S15-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a222a7-5657-73fb-a14a-634adddc4b65 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S15-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -61,55 +61,55 @@
     {
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
-      "detail": "no PI cadence row for tranche-7",
+      "detail": "PI cadence 01a22294-e13c-7314-879f-3e0399182587 and refinement 01a22294-e1da-741b-8df3-afc340915630 for tranche-7",
       "id": "S15-pi-cadence",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-7",
+      "detail": "the tranche-7 PI plan is published",
       "id": "S15-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-7",
+      "detail": "the tranche-7 PI objectives are published",
       "id": "S15-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "S15-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "S15-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "no retro cadence row for tranche-7",
+      "detail": "lesson 01a222a4-22a7-7610-93a8-0ea3ae426be6 carries a statement and evidence from the tranche-7 retro",
       "id": "S15-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -124,16 +124,16 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S15, unpublished_declared_output:S15, mandatory_artefacts:S15, std-pmp-change-control-s15:S15, std-pmp-project-baseline-s15:S15, std-pmp-project-registers-s15:S15, std-togaf-compliance-review-s15:S15, std-togaf-delivery-contract-s15:S15 (2 not yet due: tranche planned)",
+      "detail": "no open standard artefact package for this project",
       "id": "S15-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S15 (P1), unpublished_declared_output:S15 (P1), mandatory_artefacts:S15 (P1) (2 not yet due: tranche planned)",
+      "detail": "4 unresolved P0/P1 package(s): std-delivery-acceptance-criteria-s15:S15 (P1), std-delivery-definition-of-done-s15:S15 (P1), std-delivery-definition-of-ready-s15:S15 (P1), std-delivery-user-stories-s15:S15 (P1)",
       "id": "S15-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S15-baseline' did not pass; the gate check 'S15-charter' did not pass; the gate check 'S15-contract' did not pass; the gate check 'S15-review' did not pass; the gate check 'S15-pi-cadence' did not pass; the gate check 'S15-pi-plan' did not pass; the gate check 'S15-pi-objectives' did not pass; the gate check 'S15-wsjf' did not pass; the gate check 'S15-demo-credits' did not pass; the gate check 'S15-lessons' did not pass; the gate check 'S15-artefact-standard' did not pass; the gate check 'S15-rework' did not pass",
+      "detail": "the gate check 'S15-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -150,31 +150,20 @@
     }
   ],
   "failures": [
-    "S15-baseline (P0): no project baseline",
-    "S15-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "S15-contract (P0): no live board-approved delivery contract",
-    "S15-review (P0): no Phase-G compliance review for the project's live contract",
-    "S15-pi-cadence (P0): no PI cadence row for tranche-7",
-    "S15-pi-plan (P0): no published pi-plan output for tranche-7",
-    "S15-pi-objectives (P0): no published pi-objectives output for tranche-7",
-    "S15-wsjf (P0): no WBS deliverable carries the plan",
-    "S15-demo-credits (P0): no accepted deliverable to demo",
-    "S15-lessons (P1): no retro cadence row for tranche-7",
-    "S15-artefact-standard (P1): 8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S15, unpublished_declared_output:S15, mandatory_artefacts:S15, std-pmp-change-control-s15:S15, std-pmp-project-baseline-s15:S15, std-pmp-project-registers-s15:S15, std-togaf-compliance-review-s15:S15, std-togaf-delivery-contract-s15:S15 (2 not yet due: tranche planned)",
-    "S15-rework (P0): 3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S15 (P1), unpublished_declared_output:S15 (P1), mandatory_artefacts:S15 (P1) (2 not yet due: tranche planned)",
-    "gate (P0): the gate check 'S15-baseline' did not pass; the gate check 'S15-charter' did not pass; the gate check 'S15-contract' did not pass; the gate check 'S15-review' did not pass; the gate check 'S15-pi-cadence' did not pass; the gate check 'S15-pi-plan' did not pass; the gate check 'S15-pi-objectives' did not pass; the gate check 'S15-wsjf' did not pass; the gate check 'S15-demo-credits' did not pass; the gate check 'S15-lessons' did not pass; the gate check 'S15-artefact-standard' did not pass; the gate check 'S15-rework' did not pass"
+    "S15-rework (P0): 4 unresolved P0/P1 package(s): std-delivery-acceptance-criteria-s15:S15 (P1), std-delivery-definition-of-done-s15:S15 (P1), std-delivery-definition-of-ready-s15:S15 (P1), std-delivery-user-stories-s15:S15 (P1)",
+    "gate (P0): the gate check 'S15-rework' did not pass"
   ],
   "gate": "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`.",
-  "generated_at": "2026-11-25T10:37:52.459001+00:00",
+  "generated_at": "2026-11-28T14:55:51.321731+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S15.toml",
   "name": "Capability, knowledge and memory",
   "project": "S15",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T10:31:33Z",
-    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
-    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
+    "generated_at": "2026-11-28T14:55:44.898484+00:00",
+    "git_sha": "7e93a325fe0176ba6e98ce47cae7e1ea2115543f",
+    "path": "retained-snapshot/7e93a325fe0176ba6e98ce47cae7e1ea2115543f"
   },
   "verdict": "red",
   "warnings": []

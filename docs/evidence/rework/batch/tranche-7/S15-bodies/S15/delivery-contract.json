@@ -1,0 +1,94 @@
+{
+  "body_sha256": "cbf20cf98b69a64408d38216e45e3d00dd3937757e216a342e7b5e539da73ede",
+  "category": "delivery-contract",
+  "headings": [
+    {
+      "heading": "Commitments",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_field",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Compliance method",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_field",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_approval",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "d8bbc1788eff4b1aed8e594d4080d217114acf7d0c0be4183910639121fcff3b",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d2f-7ca0-9d3d-534ca7d673fb",
+    "key": "S15",
+    "kind": "project",
+    "title": "Capability, knowledge and memory"
+  },
+  "title": "Delivery Contract \u2014 Capability, knowledge and memory"
+}

@@ -1,0 +1,94 @@
+{
+  "body_sha256": "555df33a11095c4ab84457b658d46da789df7999dca8ac6cc98a90cd020bc317",
+  "category": "delivery-contract",
+  "headings": [
+    {
+      "heading": "Commitments",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_field",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Compliance method",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_field",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 0,
+          "file": "",
+          "kind": "absence",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Approval",
+      "required": true,
+      "sources": [
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "contract_approval",
+          "kind": "computed",
+          "pointer": ""
+        },
+        {
+          "category": "delivery-contract",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "d8bbc1788eff4b1aed8e594d4080d217114acf7d0c0be4183910639121fcff3b",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+    "key": "S16",
+    "kind": "project",
+    "title": "Inference ledger and prompt audit"
+  },
+  "title": "Delivery Contract \u2014 Inference ledger and prompt audit"
+}

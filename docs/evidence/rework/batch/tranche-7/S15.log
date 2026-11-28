@@ -1,0 +1,126 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/rework-project.py --project S15 --content docs/evidence/rework/tranche-7/rework-content-S15.json --tranche-label tranche 7 --demo-cadence 01a22294-e26f-77e6-9424-3ae8e8c5eaa0 --keep-active
+
+  reopen: not needed
+  01 projects.charter ok
+  02 approvals.decide ok
+  closure outputs: not applicable (the project stays active)
+  03 architecture.contracts_request ok
+  04 architecture.board_decide ok
+  05 architecture.contracts_approve ok
+  06 documents.compose ok
+  07 documents.publish ok
+  08 architecture.artifacts_create ok
+  09 architecture.artifacts_approve ok
+  10 documents.compose ok
+  11 documents.publish ok
+  12 architecture.artifacts_create ok
+  13 architecture.artifacts_approve ok
+  14 documents.compose ok
+  15 documents.publish ok
+  16 architecture.artifacts_create ok
+  17 architecture.artifacts_approve ok
+  18 documents.compose ok
+  19 documents.publish ok
+  20 architecture.artifacts_create ok
+  21 architecture.artifacts_approve ok
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_create ok
+  25 architecture.artifacts_approve ok
+  26 documents.compose ok
+  27 documents.publish ok
+  28 architecture.artifacts_create ok
+  29 architecture.artifacts_approve ok
+  30 documents.compose ok
+  31 documents.publish ok
+  32 architecture.artifacts_create ok
+  33 architecture.artifacts_approve ok
+  34 architecture.artifacts_link ok
+  35 architecture.artifacts_link ok
+  36 architecture.artifacts_link ok
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 documents.compose ok
+  42 documents.publish ok
+  document architecture-artifact: published
+  43 architecture.contracts_request ok
+  44 architecture.board_decide ok
+  45 architecture.contracts_approve ok
+  46 registers.create ok
+  47 registers.create ok
+  48 registers.create ok
+  49 registers.create ok
+  50 registers.create ok
+  51 registers.create ok
+  52 registers.create ok
+  53 registers.create ok
+  54 registers.create ok
+  55 registers.create ok
+  56 registers.create ok
+  57 registers.create ok
+  58 registers.create ok
+  59 registers.create ok
+  60 registers.create ok
+  61 registers.create ok
+  62 registers.create ok
+  benefit transitions: none in the content
+  63 projects.baseline ok
+  64 projects.baseline ok
+  65 approvals.decide ok
+  66 projects.baseline ok
+  67 approvals.decide ok
+  closure-review output: not applicable (the project stays active)
+  68 documents.compose ok
+  69 documents.publish ok
+  70 documents.publish ok
+  71 documents.update ok
+  72 documents.publish ok
+  evidence output: body corrected and republished
+  73 architecture.reviews_record ok
+  74 wbs.update ok
+  75 cadences.credit_demo ok
+  76 approvals.decide ok
+  77 changes.request ok
+  78 registers.update ok
+  79 approvals.decide ok
+  record fixes: none in the content
+  80 approvals.request ok
+  81 approvals.decide ok
+  82 cards.comment ok
+  83 cards.move ok
+  84 cards.move ok
+  card cleared: closure_outputs_undeclared:tranche-7
+  85 approvals.request ok
+  86 approvals.decide ok
+  87 cards.comment ok
+  88 cards.move ok
+  89 cards.move ok
+  card cleared: unpublished_declared_output:tranche-7
+  90 approvals.request ok
+  91 approvals.decide ok
+  92 cards.comment ok
+  93 cards.move ok
+  94 cards.move ok
+  card cleared: wbs_absent:tranche-7
+  95 approvals.request ok
+  96 approvals.decide ok
+  97 cards.comment ok
+  98 cards.move ok
+  99 cards.move ok
+  card cleared: std-togaf-architecture-artifact-s15:S15
+  card discharge: 4 card(s) cleared of 279 open package(s)
+  closure: not applicable (the project stays active)
+S15: 99 acts recorded
+
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/scripts/publish-artefact-bodies.py --apply --project S15 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-bwui79t6/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S15-snap-bwui79t6/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-951/docs/evidence/rework/batch/tranche-7/S15-bodies --local-bin /tmp/conv951-bin/conveyor
+
+
+{"code": "TRANSPORT", "message": "documents.compose: error: documents.compose refused (413): the output body is 620496 bytes; the cap is 262144\nFAILED: documents.compose: transport exited 1"}
+
+[exit 1]
+
