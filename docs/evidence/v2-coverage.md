@@ -5,7 +5,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 64 |
+| `exists` | the real route and its Playwright spec exist | 65 |
 | `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 2 |
 | `new` | neither the route nor an ancestor exists | 3 |
 
@@ -53,6 +53,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:decision_policy_refinement` | §10.3 | table | decision_policy_refinement | `exists` | migrations: CREATE TABLE decision_policy_refinement |
 | `table:laya_inference_config` | §10.3 | table | laya_inference_config | `exists` | migrations: CREATE TABLE laya_inference_config |
 | `actions:programme/plan` | §10.4 | actions | programme/plan | `extend` | actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.approve_plan, cadences.create, cadences.credit_demo…)<br>actions: governed_assets.* found (governed_assets.approve, governed_assets.compose, governed_assets.get…)<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.delete, registers.get…)<br>actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)<br>actions: wbs.* found (wbs.create, wbs.delete, wbs.get…) |
+| `actions:board` | §10.4 | actions | board | `exists` | actions: boards.* found (boards.get, boards.set_member)<br>actions: cards.* found (cards.add_label, cards.archive, cards.assign…) |
 | `actions:benefits` | §10.4 | actions | benefits | `exists` | actions: benefits.* found (benefits.create, benefits.delete, benefits.get…) |
 | `actions:architecture` | §10.4 | actions | architecture | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…) |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
