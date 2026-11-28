@@ -804,7 +804,7 @@ pub async fn withhold_malformed_tx(
     });
     // `(benchmark_run_id, instance_id)` of the case this call withheld, for the caller's event
     // and counter writes; `None` when a re-delivered producer found it no longer pending.
-    sqlx::query_as(
+    let row: Option<(Uuid, String)> = sqlx::query_as(
         "UPDATE benchmark_case
             SET produce_status = 'ok', patch = $3, patch_sha256 = $4, verdict = 'apply_failed',
                 detail = $5, produced_at = now(), updated_at = now()
@@ -818,7 +818,8 @@ pub async fn withhold_malformed_tx(
     .bind(patch_sha256)
     .bind(detail)
     .fetch_optional(&mut *conn)
-    .await
+    .await?;
+    Ok(row)
 }
 
 /// One keyset page of cases for a run, optionally filtered by verdict.
