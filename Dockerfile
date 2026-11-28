@@ -56,8 +56,17 @@ RUN set -eu; \
 RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build \
     cargo build --release --locked -p conveyor-server
 COPY . .
+# ⛔ The dependency layer compiled PLACEHOLDERS. The real sources arrive with their checkout
+# mtimes, which cargo reads as OLDER than the placeholder artifacts, so it calls the members
+# fresh and the final binary is the empty placeholder — measured on #941: the step below
+# finished in 0.9 s and the image smoke ran a binary that printed nothing. Touch every source
+# after the copy so the rebuild cannot be skipped, and assert the binary is not the placeholder
+# before it can reach the runtime stage.
+RUN find crates apps \( -name '*.rs' -o -name 'Cargo.toml' \) -print0 | xargs -0 -r touch \
+    && touch Cargo.toml Cargo.lock
 RUN --mount=type=cache,target=/usr/local/cargo/registry,id=cargo-registry-build \
     cargo build --release --locked -p conveyor-server \
+    && test -n "$(target/release/conveyor --version)" \
     && install -D -m 0755 target/release/conveyor /out/conveyor
 
 # ── the static UI (one image, two hosts since ADR 0024: the operator origin and the game
