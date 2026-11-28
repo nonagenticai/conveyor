@@ -133,6 +133,11 @@ directory) and are the factory's to replace:
   passes on the corrected pin. The pack clears everything except the three CODE packages until #962
   lands.
 
+The exit gate refuses too, as a preparation must: `python3 scripts/check-tranche-exit.py --tranche 10
+--snapshot /tmp/snap-10/data --json-out /tmp/tr10/tranche-exit-preview.json` → exit 1, with both
+members `stale` — their 2026-11-25 receipts (`37f99108`) are read against the `5389ef2b6` pin. The
+execution slice replaces them at one sha once the two blockers land.
+
 ## Delivery gates
 
 ```
