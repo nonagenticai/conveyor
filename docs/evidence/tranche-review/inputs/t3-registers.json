@@ -1,0 +1,31 @@
+{
+  "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+  "rows": [
+    {
+      "kind": "risk",
+      "code": "R-T3-1",
+      "title": "A closure without the record could recur: T3 was reopened from a vacuous closure that had no baseline, contract or review",
+      "body": "The tr3 review recorded the condition; this closure closes it with the record — charter, scope baseline, schedule and cost baselines, the live delivery contract, the Phase-G review and the published closure review — not with a waiver. The risk is that a future closure is taken on prose.",
+      "probability": "low",
+      "impact": 3,
+      "status": "open",
+      "review_at": "2026-12-12",
+      "response": "The closure gate refuses without the record; the tr4 review reads this register.",
+      "meta": {"owner": "programme manager"}
+    },
+    {
+      "kind": "assumption",
+      "code": "A-T3-1",
+      "title": "The five accepted deliverables are T3's complete scope; the project owns no open items",
+      "body": "The closure review records no open item owned by T3. The B3 benefit profile's dependency on T6's approved baseline is a T6 dependency, recorded on the programme benefit evaluation.",
+      "status": "open"
+    },
+    {
+      "kind": "dependency",
+      "code": "D-T3-1",
+      "title": "The B3 benefit profile waits on T6's approved baseline; the tranche-4 review reads it",
+      "body": "T3's closure does not depend on it; the programme's benefit evaluation does.",
+      "status": "open"
+    }
+  ]
+}

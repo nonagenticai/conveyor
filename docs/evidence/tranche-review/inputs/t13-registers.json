@@ -1,0 +1,55 @@
+{
+  "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+  "rows": [
+    {
+      "kind": "risk",
+      "code": "R-T13-1",
+      "title": "The T13 catalogue actions and published toolkits are unbuilt: eleven of the design's twelve catalogue actions and both toolkits are absent",
+      "body": "The T13 closure review (open items 1-2) records that no toolkit or tool data exists beyond test seeds and that eleven of the twelve catalogue actions are unbuilt; the candidate homes are T14 (import) and T15 (authoring/publication). The capability T13 proves is the governed call path, not the catalogue.",
+      "probability": "high",
+      "impact": 3,
+      "status": "open",
+      "review_at": "2026-12-12",
+      "response": "Carried by T14's import wave and T15's authoring/publication; the register is read at the tranche-4 review.",
+      "meta": {"owner": "programme manager"}
+    },
+    {
+      "kind": "risk",
+      "code": "R-T13-2",
+      "title": "Job-facing storage is unproven: no action calls JobStorage; the round trip is in-process and the prompt proof is a static compile",
+      "body": "The closure review's storage clause is partial: adapter-level only, in-memory by default, no job-facing action.",
+      "probability": "medium",
+      "impact": 2,
+      "status": "open",
+      "review_at": "2026-12-12",
+      "response": "A job-facing storage action and an end-to-end proof are the remedy; named at the tranche-4 review.",
+      "meta": {"owner": "tool platform owner"}
+    },
+    {
+      "kind": "risk",
+      "code": "R-T13-3",
+      "title": "The governed call path's guards stop at the handler boundary: direct external invocation remains possible, and the spend budget and rate limits are unenforced",
+      "body": "The closure review's open items 3 and 5: the externals guard covers handlers, not callers, and `429 tool_budget_exceeded` and `rate_limit_per_min` are unimplemented.",
+      "probability": "medium",
+      "impact": 2,
+      "status": "open",
+      "review_at": "2026-12-12",
+      "response": "Decide whether the broker is the only job path; the budget is deferred by the owner (2026-11-26, no spend target until the conveyor is whole).",
+      "meta": {"owner": "tool platform owner"}
+    },
+    {
+      "kind": "assumption",
+      "code": "A-T13-1",
+      "title": "The close records the core the gate was written for: one governed call path, a ledger, a data ceiling, a pre-dispatch refusal and a keyless storage adapter",
+      "body": "The named gaps (catalogue actions, toolkits, credential profiles, spend budget, job-facing storage) are carried by T14/T15 and are not treated as satisfied.",
+      "status": "open"
+    },
+    {
+      "kind": "dependency",
+      "code": "D-T13-1",
+      "title": "T14 carries the import wave and T15 the authoring/publication of the catalogue actions and toolkits that T13 did not land",
+      "body": "The dependency is directional: T14/T15's design assumes the broker path T13 proves; a divergence reopens this register.",
+      "status": "open"
+    }
+  ]
+}

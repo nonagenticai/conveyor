@@ -18,13 +18,17 @@
 ## P2 — the promotion journal and its curation
 
 - main's journal: 498 entries; plus 16 live-card entries = **514**; `--check` green.
-- Curated journal `docs/evidence/tranche-review/journal-curated.jsonl`: **476** entries after
-  excluding 38 staging-lifecycle acts — the 6 reopens; the T9/T10/T16/T7/T4/S04 close chains
+- Curated journal `docs/evidence/tranche-review/journal-curated.jsonl`: **472** entries after
+  excluding 42 staging-lifecycle acts — the 6 reopens; the T9/T10/T16/T7/T4/S04 close chains
   (including the T16 card's done chain, both the `:` and `/` natural-key forms, and the
-  `reconstructed/…-tN` input escapes); the T13 `projects.close`. The T13/T3 closure and
-  destructive gates are **kept**; the closes return as direct acts in P2.5.
+  `reconstructed/…-tN` input escapes); the T13 `projects.close`; and the four tr3 review acts
+  (`tranche-review-gate:3`, `tranche-review-decide:3`, `tranche-review:3`,
+  `tranche-authorise:4`), whose input cites the staging snapshot `9d5404d1…` — the review is a
+  live decision on the P3 evidence and must not be replayed from the staging record. The T13/T3
+  closure and destructive gates are **kept**; the closes and the review return as direct acts in
+  P2.5/P4.
 
-## P2.5 — the tr3 architecture and lifecycles
+## P2.5 — the tr3 architecture, lifecycles and v4 rework
 
 Direct acts, ids pending:
 
@@ -38,12 +42,42 @@ Direct acts, ids pending:
 | T13 schedule-baseline decide | `<action-id>` |
 | T3 schedule baseline | `<action-id>` |
 | T3 schedule-baseline decide | `<action-id>` |
+| T13 cost baseline | `<action-id>` |
+| T13 cost-baseline decide | `<action-id>` |
+| T3 cost baseline | `<action-id>` |
+| T3 cost-baseline decide | `<action-id>` |
+| T13 registers (risk/assumption/dependency) | `<action-ids>` |
+| T3 registers (risk/assumption/dependency) | `<action-ids>` |
+| T3 retrospective ADM artefacts (7, Phase A–D) | `<action-ids>` |
 | T13 close | `<action-id>` |
 | T3 close | `<action-id>` |
 
+Owner decision 2026-11-28 (this session): the tr3 rework is delivered **inside this lane** —
+the 12 v4 delivery documents (user-stories, definition-of-ready, definition-of-done,
+acceptance-criteria for S04/T13/T3), the T3 Phase A–D retrospective artefacts, the cost
+baselines and register rows the close gate requires, and S04's closure-outputs declaration —
+because standards v4 (main `232c0339d`) made the tranche exit red for all three members and a
+red exit records `pause`, not `continue`. The bodies are in
+`docs/evidence/tranche-review/inputs/` (`t3-artefacts.json`, `delivery/*.md`).
+
+## P2.4 — the replay proof on a pristine restore
+
+The restore was re-created from the 81 dump (`/tmp/conv852-conveyor-restore.sql`, the 02:41Z
+`pg_dumpall` section) and migrated to schema **110** with the post-fix binary, then replayed
+twice through `promote-record.py --apply --local-bin /tmp/conv852-bin.sh`:
+
+- pass 1: **268 created, 204 skipped, 0 failed** (the 204 are rows the 81 dump already carries);
+- pass 2: **0 created, 472 skipped, 0 failed** — idempotent.
+
+Three natural keys (`project:closure:<T13>`, `project:closure:<T3>`, `retro:tranche-3`) record the
+action's output id on creation and the resolved row id on a skip, so their `production_id`
+differs between passes; no row is duplicated (one closure gate per project; five distinct retro
+findings). Recorded, not a defect.
+
 ## P3 — the evidence
 
-- Inputs: `docs/evidence/tranche-review/inputs/` — six files.
+- Inputs: `docs/evidence/tranche-review/inputs/` — eight files (the T3 contract, board decision,
+  contract approval, Phase-G review, the two schedule baselines, the two closes).
 - Commands: `/tmp/conv852-verify.sh` — `verify-project`, `check-tranche-exit`, `audit`. Their
   outputs are recorded at the live pass.
 
