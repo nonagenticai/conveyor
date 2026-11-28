@@ -174,14 +174,16 @@ jobs:
             DEV_AUTH_TOKEN=dev:alice \
             npx playwright test
 
-      - name: the instrument reads the suite's report
+      - name: the instrument reads the suite's report at the P6 gate
         # A green suite is the browser proof; feeding its JSON report to the instrument is what
         # marks the passing specs `verified`. --require-verified makes a registered route whose
         # spec did not run and pass a failure — a spec that exists but never runs proves nothing.
+        # --gate=P6 is the strict completeness gate S4 wires here: no absent route or action, and
+        # an empty drift, or the run fails.
         run: |
           set -euo pipefail
           cd apps/walk
-          python3 ../../scripts/build-walk-coverage.py --check --require-verified \
+          python3 ../../scripts/build-walk-coverage.py --check --require-verified --gate=P6 \
             --report test-results/walk-report.json
 
       - name: server and dev-server logs on failure

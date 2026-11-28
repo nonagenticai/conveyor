@@ -159,6 +159,8 @@ a {
   background: var(--parchment-light);
   color: var(--ink);
   border-radius: 999px;
+  /* SPEC §8: a control is at least 44 px tall (measured 37 px before S4's a11y pass). */
+  min-height: 44px;
   padding: 7px 14px;
   font: inherit;
   font-size: 0.92rem;
@@ -261,6 +263,8 @@ a {
   border: 1px solid rgba(91, 70, 54, 0.3);
   background: var(--parchment-light);
   border-radius: 999px;
+  /* SPEC §8: a control is at least 44 px tall (measured 34 px before S4's a11y pass). */
+  min-height: 44px;
   padding: 6px 12px;
   font: inherit;
   font-size: 0.86rem;
@@ -513,6 +517,8 @@ a {
   border: 0;
   background: transparent;
   border-radius: 8px;
+  /* SPEC §8: a control is at least 44 px tall. */
+  min-height: 44px;
   padding: 8px 10px;
   font: inherit;
   cursor: pointer;

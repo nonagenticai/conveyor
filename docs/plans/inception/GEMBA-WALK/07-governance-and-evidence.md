@@ -189,3 +189,76 @@ retirement of `apps/web` is a separate, later decision.
 - ADR 0024: `docs/decisions/0024-gemba-walk-host-and-identity.md`
 - Change request: `08-change-request-001-host-and-identity.md`
 - Templates: `seed/output-standard.json` (`project-wbs`, `project-baseline`, `project-registers`, `change-control`, `evidence`, `closure-review`)
+
+## Evidence
+
+Artefact **GW-A8** — implementation evidence for the GEMBA-WALK project, S4 (#817). The table is
+one row per acceptance part; a result without a recorded run is `not measured`, never a pass.
+
+### Claim
+
+The walk reaches the P6 parity gate for its retained V1 surfaces with the a11y and performance
+budgets met.
+
+### Evidence
+
+| Part | Scenario | Command | Result | SHA |
+|---|---|---|---|---|
+| P1.1 | The retained V1 board and cockpit specs | `cd apps/walk && npx playwright test e2e/v1/board.spec.ts e2e/v1/cockpit.spec.ts` | not measured locally — the verdict is the PR's `walk` job | not measured |
+| P1.2 | Every census route is present | `python3 scripts/build-walk-coverage.py --check` | 56 routes, 0 absent | `10e653158` (census baseline) |
+| P2.1 | The slice-gate audit of the 40 destination modules | `git grep -n 'is planned' -- apps/walk/src/destinations`; `git grep -n 'has_action' -- apps/web/src/screens` | 40 modules read; every non-live state matches `apps/web` or is a recorded, sanctioned divergence | `8430123a7` |
+| P2.2 | The audit's gaps are owned follow-ons | `sed -n '/## 6. Findings/,/## 7/p' docs/evidence/walk-gate-audit.md` | F2 (seven board write verbs) → #912; F3 (`/knowledge/sources`) → #910; F1 recorded as a non-goal | `8430123a7` |
+| P3.1 | The P6 parity gate | `cd apps/walk && npx playwright test && python3 ../../scripts/build-walk-coverage.py --check --require-verified --gate=P6 --report test-results/walk-report.json` | wired in `.github/workflows/walk.yml`; the verdict is the PR's `walk` job | not measured |
+| P3.2 | The a11y and performance budgets | the commands in `docs/evidence/walk-a11y.md` and `docs/evidence/walk-perf.md` | met — soak 1.059× over 702 visits (warm baseline); shell 36.2 KB; frames p95 16.7 ms | not measured |
+| P3.3 | The P6 primacy runbook | `grep -n '^## 14\.' docs/plans/GEMBA-WALK.md` | present — §14 with 14.1–14.5: the gate, the evidence pack, both answers, roles | not measured |
+| P4.1 | The closure review is decided by a distinct seat | — | open — the requester cannot approve; an independent reviewer's decision closes it | — |
+| P4.2 | GW-A8 and GW-A9 are published and read back hash-equal | — | open — the live publish closes it | — |
+
+### Verification
+
+The commands are run from the repository root unless the command names `cd`:
+
+```bash
+python3 scripts/build-walk-coverage.py --check
+git grep -n 'is planned\|not in this role' -- apps/walk/src/destinations
+git grep -n 'has_action' -- apps/web/src/screens
+cd apps/walk
+PLAYWRIGHT_CHANNEL=chromium DEV_AUTH_TOKEN=dev:alice npx playwright test e2e/a11y
+npx playwright test e2e/v1/board.spec.ts e2e/v1/cockpit.spec.ts
+npx playwright test
+python3 ../../scripts/build-walk-coverage.py --check --require-verified --gate=P6 \
+  --report test-results/walk-report.json
+```
+
+The performance record's deployed run is:
+
+```bash
+cd apps/walk
+BASE_URL=https://game.nonagentic.ai E2E_USER=… E2E_PASS=… \
+  npx playwright test e2e/deployed/perf.spec.ts
+SOAK=1 npx playwright test e2e/deployed/perf.spec.ts --grep soak
+```
+
+The local runtime cannot build the server, so the Playwright suite's verdict is the PR's `walk`
+job (`.github/workflows/walk.yml`), which builds the server, runs the suite and feeds its report
+to the instrument at the P6 gate.
+
+### Links
+
+- Issue: #817
+- Plan: `docs/plans/GEMBA-WALK.md` (§11, §14)
+- Register row: GW-A8 in `03-artifact-register.md`
+- Evidence: `docs/evidence/walk-gate-audit.md`, `docs/evidence/walk-a11y.md`,
+  `docs/evidence/walk-perf.md`
+- Coverage record: `docs/evidence/walk-coverage.json`
+
+### Gap
+
+- Frame p50 is `not measured`; the performance record carries p95 and worst only. A p50 stat in
+  `e2e/deployed/perf.spec.ts` closes it.
+- The 16 px gutter is `not measured` separately; the layout spec asserts page overflow, not the
+  gutter width. A width assertion at 390 px closes it.
+- P4.1 and P4.2 are `open`; the closure needs a distinct seat's decision, and GW-A8/GW-A9 are
+  unpublished. The independent review and the live publish close them.
+- The live publish is `open`; publishing GW-A8 and GW-A9 and reading each body back hash-equal
+  closes it.

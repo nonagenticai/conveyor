@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The walk's accessibility record (W7) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/walk-a11y.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-walks-accessibility-record-w7">The walk's accessibility record (W7)</h1>
+<p>Measured 2026-11-28 for S4 (#817) against <code>apps/walk</code> at its head, using the documented local harness (the published server image + Postgres 18 + Redis, <code>DEV_AUTH_TOKEN=dev:alice</code>). The browser is Playwright's chromium; every number below is printed by the specs, not estimated.</p>
+<h2 id="protocol">Protocol</h2>
+<pre class="bash"><code>cd apps/walk
+PLAYWRIGHT_CHANNEL=chromium DEV_AUTH_TOKEN=dev:alice npx playwright test e2e/a11y</code></pre>
+<ul>
+<li><code>e2e/a11y/keyboard.spec.ts</code> — the skip link, a room sheet, Escape, focus return.</li>
+<li><code>e2e/a11y/layout.spec.ts</code> — the canvas as an image and out of the tab order; the palette as a keyboard path; 390 px and 200 % zoom with no horizontal scroll; the 44 px control target; the contrast ratio of ink on paper.</li>
+</ul>
+<h2 id="results">Results</h2>
+<table>
+<thead>
+<tr>
+<th>Budget (<code>GEMBA-WALK-SPEC.md</code> §8)</th>
+<th>Measured</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every destination reachable by keyboard alone; the skip link precedes the HUD</td>
+<td><code>#screen</code> receives focus from the skip link; the palette opens from its button by Enter; Escape returns focus to the opener</td>
+<td>met</td>
+</tr>
+<tr>
+<td>The canvas is <code>role="img"</code>, named, and not focus-trapped</td>
+<td><code>role="img"</code>, <code>aria-label="Walk world"</code>, <code>tabIndex = -1</code></td>
+<td>met</td>
+</tr>
+<tr>
+<td>Sheets manage focus (capture, escape, return)</td>
+<td>focus is contained on open, Escape closes, focus returns to the opener</td>
+<td>met</td>
+</tr>
+<tr>
+<td>390 px width: no horizontal page scroll</td>
+<td>0 px overflow</td>
+<td>met</td>
+</tr>
+<tr>
+<td>200 % zoom: no horizontal page scroll</td>
+<td>0 px overflow (measured with the root at <code>zoom: 2</code>)</td>
+<td>met</td>
+</tr>
+<tr>
+<td>Controls at least 44 px</td>
+<td>every visible control measured 44 px</td>
+<td>met <strong>after a fix</strong> (below)</td>
+</tr>
+<tr>
+<td>WCAG 2.2 AA contrast</td>
+<td>heading <strong>12.9:1</strong>, body <strong>6.1:1</strong>, primary control <strong>12.9:1</strong></td>
+<td>met (AA needs 4.5:1 body, 3:1 large text)</td>
+</tr>
+</tbody>
+</table>
+<p>Raw annotations from the run:</p>
+<pre><code>a11y.contrast={&quot;heading&quot;:12.889,&quot;body&quot;:6.146,&quot;button&quot;:12.889}
+a11y.controls= every control 44 px (the full list is in the run&#39;s JSON report)</code></pre>
+<h2 id="the-fix-this-record-required">The fix this record required</h2>
+<p>The first measurement found every control under the budget: <code>.button</code> <strong>37 px</strong>, <code>.map-room</code> **34 px<code>, </code>.palette-row<code>**36 px** — no minimum height in</code>apps/walk/style.css<code>. The SPEC's 44 px is not optional, so S4 adds </code>min-height: 44px` to those three control classes and nothing else. This is a design-system change with a global effect, declared here and in the issue so it is reviewable: it changes no layout logic, only the minimum size of a control. The same spec asserts it from now on, so a regression fails CI rather than a later audit.</p>
+<h2 id="the-one-promise-not-met">The one promise not met</h2>
+<p>The Palette button's <code>title</code> reads "Search routes and actions (Ctrl/Cmd + K)", and <strong>no handler for that shortcut exists anywhere in the client</strong> (<code>grep -rn 'KeyK\|metaKey\|ctrlKey' apps/walk/src</code> returns nothing). The palette is still a keyboard path — Tab and Enter reach it, proved above — but the advertised shortcut is a false promise. The shell is a parent-owned seam, so this is defect unit <strong>#914</strong>, not an S4 edit; its spec case lands with that unit.</p>
+<h2 id="re-running">Re-running</h2>
+<pre class="bash"><code>cd apps/walk &amp;&amp; PLAYWRIGHT_CHANNEL=chromium DEV_AUTH_TOKEN=dev:alice npx playwright test e2e/a11y</code></pre>
+<p>The <code>walk</code> workflow runs the same specs on every PR and on every push to <code>main</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/walk-a11y.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

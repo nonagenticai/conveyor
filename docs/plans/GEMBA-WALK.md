@@ -404,3 +404,62 @@ A second backend or decision store; SSR; a native mobile app; chat/AV; customer 
 design pack; a public unauthenticated v1; pixel parity with the mock; retiring `apps/web` before the
 P6 gate; adding a SPEC_V2 §12 `T##` row. The only seed change is the sanctioned GEMBA-WALK
 registration in the inception unit (#792); no other project's row moves.
+
+## 14. The P6 primacy runbook
+
+Primacy is the owner's decision, not the delivery team's. This section is what must be true before
+the question is put, and what follows either answer. It was written at S4 (#817); nothing in it
+executes before the owner decides.
+
+### 14.1 The gate
+
+```bash
+cd apps/walk
+npx playwright test                      # the suite writes test-results/walk-report.json
+python3 ../../scripts/build-walk-coverage.py --check --require-verified --gate=P6 \
+  --report test-results/walk-report.json
+```
+
+Exit 0 requires all of: no absent census row, every registered route verified **by that run's
+report**, every action `schema-rendered`, an empty drift, and no expired exemption. The PR and the
+merge run both execute this step (`.github/workflows/walk.yml`), so a regression fails CI rather
+than a later audit.
+
+### 14.2 The evidence pack
+
+| Record | What it proves |
+|---|---|
+| `docs/evidence/walk-coverage.json` + the run's report | every route has a passing spec; every action renders |
+| `docs/evidence/walk-gate-audit.md` | every non-live state matches `apps/web` or is a recorded, sanctioned divergence |
+| `docs/evidence/walk-a11y.md` | keyboard path, contrast, 390 px and 200 % zoom, 44 px controls |
+| `docs/evidence/walk-perf.md` | shell bytes, frame budget, soak |
+| the deployed full matrix (`e2e/deployed/full-matrix.spec.ts`) | the live host serves every top-level route after a real sign-in |
+
+### 14.3 If the owner says yes
+
+1. **Freeze.** Announce the freeze date; `apps/web` becomes read-only for feature work; bug fixes
+   continue on both clients until retirement.
+2. **Redirect map.** The operator host keeps `/walk/*` → `308` to the game host (already live), and
+   every internal link to `apps/web` destinations is repointed to the game host path. The map is a
+   table of `apps/web path → game path`; the walk is served at the root, so the map is the identity
+   on the destination set and a `308` for `/walk/*`.
+3. **Stabilisation.** Four weeks with the walk as the default entry point. Exit criteria: no P1
+   defect open, the P6 gate green on every release, and no fallback use of `apps/web` beyond the
+   documented rollback.
+4. **Retirement.** After stabilisation, `apps/web`'s server-side routes are removed behind a flag,
+   its image stops publishing, and the deployment is deleted. The decision is reversible until the
+   deployment is deleted.
+5. **Rollback.** Re-point the entry URL to `apps/web` and lift the freeze. The walk has no separate
+   data store, so rollback is a routing change, not a migration.
+
+### 14.4 If the owner says no
+
+The walk remains an alternative client: the gate stays wired in CI, the parity matrix is kept
+current, and the result is recorded with the date and the reason. A later review re-asks the
+question against a fresh gate run; it does not reopen the architecture.
+
+### 14.5 Roles
+
+The **quality-manager** role certifies the gate run and the evidence pack; the **release-manager**
+proves the deployed identity and the live matrix; the **owner** decides. No session records the
+owner's decision on their behalf.

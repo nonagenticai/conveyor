@@ -485,6 +485,57 @@ python3 docs/design/scripts/build-docs.py &amp;&amp; node docs/design/scripts/ch
 </ul>
 <h2 id="13-non-goals">13. Non-goals</h2>
 <p>A second backend or decision store; SSR; a native mobile app; chat/AV; customer care; replacing the design pack; a public unauthenticated v1; pixel parity with the mock; retiring <code>apps/web</code> before the P6 gate; adding a SPEC_V2 §12 <code>T##</code> row. The only seed change is the sanctioned GEMBA-WALK registration in the inception unit (#792); no other project's row moves.</p>
+<h2 id="14-the-p6-primacy-runbook">14. The P6 primacy runbook</h2>
+<p>Primacy is the owner's decision, not the delivery team's. This section is what must be true before the question is put, and what follows either answer. It was written at S4 (#817); nothing in it executes before the owner decides.</p>
+<h3 id="141-the-gate">14.1 The gate</h3>
+<pre class="bash"><code>cd apps/walk
+npx playwright test                      # the suite writes test-results/walk-report.json
+python3 ../../scripts/build-walk-coverage.py --check --require-verified --gate=P6 \
+  --report test-results/walk-report.json</code></pre>
+<p>Exit 0 requires all of: no absent census row, every registered route verified <strong>by that run's report</strong>, every action <code>schema-rendered</code>, an empty drift, and no expired exemption. The PR and the merge run both execute this step (<code>.github/workflows/walk.yml</code>), so a regression fails CI rather than a later audit.</p>
+<h3 id="142-the-evidence-pack">14.2 The evidence pack</h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>What it proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/evidence/walk-coverage.json</code> + the run's report</td>
+<td>every route has a passing spec; every action renders</td>
+</tr>
+<tr>
+<td><code>docs/evidence/walk-gate-audit.md</code></td>
+<td>every non-live state matches <code>apps/web</code> or is a recorded, sanctioned divergence</td>
+</tr>
+<tr>
+<td><code>docs/evidence/walk-a11y.md</code></td>
+<td>keyboard path, contrast, 390 px and 200 % zoom, 44 px controls</td>
+</tr>
+<tr>
+<td><code>docs/evidence/walk-perf.md</code></td>
+<td>shell bytes, frame budget, soak</td>
+</tr>
+<tr>
+<td>the deployed full matrix (<code>e2e/deployed/full-matrix.spec.ts</code>)</td>
+<td>the live host serves every top-level route after a real sign-in</td>
+</tr>
+</tbody>
+</table>
+<h3 id="143-if-the-owner-says-yes">14.3 If the owner says yes</h3>
+<ol type="1">
+<li><strong>Freeze.</strong> Announce the freeze date; <code>apps/web</code> becomes read-only for feature work; bug fixes continue on both clients until retirement.</li>
+<li><strong>Redirect map.</strong> The operator host keeps <code>/walk/*</code> → <code>308</code> to the game host (already live), and every internal link to <code>apps/web</code> destinations is repointed to the game host path. The map is a table of <code>apps/web path → game path</code>; the walk is served at the root, so the map is the identity on the destination set and a <code>308</code> for <code>/walk/*</code>.</li>
+<li><strong>Stabilisation.</strong> Four weeks with the walk as the default entry point. Exit criteria: no P1 defect open, the P6 gate green on every release, and no fallback use of <code>apps/web</code> beyond the documented rollback.</li>
+<li><strong>Retirement.</strong> After stabilisation, <code>apps/web</code>'s server-side routes are removed behind a flag, its image stops publishing, and the deployment is deleted. The decision is reversible until the deployment is deleted.</li>
+<li><strong>Rollback.</strong> Re-point the entry URL to <code>apps/web</code> and lift the freeze. The walk has no separate data store, so rollback is a routing change, not a migration.</li>
+</ol>
+<h3 id="144-if-the-owner-says-no">14.4 If the owner says no</h3>
+<p>The walk remains an alternative client: the gate stays wired in CI, the parity matrix is kept current, and the result is recorded with the date and the reason. A later review re-asks the question against a fresh gate run; it does not reopen the architecture.</p>
+<h3 id="145-roles">14.5 Roles</h3>
+<p>The <strong>quality-manager</strong> role certifies the gate run and the evidence pack; the <strong>release-manager</strong> proves the deployed identity and the live matrix; the <strong>owner</strong> decides. No session records the owner's decision on their behalf.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/GEMBA-WALK.md</code> at build time.</span>
