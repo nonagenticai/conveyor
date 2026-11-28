@@ -43,6 +43,10 @@ pub enum ProposalError {
     /// The approval row was refused.
     #[error(transparent)]
     Store(#[from] ApprovalStoreError),
+    /// The tenant's approval policy for the proposed action could not be read (v1-u5-copilot-
+    /// gate-quorum: the proposal opens a gate at the policy's quorum floor).
+    #[error(transparent)]
+    Policy(#[from] conveyor_store::approval_policy::ApprovalPolicyStoreError),
     /// The input could not be sealed (the process has no KEK, or the cipher failed).
     #[error(transparent)]
     Secret(#[from] conveyor_store::secret::SecretError),
@@ -230,12 +234,29 @@ pub async fn create_tx(
     request: &ProposalRequest<'_>,
 ) -> Result<Approval, ProposalError> {
     let mut new = NewApproval::new(request.spec.name.to_string(), KIND);
+    // SPEC_V2 §5.4: the tenant's policy row is the quorum FLOOR for this action, and a copilot
+    // proposal opens a gate exactly as `approvals.request` does — a path that did not read the
+    // policy could open a one-decision gate under a two-decision policy (v1-u5-copilot-gate-
+    // quorum). An unreadable row is a configuration fault, never a licence to open at one.
+    let policy_floor =
+        match conveyor_store::approval_policy::get(&mut *conn, tenant, request.spec.name.as_ref())
+            .await
+        {
+            Ok(Some(policy)) => policy.required_decisions,
+            Ok(None) => 1,
+            Err(error) => return Err(ProposalError::Policy(error)),
+        };
     // SPEC_V2 §6.5: an ops-controlled action carries human dual control. The invoke boundary
     // refuses the call unless the gate has a two-decision quorum, so the proposal opens it with
     // that quorum — a single-decision gate could be approved and still authorise nothing.
-    if conveyor_actions::control::approvals::requires_dual_control(request.spec.name.as_ref()) {
-        new.required_decisions = new.required_decisions.max(2);
-    }
+    let dual_control = if conveyor_actions::control::approvals::requires_dual_control(
+        request.spec.name.as_ref(),
+    ) {
+        2
+    } else {
+        1
+    };
+    new.required_decisions = new.required_decisions.max(dual_control).max(policy_floor);
     new.project_id = request.project_id;
     new.requested_by = Some(request.proposer_id);
     new.expires_at = request.expires_at;
