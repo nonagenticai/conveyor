@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Evidence — tranche-9 PI outputs carry the period in unit · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-documents-unit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="evidence--tranche-9-pi-outputs-carry-the-period-in-unit">Evidence — tranche-9 PI outputs carry the period in <code>unit</code></h1>
+<p>Measured 2026-11-28 on the replay record, snapshot <code>/tmp/snap-9</code>, after the two <code>documents.compose</code> writes and the <code>outputs.js</code> re-read.</p>
+<table>
+<thead>
+<tr>
+<th>output</th>
+<th>id</th>
+<th>project</th>
+<th>category</th>
+<th>unit</th>
+<th>published_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PI plan</td>
+<td><code>01a222b4-5dee-7060-a889-af69cf6d2ddf</code></td>
+<td>P0 <code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code></td>
+<td><code>pi-plan</code></td>
+<td><code>tranche-9</code></td>
+<td><code>2026-11-28T15:09:35.588792Z</code></td>
+</tr>
+<tr>
+<td>PI objectives</td>
+<td><code>01a222b4-5eb7-777f-b317-c0e445e762d7</code></td>
+<td>P0 <code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code></td>
+<td><code>pi-objectives</code></td>
+<td><code>tranche-9</code></td>
+<td><code>2026-11-28T15:09:35.788607Z</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>DocumentComposeIn</code> carries <code>unit</code> (<code>crates/actions/src/documents/actions.rs</code>), and <code>verify-project.py::_published_for_period</code> reads the literal token <code>tranche-9</code> from title or unit, so composing the period into <code>unit</code> at creation is what makes every member's <code>pi_plan</code> and <code>pi_objectives</code> check see these rows. The measured tranche-7 blocker — a published row with <code>unit: null</code> that the period check cannot see — does not apply here: both rows read back with the period set, and the snapshot's <code>outputs.js</code> returns both under <code>unit: "tranche-9"</code>.</p>
+<p>The plan gate is separate from the row state: <code>cadences.approve_plan</code> wrote approval <code>01a222b4-f15c-7c4e-ae37-153f5bfc3e80</code> with gate <code>cadences.approve_plan</code>, status <code>approved</code>, and a <code>rule</code> decision by <code>01a1cf1e-09dd-7580-99cc-de395f3e86cc</code> under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code> — the same shape as tranche 8's <code>01a2229e-bdf3-74ca-bf5f-17f28543c095</code>. The <code>pi</code> cadence row's own state stays <code>awaiting_approval</code>; the approval row is the gate, and the snapshot's <code>msp.json</code> carries the plan's metadata on the row.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-9/evidence/pi-documents-unit.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

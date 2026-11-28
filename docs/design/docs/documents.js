@@ -2999,6 +2999,105 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-6/tranche-review-evidence.md"
     },
     {
+      "title": "Evidence — tranche-9 demo cadence",
+      "path": "docs/evidence/rework/tranche-9/evidence/demo-cadence.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/demo-cadence.md",
+      "section": "Evidence",
+      "sha256": "58922c83946e53b1a57b4f67023eceab2b80aae303dfb62d0dff620dda8de1ca",
+      "bytes": 341,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/demo-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-9 lesson",
+      "path": "docs/evidence/rework/tranche-9/evidence/lesson.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/lesson.md",
+      "section": "Evidence",
+      "sha256": "73eb792aef9a0253ddfd77fe3d3cd296b68e1d8b14c6e81389bcb66edd39a686",
+      "bytes": 700,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/lesson.md"
+    },
+    {
+      "title": "Evidence — tranche-9 PI plan approval",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-approval.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-approval.md",
+      "section": "Evidence",
+      "sha256": "85db9192e59ed2ceac5545120434ea8a020a7350e8e5c2c80936dbe1d4b9543d",
+      "bytes": 468,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-approval.md"
+    },
+    {
+      "title": "Evidence — tranche-9 pi cadence",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-cadence.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-cadence.md",
+      "section": "Evidence",
+      "sha256": "05a53acb6c1a7558c51bfce9603ba151d8d86f7daa9d67550d7df4b1fbc1cd97",
+      "bytes": 518,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-9 PI outputs carry the period in unit",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-documents-unit.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-documents-unit.md",
+      "section": "Evidence",
+      "sha256": "338ed420aebbbbab578fbed93fae3ab183c28f7fce157baacbd19616dfd3d56b",
+      "bytes": 1708,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-documents-unit.md"
+    },
+    {
+      "title": "Evidence — tranche-9 PI row plan",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-meta.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-meta.md",
+      "section": "Evidence",
+      "sha256": "7088a5345a2be6fee6316edbbb8e8d9ba015a715ff4a15c571f21d3b6d4a0f99",
+      "bytes": 444,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-meta.md"
+    },
+    {
+      "title": "Evidence — tranche-9 PI objectives output",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-objectives.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-objectives.md",
+      "section": "Evidence",
+      "sha256": "3ef84ae22e95b73d5ce28dfbd5ba45779fdb84c590ccd76f0796f2796d8e48fc",
+      "bytes": 429,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-objectives.md"
+    },
+    {
+      "title": "Evidence — tranche-9 PI plan output",
+      "path": "docs/evidence/rework/tranche-9/evidence/pi-plan.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/pi-plan.md",
+      "section": "Evidence",
+      "sha256": "4cff241b2787752abf3df415ca259acd291e1224d4d2462153738655c95433ea",
+      "bytes": 502,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/pi-plan.md"
+    },
+    {
+      "title": "Evidence — tranche-9 refinement cadence",
+      "path": "docs/evidence/rework/tranche-9/evidence/refinement-cadence.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/refinement-cadence.md",
+      "section": "Evidence",
+      "sha256": "e2dc5d9afd80a4a9e4dd673f7690671a0b50bf1bb6e5b3159716d7a92a01c46c",
+      "bytes": 431,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/refinement-cadence.md"
+    },
+    {
+      "title": "Evidence — tranche-9 refinement record",
+      "path": "docs/evidence/rework/tranche-9/evidence/refinement-wsjf.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/refinement-wsjf.md",
+      "section": "Evidence",
+      "sha256": "187e69856aff4cc6e655ae353b94b23943c86e8487733c6ce99c8ee9d815ffb0",
+      "bytes": 503,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/refinement-wsjf.md"
+    },
+    {
+      "title": "Evidence — tranche-9 retro cadence",
+      "path": "docs/evidence/rework/tranche-9/evidence/retro-cadence.html",
+      "source": "docs/evidence/rework/tranche-9/evidence/retro-cadence.md",
+      "section": "Evidence",
+      "sha256": "6d77488a677f0549b413f442510d951421dae8beb84fc792b0ddb3a5a32e9977",
+      "bytes": 295,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/retro-cadence.md"
+    },
+    {
       "title": "S04 P4.1 — the live coding, worker and billing receipts",
       "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
       "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",

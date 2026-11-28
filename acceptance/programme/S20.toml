@@ -6,9 +6,9 @@ gate_checks = ["S20-project", "S20-baseline", "S20-charter", "S20-contract", "S2
 [[check]]
 id = "S20-project"
 check = "project"
-status = "active"
+status = "closed"
 severity = "P0"
-description = "S20 is active"
+description = "S20 is closed"
 
 [[check]]
 id = "S20-baseline"
