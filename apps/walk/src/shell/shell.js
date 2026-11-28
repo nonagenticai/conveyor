@@ -417,6 +417,9 @@ export class Shell {
     const body = el("div", { class: "palette" }, search, results);
     const sheet = this.openSheet({ title: "Palette", body });
     render();
+    // openSheet focuses the first focusable, which is the Close button. A search palette opened by
+    // Ctrl/Cmd+K must be ready to type into, so the query box takes focus after the list is drawn.
+    search.focus();
   }
 
   /**
