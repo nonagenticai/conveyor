@@ -287,23 +287,24 @@ plan states both paths so no session has to improvise.
 
 ## 9. Parity matrix (initial state at the baseline)
 
-Every row starts `absent`. A row reaches `verified` only through §6.
+Every row started `absent` at the baseline. A row reaches `verified` only through §6; the W3/W4
+rows were recorded on 2026-11-27 (#814/#877, #815/#874, #816/#880), and S4's two V1 routes remain.
 
 | Surface | Walk route | Read | Write | Spec | Status |
 |---|---|---|---|---|---|
-| Organisation | `/organisation` (+ `/jobs`, `/agents`, `/tools`, `/project-types`) | §10.5 | §10.5 | `organisation.spec.ts` | absent |
-| Procedures | `/procedures` (+ `/build/processes`, `/build/process-map`) | §10.5 | §10.5 | `procedures.spec.ts` | absent |
-| Authoring | `/authoring` | §10.5 | §10.5 | `authoring.spec.ts` | absent |
-| Portfolio | `/portfolio`, `/portfolio/:programme_id` | §10.5 | §10.5 | `portfolio.spec.ts` | absent |
-| Meetings | `/meetings`, `/meetings/:id` | T19 | T19 | `meetings.spec.ts` | absent |
-| Programme | `/programme` | §10.5 | §10.5 | `programme.spec.ts` | absent |
-| Architecture (ADM) | `/design/adm` | §10.5 | §10.5 | `adm.spec.ts` | absent |
-| Plan | `/plan` (+ `/board/:board_id`) | §10.5 | §10.5 | `plan.spec.ts` | absent |
-| Improve | `/improve`, `/evals/*` | §10.5 | §10.5 | `improve.spec.ts` | absent |
-| Operations | `/operations` | §10.5 | §10.5 | `operations.spec.ts` | absent |
-| Tools | `/tools` | §10.5 | §10.5 | `tools.spec.ts` | absent |
-| V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform) | the app path | the app's read contract | actions | the matching `apps/web` spec | absent |
-| Utilities (palette, sign-in, tenant switch, theme) | `/` | `/api/me`, config | none | `shell`/`shell-login` | absent |
+| Organisation | `/organisation` (+ `/jobs`, `/agents`, `/tools`, `/project-types`) | §10.5 | §10.5 | `organisation.spec.ts` | verified |
+| Procedures | `/procedures` (+ `/build/processes`, `/build/process-map`) | §10.5 | §10.5 | `procedures.spec.ts` | verified |
+| Authoring | `/authoring` | §10.5 | §10.5 | `authoring.spec.ts` | verified |
+| Portfolio | `/portfolio`, `/portfolio/:programme_id` | §10.5 | §10.5 | `portfolio.spec.ts` | verified |
+| Meetings | `/meetings`, `/meetings/:id` | T19 | T19 | `meetings.spec.ts` | verified |
+| Programme | `/programme` | §10.5 | §10.5 | `programme.spec.ts` | verified |
+| Architecture (ADM) | `/design/adm` | §10.5 | §10.5 | `adm.spec.ts` | verified |
+| Plan | `/plan` (+ `/board/:board_id`) | §10.5 | §10.5 | `plan.spec.ts` | verified |
+| Improve | `/improve`, `/evals/*` | §10.5 | §10.5 | `improve.spec.ts` | verified |
+| Operations | `/operations` | §10.5 | §10.5 | `operations.spec.ts` | verified |
+| Tools | `/tools` | §10.5 | §10.5 | `tools.spec.ts` | verified |
+| V1 retained (Today, boards, cards, runs, approvals, requirements, models, system architecture, processes, map, search, usage, prompt audit, evals, benchmarks, settings, copilot, platform) | the app path | the app's read contract | actions | the matching `apps/web` spec; S4: `e2e/v1/board.spec.ts`, `e2e/v1/cockpit.spec.ts` | verified except `/boards`, `/card/:card_id` (S4) |
+| Utilities (palette, sign-in, tenant switch, theme) | `/` | `/api/me`, config | none | `shell`/`shell-login` | verified |
 
 **Post-freeze surfaces (2026-11-27, #888).** Four `apps/web` routes landed after the census freeze
 and are part of the parity target: `/feedback` (`feedback.spec.ts`), `/knowledge/sources`

@@ -1,0 +1,45 @@
+{
+  "adopted": {
+    "335": {
+      "issue": 892,
+      "merged": "d13ac865aff5078d9018c7d14f08b888a3b9ac6c",
+      "merged_at": "2026-11-18T11:20:37Z"
+    },
+    "465": {
+      "issue": 893,
+      "merged": "bee26c24d7ef02a9d4dc65c21dc0d3dccae7dea9",
+      "merged_at": "2026-11-20T03:14:39Z"
+    },
+    "591": {
+      "issue": 894,
+      "merged": "71fa85876df35b1fbffbc19cd08b7df71889c978",
+      "merged_at": "2026-11-22T20:16:40Z"
+    },
+    "597": {
+      "issue": 895,
+      "merged": "dd1b9b4a9fad0e4bc41978575f288f54fdfddc27",
+      "merged_at": "2026-11-22T22:51:00Z"
+    },
+    "613": {
+      "issue": 896,
+      "merged": "13f490c1750792c5e128e9d51093fa81ff39af5c",
+      "merged_at": "2026-11-23T11:24:01Z"
+    },
+    "64": {
+      "issue": 890,
+      "merged": "2b466694527f49704bae1a87481bfa0b4e450f3d",
+      "merged_at": "2026-11-13T14:06:44Z"
+    },
+    "774": {
+      "issue": 897,
+      "merged": "f40b92410eddd0188717a820cbdac263fa0cc48e",
+      "merged_at": "2026-11-27T02:09:49Z"
+    },
+    "96": {
+      "issue": 891,
+      "merged": "268c05f1a0d3448955721b74bf59a14fcb0748e6",
+      "merged_at": "2026-11-14T09:36:36Z"
+    }
+  },
+  "comment": "Adopted deliveries (#869, owner decision 2026-11-27): merged PRs that carried no closing keyword. Each entry pairs the PR with its closed retro unit record. This map is the PR's closing reference and is read by scripts/proof/collect_units.py; the merged PR bodies are not rewritten."
+}

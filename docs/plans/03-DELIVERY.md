@@ -43,6 +43,13 @@ line.
 - Prefer file-disjoint issues: `block-duplicate-pr.py` denies a PR that overlaps ≥2 files with a
   recent PR. Overlapping issues are sequenced with `status:blocked`, never run in parallel.
 
+**Adoption — the record for a delivery that merged without an issue** (owner decision, 2026-11-27,
+#869). A merged delivery is recorded, never exempted. The record is a retro unit issue whose
+`Adopted-from` names the merged PR, plus an entry in `scripts/proof/adopted.json` pairing that PR
+with the issue; the collector reads the entry as the PR's closing reference
+(`pull.closing_reference/v1`). An adoption changes no code and rewrites no history: the merged PR,
+its body and its checks stay as they were. An exemption class is not a record and is not used.
+
 ## Issue content contract — DoR, acceptance criteria, DoD
 
 Every unit issue is a durable brief: a session that has never seen the plan must be able to decide

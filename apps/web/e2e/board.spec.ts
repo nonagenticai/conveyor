@@ -21,9 +21,26 @@ test("keyboard moves a card between lanes and the move survives a reload", async
 
   await card.focus();
   await card.press("ArrowRight");
+  // The gesture is the action; prove its effect on the board's own rows before the screen read.
+  // Under full-suite load the refetch can outlast a DOM wait (#733, the #512 family), and a
+  // screen read that fails first tells you nothing about whether the move happened.
+  await expect
+    .poll(
+      async () => {
+        const view = await request
+          .get(`/api/boards/${fixture.boardId}/cards?limit=200`)
+          .then((r) => r.json());
+        const row = (view.items ?? []).find(
+          (entry: { id: string }) => entry.id === fixture.card.id,
+        );
+        return row?.list_id;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(fixture.active.id);
   await expect(
     page.locator(".lane", { hasText: "Active" }).locator(".card", { hasText: title }),
-  ).toBeVisible({ timeout: 10_000 });
+  ).toBeVisible({ timeout: 30_000 });
 
   // The move is persisted, not just a local re-render.
   await page.reload();
@@ -319,7 +336,7 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   // The card is a `feature`: the seeded delivery matrix gives `bug` no archive→intake edge, so
   // a bug card's unarchive is refused by the type, not by the screen.
   const featureName = `e2e feature ${stamp}`;
-  await invoke(request, "cards.create", {
+  const feature = await invoke<{ id: string }>(request, "cards.create", {
     board_id: fixture.boardId,
     list_id: fixture.intake.id,
     name: featureName,
@@ -328,8 +345,28 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await page.reload();
   const card = page.locator(".card", { hasText: featureName });
   await card.getByRole("button", { name: "Archive" }).click();
-  await expect(page.locator(".archived")).toContainText(featureName);
+  // Prove the write on the card's own row before reading the screen (#733, the #512 family):
+  // under the full suite the panel's refetch can outlast a DOM wait.
+  await expect
+    .poll(
+      async () => {
+        const view = await request.get(`/api/cards/${feature.id}`).then((r) => r.json());
+        return view.card?.archived_at ?? null;
+      },
+      { timeout: 30_000 },
+    )
+    .not.toBeNull();
+  await expect(page.locator(".archived")).toContainText(featureName, { timeout: 30_000 });
   await page.locator(".archived").getByRole("button", { name: "Unarchive" }).click();
-  await expect(page.locator(".card", { hasText: featureName })).toBeVisible();
+  await expect
+    .poll(
+      async () => {
+        const view = await request.get(`/api/cards/${feature.id}`).then((r) => r.json());
+        return view.card?.archived_at ?? null;
+      },
+      { timeout: 30_000 },
+    )
+    .toBeNull();
+  await expect(page.locator(".card", { hasText: featureName })).toBeVisible({ timeout: 30_000 });
   await expect(page.locator(".problem")).toHaveCount(0);
 });

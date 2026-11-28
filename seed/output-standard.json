@@ -48,6 +48,7 @@
     "safe-portfolio",
     "safe-art",
     "safe-cadence",
+    "epic",
     "project-wbs",
     "project-baseline",
     "project-registers",
@@ -1996,6 +1997,27 @@
         ]
       }
     },
+    "epic": {
+      "required": [
+        "Epic",
+        "Features",
+        "Enablers",
+        "WSJF"
+      ],
+      "optional": [
+        "Dependencies",
+        "PI objectives",
+        "Demo evidence",
+        "Inspect & adapt",
+        "Links"
+      ],
+      "skeleton": "# Epic\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Epic\n\nThe outcome this epic delivers, stated so its completion is observable.\n\n## Features\n\nThe features it delivers, each with its acceptance.\n\n## Enablers\n\nThe enablers the features depend on.\n\n## WSJF\n\nThe weighted shortest job first inputs and the resulting order.\n\n## Dependencies\n\nWhat this epic depends on and what depends on it.\n\n## PI objectives\n\nThe PI objectives this epic contributes to.\n\n## Demo evidence\n\nThe demo that shows the epic working.\n\n## Inspect & adapt\n\nThe retrospective outcome and any change it produced.\n\n## Links\n\nThe published record, the plan and the issues.\n",
+      "standard": "SAFe",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.2"
+    },
     "project-wbs": {
       "required": [
         "Work packages",
@@ -3611,6 +3633,7 @@
     "safe-portfolio",
     "safe-art",
     "safe-cadence",
+    "epic",
     "project-wbs",
     "project-baseline",
     "project-registers",
