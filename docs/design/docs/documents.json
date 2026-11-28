@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "c256a9f0b8e4f1976d422ed9f2854da61f1b2eb4ac01930aed3ae42b65cc51a2",
-      "bytes": 202078,
+      "sha256": "277afacc67d79c98c248880e86d9bc5ce3d72bd5a4980625f88552b784fc44e5",
+      "bytes": 209817,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -3840,8 +3840,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "9e1e3097e8abbe22d125e1f5705e7468ada816867aadb68ce039edcd24e26773",
-      "bytes": 263625,
+      "sha256": "d79be824fe688c92494307134d309b4fdb112964f511731698b753883d5a4bae",
+      "bytes": 264340,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -3942,6 +3942,15 @@
       "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad",
       "bytes": 6451,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md"
+    },
+    {
+      "title": "BDD delivery at the work package — the standard, the app, the public record and the skills",
+      "path": "docs/plans/07-BDD-DELIVERY.html",
+      "source": "docs/plans/07-BDD-DELIVERY.md",
+      "section": "Plans",
+      "sha256": "52fd5b6748e4566a331a8eaf29c2bc6f6625f34945d7532514a51df4065c7106",
+      "bytes": 9961,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/07-BDD-DELIVERY.md"
     },
     {
       "title": "GEMBA-WALK — the Gemba Walk client",
