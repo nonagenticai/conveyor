@@ -230,6 +230,7 @@ def readiness(
     """
     categories = list(categories or [])
     projects_map = composer.programme_projects(snapshot)
+    classes = gen.class_map(std, snapshot)
     templates = std.get("templates") or {}
     declared = list(std.get("categories") or [])
     subjects: list[dict] = []
@@ -259,7 +260,10 @@ def readiness(
             trigger = trigger_of(template)
             if mandatory_only and not (bool(template.get("mandatory")) or trigger is not None):
                 continue
-            if not gen.applies(template, category, subject, snapshot, projects_map):
+            if not gen.applies(
+                template, category, subject, snapshot, projects_map,
+                class_by_key=classes,
+            ):
                 continue
             published = published_for(documents, subject["id"], category)
             row: dict[str, Any] = {

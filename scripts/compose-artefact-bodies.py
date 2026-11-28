@@ -263,7 +263,8 @@ def compose(
             subject=subject_key,
         )
     projects = programme_projects(snapshot)
-    if not gen.applies(template, category, subject, snapshot, projects):
+    classes = gen.class_map(std, snapshot)
+    if not gen.applies(template, category, subject, snapshot, projects, class_by_key=classes):
         abort(
             "NOT_APPLICABLE",
             f"{category!r} does not apply to {subject_kind} {subject_key!r}",
@@ -453,7 +454,12 @@ def self_test_compose(gen) -> None:
                 "programme": [{"id": "pg1", "name": "Fixture", "status": "active"}],
                 "projects": [{
                     "id": "p1", "key": "P1", "programme_id": "pg1", "status": "active",
-                    "meta": {"measured_status": "active", "expected_outputs": ["vision"]},
+                    "meta": {
+                        "measured_status": "active",
+                        # The v4 due set no longer has a mandatory-template blanket; the fixture
+                        # names the artefact its project-baseline case composes.
+                        "expected_outputs": ["vision", "project-baseline"],
+                    },
                 }],
             },
             "artefacts": {"documents": [{
@@ -593,6 +599,26 @@ def self_test_compose(gen) -> None:
         body = compose(gen, standard, snapshot, root, "project-baseline", "project", "p1")["body"]
         assert "_Explicit absence — the schedule baseline._" in body, body
         assert "b1" in body and "b3" in body, body
+        # A class-declared category is due even when no legacy path names it. The composer must
+        # pass the class map to applies(); without it, every v4 Delivery row refuses
+        # NOT_APPLICABLE. The class-only category is absent from the fixture project's
+        # expected outputs, so only the class can admit it.
+        standard["classes"] = [{
+            "name": "fixture", "when": {"key": "P1"},
+            "now": ["class-only"], "closure": [],
+        }]
+        standard["templates"]["class-only"] = {
+            "required": ["Alpha"],
+            "skeleton": "# Class Only\n\n## Alpha\n\nA.\n",
+            "standard": "MSP", "level": "project", "subject_kind": "project",
+            "mandatory": True, "spec": "§8.3", "document_category": "class-only",
+            "sources": {"Alpha": [{
+                "kind": "rows", "file": "msp.json", "pointer": "/register_items",
+                "match": {"kind": "issue"},
+            }]},
+        }
+        summary = compose(gen, standard, snapshot, root, "class-only", "project", "p1")
+        assert "One issue" in summary["body"], summary["body"]
     sys.stdout.write("PASS self-test compose\n")
 
 

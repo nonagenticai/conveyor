@@ -1588,6 +1588,21 @@ def project_class(standard: dict[str, Any], subject: dict[str, Any]) -> dict[str
     return None
 
 
+def class_map(standard: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, dict[str, Any] | None]:
+    """key -> declared class for every programme project.
+
+    The one derivation `applies()` reads. The instance builder, the body composer and the
+    publisher all pass this map; omitting it silently falls back to the legacy
+    expected-outputs path and hides every class-declared category (the v4 Delivery set).
+    """
+    projects = (snapshot.get("programme") or {}).get("projects") or []
+    return {
+        str(row.get("key")): project_class(standard, row)
+        for row in projects
+        if isinstance(row, dict) and row.get("key")
+    }
+
+
 def due_state(subject: dict[str, Any], through_tranche: int) -> str:
     """`due`, `scheduled` or `excluded` for one subject.
 
@@ -1730,10 +1745,7 @@ def build_instances(
     for project in programme_doc.get("projects") or []:
         programme_projects.setdefault(str(project.get("programme_id")), set()).add(str(project.get("id")))
     project_keys = {str(project.get("key")) for project in programme_doc.get("projects") or []}
-    class_by_key = {
-        str(project["key"]): project_class(std, project)
-        for project in subjects.get("project", [])
-    }
+    class_by_key = class_map(std, snapshot)
     through_tranche = int((std.get("scope") or {}).get("through_tranche", 8))
     instances: list[dict[str, Any]] = []
     seen: set[str] = set()
