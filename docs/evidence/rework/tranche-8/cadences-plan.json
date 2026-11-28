@@ -80,9 +80,9 @@
           }
         ],
         "reestimate": {
-          "S06d": "9 open packages (1 P1 closure review, 8 P2)",
-          "S13": "10 open packages (2 P1: the closure review and v1-s13-1 CODE; 8 P2)",
-          "S19": "7 open packages (all P2) plus the closure-output, declared-output and WBS cards"
+          "S06d": "13 open packages (2 P0: change-control and project-baseline; 7 P1: the four delivery documents, the closed-without-closure-review package, project-wbs and delivery-contract; 4 P2)",
+          "S13": "14 open packages (2 P0: change-control and project-baseline; 9 P1: the four delivery documents, the closure review, project-registers, project-wbs, v1-s13-1 CODE and delivery-contract; 3 P2)",
+          "S19": "11 open packages (2 P0: change-control and project-baseline; 6 P1: the four delivery documents, project-registers and delivery-contract; 3 P2)"
         },
         "wsjf_inputs": {
           "S19": {
