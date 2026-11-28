@@ -13,6 +13,7 @@ use http::HeaderMap;
 use schemars::Schema;
 use serde::Deserialize;
 use serde_json::Value;
+use uuid::Uuid;
 
 use super::{Capabilities, ConnectorSpec, Identity, Inbound, SendFuture, SendOutcome, SendRequest};
 use crate::channel::CONNECTOR_DEFAULT_ACTIONS;
@@ -39,6 +40,12 @@ pub struct Config {
     /// The Bot API base; defaults to [`DEFAULT_API_BASE`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub api_base: Option<String>,
+    /// The binding's identity map: the platform sender reference (`tg:<id>`, exactly as
+    /// [`Inbound::sender_ref`] spells it) to the tenant principal it stands for. A decision
+    /// from a sender not named here is refused; the bot's service account never stands in for
+    /// a person (S06 §7 / W2).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub senders: BTreeMap<String, Uuid>,
 }
 
 /// The subset of the Bot API `Update` this adapter reads.
@@ -128,6 +135,14 @@ fn parse(body: &[u8], config: &Value) -> Option<Inbound> {
     })
 }
 
+/// The binding's sender → tenant principal map, keyed by the `tg:<id>` reference the adapter
+/// puts on [`Inbound::sender_ref`]. No map entry means no attributable person.
+fn sender_principal(config: &Value, sender_ref: Option<&str>) -> Option<Uuid> {
+    let config = parse_config(config).ok()?;
+    let sender_ref = sender_ref?;
+    config.senders.get(sender_ref).copied()
+}
+
 fn send(request: SendRequest) -> SendFuture {
     Box::pin(async move {
         let Ok(config) = parse_config(&request.config) else {
@@ -197,6 +212,7 @@ pub const SPEC: ConnectorSpec = ConnectorSpec {
     validate,
     authenticate,
     parse,
+    sender_principal,
     send,
 };
 

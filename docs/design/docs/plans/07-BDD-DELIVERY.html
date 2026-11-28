@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>BDD delivery at the work package — the standard, the app, the public record and the skills · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/07-BDD-DELIVERY.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="bdd-delivery-at-the-work-package--the-standard-the-app-the-public-record-and-the-skills">BDD delivery at the work package — the standard, the app, the public record and the skills</h1>
+<p><strong>Status:</strong> D0 of #933. This plan is the audit and the queue; D1–D4 are created by #933. <strong>Programme project:</strong> <code>SPEC-V2</code> (the V2 operating model). This is a cross-cutting plan, not a §12 slice.</p>
+<h2 id="why">Why</h2>
+<p>The owner directed on 2026-11-28 that BDD user stories, Gherkin acceptance criteria, an INVEST Definition of Ready and an acceptance-criteria-based Definition of Done are the standard at the work package and lower levels, in the conveyor's own development process, in the conveyor application, in the skills every Claude session loads, and on the public progress record.</p>
+<p>PR #923 (issue #920) and PR #929 (issue #928) delivered the first half: the v4 standards catalogue, the INVEST/DoD issue contract and the evidence ratchet. This plan covers what that lane did not do or did incorrectly. It does not redo the catalogue, the ratchet or the 222-document backfill.</p>
+<h2 id="what-landed">What landed</h2>
+<ul>
+<li><code>seed/output-standard.json</code> v4 / 79 categories; the four Delivery categories (<code>user-stories</code>, <code>acceptance-criteria</code>, <code>definition-of-ready</code>, <code>definition-of-done</code>) are <code>mandatory: true</code>, with real templates. The <code>definition-of-done</code> skeleton already says <strong>one row per scenario in the issue</strong>.</li>
+<li><code>scripts/generate-standards.py</code> resolves the class set; scope through tranche 8; honest absent/partial; the register carries scope. <code>docs/design/data/standards.*</code> and the pages were regenerated.</li>
+<li><code>docs/plans/03-DELIVERY.md</code>, <code>.github/ISSUE_TEMPLATE/unit.md|yml</code> and <code>scripts/ci/board.py</code> require the six INVEST names and a DoD table. <code>board.py</code> is the claim gate.</li>
+<li>#929 added the required/optional scorecard (<code>check-evidence-ratchet.py</code>), the required <code>checks</code> job and the registry trigger change.</li>
+</ul>
+<h2 id="findings--what-is-missing-or-incorrect">Findings — what is missing or incorrect</h2>
+<p><strong>F1 — the spec is untouched.</strong> <code>docs/SPEC_V2.md</code> at <code>1ff19ecb</code> has zero occurrences of INVEST, Gherkin, user story or Definition of Ready. The four templates cite <code>spec: §8.5</code> (the requirements trace chain), not a delivery-item standard. There is no D69.</p>
+<p><strong>F2 — the unit contract is not BDD/Gherkin, and its DoD is per part.</strong></p>
+<ul>
+<li>No user-story shape. <code>03-DELIVERY.md</code> says "Every part is a user story", but the template's <code>### P</code> block carries a <code>Requirement:</code> sentence, not <code>As a …, I want …, so that …</code>; <code>board.py</code> does not check it.</li>
+<li>No Gherkin. The contract says "Given…, when…, then…" in prose; there is no <code>Feature:</code> / <code>Scenario:</code> block, no tag, and the checker only looks for one <code>Verify:</code> per part.</li>
+<li>The DoD is one row per <strong>part</strong>, not per <strong>scenario</strong> (<code>board.py::dod_gaps</code> compares rows with the part count; <code>03-DELIVERY.md</code>; PR #923 body). The project-level <code>definition-of-done</code> template says one row per scenario, so the two levels contradict each other.</li>
+<li>INVEST is names-only (<code>invest_gaps</code>), so the template's generic explanations pass as evidence.</li>
+</ul>
+<p><strong>F3 — the application does not use the standard.</strong> The four categories are project documents. A work-package card has no story, Gherkin scenarios, INVEST readiness or derived DoD; there is no <code>work_package_spec</code>, no <code>cards.spec_get|spec_put</code>, no DoR gate at run start, and <code>card_done</code> evidence is not matched to scenario keys.</p>
+<p><strong>F4 — the public progress record has no per-unit readiness.</strong> #929's scorecard is per project / standard category. The linked-issues view and <code>issues.json</code> carry no story/scenario/INVEST/DoD summary, so the owner's progress page cannot show whether a unit uses the standard.</p>
+<p><strong>F5 — the skills do not mention the standard.</strong> <code>issue-create/SKILL.md</code> still says only <code>Given/When/Then</code> + <code>Verify:</code>; no repo skill mentions INVEST, a user story or Gherkin; there is no global skill. A session can pass every current gate without using the standard by name.</p>
+<p><strong>F6 — the unit certificate is unchanged.</strong> <code>docs/spec/lean/DeliveryModel.lean</code> <code>UnitObs</code> carries only <code>verifyParts</code>. This is a follow-on, not a prerequisite.</p>
+<p><strong>F7 — the four templates cite §8.5.</strong> They should cite §5.8 once it exists. Correcting them edits <code>seed/output-standard.json</code> and regenerates <code>standards.*</code>, which the campaign lane (#930) is publishing. It is handed to that lane's next regeneration; this plan never writes the record.</p>
+<h2 id="the-standard">The standard</h2>
+<p><code>docs/SPEC_V2.md</code> §5.8 (D69) is the normative text. In short:</p>
+<ol type="1">
+<li><strong>Scope</strong> — a work package is a card of the <code>delivery</code> card type, or a card linked from a <code>wbs_node(kind='work_package')</code>; meeting/coach/system cards are outside it.</li>
+<li><strong>One spec</strong> — <code>work_package_spec</code> on the card; the WBS node resolves through <code>card_id</code>; runs and steps reference scenario keys.</li>
+<li><strong>Story</strong> — one per work package, <code>As a &lt;role&gt;, I want &lt;capability&gt;, so that &lt;value&gt;</code>.</li>
+<li><strong>Gherkin</strong> — <code>Feature</code>/<code>Scenario</code>/<code>Given</code>/<code>When</code>/<code>Then</code>, a <code>@verify=&lt;id&gt;</code> tag per scenario (a tag has no spaces; the id names the test or the issue's <code>Verify:</code> line), <code>Scenario Outline</code> expanded at parse time; the authored text is stored, the parsed form is derived.</li>
+<li><strong>INVEST DoR</strong> — six criteria, each with the work package's own evidence; a run start refuses an absent or not-ready spec.</li>
+<li><strong>Acceptance DoD</strong> — derived, one row per scenario; the <code>card_done</code> gate's evidence must name every scenario key and a run/step of the card; a waiver is recorded, never an edit.</li>
+<li><strong>Gate order</strong> — DoR at run start → work → DoD at done; domain validator, typed 422, DB CHECK.</li>
+<li><strong>Issue contract</strong> — the buildout's instance: one <code>## User story</code>, Gherkin per part with a <code>Verify:</code>, six INVEST rows with evidence, one DoD row per scenario.</li>
+<li><strong>Public readiness</strong> — fixed-vocabulary booleans/counts per unit; never a body.</li>
+<li><strong>Non-goals</strong> — no second workflow engine, no prose DoD, no in-conveyor scenario runner, no second store.</li>
+</ol>
+<h2 id="units">Units</h2>
+<h3 id="d1--correct-the-unit-contract-and-put-it-in-the-skills-934">D1 — Correct the unit contract and put it in the skills (#934)</h3>
+<p>Owns <code>docs/plans/03-DELIVERY.md</code>, <code>.github/ISSUE_TEMPLATE/unit.md|yml</code>, <code>scripts/ci/board.py</code>, the new <code>scripts/ci/issue_contract.py</code>, the repo skills (<code>issue-create</code>, <code>issue-pickup</code>, <code>issue-deliver</code>, <code>delivery-unit</code>, new <code>bdd-delivery</code>) and the global <code>~/.claude/skills/bdd-delivery/SKILL.md</code> plus the rule in <code>~/.claude/CLAUDE.md</code> (machine-level, recorded as evidence, not in the PR diff).</p>
+<p>Corrects F2:</p>
+<ul>
+<li>Add <code>## User story</code> to the template and <code>CONTRACT_SECTIONS</code>; one per unit, three clauses.</li>
+<li>Each <code>### P</code> part carries at least one Gherkin block with <code>Scenario:</code> and <code>@verify=&lt;id&gt;</code>; the parser counts scenarios and tags, not just parts.</li>
+<li>The DoD table has one row per scenario, keyed by scenario name; <code>dod_gaps</code> compares the scenario keys, not the part count.</li>
+<li>Each INVEST row names the issue's own evidence; <code>board.py</code> refuses the template's generic skeleton phrase.</li>
+<li>Forward-only: a <code>STORY_SINCE</code> date; existing units gain the shape at their next claim, and #930 (created before the rule) is exempt.</li>
+<li>The skills state the same standard; the repo <code>bdd-delivery</code> skill is the canonical overlay, and the global skill is the default for any development work.</li>
+</ul>
+<p>Blocked-by #933. Verify: <code>python3 scripts/ci/board.py --self-test</code>; fixture bodies missing the story, a Gherkin scenario with <code>@verify</code>, a second DoD row or an INVEST evidence line each exit 1; a complete body exits 0; <code>bash scripts/ci/tests/issue_dor.sh</code> and <code>board.sh</code>.</p>
+<h3 id="d2--the-app-work-package-spec-935">D2 — The app work-package spec (#935)</h3>
+<p>Migration <code>0111_work_package_spec.sql</code>; <code>crates/store/src/work_package_spec.rs</code>; <code>crates/domain/src/work_package_spec.rs</code> parsing the feature with the cucumber-rs <code>gherkin</code> crate; <code>cards.spec_get|spec_put</code>; the run-start DoR refusal in <code>control/runs.rs</code>; the scenario evidence check in <code>assert_card_done_tx</code>; views; the served-spec lock and action data. Blocked-by #933.</p>
+<p>Verify: preflight; domain/action tests; a run start with an absent or not-ready spec is refused; a card cannot enter <code>done</code> with a scenario missing from the <code>card_done</code> evidence.</p>
+<h3 id="d3--the-app-work-package-screens-936">D3 — The app work-package screens (#936)</h3>
+<p>The <code>/card/:card_id</code> cockpit, the board card detail and the plan's work_package node show and edit the story, Gherkin feature, six INVEST rows and derived DoD through <code>cards.spec_put</code>; a Playwright spec asserts empty, error, happy and one refusal. Blocked-by D2.</p>
+<h3 id="d4--the-public-per-unit-readiness-937">D4 — The public per-unit readiness (#937)</h3>
+<p><code>scripts/fetch-issues.sh</code> derives a public-safe <code>readiness</code> object per unit (story, parts, scenarios, verified, the six DoR booleans, DoD rows/evidenced) from the body through the D1 parser, never the body; <code>docs/design/v2.js</code> renders it in the project linked-issues table and the unit detail; <code>check-data.cjs</code> asserts the exact key set and still no body. It does <strong>not</strong> edit <code>docs/design/delivery.js</code>. Blocked-by D1.</p>
+<h2 id="not-this-lane">Not this lane</h2>
+<ul>
+<li>The 222-document backfill (#930 and the campaign batches); no record writes here.</li>
+<li>The evidence ratchet and scorecard (#929); their U3 shares <code>docs/design/delivery.js</code> and <code>scripts/ci/board.py</code> and is not started. D1 must sequence behind their U3 if it lands first.</li>
+<li>The four templates' <code>spec: §8.5</code> → <code>§5.8</code> correction (F7): the campaign's next regeneration.</li>
+<li>The Lean certificate facts (F6): a follow-on; <code>UnitObs</code> gains <code>story</code> and <code>scenarios</code>, and <code>collect_units.py</code> uses the D1 parser.</li>
+</ul>
+<h2 id="verification">Verification</h2>
+<ul>
+<li>D1: <code>board.py --self-test</code>; the four negative fixtures; <code>issue_dor.sh</code>; <code>board.sh</code>; the skill grep; a dry-run <code>issue-create</code>.</li>
+<li>D2: preflight; the domain/action tests; the two refusal tests.</li>
+<li>D3: preflight; the web Playwright suite.</li>
+<li>D4: <code>scripts/fetch-issues.sh</code>; <code>check-data.cjs</code>; <code>check-v2.cjs</code>; <code>build-docs.py --check</code>; <code>generate-standards.py --check</code>; <code>publish-standards.sh --check</code>.</li>
+</ul>
+<h2 id="execution-record">Execution record</h2>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>Issue</th>
+<th>Branch / PR</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D0</td>
+<td>#933</td>
+<td><code>issue/933-bdd-delivery</code></td>
+<td>this unit</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>#934</td>
+<td>—</td>
+<td>blocked-by #933</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>#935</td>
+<td>—</td>
+<td>blocked-by #933</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>#936</td>
+<td>—</td>
+<td>blocked-by #935</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>#937</td>
+<td>—</td>
+<td>blocked-by #934</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/07-BDD-DELIVERY.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

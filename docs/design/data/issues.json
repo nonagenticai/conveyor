@@ -6,11 +6,32 @@
   },
   "issues": [
     {
-      "number": 930,
-      "title": "standards: evidence the required artefacts for tranches 0\u20133 (61 documents)",
+      "number": 938,
+      "title": "benchmark: the baseline arm refuses 5 of 12 cases on a 64 KiB source cap",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/930",
-      "updatedAt": "2026-11-28T10:43:06Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/938",
+      "updatedAt": "2026-11-28T12:08:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S18",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 937,
+      "title": "design: the unit readiness summary on the public progress record",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/937",
+      "updatedAt": "2026-11-28T12:01:56Z",
       "labels": [
         {
           "name": "unit",
@@ -27,11 +48,116 @@
       ]
     },
     {
+      "number": 936,
+      "title": "web: the work-package spec on the card, board and plan screens",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/936",
+      "updatedAt": "2026-11-28T12:02:19Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 935,
+      "title": "app: the work-package spec \u2014 story, Gherkin scenarios, INVEST DoR, derived DoD",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/935",
+      "updatedAt": "2026-11-28T12:02:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 934,
+      "title": "delivery: the unit contract is BDD/Gherkin/INVEST, and the skills enforce it",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/934",
+      "updatedAt": "2026-11-28T12:00:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 933,
+      "title": "docs: BDD stories, Gherkin AC and INVEST DoR become normative (SPEC_V2 \u00a75.8)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/933",
+      "updatedAt": "2026-11-28T12:02:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 930,
+      "title": "standards: evidence the required artefacts for tranches 0\u20133 (61 documents)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/930",
+      "updatedAt": "2026-11-28T11:58:53Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 928,
       "title": "standards: the evidence ratchet and the required/optional scorecard",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/928",
-      "updatedAt": "2026-11-28T10:46:26Z",
+      "updatedAt": "2026-11-28T11:24:58Z",
       "labels": [
         {
           "name": "unit",
@@ -126,9 +252,9 @@
     {
       "number": 916,
       "title": "fix(walk): the client retains ~7 KB/s on an idle stream session (the soak budget)",
-      "state": "CLOSED",
+      "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/916",
-      "updatedAt": "2026-11-28T09:30:06Z",
+      "updatedAt": "2026-11-28T12:09:43Z",
       "labels": [
         {
           "name": "unit",
@@ -149,15 +275,19 @@
       "title": "ci: the image build is the merge-latency critical path at 19\u201325 min \u2014 cache the release compiles",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/915",
-      "updatedAt": "2026-11-28T07:28:59Z",
+      "updatedAt": "2026-11-28T11:53:22Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:not-ready",
+          "color": "B60205"
         }
       ]
     },
@@ -284,7 +414,7 @@
       "title": "bug: the benchmark producer's yield caps the improvement loop below the significance bar",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/900",
-      "updatedAt": "2026-11-28T08:32:56Z",
+      "updatedAt": "2026-11-28T12:05:21Z",
       "labels": [
         {
           "name": "bug",
@@ -770,7 +900,7 @@
       "title": "programme: promote the reworked record to production and record the tranche-3 review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/852",
-      "updatedAt": "2026-11-28T09:51:07Z",
+      "updatedAt": "2026-11-28T11:03:51Z",
       "labels": [
         {
           "name": "unit",
@@ -1126,7 +1256,7 @@
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/817",
-      "updatedAt": "2026-11-28T08:35:15Z",
+      "updatedAt": "2026-11-28T12:09:44Z",
       "labels": [
         {
           "name": "unit",
@@ -7789,7 +7919,7 @@
       "title": "S18 \u2014 executor-backed producers and the real improvement loop",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/12",
-      "updatedAt": "2026-11-27T23:06:39Z",
+      "updatedAt": "2026-11-28T12:05:19Z",
       "labels": [
         {
           "name": "unit",
@@ -7852,15 +7982,15 @@
       "title": "S15 \u2014 live strata proof and native memory provenance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/9",
-      "updatedAt": "2026-11-27T16:01:56Z",
+      "updatedAt": "2026-11-28T12:04:36Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:needs-human",
+          "color": "5319E7"
         },
         {
           "name": "S15",
@@ -7957,15 +8087,15 @@
       "title": "S06 \u2014 one shared decision boundary; Telegram sender identity",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/4",
-      "updatedAt": "2026-11-27T16:01:54Z",
+      "updatedAt": "2026-11-28T12:07:48Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S06",
