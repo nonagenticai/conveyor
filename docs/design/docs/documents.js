@@ -4430,6 +4430,24 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/README.md"
     },
     {
+      "title": "GEMBA-WALK — Closure review (GW-A9)",
+      "path": "docs/plans/inception/GEMBA-WALK/closure-review.html",
+      "source": "docs/plans/inception/GEMBA-WALK/closure-review.md",
+      "section": "Plans",
+      "sha256": "e80bd0301cf20898d3d26cdcc25da487d68562d185164d280e3027dac764df7f",
+      "bytes": 1970,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/closure-review.md"
+    },
+    {
+      "title": "GEMBA-WALK — Statement of intent",
+      "path": "docs/plans/inception/GEMBA-WALK/statement-of-intent.html",
+      "source": "docs/plans/inception/GEMBA-WALK/statement-of-intent.md",
+      "section": "Plans",
+      "sha256": "463ea734a8bb988aa46eb943c5bd1a27676e14be7667514f388f3fddb29f3b97",
+      "bytes": 1002,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/GEMBA-WALK/statement-of-intent.md"
+    },
+    {
       "title": "Inception record",
       "path": "docs/plans/inception/README.html",
       "source": "docs/plans/inception/README.md",
