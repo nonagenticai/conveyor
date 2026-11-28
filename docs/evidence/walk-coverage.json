@@ -17,8 +17,8 @@
   },
   "summary": {
     "routes_total": 56,
-    "routes_absent": 2,
-    "routes_registered": 54,
+    "routes_absent": 0,
+    "routes_registered": 56,
     "routes_verified": 0,
     "actions_total": 602,
     "actions_absent": 0,
@@ -99,9 +99,9 @@
       "room": "portfolio",
       "owner": "S4",
       "spec": "e2e/v1/board.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/build/process-map",
@@ -154,9 +154,9 @@
       "room": "portfolio",
       "owner": "S4",
       "spec": "e2e/v1/cockpit.spec.ts",
-      "status": "absent",
-      "spec_present": false,
-      "registered": false
+      "status": "registered",
+      "spec_present": true,
+      "registered": true
     },
     {
       "pattern": "/copilot",
