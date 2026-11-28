@@ -38,16 +38,16 @@
       "sha256": "58c9c21e63382919df5b381260e9cc6633040a1c9fb97f52d16ee9cf9d1663b3"
     },
     {
-      "bytes": 29479,
+      "bytes": 29532,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "0c6b344149245b96f365a7711024372da901fc7a103db9718a2424b29df318f8"
+      "sha256": "e04b4df739502772c9d65d708a22b3d6ba1004b9420fedd4839dffeca05368d3"
     },
     {
-      "bytes": 54511,
+      "bytes": 54707,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "453da847fde33d6ddd5092a7f9bb7089b002026378ed85808a028eca6d4fcafb"
+      "sha256": "57e7dd2bbfc93bd347e305b63d86a46b727e24f0a48c555e1515b7e0197bac95"
     },
     {
       "bytes": 106,
@@ -68,10 +68,10 @@
       "sha256": "8f00cb176bd96c052e157fca2b7c9dac64b008bda90df17a02a366e596176bd1"
     },
     {
-      "bytes": 208628,
+      "bytes": 215971,
       "path": "issues.json",
       "records": 421,
-      "sha256": "fb70295299b4950ed0f2f3970d94e8486d8d0cbef0458a2c60e7201a0cb8b6d4"
+      "sha256": "ec9e59d382ec7f9ffc96111c226b5099c9c010c299060ed2e2c516895453a96c"
     },
     {
       "bytes": 4020,

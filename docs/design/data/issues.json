@@ -6,11 +6,11 @@
   },
   "issues": [
     {
-      "number": 938,
-      "title": "benchmark: the baseline arm refuses 5 of 12 cases on a 64 KiB source cap",
+      "number": 965,
+      "title": "test(web): S12's gate \u2014 every screen spec asserts empty, error and happy",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/938",
-      "updatedAt": "2026-11-28T12:08:08Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/965",
+      "updatedAt": "2026-11-28T16:07:13Z",
       "labels": [
         {
           "name": "unit",
@@ -19,6 +19,306 @@
         {
           "name": "status:ready",
           "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 964,
+      "title": "programme: tranche 10 \u2014 S12 and T5 packs, readiness and both closure reviews",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/964",
+      "updatedAt": "2026-11-28T16:16:12Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        },
+        {
+          "name": "T5",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 963,
+      "title": "programme: tranche 11 \u2014 S14, T6, T8 packs, readiness and the two closures",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/963",
+      "updatedAt": "2026-11-28T16:13:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S14",
+          "color": "6E7781"
+        },
+        {
+          "name": "T6",
+          "color": "6E7781"
+        },
+        {
+          "name": "T8",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 962,
+      "title": "fix(kata): T5's three code packages \u2014 the instrument digest, the kata tenant and the schema-drift instrument",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/962",
+      "updatedAt": "2026-11-28T15:58:34Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T5",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 961,
+      "title": "programme: tranche 12 \u2014 T15 pack, readiness and its closure record",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/961",
+      "updatedAt": "2026-11-28T16:14:03Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T15",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 959,
+      "title": "programme: the tranche-6 completion \u2014 the v4 pack set and the review that was never recorded live",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/959",
+      "updatedAt": "2026-11-28T15:58:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 958,
+      "title": "programme: the tranche-5 exit \u2014 the v4 residue to zero and the review that authorises tranche 6",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/958",
+      "updatedAt": "2026-11-28T15:57:45Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 954,
+      "title": "programme: tranche 9 \u2014 S18, S20, S21 packs, readiness and S20's closure review",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/954",
+      "updatedAt": "2026-11-28T16:13:06Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S18",
+          "color": "6E7781"
+        },
+        {
+          "name": "S20",
+          "color": "6E7781"
+        },
+        {
+          "name": "S21",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 953,
+      "title": "ci: throttle the issue-registry refresh so a label burst is one push, not five",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/953",
+      "updatedAt": "2026-11-28T16:13:59Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "status:not-ready",
+          "color": "B60205"
+        }
+      ]
+    },
+    {
+      "number": 952,
+      "title": "programme: tranche 8 \u2014 S06d, S13, S19 packs, readiness and S13's workflow catalogue",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/952",
+      "updatedAt": "2026-11-28T15:12:57Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S06",
+          "color": "6E7781"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        },
+        {
+          "name": "S19",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 951,
+      "title": "programme: tranche 7 \u2014 S06c, S15, S16 packs, readiness and exit",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/951",
+      "updatedAt": "2026-11-28T16:25:15Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 950,
+      "title": "process: cap active delivery lanes at four and drain the over-cap queue",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/950",
+      "updatedAt": "2026-11-28T15:44:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 938,
+      "title": "benchmark: the baseline arm refuses 5 of 12 cases on a 64 KiB source cap",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/938",
+      "updatedAt": "2026-11-28T15:30:36Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S18",
@@ -31,15 +331,15 @@
       "title": "design: the unit readiness summary on the public progress record",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/937",
-      "updatedAt": "2026-11-28T12:01:56Z",
+      "updatedAt": "2026-11-28T16:06:12Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -73,15 +373,15 @@
       "title": "app: the work-package spec \u2014 story, Gherkin scenarios, INVEST DoR, derived DoD",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/935",
-      "updatedAt": "2026-11-28T13:12:07Z",
+      "updatedAt": "2026-11-28T16:06:32Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -92,17 +392,17 @@
     {
       "number": 934,
       "title": "delivery: the unit contract is BDD/Gherkin/INVEST, and the skills enforce it",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/934",
-      "updatedAt": "2026-11-28T13:12:10Z",
+      "updatedAt": "2026-11-28T15:37:38Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -136,7 +436,7 @@
       "title": "standards: evidence the required artefacts for tranches 0\u20133 (61 documents)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/930",
-      "updatedAt": "2026-11-28T11:58:53Z",
+      "updatedAt": "2026-11-28T14:42:48Z",
       "labels": [
         {
           "name": "unit",
@@ -317,7 +617,7 @@
       "title": "walk: the board screen's seven missing write verbs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/912",
-      "updatedAt": "2026-11-28T08:42:17Z",
+      "updatedAt": "2026-11-28T14:06:08Z",
       "labels": [
         {
           "name": "unit",
@@ -330,6 +630,10 @@
         {
           "name": "GEMBA-WALK",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:not-ready",
+          "color": "B60205"
         }
       ]
     },
@@ -376,15 +680,15 @@
       "title": "bug: the model emits malformed unified diffs, so produced patches are withheld as apply_failed",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/908",
-      "updatedAt": "2026-11-28T06:22:47Z",
+      "updatedAt": "2026-11-28T15:38:10Z",
       "labels": [
         {
           "name": "bug",
           "color": "d73a4a"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -855,18 +1159,18 @@
     },
     {
       "number": 854,
-      "title": "programme: the tranche-4 and tranche-5 exits \u2014 the residual P2s and the two reviews",
+      "title": "programme: the tranche-4 exit \u2014 the v4 residue to zero and the review that authorises tranche 5",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/854",
-      "updatedAt": "2026-11-27T14:21:00Z",
+      "updatedAt": "2026-11-28T15:59:10Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -898,17 +1202,13 @@
     {
       "number": 852,
       "title": "programme: promote the reworked record to production and record the tranche-3 review",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/852",
-      "updatedAt": "2026-11-28T11:03:51Z",
+      "updatedAt": "2026-11-28T15:59:36Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
-        },
-        {
-          "name": "status:claimed",
-          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -1026,7 +1326,7 @@
       "title": "programme: tranche 6 \u2014 S06b, S10, S11, T19F packs + S06a receipt, exit and review",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/838",
-      "updatedAt": "2026-11-28T08:41:46Z",
+      "updatedAt": "2026-11-28T15:47:37Z",
       "labels": [
         {
           "name": "unit",
@@ -1155,15 +1455,15 @@
       "title": "publish: the strict pack at the tranche-3 close \u2014 the blocked documents, the register and the reconciled baseline",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/830",
-      "updatedAt": "2026-11-27T14:21:48Z",
+      "updatedAt": "2026-11-28T15:52:42Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -1256,7 +1556,7 @@
       "title": "S4 \u2014 Gemba Walk: retained V1, the slice-gate audit, P6 parity gate and hardening",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/817",
-      "updatedAt": "2026-11-28T12:09:44Z",
+      "updatedAt": "2026-11-28T14:10:02Z",
       "labels": [
         {
           "name": "unit",
@@ -1786,7 +2086,7 @@
       "title": "programme: the retrospective tranche reviews \u2014 close tranches 7\u201312 and authorise tranches 8\u201313",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/755",
-      "updatedAt": "2026-11-27T14:21:33Z",
+      "updatedAt": "2026-11-28T15:47:38Z",
       "labels": [
         {
           "name": "unit",
@@ -5756,9 +6056,9 @@
     {
       "number": 193,
       "title": "research: media_parity asserts avg_score, a mean of fields the tolerances declare volatile",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/193",
-      "updatedAt": "2026-11-16T19:34:11Z",
+      "updatedAt": "2026-11-28T14:21:03Z",
       "labels": [
         {
           "name": "bug",
@@ -5769,8 +6069,8 @@
           "color": "7057ff"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -7558,17 +7858,17 @@
     {
       "number": 31,
       "title": "S19: the Tier-3 per-case LLM auditor",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/31",
-      "updatedAt": "2026-11-27T16:02:00Z",
+      "updatedAt": "2026-11-28T16:40:08Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S19",
@@ -7837,17 +8137,17 @@
     {
       "number": 16,
       "title": "train \u2014 post-#9 queue sweep and merged-branch cleanup",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/16",
-      "updatedAt": "2026-11-27T17:35:39Z",
+      "updatedAt": "2026-11-28T15:26:35Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -7980,17 +8280,17 @@
     {
       "number": 9,
       "title": "S15 \u2014 live strata proof and native memory provenance",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/9",
-      "updatedAt": "2026-11-28T12:04:36Z",
+      "updatedAt": "2026-11-28T16:09:00Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:needs-human",
-          "color": "5319E7"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S15",
