@@ -145,12 +145,32 @@ async fn answer(
 async fn source(Path(path): Path<String>) -> (StatusCode, String) {
     if path.ends_with("django/core.py") {
         (StatusCode::OK, "SOURCE-MARKER\n".to_owned())
+    } else if path.ends_with("django/big.py") {
+        let mut big = String::from("HEAD-MARKER\n");
+        big.push_str(&"a".repeat(40_000));
+        big.push_str("\nMIDDLE-MARKER\n");
+        big.push_str(&"b".repeat(40_000));
+        big.push_str("\nTAIL-MARKER\n");
+        (StatusCode::OK, big)
+    } else if path.ends_with("django/utf8.py") {
+        let mut utf8 = String::from("HEAD-MARKER\n"); // 12 bytes
+        utf8.push_str(&"a".repeat(32_755)); // ends at byte 32,767
+        utf8.push('é'); // occupies 32,767..32,769; cut at 32,768 is inside it
+        utf8.push_str(&"b".repeat(10_000)); // ends at 42,769
+        utf8.push('é'); // occupies 42,769..42,771
+        utf8.push_str(&"c".repeat(32_754)); // tail start (len-32,768) lands at 42,770, inside the é
+        utf8.push_str("\nTAIL-MARKER\n");
+        (StatusCode::OK, utf8)
     } else {
         (StatusCode::NOT_FOUND, String::new())
     }
 }
 
 fn document(problem: &str) -> SeedDocument {
+    document_with_files(problem, vec!["django/core.py".to_owned()])
+}
+
+fn document_with_files(problem: &str, files: Vec<String>) -> SeedDocument {
     SeedDocument {
         schema: 1,
         slug: format!("producer-{}", Uuid::now_v7()),
@@ -166,7 +186,7 @@ fn document(problem: &str) -> SeedDocument {
             base_commit: "0".repeat(40),
             image: "registry.example.com:5000/swebench/repo@sha256:abc".to_owned(),
             problem_statement: problem.to_owned(),
-            oracle_files: vec!["django/core.py".to_owned()],
+            oracle_files: files,
             gold_patch: "GOLD-ANSWER-MUST-NOT-REACH-THE-MODEL".to_owned(),
             test_patch: "TEST-ANSWER-MUST-NOT-REACH-THE-MODEL".to_owned(),
             fail_to_pass: vec!["tests/test_core.py::test_fix".to_owned()],
@@ -188,6 +208,10 @@ struct Fixture {
 /// agent (tool-less, and pinned to its own system-only recipe since SPEC_V2 §7.7 requires compiled
 /// text for every call), one seeded suite and one `conveyor` run over its single instance.
 async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
+    fixture_with_files(db, problem, vec!["django/core.py".to_owned()]).await
+}
+
+async fn fixture_with_files(db: &common::TestDb, problem: &str, files: Vec<String>) -> Fixture {
     let slug = format!("producer-{}", Uuid::now_v7());
     let tenant_id: Uuid =
         sqlx::query_scalar("INSERT INTO tenant (slug, name) VALUES ($1, $1) RETURNING id")
@@ -259,9 +283,10 @@ async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
     .await
     .expect("capability agent");
 
-    let (suite, _) = store::benchmark::seed_suite_tx(&mut tx, tenant, &document(problem))
-        .await
-        .expect("suite");
+    let (suite, _) =
+        store::benchmark::seed_suite_tx(&mut tx, tenant, &document_with_files(problem, files))
+            .await
+            .expect("suite");
     let instance_ids = vec!["repo__i-0".to_owned()];
     let run = store::benchmark::create_run_tx(
         &mut tx,
@@ -1192,4 +1217,126 @@ async fn the_baseline_arm_fetches_the_source_and_records_a_patch() {
     assert_eq!(status, "ok");
     assert_eq!(patch.as_deref(), Some(DIFF.trim()));
     assert_eq!(attempts, 1);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn an_over_cap_source_is_carried_bounded() {
+    let _serial = SERIAL.lock().await;
+    let stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture =
+        fixture_with_files(&db, "An over-cap source.", vec!["django/big.py".to_owned()]).await;
+
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    sqlx::query(
+        "UPDATE benchmark_run
+            SET arm = 'baseline', subject_kind = 'suite', capability_agent_id = NULL,
+                subject_version = NULL, options = $3::jsonb
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .bind(json!({"model_ref": "test-model"}).to_string())
+    .execute(&mut *tx)
+    .await
+    .expect("make the run a baseline");
+    tx.commit().await.expect("commit");
+
+    let before = stub.calls.lock().expect("calls").len();
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("produce");
+
+    // A source over the cap is an answer from an excerpt, never a refused case.
+    let (status, _, _, _) = case_row(&db, &fixture).await;
+    assert_eq!(status, "ok", "an over-cap source is not no_attempt");
+
+    let calls = stub.calls.lock().expect("calls").clone();
+    assert_eq!(calls.len(), before + 1, "one case is one model call");
+    let text = calls[before].to_string();
+    assert!(
+        text.contains("HEAD-MARKER"),
+        "the head reached the model: {text}"
+    );
+    assert!(
+        text.contains("TAIL-MARKER"),
+        "the tail reached the model: {text}"
+    );
+    assert!(
+        text.contains("django/big.py: "),
+        "the marker names the file: {text}"
+    );
+    assert!(
+        text.contains("bytes are omitted"),
+        "the marker is explicit: {text}"
+    );
+    assert!(
+        !text.contains("MIDDLE-MARKER"),
+        "the omitted middle never reaches the model: {text}"
+    );
+    assert!(
+        text.contains("django/big.py: 80040 bytes"),
+        "the marker names the total: {text}"
+    );
+    assert!(
+        text.contains("the middle 14504 bytes are omitted"),
+        "the marker names the omitted count: {text}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn an_over_cap_source_with_multibyte_characters_is_carried() {
+    let _serial = SERIAL.lock().await;
+    let stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture = fixture_with_files(
+        &db,
+        "A multi-byte over-cap source.",
+        vec!["django/utf8.py".to_owned()],
+    )
+    .await;
+
+    // make the run a baseline exactly as the existing over-cap test does (the same UPDATE)
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    sqlx::query(
+        "UPDATE benchmark_run
+            SET arm = 'baseline', subject_kind = 'suite', capability_agent_id = NULL,
+                subject_version = NULL, options = $3::jsonb
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .bind(json!({"model_ref": "test-model"}).to_string())
+    .execute(&mut *tx)
+    .await
+    .expect("make the run a baseline");
+    tx.commit().await.expect("commit");
+
+    let before = stub.calls.lock().expect("calls").len();
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("produce");
+
+    // The cut boundaries land inside a 2-byte character; a byte-slice panic would fail here.
+    let (status, _, _, _) = case_row(&db, &fixture).await;
+    assert_eq!(status, "ok");
+    let calls = stub.calls.lock().expect("calls").clone();
+    assert_eq!(calls.len(), before + 1, "one case is one model call");
+    let text = calls[before].to_string();
+    assert!(
+        text.contains("HEAD-MARKER"),
+        "the head reached the model: {text}"
+    );
+    assert!(
+        text.contains("TAIL-MARKER"),
+        "the tail reached the model: {text}"
+    );
+    assert!(
+        text.contains("django/utf8.py: "),
+        "the marker names the file: {text}"
+    );
 }
