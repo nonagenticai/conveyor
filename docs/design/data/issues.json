@@ -250,9 +250,9 @@
     {
       "number": 869,
       "title": "delivery: the 8 no-issue PRs \u2014 adopt or exempt",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/869",
-      "updatedAt": "2026-11-27T22:27:46Z",
+      "updatedAt": "2026-11-27T23:30:28Z",
       "labels": [
         {
           "name": "unit",
@@ -1551,17 +1551,17 @@
     {
       "number": 733,
       "title": "ci: the web suite's board and evals specs fail a different test on every run under load",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/733",
-      "updatedAt": "2026-11-27T22:58:51Z",
+      "updatedAt": "2026-11-27T23:48:11Z",
       "labels": [
         {
           "name": "bug",
           "color": "d73a4a"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -1908,17 +1908,17 @@
     {
       "number": 669,
       "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/669",
-      "updatedAt": "2026-11-27T23:04:39Z",
+      "updatedAt": "2026-11-28T00:13:29Z",
       "labels": [
         {
           "name": "bug",
           "color": "d73a4a"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -7510,15 +7510,15 @@
       "title": "S18 \u2014 executor-backed producers and the real improvement loop",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/12",
-      "updatedAt": "2026-11-27T23:02:49Z",
+      "updatedAt": "2026-11-27T23:06:39Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S18",
