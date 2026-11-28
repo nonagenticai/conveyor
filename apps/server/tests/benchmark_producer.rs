@@ -539,6 +539,94 @@ async fn a_redelivered_job_replays_and_buys_no_second_call() {
     );
 }
 
+/// A key held by a call that has not settled is a WAIT, not a refusal (#900).
+///
+/// The measured production case: a deploy SIGKILLed the worker mid-`inference.chat`, the claim was
+/// never released, and the producer wrote a terminal `no_attempt` — three of twelve pipeline cases.
+/// The same input must now come back after the claim's own lifetime; only the same key naming a
+/// DIFFERENT input (which no retry can satisfy) stays terminal.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_held_key_defers_and_a_reused_key_still_refuses() {
+    let _serial = SERIAL.lock().await;
+    let _stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture = fixture(&db, "The ordering endpoint returns the wrong total.").await;
+
+    // One real production writes the claim with the hash the engine computes for this input.
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("the first production");
+    let key = format!("benchmark.produce:{}:turn1", fixture.case_id);
+
+    // Re-open the row as an unsettled claim — exactly what a holder killed mid-call leaves — and
+    // put the case back to pending so the producer will produce it again.
+    sqlx::query(
+        "UPDATE idempotency_key
+            SET status_code = NULL, response = NULL, expires_at = now() + interval '5 minutes'
+          WHERE key = $1",
+    )
+    .bind(&key)
+    .execute(&db.super_pool)
+    .await
+    .expect("re-open the claim");
+    let spent: i32 = sqlx::query_scalar(
+        "UPDATE benchmark_case
+            SET produce_status = 'pending', patch = NULL, patch_sha256 = NULL
+          WHERE id = $1 RETURNING attempts",
+    )
+    .bind(fixture.case_id)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("re-open the case");
+    assert_eq!(spent, 1, "the first production spent one attempt");
+
+    let failure = produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect_err("a held key writes no outcome");
+    assert!(
+        failure.deferred,
+        "the job comes back on the SAME attempt, not as a retry: {failure}"
+    );
+    assert!(
+        failure.retry_after >= std::time::Duration::from_secs(1),
+        "the wait is the claim's own remaining life: {:?}",
+        failure.retry_after
+    );
+    let (status, patch, _, attempts) = case_row(&db, &fixture).await;
+    assert_eq!(status, "pending", "a wait invents no outcome");
+    assert!(patch.is_none());
+    assert_eq!(attempts, 2, "waiting still spends the case's attempt");
+
+    // The same key naming a DIFFERENT input is a client bug: no retry can satisfy it. It answers
+    // the same 409 slug, so it must be pinned to the terminal arm.
+    sqlx::query(
+        "UPDATE idempotency_key SET request_hash = 'fnv1a64:0000000000000000' WHERE key = $1",
+    )
+    .bind(&key)
+    .execute(&db.super_pool)
+    .await
+    .expect("rehash the claim");
+    sqlx::query(
+        "UPDATE benchmark_case
+            SET produce_status = 'pending', patch = NULL, patch_sha256 = NULL, attempts = 1
+          WHERE id = $1",
+    )
+    .bind(fixture.case_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("re-open the case");
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("a different-input conflict finishes the job");
+    let (status, patch, _, _) = case_row(&db, &fixture).await;
+    assert_eq!(
+        status, "no_attempt",
+        "the reused key is recorded, never retried"
+    );
+    assert!(patch.is_none());
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn an_edit_to_the_agent_row_cannot_change_a_started_run() {
     let _serial = SERIAL.lock().await;

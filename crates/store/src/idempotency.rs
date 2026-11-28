@@ -18,6 +18,30 @@ use sqlx::PgConnection;
 /// The contract TTL.
 pub const TTL_HOURS: i64 = 24;
 
+/// How far past a call's own timeout an *in-flight* claim may outlive it.
+///
+/// An in-flight row says "a request with this key is running". Once the engine's own deadline has
+/// passed, no legitimate invocation of that key can still be running — the engine cancelled it —
+/// so the row can only be a leaked claim from a holder that died without releasing (a SIGKILLed
+/// worker has no `Drop`; measured 2026-11-28, conveyor#900). The margin covers the bookkeeping
+/// commit that follows the call and clock skew.
+pub const IN_FLIGHT_MARGIN_SECS: i64 = 60;
+
+/// The longest a caller is ever asked to wait for an in-flight claim.
+///
+/// A `defer` that parks a job is bounded on purpose: a hint longer than this means the row is not
+/// the whole story, and the caller's own attempt budget should decide, not an open-ended sleep.
+pub const MAX_IN_FLIGHT_WAIT_SECS: u64 = 600;
+
+/// The lifetime of an in-flight claim for a call whose engine deadline is `timeout_ms`.
+///
+/// Never the 24-hour contract TTL: that TTL is the *replay* window for a settled row, and applying
+/// it to a row that will never settle turns one killed process into a day of refusals.
+pub fn in_flight_ttl(timeout_ms: u32) -> ChronoDuration {
+    ChronoDuration::milliseconds(i64::from(timeout_ms))
+        + ChronoDuration::seconds(IN_FLIGHT_MARGIN_SECS)
+}
+
 /// What a lookup found.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Lookup {
@@ -33,7 +57,11 @@ pub enum Lookup {
     /// The key exists but names a different request body.
     ConflictHash,
     /// The key exists and the first request has not completed (no response stored yet).
-    InFlight,
+    /// `expires_at` is when the claim stops blocking — the caller's own remaining wait.
+    InFlight {
+        /// When this claim becomes reclaimable (the holder's own deadline, not the replay TTL).
+        expires_at: DateTime<Utc>,
+    },
 }
 
 /// The stored columns: hash, status, body, expiry.
@@ -72,7 +100,7 @@ pub async fn lookup(
             status_code,
             response,
         }),
-        _ => Ok(Lookup::InFlight),
+        _ => Ok(Lookup::InFlight { expires_at }),
     }
 }
 
@@ -116,14 +144,21 @@ pub async fn save(
 
 /// Remember a request that is still running, so a concurrent replay is refused rather than
 /// racing the mutation. The response columns stay NULL until [`save`] completes the row.
+///
+/// `ttl` is the lifetime of this *in-flight* row. An internal claim commits with its mutation and
+/// [`save`] settles it in the same transaction, so [`TTL_HOURS`] is right there. An external call
+/// commits its claim before the call, so its TTL must be the call's own deadline plus
+/// [`IN_FLIGHT_MARGIN_SECS`] — a 24-hour in-flight row outlives any invocation and blocks every
+/// retry after a holder dies (conveyor#900).
 pub async fn begin(
     conn: &mut PgConnection,
     tenant: TenantId,
     scope: &str,
     key: &str,
     request_hash: &str,
+    ttl: ChronoDuration,
 ) -> Result<bool, sqlx::Error> {
-    let expires_at = Utc::now() + ChronoDuration::hours(TTL_HOURS);
+    let expires_at = Utc::now() + ttl;
     let row: Option<(String,)> = sqlx::query_as(
         // A row past its TTL is a `Lookup::Miss` but still occupies the unique key until the
         // sweep deletes it; without the reclaim below, a retry in that window could never
