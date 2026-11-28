@@ -38504,7 +38504,7 @@
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "f1eaa2bb29805ffb22d067d8def3e36ca3989fa13ebab4994be44c5bf8b99962"
+        "sha256": "1a3d1e4c396ab01fba85265445ff47cd9bedf9bd7e5d468e93ae34b74b9282ba"
       },
       "due_state": "due",
       "gate": {
@@ -38605,7 +38605,7 @@
           "severity": "",
           "sources": [
             {
-              "count": 635,
+              "count": 637,
               "items": [
                 {
                   "id": "",
@@ -223208,7 +223208,7 @@
   },
   "generated_at": "2026-11-28T12:46:29.116452+00:00",
   "git_sha": "4f771d537181b44a69d4291e239eee2d436b734e",
-  "payload_sha256": "4e650a83abfbb385a632df744f76dac157b0a2411185700168cf9756ee407237",
+  "payload_sha256": "fb7cb3b9d843c5b3b1304344ce74eacd11365c91d84db86c50fa000ed7615e3b",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 572,
