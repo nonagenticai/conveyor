@@ -1874,8 +1874,11 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
     p0 = next(
         (cls for cls in output_standard.get("classes", []) if cls.get("name") == "p0"), None
     )
-    if p0 is None or len(p0.get("now", [])) != 21:
-        fail("seed/output-standard.json must define the p0 class with 21 categories")
+    # The p0 definition set is at least the 21 programme categories; the standard v4 adds the
+    # project-level set (PMP, risk, WBS, BDD, DoR/DoD) to every non-archived class, so the
+    # assertion pins the floor, not the exact length.
+    if p0 is None or len(p0.get("now", [])) < 21:
+        fail("seed/output-standard.json must define the p0 class with at least 21 categories")
     seed = read_json(ROOT / sources["programme_seed"])
     definition = read_json(ROOT / sources["programme_definition"])
     seed_keys = {row.get("key") for row in seed.get("projects", [])}

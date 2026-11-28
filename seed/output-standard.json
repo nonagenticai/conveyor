@@ -1,5 +1,9 @@
 {
-  "version": 3,
+  "version": 4,
+  "scope": {
+    "through_tranche": 8,
+    "note": "Tranches 0-8 are due, including the next two as forward evidence; 9-13 are scheduled and produce no finding."
+  },
   "categories": [
     "project-brief",
     "inception-analysis",
@@ -75,7 +79,11 @@
     "pi-objectives",
     "system-demo",
     "inspect-adapt",
-    "epic"
+    "epic",
+    "user-stories",
+    "acceptance-criteria",
+    "definition-of-ready",
+    "definition-of-done"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -119,9 +127,27 @@
         "adm-profile",
         "artifact-standard",
         "maturity-assessment",
-        "skills-assessment"
+        "skills-assessment",
+        "project-brief",
+        "inception-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
-      "closure": []
+      "closure": [
+        "evidence",
+        "closure-review"
+      ]
     },
     {
       "name": "spec",
@@ -129,9 +155,28 @@
         "key": "SPEC-V2"
       },
       "now": [
-        "spec"
+        "spec",
+        "project-brief",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
-      "closure": []
+      "closure": [
+        "evidence",
+        "closure-review"
+      ]
     },
     {
       "name": "t9",
@@ -150,7 +195,17 @@
         "compliance-review",
         "waiver",
         "maturity-assessment",
-        "skills-assessment"
+        "skills-assessment",
+        "architecture-analysis",
+        "delivery-contract",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
       "closure": [
         "evidence",
@@ -166,7 +221,20 @@
       "now": [
         "project-brief",
         "inception-analysis",
-        "architecture-design"
+        "architecture-design",
+        "architecture-analysis",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
       "closure": [
         "evidence",
@@ -180,7 +248,22 @@
       },
       "now": [
         "project-brief",
-        "evidence"
+        "evidence",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
       "closure": [
         "closure-review"
@@ -194,7 +277,22 @@
       },
       "now": [
         "project-brief",
-        "evidence"
+        "evidence",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
       "closure": [
         "closure-review"
@@ -207,9 +305,26 @@
       },
       "now": [
         "project-brief",
-        "evidence"
+        "evidence",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
-      "closure": []
+      "closure": [
+        "closure-review"
+      ]
     },
     {
       "name": "programme",
@@ -218,7 +333,22 @@
       },
       "now": [
         "project-brief",
-        "evidence"
+        "evidence",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+        "delivery-contract",
+        "compliance-review",
+        "project-wbs",
+        "project-baseline",
+        "project-registers",
+        "change-control",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done"
       ],
       "closure": [
         "closure-review"
@@ -5365,6 +5495,374 @@
           }
         ]
       }
+    },
+    "user-stories": {
+      "required": [
+        "Personas",
+        "Stories",
+        "Scenarios",
+        "Verify"
+      ],
+      "optional": [
+        "Links",
+        "Notes"
+      ],
+      "skeleton": "# User stories\n\nThe BDD user stories this project delivers, each with the scenario that accepts it.\n\n## Personas\n\nWho the stories serve, and the role each persona plays in the outcome.\n\n## Stories\n\nAs a persona, I want the capability, so that the value — one story per delivered part.\n\n## Scenarios\n\nGiven the state, when the action, then the observable outcome; one scenario per story.\n\n## Verify\n\nThe exact command or test for each scenario; a scenario with no verification is not acceptance.\n\n## Links\n\nThe project brief, the units and the evidence rows the stories are accepted by.\n\n## Notes\n\nWhat the stories deliberately leave out of scope.\n",
+      "standard": "Delivery",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.5",
+      "document_category": "user-stories",
+      "sources": {
+        "Personas": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Stories": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Scenarios": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Verify": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Links": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Notes": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "user-stories",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category user-stories",
+      "document_authored": true
+    },
+    "acceptance-criteria": {
+      "required": [
+        "Scenarios",
+        "Verify commands",
+        "Results",
+        "Status"
+      ],
+      "optional": [
+        "Links",
+        "Waivers"
+      ],
+      "skeleton": "# Acceptance criteria\n\nThe acceptance criteria the project is judged by, one scenario per criterion with its command.\n\n## Scenarios\n\nGiven the state, when the action, then the observable outcome; one scenario per criterion.\n\n## Verify commands\n\nThe exact command or test per scenario, runnable at the recorded baseline.\n\n## Results\n\nThe measured result per scenario, with date and commit, or an explicit not-run.\n\n## Status\n\nmet, not met or waived; a waiver names its approval.\n\n## Links\n\nThe units, evidence rows and pages the criteria are recorded on.\n\n## Waivers\n\nEach waiver, its reason, its approver and its reassessment date.\n",
+      "standard": "Delivery",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.5",
+      "document_category": "acceptance-criteria",
+      "sources": {
+        "Scenarios": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Verify commands": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Results": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Status": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Links": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Waivers": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "acceptance-criteria",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category acceptance-criteria",
+      "document_authored": true
+    },
+    "definition-of-ready": {
+      "required": [
+        "Independent",
+        "Negotiable",
+        "Valuable",
+        "Estimable",
+        "Small",
+        "Testable",
+        "Dependencies"
+      ],
+      "optional": [
+        "Notes"
+      ],
+      "skeleton": "# Definition of ready\n\nThe INVEST test every unit of this project must pass before it is claimed.\n\n## Independent\n\nThe unit can land without another unit's files; any real ordering is a typed dependency.\n\n## Negotiable\n\nThe outcome is fixed; the implementation is settled at delivery, not in the brief.\n\n## Valuable\n\nThe outcome is true after the unit and maps to a benefit or removes a named gap.\n\n## Estimable\n\nThe baseline and every file are named, so the work can be sized.\n\n## Small\n\nOne issue, one branch, one PR; a split is the written exception.\n\n## Testable\n\nEvery part carries a BDD scenario with a Verify command.\n\n## Dependencies\n\nblocked-by, acceptance-blocked-by, blocks and related, each cited.\n\n## Notes\n\nProject-specific readiness rules that add to, never subtract from, the six.\n",
+      "standard": "Delivery",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.5",
+      "document_category": "definition-of-ready",
+      "sources": {
+        "Independent": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Negotiable": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Valuable": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Estimable": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Small": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Testable": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Notes": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-ready",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category definition-of-ready",
+      "document_authored": true
+    },
+    "definition-of-done": {
+      "required": [
+        "Acceptance criteria",
+        "Evidence at completion",
+        "Repo gate",
+        "Merge and closure"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Definition of done\n\nThe acceptance-based closure test: every criterion evidenced at the merge head.\n\n## Acceptance criteria\n\nOne row per scenario in the issue, with its Verify command.\n\n## Evidence at completion\n\nThe command, result and SHA for each scenario at the PR head.\n\n## Repo gate\n\nThe compile and test verdict at the exact head; docs checked; no skipped test.\n\n## Merge and closure\n\nOne PR merged, the issue closed by it, the branch deleted.\n\n## Links\n\nThe PR, the CI runs and the evidence page.\n",
+      "standard": "Delivery",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.5",
+      "document_category": "definition-of-done",
+      "sources": {
+        "Acceptance criteria": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-done",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Evidence at completion": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-done",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Repo gate": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-done",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Merge and closure": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-done",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Links": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "definition-of-done",
+              "scope": "subject"
+            }
+          }
+        ]
+      },
+      "verifier": "generate-standards.py --check-category definition-of-done",
+      "document_authored": true
     }
   },
   "on_demand": [
@@ -5379,16 +5877,9 @@
     "requirements-catalog",
     "architecture-capability",
     "architecture-governance-log",
-    "delivery-contract",
-    "statement-of-intent",
-    "request-for-architecture-work",
     "safe-portfolio",
     "safe-art",
     "safe-cadence",
-    "project-wbs",
-    "project-baseline",
-    "project-registers",
-    "change-control",
     "phase-preliminary",
     "phase-a",
     "phase-b",
@@ -5407,6 +5898,8 @@
     "benefits-registry",
     "benefit-evaluation",
     "mandate",
+    "statement-of-intent",
+    "request-for-architecture-work",
     "candidate-solutions",
     "project-context-diagram",
     "benefits-diagram",

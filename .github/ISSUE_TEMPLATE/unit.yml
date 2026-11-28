@@ -119,9 +119,14 @@ body:
       label: Definition of ready
       description: Tick each item before the issue is claimable.
       value: |
+        - [ ] **Independent** — the unit lands without another unit's files; a real ordering is a typed dependency.
+        - [ ] **Negotiable** — the outcome is fixed; the implementation is settled at delivery.
+        - [ ] **Valuable** — the outcome maps to a benefit or removes a named gap.
+        - [ ] **Estimable** — the baseline and every file are named.
+        - [ ] **Small** — one issue, one branch, one PR.
+        - [ ] **Testable** — every part has ≥1 BDD scenario with a `Verify:` command or test target.
         - [ ] Baseline named and the plan/audit blob shas recorded.
         - [ ] Every spec/plan/code/test reference resolves at its ref; every `#N` resolves.
-        - [ ] Every part has ≥1 scenario with a `Verify:` command or test target.
         - [ ] Dependencies complete, typed and cited.
         - [ ] One-PR scope, file-disjoint from other ready issues or explicitly sequenced.
     validations:
@@ -133,7 +138,13 @@ body:
       label: Definition of done
       description: What the closing PR must show.
       value: |
-        - [ ] Every scenario passes at the PR head; `Evidence at completion` has one row per scenario.
+        The DoD is an acceptance-criteria table — one row per part, filled at close.
+
+        | Part / scenario | Evidence at completion | `Verify:` at the PR head |
+        |---|---|---|
+        | P1.1 | to fill | to fill |
+
+        - [ ] Every scenario passes at the PR head; the table has one row per scenario.
         - [ ] Repo gate green at the exact head (`preflight.yml`, then the PR's `ci-public`).
         - [ ] Tests added/updated per part; none skipped.
         - [ ] One PR `Closes #N` merged; issue closed; branch deleted.

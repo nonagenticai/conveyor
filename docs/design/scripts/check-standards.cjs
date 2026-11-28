@@ -36,7 +36,7 @@ const root = option("--documents") ? path.resolve(option("--documents")) : path.
 const dataDir = option("--data") ? path.resolve(option("--data")) : path.join(root, "data");
 const dataPath = path.join(dataDir, "standards.json");
 const STATUSES = new Set(["evidenced", "partial", "absent"]);
-const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]);
+const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC", "Delivery"]);
 const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
 const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"]);
 const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register", "absence"]);
@@ -66,6 +66,7 @@ function validate(record, documentsRoot, registerKeys) {
     const sections = Array.isArray(artefact.sections) ? artefact.sections : [];
     if (!sections.length) errors.push(`${id}: no sections`);
     const evidenced = sections.filter((section) => section.status === "evidenced").length;
+    const partial = sections.filter((section) => section.status === "partial").length;
     // Row evidence alone is not the artefact: when the published-document section is absent, the
     // record is absent regardless of how many of its other sections have rows. This is the
     // generator's own doctrine (`document_missing` in generate-standards.py), and it must be the
@@ -73,11 +74,14 @@ function validate(record, documentsRoot, registerKeys) {
     const documentMissing = sections.some(
       (section) => section.heading === "Published document" && section.status === "absent"
     );
+    // A document that exists but lacks a required heading is PARTIAL: zero evidenced sections
+    // is not the same as no document. The generator's all-partial rule and this recomputation
+    // must agree, or a legitimate partial artefact reads absent on the public page.
     const expected = documentMissing
       ? "absent"
       : evidenced === sections.length
         ? "evidenced"
-        : evidenced
+        : evidenced || partial
           ? "partial"
           : "absent";
     if (artefact.status !== expected) {
@@ -115,7 +119,10 @@ function validate(record, documentsRoot, registerKeys) {
         : artefactSections.some(
             (section) => section.required !== false && section.status !== "evidenced",
           );
-    if (artefact.mandatory && missingRequired) {
+    // A scheduled or excluded artefact is not work yet: it produces no finding, so it owes no
+    // package. The page still shows it (and its status) so the future tranche is visible.
+    const notDue = artefact.due_state === "scheduled" || artefact.due_state === "excluded";
+    if (artefact.mandatory && missingRequired && !notDue) {
       if (!artefact.package_key) errors.push(`${id}: ${artefact.status} and no package key`);
       if (artefact.package_published !== true) {
         errors.push(`${id}: ${artefact.status} but its package is not in the published register`);

@@ -62,6 +62,15 @@ pub fn standard_version() -> u64 {
     standard()["version"].as_u64().unwrap_or(0)
 }
 
+/// The last tranche whose work is due (`scope.through_tranche`).
+///
+/// A project in a later tranche is `scheduled`: its artefacts are recorded honestly but produce
+/// no finding until the programme reaches it. The audit and the published register read this one
+/// number; changing it is a programme decision, not a code change.
+pub fn through_tranche() -> u64 {
+    standard()["scope"]["through_tranche"].as_u64().unwrap_or(8)
+}
+
 /// The canonical vocabulary, in the standard's order.
 pub fn categories() -> Vec<String> {
     standard()["categories"]

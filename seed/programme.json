@@ -22,9 +22,26 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -46,9 +63,26 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -74,9 +108,26 @@
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -100,9 +151,26 @@
         "tranche": 2,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -130,9 +198,26 @@
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -157,9 +242,26 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -188,9 +290,26 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -243,9 +362,26 @@
         "tranche": 6,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -272,9 +408,26 @@
         "tranche": 7,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -303,9 +456,26 @@
         "tranche": 8,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -330,9 +500,26 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -358,9 +545,26 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -395,9 +599,26 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -424,9 +645,26 @@
         "tranche": 6,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -455,9 +693,26 @@
         "tranche": 6,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -508,9 +763,26 @@
         "tranche": 10,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -544,9 +816,26 @@
         "tranche": 8,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -576,7 +865,22 @@
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -609,9 +913,26 @@
         "tranche": 7,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -641,9 +962,26 @@
         "tranche": 7,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -673,9 +1011,26 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -704,9 +1059,26 @@
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -740,9 +1112,26 @@
         "tranche": 8,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -768,9 +1157,26 @@
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -811,9 +1217,26 @@
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -837,7 +1260,22 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -872,7 +1310,22 @@
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -904,7 +1357,22 @@
         "tranche": 2,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -937,7 +1405,22 @@
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -969,7 +1452,22 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1007,7 +1505,22 @@
         "tranche": 10,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1040,7 +1553,22 @@
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1077,7 +1605,22 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1109,7 +1652,22 @@
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1153,7 +1711,17 @@
           "compliance-review",
           "waiver",
           "maturity-assessment",
-          "skills-assessment"
+          "skills-assessment",
+          "architecture-analysis",
+          "delivery-contract",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "evidence",
@@ -1188,7 +1756,22 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1220,7 +1803,22 @@
         "tranche": 1,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1268,7 +1866,22 @@
         "tranche": 13,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1304,7 +1917,22 @@
         "tranche": 3,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1341,7 +1969,22 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1374,7 +2017,22 @@
         "tranche": 12,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1408,7 +2066,22 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1443,7 +2116,22 @@
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1485,7 +2173,20 @@
         "expected_outputs": [
           "project-brief",
           "inception-analysis",
-          "architecture-design"
+          "architecture-design",
+          "architecture-analysis",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "evidence",
@@ -1522,7 +2223,22 @@
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1560,7 +2276,22 @@
         "tranche": 6,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1597,7 +2328,22 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1631,7 +2377,22 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1680,9 +2441,27 @@
           "adm-profile",
           "artifact-standard",
           "maturity-assessment",
-          "skills-assessment"
+          "skills-assessment",
+          "project-brief",
+          "inception-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
         "adm_phase": "Preliminary",
         "plateau": "definition"
       }
@@ -1732,7 +2511,22 @@
         "tranche": 0,
         "expected_outputs": [
           "project-brief",
-          "evidence"
+          "evidence",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
         "closure_outputs": [
           "closure-review"
@@ -1759,9 +2553,28 @@
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
-          "spec"
+          "spec",
+          "project-brief",
+          "inception-analysis",
+          "architecture-analysis",
+          "architecture-design",
+          "architecture-artifact",
+          "statement-of-architecture-work",
+          "delivery-contract",
+          "compliance-review",
+          "project-wbs",
+          "project-baseline",
+          "project-registers",
+          "change-control",
+          "user-stories",
+          "acceptance-criteria",
+          "definition-of-ready",
+          "definition-of-done"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
         "adm_phase": "Preliminary",
         "plateau": "definition"
       }
