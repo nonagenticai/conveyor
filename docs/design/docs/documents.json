@@ -3098,6 +3098,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/evidence/retro-cadence.md"
     },
     {
+      "title": "Tranche-9 readiness gate — measured 2026-11-28",
+      "path": "docs/evidence/rework/tranche-9/readiness-gate.html",
+      "source": "docs/evidence/rework/tranche-9/readiness-gate.md",
+      "section": "Evidence",
+      "sha256": "fdf497916bf867927189d5022c4c32ec36e83014988226914f5af4d2bee2be24",
+      "bytes": 6968,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-9/readiness-gate.md"
+    },
+    {
       "title": "S04 P4.1 — the live coding, worker and billing receipts",
       "path": "docs/evidence/s04-p41-live/2026-11-27/README.html",
       "source": "docs/evidence/s04-p41-live/2026-11-27/README.md",
