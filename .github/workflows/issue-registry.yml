@@ -51,6 +51,9 @@ concurrency:
 jobs:
   refresh:
     name: Refresh the public issue registry
+    # The registry carries issue state, not arbitrary label churn. Only `status:` labels change
+    # the design page's chips; `opened`/`closed`/`reopened` and every non-issue trigger still run.
+    if: ${{ github.event_name != 'issues' || (github.event.action != 'labeled' && github.event.action != 'unlabeled') || (github.event.label.name != null && startsWith(github.event.label.name, 'status:')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -76,15 +79,29 @@ jobs:
           # been force-pushed, and GitHub then refuses `gh pr reopen` for good (measured:
           # #355, #367). With no open PR the run uses a fresh timestamped branch and opens a
           # new PR from it.
-          open_prs="$(gh pr list --repo "$REPO" --state open --limit 100 --json number,headRefName)"
+          open_prs="$(gh pr list --repo "$REPO" --state open --limit 100 --json number,headRefName,updatedAt)"
           open="$(printf '%s' "$open_prs" | jq -r '[.[] | select(.headRefName | startswith("automation/issue-registry"))][0].number // empty')"
           head_branch="$(printf '%s' "$open_prs" | jq -r '[.[] | select(.headRefName | startswith("automation/issue-registry"))][0].headRefName // empty')"
           if [ -z "$head_branch" ]; then
             head_branch="automation/issue-registry-$(date -u +%Y%m%dT%H%M%SZ)"
           fi
+          # Throttle: a burst of issue events must collapse to one push. An event that arrives
+          # while the open generated PR is younger than the window is a no-op; a manual dispatch
+          # always proceeds. Measured 2026-11-28 (PR #942): five force-pushes in 20 minutes, three
+          # `ci` runs live concurrently, and #945's `ci` queued behind them.
+          now="$(date -u +%s)"
+          updated="$(printf '%s' "$open_prs" | jq -r '[.[] | select(.headRefName | startswith("automation/issue-registry"))][0].updatedAt // empty')"
+          updated_epoch=""
+          if [ -n "$updated" ]; then
+            updated_epoch="$(date -u -d "$updated" +%s)"
+          fi
+          if [ "$(bash scripts/ci/registry-throttle.sh "${GITHUB_EVENT_NAME:-unknown}" "$now" "$updated_epoch")" = "skip" ]; then
+            echo "Throttled: the generated PR was updated less than 30 minutes ago; this event is a no-op." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           # ⛔ A branch whose PR is IN THE MERGE QUEUE cannot be updated: GitHub answers
           # `GH006: Protected branch update failed … A pull request for this branch has been
-          # added to a merge queue`. This workflow runs on every push to main, so a busy queue
+          # added to a merge queue`. This workflow runs on every issue event, so a busy queue
           # turned it red over and over (measured 2026-11-19: run 44495172473 at 09:18Z, while
           # 09:27Z and 09:35Z were green — the same code, a different queue state). A queued
           # generated PR is already the deliverable; the refresh resumes on the next push after
