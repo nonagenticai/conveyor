@@ -73,15 +73,15 @@
       "title": "app: the work-package spec \u2014 story, Gherkin scenarios, INVEST DoR, derived DoD",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/935",
-      "updatedAt": "2026-11-28T12:02:16Z",
+      "updatedAt": "2026-11-28T13:12:07Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -94,15 +94,15 @@
       "title": "delivery: the unit contract is BDD/Gherkin/INVEST, and the skills enforce it",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/934",
-      "updatedAt": "2026-11-28T12:00:36Z",
+      "updatedAt": "2026-11-28T13:12:10Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -113,9 +113,9 @@
     {
       "number": 933,
       "title": "docs: BDD stories, Gherkin AC and INVEST DoR become normative (SPEC_V2 \u00a75.8)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/933",
-      "updatedAt": "2026-11-28T12:02:36Z",
+      "updatedAt": "2026-11-28T13:11:55Z",
       "labels": [
         {
           "name": "unit",
@@ -273,9 +273,9 @@
     {
       "number": 915,
       "title": "ci: the image build is the merge-latency critical path at 19\u201325 min \u2014 cache the release compiles",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/915",
-      "updatedAt": "2026-11-28T11:53:22Z",
+      "updatedAt": "2026-11-28T13:44:34Z",
       "labels": [
         {
           "name": "unit",
@@ -294,9 +294,9 @@
     {
       "number": 914,
       "title": "fix(walk): the Palette's advertised Ctrl/Cmd+K shortcut has no handler",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/914",
-      "updatedAt": "2026-11-28T09:13:38Z",
+      "updatedAt": "2026-11-28T14:02:35Z",
       "labels": [
         {
           "name": "unit",
@@ -355,7 +355,7 @@
       "title": "fix(walk): the sources catalogue's real field, the unbound query and the paging shape",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/910",
-      "updatedAt": "2026-11-28T08:35:06Z",
+      "updatedAt": "2026-11-28T14:02:55Z",
       "labels": [
         {
           "name": "unit",
@@ -8085,9 +8085,9 @@
     {
       "number": 4,
       "title": "S06 \u2014 one shared decision boundary; Telegram sender identity",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/4",
-      "updatedAt": "2026-11-28T12:07:48Z",
+      "updatedAt": "2026-11-28T13:04:10Z",
       "labels": [
         {
           "name": "unit",

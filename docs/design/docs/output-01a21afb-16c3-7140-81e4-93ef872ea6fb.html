@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>GEMBA-WALK — World layer architecture (bevy_ecs) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-artifact" data-provenance-version="1" data-provenance-hash="473fb0d7a9e750200949bf04eade0cf691986124f0788e6d3b53ae161cd62927" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-artifact</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>473fb0d7a9e750200949bf04eade0cf691986124f0788e6d3b53ae161cd62927</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>GEMBA-WALK — World layer architecture (bevy_ecs)</h1>
+<h2>Metadata</h2>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Project</td><td>GEMBA-WALK — a separate game-style client</td></tr>
+<tr><td>Artefact type</td><td>architecture-artifact (TOGAF, D phase)</td></tr>
+<tr><td>Version</td><td>1</td></tr>
+<tr><td>Owner</td><td>programme-architect</td></tr>
+<tr><td>Reviewer</td><td>Conveyor Architecture Board</td></tr>
+<tr><td>Review date</td><td>2026-11-27</td></tr>
+<tr><td>Phase / plateau</td><td>D / HLD</td></tr>
+<tr><td>Authority</td><td>delegated rule decision under the published standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3</td></tr>
+<tr><td>Source document</td><td><code>docs/design/GEMBA-WALK-ECS.md</code> at 6ffdd063b, sha256 <code>8bdb6eea5b14567660a087a86a931893f3c98e3e95b3ee423c89b5a79d68c559</code></td></tr>
+</tbody></table>
+<h2>Entries</h2>
+<table><thead><tr><th>#</th><th>Section</th><th>Content</th></tr></thead><tbody>
+<tr><td>1</td><td>1. Boundary and the three state classes</td><td>fixed by the document body</td></tr>
+<tr><td>2</td><td>2. Crate and dependency contract</td><td>fixed by the document body</td></tr>
+<tr><td>3</td><td>3. Entities</td><td>fixed by the document body</td></tr>
+<tr><td>4</td><td>4. Components</td><td>fixed by the document body</td></tr>
+<tr><td>5</td><td>5. Resources</td><td>fixed by the document body</td></tr>
+<tr><td>6</td><td>6. Schedules, sets and ordering</td><td>fixed by the document body</td></tr>
+<tr><td>7</td><td>7. Messages and observers</td><td>fixed by the document body</td></tr>
+<tr><td>8</td><td>8. The command path</td><td>fixed by the document body</td></tr>
+<tr><td>9</td><td>9. Projection</td><td>fixed by the document body</td></tr>
+<tr><td>10</td><td>10. Determinism and replay</td><td>fixed by the document body</td></tr>
+<tr><td>11</td><td>11. WASM constraints and the boundary</td><td>fixed by the document body</td></tr>
+<tr><td>12</td><td>12. Performance budgets</td><td>fixed by the document body</td></tr>
+<tr><td>13</td><td>13. Renderer adapter and the <code>WorldView</code> port</td><td>fixed by the document body</td></tr>
+<tr><td>14</td><td>14. Testing</td><td>fixed by the document body</td></tr>
+<tr><td>15</td><td>15. Security</td><td>fixed by the document body</td></tr>
+<tr><td>16</td><td>16. Extension rules</td><td>fixed by the document body</td></tr>
+</tbody></table>
+<h2>Links</h2>
+<table><thead><tr><th>From</th><th>Kind</th><th>To</th></tr></thead><tbody>
+<tr><td>ADR 0022</td><td>authorises</td><td>this document</td></tr>
+<tr><td>this document</td><td>derivation</td><td><code>docs/design/GEMBA-WALK-SPEC.md</code> §6.2, §6.3, §12</td></tr>
+<tr><td>this document</td><td>realization</td><td><code>crates/walk-world</code> (G0's W1a–W1d)</td></tr>
+<tr><td>this document</td><td>dependency</td><td><code>docs/plans/inception/GEMBA-WALK/03-artifact-register.md</code> v2 rows</td></tr>
+</tbody></table>
+<h2>Document</h2>
+<h1>The Gemba Walk — world-layer architecture (bevy_ecs)</h1>
+<p>Status: Accepted · Date: 2026-11-26 · Owner direction: 2026-11-26 · ADR: 0022
+Normative siblings: <code>GEMBA-WALK-SPEC.md</code> §2, §6.2, §10, §12 · Plan: <code>docs/plans/GEMBA-WALK.md</code>
+Crate: <code>crates/walk-world</code> · Pinned engine: <code>bevy_ecs 0.20.1</code></p>
+<p>This document is the architecture description of the world layer. It fixes the crate boundary, the
+entity/component model, the schedules, the message and observer contracts, the command path, the
+projection rules, determinism, the wasm surface and the test strategy. It is normative for
+<code>crates/walk-world</code>; the shell consumes it through the <code>WorldView</code> port and the wasm boundary.</p>
+<p>It does <strong>not</strong> reopen SPEC §2: the world is navigation, the sheets are the work, and no capability
+exists only in the world. The ECS renders no text that the DOM does not also carry.</p>
+<h2>1. Boundary and the three state classes</h2>
+<p>The server is the only source of programme truth. The ECS is a <strong>view</strong> of it plus the client state
+the server has no table for. This is not a convention: it is the module boundary.</p>
+<table><thead><tr><th>Class</th><th>Examples</th><th>Owner</th><th>Written by</th><th>Persisted</th><th>Authority</th></tr></thead><tbody>
+<tr><td><strong>Server truth</strong> (mirror)</td><td>project, tranche, card, register item, decision, architecture artefact, meeting</td><td><code>projection</code> module</td><td><code>project_snapshot</code>, <code>apply_delta</code> only</td><td><strong>never</strong></td><td>the API; the ECS may not author it</td></tr>
+<tr><td><strong>Session</strong></td><td>seat preset, avatar pose, camera, open sheet, selection, filters, unsent draft</td><td><code>session</code> module</td><td>intent and session systems</td><td>preferences only, under <code>conveyor.walk.*</code></td><td>the client</td></tr>
+<tr><td><strong>Derived</strong></td><td>proximity prompt, highlight, badge, mood, moodlet, draw list</td><td><code>system/mood</code>, <code>view</code></td><td>pure systems</td><td>no</td><td>a function of the two above</td></tr>
+</tbody></table>
+<p>Rules that follow, and that a review must enforce:</p>
+<ol>
+<li>No system assigns a mirror field from local intent. A write leaves as an <code>ActionCall</code> and the
+mirrored value changes only when a receipt or a delta arrives.</li>
+<li><code>save()</code> serialises <strong>session state only</strong>. Serialising the mirror would be the "programme store"
+SPEC §6.4 forbids: a seed by another name.</li>
+<li><code>project()</code> is idempotent. Applying the same snapshot twice leaves every component and the entity
+key set identical.</li>
+<li>A screen refetches after a write (SPEC §5); the mirror never becomes the refetch substitute.</li>
+</ol>
+<h2>2. Crate and dependency contract</h2>
+<pre><code>crates/walk-world/
+  Cargo.toml
+  src/lib.rs              WalkWorld, WorldConfig, WalkWorldPlugin
+  src/entity.rs           RecordKey, RecordKind, SceneKey, InteractableId
+  src/component.rs        every component (derive Component)
+  src/resource.rs         every resource (derive Resource)
+  src/message.rs          every message (derive Message) and entity event (derive EntityEvent)
+  src/projection.rs       snapshot/delta application, despawn guard
+  src/command.rs          ActionCall, Outcome, the call state machine
+  src/session.rs          seat, camera, sheet, save/load
+  src/view.rs             FrameView, SheetContext, render_prepare
+  src/replay.rs           the replay log and its determinism check
+  src/system/{intent,locomotion,collision,interaction,camera,animation,mood,outbox}.rs
+  src/wasm.rs             the wasm-bindgen surface (feature "wasm")
+  tests/                  headless scenarios, properties, replay, ambiguity
+</code></pre>
+<pre><code class="language-toml">[dependencies]
+bevy_ecs   = { version = "=0.20.1", features = ["serialize"] }
+bevy_app   = "=0.20.1"
+bevy_time  = "=0.20.1"
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# bevy_time reads the platform clock through bevy_platform, which needs its web backend on wasm.
+# Enabled per target so native builds never pull wasm-bindgen or web-sys.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+bevy_app = { version = "=0.20.1", features = ["web"] }
+
+[features]
+default = []
+wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
+</code></pre>
+<p>The defaults stay on. <code>bevy_app</code>'s default feature enables <code>bevy_ecs/default</code>, so pruning
+<code>bevy_ecs</code> in isolation changes nothing; a real prune turns both off together and is verified by a
+preflight compile, never assumed here.</p>
+<p><strong>Not in the dependency graph, deliberately:</strong> the <code>bevy</code> umbrella crate, <code>bevy_render</code>,
+<code>bevy_winit</code>, <code>bevy_asset</code>, <code>bevy_ui</code>; <code>web-sys</code>, <code>leptos</code>, <code>gloo</code>. The crate is <code>rlib</code>, compiles
+for host and <code>wasm32-unknown-unknown</code>, and has no DOM, no network and no storage.</p>
+<p>Costs accepted, stated so a future session does not rediscover them: <code>bevy_ecs</code> joins every
+workspace build (native and wasm); <code>multi_threaded</code> stays off; the 0.x API is pinned exactly and an
+upgrade is its own issue.</p>
+<h2>3. Entities</h2>
+<p>Identity is a key, not an allocation order. Every mirrored entity carries exactly one <code>RecordKey</code>;
+every scene-only entity carries a <code>SceneKey</code>. Spawning is idempotent by key: <code>project()</code> looks up by
+key first, spawns only when absent.</p>
+<table><thead><tr><th>Entity</th><th>Key</th><th>Source</th><th>Cardinality</th></tr></thead><tbody>
+<tr><td>Project</td><td><code>Record(Project, id)</code></td><td><code>project</code> via <code>programmes.*</code> reads</td><td>52 nominal</td></tr>
+<tr><td>Tranche</td><td><code>Record(Tranche, id)</code></td><td><code>tranches.*</code></td><td>14</td></tr>
+<tr><td>Card / unit</td><td><code>Record(Card, id)</code></td><td><code>cards.*</code>, board reads</td><td>open cards, ≤ 400</td></tr>
+<tr><td>Register item (risk, change, …)</td><td><code>Record(RegisterItem, id)</code></td><td><code>registers.*</code></td><td>per project</td></tr>
+<tr><td>Decision</td><td><code>Record(Decision, id)</code></td><td><code>decisions.*</code></td><td>per project</td></tr>
+<tr><td>Architecture artefact</td><td><code>Record(Artifact, id)</code></td><td><code>architecture.artifacts_*</code></td><td>per project</td></tr>
+<tr><td>Meeting</td><td><code>Record(Meeting, id)</code></td><td><code>meetings.*</code></td><td>per board</td></tr>
+<tr><td>Room</td><td><code>Scene(Room, WingId)</code></td><td>the route table's wings</td><td>8</td></tr>
+<tr><td>Wall</td><td><code>Scene(Wall, RouteId)</code></td><td>the frozen census: one per route</td><td>52</td></tr>
+<tr><td>Portal</td><td><code>Scene(Portal, n)</code></td><td>the wing graph</td><td>~12</td></tr>
+<tr><td>Avatar</td><td><code>Scene(Avatar, 0)</code></td><td>one per session</td><td>1</td></tr>
+<tr><td>Advisor</td><td><code>Scene(Advisor, SeatId)</code></td><td>the seat presets</td><td>≤ 7</td></tr>
+<tr><td>Prop, badge, moodlet</td><td><code>Scene(_, n)</code></td><td>derived</td><td>bounded by the draw budget</td></tr>
+</tbody></table>
+<p><code>InteractableId</code> is the new-type the port exchanges with the renderer: it is either a <code>RecordKey</code>
+(open the record's sheet) or a <code>WallId</code> (open the destination). The renderer never invents one.</p>
+<h2>4. Components</h2>
+<table><thead><tr><th>Component</th><th>Field sketch</th><th>Written by</th><th>Source</th></tr></thead><tbody>
+<tr><td><code>Position(Vec3)</code></td><td>world position</td><td><code>locomotion</code>, <code>spawn</code></td><td>scene</td></tr>
+<tr><td><code>Velocity(Vec3)</code></td><td>m/s</td><td><code>intent</code>, <code>locomotion</code></td><td>input</td></tr>
+<tr><td><code>Facing(f32)</code></td><td>yaw radians</td><td><code>intent</code>, <code>locomotion</code></td><td>input</td></tr>
+<tr><td><code>Collider { half_extents }</code></td><td>wall AABB</td><td>static</td><td>scene</td></tr>
+<tr><td><code>Avatar</code></td><td>marker</td><td><code>spawn</code></td><td>session</td></tr>
+<tr><td><code>CameraRig { mode, yaw, distance, target }</code></td><td></td><td><code>camera</code></td><td>session</td></tr>
+<tr><td><code>InRoom(RoomKey)</code></td><td>which room the avatar is in</td><td><code>interaction</code></td><td>derived</td></tr>
+<tr><td><code>Wall { route: RouteId }</code></td><td></td><td><code>spawn</code></td><td>census</td></tr>
+<tr><td><code>Interactable { target: InteractableId }</code></td><td></td><td><code>spawn</code></td><td>scene/projection</td></tr>
+<tr><td><code>Highlight { on: bool }</code></td><td></td><td><code>interaction</code>, <code>session</code></td><td>derived</td></tr>
+<tr><td><code>Badge { count: u16, kind }</code></td><td>queue counts</td><td><code>mood</code></td><td>derived</td></tr>
+<tr><td><code>Mood { valence, label }</code></td><td></td><td><code>mood</code></td><td>derived</td></tr>
+<tr><td><code>Moodlet { expires_at_tick }</code></td><td></td><td><code>mood</code></td><td>derived</td></tr>
+<tr><td><code>RecordRef(RecordKey)</code></td><td>reverse index</td><td><code>projection</code></td><td>mirror</td></tr>
+<tr><td><code>Version(u64)</code></td><td><code>If-Match</code> source</td><td><code>projection</code></td><td>mirror</td></tr>
+<tr><td><code>Title(String)</code>, <code>Headline(String)</code></td><td>short labels only</td><td><code>projection</code></td><td>mirror</td></tr>
+<tr><td><code>PendingCall(CallId)</code></td><td>presentation</td><td><code>outbox</code></td><td>command</td></tr>
+<tr><td><code>AbsentSince(u64)</code></td><td>despawn guard generation</td><td><code>projection</code></td><td>projection</td></tr>
+<tr><td><code>AnimPhase(f32)</code></td><td></td><td><code>animation</code></td><td>derived</td></tr>
+<tr><td><code>SeatPreset(SeatId)</code></td><td></td><td><code>session</code></td><td>session</td></tr>
+</tbody></table>
+<p>Long-form content never enters a component. A component holds what the world draws or the command
+path needs to build a request; the sheet fetches the record itself.</p>
+<h2>5. Resources</h2>
+<table><thead><tr><th>Resource</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>WorldClock { tick: u64 }</code></td><td>the only clock; incremented in <code>FixedUpdate</code></td></tr>
+<tr><td><code>ActionManifest</code></td><td>name → <code>{effect, confirm, scopes, idempotent, spec_hash}</code> from <code>actions.describe</code></td></tr>
+<tr><td><code>Messages</code>-backed input streams</td><td>see §7; each <code>app.add_message::&lt;T&gt;()</code></td></tr>
+<tr><td><code>Outbox { queue: Vec&lt;ActionCall&gt; }</code></td><td>intents awaiting the transport; drained by the shell</td></tr>
+<tr><td><code>SnapshotGeneration { gen: u64 }</code></td><td>the despawn guard</td></tr>
+<tr><td><code>SessionState { seat, sheet, selection }</code></td><td>session truth</td></tr>
+<tr><td><code>CameraRig</code></td><td>the camera resource (mirrored into the avatar entity for queries)</td></tr>
+<tr><td><code>FrameView</code></td><td>the last <code>render_prepare</code> output</td></tr>
+<tr><td><code>Rand64 { state }</code></td><td>seeded; cosmetic jitter only</td></tr>
+<tr><td><code>WorldConfig { seed, rooms, walls }</code></td><td>construction inputs</td></tr>
+</tbody></table>
+<h2>6. Schedules, sets and ordering</h2>
+<p>The simulation is <code>FixedUpdate</code> at 60 Hz (<code>Time&lt;Fixed&gt;</code>); presentation is <code>Update</code>. Every ordering
+constraint is explicit; nothing relies on insertion order.</p>
+<table><thead><tr><th>Schedule</th><th>Set (in order)</th><th>Systems</th><th>Effect</th></tr></thead><tbody>
+<tr><td><code>FixedUpdate</code></td><td><code>IntentSet</code></td><td><code>read_input</code>, <code>validate_against_manifest</code></td><td>input message → <code>ActionRequested</code> / movement intent</td></tr>
+<tr><td></td><td><code>LocomotionSet</code></td><td><code>apply_intent</code></td><td>writes <code>Velocity</code>, <code>Facing</code></td></tr>
+<tr><td></td><td><code>CollisionSet</code></td><td><code>integrate</code>, <code>resolve_walls</code></td><td>writes <code>Position</code>, clamps to floors</td></tr>
+<tr><td></td><td><code>InteractionSet</code></td><td><code>resolve_proximity</code>, <code>resolve_pick</code></td><td>writes <code>InRoom</code>, <code>Highlight</code>, emits <code>PromptChanged</code></td></tr>
+<tr><td></td><td><code>CameraSet</code></td><td><code>follow</code>, <code>boom_collision</code></td><td>writes <code>CameraRig</code></td></tr>
+<tr><td></td><td><code>AnimationSet</code></td><td><code>advance_phase</code>, <code>apply_moodlets_expiry</code></td><td>writes <code>AnimPhase</code>, drops expired moodlets</td></tr>
+<tr><td></td><td><code>MoodSet</code></td><td><code>derive_mood</code>, <code>derive_badges</code></td><td>writes <code>Mood</code>, <code>Badge</code></td></tr>
+<tr><td></td><td><code>OutboxSet</code></td><td><code>drain_requests</code></td><td>writes <code>Outbox</code>, <code>PendingCall</code></td></tr>
+<tr><td><code>Update</code></td><td><code>ProjectionSet</code></td><td><code>apply_snapshot</code>, <code>apply_delta</code>, <code>apply_receipt</code>, <code>despawn_absent</code></td><td>mirror writes</td></tr>
+<tr><td></td><td><code>RenderPrepareSet</code></td><td><code>build_frame_view</code></td><td>writes <code>FrameView</code></td></tr>
+</tbody></table>
+<p>Within each set the systems are <code>.chain()</code>ed where one reads what the previous writes. The
+<code>ProjectionSet</code> is in <code>Update</code> because a receipt must land at the next frame, not at the next fixed
+tick, and it touches no simulated state.</p>
+<p>Why this shape: a <code>MessageReader</code> ordered <strong>before</strong> its writer sees the message on the <strong>next</strong>
+frame. Same-frame reaction is therefore a scheduling fact, not a hope — the chains above are the
+contract, and <code>same_frame_ordering</code> is a test.</p>
+<h2>7. Messages and observers</h2>
+<p>Bevy 0.20 has two mechanisms and they are not interchangeable. The rule:</p>
+<table><thead><tr><th>Mechanism</th><th>Use for</th><th>Not for</th></tr></thead><tbody>
+<tr><td><strong>Message</strong> (<code>#[derive(Message)]</code>, <code>app.add_message::&lt;T&gt;()</code>, <code>MessageWriter::write</code>, <code>MessageReader::read</code>)</td><td>cross-system streams that need an ordering guarantee</td><td>per-entity reactions</td></tr>
+<tr><td><strong>Observer</strong> (<code>#[derive(Event)]</code> / <code>#[derive(EntityEvent)]</code>, <code>Commands::trigger</code>, <code>On&lt;E&gt;</code>)</td><td>per-entity reactions to an add/update/selection</td><td>global flow that another system must observe the same frame</td></tr>
+</tbody></table>
+<p>Messages:</p>
+<table><thead><tr><th>Message</th><th>Writer</th><th>Reader</th><th>Same-frame?</th></tr></thead><tbody>
+<tr><td><code>InputIn</code></td><td>the shell (via <code>push_input</code>)</td><td><code>read_input</code></td><td>yes</td></tr>
+<tr><td><code>SnapshotIn</code></td><td>the shell</td><td><code>apply_snapshot</code></td><td>next frame</td></tr>
+<tr><td><code>DeltaIn</code></td><td>the shell (SSE)</td><td><code>apply_delta</code></td><td>next frame</td></tr>
+<tr><td><code>ReceiptIn</code></td><td>the shell</td><td><code>apply_receipt</code></td><td>next frame</td></tr>
+<tr><td><code>ActionRequested</code></td><td><code>validate_against_manifest</code></td><td><code>drain_requests</code></td><td><strong>yes — chained</strong></td></tr>
+<tr><td><code>ActionResolved</code></td><td><code>apply_receipt</code></td><td>the sheet presenter</td><td>next frame</td></tr>
+<tr><td><code>PromptChanged</code></td><td><code>resolve_proximity</code></td><td><code>build_frame_view</code></td><td>yes (same schedule)</td></tr>
+<tr><td><code>SessionCommand</code></td><td>the shell</td><td>session systems</td><td>next frame</td></tr>
+</tbody></table>
+<p>Entity events (observers), all <code>#[derive(EntityEvent)]</code> with an <code>entity</code> field read through
+<code>On&lt;E&gt;</code>:</p>
+<table><thead><tr><th>Event</th><th>Triggered by</th><th>Observer effect</th></tr></thead><tbody>
+<tr><td><code>RecordUpdated</code></td><td><code>projection</code> when a mirrored component changes</td><td>re-derive the badge/mood for that entity</td></tr>
+<tr><td><code>WallEntered</code></td><td><code>interaction</code></td><td>open the destination sheet if the session says so</td></tr>
+<tr><td><code>SheetOpened</code> / <code>SheetClosed</code></td><td><code>session</code></td><td>pin/unpin the subject from the despawn guard</td></tr>
+<tr><td><code>ReceiptApplied</code></td><td><code>projection</code></td><td>clear <code>PendingCall</code>, announce on the entity</td></tr>
+</tbody></table>
+<p>Observers never drive ordering between systems; if an effect must happen before another system reads
+it in the same tick, it is a message in a chain, not an observer.</p>
+<h2>8. The command path</h2>
+<p>A write is a state machine. The ECS owns the states; the shell owns the transport.</p>
+<pre><code>Draft ──submit──▶ Submitted ──drain──▶ Pending ──receipt──▶ Confirmed
+  │                  │                    │
+  │                  │                    ├──refusal(4xx)──▶ Refused
+  │                  │                    ├──transport────▶ Failed
+  │                  │                    └──deadline─────▶ TimedOut
+  └──discard────────▶ (no call)
+</code></pre>
+<p><code>ActionCall { id: CallId, action: String, input: serde_json::Value, idempotency_key: String, if_match: Option&lt;u64&gt;, approval_id: Option&lt;Uuid&gt; }</code>.</p>
+<table><thead><tr><th>Rule</th><th>Why</th></tr></thead><tbody>
+<tr><td>The manifest's <code>effect</code> decides the confirmation: <code>read</code> none, <code>write</code> one confirm, <code>destructive</code> requires <code>approval_id</code></td><td>SPEC §5, §6.5; the server's gate is the only gate</td></tr>
+<tr><td>`confirm = card</td><td>card-typed` without an approval is not submitted; the sheet shows the refusal the server would give</td></tr>
+<tr><td><code>if_match</code> comes from the mirrored <code>Version</code>; a <code>412</code> refetches and shows both versions</td><td>never retry with a guessed version</td></tr>
+<tr><td><code>idempotency_key</code> is generated once per call and reused on retry</td><td>a retried write must not double-apply</td></tr>
+<tr><td>No component field is set from the request body; only the receipt or the delta changes the mirror</td><td>the optimistic value is exactly the "client copy" SPEC §6.4 forbids</td></tr>
+<tr><td><code>PendingCall</code> is presentation state; a <code>Refused</code> clears it and surfaces the problem verbatim</td><td>the toast never claims a success the server did not return</td></tr>
+<tr><td>Navigation does not cancel a submitted call; its result lands in the mirror</td><td>the act already left the client</td></tr>
+</tbody></table>
+<p><code>Outcome</code> is <code>Receipt(Value) | Refused(Problem) | Failed(String) | TimedOut</code>; <code>resolve(id, outcome)</code>
+is the only entry point, and it is a message (<code>ReceiptIn</code>) so the schedule stays the only mutator.</p>
+<h2>9. Projection</h2>
+<p>A snapshot is <code>{ generation: u64, records: Vec&lt;Record&gt; }</code>. <code>apply_snapshot</code>:</p>
+<ol>
+<li>For each record, resolve the entity by <code>RecordKey</code>; insert or update the mirrored components;
+stamp <code>Version</code>; clear <code>AbsentSince</code>.</li>
+<li>For every mirrored entity not seen in this generation, insert <code>AbsentSince(gen)</code>.</li>
+<li>On the <strong>following</strong> generation, despawn every entity whose <code>AbsentSince</code> is older than one
+generation — <strong>except</strong> the entity pinned by <code>SessionState.sheet</code>.</li>
+</ol>
+<p>A delta is <code>{ seq: u64, kind, op: upsert|remove, record }</code>. <code>apply_delta</code> upserts by key; a <code>seq</code>
+gap, a <code>resync</code> frame, or a 409 from the stream triggers <code>push_snapshot</code> on the shell side. Remove
+marks <code>AbsentSince</code>; it never despawns inline.</p>
+<p>Properties the tests assert:</p>
+<ul>
+<li><code>project(s); project(s)</code> ≡ <code>project(s)</code> — components and key set identical.</li>
+<li><code>project(s1); delta(upsert r)</code> ≡ <code>project(s1 ∪ {r})</code> — for the same generation.</li>
+<li>A key absent for one generation survives; absent for two, it is despawned unless pinned.</li>
+<li>The mirror never round-trips through <code>save()</code>.</li>
+</ul>
+<h2>10. Determinism and replay</h2>
+<table><thead><tr><th>Rule</th><th>Mechanism</th></tr></thead><tbody>
+<tr><td>One clock</td><td><code>Time&lt;Fixed&gt;</code> at 60 Hz; <code>WorldClock.tick</code> is the only tick a system may read</td></tr>
+<tr><td>Explicit order</td><td><code>.chain()</code> within a set, sets ordered in <code>configure_sets</code></td></tr>
+<tr><td>No ambiguity</td><td><code>Schedule::set_build_settings(ScheduleBuildSettings { ambiguity_detection: LogLevel::Error, shuffle_seed: Some(0), ..default() })</code> on the test-built schedule, <strong>before</strong> systems are added</td></tr>
+<tr><td>No ambient time</td><td>no <code>Instant</code>, <code>SystemTime</code>, <code>std::thread</code>, no <code>rand::thread_rng</code></td></tr>
+<tr><td>No iteration-order dependence</td><td><code>BTreeMap</code>/<code>Vec</code> anywhere order affects state</td></tr>
+<tr><td>Reproducible RNG</td><td><code>Rand64</code> seeded from <code>WorldConfig.seed</code>; cosmetic only</td></tr>
+</tbody></table>
+<p>Replay: <code>ReplayLog { seed, entries: Vec&lt;(tick, Entry)&gt; }</code> where <code>Entry</code> is one of the four input
+messages. <code>replay(log)</code> builds a fresh <code>WalkWorld</code>, applies each entry at its tick, and returns the
+final <code>FrameView</code> hash. Equality across two runs and across native/wasm is the test.</p>
+<h2>11. WASM constraints and the boundary</h2>
+<ul>
+<li><code>multi_threaded</code> off; the executor is single-threaded. No <code>std::thread</code>.</li>
+<li><code>MinimalPlugins</code> only: no window, no renderer, no asset server. <code>ScheduleRunnerPlugin</code> is <strong>not</strong>
+used; the shell owns the frame loop and calls <code>advance(dt)</code> from <code>requestAnimationFrame</code>.</li>
+<li>The host-side surface is JSON at the edge, serde inside:</li>
+</ul>
+<table><thead><tr><th>Export</th><th>Signature</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>new</code></td><td><code>(seed: u64, config_json: &amp;str) -&gt; WalkWorld</code></td><td>rooms/walls come from the census</td></tr>
+<tr><td><code>advance</code></td><td><code>(dt_ms: f64)</code></td><td>clamps a long frame to 4 ticks</td></tr>
+<tr><td><code>push_input</code></td><td><code>(json: &amp;str)</code></td><td><code>InputIn</code></td></tr>
+<tr><td><code>push_snapshot</code></td><td><code>(json: &amp;str)</code></td><td><code>SnapshotIn</code></td></tr>
+<tr><td><code>push_delta</code></td><td><code>(json: &amp;str)</code></td><td><code>DeltaIn</code></td></tr>
+<tr><td><code>resolve</code></td><td><code>(json: &amp;str)</code></td><td><code>ReceiptIn</code></td></tr>
+<tr><td><code>drain_calls</code></td><td><code>() -&gt; String</code></td><td><code>Vec&lt;ActionCall&gt;</code>, emptied</td></tr>
+<tr><td><code>view</code></td><td><code>() -&gt; String</code></td><td><code>FrameView</code></td></tr>
+<tr><td><code>context</code></td><td><code>(interactable_json: &amp;str) -&gt; String</code></td><td><code>SheetContext</code></td></tr>
+<tr><td><code>save</code> / <code>load</code></td><td><code>() -&gt; String</code> / <code>(&amp;str)</code></td><td>session only</td></tr>
+</tbody></table>
+<ul>
+<li><code>panic = "abort"</code> in the wasm profile; <code>console_error_panic_hook</code> installed in <code>new</code>.</li>
+<li>No <code>Instant</code>: <code>bevy_platform</code>'s web time is used by <code>bevy_time</code>; the shell supplies the delta.</li>
+<li>The <code>.wasm</code> is a lazy asset loaded after first paint; it is never in the sign-in critical path
+(SPEC §9).</li>
+</ul>
+<h2>12. Performance budgets</h2>
+<table><thead><tr><th>Budget</th><th>Value</th><th>Measured by</th></tr></thead><tbody>
+<tr><td>Entities, reference programme</td><td>≤ 5 000</td><td><code>view()</code> entity count in the spike scene</td></tr>
+<tr><td>Fixed tick cost</td><td>≤ 1 ms p50 at 500 entities</td><td>the replay benchmark on an M-series laptop and in CI</td></tr>
+<tr><td>Wasm heap after 20 room changes</td><td>≤ 30 MB, ≤ 1.5× first load</td><td>the soak test</td></tr>
+<tr><td><code>walk-world</code> wasm contribution</td><td>≤ 600 KB gzip</td><td>the spike's bundle measurement</td></tr>
+<tr><td>First <code>FrameView</code> after fetch</td><td>≤ 100 ms</td><td>the spike</td></tr>
+</tbody></table>
+<p>Budgets are release criteria for P6, not hopes; a miss is recorded in the spike and ADR 0023, and
+the mitigation is a measured prune (<code>bevy_ecs</code> and <code>bevy_app</code> defaults off together, <code>bevy_reflect</code>
+off, <code>opt-level = "z"</code>, LTO, wasm-opt) verified by a preflight compile — never a different ECS.</p>
+<h2>13. Renderer adapter and the <code>WorldView</code> port</h2>
+<p>The port from SPEC §6.2 stays. Its producer changes: the ECS produces a <code>FrameView</code>, and the adapter
+draws it. The adapter is a pure function of the frame view plus the canvas.</p>
+<pre><code>ECS (Rust, wasm)                    shell (JS)                       adapter (canvas-2D | WebGL2)
+FrameView ──view()──▶ world/ecs ──▶ world/port ──setScene──▶ draw
+InputIn   ◀──push_input──         ◀──on(pointer/key)──
+</code></pre>
+<p><code>FrameView</code>:</p>
+<table><thead><tr><th>Field</th><th>Shape</th><th>Consumer</th></tr></thead><tbody>
+<tr><td><code>camera</code></td><td><code>{mode, position, target, fov}</code></td><td>the projection</td></tr>
+<tr><td><code>sprites</code></td><td><code>[{id: InteractableId, kind, position, size, facing, tint, label}]</code></td><td>depth sort + draw</td></tr>
+<tr><td><code>overlays</code></td><td><code>[{id, kind, anchor, text}]</code></td><td>prompts, badges, moodlets — short labels only</td></tr>
+<tr><td><code>highlight</code></td><td><code>Option&lt;InteractableId&gt;</code></td><td>selection from a sheet or the palette</td></tr>
+<tr><td><code>room</code></td><td><code>RoomKey</code></td><td>the HUD's location line</td></tr>
+</tbody></table>
+<p>Rules: no draw-list entry carries long text, a table or a form (SPEC §2); the adapter never mutates
+the world — it returns <code>InputIn</code>; picking is <code>pointer → sprite id</code> in the adapter, resolved against
+<code>InteractableId</code>, never a second ray-cast implementation in the ECS.</p>
+<p>The renderer remains undecided (canvas-2D vs WebGL2) and is ADR 0023's subject. This document fixes
+only what both renderers consume.</p>
+<h2>14. Testing</h2>
+<p>Headless is the default: <code>App::new().add_plugins(MinimalPlugins).add_plugins(WalkWorldPlugin)</code> and
+<code>app.update()</code> in a loop; no browser, no canvas, no network.</p>
+<table><thead><tr><th>Scenario (BDD)</th><th>Test</th></tr></thead><tbody>
+<tr><td>Given the avatar outside a wall, when it walks into it, then a prompt names the destination</td><td><code>walk_to_wall_prompts</code></td></tr>
+<tr><td>Given a snapshot, when projected twice, then components and keys are identical</td><td><code>projection_is_idempotent</code></td></tr>
+<tr><td>Given a record absent for one generation, when the next snapshot also misses it, then it despawns</td><td><code>despawn_requires_two_generations</code></td></tr>
+<tr><td>Given an open sheet, when its record disappears from the snapshot, then the entity survives</td><td><code>sheet_subject_is_pinned</code></td></tr>
+<tr><td>Given a destructive action without an approval, when submitted, then no call leaves and the refusal is shown</td><td><code>destructive_requires_approval</code></td></tr>
+<tr><td>Given a submitted call, when a refusal arrives, then <code>PendingCall</code> is cleared and the problem is surfaced</td><td><code>refusal_clears_pending</code></td></tr>
+<tr><td>Given an input and a writer in the same set, when run unchained, then the reader sees it next frame; chained, same frame</td><td><code>same_frame_ordering</code></td></tr>
+<tr><td>Given a replay log, when replayed twice, then the frame-view hash is equal</td><td><code>replay_is_deterministic</code></td></tr>
+<tr><td>Given the built schedule, when initialized with ambiguity detection, then no ambiguity is reported</td><td><code>no_schedule_ambiguity</code></td></tr>
+<tr><td>Given the wasm module, when loaded in the shell, then <code>view()</code> matches the native frame view</td><td>Playwright <code>world.spec.ts</code></td></tr>
+</tbody></table>
+<p>Playwright covers what only a browser can: the module loads, the canvas matches the frame view, a
+sheet opens on selection, and a write round-trips with its headers.</p>
+<h2>15. Security</h2>
+<ul>
+<li>The ECS holds no token, no URL it did not receive from the shell's <code>api</code> module, and no
+credentials. <code>save()</code> cannot leak one because it serialises session state only.</li>
+<li>The manifest gates what the sheet offers; the server authorises. The ECS refuses to submit an
+action absent from the manifest, and shows the server's refusal verbatim otherwise.</li>
+<li>Every server string in a component is a short label rendered as text by the shell; the draw list
+never carries HTML. The sheet renderer escapes as SPEC §9 requires.</li>
+<li>A record id is not a capability: opening a sheet is a read the server authorises.</li>
+</ul>
+<h2>16. Extension rules</h2>
+<p>Adding a component: name its writer system and its source in §4, or it is rejected. Adding a system:
+assign it a set in §6 and state its inputs and outputs. Adding a message: classify it in §7 and say
+whether it must be same-frame. Adding an entity kind: give it a <code>RecordKey</code> with a real source
+table, or it is scene-only and carries a <code>SceneKey</code>.</p>
+<p>Never in the ECS: network calls, timers, storage, DOM, <code>Instant</code>, threads, long-form content, a
+second copy of a record's authoritative state.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

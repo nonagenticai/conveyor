@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Baseline — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-baseline" data-provenance-version="1" data-provenance-hash="ca0afb9b5f3d90e16bcb8d598f0894e78d37369b37296d0c1278e432d083b032" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-baseline</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>ca0afb9b5f3d90e16bcb8d598f0894e78d37369b37296d0c1278e432d083b032</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Project Baseline — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</h1>
+<h2>Scope</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approved_by_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:18:56.640334+00:00",
+      "id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+      "kind": "scope",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "snapshot": {
+        "frozen": true,
+        "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+        "register": [],
+        "wbs": [
+          {
+            "business_value": 8,
+            "id": "01a20255-94ae-76d9-9cbf-a9fe7eef56cb",
+            "job_size": 5,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 0.0,
+            "risk_reduction": 13,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "ActionSpec derive crate"
+          },
+          {
+            "business_value": 13,
+            "id": "01a20255-a3e5-7454-9f11-2ca19de99a6a",
+            "job_size": 8,
+            "kind": "deliverable",
+            "parent_id": null,
+            "position": 1.0,
+            "risk_reduction": 13,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "Registry and spec vocabularies"
+          },
+          {
+            "business_value": 8,
+            "id": "01a20255-b2e2-70b9-89e9-e0ad09906d65",
+            "job_size": 8,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 2.0,
+            "risk_reduction": 5,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "The 16 internal actions"
+          },
+          {
+            "business_value": 13,
+            "id": "01a20255-c415-7518-a1d6-60954194e06f",
+            "job_size": 8,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 3.0,
+            "risk_reduction": 13,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "Invocation path with idempotency and audit"
+          },
+          {
+            "business_value": 5,
+            "id": "01a20255-d447-7dbe-be52-d911f68c4f72",
+            "job_size": 5,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 4.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "Store transaction helpers"
+          },
+          {
+            "business_value": 5,
+            "id": "01a20255-e361-73f9-9671-f7378860f15f",
+            "job_size": 3,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 5.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "Migration 0003 action registry"
+          },
+          {
+            "business_value": 8,
+            "id": "01a20255-f291-77c1-977c-6d0f211a48d1",
+            "job_size": 3,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 6.0,
+            "risk_reduction": 5,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "Manifest endpoint"
+          },
+          {
+            "business_value": 8,
+            "id": "01a20256-0308-79d7-94e9-1aaccf4311a3",
+            "job_size": 5,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 7.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "MCP endpoint"
+          },
+          {
+            "business_value": 8,
+            "id": "01a20256-122d-71bc-a0b0-517791be4f50",
+            "job_size": 8,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 8.0,
+            "risk_reduction": 5,
+            "status": "open",
+            "time_criticality": 5,
+            "title": "OpenAPI fold and ingest"
+          },
+          {
+            "business_value": 5,
+            "id": "01a20256-20c9-7430-bdff-63db10f7704a",
+            "job_size": 3,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 9.0,
+            "risk_reduction": 8,
+            "status": "open",
+            "time_criticality": 3,
+            "title": "Boot assertion and wiring"
+          },
+          {
+            "business_value": 8,
+            "id": "01a20256-2ff6-7697-95cc-6fa50021a1a0",
+            "job_size": 5,
+            "kind": "work_package",
+            "parent_id": null,
+            "position": 10.0,
+            "risk_reduction": 13,
+            "status": "open",
+            "time_criticality": 8,
+            "title": "The gate proofs a-f"
+          }
+        ]
+      },
+      "taken_at": "2026-11-22T08:18:56.640334+00:00",
+      "taken_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "taken_by_name": "conveyor-e2e",
+      "version": 1
+    }
+  ],
+  "source": "msp.json#/project_baselines"
+}
+</code></pre>
+<h2>Schedule</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<p><em>Explicit absence — the project schedule baseline: a project_baseline row of kind schedule.</em></p>
+<h2>Cost</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<p><em>Explicit absence — the project cost baseline: a project_baseline row of kind cost.</em></p>
+<h2>Approval</h2>
+<p>The record the section derives from, or an explicit absence.</p>
+<pre><code class="language-json">{
+  "category": "project-baseline",
+  "count": 1,
+  "rows": [
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:18:56.640334+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
+      "kind": "pm",
+      "meta": {
+        "baseline_id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+        "description": "Approve the scope baseline"
+      },
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:19:02.106253+00:00",
+      "version": 2
+    }
+  ],
+  "source": "work.json#/approvals"
+}
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

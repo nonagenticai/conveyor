@@ -41,12 +41,13 @@
         <div><dt>SPEC</dt><dd>§8.4</dd></div>
         <div><dt>Gate</dt><dd>approved</dd></div>
         <div><dt>Package</dt><dd><code>std-pmp-project-registers-t3:T3</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Risks</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 4 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 5 row(s)</p>
 <ul>
+<li>A closure without the record could recur: T3 was reopened from a vacuous closure that had no baseline, contract or review <span class="std-state">open</span></li>
 <li>A gate can still be self-approved if the approver identity is reused <span class="std-state">open</span></li>
 <li>An in-place baseline edit would erase the agreed scope <span class="std-state">open</span></li>
 <li>The rework could drift into new scope <span class="std-state">open</span></li>
@@ -61,15 +62,17 @@
 <li>The mandatory artefact packages and the seed-live drift kept the project red <span class="std-state">open</span></li>
 </ul><h2>Assumptions</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 4 row(s)</p>
 <ul>
+<li>The five accepted deliverables are T3&#x27;s complete scope; the project owns no open items <span class="std-state">open</span></li>
 <li>The approver recorded on the baseline remains distinct from the PM requester <span class="std-state">open</span></li>
 <li>The scope baseline taken on 2026-11-26 is the agreed scope and the rework adds none <span class="std-state">open</span></li>
 <li>The PM job&#x27;s build is what closed issue #74, and the rework reconstructs its record <span class="std-state">open</span></li>
 </ul><h2>Dependencies</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 3 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 4 row(s)</p>
 <ul>
+<li>The B3 benefit profile waits on T6&#x27;s approved baseline; the tranche-4 review reads it <span class="std-state">open</span></li>
 <li>T3 needs T2&#x27;s decision ladder and the P0 platform before a request can run end to end <span class="std-state">open</span></li>
 <li>The PM job reads the T1 plan spine <span class="std-state">open</span></li>
 <li>T4, T9/T10 and T18 depend on the closed PM job <span class="std-state">open</span></li>

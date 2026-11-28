@@ -23,18 +23,48 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="benefits-strategy" data-provenance-version="2" data-provenance-hash="571491301957507bef3281641be1175d70039838b1c716909f297025be424c2f" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>benefits-strategy</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>571491301957507bef3281641be1175d70039838b1c716909f297025be424c2f</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Benefits management strategy — P0 (retrospective, 2026-11-26)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="benefits-strategy" data-provenance-version="1" data-provenance-hash="281a34555f0ebef31da58defc38a08d91eb9859b472601d5424934aa26533659" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>benefits-strategy</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>281a34555f0ebef31da58defc38a08d91eb9859b472601d5424934aa26533659</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Benefits management strategy</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) ·
+<strong>Owner:</strong> the programme manager (interim); the BCM position is unstaffed · <strong>Artefact:</strong> BS-1.</p>
 <h2>Measurement methods</h2>
-<p>The strategy published on 2026-11-18 at 08:18:00 (<code>01a1e9e1-fd54-731e-945d-45d8e9f2d2a4</code>) fixes the measurement method per benefit: the affected KPI, the baseline taken while the old practice is observable, the target, the method and the financial value where expressible. The method is recorded in the profile, and the comparison with the baseline is the evidence a sponsor uses. An LLM may draft narrative but not the numbers.</p>
+<p>The method is named for every benefit; the baseline is the missing part, and each baseline has a kata
+on the kata project. The method and the kata are what a reviewer can open today.</p>
+<table><thead><tr><th>Benefit</th><th>Method</th><th>Baseline</th><th>Kata</th></tr></thead><tbody>
+<tr><td>B1 Auditable decisions</td><td>decision rows per run from the action ledger; a refusing gate as a test</td><td>not measured</td><td><code>01a1e9df-b74d-7030-904d-e5198bb6e9f3</code></td></tr>
+<tr><td>B2 Less bespoke tooling</td><td>tool_call ledger counts per toolkit; zero-use retirement</td><td>not measured</td><td><code>01a1e9df-c04d-7679-8112-6e1310327dbd</code></td></tr>
+<tr><td>B3 Self-development</td><td>the development project's run, CI and deploy records</td><td>not measured</td><td><code>01a1e9df-c94d-76cf-a390-aa5cb6af7d9e</code></td></tr>
+<tr><td>B4 Public collaboration</td><td>the issue registry and merged outside PR authors</td><td>not measured</td><td><code>01a1e9df-d36f-77f7-8b24-8dab7b92a855</code></td></tr>
+<tr><td>B5 One model</td><td>the T0 gate test and the absorption inventory</td><td>not measured</td><td><code>01a1e9df-dcd3-72f0-9d57-7a83923b1a81</code></td></tr>
+<tr><td>B6 Predictable delivery</td><td>coverage, seed and the published checklist regenerated and checked</td><td>not measured</td><td><code>01a1e9df-e6de-7267-a86c-a8f48e1ba766</code></td></tr>
+</tbody></table>
+<p>A method that does not exist yet is a second kata (the instrument), never a number. The financial
+value of a benefit is expressed only after its baseline is measured.</p>
 <h2>Review cycle</h2>
-<p>Measurement is reviewed at the tranche reviews, where the sponsoring group decides continue, pause or stop on the baselines, benefit status and risk register. A re-baseline goes through change control and never through the review itself, so the review cannot rewrite the evidence it judges. The tranche 0 review on 2026-11-17 and the tranche 1 authorisation on 2026-11-21 are the recorded instances of the cycle.</p>
+<p>The benefits are reviewed at every <strong>tranche review</strong> (P0 plan §7), against the baseline and the
+profiles, together with the risk and issue register and the blueprint alignment. A review with no
+evidence is refused. The benefits at risk are read from the benefits map: a slipping project names
+the benefits it puts at risk. A re-baseline goes through change control, never through the review.</p>
 <h2>Roles and assessment</h2>
-<p>The BCM owns each benefit and assesses realisation; the SRO is accountable for the coherent capability and the benefits; the PMO lead and quality manager assure the governance baseline; the sponsoring group makes the tranche decision. Assessment happens per benefit at its transition, not at programme closure alone. What is measurable now is the role assignment in the strategy and the six profiles, not an assessment outcome.</p>
+<ul>
+<li><strong>The BCM</strong> owns each benefit and its transition. The position is unstaffed; the programme manager
+is the interim owner, and the attribution moves when the position is staffed (SA-1's S1).</li>
+<li><strong>The SRO (sponsor)</strong> is accountable for the coherent capability and the benefits; the sponsor
+accepts the definition set and decides at each tranche review.</li>
+<li><strong>The reviewers</strong> assess the evidence before a publication; an overstated benefit is returned.</li>
+</ul>
 <h2>Realization process</h2>
-<p>The process runs measure, monitor, plan the transition, communicate the change, assess readiness, enact, measure post-transition performance, retire the superseded practice, and continue measuring under the realisation plan. P0 defined the procedure and named who continues after closure. The P0 record contains no transition or post-transition measurement, so the procedure is defined and unexercised in the record, and no improvement is claimed.</p>
+<p>For each benefit the BCM: measures the baseline while the old practice is still observable; monitors
+against the profile; plans the transition; communicates the change; assesses readiness; enacts it;
+measures the post-transition performance; retires the superseded practice and system; and keeps
+measuring until the realization plan names who continues after programme closure. The comparison
+with the baseline is the evidence the sponsor judges. A benefit whose baseline was never measured
+cannot claim an improvement — the rule the six katas serve.</p>
+<p><strong>Gap.</strong> The BCM is unstaffed, so the interim programme manager holds the process; no baseline has
+been measured; the review cycle's first run has not happened. The strategy names the process and the
+gaps rather than asserting a cycle that has not run.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

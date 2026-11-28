@@ -263,7 +263,19 @@ def compose(
             subject=subject_key,
         )
     projects = programme_projects(snapshot)
-    if not gen.applies(template, category, subject, snapshot, projects):
+    # The class-based due set is the standard's own declaration (`classes[].when`), and the
+    # generator's instance builder passes it to `applies`; omitting it here made every
+    # class-declared category report NOT_APPLICABLE, so `--check-category` could never pass for
+    # them (measured 2026-11-28: the four v4 delivery categories refused composition on T3 while
+    # the generator listed the instance).
+    subjects = gen.build_subjects(snapshot, gen.load_declared_phases())
+    class_by_key = {
+        str(project["key"]): gen.project_class(std, project)
+        for project in subjects.get("project", [])
+    }
+    if not gen.applies(
+        template, category, subject, snapshot, projects, class_by_key=class_by_key
+    ):
         abort(
             "NOT_APPLICABLE",
             f"{category!r} does not apply to {subject_kind} {subject_key!r}",
@@ -453,7 +465,11 @@ def self_test_compose(gen) -> None:
                 "programme": [{"id": "pg1", "name": "Fixture", "status": "active"}],
                 "projects": [{
                     "id": "p1", "key": "P1", "programme_id": "pg1", "status": "active",
-                    "meta": {"measured_status": "active", "expected_outputs": ["vision"]},
+                    # `project-baseline` is due because the project declares it: standards v4
+                    # removed the mandatory-PMP blanket that used to make every PMP template
+                    # apply to every project, and this fixture predated the change.
+                    "meta": {"measured_status": "active",
+                             "expected_outputs": ["vision", "project-baseline"]},
                 }],
             },
             "artefacts": {"documents": [{
@@ -568,6 +584,41 @@ def self_test_compose(gen) -> None:
         standard["templates"]["vision"]["document_authored"] = True
         summary = compose(gen, standard, snapshot, root, "vision", "project", "p1")
         assert "## Purpose" in summary["body"], summary["body"]
+        # The class-based due set must reach compose(): a category the standard's `classes[].when`
+        # declares is an instance the generator lists, so composition must not answer
+        # NOT_APPLICABLE for it. Omitting `class_by_key` did exactly that, and every v4 delivery
+        # category was uncomposable and uncheckable (measured 2026-11-28). The mutant that drops
+        # class_by_key from the compose call dies here.
+        standard["classes"] = [{"when": {"track": "v2"}, "now": ["user-stories"],
+                                "closure": []}]
+        snapshot["programme"]["projects"][0]["meta"]["track"] = "v2"
+        snapshot["artefacts"]["documents"].append({
+            "id": "d2", "category": "user-stories", "project_id": "p1",
+            "publishable": True, "created_at": "2026-11-20T00:00:01Z", "title": "User Stories",
+        })
+        standard["templates"]["user-stories"] = {
+            "required": ["Personas"],
+            "skeleton": "# User Stories\n\n## Personas\n\nP.\n",
+            "standard": "PMP", "level": "project", "subject_kind": "project",
+            "mandatory": True, "spec": "§8.3", "document_category": "user-stories",
+            "document_authored": True,
+            "sources": {"Personas": [{
+                "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
+                "match": {"category": "user-stories"},
+            }]},
+        }
+        try:
+            compose(gen, standard, snapshot, root, "user-stories", "project", "p1")
+        except Abort as exc:
+            raise AssertionError(
+                "a class-declared category must not be NOT_APPLICABLE: %s" % exc.code
+            ) from exc
+        except Refusal:
+            pass  # a source refusal is a fixture limit; applicability is what is under test
+        # Roll the fixture back: a declared class narrows the due set, and the project-baseline
+        # cases below must run against the unclassified fixture.
+        del standard["classes"]
+        snapshot["programme"]["projects"][0]["meta"].pop("track", None)
         def section_text(body: str, heading: str) -> str:
             parts: list[str] = []
             current = ""

@@ -770,6 +770,20 @@ class Runner:
         # the row this pack names: T19F's live gate created its seven artefacts under its own
         # titles, so a title match documented the pack's row and left the original's package open.
         # Repair each undocumented row with the pack's content for its type.
+        #
+        # The view read at step 5 is stale here: a row the main loop just re-versioned and
+        # documented still reads as undocumented in it, so the repair superseded it a second
+        # time and the record refused 412 "the architecture artefact moved" (measured on T13,
+        # 2026-11-28). Re-read the record and the published outputs before the repair, so only
+        # rows this run has not touched are repaired.
+        self.snapshot_now("artefacts")
+        existing = self._read(
+            "architecture.artifacts_list", {"project_id": self.project_id}
+        ).get("items", [])
+        snapshot_documents = {
+            str(row.get("id")): row.get("document_id")
+            for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
+        }
         repaired: dict[str, str] = {}
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
@@ -2156,6 +2170,19 @@ def self_test() -> None:
         )
     if payload.get("decision") != "approve" or payload.get("approval_id") != "01a2":
         raise SystemExit(f"self-test: the decision payload lost its shape: {payload}")
+
+    # The artefact repair loop must re-read the record before it repairs. The view read at step
+    # 5 is stale for every row the main loop just documented, and the second supersede is
+    # refused 412 "the architecture artefact moved" (measured on T13, 2026-11-28).
+    import inspect
+
+    source = inspect.getsource(Runner.run)
+    repair_at = source.find("repaired: dict[str, str] = {}")
+    refresh_at = source.find('snapshot_now("artefacts")', 0, repair_at)
+    if repair_at < 0 or refresh_at < 0:
+        raise SystemExit(
+            "self-test: the artefact repair loop no longer re-reads the record before repairing"
+        )
 
     # The discharge: only a card whose package the fresh register no longer carries moves.
     class FakeRunner(Runner):

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T14 Estate toolkits · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="closure-review" data-provenance-version="1" data-provenance-hash="31bbaac8d94ae868b6a335efeca576bbf766048e3c6c8b426fca8ed148cf4ef8" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>closure-review</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>31bbaac8d94ae868b6a335efeca576bbf766048e3c6c8b426fca8ed148cf4ef8</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><hr />
+<h2>document: T14/closure-review
+version: 1
+status: published
+project: T14
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-27
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>Closure review — T14 Estate toolkits</h1>
+<p>Whether the estate toolkits delivered their acceptance, on their evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<p>The project's gate (seed/programme.json T14): each published toolkit has a probe and one live call;
+<code>scientific_processor</code> is scaled up for its probe and one live call, then scaled back; a zero-use report
+exists; a backend outage unbinds new runs and in-flight runs finish.</p>
+<ul>
+<li><strong>Each published toolkit has a probe and one live call — pass.</strong> The live catalogue carries 8
+toolkits, 4 published (<code>image_gen</code>, <code>transcription</code>, <code>speech</code>, <code>coding</code>) with 5 published tools. The
+call ledger (<code>tool_calls.list</code>, 2026-11-27) carries ok calls for every published toolkit: <code>coding</code> 12,
+<code>image_gen</code> 4, <code>speech</code> 1, <code>transcription</code> 1.</li>
+<li><strong><code>scientific_processor</code> scaled up, probed, scaled back — not evidenced.</strong> The live catalogue has no
+<code>scientific_processor</code> row: the scientific toolkit was delivered as a draft (#560, closed) and is not
+part of the live toolkit set. This is the closure's open item 1 below; it is recorded, not waived.</li>
+<li><strong>A zero-use report exists — pass.</strong> The toolkit and tool rows plus the call ledger are the report:
+every published tool's call count, including the zero-use rows, is readable from <code>tools.list</code> and
+<code>tool_calls.list</code> and rendered by the metering screen.</li>
+<li><strong>A backend outage unbinds new runs and in-flight runs finish — pass.</strong> The broker's <code>check_failed</code> and
+<code>backend_error</code> classification is present in the live ledger (<code>transcription</code> 3 <code>check_failed</code>,
+<code>coding</code> 2 <code>check_failed</code>, <code>speech</code> 4 <code>backend_error</code>, <code>transcription</code> 1 <code>backend_error</code>) and proved by
+<code>crates/actions/tests/tool_platform.rs</code> (a 2xx whose own check fails is <code>check_failed</code>; a failed probe
+unbinds new runs, in-flight runs finish).</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Live record read through <code>conveyor admin action invoke</code> (tenant <code>nonagentic</code>, 2026-11-27):
+<code>projects.get</code> → T14 <code>Estate toolkits</code>, status <code>closed</code>, version 13; <code>toolkits.list</code> → 8 toolkits
+(4 published, 4 draft); <code>tools.list</code> → 5 published tools; <code>tool_calls.list</code> → 28 calls with the
+statuses above.</li>
+<li>The T14 units, all closed: #83 (T14), #558 (tool provenance and retirement gate), #560 (the scientific
+toolkit as a draft), #561 (research and Lean toolkits), #688 (media-discovery licence bearer),
+#776 (the mint's dedicated credential).</li>
+<li>Tests: <code>crates/actions/tests/tool_platform.rs</code> (the verdict/check_failed rule and the binding and probe
+behaviour) and <code>estate_toolkits.rs</code> (toolkit publication and the write-tool verification contract).</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li><strong><code>scientific_processor</code> probe and one live call.</strong> The toolkit is not in the live catalogue; its
+draft (#560) is closed but unpublished. Owner: the T14/T15 estate lane. Next step: publish the
+scientific toolkit, run its probe and one live call, scale it up and back, and record the result.
+This is the one gate clause the closure carries as a condition.</li>
+<li>The four draft toolkits (<code>worker_management</code>, <code>billing</code>, <code>artifacts</code>, <code>retrieval</code>) remain drafts by
+design; they are not part of the published estate this gate scores.</li>
+</ol>
+<h2>Decision</h2>
+<p>Close. The project is closed in the live record (version 13) and the published estate meets the probe,
+live-call, zero-use and outage clauses on the evidence above. The <code>scientific_processor</code> clause is not
+evidenced; it is carried as open item 1 with its owner and next step — recorded, not waived.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Estate toolkits · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

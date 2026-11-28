@@ -41,37 +41,30 @@
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t10:T10</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Commitments</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>commitments: T10 commits to the SAFe cadence and MSP tranche machinery: PI planning, system demo, inspect and adapt and backlog refinement; WSJF arithmetic computed from four typed inputs and never stored; an approved PI plan materialising the backlog into cards within WIP; demo evidence before a deliverable is demonstrated; a lesson for every retro finding; and a tranche review citing baselines, benefit status and risk evidence, with benefit realisation measured by a baseline and post value pair.</li>
-</ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
-<ul>
-<li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">superseded</span></li>
 <li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">live</span></li>
 </ul><h2>Compliance method</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>compliance: The Phase-G verdict this pass records is consistent: the seven A–D artefacts, the Statement of Architecture Work, the delivery contract, the WBS deliverable and the published outputs exist and are reviewed, so the record is consistent with the gate, but clause 4 is unproved and clause 1 is partial. It is not compliant, conformant or fully_conformant: v1-p82-5, v1-p82-6 and v1-p83-1 to v1-p83-6 remain open and are carried as findings.</li>
+<li>compliance: T10 is assessed clause by clause against the SPEC_V2 section 12 gate. Clause 1 is proved for a project backlog by `crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored` (line 179) and `::materialisation_respects_wip_slots` (line 215), with `crates/actions/tests/pi_plan_approval.rs::an_approved_plan_materialises_exactly_once` (line 297) and `apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent` (line 153); it is not proved for the programme&#x27;s standing backlog (v1-p82-5). Clause 2 is proved by `crates/store/tests/demo_gate.rs::a_credit_needs_typed_evidence` (line 94) with `crates/actions/tests/demo_credit.rs` (lines 154 and 168). Clause 3 is proved by `crates/store/tests/retro.rs::retro_cannot_close_without_lessons` (line 190) and `::every_finding_becomes_a_lesson` (line 156), with the evidence gap v1-p82-6. Clause 4 has a named passing test, `crates/store/tests/tranche_review.rs::a_review_without_evidence_is_refused` (line 208), but it is unproved at HEAD: v1-p83-1 shows the three evidence keys accept free-text placeholders and the seed authorises tranches with no review, and v1-p83-4 shows the baseline is not gated. Clause 5 is proved by `crates/store/tests/benefit_transition.rs::a_missing_baseline_cannot_claim_realization` (line 194) and `::a_measured_baseline_enables_realization` (line 161), with the measurement-value gap v1-p83-2. The batch admitted eight findings — v1-p83-1 to v1-p83-5 (P1), v1-p83-6 (P2), v1-p82-5 (P2) and v1-p82-6 (P2). The compliance level is non_conformant; no finding is P0, so the manifest&#x27;s product gate does not reopen the register&#x27;s `closed` status. The rework&#x27;s acceptance instrument is `acceptance/programme/T10.toml`.</li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">superseded</span></li>
 <li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">live</span></li>
 </ul><h2>Approval</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>approval 01a219da-d317-7c79-826f-aa72f4f248c7 — approved <span class="std-state">approved</span></li>
+<li>approval 01a20289-44a3-7f2b-b741-b502fe86eef3 — approved <span class="std-state">approved</span></li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">superseded</span></li>
 <li>Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a) <span class="std-state">live</span></li>
 </ul>
     </main>

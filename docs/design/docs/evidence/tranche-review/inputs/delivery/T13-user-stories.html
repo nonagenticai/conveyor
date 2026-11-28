@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>User Stories — T13 Tool platform · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-user-stories.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="user-stories--t13-tool-platform">User Stories — T13 Tool platform</h1>
+<h2 id="personas">Personas</h2>
+<ul>
+<li><strong>The development job</strong> calls coding through the broker, never an ad-hoc backend call.</li>
+<li><strong>The tool operator</strong> binds a tool to a destination, declares its effect, and reads the call ledger.</li>
+<li><strong>The tenant administrator</strong> holds the approval configuration a destructive call needs.</li>
+<li><strong>The auditor</strong> reads one <code>tool_call</code> row per call and the redacted payload.</li>
+</ul>
+<h2 id="stories">Stories</h2>
+<ul>
+<li>As a development job I call coding through the broker and get the destination's answer.</li>
+<li>As a tool operator I declare a tool's effect and binding once; an undeclared or mis-bound verb is refused.</li>
+<li>As the tenant administrator no destructive call runs without the tenant's configured approvals.</li>
+<li>As the auditor every call is one ledger row with a 64-hex input hash and a redacted payload.</li>
+<li>As a job I write and read a tenant-prefixed object without an S3 key in my prompt.</li>
+</ul>
+<h2 id="scenarios">Scenarios</h2>
+<ul>
+<li>Given a bound job, when it calls coding through the broker, then the destination is reached by the declared path and no ad-hoc backend call is made.</li>
+<li>Given a destructive tool, when it is called without the configured approvals, then the call is refused (403 <code>approval_required</code>) with zero destination hits and no ledger row.</li>
+<li>Given schema-invalid input, when the tool is called, then it is refused (422 <code>tool_input_invalid</code>) before the backend call.</li>
+<li>Given a valid call, when it completes, then exactly one <code>tool_call</code> row and one <code>tool.called</code> event are written.</li>
+<li>Given a job object, when it is written and read back, then the key is tenant-prefixed and the hash verifies.</li>
+</ul>
+<h2 id="verify">Verify</h2>
+<ul>
+<li><code>crates/actions/tests/tool_platform.rs</code>: the seven scenarios, including the counted stub of the declared <code>coding_jobs.create</code> destination.</li>
+<li><code>crates/actions/tests/s3_wire.rs</code>: the wire-level storage round trip.</li>
+<li><code>crates/actions/tests/parity_http_mcp.rs</code>: the 409 parity.</li>
+<li><code>acceptance/programme/T13.toml</code>: the manifest's checks against the live rows.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/T13-user-stories.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

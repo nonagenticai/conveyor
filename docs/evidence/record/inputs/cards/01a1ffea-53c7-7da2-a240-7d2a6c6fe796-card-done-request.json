@@ -1,0 +1,7 @@
+{
+ "card_id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
+ "gate": "card_done",
+ "kind": "card_dod",
+ "require_evidence": true,
+ "evidence_waiver_reason": "the package's finding v1-w2c-3 is resolved in docs/evidence/v1-conformance-findings.json (crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline); that resolution is the card's Definition of Done"
+}

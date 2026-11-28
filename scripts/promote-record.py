@@ -2850,6 +2850,35 @@ def remap_baseline_evidence(payload: dict, state: State) -> None:
             item["id"] = scope["id"]
 
 
+# The actions the replay invokes with the live row's If-Match (see the invoke chain): a
+# recorded `_version` in the payload names the staging row's version and must not contradict it.
+UPDATE_ACTIONS = frozenset(
+    {
+        "cards.move",
+        "wbs.update",
+        "architecture.artifacts_approve",
+        "architecture.contracts_approve",
+        "documents.publish",
+        "registers.update",
+        "benefits.update",
+        "cadences.update",
+    }
+)
+
+
+def strip_stale_version(action: str, payload: dict) -> dict:
+    """Drop a recorded `_version` from an action the replay invokes with the live If-Match.
+
+    The row's current version is the precondition the invoke sends; the recorded `_version`
+    names the staging row's version and would contradict it. Measured on
+    `cadence:tranche-5/pi/meta`, production 2026-11-28: 400 "If-Match and _version name
+    different preconditions" when the live row had moved past the staged version.
+    """
+    if action in UPDATE_ACTIONS:
+        payload.pop("_version", None)
+    return payload
+
+
 def remap_payload(
     entry: Entry,
     state: State,
@@ -2861,10 +2890,7 @@ def remap_payload(
     payload = copy.deepcopy(entry.payload)
     if entry.action == "approvals.request":
         remap_baseline_evidence(payload, state)
-    if entry.action == "documents.publish" and "_version" in payload:
-        # The row's current version is the precondition the invoke sends; the recorded
-        # `_version` belongs to the staging row and would contradict it.
-        payload.pop("_version", None)
+    payload = strip_stale_version(entry.action, payload)
     if entry.action == "changes.request" and not (
         isinstance(payload.get("body"), str) and payload["body"].strip()
     ):
@@ -5037,6 +5063,20 @@ def self_test() -> int:
         checks += 1
         if not condition:
             raise AssertionError(message)
+
+    # The replay sends the live row's If-Match; a staged `_version` must not ride along.
+    ok(
+        strip_stale_version("cadences.update", {"_version": 1, "id": "c"}) == {"id": "c"},
+        "a staged _version is dropped from an If-Match action (cadences.update)",
+    )
+    ok(
+        strip_stale_version("wbs.update", {"_version": 2}) == {},
+        "a staged _version is dropped from wbs.update",
+    )
+    ok(
+        strip_stale_version("documents.compose", {"_version": 1}) == {"_version": 1},
+        "a create keeps its payload untouched",
+    )
 
     def refused(call) -> bool:
         try:

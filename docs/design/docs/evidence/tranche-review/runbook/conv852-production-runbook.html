@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>#852 production runbook — resume here · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/runbook/conv852-production-runbook.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="852-production-runbook--resume-here">#852 production runbook — resume here</h1>
+<p>State at handoff (2026-11-28 ~11:00Z): the promotion and the tr3 lifecycles are proven end to end on a scratch restore; <strong>nothing has been written to production</strong>; the tr3 review has NOT been recorded. The remaining work is the standards-v4 lifecycle rework for the three tranche members (see §3), then the live replay, acts, publish, verify and review (§4).</p>
+<h2 id="1-the-transports-recreate-in-seconds">1. The transports (recreate in seconds)</h2>
+<pre class="bash"><code># the restore CLI (a container on conv852-net against conv852-restore):
+cat &gt; /tmp/conv852-bin.sh &lt;&lt;&#39;EOF&#39;
+#!/bin/bash
+exec docker exec -i conv852-bin /usr/local/bin/conveyor &quot;$@&quot;
+EOF
+# production: the deployed pod&#39;s own binary. The host, login and key are the private estate&#39;s:
+# supply them in the environment (CONVEYOR_HOST, CONVEYOR_SSH_KEY); never commit the address.
+cat &gt; /tmp/conv852-pod-bin.sh &lt;&lt;&#39;EOF&#39;
+#!/bin/bash
+exec ssh -i &quot;${CONVEYOR_SSH_KEY:?set CONVEYOR_SSH_KEY}&quot; &quot;${CONVEYOR_HOST:?set CONVEYOR_HOST}&quot; \
+  &quot;sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n conveyor exec -i deploy/conveyor -- /usr/local/bin/conveyor $(printf &#39;%q &#39; &quot;$@&quot;)&quot;
+EOF</code></pre>
+<p>The scripts here default <code>WT</code> to this worktree; override when running elsewhere. Inputs are <code>../inputs/</code> (relative to this runbook).</p>
+<h2 id="2-the-restore-the-rehearsal-base">2. The restore (the rehearsal base)</h2>
+<ul>
+<li><code>/tmp/conv852-conveyor-restore.sql</code> = the 02:41Z <code>pg_dumpall</code> conveyor section, schema 81.</li>
+<li>Container <code>conv852-restore</code> (postgres:18) on 127.0.0.1:55459; roles <code>conveyor_migrate</code>, <code>conveyor_runtime</code>, <code>process</code>.</li>
+<li>Re-create: <code>DROP DATABASE conveyor; CREATE DATABASE conveyor OWNER conveyor_migrate; psql -f /tmp/conv852-conveyor-restore.sql</code>, then <code>docker exec conv852-bin conveyor migrate</code> (schema 110).</li>
+</ul>
+<h2 id="3-what-remains-before-the-exit-can-be-green-the-v4-lifecycle-rework">3. What remains before the exit can be green: the v4 lifecycle rework</h2>
+<p>Measured on the restore after every act below: the tr3 exit still lists ~35 packages across the members (S04 ~11, T13 ~12, T3 ~12). They are the full standards-v4 retrospective set and must be authored with <code>scripts/rework-project.py</code> (one project per invocation, one content JSON each — the same vehicle that repaired S00/T9/T19F/T14; it publishes the typed <code>architecture-artifact-instance</code> pages and repairs artefact bindings itself). The delivery documents already written here (<code>../inputs/delivery/*.md</code>) are the four <code>std-delivery-*</code> packages per member and should be reused as content, not re-authored.</p>
+<p>Content order per project: charter → SoAW → the seven A–D artefacts → delivery contract → Phase-G review → closure record/review. <code>scripts/rework-content-check.py</code> validates a content file before it runs.</p>
+<p>After the rework: the <strong>live publish</strong> (<code>docs/design/scripts/publish-data.sh</code>, with <code>CONVEYOR_BIN</code> = the deployed binary, <code>SNAPSHOT_DATABASE_URL</code> = a read-only live URL, and <code>HOMEPAGE</code> pointed at a scratch dir so the shared homepage checkout is not touched) regenerates <code>docs/design/data</code>, the rendered pages <strong>and</strong> the standards findings; only then do the <code>std-*</code> packages close (the section rule reads the rendered <code>output-&lt;id&gt;.html</code>, never the snapshot body).</p>
+<h2 id="4-the-proven-sequence-scripts-in-this-directory">4. The proven sequence (scripts in this directory)</h2>
+<ol type="1">
+<li><strong>P2 promotion replay</strong> — <code>promote-record.py --apply --local-bin &lt;shim&gt; --journal ../journal-curated.jsonl --output /tmp/promo1.json --tenant nonagentic</code>, twice (pass 2 must create nothing). Restore rehearsal: pass 1 <strong>268 created / 204 skipped / 0 failed</strong>, pass 2 <strong>0 created</strong>.</li>
+<li><strong>Acts</strong> — <code>conv852-acts.sh</code> (contract, Board decision, approve, Phase-G review, schedule and cost baselines + decides, registers, T3's seven artefacts, both closes). Restore result: <strong>T13 closed, T3 closed through the full gate</strong>. Resumable via <code>CONTRACT=</code>, <code>BOARD=</code>, <code>REVIEW=</code>, <code>BASE_*</code>, <code>SKIP_REGISTERS=</code>, <code>SKIP_ARTEFACTS=</code>.</li>
+<li><strong>Delivery documents</strong> — <code>conv852-delivery.sh</code> (12 v4 documents + S04 <code>closure_outputs</code>). Not yet exercised (needs the v4 binary; see §5).</li>
+<li><strong>P3 evidence</strong> — <code>conv852-verify.sh</code> with <code>MODE=prod SHA=&lt;the deployed pod's CONVEYOR_GIT_SHA&gt;</code>; it snapshots, writes the three receipts, runs <code>check-tranche-exit</code> with <code>--evidence-dir</code> (the fix that makes it read the fresh receipts) and the audit.</li>
+<li><strong>P4 review</strong> — <code>conv852-review.sh</code> (evidence → <code>tranches.update</code> review_at → approvals → <code>tranches.review continue</code> → read-backs → compose/publish the <code>tranche-review</code> document). Rehearsed logic; never run live. The evidence arrays must be non-empty UUID lists (<code>tranche_review_has_evidence</code>); the document scopes to project P0 <code>01a1dcb8-d24b-76de-b901-56fd56e001bc</code>, never the programme id.</li>
+</ol>
+<h2 id="5-blockers-and-traps-at-handoff">5. Blockers and traps at handoff</h2>
+<ul>
+<li><strong>The v4 binary must be deployed.</strong> The v4 image IS pushed (<code>ghcr.io/nonagenticai/conveyor</code> <code>latest</code> and <code>sha-232c033</code> both report <code>CONVEYOR_GIT_SHA=232c0339d</code>; re-pull before trusting a local tag). At handoff the <strong>deployed pod still reports <code>6918ceee6</code></strong> (pre-v4) and refuses the v4 categories because the seed is compiled in. Check <code>kubectl exec deploy/conveyor -c conveyor -- printenv CONVEYOR_GIT_SHA</code> before any live act; if it is &lt; <code>232c0339d</code>, wait for the Flux ImagePolicy roll (or reconcile it) — do not work around it. Note main had already moved to <code>da5e9b6b4</code> (refresh) at handoff; whichever main sha deploys must still be ≥ <code>232c0339d</code>.</li>
+<li>The v4 image must be <strong>pulled and used</strong> to recreate <code>conv852-bin</code> before the delivery rehearsal (the container recipe is in the session log; <code>latest</code> must report a v4 sha).</li>
+<li><code>documents.compose</code>/<code>publish</code> need <code>--if-match</code> in several places; the scripts here handle it.</li>
+<li>The receipt <code>../tranche-3.md</code> carries <code>&lt;action-id&gt;</code> placeholders; fill them from the live outputs (<code>/tmp/conv852-*.json</code> per step) before the PR.</li>
+<li>One PR for the lane (<code>Closes #852</code>), opened only when the exit is green and the receipts are fresh; CI budget 2 runs.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/runbook/conv852-production-runbook.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Architecture analysis — T13 tool platform (retrospective, 2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/analysis-T13.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="architecture-analysis--t13-tool-platform-retrospective-2026-11-28">Architecture analysis — T13 tool platform (retrospective, 2026-11-28)</h1>
+<h2 id="current-state">Current state</h2>
+<p>Measured at the record, the tool platform gives every conveyor-internal run one governed way to reach an external capability. The broker <code>tools.call</code> performs seven steps in order: resolve the binding, check the effect class and budget, validate the closed input schema, resolve the credential alias, call the registered destination, normalise and redact the result, and record and emit the ledger row. The schema carries the tool, toolkit, tool_binding and tool_call tables; effect classes <code>read</code>, <code>write</code>, <code>destructive</code> and <code>spend</code> drive tenant-configured approvals, dry-run and dual control. Credential aliases resolve over sealed secrets, and the storage path is a direct MinIO adapter writing tenant-, project- and run-prefixed objects. The proof is <code>crates/actions/tests/tool_platform.rs</code>: a bound job calls coding through the broker, one call is one ledger row, a destructive call without approvals is refused, a closed schema refuses before the call, a job round-trips a tenant-prefixed object, and the compiled prompt carries no S3 key.</p>
+<h2 id="options-considered">Options considered</h2>
+<ol type="1">
+<li>Let every run call its destination directly, with credentials in its own environment. Rejected: no single ledger, no effect gate, and credential use becomes unauditable.</li>
+<li>Ad-hoc credential handling per tool versus aliases over sealed secrets. The alias layer was chosen so the call path never handles the raw secret and the compiled prompt cannot carry it.</li>
+<li>Per-tool approval rules versus effect classes. Classes were chosen because the decision a caller faces is "what kind of effect is this", and a per-tool rule table drifts as tools are added.</li>
+<li>A generic storage SDK versus the direct MinIO adapter with tenant prefixes. The adapter was chosen so the prefixing rule is in one place and the object round-trip is testable.</li>
+</ol>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>A tool binding pointing at an unregistered destination is refused before the call, so a broken binding fails closed rather than at the destination.</li>
+<li>A destructive call without its approvals is refused; a spend call carries dual control; both are proved by named tests rather than assumed.</li>
+<li>Credential leakage through the prompt is the sharpest risk; the compiled-prompt test is the standing check, and the alias resolves server-side only.</li>
+<li>Schema drift at the boundary: a closed schema refuses before the call, so an unexpected argument is a refusal the caller can see, not a partial call.</li>
+<li>The ledger is the only record: a call that bypasses the broker would be invisible, which is why the broker is the only path rather than a convention.</li>
+</ul>
+<h2 id="dependency-map">Dependency map</h2>
+<p>The record declares <code>meta.depends_on: [T2, P0]</code>: T2's store carries the tables and the tenancy this slice writes, and P0 supplies the programme definition. The tool platform is in turn a dependency of the consumers that reach external capabilities — the SOP ingestion path (<code>procedures.ingest_sop</code>), the coding service and the agent platform's external calls — all of which go through the broker rather than a second call path. Inside the project the seven A–D artefacts run from the stakeholder map through the requirements and the solution concept to the data entity and technology standards catalogues.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/v4/analysis-T13.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -4587,12 +4587,21 @@ function readBody(req, done) {
         "the plan reaches projects.update",
       );
       const createPatch = consoleState.createPatches.at(-1);
-      assert.deepEqual(createPatch.expected_outputs, [
-        "project-brief",
-        "inception-analysis",
-        "architecture-design",
-      ]);
-      assert.deepEqual(createPatch.closure_outputs, ["evidence", "closure-review"]);
+      // The class's own declaration is the expectation: the console must write the facts the
+      // standard declares, so a standard change (v4 widened v2-proposed) does not need a second
+      // hard-coded copy here to rot (measured on #852: the pinned three-category list failed
+      // once the regenerated standard carried the sixteen).
+      const classFacts = await page.evaluate(() => {
+        const std = window.CONVEYOR_OUTPUT_STANDARD;
+        const cls = (std.classes || []).find((c) => c.name === "v2-proposed") || {};
+        return { now: cls.now || [], closure: cls.closure || [] };
+      });
+      assert.deepEqual(
+        createPatch.expected_outputs,
+        classFacts.now,
+        "the class's declared outputs reach projects.update",
+      );
+      assert.deepEqual(createPatch.closure_outputs, classFacts.closure);
       assert.equal(createPatch.track, "v2", "the class facts are written");
       assert.equal(createPatch.measured_status, "proposed");
       assert.equal(createPatch.tranche, 4, "the tranche reaches projects.programme_meta");
@@ -4624,12 +4633,19 @@ function readBody(req, done) {
       await page.fill("#project-tranche", "3");
       await page.click('[data-v2="project-save"][data-id="p-noboard"]');
       await page.waitForSelector("text=Project updated");
+      // The class's own declaration is the expectation (v4 widened every class's now set), read
+      // from the page, never a copied list that rots with the standard.
+      const builtClassFacts = await page.evaluate(() => {
+        const std = window.CONVEYOR_OUTPUT_STANDARD;
+        const cls = (std.classes || []).find((c) => c.name === "v2-built") || {};
+        return { now: cls.now || [], closure: cls.closure || [] };
+      });
       assert.deepEqual(
         consoleState.noBoard.meta.expected_outputs,
-        ["project-brief", "evidence"],
+        builtClassFacts.now,
         "the class change recomputes the due-now set",
       );
-      assert.deepEqual(consoleState.noBoard.meta.closure_outputs, ["closure-review"]);
+      assert.deepEqual(consoleState.noBoard.meta.closure_outputs, builtClassFacts.closure);
       assert.equal(consoleState.noBoard.meta.track, "v2");
       assert.equal(consoleState.noBoard.meta.measured_status, "built");
       assert.equal(consoleState.noBoard.meta.tranche, 3);

@@ -39,49 +39,36 @@
         <div><dt>Subject</dt><dd>SPEC_V2 slice T2 (docs/SPEC_V2.md §12)</dd></div>
         <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
-        <div><dt>Gate</dt><dd>superseded</dd></div>
+        <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t2:T2</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Commitments</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
-<ul>
-<li>commitments: T2 commits to one decision ladder for every gate the platform asks: the four rungs share a single stored and returned audit shape, every decision pins the policy, refinement and laya-config versions it read, and a threshold change is a tenant refinement rather than a code change. The laya rung is an inference the engine performs and verifies, not an answer its caller supplies; option sets are authored and versioned rows the answer must match; and a generated draft cannot transition a card. The delivery is the ladder family and its migrations, not a parallel decision store: later slices call ladder.evaluate rather than adding a second gate mechanism.</li>
-</ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 5 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">live</span></li>
+<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
 </ul><h2>Compliance method</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>compliance: T2 is assessed clause by clause against the SPEC_V2 §12 gate and the issue-#73 scenarios P1.1, P2.1, P3.1 and P4.1/P4.2. The first three gate clauses are proved by named real-Postgres tests: `crates/actions/tests/decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape`, `::a_refinement_changes_a_threshold_without_a_code_change` and `::every_decision_pins_the_refinement_and_laya_config_versions`. The fourth clause is proved on the apply and update paths by `::a_generated_draft_cannot_transition_a_card` and `crates/actions/tests/ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft`, but is refuted on the create path by v1-t2-1: `documents.compose` accepts `card_id` and `meta.generated = true` and attaches the document with no gate. The batch admitted six findings — v1-t2-1 (P0, blocking), v1-t2-2 (L1 never calls laya), v1-t2-3 (`refinements.publish` ungated), v1-t2-4 (inline options and questions), v1-t2-5 (budget code spelling) and v1-t2-6 (a human decision cites any approved approval, not its gate). The compliance level is non_conformant; the project stays ACTIVE and is not closed in this pass. The rework&#x27;s acceptance instrument is `acceptance/programme/T2.toml`.</li>
+<li>compliance: T2 is assessed against SPEC_V2 §12 T2 and issue #73. The fourth clause — a generated draft cannot transition a card — is proved on create, update and apply by documents_compose_gate.rs and ladder_human_gate.rs. Residual deviations are recorded, none P0: v1-w1c-3, v1-w1c-4, v1-p101-1 (P1); v1-t2-5, v1-w1c-5, v1-p102-1 (P2); artefacts std-pmp-project-brief-t2 and std-togaf-architecture-artifact-t2 (P2 partials).</li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 5 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">live</span></li>
+<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
 </ul><h2>Approval</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>approval 01a21810-710e-749b-ae68-218d3e959d72 — approved <span class="std-state">approved</span></li>
+<li>approval 01a2009a-a7fa-7a68-a539-32dc78e5a221 — approved <span class="std-state">approved</span></li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 5 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">live</span></li>
+<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>

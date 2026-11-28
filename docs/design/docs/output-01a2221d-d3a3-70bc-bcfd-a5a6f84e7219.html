@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Acceptance Criteria — S04 Action registry · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="acceptance-criteria" data-provenance-version="1" data-provenance-hash="51d0755a9281a31413d47a32157507d2050659f4a40062669b0d087f32f73d6b" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>acceptance-criteria</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>51d0755a9281a31413d47a32157507d2050659f4a40062669b0d087f32f73d6b</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Acceptance Criteria — S04 Action registry</h1>
+<h2>Scenarios</h2>
+<ul>
+<li><strong>S04-1 derive.</strong> Given the action crates, when the derive macro generates the registry, then
+every declared action appears once with its scopes, effect and approval target.</li>
+<li><strong>S04-2 manifest.</strong> Given the registry, when the manifest is generated, then every action's
+input schema validates and no action is declared twice.</li>
+<li><strong>S04-3 OpenAPI.</strong> Given the registry, when the served document is produced, then every
+action's operation is present and the lock hash matches.</li>
+<li><strong>S04-4 MCP.</strong> Given the same registry, when the MCP surface is enumerated, then the actions
+and their schemas agree with HTTP.</li>
+<li><strong>S04-5 invocation.</strong> Given an action call, when it is invoked through any transport, then the
+same idempotency and audit path runs.</li>
+<li><strong>S04-6 ingest.</strong> Given an external payload, when it is folded, then the declared rows exist
+and a re-run is a no-op.</li>
+</ul>
+<h2>Verify commands</h2>
+<ul>
+<li><code>python3 scripts/verify-project.py --project S04 --snapshot &lt;snap&gt;/data</code></li>
+<li><code>cargo test -p conveyor-actions --test parity_http_mcp</code> (in CI)</li>
+<li><code>conveyor snapshot --check-lock</code> (in CI)</li>
+</ul>
+<h2>Results</h2>
+<p>Measured at the tranche-3 review's snapshot: the six clauses are executed by the manifest's gate
+checks and the named suite; the receipt's per-check verdicts are the record.</p>
+<h2>Status</h2>
+<p>Accepted and closed: the two deliverables were accepted under change
+<code>01a2054b-3f86-7959-b2ad-f1edc5b0bb55</code> and credited at the tranche-3 demo; the project is closed
+against its frozen baseline.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

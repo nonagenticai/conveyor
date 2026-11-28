@@ -23,18 +23,54 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="maturity-assessment" data-provenance-version="5" data-provenance-hash="71bc1b6724c4d224df43de361bb28c1c66791bee265d9c3ce8b86f9e279c062d" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>maturity-assessment</dd></div><div><dt>Version</dt><dd>5</dd></div><div><dt>SHA-256</dt><dd>71bc1b6724c4d224df43de361bb28c1c66791bee265d9c3ce8b86f9e279c062d</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture maturity assessment — P0 (retrospective, 2026-11-26)</h1>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="maturity-assessment" data-provenance-version="4" data-provenance-hash="6c4be74f36ca6be05b1f2f380f9265b68c58234b15d42ad2a9200b55cf9f6c26" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>maturity-assessment</dd></div><div><dt>Version</dt><dd>4</dd></div><div><dt>SHA-256</dt><dd>6c4be74f36ca6be05b1f2f380f9265b68c58234b15d42ad2a9200b55cf9f6c26</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Architecture maturity assessment</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
+programme architect · <strong>Reviewer:</strong> the Architecture Board (charter proposed in PF-1; rows are T9's)
+· <strong>Artefact:</strong> MA-1, <code>architecture_maturity</code>, Preliminary baseline.</p>
 <h2>Dimensions</h2>
-<p>The assessment published on 2026-11-18 at 08:17:38 (<code>01a1e9d1-3075-74b7-9ee4-f7d238440774</code>) scores nine dimensions on a 0–5 scale, as plan §3 item 14 requires of the architecture capability baseline. The dimensions are the programme's own maturity model, and they are assessed to set the mandatory artefact set the tailored profile expects at each plateau.</p>
+<p>The nine TOGAF maturity dimensions, scored 0–5: 0 none, 1 initial, 2 under development, 3 defined,
+4 managed, 5 measured. Every score names its evidence; a dimension with no evidence is scored no
+higher than 1 and says so. The assessment is a review judgement, not an instrument reading — the
+evidence is what a reviewer can open today.</p>
 <h2>Scores</h2>
-<p>The assessment records a baseline score per dimension. The P0 record available on 2026-11-26 does not restate the nine numeric scores in the brief, so this retrospective does not quote them; the published assessment is the source. No score is presented as an improvement.</p>
+<table><thead><tr><th>#</th><th>Dimension</th><th>Score</th><th>Stage</th><th>Evidence for the score</th></tr></thead><tbody>
+<tr><td>1</td><td>Architecture process</td><td><strong>2</strong></td><td>under development</td><td>The ADM is specified (<code>docs/SPEC_V2.md</code> §8.1) and this profile proposes it, but no <code>architecture</code> project type, phase WBS rows or phase gate exists; T9 is proposed (#81).</td></tr>
+<tr><td>2</td><td>Architecture development</td><td><strong>1</strong></td><td>initial</td><td>P0's artefacts exist as published documents; there is no typed <code>architecture_artifact</code> repository, no entry rows and no artefact links. The typed-metadata discipline is proposed (AS-1), not yet enforced.</td></tr>
+<tr><td>3</td><td>Business linkage</td><td><strong>2</strong></td><td>under development</td><td>The business case's benefit map and the MSP definition set (issue #260) name the outputs→capability→outcome→benefit paths; no benefit baseline has been measured, so no improvement can yet be demonstrated.</td></tr>
+<tr><td>4</td><td>Senior-management involvement</td><td><strong>2</strong></td><td>under development</td><td>The owner is the sponsor and the decision-maker: the ADRs, the owner rulings and the public programme record evidence it. There is no sponsoring-group forum, no board rows and no recorded tranche review.</td></tr>
+<tr><td>5</td><td>Operating-unit participation</td><td><strong>1</strong></td><td>initial</td><td>There is one operating unit (the conveyor programme itself). The organisation seed's 22 catalogue positions exist, but no job release is bound to a running project: the organisation is design, not operation.</td></tr>
+<tr><td>6</td><td>Architecture communication</td><td><strong>2</strong></td><td>under development</td><td>The public site, the published output set, the stable output URLs and the Feedback/Discuss links make the design readable; there is no board, no stakeholder engagement plan in operation, and the stakeholder profiles are a draft (#260).</td></tr>
+<tr><td>7</td><td>IT security</td><td><strong>3</strong></td><td>defined</td><td>Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned (<code>no-private-refs</code>, secret-scan, and GitHub code scanning's CodeQL checks on every PR) and the public page neutralises author markup. Defined by code and CI, not by a security review cycle.</td></tr>
+<tr><td>8</td><td>Architecture governance</td><td><strong>1</strong></td><td>initial</td><td>The principles and profile are proposed by this document; board, contracts and waivers are rows T9 will add. A deviation is handled by a decision record today, not a governed waiver.</td></tr>
+<tr><td>9</td><td>IT investment and acquisition strategy</td><td><strong>2</strong></td><td>under development</td><td>ADR 0005 fixes the absorption sequence; the business case carries the cost/risk posture and the licensing frame; there is no formal investment appraisal cycle or portfolio-level benefits tracking yet.</td></tr>
+</tbody></table>
+<p>Baseline mean <strong>1.8 / 5</strong>. The low scores are the honest reading of a programme that has specified
+its architecture capability and adopted its baseline but has not yet built the rows that enforce it.</p>
 <h2>Baseline</h2>
-<p>The baseline is the starting position, measured before the delivery programme changes anything. It is a baseline for growth, not a verdict: SPEC_V2 §8.1 states that the mandatory artefact set grows with the assessed maturity, so the baseline sets the first plateau rather than a ceiling. P0 measured the baseline; it did not raise it.</p>
+<ul>
+<li><strong>Dated:</strong> 2026-11-17, at <code>main@4ac0ede</code> (the #221 merge) plus the #245 branch head.</li>
+<li><strong>Scope:</strong> the conveyor programme's own architecture capability, not the estate's other services.</li>
+<li><strong>Method:</strong> a review judgement against evidence a reviewer can open; the evidence column is the
+record. The next assessment re-scores the same nine dimensions against the same method.</li>
+<li><strong>What is not claimed:</strong> this is not a TOGAF certification and not an external audit.</li>
+</ul>
 <h2>Milestones</h2>
-<p>The assessment records development milestones against the nine dimensions, which are the maturity targets the programme manages between tranches. The milestones are defined in the published assessment. Their attainment is not measured on 2026-11-26, because attainment belongs to the delivery tranches that follow P0's definition.</p>
+<p>The development plan a tranche review can hold the capability to:</p>
+<table><thead><tr><th>Milestone</th><th>Target</th><th>Evidence that closes it</th></tr></thead><tbody>
+<tr><td>M1 — the rows exist</td><td>next tranche</td><td>T9 lands <code>adm_profile</code>, <code>artifact_type</code>, <code>architecture_artifact</code> and <code>architecture_contract</code>; dimensions 1, 2 and 8 re-scored</td></tr>
+<tr><td>M2 — the board is convened</td><td>after M1</td><td><code>governance_body(kind='architecture_board')</code> + charter, membership and decision limits; a record of one board decision</td></tr>
+<tr><td>M3 — the first governed contract</td><td>after M2</td><td>one delivery project's design gate resolves against a live <code>architecture_contract</code>; a phase advance refuses a missing artefact</td></tr>
+<tr><td>M4 — the first governed waiver</td><td>after M3</td><td>an <code>architecture_waiver</code> with an accepting owner, reason, cost/risk and reassessment date; no hand-applied deviation</td></tr>
+<tr><td>M5 — measured, not asserted</td><td>end of the second tranche</td><td>every dimension's score cites a row or a measured result; dimension 6's stakeholder engagement has run a cycle; dimension 3's first benefit baseline is measured (or kata'd)</td></tr>
+<tr><td>M6 — the capability reviews itself</td><td>each tranche review</td><td>a principles/gate that never refused is flagged; the profile's mandatory set grows with the score</td></tr>
+</tbody></table>
+<p><strong>Gap recorded as a kata.</strong> The scores above are a judgement; there is no instrument that computes
+them. The missing measurement — a maturity scoring action over the nine dimensions with dated rows
+and a baseline — is a system issue, recorded as a kata candidate on the kata project. Until it
+exists, MA-1 is a dated review, and the date is its honesty.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-27T12:10:18.740973+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

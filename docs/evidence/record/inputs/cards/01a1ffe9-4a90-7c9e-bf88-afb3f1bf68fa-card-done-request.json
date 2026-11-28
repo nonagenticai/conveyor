@@ -1,0 +1,7 @@
+{
+ "card_id": "01a1ffe9-4a90-7c9e-bf88-afb3f1bf68fa",
+ "gate": "card_done",
+ "kind": "card_dod",
+ "require_evidence": true,
+ "evidence_waiver_reason": "the tranche-3 closure review is published by this journal; the derived package clears on that publish and the card is its materialised view"
+}

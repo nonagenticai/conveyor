@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 — Project context diagram · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="project-context-diagram" data-provenance-version="1" data-provenance-hash="ae2342fbc36c402f60fc24262170ac36d4547c37ed4ac952c7b3e06ca3445002" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>project-context-diagram</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>ae2342fbc36c402f60fc24262170ac36d4547c37ed4ac952c7b3e06ca3445002</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>T3 — Project context diagram</h1>
+<h2>Context</h2>
+<p>The PM job sits between the sponsor (programme owner), the approver job and the projects it runs:
+it consumes the spine's primitives and writes the project's own rows.</p>
+<h2>Affected organisation</h2>
+<p>The programme manager, the approver and the architect; the PM job is the only requester of the
+gates it runs.</p>
+<h2>Affected systems</h2>
+<p>The action registry, the approval ledger, the spine store's baseline and change tables, the
+document store (for the outputs) and the snapshot projection — all reused unchanged.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

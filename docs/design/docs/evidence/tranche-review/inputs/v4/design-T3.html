@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Architecture design — T3 PM job (retrospective, 2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/design-T3.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="architecture-design--t3-pm-job-retrospective-2026-11-28">Architecture design — T3 PM job (retrospective, 2026-11-28)</h1>
+<h2 id="context-and-boundary">Context and boundary</h2>
+<p>This design owns the PM job: the project's lifecycle actions and the gates between them. It must not duplicate the approval engine, the store, the cadence surfaces or the registers; it sequences them and refuses a step whose precondition is not met. The blueprint it fits is the one the requirements catalogue and the solution concept name: one project run end to end, with the approver kept distinct from the requester and a baseline change forced through a change request.</p>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<ul>
+<li>Aggregates: the project, the WBS node, the scope baseline, the approval and its decision, the register item and the cadence row.</li>
+<li>Tables: the project and WBS rows, the approval and decision rows, the register rows and the baseline rows — the same rows the close gate reads.</li>
+<li>Actions: <code>projects.charter</code>, <code>projects.baseline</code>, <code>projects.close</code>, <code>approvals.request</code>, <code>approvals.decide</code>, the cadence actions and the retrospective actions; a baseline change is <code>changes.request</code> and a register row, never an edit.</li>
+<li>Events: each gate decision, the demo credit per accepted deliverable, the PI plan approval and the tranche review.</li>
+</ul>
+<h2 id="decisions">Decisions</h2>
+<ul>
+<li>The approver must differ from the requester; a rule decision is accepted only under a published delegation naming the scope, and the decision records <code>decided_by_kind</code>.</li>
+<li>A baseline change requires a change request naming the baseline; the frozen row is superseded, never edited.</li>
+<li>Closure reads the declared outputs, the closure review, the live delivery contract and its Phase-G review, the approved scope baseline, the seven A–D artefacts and their registers, the WBS WSJF inputs and a demo credit per accepted deliverable.</li>
+<li>The charter gate and the closure gate are separate decisions; a single approval cannot stand for both.</li>
+</ul>
+<h2 id="acceptance">Acceptance</h2>
+<p><code>acceptance/programme/T3.toml</code> carries the gate, and SPEC_V2 §12 states it in prose. The proof is the cadence and gate suites — <code>crates/store/tests/programme_cadence.rs</code>, <code>refinement.rs</code>, <code>demo_gate.rs</code>, <code>retro.rs</code>, <code>tranche_review.rs</code> and <code>benefit_transition.rs</code>, with <code>crates/actions/tests/pi_plan_approval.rs</code>, <code>demo_credit.rs</code> and <code>apps/server/tests/cadence_jobs.rs</code> — and the record's own closure: the project's closure review is published and its closure gate was decided by an approver distinct from its requester.</p>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
+<p>The design's record is the seven Phase A–D artefacts — stakeholder map, driver/goal/objective catalogue, requirements catalog, solution concept, business capability map, data entity catalogue and technology standards — together with the five register kinds and the WBS deliverable. Each artefact is a typed row with its entries and links and is published as its own page.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/v4/design-T3.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

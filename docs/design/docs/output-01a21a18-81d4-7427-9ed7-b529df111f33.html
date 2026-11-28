@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T7 — Statement of Architecture Work · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="statement-of-architecture-work" data-provenance-version="1" data-provenance-hash="7326df520829d8781ab5e1fccb9d25433140a9b68085c1ec3714ec4911a19100" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>statement-of-architecture-work</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7326df520829d8781ab5e1fccb9d25433140a9b68085c1ec3714ec4911a19100</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Statement of Architecture Work — T7 operations</h1>
+<h2>Assignment</h2>
+<p>The T7 slice (SPEC_V2 §12) under the programme's architecture governance: operate the estate
+through one governed action surface, with the tenant's own approvals on every destructive write.</p>
+<h2>Scope</h2>
+<p>Incidents and triage, the four write verbs, the tenant approval policy and quorum, mitigation and
+resolution with a postmortem, host registration and the k8s reads, and the systemic-finding loop.
+Not in scope: the process engine (S13) and the procedure catalogue (T18).</p>
+<h2>Responsibilities</h2>
+<p>The operator job requests and acts; the approver job decides every gate and is never its
+requester; the programme architect owns the contract and the Phase-G review; the operations owner
+owns the incident record.</p>
+<h2>Acceptance criteria</h2>
+<p>SPEC_V2 §12 T7: triage, an approved mitigation with a read-back, resolution with a linked
+postmortem, a destructive call without the tenant's approvals refused, and restart/scale/rollback/
+flag-flip callable. Proven by the executed suite (<code>/tmp/u5a-r9/evidence/T7-acceptance.md</code>).</p>
+<h2>Contract</h2>
+<p>The live delivery contract <code>01a20ae2-30eb-7f69-812e-e98009182041</code>, requested by the operator job and approved by the
+Architecture Board under the standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; its Phase-G review is compliant
+and cites that delegation.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

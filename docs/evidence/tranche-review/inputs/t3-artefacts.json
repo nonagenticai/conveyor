@@ -1,0 +1,139 @@
+{
+  "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+  "artefacts": [
+    {
+      "artifact_key": "stakeholder_map",
+      "artifact_type_id": "01a1f2c1-13ea-7764-afc8-4f6322e0ad3e",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "title": "Stakeholder Map — T3 PM job (Phase A, retrospective)",
+      "purpose": "Identify the requester, the approver, the programme roles and the boundaries whose needs and constraints shape the PM job.",
+      "scope": "T3's direct stakeholders; S05 appears only as the boundary that owns project creation and the board surfaces.",
+      "entries": [
+        {"axis_a": "Stakeholder", "axis_b": "PM job (requester)", "value": {"objective": "Runs a request end to end: charter, plan, baseline, change and closure.", "detail": "The PM requests every gate and is never its requester-side approver; SPEC_V2 §12 T3's first clause is proved by the close gate's distinct-approver rule."}},
+        {"axis_a": "Stakeholder", "axis_b": "Approver job", "value": {"objective": "Decides every PM gate, always distinct from the requester.", "detail": "approvals.decide records decided_by and via.delegation_ref; the closing rule refuses self-approval (`the taker cannot approve their own baseline` in programme_baseline)."}},
+        {"axis_a": "Stakeholder", "axis_b": "Programme manager", "value": {"objective": "Owns delivery and the tranche record.", "detail": "Reads the baseline, the closure gate and the closure review; the tr3 review is the tranche's decision."}},
+        {"axis_a": "Stakeholder", "axis_b": "Architect", "value": {"objective": "Owns the baseline's architecture content.", "detail": "The scope baseline's architecture content and the delivery contract's design are the architect's; the Board approves the contract."}},
+        {"axis_a": "Stakeholder", "axis_b": "Architecture Board", "value": {"objective": "Approves the T3 delivery contract under the standing delegation.", "detail": "architecture.board_decide records an approval_decision with decided_by_kind='rule' and via.delegation_ref."}},
+        {"axis_a": "Stakeholder", "axis_b": "Programme board", "value": {"objective": "Reviews the tranche; the review authorises the next.", "detail": "tranches.review continue closes the tranche and authorises the next; a paused or stopped tranche authorises nothing."}},
+        {"axis_a": "Stakeholder", "axis_b": "Tenant administrator", "value": {"objective": "Holds the tenant's scopes and RLS.", "detail": "Every row the PM job writes is tenant-scoped with FORCE RLS; the close gate reads the same tenant only."}},
+        {"axis_a": "Stakeholder", "axis_b": "S05 (boundary)", "value": {"objective": "Owns project creation and the board surfaces.", "detail": "T3 consumes projects and boards but does not build them; the boundary is declared in the SoAW's scope."}}
+      ]
+    },
+    {
+      "artifact_key": "driver_goal_objective",
+      "artifact_type_id": "01a1f2c1-1406-747c-a7e8-b30353a58eaf",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Driver/Goal/Objective Catalogue — T3 PM job (Phase A, retrospective)",
+      "purpose": "Record why the PM job exists and what it must achieve: a request end to end, dual control on every gate, and change only through a change request.",
+      "scope": "The T3 slice as SPEC_V2 §12 defines it and the manifest's checks execute it.",
+      "entries": [
+        {"axis_a": "Driver", "axis_b": "SPEC_V2 §12 T3", "value": {"objective": "The PM runs a request end to end.", "detail": "pm.plan and projects.baseline write the WBS and the scope baseline; the five deliverables carry WSJF inputs and accepted status."}},
+        {"axis_a": "Driver", "axis_b": "Dual control", "value": {"objective": "The PM cannot approve its own gate.", "detail": "Every PM gate is decided by an actor other than its requester; the closure gate refuses a self-approved decision."}},
+        {"axis_a": "Driver", "axis_b": "Controlled change", "value": {"objective": "A baseline change requires a change request.", "detail": "A change is an approved `change` register row with an impact block and its own gate; a self-declared approved change cannot advance a baseline (`a_self_declared_approved_change_cannot_advance_a_baseline`)."}},
+        {"axis_a": "Driver", "axis_b": "Closure on evidence", "value": {"objective": "The close reads the record, not prose.", "detail": "projects.close runs assert_project_can_close: published outputs, approved closure gate, distinct approver, tranche authorisation, charter, scope/schedule/cost baselines, the live contract and its Phase-G review."}},
+        {"axis_a": "Driver", "axis_b": "Auditability", "value": {"objective": "Every decision is a row.", "detail": "approval_decision records the approver, the kind and the delegation; the closure review and the contract cite it."}},
+        {"axis_a": "Driver", "axis_b": "Tranche governance", "value": {"objective": "A close cannot outrun its tranche.", "detail": "The closure gate refuses a project whose tranche is not authorised (`a_project_outside_its_programme_tranche_plan_cannot_start`)."}}
+      ]
+    },
+    {
+      "artifact_key": "requirements_catalog",
+      "artifact_type_id": "01a1f2c1-1421-7aa2-9f15-39948d9a84ab",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "title": "Requirements Catalogue — T3 PM job (Phase A, retrospective)",
+      "purpose": "State the functional and non-functional requirements the PM job must satisfy, with the proof each demands.",
+      "scope": "The PM request-to-plan path, the four PM gates, the change path and the closure — the subjects the manifest's checks execute.",
+      "entries": [
+        {"axis_a": "Requirement", "axis_b": "R1 request-to-plan", "value": {"objective": "pm.plan writes the WBS and the scope baseline in one transaction.", "detail": "Proved by `programme_baseline::all_three_kinds_are_taken_and_read_back` and the T3 manifest's T3-baseline check."}},
+        {"axis_a": "Requirement", "axis_b": "R2 charter gate", "value": {"objective": "The charter gate is approved before the project can be planned.", "detail": "plan_project refuses `charter_not_approved`; the T3-charter check reads the charter asset and the gate."}},
+        {"axis_a": "Requirement", "axis_b": "R3 baseline gate", "value": {"objective": "A baseline is approved by a distinct reviewer.", "detail": "`the taker cannot approve their own baseline`; `a_distinct_reviewer_approves_only_once`."}},
+        {"axis_a": "Requirement", "axis_b": "R4 change path", "value": {"objective": "A change carries an impact block and cannot be born approved.", "detail": "`a_change_with_no_impact_analysis_is_refused`, `a_change_status_cannot_be_written_approved`, `a_change_impact_cannot_be_stripped_by_an_update`."}},
+        {"axis_a": "Requirement", "axis_b": "R5 closure", "value": {"objective": "projects.close_request opens a closure gate; projects.close refuses without the record.", "detail": "`closure_gate.rs` deletes the published evidence and the close is refused; the T3-closure-gate check reads the distinct approver."}},
+        {"axis_a": "Requirement", "axis_b": "R6 evidence-bearing gates", "value": {"objective": "A gate is opened with typed evidence or an explicit waiver.", "detail": "`an_evidence_less_gate_is_refused`, `a_gate_with_evidence_opens`, `an_explicit_evidence_waiver_is_recorded`."}},
+        {"axis_a": "Requirement", "axis_b": "R7 tenant isolation", "value": {"objective": "Every row and every gate is tenant-scoped.", "detail": "FORCE RLS on the PM tables; `a_foreign_tenant_cannot_approve`."}},
+        {"axis_a": "Requirement", "axis_b": "R8 tranche awareness", "value": {"objective": "A project cannot start or close outside its tranche's authorisation.", "detail": "`a_project_outside_its_programme_tranche_plan_cannot_start`; the close gate's `closure_tranche_not_authorised`."}}
+      ]
+    },
+    {
+      "artifact_key": "solution_concept",
+      "artifact_type_id": "01a1f2c1-143c-73a5-8820-83771e8602ca",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "title": "Solution Concept Diagram — T3 PM job (Phase A, retrospective)",
+      "purpose": "Show the PM path's components and the flows between them: request, gate, decide, baseline, change, close.",
+      "scope": "The T3 slice only; project creation and the board surfaces belong to S05.",
+      "entries": [
+        {"axis_a": "Component", "axis_b": "pm.plan / projects.baseline", "value": {"objective": "Writes WBS nodes, takes the baseline and opens its approval in one transaction.", "detail": "plan_project: charter gate, baseline_change_guard, WBS inserts, take_baseline_linked."}},
+        {"axis_a": "Component", "axis_b": "approvals.request / approvals.decide", "value": {"objective": "Poses each gate and records each decision.", "detail": "The approval row carries gate, target, evidence; the decision carries decided_by, decided_by_kind and via.delegation_ref."}},
+        {"axis_a": "Component", "axis_b": "baseline_change_guard", "value": {"objective": "Refuses a baseline replacement without an approved change.", "detail": "Reads the change register row, its impact block and its own gate before any WBS write."}},
+        {"axis_a": "Component", "axis_b": "projects.close_request → projects.close", "value": {"objective": "Opens the closure gate, then closes on the record.", "detail": "close_request opens `projects.close` with the closure asset; close runs assert_project_can_close."}},
+        {"axis_a": "Component", "axis_b": "assert_project_can_close", "value": {"objective": "The close gate's one authority.", "detail": "Outputs published, gate approved by a distinct actor, asset approved, charter, baselines, contract and Phase-G review, mandatory artefacts, no open P0."}},
+        {"axis_a": "Component", "axis_b": "Action registry and dispatch", "value": {"objective": "Every verb is registered, schema-validated and tenant-scoped.", "detail": "The action macro declares scopes, effects and approval targets; the invoke boundary validates input before the handler."}},
+        {"axis_a": "Component", "axis_b": "Postgres 18 row store", "value": {"objective": "One tenant-scoped store for the whole path.", "detail": "FORCE RLS; migrations carry the constraints the PM gates read."}}
+      ]
+    },
+    {
+      "artifact_key": "business_capability_map",
+      "artifact_type_id": "01a1f2c1-1456-7505-bb5b-5b8656aa8a1b",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "title": "Business Capability Map — T3 PM job (Phase B, retrospective)",
+      "purpose": "Name the capabilities the PM job establishes and the outcome each delivers.",
+      "scope": "The capabilities delivered by the T3 slice; the platform capabilities it consumes are named, not claimed.",
+      "entries": [
+        {"axis_a": "Capability", "axis_b": "Request-to-plan", "value": {"objective": "A request becomes a planned, baselined project.", "detail": "pm.plan and projects.baseline; the WBS and the scope baseline are the artefacts."}},
+        {"axis_a": "Capability", "axis_b": "Dual-controlled gates", "value": {"objective": "No actor decides its own gate.", "detail": "Charter, baseline, change and closure gates each record a distinct approver."}},
+        {"axis_a": "Capability", "axis_b": "Controlled change", "value": {"objective": "Scope changes travel as change requests with impact.", "detail": "The change register row, its impact block and its own gate; a baseline replacement reads them."}},
+        {"axis_a": "Capability", "axis_b": "Closure on evidence", "value": {"objective": "A project closes only against its frozen record.", "detail": "The close gate's full read; the closure review is published before the close."}},
+        {"axis_a": "Capability", "axis_b": "Gate audit trail", "value": {"objective": "Every decision is attributable and delegable.", "detail": "approval_decision rows with decided_by, kind and via.delegation_ref."}},
+        {"axis_a": "Capability", "axis_b": "Tranche-aware delivery", "value": {"objective": "Delivery cannot outrun the programme's authorisation.", "detail": "The start and close gates read the tranche's state."}}
+      ]
+    },
+    {
+      "artifact_key": "data_entity_catalog",
+      "artifact_type_id": "01a1f2c1-1470-71d6-a5a8-2e7d0d615178",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Data Entity Catalogue — T3 PM job (Phase C, retrospective)",
+      "purpose": "List the entities the PM job writes or relies on, and the role each plays in the gates.",
+      "scope": "T3's persistence; reused tenant tables are named where the PM path reads them.",
+      "entries": [
+        {"axis_a": "Entity", "axis_b": "project", "value": {"objective": "The governed unit.", "detail": "Status, meta (track, adm_phase, closure_outputs), phase_code — every gate reads it."}},
+        {"axis_a": "Entity", "axis_b": "project_baseline", "value": {"objective": "The frozen plan by kind.", "detail": "scope, schedule and cost kinds; approved_by is the distinct approver the gates require."}},
+        {"axis_a": "Entity", "axis_b": "wbs_node", "value": {"objective": "The deliverables and their acceptance.", "detail": "kind='deliverable' with accepted status is the closure's deliverable proof; WSJF inputs ride the row."}},
+        {"axis_a": "Entity", "axis_b": "approval / approval_decision", "value": {"objective": "The gate and its decision.", "detail": "gate, target, status, meta.evidence; the decision carries decided_by, decided_by_kind and via.delegation_ref."}},
+        {"axis_a": "Entity", "axis_b": "project_register_item", "value": {"objective": "The change, risk, issue, assumption and dependency rows.", "detail": "A change is a row with an impact block; the closure gate requires the four register kinds."}},
+        {"axis_a": "Entity", "axis_b": "governed_asset", "value": {"objective": "The charter and closure assets the gates authorise.", "detail": "The gate's meta.closure_asset_id names an approved asset whose owner is not the approver."}},
+        {"axis_a": "Entity", "axis_b": "document", "value": {"objective": "The published outputs the gates read.", "detail": "category, unit, published_at; the closure requires the declared outputs published."}},
+        {"axis_a": "Entity", "axis_b": "programme_tranche", "value": {"objective": "The authorisation the delivery reads.", "detail": "state authorises the project's start and close; the review authorises the next tranche."}}
+      ]
+    },
+    {
+      "artifact_key": "technology_standards",
+      "artifact_type_id": "01a1f2c1-148a-7b2a-8f3e-77e7d910fcc2",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "title": "Technology Standards Catalogue — T3 PM job (Phase D, retrospective)",
+      "purpose": "Record the technologies and standards the PM job standardises on, drawn from the record and the proving suite.",
+      "scope": "Standards used by the T3 slice; no version is asserted beyond what the sources state.",
+      "entries": [
+        {"axis_a": "Technology", "axis_b": "PostgreSQL 18 + sqlx", "value": {"objective": "One relational store, compiled queries, explicit transactions.", "detail": "The PM path runs in one transaction per action; migrations carry the constraints the gates read."}},
+        {"axis_a": "Technology", "axis_b": "FORCE RLS", "value": {"objective": "Tenant isolation at the row.", "detail": "Every PM table is tenant-scoped with FORCE RLS; `a_foreign_tenant_cannot_approve` proves the boundary."}},
+        {"axis_a": "Technology", "axis_b": "JSON Schema action inputs", "value": {"objective": "Every verb validates its input before the handler.", "detail": "The action registry exposes the schema; the invoke boundary answers 422 on a mismatch."}},
+        {"axis_a": "Technology", "axis_b": "Approval targets from input", "value": {"objective": "An approval and the call it authorises agree by construction.", "detail": "Each destructive PM action declares approval_target computed from the input, never a copied string."}},
+        {"axis_a": "Technology", "axis_b": "Delegation references", "value": {"objective": "A rule decision names the published standing delegation.", "detail": "assert_delegation_ref validates the P0 decision document; the decision records via.delegation_ref."}},
+        {"axis_a": "Technology", "axis_b": "Manifest gate checks", "value": {"objective": "The acceptance is executable, not prose.", "detail": "acceptance/programme/T3.toml names the checks; verify-project executes them against the live rows."}}
+      ]
+    }
+  ]
+}

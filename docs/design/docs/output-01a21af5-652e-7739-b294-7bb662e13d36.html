@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>GEMBA-WALK — Architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="architecture-design" data-provenance-version="2" data-provenance-hash="d0112bec464950f6693f10390555b6c969d7569d8abd563aa586ededb790c465" data-provenance-status="active" data-provenance-owner="FR Test" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>architecture-design</dd></div><div><dt>Version</dt><dd>2</dd></div><div><dt>SHA-256</dt><dd>d0112bec464950f6693f10390555b6c969d7569d8abd563aa586ededb790c465</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>FR Test</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><hr />
+<h2>document: GEMBA-WALK/architecture-design
+version: 2
+status: draft
+project: GEMBA-WALK
+category: architecture-design
+owner: programme-architect
+reviewer: Architecture Board
+review_date: 2026-12-03
+phase: A–F
+plateau: PSA + HLD</h2>
+<h1>GEMBA-WALK — Architecture design (PSA and HLD)</h1>
+<blockquote>
+<p><strong>Amendment 2026-11-27 (CR-WALK-001, ADR 0024).</strong> The client is served at
+<code>https://game.nonagentic.ai/</code> at the root from the same image and service, with its own public
+client <code>conveyor-game</code> in the <code>conveyor</code> realm; the operator origin's <code>/walk/*</code> 308s to it. The
+host boundary, the <code>azp</code> allowlist and the live sign-in are added below (R17–R19, AD10, D1). The
+earlier <code>/walk/</code> sub-site is retained only as the no-host dev/CI shape.</p>
+</blockquote>
+<h2>Context and boundary</h2>
+<p>GEMBA-WALK adds a <strong>second client</strong>, not a second system. It is a static client at <code>https://game.nonagentic.ai/</code>, served at the
+root from the same image and service as the API (so the API is same-origin), with its own router,
+sheets, world, identity client and Playwright suite. It adds no table, action, event, port, decision store or read model. Every read is a literal
+<code>GET</code> route where one exists, or the owning read action (<code>programmes.list</code> is one); every write is <code>POST /api/actions/{name}/invocations</code> with the
+standard envelope and headers; a capability the server does not expose is an honest gate.</p>
+<p>The design covers the client architecture, the route/action parity model, the <code>WorldView</code> port, the
+seats-as-presets rule, the serving fallback and the parity instrument. <code>apps/web</code> remains the
+normative operator UI until the P6 gate. The design pack at <code>/design/</code> is unchanged.</p>
+<p>This is a tailored ADM set for a software delivery project; it is a document set now and imports as
+typed <code>architecture_artifact</code> rows when the T9 repository is used. Every artefact carries the
+standard's common metadata: title, status, version, owner, reviewer, review date, purpose,
+stakeholders, scope, related project and its published document; links use
+<code>derivation | realization | reuse | dependency</code>.</p>
+<h2>Architecture artefacts</h2>
+<table><thead><tr><th>ID</th><th>Artefact</th><th>Type</th><th>Phase / plateau</th><th>Version</th><th>Owner</th><th>Reviewer</th><th>Review date</th><th>Status</th></tr></thead><tbody>
+<tr><td>A1</td><td>Principles applied</td><td>catalog</td><td>Preliminary–A / PSA</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>A2</td><td>Requirements catalog</td><td>catalog</td><td>A / PSA</td><td>1</td><td>business-analyst</td><td>programme-architect</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>A3</td><td>Stakeholder map</td><td>matrix</td><td>A / PSA</td><td>1</td><td>business-analyst</td><td>SRO</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>A4</td><td>Drivers, goals, objectives</td><td>catalog</td><td>A / PSA</td><td>1</td><td>programme-manager</td><td>SRO</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>A5</td><td>Solution concept</td><td>diagram</td><td>A / PSA</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>A6</td><td>Statement of Architecture Work</td><td>contract</td><td>A / PSA</td><td>1</td><td>programme-architect</td><td>SRO</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>B1</td><td>Business interaction matrix</td><td>matrix</td><td>B / HLD</td><td>1</td><td>business-analyst</td><td>SRO</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>B2</td><td>Actor / role matrix</td><td>matrix</td><td>B / HLD</td><td>1</td><td>business-analyst</td><td>programme-architect</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>C1</td><td>Data entity catalog</td><td>catalog</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>C2</td><td>Application / function matrix</td><td>matrix</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>C3</td><td>Conceptual data diagram</td><td>diagram</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>D1</td><td>Technology view</td><td>catalog</td><td>D / HLD</td><td>2</td><td>platform lead</td><td>Architecture Board</td><td>2026-12-03</td><td>draft</td></tr>
+<tr><td>F1</td><td>Migration and delivery diagram</td><td>diagram</td><td>F / HLD</td><td>1</td><td>programme-manager</td><td>SRO</td><td>2026-12-03</td><td>draft</td></tr>
+</tbody></table>
+<p>The published document is this file for every row; the future typed repository rows derive from it.
+No row is approved yet; the review date is the Architecture Board's sitting after the P0 spike.</p>
+<h2>Aggregates, tables and actions</h2>
+<h3>Project Start Architecture (Phase A–Preliminary)</h3>
+<h3>A1 — Principles applied (catalog)</h3>
+<table><thead><tr><th>ID</th><th>Principle</th><th>Rationale</th><th>Implication</th></tr></thead><tbody>
+<tr><td>P1</td><td>The contract is the product</td><td>the walk exists to prove the action contract is UI-independent</td><td>every read/write is the existing route/action; no client-only capability</td></tr>
+<tr><td>P2</td><td>One backend, one decision store</td><td>a second store or backend makes the record ambiguous</td><td>no new table, action, event, port or read model</td></tr>
+<tr><td>P3</td><td>The sheets own the work</td><td>a canvas cannot carry tables, long text or audit-quality forms</td><td>every record, form and decision is a DOM sheet with HTML semantics</td></tr>
+<tr><td>P4</td><td>The world never gates a capability</td><td>not every user will walk or use a pointer</td><td>every room, record and action has a deep link and a keyboard path</td></tr>
+<tr><td>P5</td><td>Seats are presets, not privileges</td><td>authority lives in the manifest, scopes and server refusals</td><td>changing a seat changes the landing and emphasis only</td></tr>
+<tr><td>P6</td><td>No fixtures, no client store</td><td>a fixture makes the measurement lie</td><td>the client renders real rows or the honest gate; no snapshot as the app's source</td></tr>
+<tr><td>P7</td><td>Parity is measured</td><td>prose cannot prove a UI</td><td>the frozen census and per-destination specs are the only credit</td></tr>
+<tr><td>P8</td><td>Same identity, same origin</td><td>a second identity path doubles the attack surface</td><td>auth-code + PKCE, token in memory, tenant header, no <code>localStorage</code> token</td></tr>
+<tr><td>P9</td><td>The renderer is replaceable</td><td>a rendering choice must not trap the client</td><td>the simulation is <code>bevy_ecs</code> behind <code>WorldView</code> (ADR 0022); the P0 spike measured canvas-2D against WebGL2 and ADR 0023 selects canvas-2D, with WebGL2 behind the port</td></tr>
+<tr><td>P10</td><td>The walk is reversible</td><td>primacy must not be a one-way door</td><td>additive surface, redirect map and an <code>apps/web</code> retirement as a later decision</td></tr>
+</tbody></table>
+<h3>A2 — Requirements catalog (typed)</h3>
+<table><thead><tr><th>ID</th><th>Type</th><th>Requirement</th><th>Source</th></tr></thead><tbody>
+<tr><td>R1</td><td>condition</td><td>Every §10.5 destination and every retained V1 route has a walk route equal to the app path on the game host</td><td>spec §4, plan §7, ADR 0024</td></tr>
+<tr><td>R2</td><td>condition</td><td>Every action in the frozen census is reachable and schema-rendered, with a labelled JSON fallback</td><td>spec §6.5, plan §6</td></tr>
+<tr><td>R3</td><td>constraint</td><td>Every write uses the standard envelope, <code>If-Match</code>/<code>Idempotency-Key</code>, approval and the server's refusal verbatim</td><td>spec §5, §9</td></tr>
+<tr><td>R4</td><td>constraint</td><td>No new table, action, event, port or decision store</td><td>ADR 0021 decision 3</td></tr>
+<tr><td>R5</td><td>condition</td><td>Auth-code + PKCE S256, token in memory, tenant header, dev cookie locally</td><td>spec §9, ADR 0021 decision 4</td></tr>
+<tr><td>R6</td><td>condition</td><td>SSE via fetch stream, <code>Last-Event-ID</code>, <code>resync</code>; a subscribed screen reflects its topic</td><td>spec §6.4</td></tr>
+<tr><td>R7</td><td>constraint</td><td>On the game host a deep link serves the walk entry; the operator origin 308s <code>/walk/*</code>; both tested</td><td>spec §10, ADR 0024</td></tr>
+<tr><td>R8</td><td>condition</td><td>The world is a <code>WorldView</code> port; the canvas baseline is always available</td><td>spec §6.2–§6.3</td></tr>
+<tr><td>R9</td><td>constraint</td><td>Seats never change authority; a control absent from the manifest is not rendered</td><td>spec §3</td></tr>
+<tr><td>R10</td><td>condition</td><td>Accessibility: keyboard path for every capability, focus return, contrast, 200 % zoom, 390 px</td><td>spec §8</td></tr>
+<tr><td>R11</td><td>condition</td><td>Performance budgets: the entrance and each destination measured; a 5-minute soak</td><td>spec §9, plan §11</td></tr>
+<tr><td>R12</td><td>constraint</td><td>No fixture, no snapshot URL fetched by a signed-in walk, no <code>localStorage</code> programme state</td><td>spec §14</td></tr>
+<tr><td>R13</td><td>condition</td><td>The parity instrument runs with no server, no database and no network; an expired exemption fails</td><td>plan §6</td></tr>
+<tr><td>R14</td><td>assumption</td><td>The action registry, read routes and identity provider remain the sole authority</td><td>spec §5</td></tr>
+<tr><td>R15</td><td>delta</td><td>The game has its own public client <code>conveyor-game</code> (PKCE S256, redirect <code>https://game.nonagentic.ai/*</code>, web origin, <code>conveyor</code> audience); it is delivered and read back, not deferred</td><td>CR-WALK-001, ADR 0024</td></tr>
+<tr><td>R16</td><td>condition</td><td>The walk adds no port, image or service; it is a second host on the same image; the static tree is copied into the image</td><td>spec §10</td></tr>
+<tr><td>R17</td><td>constraint</td><td>On the game host the server serves only the walk tree, <code>/config.json</code> and the API; <code>/mcp</code> and <code>/design</code> are refused before their routes run; the operator index is never served</td><td>ADR 0024, spec §10</td></tr>
+<tr><td>R18</td><td>constraint</td><td>The API accepts exactly the two first-party <code>azp</code> values (<code>conveyor-web</code>, <code>conveyor-game</code>) against the <code>conveyor</code> audience; an unknown or missing <code>azp</code> is rejected</td><td>ADR 0024</td></tr>
+<tr><td>R19</td><td>condition</td><td>The production sign-in is proven by a real <code>conveyor-e2e</code> PKCE sign-in on the game host, not a redirect</td><td>ADR 0024, spec §11</td></tr>
+</tbody></table>
+<h3>A3 — Stakeholder map (matrix)</h3>
+<table><thead><tr><th>Stakeholder</th><th>Concern</th><th>Influence</th><th>Interest</th><th>Engagement</th></tr></thead><tbody>
+<tr><td>Owner / sponsoring group</td><td>the walk may become primary; the parity claim must be measurable</td><td>high</td><td>high</td><td>P6 primacy decision; reviews the instrument</td></tr>
+<tr><td>Product owner seat</td><td>the board and delivery tasks are complete and fast</td><td>high</td><td>high</td><td>Portfolio/plan wing; write flows</td></tr>
+<tr><td>Programme office seat</td><td>programme, tranche, benefits and ADM tasks are visible</td><td>high</td><td>high</td><td>Programme/design wings</td></tr>
+<tr><td>Tenant owner seat</td><td>approvals, members, tenant settings are governed</td><td>high</td><td>high</td><td>Approvals/settings; destructive actions show refusals</td></tr>
+<tr><td>Reviewer seat</td><td>read-only evidence and decisions are legible</td><td>medium</td><td>high</td><td>read parity; no write affordance</td></tr>
+<tr><td>Architecture Board</td><td>the walk fits the blueprint and its contract</td><td>high</td><td>medium</td><td>SoAW, artefact set, compliance review</td></tr>
+<tr><td>Platform / security</td><td>same origin, headers, identity, no secret leakage</td><td>high</td><td>high</td><td>serving fallback, CSP, auth tests</td></tr>
+<tr><td>Accessibility / UX</td><td>the game UI does not regress keyboard or contrast</td><td>medium</td><td>high</td><td>a11y budget and keyboard spec</td></tr>
+<tr><td>External stakeholder</td><td>reads the public programme pack, not the walk</td><td>low</td><td>medium</td><td><code>/design/</code> remains the public surface (D48)</td></tr>
+</tbody></table>
+<h3>A4 — Drivers, goals, objectives (catalog)</h3>
+<table><thead><tr><th>ID</th><th>Statement</th></tr></thead><tbody>
+<tr><td>DR1</td><td>The only spatial interface is a local mock with no auth, registry or live rows</td></tr>
+<tr><td>DR2</td><td>The owner is considering the walk as the primary UI; a decision needs evidence</td></tr>
+<tr><td>G1</td><td>Every operator task is reachable in the walk through the existing contract</td></tr>
+<tr><td>G2</td><td>The contract's UI-independence is proven by a second client, not asserted</td></tr>
+<tr><td>O1</td><td>The P6 gate passes: 52 routes, 598 actions reachable, named flows round-trip, a11y/perf met</td></tr>
+<tr><td>O2</td><td>A contract change that breaks one client is caught by the parity instrument or a spec</td></tr>
+<tr><td>O3</td><td>The walk can be retired or promoted without a backend change</td></tr>
+</tbody></table>
+<h3>A5 — Solution concept (diagram)</h3>
+<pre><code>browser (game.nonagentic.ai)
+  shell ── seats (view presets) ── HUD (principal, tenant, queues, palette)
+    └── router registry ── route row: walk path + app path + room + spec
+          └── destination module ── read model ── GET /api/... | read action (e.g. programmes.list)
+                                 └── sheet host ── action sheet ── actions.describe
+                                                          └── POST /api/actions/{name}/invocations
+                                                               (envelope, If-Match, Idempotency-Key, approval)
+          └── world (WorldView port) ── canvas-2D (ADR 0023) · WebGL2 candidate
+                                 └── rooms/figures/state; never a work surface
+  events: GET /api/events?topics= (SSE) ── subscribed destination resync
+</code></pre>
+<h3>A6 — Statement of Architecture Work (draft)</h3>
+<p>Assignment: build the Gemba Walk to the P6 parity gate. Scope: the seven wings, the seven
+destinations families, the retained V1 surfaces, the host dispatch and boundary, its own public
+client, the instrument and the live sign-in proof.
+Responsibilities: the programme architect owns the set; the Architecture Board reviews; the SRO
+accepts the benefit and tranche evidence; the delivery sessions own their files. Acceptance: the P6
+gate (52 routes, 598 actions, named flows, a11y/perf, owner sign-off). The contract is a document
+now; <code>architecture.contracts_approve</code> makes it live. The full text is
+<code>06-statement-of-architecture-work.md</code>.</p>
+<h3>High-Level Design (Phases B–D)</h3>
+<h3>B1 — Business interaction matrix</h3>
+<table><thead><tr><th>Wing</th><th>Destinations</th><th>Primary seats</th><th>Write flows</th><th>Gate surface</th></tr></thead><tbody>
+<tr><td>Portfolio &amp; plan</td><td>portfolio, programme, plan/board</td><td>Product owner, Programme</td><td>plan/programme/card moves, decisions</td><td>approval, <code>If-Match</code></td></tr>
+<tr><td>Organisation</td><td>organisation, jobs, agents, tools, project types</td><td>Owner, Programme</td><td>create/update, bindings</td><td>manifest, scopes</td></tr>
+<tr><td>Procedures &amp; authoring</td><td>procedures, processes, map, authoring</td><td>Programme, Product owner</td><td>author/publish, process map</td><td>publish gates</td></tr>
+<tr><td>Govern &amp; design</td><td>decisions, approvals, ADM, architecture, requirements, models, copilot</td><td>Owner, Architecture Board</td><td>approvals, contracts, ADM, models</td><td>dual control, Board</td></tr>
+<tr><td>Knowledge &amp; memory</td><td>knowledge, search</td><td>all seats</td><td>remember/recall</td><td>tenancy</td></tr>
+<tr><td>Measure &amp; improve</td><td>improve, evals, benchmarks, usage, prompt audit, metering</td><td>Programme, Reviewer</td><td>evaluate, benchmark, meter</td><td>read-mostly</td></tr>
+<tr><td>Operations &amp; utilities</td><td>operations, platform, settings, tools</td><td>Owner, platform</td><td>settings, jobs, search</td><td>destructive confirm</td></tr>
+<tr><td>Retained V1</td><td>today, boards, cards, runs, approvals, requirements, models, processes, usage, settings, copilot</td><td>all seats</td><td>per the app route</td><td>same as <code>apps/web</code></td></tr>
+</tbody></table>
+<h3>B2 — Actor / role matrix</h3>
+<table><thead><tr><th>Seat preset</th><th>Landing</th><th>Queue emphasis</th><th>May change authority?</th><th>May write?</th></tr></thead><tbody>
+<tr><td>Delivery (product owner)</td><td>plan/board</td><td>cards, runs, approvals</td><td>no</td><td>only where the manifest and scopes allow</td></tr>
+<tr><td>Programme (project office)</td><td>programme</td><td>tranche, benefits, ADM, registers</td><td>no</td><td>only where the manifest and scopes allow</td></tr>
+<tr><td>Owner (tenant owner)</td><td>approvals/portfolio</td><td>approvals, members, settings</td><td>no — the server owns authority</td><td>yes, per scopes; destructive actions need approval</td></tr>
+<tr><td>Reviewer (observer)</td><td>portfolio/read views</td><td>evidence and decisions</td><td>no</td><td>no; write affordances are absent</td></tr>
+</tbody></table>
+<h3>C1 — Data entity catalog</h3>
+<table><thead><tr><th>Entity</th><th>Key content</th><th>Relationships</th></tr></thead><tbody>
+<tr><td>principal / membership</td><td><code>GET /api/me</code>, tenant memberships, job keys</td><td>1→* seats (presets)</td></tr>
+<tr><td>tenant</td><td><code>X-Active-Tenant</code>, config</td><td>1→* read models</td></tr>
+<tr><td>action manifest</td><td>name, effect, scopes, schema, confirm, tenancy, spec hash</td><td>1→* action sheet rows</td></tr>
+<tr><td>board / card / run</td><td>read models of the plan and execution</td><td>1→* destinations</td></tr>
+<tr><td>programme / tranche / benefit</td><td>MSP read models</td><td>1→* programme wing</td></tr>
+<tr><td>approval / decision</td><td>approval lifecycle, decision rows</td><td>1→* govern wing</td></tr>
+<tr><td>document / output</td><td>programme outputs and design pack</td><td>1→* knowledge/design</td></tr>
+<tr><td>architecture contract / artefact</td><td>ADM rows</td><td>1→* design wing</td></tr>
+<tr><td>event</td><td>SSE topic, <code>Last-Event-ID</code></td><td>*→1 subscription</td></tr>
+</tbody></table>
+<p>No entity is new. The client reads them; writes go through actions. A client-side cache is a view
+cache, never a source of truth.</p>
+<h3>C2 — Application / function matrix</h3>
+<table><thead><tr><th>Module</th><th>Responsibility</th><th>Contract</th></tr></thead><tbody>
+<tr><td><code>src/auth</code></td><td>PKCE, token memory, dev cookie, tenant header</td><td><code>apps/web/src/auth.rs</code> contract</td></tr>
+<tr><td><code>src/api</code></td><td>manifest, <code>actions.describe</code>, invocation envelope, RFC 9457 problems</td><td><code>apps/web/src/api.rs</code></td></tr>
+<tr><td><code>src/sse</code></td><td>fetch stream, <code>Last-Event-ID</code>, resync</td><td><code>apps/web/src/sse.rs</code></td></tr>
+<tr><td><code>src/forms</code></td><td>schema → form; JSON fallback</td><td><code>actions.describe</code> input schema</td></tr>
+<tr><td><code>src/router/registry</code></td><td>route rows + composition</td><td><code>apps/web/src/app.rs</code> census</td></tr>
+<tr><td><code>src/shell</code></td><td>seats, HUD, palette, map, sheet host</td><td>spec §2, §3</td></tr>
+<tr><td><code>src/world</code></td><td><code>WorldView</code> port; canvas baseline; Bevy candidate</td><td>spec §6.2–§6.3</td></tr>
+<tr><td><code>src/state</code></td><td>view state; no programme store</td><td>spec §6.4</td></tr>
+<tr><td><code>src/a11y</code></td><td>focus, keyboard, contrast</td><td>spec §8</td></tr>
+<tr><td><code>src/destinations</code></td><td>one module per destination</td><td>spec §4, §6.1</td></tr>
+</tbody></table>
+<h3>C3 — Conceptual data diagram</h3>
+<pre><code>/api/me → principal ── memberships → tenant ── config
+                            │
+                    seat preset (view only)
+                            │
+manifest + actions.describe → action sheet → invocation → server refusal/result
+                            │
+boards/cards/runs · programme/tranche/benefit · approvals/decisions · documents · architecture
+                            │
+                      destination read model ── SSE topic → resync
+</code></pre>
+<h3>D1 — Technology view</h3>
+<p>Static HTML/JS/CSS sub-site served from the existing image and origin; no new port. The baseline
+world simulation is <code>bevy_ecs 0.20.1</code> in <code>crates/walk-world</code>, compiled to wasm32 and loaded behind
+<code>WorldView</code> (ADR 0022); the renderer is the canvas-2D projection (ADR 0023), measured against
+WebGL2 in P0 (bundle, startup, frame time, WebGL requirements, CI build and DOM-overlay input);
+WebGL2 remains a candidate behind the port. Browser APIs: fetch, streams, Web Crypto (PKCE), <code>sessionStorage</code> (verifier only),
+<code>history</code>/URL. Build: GitHub-hosted preflight for the wasm compile (no local cargo); the walk's
+static assets are copied by the Dockerfile. Tests: Playwright against the dev server; <code>node --test</code>
+for pure modules. No SSR, no server runtime, no third-party hosted service.</p>
+<h3>F1 — Migration and delivery diagram</h3>
+<pre><code>P0 governance + census/instrument + spike + ADR 0022
+ → P1 foundation + Portfolio read/write + fallback
+ → P2 read parity → P3 write parity → P4 retained V1 → P5 slice-dependent surfaces → P6 parity gate
+</code></pre>
+<p>Build order: W0 census/instrument → W1 spike → W2 foundation → W3 reads → W4 writes → W5 V1 →
+W6 slice-gate audit → W7 P6/primacy → W8 hardening. The split by file ownership is G0 (W0–W2),
+S1–S3 (W3–W4 by wing), S4 (W5–W8). The P0 spike's throwaway workflow is deleted with the spike.</p>
+<h2>5. Artefact links</h2>
+<table><thead><tr><th>From</th><th>Kind</th><th>To</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>A2 requirements</td><td>derivation</td><td>A5 solution concept</td><td>each requirement maps to a module or contract</td></tr>
+<tr><td>A1 principles</td><td>derivation</td><td>A5 solution concept</td><td>P1–P10 shape the client</td></tr>
+<tr><td>A3 stakeholders</td><td>dependency</td><td>B1 interaction matrix</td><td>each wing names its seats</td></tr>
+<tr><td>B1 interaction matrix</td><td>realization</td><td>C2 modules</td><td>each wing uses the shared seams</td></tr>
+<tr><td>C1 data entities</td><td>realization</td><td>D1 technology view</td><td>reads/actions over the existing contract</td></tr>
+<tr><td>A4 goals</td><td>derivation</td><td>A2 requirements</td><td>R1–R16 serve G1–G2</td></tr>
+<tr><td>F1 migration</td><td>dependency</td><td>W0–W8</td><td>the build order</td></tr>
+<tr><td><code>apps/web</code> route table</td><td>reuse</td><td>census</td><td>the frozen baseline</td></tr>
+<tr><td><code>crates/api/src/web.rs</code></td><td>reuse</td><td>D1 serving</td><td>the static sub-site model</td></tr>
+<tr><td>ADR 0013 / D64</td><td>superseded in part</td><td>A1</td><td>ADR 0021 authorises this client only</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Decision</th><th>Rationale</th><th>Where it shows</th></tr></thead><tbody>
+<tr><td>AD1</td><td>A static client at <code>https://game.nonagentic.ai/</code>, at the root, same image and service</td><td>the owner's product URL and a first-class client with no new runtime; the operator origin 308s <code>/walk/*</code></td><td>D1, R17, ADR 0024</td></tr>
+<tr><td>AD2</td><td>Route parity by construction (the walk path is the app path on the game host)</td><td>a missing route is visible, not invented; parity is an equality</td><td>router registry, census</td></tr>
+<tr><td>AD3</td><td>Full functionality through the existing contract</td><td>a second backend would fork the record</td><td>C1/C2, R3/R4</td></tr>
+<tr><td>AD4</td><td>DOM sheets own all work; the world is navigation/state display</td><td>a canvas cannot carry audit-quality forms</td><td>P3, A5</td></tr>
+<tr><td>AD5</td><td>Seats are view presets; the manifest and scopes own authority</td><td>a preset must never grant a permission</td><td>B2, R9</td></tr>
+<tr><td>AD6</td><td>No fixtures, no client programme store</td><td>a fixture makes the parity claim false</td><td>P6, R12</td></tr>
+<tr><td>AD7</td><td><code>WorldView</code> port; <code>bevy_ecs</code> simulation (ADR 0022); canvas-2D renderer (ADR 0023), WebGL2 measured behind the port</td><td>the simulation and the renderer are decided; the port keeps the renderer replaceable</td><td>R8, D1, ADR 0022/0023</td></tr>
+<tr><td>AD8</td><td>The instrument is a frozen census + per-destination specs</td><td>live manifests move; the gate must stay passable</td><td>plan §6, R13</td></tr>
+<tr><td>AD9</td><td>Deep links served by the game-host dispatch + Rust matrix; the operator <code>/walk/*</code> 308s</td><td>without it a deep link renders the operator app or an operator surface leaks on the game host</td><td>R7, R17, W2</td></tr>
+<tr><td>AD10</td><td>The game has its own public client <code>conveyor-game</code> in the <code>conveyor</code> realm; the API accepts the two-client <code>azp</code> allowlist</td><td>isolation without duplicating users; the replay guard stays first-party</td><td>R15, R18, D1</td></tr>
+</tbody></table>
+<h3>D1 — Deployment and identity view (v2, 2026-11-27)</h3>
+<table><thead><tr><th>Element</th><th>Design</th><th>Source</th></tr></thead><tbody>
+<tr><td>Edge</td><td>Cloudflare → <code>cloudflared-apps</code> tunnel → istio <code>n8n-gateway</code> → <code>conveyor-public-vs</code>; <code>game.nonagentic.ai</code> is a second host on the same VirtualService; TLS uses the wildcard edge and the origin's <code>noTLSVerify</code>; DNS is derived by the <code>dns-ensure</code> CronJob</td><td>gitops <code>clusters/strato/**</code></td></tr>
+<tr><td>Service</td><td>one <code>conveyor</code> Deployment and Service on 8930; no second image, port or runtime</td><td><code>crates/api</code>, gitops <code>services/conveyor</code></td></tr>
+<tr><td>Host boundary</td><td>normalise <code>Host</code>; on a game host serve only the walk tree (<code>/srv/site/walk</code> at the root), <code>/config.json</code> and the API; a router-level gate refuses <code>/mcp</code> and <code>/design</code> before their routes; the operator index is never served; the operator host keeps its behaviour and 308s <code>/walk/*</code> to <code>CONVEYOR_GAME_PUBLIC_URL</code></td><td><code>crates/api/src/{lib,web}.rs</code>, ADR 0024</td></tr>
+<tr><td>Interface: browser ↔ API</td><td>same origin on both hosts; bearer access token, <code>X-Active-Tenant</code>, <code>If-Match</code>, <code>Idempotency-Key</code>; no CORS</td><td>spec §5, §10</td></tr>
+<tr><td>Interface: browser ↔ Keycloak</td><td>public client <code>conveyor-game</code>, standard flow + PKCE S256, redirect <code>https://game.nonagentic.ai/*</code>, web origin <code>https://game.nonagentic.ai</code>, audience mapper <code>conveyor</code>; the API accepts <code>azp ∈ {conveyor-web, conveyor-game}</code></td><td>realm patch, ADR 0024</td></tr>
+<tr><td>Configuration</td><td><code>/config.json</code> per host: game client id on the game host, operator client id elsewhere; same issuer and <code>dev_auth</code></td><td><code>crates/api/src/web.rs</code></td></tr>
+<tr><td>Rollback</td><td>remove the host from the VirtualService/tunnel, drop the two env values; the client is inert; no data migrated</td><td>CR-WALK-001 §8</td></tr>
+</tbody></table>
+<h2>Acceptance</h2>
+<p>The delivery design gate: GEMBA-WALK operates under the P0 brief and the T9 capability. This set is
+the PSA/HLD evidence; a deviation (a second backend, a fixture, a canvas-only work surface, a seat
+that grants authority) is a change request, never a silent fork. The compliance review records one
+level against the delivery contract when the project closes. The full TOGAF repository rows are
+T9's; this set is publishable now and importable later.</p>
+<p>The acceptance itself is the P6 gate in <code>docs/plans/GEMBA-WALK.md</code> §7 and §11, the instrument's
+record <code>docs/evidence/walk-coverage.json</code>, and the owner's primacy decision.</p>
+<h2>7. Review and links</h2>
+<ul>
+<li>Review date: 2026-12-03 (Architecture Board, after the P0 spike)</li>
+<li>Brief: <code>00-project-brief.md</code></li>
+<li>Analysis: <code>01-inception-analysis.md</code></li>
+<li>Register: <code>03-artifact-register.md</code></li>
+<li>Plan: <code>docs/plans/GEMBA-WALK.md</code></li>
+<li>Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code></li>
+<li>ADR: <code>docs/decisions/0021-gemba-walk-client.md</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>The Gemba Walk — a separate game-style client · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

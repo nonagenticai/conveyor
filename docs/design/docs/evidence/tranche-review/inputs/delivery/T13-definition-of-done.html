@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Definition of Done — T13 Tool platform · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/T13-definition-of-done.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="definition-of-done--t13-tool-platform">Definition of Done — T13 Tool platform</h1>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<p>The <code>acceptance/programme/T13.toml</code> gate executes green: a bound job calls coding through the broker; a <code>tool_call</code> is recorded; a destructive call without the configured approvals is refused; schema-invalid input is refused before the backend call; the storage adapter round-trips a tenant-prefixed object with no S3 key in the prompt (partial — adapter-level only).</p>
+<h2 id="evidence-at-completion">Evidence at completion</h2>
+<p>The acceptance receipt (<code>verify-project.py --project T13</code>) at the deployed sha; the published closure review with its per-clause verdicts and its seven named open items; the three architecture artefacts' evidence (catalogue suite, broker tests, storage tests); CI at the merge sha (<code>ci</code> and <code>merge_group</code> runs).</p>
+<h2 id="repo-gate">Repo gate</h2>
+<p><code>cargo fmt --all -- --check</code>, <code>cargo metadata --locked</code>, the repository's preflight, and the PR's CI suite; CodeQL, delivery, board and issue-registry on the merge.</p>
+<h2 id="merge-and-closure">Merge and closure</h2>
+<p>Issue #76 closed by PR #352's <code>Closes</code>; the close gate decided by a distinct approver; the closure review published before the close; the tranche-3 review reads the receipt at the snapshot's head sha.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/T13-definition-of-done.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "schema": "conformance-ratchet-rebase/v1",
+  "accepted_at": "2026-11-28T13:05:00Z",
+  "accepted_by": "conveyor-e2e",
+  "approver": "conveyor-approver",
+  "acceptance_ref": "01a22276-4e34-7292-9ae9-2912e3056c60",
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "base_required_absent": 222,
+  "required_absent": 301,
+  "optional_absent": 150,
+  "reason": "The committed pack at origin/main carried 582 documents the live record does not hold (staging-derived evidence; e.g. S05's 'Project Brief - S05 (retrospective, 2026-11-26)' 01a219d8-b0ef-7561-a551-1402074e92a7, absent from the live record, whose S05 brief 01a1e007-50ba-71e6-84d1-fb09d88cfe6c is an unpublished 2026-11-15 draft). The live publish at e6c36e66 is the first truthful reading of the required gap: 84 rows main's pack overstated, 5 rows resolved by the tranche-3 rework, 4 genuinely new GEMBA-WALK delivery rows. The reduction is #930's subject under the #928 rule; this record binds one exact published record and any later growth must be evidenced or re-based by a fresh owner decision.",
+  "evidence": {
+    "staging_derived_documents_absent_from_live": 582,
+    "rows_overstated_on_main": 84,
+    "rows_resolved_by_the_tranche_3_rework": 5,
+    "rows_genuinely_new": "4 GEMBA-WALK delivery rows",
+    "live_publish_head": "e6c36e664ad071a144491b8537be162efd4cd8e0",
+    "live_publish_at": "2026-11-28T12:48:28Z"
+  },
+  "gap_sha256": "e469d245f034d9ac43ef9c124b7fe14f2856fce6e8d4f17dac537af4c417d986"
+}

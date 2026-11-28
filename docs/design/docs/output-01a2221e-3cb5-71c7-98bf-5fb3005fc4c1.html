@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Definition of Done — T3 PM job · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="definition-of-done" data-provenance-version="1" data-provenance-hash="20434fba904fb6091237c9fb8284f1cdd59dd8db6f1d1e3b0e935fc701846013" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>definition-of-done</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>20434fba904fb6091237c9fb8284f1cdd59dd8db6f1d1e3b0e935fc701846013</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>Definition of Done — T3 PM job</h1>
+<h2>Acceptance criteria</h2>
+<p>The <code>acceptance/programme/T3.toml</code> gate executes green: the project is closed; the scope,
+schedule and cost baselines are approved by a distinct approver; the charter asset exists and
+its gate is approved; the declared closure outputs are published; the delivery contract is live
+and board-approved; the Phase-G review cites the standing delegation; the closure gate was
+decided by an approver other than its requester; no waiver is expired; the PI cadence, plan,
+objectives, WSJF inputs and demo credits exist; the retro produced a lesson; no open P0 remains;
+the mandatory artefacts are evidenced; no P0/P1 rework package remains.</p>
+<h2>Evidence at completion</h2>
+<p>The acceptance receipt (<code>verify-project.py --project T3</code>) at the deployed sha; the published
+closure review; the change <code>01a2052e-5648…</code> authorising the deliverables' acceptance; the
+delivery contract <code>01a2052f-29da-76c4-9bda-e45e0f408fe8</code> and its Phase-G review
+<code>01a2052f-cc4e…</code>; the five accepted deliverables and five demo credits; the retrospective ADM
+artefacts (Phase A–D) built from this record.</p>
+<h2>Repo gate</h2>
+<p><code>cargo fmt --all -- --check</code>, <code>cargo metadata --locked</code>, the repository's preflight, and the
+PR's CI; the served-spec lock check.</p>
+<h2>Merge and closure</h2>
+<p>Issue #74, one branch, one PR; the closure gate (<code>projects.close_request</code>) requested by the PM
+and decided by a distinct approver; <code>projects.close</code> runs the full record; the tranche-3 review
+reads the receipt at the snapshot's head sha.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

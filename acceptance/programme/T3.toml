@@ -6,6 +6,7 @@ gate_checks = ["T3-project", "T3-baseline", "T3-charter", "T3-closure-outputs", 
 [[check]]
 id = "T3-project"
 check = "project"
+status = "closed"
 severity = "P0"
 description = "T3 is closed"
 

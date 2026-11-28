@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>User Stories — S04 Action registry · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/delivery/S04-user-stories.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="user-stories--s04-action-registry">User Stories — S04 Action registry</h1>
+<h2 id="personas">Personas</h2>
+<ul>
+<li><strong>The action author</strong> declares an action once and gets HTTP, MCP, OpenAPI, the admin CLI and external ingest from that one declaration.</li>
+<li><strong>The transport client</strong> calls the served spec and gets the same schema, scopes and errors on every transport.</li>
+<li><strong>The operator</strong> reduces the allowlist from one registry and reads one audit path.</li>
+<li><strong>The external integrator</strong> ingests through the same fold the platform uses.</li>
+</ul>
+<h2 id="stories">Stories</h2>
+<ul>
+<li>As an action author I declare an ActionSpec once and never fork it per transport; a second declaration path is a defect.</li>
+<li>As a transport client I receive the same served operation and the same typed refusal on HTTP and MCP.</li>
+<li>As the operator I read one registry (549 actions) and one served spec locked by hash.</li>
+<li>As an external integrator I ingest through the declared fold and read the created rows back.</li>
+</ul>
+<h2 id="scenarios">Scenarios</h2>
+<ul>
+<li>Given a new action declaration, when the derive crate generates the spec, then the action is registered with its scopes, effect and approval target.</li>
+<li>Given the same action, when HTTP and MCP invoke it, then both answer with the same result and the same error shape.</li>
+<li>Given a changed spec, when the lock check runs, then the served document is regenerated and the new hash recorded, and a drift fails the check.</li>
+<li>Given an external ingest payload, when it is folded, then the declared rows exist and the fold is idempotent by its natural key.</li>
+</ul>
+<h2 id="verify">Verify</h2>
+<ul>
+<li><code>acceptance/programme/S04.toml</code>: the manifest's checks (derive crate, registry and vocabularies, parity, lock, ingest) execute against the live rows.</li>
+<li><code>crates/actions/tests/parity_http_mcp.rs</code>: HTTP/MCP parity of results and refusals.</li>
+<li>The served-spec lock check in CI (<code>conveyor snapshot --check-lock</code>).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/delivery/S04-user-stories.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

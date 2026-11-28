@@ -41,38 +41,34 @@
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t4:T4</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Commitments</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
-<ul>
-<li>commitments: T4 commits to the kanban coach as one write path over the board and the action spine: one interruption yields one coach card, one triage from the closed five-term set and at most one remedy from the closed six-term set; a repeat signature inside the coach.window policy escalates instead of opening a second card; a systemic class opens one measured kata; and no coach card is ever opened about a coach card.</li>
-</ul>
 <p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T4 Kanban coach (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+<li>Delivery contract — T4 Kanban coach (retrospective, U5a) — v2 <span class="std-state">live</span></li>
 </ul><h2>Compliance method</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>compliance: The Phase-G findings record the level non_conformant carried by the facts: the live delivery contract review 01a2028e-a1be-779d-a762-8d118fc2ec0b has no published delegation_ref and no active waiver exists, while the acceptance record docs/evidence/rework/T4.json is red on the charter, review, artefact-standard and rework-resolution checks and fifteen mandatory artefact packages remain open.</li>
+<li>compliance: T4 is assessed clause by clause against the SPEC_V2 section 12 gate on the post-#831 record. Clause 1 (&#x27;an injected failure yields exactly one coach card and one remedy&#x27;): the remedy&#x27;s missing effect (v1-p6-1, P0) is fixed — `coach.remedy` applies the bounded effect in its own transaction (block/move/retry/repull; ask is the gate and writes no effect) and `process_runs.start` refuses a blocked card or a pending ask (409 `coach_blocked` / `coach_ask_pending`), proved by `crates/actions/tests/coach.rs::{a_block_remedy_stops_the_next_dispatch, a_retry_remedy_lets_the_next_dispatch_run, a_move_remedy_places_the_card}` with the v1 ledger receipt at 26b47b61cfe735b5b891afb4dd0d5ea6e63434e0. Clause 1 remains refuted as a universal by v1-p6-4 (P1, open). Clause 2 (&#x27;a repeat signature escalates&#x27;) stands as proved by `::a_repeat_signature_escalates_instead_of_a_second_card`. Clause 3 (&#x27;no coach card about a coach card&#x27;) stands as proved by `::a_failed_coach_run_never_opens_a_coach_card` and `::a_nested_coach_run_is_refused`. Clause 4 (&#x27;a systemic class opens a kata&#x27;) stands as proved only as a `kata.open` process start by `::a_systemic_class_opens_one_kata` with `::a_transient_class_opens_no_kata`, and v1-p6-2 remains open. Open findings after this unit: v1-p6-2, v1-p6-3, v1-p6-4, v1-p6-5 (P1) and v1-p6-6 (P2), all tracked in docs/evidence/v1-conformance-findings.json; no P0 remains for T4. The rework&#x27;s acceptance instrument is `acceptance/programme/T4.toml`.</li>
 </ul>
 <p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T4 Kanban coach (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+<li>Delivery contract — T4 Kanban coach (retrospective, U5a) — v2 <span class="std-state">live</span></li>
 </ul><h2>Approval</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>approval 01a219df-d9bf-74a3-942a-f60b24cb9f38 — approved <span class="std-state">approved</span></li>
+<li>approval 01a21d2c-9949-7b5d-bc15-829f5153d494 — approved <span class="std-state">approved</span></li>
 </ul>
 <p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
 <ul>
 <li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T4 Kanban coach (retrospective, 2026-11-24) <span class="std-state">live</span></li>
+<li>Delivery contract — T4 Kanban coach (retrospective, U5a) — v2 <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>

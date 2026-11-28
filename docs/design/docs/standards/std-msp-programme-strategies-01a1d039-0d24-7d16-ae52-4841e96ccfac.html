@@ -41,11 +41,11 @@
         <div><dt>SPEC</dt><dd>§8.3</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-27T12:10:18.740973+00:00 · 17f470d5c621</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-28T12:46:29.116452+00:00 · 4f771d537181</dd></div>
       </dl>
       <h2>Information strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>artefacts.json#/documents</code> — 851 row(s)</p>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 420 row(s)</p>
 <ul>
 <li>The programme site is live</li>
 <li>Vision and mandate</li>
@@ -56,57 +56,57 @@
 <li>Reuse map</li>
 <li>Project brief template</li>
 <li>Architecture and analysis pack — current state, options, risks</li>
-<li>Project Brief — SPEC-V2 (retrospective, 2026-11-26)</li>
 <li>T12 — One organisation loop</li>
 <li>T15 — Tool authoring and BYO</li>
+<li>T17 — Tenant asset authoring</li>
 </ul><h2>Risk strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 92 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 33 row(s)</p>
 <ul>
-<li>The dated samples cannot be re-measured, so a later reader cannot reproduce the counts <span class="std-state">open</span></li>
-<li>A used id that no later slice builds would break S14&#x27;s 100 % gate <span class="std-state">open</span></li>
-<li>A surface dropped by decision may still receive live traffic after sign-off <span class="std-state">open</span></li>
-<li>Metrics 5–7 cannot be re-established, so the measured table is narrower than the eight-metric protocol <span class="std-state">open</span></li>
-<li>The drag-smoothness threshold was missed by both stacks and passes to S12 as an unmet target <span class="std-state">open</span></li>
-<li>The replay record lost the artefact rows, so a re-creation could duplicate a surviving row <span class="std-state">open</span></li>
-<li>The two-worker lease proof is timing-sensitive and could flake under load <span class="std-state">open</span></li>
-<li>The rework could close S02 while issue #2 still reads open <span class="std-state">open</span></li>
-<li>The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1) <span class="std-state">admitted</span></li>
-<li>The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2) <span class="std-state">admitted</span></li>
 <li>A projection reads a second source and the four surfaces drift apart <span class="std-state">open</span></li>
 <li>An approved imported action is executable by a tenant that should not see it <span class="std-state">open</span></li>
+<li>A closure without the record could recur: T3 was reopened from a vacuous closure that had no baseline, contract or review <span class="std-state">open</span></li>
+<li>A gate can still be self-approved if the approver identity is reused <span class="std-state">open</span></li>
+<li>An in-place baseline edit would erase the agreed scope <span class="std-state">open</span></li>
+<li>The rework could drift into new scope <span class="std-state">open</span></li>
+<li>The retrospective record cannot replay each PM run <span class="std-state">open</span></li>
+<li>The T13 catalogue actions and published toolkits are unbuilt: eleven of the design&#x27;s twelve catalogue actions and both toolkits are absent <span class="std-state">open</span></li>
+<li>Job-facing storage is unproven: no action calls JobStorage; the round trip is in-process and the prompt proof is a static compile <span class="std-state">open</span></li>
+<li>The governed call path&#x27;s guards stop at the handler boundary: direct external invocation remains possible, and the spend budget and rate limits are unenforced <span class="std-state">open</span></li>
+<li>The approved destructive execution path is not proved — only its refusal is <span class="std-state">open</span></li>
+<li>The storage round trip falls back to the in-memory store, so live MinIO stays unproved <span class="std-state">open</span></li>
 </ul><h2>Issue strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/register_items</code> — 78 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/register_items</code> — 30 row(s)</p>
 <ul>
-<li>Planka&#x27;s database cannot evidence usage: four boards and five test cards <span class="std-state">open</span></li>
-<li>The execution census covers three days, so it cannot answer quarterly use <span class="std-state">open</span></li>
-<li>The five-run sets for metrics 5–7 never completed inside the measurement window <span class="std-state">open</span></li>
-<li>Issue #2 was open at the start of the rework although its P2 test was already written <span class="std-state">open</span></li>
-<li>The closure outputs were declared in the 2026-11-21 transcript but are absent from the replay row <span class="std-state">open</span></li>
 <li>Out-of-sequence closure accepted as a retrospective exception (S03) <span class="std-state">accepted</span></li>
-<li>S03 closed out of sequence before the tranche-2 review (U3-EXC-S03) <span class="std-state">accepted</span></li>
-<li>No contemporaneous schema review or Phase A-D artefact set existed at the snapshot <span class="std-state">closed</span></li>
 <li>The parity contract does not yet name S04&#x27;s actions <span class="std-state">open</span></li>
 <li>The pre-rework receipt was red on the delivery contract and the artefact set <span class="std-state">open</span></li>
 <li>Out-of-sequence closure accepted as a retrospective exception (S05) <span class="std-state">accepted</span></li>
-<li>The close preceded tranche 4&#x27;s authorisation by three days and rests only on an accepted P0 exception <span class="std-state">open</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06b) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06c) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S06d) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S07) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S08) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S09) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S10) <span class="std-state">accepted</span></li>
+<li>Out-of-sequence closure accepted as a retrospective exception (S11) <span class="std-state">accepted</span></li>
 </ul><h2>Monitoring strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>msp.json#/cadences</code> — 29 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/cadences</code> — 25 row(s)</p>
 <ul>
 <li>01a1ff21-7354-7777-996b-4c8cb12f25e9 <span class="std-state">materialised</span></li>
 <li>01a1ff74-9819-72dc-a1f2-e102c73e9672 <span class="std-state">materialised</span></li>
 <li>01a2004a-87d8-77e9-b06a-171361548e38 <span class="std-state">materialised</span></li>
 <li>01a20280-ef3f-7aac-8fad-3840a7995847 <span class="std-state">materialised</span></li>
 <li>01a202a1-f4ee-7acc-8e57-50ac6f0417fd <span class="std-state">materialised</span></li>
-<li>01a216d1-1976-7be8-b1a6-e85e9aeeea16 <span class="std-state">planned</span></li>
-<li>01a21c62-6aeb-764e-af16-44eefdee7186 <span class="std-state">planned</span></li>
-<li>01a210c9-0d47-7473-8339-7ea7648e59e9 <span class="std-state">planned</span></li>
-<li>01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 <span class="std-state">planned</span></li>
-<li>01a1ff73-df1f-78c5-8793-101de5a3dd60 <span class="std-state">planned</span></li>
-<li>01a2004a-51f4-7482-b5f8-455a4bd371b5 <span class="std-state">planned</span></li>
+<li>01a22213-f19a-784a-a2da-7aad4577ddda <span class="std-state">materialised</span></li>
+<li>01a210c9-0d47-7473-8339-7ea7648e59e9 <span class="std-state">awaiting_approval</span></li>
+<li>01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 <span class="std-state">awaiting_approval</span></li>
+<li>01a1ff73-df1f-78c5-8793-101de5a3dd60 <span class="std-state">awaiting_approval</span></li>
+<li>01a2004a-51f4-7482-b5f8-455a4bd371b5 <span class="std-state">awaiting_approval</span></li>
 <li>01a20280-a739-7bb9-823f-232f34b32aaa <span class="std-state">awaiting_approval</span></li>
+<li>01a202a1-dbb9-7e49-b64a-cf97c3fab095 <span class="std-state">awaiting_approval</span></li>
 </ul><h2>Communications strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>msp.json#/stakeholder_profiles</code> — 6 row(s)</p>
@@ -119,7 +119,7 @@
 <li>The tenant&#x27;s jobs (the organisation)</li>
 </ul><h2>Quality strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>work.json#/approvals</code> — 689 row(s)</p>
+<p class="std-source">Source: <code>work.json#/approvals</code> — 200 row(s)</p>
 <ul>
 <li>01a1f7fc-d2ec-7137-b28e-12217dd7618d <span class="std-state">approved</span></li>
 <li>01a1fbb1-43b4-7c55-ae77-493c426731fa <span class="std-state">approved</span></li>
@@ -134,25 +134,26 @@
 <li>01a1ff31-4403-7988-a64b-796300ce7102 <span class="std-state">approved</span></li>
 <li>01a1ff31-7348-7c52-b06f-e57cf09796e9 <span class="std-state">approved</span></li>
 </ul>
-<p class="std-source">Source: <code>architecture.json#/compliance_reviews</code> — 61 row(s)</p>
+<p class="std-source">Source: <code>architecture.json#/compliance_reviews</code> — 32 row(s)</p>
 <ul>
-<li>01a21c26-e355-7d2e-ae8d-bb8a3f163712</li>
-<li>01a21c1d-da39-740d-b3a5-d0be2d17fe59</li>
-<li>01a21c1b-e602-7978-ad2d-6acfe3277dd2</li>
-<li>01a21c16-b8dd-7e5c-83bf-f59cc118f73f</li>
-<li>01a21a3b-e8a9-7ab6-ba8f-227e0edc4ad6</li>
-<li>01a21a39-dab0-733c-a041-9cf36da4703b</li>
-<li>01a21a10-19b3-704b-b52a-2b85e9f4930d</li>
-<li>01a219e0-cf6f-7839-8c64-5c590e56f4d7</li>
-<li>01a219df-f43e-72a4-b367-9bfa02d68dde</li>
-<li>01a219df-2530-7597-8836-ec3dfc7154ef</li>
-<li>01a219de-b233-7c79-9cf9-5c16a4f05765</li>
-<li>01a219de-25c1-7eb7-adc2-fac9877f505f</li>
+<li>01a2222d-92b1-79f6-8bda-562ea44260e7</li>
+<li>01a22226-5d88-734b-8f8a-4b4a91d097f8</li>
+<li>01a22221-301c-73a8-a3f4-7b0db1beb62c</li>
+<li>01a2221c-78ad-75bf-8fb7-69678a50f6b8</li>
+<li>01a22212-348f-7e7f-b8b0-8c04b537cec0</li>
+<li>01a22212-2ca1-7e78-ac7d-a5f686e285a7</li>
+<li>01a22212-253a-7fe8-92de-897d7da4b689</li>
+<li>01a22212-1d23-7719-a54c-be3269d39f1f</li>
+<li>01a21d2c-c669-79fa-9fe8-4721bbca9f45</li>
+<li>01a210be-4ded-728e-96ba-d4805b5f9b29</li>
+<li>01a210be-3a02-75f3-b39d-5309d7a2cd92</li>
+<li>01a20ceb-66b2-75a4-ac9f-6ceae8ab187d</li>
 </ul><h2>Resource strategy</h2>
 <p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>programme.json#/projects</code> — 51 row(s)</p>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 52 row(s)</p>
 <ul>
 <li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>The Gemba Walk — a separate game-style client <span class="std-state">active</span></li>
 <li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
 <li>CI, runners and platform <span class="std-state">active</span></li>
 <li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
@@ -160,10 +161,9 @@
 <li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">closed</span></li>
 <li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
 <li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">closed</span></li>
-<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
 <li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
 <li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
-<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
 </ul>
 <p class="std-source">Source: <code>measure.json#/inference/by_project</code> — 2 row(s)</p>
 <ul>

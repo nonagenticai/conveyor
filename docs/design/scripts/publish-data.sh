@@ -221,6 +221,15 @@ target.write_text(
 PY
 python3 "$pack/scripts/build-docs.py"
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
+# The platform output pages are the snapshot's projection of the record: a page this record no
+# longer produces is stale and must go. `build-docs.py` deliberately never deletes OUT (the
+# directory also holds these pages), so installing them additively let 582 pages from a
+# staging-derived record survive a live publish and `check-outputs` refused the pack (measured on
+# #852, 2026-11-28). Mirror the output pages, then install this publish's.
+for page in "$pack/docs"/output-*.html; do
+  [ -e "$page" ] || continue
+  [ -f "$tmp/docs/$(basename "$page")" ] || rm -f "$page"
+done
 rsync -a "$tmp/docs/" "$pack/docs/"
 # 3g. The manifest must name every file the installed pack carries. The files written after 3f
 #     (actions.json, coverage.*, output-standard.js, the rendered pages) are not snapshot outputs,

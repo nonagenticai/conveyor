@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>User Stories — T13 Tool platform · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><dl class="output-provenance" data-provenance-kind="user-stories" data-provenance-version="1" data-provenance-hash="7dec81fda3bd8d4d2242c602f3903f59b7c174212596615d5be39d40dedf8ea8" data-provenance-status="active" data-provenance-owner="conveyor-e2e" data-provenance-gate="unrecorded" data-provenance-commit="unrecorded"><div><dt>Kind</dt><dd>user-stories</dd></div><div><dt>Version</dt><dd>1</dd></div><div><dt>SHA-256</dt><dd>7dec81fda3bd8d4d2242c602f3903f59b7c174212596615d5be39d40dedf8ea8</dd></div><div><dt>Status</dt><dd>active</dd></div><div><dt>Owner</dt><dd>conveyor-e2e</dd></div><div><dt>Gate</dt><dd>unrecorded</dd></div><div><dt>Rendered from</dt><dd>unrecorded</dd></div></dl><h1>User Stories — T13 Tool platform</h1>
+<h2>Personas</h2>
+<ul>
+<li><strong>The development job</strong> calls coding through the broker, never an ad-hoc backend call.</li>
+<li><strong>The tool operator</strong> binds a tool to a destination, declares its effect, and reads the call
+ledger.</li>
+<li><strong>The tenant administrator</strong> holds the approval configuration a destructive call needs.</li>
+<li><strong>The auditor</strong> reads one <code>tool_call</code> row per call and the redacted payload.</li>
+</ul>
+<h2>Stories</h2>
+<ul>
+<li>As a development job I call coding through the broker and get the destination's answer.</li>
+<li>As a tool operator I declare a tool's effect and binding once; an undeclared or mis-bound verb
+is refused.</li>
+<li>As the tenant administrator no destructive call runs without the tenant's configured
+approvals.</li>
+<li>As the auditor every call is one ledger row with a 64-hex input hash and a redacted payload.</li>
+<li>As a job I write and read a tenant-prefixed object without an S3 key in my prompt.</li>
+</ul>
+<h2>Scenarios</h2>
+<ul>
+<li>Given a bound job, when it calls coding through the broker, then the destination is reached by
+the declared path and no ad-hoc backend call is made.</li>
+<li>Given a destructive tool, when it is called without the configured approvals, then the call is
+refused (403 <code>approval_required</code>) with zero destination hits and no ledger row.</li>
+<li>Given schema-invalid input, when the tool is called, then it is refused (422
+<code>tool_input_invalid</code>) before the backend call.</li>
+<li>Given a valid call, when it completes, then exactly one <code>tool_call</code> row and one <code>tool.called</code>
+event are written.</li>
+<li>Given a job object, when it is written and read back, then the key is tenant-prefixed and the
+hash verifies.</li>
+</ul>
+<h2>Verify</h2>
+<ul>
+<li><code>crates/actions/tests/tool_platform.rs</code>: the seven scenarios, including the counted stub of the
+declared <code>coding_jobs.create</code> destination.</li>
+<li><code>crates/actions/tests/s3_wire.rs</code>: the wire-level storage round trip.</li>
+<li><code>crates/actions/tests/parity_http_mcp.rs</code>: the 409 parity.</li>
+<li><code>acceptance/programme/T13.toml</code>: the manifest's checks against the live rows.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-28T12:46:29.116452+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

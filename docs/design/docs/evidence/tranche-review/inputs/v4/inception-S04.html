@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Inception analysis — S04 action registry (retrospective, 2026-11-28) · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/tranche-review/inputs/v4/inception-S04.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="inception-analysis--s04-action-registry-retrospective-2026-11-28">Inception analysis — S04 action registry (retrospective, 2026-11-28)</h1>
+<h2 id="current-state">Current state</h2>
+<p>Before the slice's own build, the service carried one hand-written route per operation and a generated OpenAPI document, with no single declaration that could be projected into every surface. The store and the tenancy model already existed under <code>crates/store</code>, the router and middleware already carried the tenant bearer and the idempotency key, and the registry table the invocation path writes was already created by <code>migrations/0003_action_registry.sql</code>. The slice's own record (<code>docs/evidence/rework/S04.json</code>) was red before the retrospective: the live delivery contract was absent and seven artefact-standard rows were partial. What existed was proven below the declaration; what was missing was the declaration itself.</p>
+<h2 id="reuse-sources">Reuse sources</h2>
+<ul>
+<li>The tenant-scoped store and its row-level security (<code>app_current_tenant()</code>) were reused unchanged for the registry and the audit ledger; the slice did not add a second persistence path.</li>
+<li>The router and middleware were reused as the invocation transport: the tenant bearer, the idempotency key, the deadline and the transaction come from the existing path, not a new one.</li>
+<li>The RFC 9457 error envelope was reused for schema-invalid input, so a refusal has one shape on every surface.</li>
+<li><code>served-spec.lock.json</code> and the <code>--check-lock</code> path were reused as the drift gate for the OpenAPI projection.</li>
+<li>The MCP tool surface already present in the service was reused as the fourth projection rather than introducing a second tool registry.</li>
+</ul>
+<h2 id="build-vs-reuse">Build vs reuse</h2>
+<p>Built: the <code>ActionSpec</code> declaration and the derive crate (<code>crates/actions-derive</code>) that emits it, the resolver (<code>crates/actions/src/resolve.rs</code>), the manifest, OpenAPI and MCP projections with their boot-time collision checks, and the external-action ingest from a declared OpenAPI document. Reused: everything below the declaration — the store, the tenancy, the idempotency, the error envelope and the lock. The line was drawn at "one declaration per invocable operation": the slice did not rebuild the transport, the store or the auth path, because those were proven by earlier slices and must not fork.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>Projection divergence: a change to one projection silently changing another. Mitigated by the parity test <code>crates/actions/tests/parity_http_mcp.rs</code>, which compares <code>http.body</code> with <code>mcp.structuredContent</code>, and by the one <code>spec_hash</code> carried across the projections.</li>
+<li>Boot-time collisions: duplicate names, MCP name collisions and out-of-charset names fail closed at boot rather than shadowing a route or a tool.</li>
+<li>External ingest is a trust boundary: a declared document carrying a schema the closed set cannot express is refused when the document is ingested, not when the action is first called.</li>
+<li>Drift in CI: the served spec and the lock are compared on every run, so a hand edit to the OpenAPI document fails the check instead of publishing a second source of truth.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/tranche-review/inputs/v4/inception-S04.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

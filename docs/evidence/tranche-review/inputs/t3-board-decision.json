@@ -1,0 +1,12 @@
+{
+  "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+  "decision": "approved",
+  "evidence": {
+    "sha": "9e2ebbeac3d5a1612d298b67f7d7b4f07058e36e",
+    "manifest": "acceptance/programme/T3.toml",
+    "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+  },
+  "subject_kind": "contract",
+  "subject_id": "<CONTRACT_ID>",
+  "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}
