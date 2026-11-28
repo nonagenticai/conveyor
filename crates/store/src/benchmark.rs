@@ -784,6 +784,44 @@ pub async fn finalise_case_tx(
         })
 }
 
+/// Withhold a produced patch that is not a valid unified diff (#908).
+///
+/// The verdict is `apply_failed` — the class the grader writes when a patch cannot be applied —
+/// with the shape reason in `detail`, and **no sandbox Job is spent**. Conditional on the case
+/// still being pending, so a re-delivered producer cannot rewrite it.
+pub async fn withhold_malformed_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    case_id: Uuid,
+    patch: &str,
+    patch_sha256: &str,
+    shape: &str,
+) -> Result<Option<(Uuid, String)>, BenchmarkStoreError> {
+    let detail = json!({
+        "reason": "the produced patch is not a valid unified diff",
+        "shape": shape,
+        "source": "producer-shape-check",
+    });
+    // `(benchmark_run_id, instance_id)` of the case this call withheld, for the caller's event
+    // and counter writes; `None` when a re-delivered producer found it no longer pending.
+    let row: Option<(Uuid, String)> = sqlx::query_as(
+        "UPDATE benchmark_case
+            SET produce_status = 'ok', patch = $3, patch_sha256 = $4, verdict = 'apply_failed',
+                detail = $5, produced_at = now(), updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+            AND verdict = 'pending' AND produce_status = 'pending' AND sandbox_ref IS NULL
+          RETURNING benchmark_run_id, instance_id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(case_id)
+    .bind(patch)
+    .bind(patch_sha256)
+    .bind(detail)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row)
+}
+
 /// One keyset page of cases for a run, optionally filtered by verdict.
 pub async fn list_cases_tx(
     conn: &mut PgConnection,

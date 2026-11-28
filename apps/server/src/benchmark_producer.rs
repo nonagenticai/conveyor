@@ -23,6 +23,13 @@
 //! **A refusal is not a model failure.** CONTRACT §19: an outage, an unready binding or an empty
 //! reply is written as `produce_status = 'no_attempt'`, which the graded denominator withholds.
 //! Only a genuine infrastructure fault (a 5xx, a transport error) is a retryable job failure.
+//!
+//! **A malformed patch is withheld without a Job** (#908). A produced reply that is not a unified
+//! diff a `git apply` could consume — a hunk header whose counts disagree with its body, a
+//! fragment with no file header — is finalised here as `apply_failed` with the shape reason in
+//! `detail`. That is the verdict the grader would have written after the sandbox rejected it,
+//! so no count changes; what changes is that a sandbox Job is no longer spent discovering it,
+//! and the reason distinguishes a malformed diff from a base/patch mismatch.
 
 use conveyor_actions::invoke::{ActionError, Authority, InvokeRequest, invoke};
 use conveyor_actions::registry::registry;
@@ -43,8 +50,11 @@ use crate::worker::JobFailure;
 /// the sandbox applies it exactly as it applies a stored gold patch.
 const INSTRUCTION: &str = "\
 You are fixing a bug in a repository you cannot see. Answer with a unified diff (`git diff` \
-format) only and nothing else — no prose, no explanation, no code fence. If you cannot produce a \
-patch, answer with the single word NONE.";
+format) only and nothing else — no prose, no explanation, no code fence. Every hunk must start \
+with a valid header (`@@ -old_start,old_count +new_start,new_count @@`) whose counts are the exact \
+number of context, removed and added lines that follow it, and it must carry the real surrounding \
+context lines from the file: a one-line fragment with a guessed range cannot be applied and is \
+discarded. If you cannot produce a patch, answer with the single word NONE.";
 
 /// The baseline's pinned system prompt. It is the direct pipeline: one model call with the
 /// problem statement and the files the fix touches, answering in the same unified-diff contract
@@ -52,8 +62,11 @@ patch, answer with the single word NONE.";
 const BASELINE_SYSTEM: &str = "\
 You are a software engineer fixing a bug in a repository. You are given the problem statement and \
 the current content of the files the fix is expected to touch. Answer with a unified diff in \
-`git diff` format only — no prose, no explanation, no code fence. If you cannot produce a patch, \
-answer with the single word NONE.";
+`git diff` format only — no prose, no explanation, no code fence. Every hunk must start with a \
+valid header (`@@ -old_start,old_count +new_start,new_count @@`) whose counts are the exact number \
+of context, removed and added lines that follow it, and it must carry the real surrounding context \
+lines from the file: a one-line fragment with a guessed range cannot be applied and is discarded. \
+If you cannot produce a patch, answer with the single word NONE.";
 /// The baseline's one model call is bounded.
 const BASELINE_TIMEOUT_MS: i64 = 300_000;
 /// The source fetch is bounded, so a huge list of files cannot become the prompt.
@@ -369,6 +382,9 @@ pub async fn produce(
         )
         .await;
     }
+    if let Err(shape) = unified_diff_shape(&text) {
+        return withhold(pool, tenant, case_id, &text, &shape).await;
+    }
     let hash = sha256_hex(&text);
     record(
         pool,
@@ -627,6 +643,9 @@ async fn collect_process(
             &format!("the produced patch is {} bytes, over the cap", text.len()),
         )
         .await;
+    }
+    if let Err(shape) = unified_diff_shape(text) {
+        return withhold(pool, tenant, case_id, text, &shape).await;
     }
     let hash = sha256_hex(text);
     record(pool, tenant, case_id, "ok", Some((text, hash.as_str())), "").await
@@ -895,4 +914,273 @@ async fn record(
         .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
     tracing::info!(case = %case_id, produce_status, note, "benchmark case produced");
     Ok(())
+}
+
+/// Withhold a produced patch the sandbox could not have applied.
+///
+/// The case is finalised as `apply_failed` with the shape reason in `detail` — the verdict class
+/// and every run count are what a spent Job would have written. What changes is that no sandbox
+/// Job is started to discover a malformed diff, and the reason separates a malformed patch from a
+/// genuine base/patch mismatch.
+async fn withhold(
+    pool: &PgPool,
+    tenant: TenantId,
+    case_id: Uuid,
+    text: &str,
+    shape: &str,
+) -> Result<(), JobFailure> {
+    let mut tx = store::begin_scoped(pool, tenant)
+        .await
+        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    let hash = sha256_hex(text);
+    let withheld =
+        store::benchmark::withhold_malformed_tx(&mut tx, tenant, case_id, text, &hash, shape)
+            .await
+            .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    if let Some((run_id, instance_id)) = withheld {
+        store::benchmark::append_case_event_tx(
+            &mut tx,
+            tenant,
+            run_id,
+            &instance_id,
+            "apply_failed",
+        )
+        .await
+        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+        let refreshed = store::benchmark::refresh_run_counts_tx(&mut tx, tenant, run_id)
+            .await
+            .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+        store::benchmark::append_run_event_tx(&mut tx, tenant, &refreshed, "benchmark_run.changed")
+            .await
+            .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+        tracing::info!(
+            case = %case_id,
+            run = %run_id,
+            %instance_id,
+            %shape,
+            "benchmark case withheld: malformed patch"
+        );
+    }
+    tx.commit()
+        .await
+        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    Ok(())
+}
+
+/// Whether `text` is a unified diff a `git apply` can consume.
+///
+/// This is a shape check, never a repair. The measured failure mode (#908) is a hunk header whose
+/// declared counts disagree with its body, or a fragment with no file header; every apply tool
+/// rejects those. A patch that fails this check is withheld as `apply_failed` with this reason; a
+/// patch that passes it still goes to the sandbox, where a genuine base/patch mismatch is graded
+/// exactly as before.
+fn unified_diff_shape(text: &str) -> Result<(), String> {
+    let lines: Vec<&str> = text.lines().collect();
+    let mut i = 0usize;
+    let mut hunks = 0usize;
+    let mut have_file = false;
+    while i < lines.len() {
+        let line = lines[i];
+        if line.is_empty() {
+            i += 1;
+            continue;
+        }
+        // The section metadata `git diff` writes around a file's `---`/`+++` pair.
+        if line.starts_with("diff --git ")
+            || line.starts_with("index ")
+            || line.starts_with("new file mode ")
+            || line.starts_with("deleted file mode ")
+            || line.starts_with("old mode ")
+            || line.starts_with("new mode ")
+            || line.starts_with("similarity index ")
+            || line.starts_with("rename from ")
+            || line.starts_with("rename to ")
+        {
+            i += 1;
+            continue;
+        }
+        if line.starts_with("--- ") {
+            let Some(next) = lines.get(i + 1) else {
+                return Err(format!("line {}: a `---` header with no `+++` line", i + 1));
+            };
+            if !next.starts_with("+++ ") {
+                return Err(format!(
+                    "line {}: a `---` header not followed by `+++`",
+                    i + 1
+                ));
+            }
+            have_file = true;
+            i += 2;
+            continue;
+        }
+        if let Some(header) = line.strip_prefix("@@ ") {
+            if !have_file {
+                return Err(format!("line {}: a hunk with no file header", i + 1));
+            }
+            let (old_count, new_count) =
+                parse_hunk_header(header).map_err(|error| format!("line {}: {error}", i + 1))?;
+            i += 1;
+            let (mut old_seen, mut new_seen) = (0usize, 0usize);
+            while i < lines.len() {
+                let body = lines[i];
+                if body.starts_with(' ') {
+                    old_seen += 1;
+                    new_seen += 1;
+                } else if body.starts_with('-') {
+                    old_seen += 1;
+                } else if body.starts_with('+') {
+                    new_seen += 1;
+                } else if body.starts_with('\\') {
+                    // `\ No newline at end of file` describes the line before it; the hunk's
+                    // counts never include it.
+                } else {
+                    break;
+                }
+                i += 1;
+            }
+            if old_seen != old_count || new_seen != new_count {
+                return Err(format!(
+                    "hunk `@@ {header}` declares -{old_count} +{new_count} but its body is \
+                     -{old_seen} +{new_seen}"
+                ));
+            }
+            hunks += 1;
+            continue;
+        }
+        return Err(format!("line {}: not part of a hunk: `{line}`", i + 1));
+    }
+    if !have_file {
+        return Err(String::from("no `---`/`+++` file header"));
+    }
+    if hunks == 0 {
+        return Err(String::from("no hunk"));
+    }
+    Ok(())
+}
+
+/// Parse the text after `@@ `: `-old[,count] +new[,count] @@`.
+fn parse_hunk_header(header: &str) -> Result<(usize, usize), String> {
+    let (old_spec, rest) = header
+        .split_once(' ')
+        .ok_or_else(|| String::from("a hunk header with no new range"))?;
+    let old_count = parse_hunk_range(old_spec, '-')?;
+    let (new_spec, tail) = rest
+        .split_once(' ')
+        .ok_or_else(|| String::from("a hunk header with no closing `@@`"))?;
+    if !tail.starts_with("@@") {
+        return Err(String::from("a hunk header with no closing `@@`"));
+    }
+    let new_count = parse_hunk_range(new_spec, '+')?;
+    Ok((old_count, new_count))
+}
+
+/// A hunk range's count: the number after the comma, or `1` when the comma is omitted.
+fn parse_hunk_range(spec: &str, sign: char) -> Result<usize, String> {
+    let body = spec
+        .strip_prefix(sign)
+        .ok_or_else(|| format!("a hunk range `{spec}` without its `{sign}`"))?;
+    let count = match body.split_once(',') {
+        Some((_start, count)) => count,
+        None => "1",
+    };
+    count
+        .parse::<usize>()
+        .map_err(|_| format!("a hunk range `{spec}` whose count is not a number"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::unified_diff_shape;
+
+    /// A well-formed `git diff` the sandbox can apply: one file, one hunk, real counts.
+    ///
+    /// `concat!`, not `\`-continuations: a backslash-newline in a string literal also strips the
+    /// next line's leading whitespace, which would remove every context marker.
+    const VALID: &str = concat!(
+        "diff --git a/django/core.py b/django/core.py\n",
+        "--- a/django/core.py\n",
+        "+++ b/django/core.py\n",
+        "@@ -60,7 +60,7 @@ class Base:\n",
+        " class Base:\n",
+        " \n",
+        "     def render(self):\n",
+        "-        return self.value\n",
+        "+        return str(self.value)\n",
+        " \n",
+        "     def close(self):\n",
+        "         pass\n",
+    );
+
+    #[test]
+    fn a_well_formed_diff_passes_the_shape_check() {
+        assert_eq!(unified_diff_shape(VALID), Ok(()));
+    }
+
+    #[test]
+    fn the_omitted_count_means_one() {
+        let diff = "--- a/x.py\n+++ b/x.py\n@@ -1 +1 @@\n-a\n+b\n";
+        assert_eq!(unified_diff_shape(diff), Ok(()));
+    }
+
+    #[test]
+    fn a_hunk_whose_counts_disagree_with_its_body_is_refused() {
+        // The measured 2026-11-27 shape: a three-line header over seven changed lines.
+        let diff = "--- a/x.py\n+++ b/x.py\n@@ -1,3 +1,3 @@\n-a\n-b\n+a\n+b\n+c\n+d\n+e\n+f\n+g\n";
+        let error = unified_diff_shape(diff).expect_err("a fabricated range must be refused");
+        assert!(error.contains("declares -3 +3"), "{error}");
+        assert!(error.contains("body is -2 +7"), "{error}");
+    }
+
+    #[test]
+    fn a_fragment_with_no_file_header_is_refused() {
+        let diff = "@@ -1,3 +1,3 @@\n-a\n-b\n+a\n+b\n";
+        let error = unified_diff_shape(diff).expect_err("a bare hunk must be refused");
+        assert!(error.contains("no file header"), "{error}");
+    }
+
+    #[test]
+    fn a_prose_answer_is_refused() {
+        let error =
+            unified_diff_shape("I cannot see the repository.").expect_err("prose must be refused");
+        assert!(error.contains("not part of a hunk"), "{error}");
+    }
+
+    #[test]
+    fn a_fenced_diff_is_refused() {
+        let diff = format!("```diff\n{VALID}```\n");
+        let error = unified_diff_shape(&diff).expect_err("a fence cannot be applied");
+        assert!(error.contains("not part of a hunk"), "{error}");
+    }
+
+    #[test]
+    fn a_multi_hunk_multi_file_diff_is_accepted() {
+        let diff = concat!(
+            "diff --git a/x.py b/x.py\n",
+            "index 111..222 100644\n",
+            "--- a/x.py\n",
+            "+++ b/x.py\n",
+            "@@ -1,2 +1,3 @@\n",
+            " a\n",
+            "+b\n",
+            " c\n",
+            "@@ -9,2 +10,2 @@\n",
+            "-x\n",
+            "+y\n",
+            " z\n",
+            "diff --git a/y.py b/y.py\n",
+            "--- a/y.py\n",
+            "+++ b/y.py\n",
+            "@@ -4 +4 @@\n",
+            "-p\n",
+            "+q\n",
+        );
+        assert_eq!(unified_diff_shape(diff), Ok(()));
+    }
+
+    #[test]
+    fn the_no_newline_marker_is_not_counted() {
+        let diff =
+            "--- a/x.py\n+++ b/x.py\n@@ -1,2 +1,2 @@\n a\n-b\n+c\n\\ No newline at end of file\n";
+        assert_eq!(unified_diff_shape(diff), Ok(()));
+    }
 }
