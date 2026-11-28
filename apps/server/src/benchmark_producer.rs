@@ -60,11 +60,11 @@ const BASELINE_TIMEOUT_MS: i64 = 300_000;
 const MAX_SOURCE_FILES: usize = 8;
 const MAX_SOURCE_BYTES: usize = 64 * 1024;
 
-/// How long to wait when an in-flight conflict carries no usable hint.
+/// How long to wait when an in-flight conflict carries no usable hint, in seconds.
 ///
-/// The engine always sets one for a held key; this covers only a malformed/missing tip, and is
-/// the same order as the shortest claim an `inference.chat` call can hold.
-const IN_FLIGHT_WAIT_FALLBACK: std::time::Duration = std::time::Duration::from_secs(30);
+/// The engine always sets one for a held key; this covers only a missing tip, and is the same
+/// order as the shortest claim an `inference.chat` call can hold.
+const IN_FLIGHT_WAIT_FALLBACK_SECS: u16 = 30;
 
 fn want_uuid(payload: &Value, field: &str) -> Result<Uuid, JobFailure> {
     payload
@@ -318,7 +318,11 @@ pub async fn produce(
             }
             return Err(JobFailure::deferred(
                 format!("agent.run: {error}; waiting for the claim to settle"),
-                error.retry_after.unwrap_or(IN_FLIGHT_WAIT_FALLBACK),
+                std::time::Duration::from_secs(u64::from(
+                    error
+                        .retry_after_secs
+                        .unwrap_or(IN_FLIGHT_WAIT_FALLBACK_SECS),
+                )),
             ));
         }
         // A transport-level fault: the call may or may not have happened, so retry.

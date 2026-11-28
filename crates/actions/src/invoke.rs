@@ -394,11 +394,15 @@ pub struct ActionError {
     pub errors: Vec<FieldError>,
     /// The current representation a `412` should carry (CONTRACT §3).
     pub current: Option<Value>,
-    /// How long the caller should wait before retrying, when the failure is a wait rather than a
-    /// refusal. Set only on an in-flight idempotency conflict, where the claim names its own
+    /// How many SECONDS the caller should wait before retrying, when the failure is a wait rather
+    /// than a refusal. Set only on an in-flight idempotency conflict, where the claim names its own
     /// expiry — the caller may then defer for exactly that long instead of spending a retry
     /// against a row that cannot move yet (conveyor#900).
-    pub retry_after: Option<std::time::Duration>,
+    ///
+    /// Seconds, not a `Duration`, on purpose: this struct is the `Err` of nearly every action
+    /// handler, and a 24-byte `Option<Duration>` here trips `clippy::result_large_err` on every
+    /// one of them.
+    pub retry_after_secs: Option<u16>,
     /// The `gate_unavailable` outcome to record after the handler transaction rolls back.
     pub gate_outage: Option<Box<GateUnavailable>>,
 }
@@ -412,7 +416,7 @@ impl ActionError {
             detail: detail.into(),
             errors: Vec::new(),
             current: None,
-            retry_after: None,
+            retry_after_secs: None,
             gate_outage: None,
         }
     }
@@ -510,19 +514,23 @@ impl ActionError {
             "idempotency-conflict",
             "a request with this Idempotency-Key is still running",
         );
-        error.retry_after = Some(remaining.min(std::time::Duration::from_secs(
-            idempotency::MAX_IN_FLIGHT_WAIT_SECS,
-        )));
+        // At least one second: a zero-second hint tells the caller to retry immediately, which is
+        // the one thing a held key cannot allow. The cap bounds a job's parked time.
+        error.retry_after_secs = Some(
+            remaining
+                .as_secs()
+                .clamp(1, idempotency::MAX_IN_FLIGHT_WAIT_SECS) as u16,
+        );
         error
     }
 
     /// True when this failure is a **wait** — the key is held by a request that has not settled,
-    /// and the same call may be retried once [`Self::retry_after`] has passed.
+    /// and the same call may be retried once [`Self::retry_after_secs`] has passed.
     ///
     /// Deliberately not `code == "idempotency-conflict"`: the same slug covers the different-input
     /// conflict, which no retry can ever satisfy.
     pub fn is_in_flight_conflict(&self) -> bool {
-        self.status == 409 && self.code == "idempotency-conflict" && self.retry_after.is_some()
+        self.status == 409 && self.code == "idempotency-conflict" && self.retry_after_secs.is_some()
     }
 
     /// `501` for a `kind: workflow` action (S4-D7).
