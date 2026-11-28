@@ -99,6 +99,7 @@ pub(crate) fn build(programme: &Value, docs: &[PublishedDoc], gaps: Option<&Valu
     let mut drift = Vec::new();
     let (mut declared_total, mut evidenced_total, mut missing_total) = (0usize, 0usize, 0usize);
     let mut projects_without_class = 0usize;
+    let through_tranche = output_standard::through_tranche();
 
     for project in &projects {
         let id = project
@@ -217,6 +218,36 @@ pub(crate) fn build(programme: &Value, docs: &[PublishedDoc], gaps: Option<&Valu
             .collect();
         documents.sort_by(|a, b| a["id"].as_str().cmp(&b["id"].as_str()));
 
+        // The scope is the standard's one declaration: archived is history (`excluded`), a
+        // tranche beyond `scope.through_tranche` is `scheduled`, everything else is `due`.
+        let archived = meta.get("measured_status").and_then(Value::as_str) == Some("archived");
+        let tranche_number = meta.get("tranche").and_then(Value::as_u64);
+        let due_state = if archived {
+            "excluded"
+        } else if tranche_number.is_some_and(|number| number > through_tranche) {
+            "scheduled"
+        } else {
+            "due"
+        };
+        // One row per declared kind: the campaign's work list, and the drill-down a reader
+        // needs to know whether a missing kind is evidenced, missing, or out of scope.
+        let mut kinds: Vec<Value> = Vec::new();
+        for (field, declared) in [("now", &now), ("closure", &closure)] {
+            for kind in declared {
+                kinds.push(json!({
+                    "kind": kind,
+                    "due": field,
+                    "state": if evidenced.contains(kind.as_str()) {
+                        "evidenced"
+                    } else {
+                        "missing"
+                    },
+                    "pack": format!("docs/evidence/rework/{key}.json"),
+                    "acceptance": format!("python3 scripts/verify-project.py --project {key}"),
+                }));
+            }
+        }
+
         rows.push(json!({
             "id": id,
             "key": key,
@@ -227,7 +258,9 @@ pub(crate) fn build(programme: &Value, docs: &[PublishedDoc], gaps: Option<&Valu
             // gap leads to the issue that owns it rather than to a bare project name.
             "issues": meta.get("issues").cloned().unwrap_or(Value::Null),
             "class": class_name,
+            "due_state": due_state,
             "declared": {"now": now, "closure": closure},
+            "kinds": kinds,
             "evidenced": evidenced.iter().map(|kind| Value::String((*kind).to_owned())).collect::<Vec<_>>(),
             "missing": {"now": missing_now, "closure": missing_closure},
             "documents": documents,
@@ -264,6 +297,7 @@ pub(crate) fn build(programme: &Value, docs: &[PublishedDoc], gaps: Option<&Valu
     json!({
         "standard_version": standard_version(),
         "categories": output_standard::categories().len(),
+        "scope": {"through_tranche": through_tranche},
         "projects": rows,
         "classes": classes,
         "drift": drift,
@@ -446,6 +480,42 @@ mod tests {
         let register = build(&programme, &[], None);
         assert_eq!(register["drift"][0]["project"], "P0");
         assert_eq!(register["drift"][0]["field"], "expected_outputs");
+    }
+
+    /// The register carries the per-kind target and the scope, so the campaign and the page read
+    /// one list: evidenced/missing per declared kind, the pack that owns it, and whether the
+    /// project is due at all.
+    #[test]
+    fn the_register_carries_the_per_kind_target_and_the_scope() {
+        let mut programme = programme();
+        programme["projects"][0]["meta"]["tranche"] = json!(0);
+        programme["projects"][1]["meta"]["tranche"] = json!(9);
+        let register = build(&programme, &[], None);
+        assert_eq!(register["scope"]["through_tranche"], json!(8));
+        let p0 = &register["projects"][0];
+        assert_eq!(p0["due_state"], "due");
+        let kinds = p0["kinds"].as_array().expect("kinds");
+        assert!(
+            kinds
+                .iter()
+                .any(|row| row["kind"] == "project-brief" && row["due"] == "now"),
+            "a declared kind is a row: {kinds:?}"
+        );
+        assert!(
+            kinds
+                .iter()
+                .all(|row| row["pack"] == "docs/evidence/rework/P0.json"),
+            "every kind names its project's pack"
+        );
+        assert!(
+            kinds.iter().all(|row| row["state"] == "missing"),
+            "with no published rows every kind is missing"
+        );
+        let t17 = &register["projects"][1];
+        assert_eq!(
+            t17["due_state"], "scheduled",
+            "tranche 9 is beyond the scope"
+        );
     }
 
     /// The posture is computed from the register's own rows, so a stale count cannot be quoted.

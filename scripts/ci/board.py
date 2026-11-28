@@ -94,6 +94,12 @@ UNIT = "unit"
 PROGRAMME_SINCE = dt.date(2026, 11, 18)
 PROGRAMME_FIELDS = ("Tranche", "Brief", "ADM phase/plateau", "Benefits")
 
+# The INVEST Definition of Ready and the acceptance-criteria Definition of Done (owner direction
+# 2026-11-28). Forward-only from the day the contract gained them: an issue created earlier is
+# never made unready retroactively.
+INVEST_SINCE = dt.date(2026, 11, 28)
+INVEST_CRITERIA = ("Independent", "Negotiable", "Valuable", "Estimable", "Small", "Testable")
+
 # The issue content contract's sections, in the template's order. Both `##` and `###` headings
 # count: the Markdown template and older issues use h2, and a GitHub issue form renders every
 # field as h3 (`### Goal`), so one parser must read both or the form could never satisfy it.
@@ -198,7 +204,59 @@ def section_lines(body: str, heading: str) -> list[str] | None:
     return None
 
 
-def contract_gaps(body: str) -> list[str]:
+def invest_gaps(body: str) -> list[str]:
+    """The INVEST criteria the `## Definition of ready` section does not name.
+
+    A missing section is the larger defect `contract_gaps` already reports; this names only the
+    criteria a present section omits.
+    """
+    content = section_lines(body, "Definition of ready")
+    if content is None:
+        return []
+    text = "\n".join(content)
+    missing = [
+        criterion
+        for criterion in INVEST_CRITERIA
+        if not re.search(rf"\b{criterion}\b", text, re.IGNORECASE)
+    ]
+    return [f"the DoR does not name INVEST: {', '.join(missing)}"] if missing else []
+
+
+def dod_gaps(body: str) -> list[str]:
+    """The acceptance-criteria rows the `## Definition of done` section is missing.
+
+    The DoD is an acceptance-criteria table: one row per `###` part, each with its `Verify:`.
+    A prose checklist is not the DoD the contract requires.
+    """
+    content = section_lines(body, "Definition of done")
+    if content is None:
+        return []
+    parts = section_lines(body, "Parts and acceptance criteria")
+    part_count = len(re.split(r"(?m)^###\s+", "\n".join(parts or []))[1:]) if parts else 0
+    rows = 0
+    header_seen = False
+    has_verify = False
+    for line in content:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if cells and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+            continue
+        if not header_seen:
+            header_seen = True
+            has_verify = any("verify" in cell.lower() for cell in cells)
+            continue
+        rows += 1
+    gaps: list[str] = []
+    if not has_verify:
+        gaps.append("the DoD table names no `Verify:` column")
+    if part_count and rows < part_count:
+        gaps.append(f"the DoD has {rows} acceptance row(s) for {part_count} part(s)")
+    return gaps
+
+
+def contract_gaps(body: str, require_invest: bool = False) -> list[str]:
     """Every section or field the issue content contract requires and this body lacks.
 
     A gap names the missing thing, not a rule number: the report is posted on the issue, where a
@@ -227,6 +285,9 @@ def contract_gaps(body: str) -> list[str]:
             any(VERIFY_RE.match(line) for line in block.splitlines()) for block in blocks
         ):
             gaps.append("a `Verify:` line in every part of `Parts and acceptance criteria`")
+    if require_invest:
+        gaps.extend(invest_gaps(body))
+        gaps.extend(dod_gaps(body))
     return gaps
 
 
@@ -564,11 +625,15 @@ def check_dor(repo: str, number: int) -> int:
     if created < PROGRAMME_SINCE:
         print(f"#{number}: created {created}, before {PROGRAMME_SINCE}; exempt (forward-only).")
         return 0
-    gaps = programme_gaps(raw.get("body") or "")
+    body = raw.get("body") or ""
+    gaps = programme_gaps(body)
+    if created >= INVEST_SINCE:
+        gaps.extend(invest_gaps(body))
+        gaps.extend(dod_gaps(body))
     if gaps:
-        print(f"#{number}: not ready — `## Programme` missing or empty: {', '.join(gaps)}")
+        print(f"#{number}: not ready — {', '.join(gaps)}")
         return 1
-    print(f"#{number}: Programme complete; ready on this rule.")
+    print(f"#{number}: Programme and the INVEST/acceptance contract complete; ready.")
     return 0
 
 
@@ -655,7 +720,9 @@ def check_contract(repo: str, number: int, apply: bool) -> int:
     if created < PROGRAMME_SINCE:
         print(f"#{number}: created {created}, before {PROGRAMME_SINCE}; exempt (forward-only).")
         return 0
-    gaps = contract_gaps(raw.get("body") or "")
+    gaps = contract_gaps(
+        raw.get("body") or "", require_invest=created >= INVEST_SINCE
+    )
     if not gaps:
         if apply:
             clear_not_ready(repo, number)
@@ -984,8 +1051,17 @@ def self_test() -> int:
                 "  Verify: `true`",
             ),
             ("Dependencies", "| Relation | Issue | Why | State |\n|---|---|---|---|"),
-            ("Definition of ready", "- [x] Baseline recorded"),
-            ("Definition of done", "- [ ] One PR `Closes #N` merged"),
+            (
+                "Definition of ready",
+                "- [x] **Independent** — one unit\n- [x] **Negotiable** — the outcome is fixed\n"
+                "- [x] **Valuable** — mapped to a benefit\n- [x] **Estimable** — the baseline\n"
+                "- [x] **Small** — one issue, one PR\n- [x] **Testable** — a Verify per part",
+            ),
+            (
+                "Definition of done",
+                "| Acceptance scenario | Evidence at completion | Verify: |\n|---|---|---|\n"
+                "| P1.1 | to fill | `true` |",
+            ),
         ]
         return "\n\n".join(f"{level} {name}\n{text}" for name, text in sections)
 
@@ -1002,11 +1078,16 @@ def self_test() -> int:
             ["a `Verify:` line in every part"],
         ),
         (
-            "two parts, each with a Verify line",
-            contract_body("###").replace(
+            "two parts, each with a Verify line and a DoD row",
+            contract_body("###")
+            .replace(
                 "  Verify: `true`",
                 "  Verify: `true`\n\n### P2 — the second part\n"
                 "- **P2.1** Given a state, when an act, then an outcome.\n  Verify: `true`",
+            )
+            .replace(
+                "| P1.1 | to fill | `true` |",
+                "| P1.1 | to fill | `true` |\n| P2.1 | to fill | `true` |",
             ),
             [],
         ),
@@ -1032,10 +1113,24 @@ def self_test() -> int:
             ),
             ["`Baseline` section is empty"],
         ),
+        (
+            "a DoR without the INVEST criteria",
+            contract_body("###").replace("**Small**", "**Sized**"),
+            ["the DoR does not name INVEST: Small"],
+        ),
+        (
+            "a DoD with no acceptance rows",
+            contract_body("###").replace(
+                "| Acceptance scenario | Evidence at completion | Verify: |\n|---|---|---|\n"
+                "| P1.1 | to fill | `true` |",
+                "- [ ] One PR `Closes #N` merged",
+            ),
+            ["the DoD table names no `Verify:` column"],
+        ),
     ]
     for name, text, wanted in contract_cases:
         total += 1
-        gaps = contract_gaps(text)
+        gaps = contract_gaps(text, require_invest=True)
         joined = "; ".join(gaps)
         if all(item in joined for item in wanted) and (wanted or not gaps):
             print(f"ok: contract — {name}")
@@ -1152,7 +1247,7 @@ def main() -> int:
     if args.contract_body is not None:
         try:
             with open(args.contract_body, encoding="utf-8") as handle:
-                gaps = contract_gaps(handle.read())
+                gaps = contract_gaps(handle.read(), require_invest=True)
         except OSError as error:
             print(f"board: {error}", file=sys.stderr)
             return 2

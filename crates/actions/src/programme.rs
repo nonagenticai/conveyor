@@ -841,10 +841,28 @@ fn mandatory_artefacts(project: &Project, governed: bool) -> (Vec<String>, bool,
         serde_json::from_str(OUTPUT_STANDARD).expect("seed/output-standard.json is valid JSON");
     let declared = closure_outputs(&project.meta);
     let mut documents: Vec<String> = Vec::new();
+    let mut change_control = false;
+    let mut baseline = false;
     if let Some(class) = class_for(&standard, project) {
         for field in ["now", "closure"] {
             if let Some(categories) = class[field].as_array() {
                 for category in categories.iter().filter_map(Value::as_str) {
+                    // A structural category is evidenced by typed rows, and Phase G binds the
+                    // contract and its compliance review. The class is mapped the same way the
+                    // template loop below maps it, or the class would demand a document for a
+                    // record that is a register or a baseline.
+                    match category {
+                        "change-control" => {
+                            change_control = true;
+                            continue;
+                        }
+                        "project-baseline" => {
+                            baseline = true;
+                            continue;
+                        }
+                        "delivery-contract" | "compliance-review" => continue,
+                        _ => {}
+                    }
                     if !documents.iter().any(|seen| seen == category) {
                         documents.push(category.to_owned());
                     }
@@ -852,8 +870,6 @@ fn mandatory_artefacts(project: &Project, governed: bool) -> (Vec<String>, bool,
             }
         }
     }
-    let mut change_control = false;
-    let mut baseline = false;
     if let Some(templates) = standard["templates"].as_object() {
         for (key, template) in templates {
             if template["mandatory"].as_bool() != Some(true) {

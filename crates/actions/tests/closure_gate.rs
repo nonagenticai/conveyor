@@ -449,8 +449,9 @@ async fn the_refusal_writes_nothing() {
     );
 }
 
-/// P3.2 — P0's worked example: 20 of 21 categories published, the refusal names exactly the
-/// owner's missing `tranche-review`.
+/// P3.2 — P0's worked example: every declared category but one published, the refusal names
+/// exactly the owner's missing `tranche-review`. The class's closure set is published too, so
+/// the one missing output is the only one the refusal can name.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_p0_class_without_the_tranche_review_is_refused() {
     let (_pg, running, _seeded) = fixture().await;
@@ -468,6 +469,10 @@ async fn the_p0_class_without_the_tranche_review_is_refused() {
         if category == "tranche-review" {
             continue;
         }
+        let (id, doc_version) = compose(&running, &project, category).await;
+        publish(&running, &id, doc_version).await;
+    }
+    for category in &closure {
         let (id, doc_version) = compose(&running, &project, category).await;
         publish(&running, &id, doc_version).await;
     }

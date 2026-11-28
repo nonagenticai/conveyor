@@ -23,6 +23,11 @@ export class Shell {
     this.map = /** @type {HTMLElement} */ (document.getElementById("map"));
     this.screen = /** @type {HTMLElement} */ (document.getElementById("screen"));
     this.sheetHost = /** @type {HTMLElement} */ (document.getElementById("sheet-host"));
+    // #916. Every render takes a generation; only the newest may write the screen. Without it a
+    // slow destination that resolves after a newer one re-appends its tree over it, and the losing
+    // tree's stream subscription and 1 s teardown poll keep running against a root that is still
+    // connected — the measured soak retention (1.58x over 726 visits).
+    this.renderGeneration = 0;
   }
 
   async start() {
@@ -33,6 +38,7 @@ export class Shell {
     try {
       this.manifest = await this.api.manifest();
     } catch (error) {
+      this.renderGeneration += 1;
       this.renderHud();
       this.renderMap();
       clear(this.screen);
@@ -44,6 +50,7 @@ export class Shell {
 
   /** The same shell, rebuilt after a tenant change or a return from a sheet. */
   renderSession() {
+    this.renderGeneration += 1;
     document.getElementById("world")?.classList.remove("hidden");
     this.renderHud();
     this.renderMap();
@@ -53,6 +60,7 @@ export class Shell {
   }
 
   renderSignIn() {
+    this.renderGeneration += 1;
     document.getElementById("world")?.classList.add("hidden");
     clear(this.hud);
     this.hud.append(
@@ -167,6 +175,7 @@ export class Shell {
 
   /** @param {{row: any, params: Record<string,string>}|null} found @param {string} path */
   async renderRoute(found, path) {
+    const generation = ++this.renderGeneration;
     clear(this.screen);
     if (!found) {
       this.screen.append(
@@ -184,7 +193,12 @@ export class Shell {
     const before = document.activeElement;
     try {
       const module = await found.row.load();
+      // A newer navigation has taken the screen; this render must not touch it.
+      if (generation !== this.renderGeneration) return;
       const view = await module.render(this.context(found));
+      // Resolved after a newer navigation: its root is never attached, so the destination's own
+      // `isConnected` teardown stops the subscription it opened. Writing here would attach it.
+      if (generation !== this.renderGeneration) return;
       clear(this.screen);
       this.screen.append(view.element);
       document.title = `${view.title} · Gemba Walk`;
@@ -196,6 +210,7 @@ export class Shell {
       if (!userMoved) focusFirst(view.element);
       announce(view.title);
     } catch (error) {
+      if (generation !== this.renderGeneration) return;
       clear(this.screen);
       this.screen.append(this.problemPanel(error));
     }

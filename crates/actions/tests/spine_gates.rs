@@ -1522,17 +1522,17 @@ async fn baseline_kind(running: &support::Running, project: &str, kind: &str, wi
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
-/// v1-close-1: the mandatory set a `v2` programme project owes — its `v2-built` class
-/// (`project-brief`, `evidence`, `closure-review`), PMP's WBS/registers, TOGAF's artefact pages
-/// (a programme project is governed), plus the `change` register row; the baseline is written
-/// by [`baseline`].
+/// v1-close-1: the mandatory set a `v2` programme project owes — its `v2-built` class (the
+/// standard v4 management set, BDD and the DoR/DoD, plus `evidence`/`closure-review`), PMP's
+/// WBS/registers, TOGAF's artefact pages (a programme project is governed), plus the `change`
+/// register row; the baseline is written by [`baseline`].
 async fn satisfy_mandatory_set(
     pg: &support::Pg,
     running: &support::Running,
     seeded: &support::Seeded,
     project: &str,
 ) {
-    const DOCUMENTS: [&str; 11] = [
+    const DOCUMENTS: [&str; 18] = [
         "project-brief",
         "evidence",
         "closure-review",
@@ -1540,6 +1540,13 @@ async fn satisfy_mandatory_set(
         "project-registers",
         "architecture-artifact",
         "statement-of-architecture-work",
+        "inception-analysis",
+        "architecture-analysis",
+        "architecture-design",
+        "user-stories",
+        "acceptance-criteria",
+        "definition-of-ready",
+        "definition-of-done",
         "benefits-diagram",
         "candidate-solutions",
         "gap-analysis",

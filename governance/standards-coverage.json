@@ -375,6 +375,26 @@
       "check": "generate-standards.py --check#epic",
       "spec": "§8.2",
       "standard": "SAFe"
+    },
+    "user-stories": {
+      "check": "generate-standards.py --check#user-stories",
+      "spec": "§8.5",
+      "standard": "Delivery"
+    },
+    "acceptance-criteria": {
+      "check": "generate-standards.py --check#acceptance-criteria",
+      "spec": "§8.5",
+      "standard": "Delivery"
+    },
+    "definition-of-ready": {
+      "check": "generate-standards.py --check#definition-of-ready",
+      "spec": "§8.5",
+      "standard": "Delivery"
+    },
+    "definition-of-done": {
+      "check": "generate-standards.py --check#definition-of-done",
+      "spec": "§8.5",
+      "standard": "Delivery"
     }
   },
   "description": "Every audit rule's output category, live source and verifier, and every output-standard category's standard, spec and verifier (WP11). The checker enforces: no orphan rule or category, a known verifier (a registry name, a manifest clause, or generate-standards.py --check for a category), a standard/spec that matches its source, and a source that resolves (or an explicitly live-only projection that is still absent from the committed pack).",

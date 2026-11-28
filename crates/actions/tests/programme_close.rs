@@ -408,11 +408,11 @@ async fn update_programme_closed(running: &support::Running, programme: &str) ->
         .await
 }
 
-/// The published documents the fixture's mandatory set requires: the `v2-built` class
-/// (`project-brief`, `evidence`, `closure-review`), PMP's WBS and registers, and — because a
-/// programme project is governed — TOGAF's artefact pages. The delivery contract/compliance
-/// review are Phase-G rows; baseline and change control are typed rows.
-const MANDATORY_DOCUMENTS: [&str; 11] = [
+/// The published documents the fixture's mandatory set requires: the standard v4 project class
+/// (the management set, BDD and the DoR/DoD), PMP's WBS and registers, and — because a programme
+/// project is governed — TOGAF's artefact pages. The delivery contract/compliance review are
+/// Phase-G rows; baseline and change control are typed rows, mapped to flags by the gate.
+const MANDATORY_DOCUMENTS: [&str; 18] = [
     "project-brief",
     "evidence",
     "closure-review",
@@ -420,6 +420,14 @@ const MANDATORY_DOCUMENTS: [&str; 11] = [
     "project-registers",
     "architecture-artifact",
     "statement-of-architecture-work",
+    // The standard v4 management set (the owner's full-set direction, 2026-11-28).
+    "inception-analysis",
+    "architecture-analysis",
+    "architecture-design",
+    "user-stories",
+    "acceptance-criteria",
+    "definition-of-ready",
+    "definition-of-done",
     // The TOGAF artefact pages the mandatory set names per §8.1 (A–D deliverables).
     "benefits-diagram",
     "candidate-solutions",
