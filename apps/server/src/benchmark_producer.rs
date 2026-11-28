@@ -56,8 +56,10 @@ the current content of the files the fix is expected to touch. Answer with a uni
 answer with the single word NONE.";
 /// The baseline's one model call is bounded.
 const BASELINE_TIMEOUT_MS: i64 = 300_000;
-/// The source fetch is bounded, so a huge file cannot become the prompt.
+/// The source fetch is bounded, so a huge list of files cannot become the prompt.
 const MAX_SOURCE_FILES: usize = 8;
+/// The per-file excerpt bound: a larger file is carried as its head and tail around a marker,
+/// never refused.
 const MAX_SOURCE_BYTES: usize = 64 * 1024;
 
 /// How long to wait when an in-flight conflict carries no usable hint, in seconds.
@@ -791,10 +793,44 @@ fn db<E: std::fmt::Display>(error: E) -> JobFailure {
     JobFailure::retryable(format!("database: {error}"))
 }
 
+/// Step back from `at` to the nearest UTF-8 character boundary.
+///
+/// A byte offset inside a multi-byte character would panic when the excerpt is sliced.
+fn cut_at_boundary(text: &str, mut at: usize) -> usize {
+    while at > 0 && !text.is_char_boundary(at) {
+        at -= 1;
+    }
+    at
+}
+
+/// One file's prompt block. A file within [`MAX_SOURCE_BYTES`] is included whole; a larger file is
+/// carried as its head and tail around an explicit marker, so an over-cap source is still evidence
+/// rather than a refused case.
+fn source_block(path: &str, text: &str) -> String {
+    if text.len() <= MAX_SOURCE_BYTES {
+        return format!("### {path}\n```\n{text}\n```");
+    }
+    let head_end = cut_at_boundary(text, MAX_SOURCE_BYTES / 2);
+    let mut tail_start = text.len() - MAX_SOURCE_BYTES / 2;
+    while tail_start < text.len() && !text.is_char_boundary(tail_start) {
+        tail_start += 1;
+    }
+    let omitted = tail_start - head_end;
+    let head = &text[..head_end];
+    let tail = &text[tail_start..];
+    format!(
+        "### {path}\n```\n{head}\n… [{path}: {} bytes; the middle {omitted} bytes are omitted — the first {} and last {} bytes are shown] …\n{tail}\n```",
+        text.len(),
+        head_end,
+        text.len() - tail_start
+    )
+}
+
 /// Fetch the instance's source files at its base commit for the baseline prompt.
 ///
 /// The base is configurable so a test can serve the files without GitHub; production uses the
-/// raw content host. A fetch failure is `no_attempt`, never a model failure.
+/// raw content host. A file over [`MAX_SOURCE_BYTES`] is carried as its head and tail around an
+/// explicit marker, never refused. A fetch failure is still `no_attempt`, never a model failure.
 async fn source_context(instance: &store::benchmark::ProducerInstance) -> Result<String, String> {
     let base = std::env::var("BENCHMARK_SOURCE_BASE")
         .unwrap_or_else(|_| "https://raw.githubusercontent.com".to_owned());
@@ -823,10 +859,7 @@ async fn source_context(instance: &store::benchmark::ProducerInstance) -> Result
             .text()
             .await
             .map_err(|error| format!("read {path}: {error}"))?;
-        if text.len() > MAX_SOURCE_BYTES {
-            return Err(format!("{path} is over {MAX_SOURCE_BYTES} bytes"));
-        }
-        files.push(format!("### {path}\n```\n{text}\n```"));
+        files.push(source_block(path, &text));
     }
     if files.is_empty() {
         Ok(String::from("(the instance names no source files)"))
