@@ -706,6 +706,27 @@ pub async fn require_approval_tx(
             format!("approval {id} authorises {approved_target:?}, not {target:?}"),
         ));
     }
+    // v1-u5-copilot-gate-quorum: the tenant's policy row is the quorum floor for this action, and
+    // this gate is the door a destructive call names. An approval opened at one decision under a
+    // two-decision policy authorises nothing, whichever door opened it.
+    let floor = match store::approval_policy::get(&mut *tx, ctx.tenant, action).await {
+        Ok(Some(policy)) => policy.required_decisions,
+        Ok(None) => 1,
+        Err(error) => {
+            tracing::error!(%error, action, "approvals: read the policy floor");
+            return Err(ActionError::internal());
+        }
+    };
+    if record.approval.required_decisions < floor {
+        return Err(ActionError::new(
+            403,
+            "approval_below_policy",
+            format!(
+                "{action} needs an approval with at least {floor} decisions under the tenant policy; approval {id} has {}",
+                record.approval.required_decisions
+            ),
+        ));
+    }
     // T7 / v1-w1b-4: the four cluster writes and the incident mitigation carry SPEC_V2 §6.5's
     // human dual control. The tenant policy may raise the floor; it may never lower this one.
     // The dry-run half of the rule is checked at the invoke boundary, where the input is known.

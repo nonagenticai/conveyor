@@ -1,0 +1,31 @@
+{
+ "tranche": 6,
+ "tranche_id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7",
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "review_id": "01a2211d-bbb6-7238-9bae-e29bf0b4f62d",
+ "review_gate": "01a2211d-a05a-7e23-9145-0d3266a1341c",
+ "decision": "continue",
+ "reviewed_at": "2026-11-28T07:45:26.431374Z",
+ "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+ "tranche_6_state": "closed",
+ "tranche_7_id": "01a1e9e1-0fab-7068-99f2-a233045b1276",
+ "tranche_7_state": "authorised",
+ "document_id": "01a2211d-81a4-7290-8590-396447533814",
+ "document_content_hash": "314d32959f4b7af56fbd6e99df4950cbf6cbcfacaad7294e771acc7dec8849c9",
+ "snapshot_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+ "snapshot_manifest_sha256": "bb6bb79bfe00d5c943902a08715b3dc9e86d710c75c59092bfdb17bbe515563d",
+ "t19f_closure": {
+  "closure_gate": "01a2211c-d49b-7f51-a176-ec8da438779d",
+  "close_gate": "01a2211d-0a73-7ca3-95db-817d70dd91bd",
+  "closure_asset": "01a2211c-d496-7ea7-9cb5-53cf7c30c93b",
+  "state": "closed"
+ },
+ "exit_gate": {
+  "S06a": 5,
+  "S06b": 18,
+  "S10": 18,
+  "S11": 18,
+  "T19F": 17
+ }
+}

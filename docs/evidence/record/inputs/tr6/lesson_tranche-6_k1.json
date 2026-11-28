@@ -1,0 +1,10 @@
+{
+ "cadence_id": "01a21c62-6b8c-73d2-a4cd-425f244cde36",
+ "evidence": [
+  {"kind": "card", "id": "01a20ec4-b1a7-7a73-bd5f-4366c08ba15a"},
+  {"kind": "card", "id": "01a20ecb-11a3-7236-bdcf-673ed61d4cd7"}
+ ],
+ "finding_key": "k1",
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "statement": "A retrospective project cannot close on the factory's own pass: the close gate reads published standard documents that only the artefact publisher composes, so clearing the register and WBS cards is not the same as satisfying closure. Run the publisher between factory passes, or the close is refused on documents the factory never writes."
+}

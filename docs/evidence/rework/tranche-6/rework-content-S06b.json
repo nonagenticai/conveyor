@@ -1,0 +1,648 @@
+{
+ "charter": "# Charter — S06b Agent Direct Interface (retrospective, 2026-11-27)\n\n- **Project:** S06b 'Agent direct interface — the conveyor's own MCP surface', track v1, ADM phase G,\n  delivery plateau, tranche 6, plan `docs/plans/slices/S06b-agent-direct-interface.md`.\n- **Sponsor:** the programme's sponsoring group, through the tranche-6 PI plan and the standing\n  delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`.\n- **Authority:** SPEC V2 D19 makes the conveyor's own `/mcp` the agent interface. S06b supersedes\n  S06a's HMAC channel (SPEC D18), and that supersession is recorded against S06a rather than\n  rebuilt.\n- **Objective:** the `agent` app operates the conveyor over `/mcp`. One real agent task creates a\n  project, reads its progress, answers an approval and closes the project; the decision records\n  `decided_by_kind='agent'`; and no component called `nonagenticai_mcp_server` sits in the path.\n- **Scope in:** the tool key (`_meta.operation`), machine authentication (a licence bearer\n  introspected against the licences service, fail-closed, cached at most 60 seconds), principal\n  attribution at the three `actor_kind` sites, `approvals.request` for a standalone approval with a\n  NULL run, and the agent-side registration contract.\n- **Scope out:** the `fr` toolkit (retires at cutover), S06c's MCP task extension, S10's copilot\n  surface, S13's workflow authoring, and any second HMAC channel.\n- **Constraints:** one membership per call, with the tenant taken from the licence and never from a\n  header; a JWT-shaped token that fails verification is never retried as a licence; the licence\n  cache is keyed by the token hash; `open_gate_tx` is wrong for a NULL-run approval; the agent's\n  membership role is the synthetic tenant-admin `kata_executor`, and the allowlist remains the\n  authorization.\n- **Retrospective status:** the capability was built on 2026-11-09. It is evidenced by the\n  `mcp_agent` and `mcp_meta` suites and the S06B-RECEIPT recorded in\n  `docs/evidence/S06b-agent-task.md`. This charter and the lifecycle set that follows are authored\n  retrospectively and do not attest contemporaneous ceremonial review. The agent-app run and the\n  deployed task remain S14's gate and are recorded as deferred, not claimed.\n",
+ "soaw": {
+  "title": "Statement of Architecture Work — S06b Agent Interface (retrospective, 2026-11-27)",
+  "body": {
+   "assignment": "The architecture work assigns S06b the agent's direct interface to the conveyor: define the tool key every MCP tool carries, resolve a machine principal from a licence bearer, propagate that principal into attribution, and add the approval-request action an agent needs to escalate. This statement governs the retrospective record of work completed on 2026-11-09 and re-read at the 2026-11-27 snapshot.",
+   "scope": "In scope are `_meta.operation` on every registered tool, the licence introspection in `crates/auth/src/machine.rs` with its 60-second capped cache and fail-closed rule, `Principal.kind` across human, agent and service, `approvals.request` over `insert_approval_tx`, and the end-to-end `/mcp` session in `crates/api/tests/mcp_agent.rs`. Out of scope are the `fr` toolkit, MCP tasks (S06c), the copilot surface (S10) and any signed HMAC channel (S06a, superseded).",
+   "responsibilities": "The programme architect authors this retrospective statement; the delivery team (conveyor-e2e) is accountable for the evidence; the Architecture Board reviews the artefact set; the SRO accepts the project's closure at the tranche-6 review. The agent platform is consulted as the consumer, and the tenant admin is informed because the tool allowlist is the authorization surface.",
+   "acceptance_criteria": "The gate is one real agent task over `/mcp`: create a project, read its progress, open and answer an approval, close the project, with `decided_by_kind='agent'` recorded, no `nonagenticai_mcp_server` component in the path, and no `X-MCP-Binding` header. The local proof is `crates/api/tests/mcp_agent.rs::one_licence_principal_task_creates_reads_decides_and_closes`; the deployed agent-app run is S14's gate and is recorded as deferred.",
+   "constraints": "The one-membership rule rejects zero or several memberships, so the tenant is taken from the licence. A JWT-shaped token that fails JWT verification never falls through to licence introspection. The licence service is on the request path, so its verdict is cached for at most 60 seconds, and an unreachable service refuses with `503 licence_unavailable` rather than admitting. The cache is keyed by the token hash, never by tenant.",
+   "retrospective": "This statement of architecture work is authored on 2026-11-27 for the tranche-6 rework. No contemporaneous SoAW exists; the 2026-11-09 delivery was recorded only in the slice plan and the evidence file. The statement records what the tree and the suites prove today and names the deferred live step instead of implying it happened."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S06b Agent Interface (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-6 authorisation, the S06a retirement and the close decision",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the agent-interface capability and the tranche outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Agent platform team",
+     "axis_b": "the consumer that registers an external MCP system and runs the task",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "collaborate"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Tenant admin",
+     "axis_b": "sets the MCP channel policy and its tool list",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the artefact set and the retrospective Phase-G level",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "approve"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S14 cutover",
+     "axis_b": "owns the deployed agent-app run and the live task",
+     "value": {
+      "influence": "high",
+      "interest": "medium",
+      "engagement": "inform"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Business Capability Map — S06b Agent Interface (Phase B)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Stakeholder Map — S06b Agent Interface (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. This artefact is authored by the retrospective rework and does not attest contemporaneous intent.\n\n## Entries\n\nSix stakeholders on the influence/interest/engagement axes: the sponsoring group decides the tranche and the close, the SRO is accountable, the agent platform is the consumer that collaborates on the contract, the tenant admin consults on the tool list, the Architecture Board approves the artefact set, and S14 is informed because it carries the deployed proof.\n\n## Links\n\nDerives from `docs/plans/slices/S06b-agent-direct-interface.md` §1–§3 and §9; realizes the Phase A stakeholder view for the agent-interface capability; depends on the Business Capability Map for the value each group receives. The programme roles are those already recorded for the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project has no contemporaneous architecture publication of its own; this retrospective artefact is published as its own architecture-artifact-instance document by the rework factory, and its subject is the record the 2026-11-27 snapshot carries for S06b.\n"
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "D1 One agent interface, not two",
+     "axis_b": "G1 Retire the signed channel; O1 D19's seam is the conveyor's own /mcp",
+     "value": {
+      "measure": "no mcp_server component in the path",
+      "owner": "the programme architect"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 Attributable machine decisions",
+     "axis_b": "G2 Decisions carry decided_by_kind='agent'; O2 the three actor_kind sites read the principal",
+     "value": {
+      "measure": "approval_decision.decided_by_kind",
+      "owner": "conveyor-e2e"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Fail-closed machine identity",
+     "axis_b": "G3 Licence introspection is authoritative; O3 the JWT-shape rule and the 60-second cache",
+     "value": {
+      "measure": "503 licence_unavailable on an unreachable service",
+      "owner": "conveyor-e2e"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Escalation without a run",
+     "axis_b": "G4 approvals.request opens a standalone approval; O4 a NULL run_id is decidable",
+     "value": {
+      "measure": "insert_approval_tx, not open_gate_tx",
+      "owner": "conveyor-e2e"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Least privilege",
+     "axis_b": "G5 The agent sees exactly its tool list; O5 the synthetic tenant-admin role plus the allowlist",
+     "value": {
+      "measure": "MCP_DEFAULT_ACTIONS is the compiled default",
+      "owner": "the tenant admin"
+     },
+     "position": 5
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S06b Agent Interface (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. The drivers are read from the slice plan's objective and its open questions, not invented for the retrospective.\n\n## Entries\n\nFive driver/goal/objective rows: one agent interface rather than a second channel, attributable machine decisions, fail-closed machine identity, escalation without a running run, and least privilege. Each row names the measure the tree proves and the owner accountable for it.\n\n## Links\n\nDerives from `docs/plans/slices/S06b-agent-direct-interface.md` §1 and §9; each objective is realized by a requirement in the Requirements Catalog, and the measurement column names the suite or record field that carries it. The D1 row is the plan's recorded supersession of S06a under SPEC D19.\n\n## Document\n\nThe catalog is the retrospective statement of why S06b exists. It is published as an architecture-artifact-instance by the rework factory and is read together with the Requirements Catalog: the drivers justify the seven requirements, and the requirements carry the tests that prove them at the snapshot.\n"
+  },
+  {
+   "title": "Requirements Catalog — S06b Agent Interface (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "R-1 Tool key",
+     "axis_b": "Every MCP tool carries _meta.operation equal to its action name",
+     "value": {
+      "test": "crates/actions/tests/mcp_meta.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R-2 Machine authentication",
+     "axis_b": "A licence bearer resolves (tenant, app_key, subject) and a machine principal",
+     "value": {
+      "test": "crates/api/tests/mcp_agent.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R-3 JWT-shape rule",
+     "axis_b": "A JWT-shaped token that fails verification is never retried as a licence",
+     "value": {
+      "test": "crates/api/tests/mcp_agent.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R-4 Attribution",
+     "axis_b": "approval_decision.decided_by_kind='agent' and via names the licence principal",
+     "value": {
+      "test": "crates/api/tests/approval_dual.rs and mcp_agent.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R-5 Escalation",
+     "axis_b": "approvals.request accepts a NULL run_id and the approval is decidable",
+     "value": {
+      "test": "crates/api/tests/mcp_agent.rs"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R-6 Scoping",
+     "axis_b": "The agent principal sees exactly the agent tool list; an admin sees more, a viewer fewer",
+     "value": {
+      "test": "crates/api/tests/mcp_agent.rs::scopes"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R-7 One membership",
+     "axis_b": "Zero or several memberships are refused; the tenant comes from the licence",
+     "value": {
+      "test": "crates/auth unit tests"
+     },
+     "position": 7
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S06b Agent Interface (Phase A)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Requirements Catalog — S06b Agent Interface (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. Each requirement maps to a named suite in the tree, which is the evidence link the plan's §7 property table carries.\n\n## Entries\n\nSeven requirements: the tool key, machine authentication, the JWT-shape rule, principal attribution, standalone escalation, tool scoping, and the one-membership rule. Each row names the observable and the suite that exercises it; none is a prose aspiration without a test target.\n\n## Links\n\nDerives from the Driver/Goal/Objective Catalog and is realized by the Solution Concept Diagram; the plan's §7 property table is the source for the pairing of property and proof. The requirements are read at the 2026-11-27 snapshot and are unchanged by the retrospective: the tree is the built state the plan describes.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It is the bridge between the drivers and the tests: a reader can move from a driver to its requirement to the suite that proves it without relying on the plan's prose alone.\n"
+  },
+  {
+   "title": "Solution Concept Diagram — S06b Agent Interface (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "agent app",
+     "axis_b": "the conveyor's /mcp over rmcp streamable HTTP, authenticated by a licence bearer",
+     "value": {
+      "protocol": "mcp",
+      "auth": "licence"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "/mcp",
+     "axis_b": "the action registry; every tool carries _meta.operation",
+     "value": {
+      "filter": "scoped by principal"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "action registry",
+     "axis_b": "projects, runs, approvals, boards, cards, events and procedures actions",
+     "value": {
+      "shape": "ActionSpec"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "actions",
+     "axis_b": "the store: approvals with a NULL run_id and attributed decisions",
+     "value": {
+      "writer": "insert_approval_tx"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "licences service",
+     "axis_b": "introspection on the request path, cached at most 60 seconds, fail-closed",
+     "value": {
+      "refusal": "503 licence_unavailable"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "agent membership",
+     "axis_b": "the synthetic tenant-admin role kata_executor with the compiled tool list",
+     "value": {
+      "role": "kata_executor"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "S06a signed channel",
+     "axis_b": "retired under D19; no component is in the path",
+     "value": {
+      "state": "superseded"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "events.list",
+     "axis_b": "the polling fallback until S06c adds MCP tasks",
+     "value": {
+      "surface": "poll"
+     },
+     "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A)",
+     "kind": "derivation"
+    }
+   ],
+   "body": "# Solution Concept Diagram — S06b Agent Interface (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. The diagram is textual: the record's artefact action carries entries, so the nodes and edges are enumerated rather than drawn.\n\n## Entries\n\nEight nodes and edges: the agent app over rmcp, the /mcp surface and its scoped registry, the actions and their store writers, the licences service on the request path, the agent membership, the retired S06a channel, and the polling fallback. The entries name each node's contract and its refusal behaviour.\n\n## Links\n\nDerives from the requirements and realizes them on one wire. The source is `docs/plans/slices/S06b-agent-direct-interface.md` §5, whose deliverable list is the component map, and `crates/actions/src/mcp.rs`, whose tool shape carries the operation key the diagram shows.\n\n## Document\n\nThe diagram is published as an architecture-artifact-instance by the rework factory. It deliberately shows the absence of the signed channel as a node: the plan's trap 7 warns later sessions that S06a text is superseded, so a reader of the diagram sees the seam rather than reconstructing it.\n"
+  },
+  {
+   "title": "Business Capability Map — S06b Agent Interface (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "entries": [
+    {
+     "axis_a": "Machine identity",
+     "axis_b": "the licence bearer and the agent principal",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/auth/src/machine.rs"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Scoped tool access",
+     "axis_b": "the compiled allowlist and the tenant channel policy",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/channel.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Agent-operated project delivery",
+     "axis_b": "create, read, decide and close over /mcp",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/api/tests/mcp_agent.rs"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Gate escalation",
+     "axis_b": "approvals.request with a NULL run and an attributed decision",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/actions/src/control/approvals.rs"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Attributable decisions",
+     "axis_b": "decided_by_kind and via on every decision row",
+     "value": {
+      "level": 2,
+      "delivered_by": "crates/store/src/approval.rs"
+     },
+     "position": 5
+    }
+   ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S06b Agent Interface (Phase C)",
+     "kind": "realization"
+    }
+   ],
+   "body": "# Business Capability Map — S06b Agent Interface (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. The capability levels are the retrospective reading: each capability is delivered by a named module and is proven by a named suite, not by an aspiration.\n\n## Entries\n\nFive capabilities: machine identity, scoped tool access, agent-operated project delivery, gate escalation and attributable decisions. Each entry pairs the capability with its delivering module and names the level the tree supports; the level is 2 because the capability exists and is tested locally.\n\n## Links\n\nRealizes the Phase A drivers; the Data Entity catalog carries the components each capability writes. The source is the plan's §5 deliverable table and §7 property table, which map the capabilities to modules and to the proofs the suites run.\n\n## Document\n\nThe map is published as an architecture-artifact-instance by the rework factory. It is the Phase B view a reader uses to go from the business outcome (an agent runs a project) to the components that deliver it, without reading the crate tree first.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S06b Agent Interface (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "app_user(kind='agent')",
+     "axis_b": "the machine principal's user row",
+     "value": {
+      "writer": "the machine authenticator"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Licence introspection cache",
+     "axis_b": "token-hash keyed, TTL capped at 60 seconds",
+     "value": {
+      "state": "in-process",
+      "owner": "crates/auth/src/machine.rs"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "approval with a NULL run_id",
+     "axis_b": "a standalone escalation requested by an agent",
+     "value": {
+      "writer": "insert_approval_tx"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "approval_decision",
+     "axis_b": "the attributed decision with decided_by_kind and via",
+     "value": {
+      "writer": "record_decision_tx"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "action_invocation",
+     "axis_b": "the audit row written per call",
+     "value": {
+      "writer": "the invocation path"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Channel policy",
+     "axis_b": "the compiled MCP_DEFAULT_ACTIONS; a stored grant narrows, never widens the machine floor",
+     "value": {
+      "owner": "the tenant admin"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S06b Agent Interface (Phase D)",
+     "kind": "dependency"
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S06b Agent Interface (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. The entities are the rows the agent path writes or reads; the cache is the one non-database component and is listed because it is on the security path.\n\n## Entries\n\nSix data entities and components: the agent user, the licence cache, the standalone approval, the attributed decision, the invocation audit row and the channel policy. Each names its writer and the module that owns it; the policy row records that S06d made the tool list a stored policy whose default is compiled.\n\n## Links\n\nDepends on the Technology Standards Catalog for the storage and wire standards. The source is `crates/store/src/approval.rs` for the approval writers and `crates/actions/src/channel.rs` for the channel policy; the plan's §5 table is the mapping from requirement to component.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It gives the Phase C view of the agent interface: the rows an audit would read after an agent task, and the component that writes each one.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — S06b Agent Interface (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "entries": [
+    {
+     "axis_a": "rmcp streamable HTTP",
+     "axis_b": "the MCP wire the agent uses",
+     "value": {
+      "standard": "MCP",
+      "pin": "workspace dependency"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "OIDC JWT and dev auth",
+     "axis_b": "human and service principals in the same authenticate path",
+     "value": {
+      "rule": "one membership"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Licence bearer introspection",
+     "axis_b": "the machine principal's authentication",
+     "value": {
+      "rule": "fail-closed, cached at most 60 s"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Postgres 18 with RLS",
+     "axis_b": "the store every action writes",
+     "value": {
+      "rule": "tenant_id on every row"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Action registry and served OpenAPI lock",
+     "axis_b": "one action surface for HTTP and MCP",
+     "value": {
+      "check": "--print-openapi --check-lock"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "events.list polling",
+     "axis_b": "the progress read until S06c adds MCP tasks",
+     "value": {
+      "owner": "S06c"
+     },
+     "position": 6
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S06b Agent Interface (Phase A)",
+     "kind": "reuse"
+    }
+   ],
+   "body": "# Technology Standards Catalog — S06b Agent Interface (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; version 1; status draft; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-27; project S06b; tranche 6; retrospective under the standing delegation. The standards are the ones the tree actually uses; the catalog is a reading of the workspace, not a wish list.\n\n## Entries\n\nSix technology standards: the rmcp wire, OIDC and dev authentication, licence introspection, Postgres with row-level security, the action registry with its served lock, and the events polling fallback. Each names the rule that makes it safe and the check that holds it.\n\n## Links\n\nReuses the Solution Concept Diagram's node set and depends on the Data Entity catalog's writers. The source is the workspace dependency set, `crates/actions/src/mcp.rs` for the wire shape, and `crates/auth/src/authn.rs` for the authentication order.\n\n## Document\n\nThe catalog is published as an architecture-artifact-instance by the rework factory. It closes the Phase D view: a reader can see which standards the agent interface rests on and which one (MCP tasks) is deliberately left to S06c.\n"
+  }
+ ],
+ "documents": [
+  {
+   "category": "architecture-artifact",
+   "title": "Architecture Artefact Index — S06b (retrospective, 2026-11-27)",
+   "body": "# Architecture Artefact Index — S06b (retrospective, 2026-11-27)\n\n## Metadata\n\nThe artefact set for S06b is the seven mandatory Phase A–D artefacts on the delivery track: the Stakeholder Map, Driver/Goal/Objective Catalog, Requirements Catalog and Solution Concept Diagram at phase a, plateau psa; the Business Capability Map at phase b; the Data Entity/Data Component Catalog at phase c; and the Technology Standards Catalog at phase d. Each carries an authored body dated 2026-11-27; the owner is the programme architect under the #526 rework delegation, the reviewer is the Architecture Board, and the subject is this project's record.\n\n## Entries\n\nThe set is seven rows in the order the standard seeds them: a/matrix — Stakeholder Map — S06b Agent Interface (Phase A); a/catalog — Driver/Goal/Objective Catalog — S06b Agent Interface (Phase A); a/catalog — Requirements Catalog — S06b Agent Interface (Phase A); a/diagram — Solution Concept Diagram — S06b Agent Interface (Phase A); b/diagram — Business Capability Map — S06b Agent Interface (Phase B); c/catalog — Data Entity/Data Component Catalog — S06b Agent Interface (Phase C); d/catalog — Technology Standards Catalog — S06b Agent Interface (Phase D).\n\n## Links\n\nEvery artefact links to another artefact of the set with one of the four §8.1 kinds: derivation, realization, reuse or dependency. The links follow the phase order, so a reader can walk A to D without an orphan, and each artefact's own Links section names its source in the slice plan and the tree.\n\n## Document\n\nThis index is published as its own architecture-artifact document by the rework factory. It is the document the close gate reads for the project's artefact standard, and it is the reason the set can be verified without re-reading the plan: the rows, the order and the links are all stated here.\n"
+  }
+ ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S06b-R1",
+    "title": "The deployed agent-app task is S14's gate, so the consumer path is proven locally only",
+    "body": "The local proof runs the whole task over the real `/mcp` HTTP surface as a licence principal, but it does not run the `agent` app's own importer or a deployed conveyor. The plan records both as S14's gate. Until that run exists the end-to-end consumer contract is evidenced on the loopback path only, and no retrospective pack may claim more than the suite proves.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Run the agent app against the deployed conveyor at S14, record the importer's tool keys and the task's project, approval and decision ids, and re-read this risk against that receipt.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S06b-agent-direct-interface.md#7"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the release manager (conveyor-e2e)"
+    }
+   },
+   {
+    "code": "S06b-R2",
+    "title": "Licence introspection is on the request path, so a licences outage refuses every machine call",
+    "body": "The fail-closed rule is deliberate: an unreachable licences service refuses with 503 licence_unavailable and admits no principal. The cost is availability, not confidentiality — a licences outage stops every agent call. The 60-second cache bounds the blast radius but does not remove it, and the cache is keyed by token hash so a revoked token cannot ride another tenant's entry.",
+    "probability": "low",
+    "impact": 3,
+    "review_at": "2026-12-11",
+    "severity": "medium",
+    "status": "open",
+    "response": "Track the licences service's availability with the estate's external probe; if an outage is measured during a delivery window, record the incident and re-open the cache TTL decision rather than weakening the fail-closed rule.",
+    "links": {
+     "cards": [],
+     "requirements": [
+      "docs/plans/slices/S06b-agent-direct-interface.md#5"
+     ],
+     "decisions": []
+    },
+    "meta": {
+     "owner": "the operations lead (conveyor-e2e)"
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S06b-I1",
+    "title": "The record claimed built but carried no charter, baseline, contract or Phase-G review",
+    "body": "At the 2026-11-27 snapshot the project row records measured_status built while plan_status is planned, and the snapshot carries no charter, statement of architecture work, delivery contract, Phase A–D set or Phase-G review for S06b. The capability and its suites exist; the lifecycle record did not. This pack supplies the missing set retrospectively and records the deferred live step explicitly.",
+    "severity": "medium",
+    "status": "open",
+    "response": "This pack is the repair: the lifecycle set, the receipt and the Phase-G review are authored and verified at the pinned snapshot; the deferred agent-app run stays S14's gate."
+   },
+   {
+    "code": "S06b-I2",
+    "title": "The agent app's own importer is not executed in this repository",
+    "body": "The plan's property (b) — the agent's `mcp-import` yields `projects.create`-style keys rather than `tool.*` — is exercised on the conveyor side by the tool key and the parity suite, but the agent's importer runs in the agent repository. The S06b evidence file records this as S14 §7's check, and the retrospective pack keeps it open rather than claiming the consumer.",
+    "severity": "low",
+    "status": "open",
+    "response": "At S14, capture the importer's output for this conveyor's tool list and attach it to the cutover evidence; close this issue row against that capture."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S06b-A1",
+    "title": "The 2026-11-27 rework snapshot is the authoritative record for S06b",
+    "body": "The delivery contract judges acceptance against the record at the pinned rework snapshot; the content checker refuses any id that appears nowhere in it. Every judgement in this pack is read from that snapshot, so if it is incomplete or stale for S06b the pack's facts and any re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S06b-A2",
+    "title": "The licences service's introspection endpoint behaves as the S02 contract declares",
+    "body": "The machine authenticator calls the licences service for a non-JWT bearer and trusts its verdict for at most 60 seconds. The assumption is that the deployed service answers the introspection contract the S02 delivery settled; if it does not, every agent call refuses and the failure is loud rather than silent.",
+    "status": "held"
+   },
+   {
+    "code": "S06b-A3",
+    "title": "The agent principal's tool list is the compiled MCP_DEFAULT_ACTIONS",
+    "body": "S06d made the MCP channel's tool list a tenant policy whose compiled default is MCP_DEFAULT_ACTIONS, and the machine floor still refuses eval sign-off, held-out reads and administrative actions. The assumption is that no stored grant has widened the list beyond the floor; the suite asserts the agent's view and the floor's refusals.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S06b-D1",
+    "title": "S06b depends on S04, S05 and S06",
+    "body": "The project row records depends_on needs S04, needs S05 and needs S06. S04 supplies the action registry and the `/mcp` transport, S05 the project and card actions, and S06 the approval state machine, the events and the SSE the agent reads instead of building a second surface. All three are green at the same snapshot.",
+    "status": "met"
+   },
+   {
+    "code": "S06b-D2",
+    "title": "S06b blocks S10's copilot surface and S14's deployed task",
+    "body": "S10's copilot is a projection of the same registry S06b exposes over `/mcp`, and S14's cutover runs the agent app's task against the deployed conveyor. Neither can be evidenced before the agent principal and the approval-request action exist, so both dependencies are carried as blocks rather than related work.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S06b-B1",
+    "title": "One agent interface replaces a second signed channel",
+    "body": "D19 makes the conveyor's own `/mcp` the agent interface, so the estate carries one wire, one principal model and one action registry instead of an HMAC channel with its own grammar and shared secret. The benefit is declared in the charter and carried by the parity suite and the retired-S06a decision; it is a structural reduction, not a measured saving.",
+    "status": "open"
+   },
+   {
+    "code": "S06b-B2",
+    "title": "Machine decisions become attributable",
+    "body": "The three actor_kind sites read the principal, so an agent's approval decision records decided_by_kind='agent' with via naming the licence principal. The benefit is an audit property: the decision can be traced to a machine identity without reading the transport logs, and the mcp_agent suite asserts the field.",
+    "status": "open"
+   },
+   {
+    "code": "S06b-B3",
+    "title": "Escalation no longer needs a running run",
+    "body": "approvals.request uses insert_approval_tx and accepts a NULL run_id, so an agent can raise a decision while no run is open and the approval stays decidable. The benefit is that the escalation path exists outside the run lifecycle, which the plan's property (f) records and the suite proves.",
+    "status": "open"
+   }
+  ]
+ },
+ "delivery_contract": {
+  "title": "Delivery Contract — S06b Agent Direct Interface (retrospective, 2026-11-27)",
+  "body": {
+   "commitments": "S06b delivers the conveyor's own `/mcp` as the agent interface: every tool carries `_meta.operation`; a licence bearer resolves a machine principal under the fail-closed introspection rule; `approvals.request` opens a standalone approval with a NULL run_id; and the three `actor_kind` sites read the principal so a decision is attributable. The project also records the one thing it does not deliver — the deployed agent-app task — as S14's gate.",
+   "compliance": "Compliance is evidenced by `crates/api/tests/mcp_agent.rs` (the whole task over the real HTTP surface as a licence principal), `crates/actions/tests/mcp_meta.rs` (every tool names its operation) and the S06B-RECEIPT in `docs/evidence/S06b-agent-task.md`. The retrospective Phase-G review reads the same evidence and records the level compliant for the record set, with the deferred live step carried as an open item rather than a pass.",
+   "approval": "The contract is approved by the board decision the factory records for this pack, under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3; the Phase-G review is compliant for the record set at the 2026-11-27 snapshot, and the closure decision is taken by an approver other than the requester.",
+   "manifest": "acceptance/programme/S06b.toml — 17 checks over the project row, the baseline, the charter, the closure outputs, the contract, the Phase-G review, the closure gate, the waivers, the PI cadence/plan/objectives, the WSJF, the demo credits, the lessons, the product findings, the artefact standard and the rework resolution.",
+   "acceptance_at": "2026-11-27",
+   "retrospective": "This delivery contract is authored retrospectively for the tranche-6 rework. The 2026-11-09 build carried no contemporaneous contract, so the commitments are read from the tree and the suites at the 2026-11-27 snapshot and are not presented as a 2026-11-09 agreement.",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The conveyor's own /mcp as the agent interface — one wire, one principal, attributable decisions",
+  "business_value": 10,
+  "time_criticality": 13,
+  "risk_reduction": 8,
+  "job_size": 8
+ },
+ "review": {
+  "level": "compliant",
+  "findings": "This retrospective Phase-G review records the level compliant for the record set it assesses under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. The 2026-11-09 build was measured and re-read at the 2026-11-27 snapshot: the tool key is on every tool, the machine principal is resolved from a licence bearer with the fail-closed cache, `approvals.request` opens a standalone approval, and the three attribution sites read the principal. No contemporaneous lifecycle review or contract exists, and that absence is carried as the project's open record item rather than as non-conformance, because the pack supplies the set and the receipt is green on the fixed checks. The deployed agent-app task and the agent's own importer remain S14's gate and are recorded as deferred.",
+  "evidence": {
+   "manifest": "acceptance/programme/S06b.toml",
+   "suite": "crates/api/tests/mcp_agent.rs",
+   "tool_key_suite": "crates/actions/tests/mcp_meta.rs",
+   "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+  }
+ },
+ "project_brief_output": "# Project Brief — S06b Agent Direct Interface (retrospective, 2026-11-27)\n\n## Outcome\n\nAn agent operates the conveyor over the conveyor's own `/mcp` surface: it creates a project, reads its progress, answers an approval and closes the project, and the decision records `decided_by_kind='agent'`. The outcome is true in the tree today on the loopback path and is exercised by the `mcp_agent` suite; the deployed agent-app run is S14's gate.\n\n## Boundary\n\nS06b owns the tool key, the machine principal, attribution, the approval-request action and the agent-side registration contract. It does not own the `/mcp` transport or scope filtering (S04), the approval state machine (S06), the copilot surface (S10), MCP tasks (S06c), workflow authoring (S13), or the signed channel it supersedes (S06a). The `fr` toolkit retires at cutover and is not carried.\n\n## Reuse sources\n\nThe slice plan's source table names what S06b reads from S04, S05, S06 and the agent's `mcp_import.rs`. The machine authenticator reuses the one-membership rule and the JWT-shape rule already in `authenticate`; the approval-request action reuses `insert_approval_tx`; the tool surface reuses the registry's `tool_json` and adds only `_meta.operation`.\n\n## Inception units\n\nThe plan's build order is the inception sequence: re-capture the agent and mcp_server SHAs, add the tool key, add `Principal.kind`, add the machine authenticator and cache, wire it before membership resolution, add `approvals.request`, fix the three attribution sites, add the scoping test, run the end-to-end session, and regenerate the served lock. Each step has a named test binary in the plan.\n\n## Dependencies\n\nS04 supplies the registry and the `/mcp` transport; S05 supplies `projects.create|get|close` and `cards.get`; S06 supplies `approvals.list|decide` and `events.list`. S06b in turn unblocks S10's copilot projection and S14's deployed agent task. The project row records these edges, and all upstream members are green at the same snapshot.\n\n## Acceptance\n\nThe plan's §7 property table is the acceptance: the tool key, the import, the machine-auth tenant isolation, the JWT-shape rule, attribution, escalation, the end-to-end task, and the absence of a middleman header or host. The content is accepted when `crates/api/tests/mcp_agent.rs` and `crates/actions/tests/mcp_meta.rs` pass and the receipt is green on the 17 manifest checks.\n\n## Capabilities\n\nMachine identity from a licence bearer, a scoped tool list, agent-operated project delivery, standalone gate escalation and attributable decisions. Each capability is delivered by a named module in the Phase C catalog and proven by a named suite; none depends on the retired signed channel.\n\n## Plan\n\nThe plan is `docs/plans/slices/S06b-agent-direct-interface.md`. Its build order is complete in the tree; this brief is the retrospective reading of it. The live agent-app task, the importer check and the deployed run stay S14's, and the tranche-6 review is the project's closure forum.\n",
+ "evidence_output": "# Evidence — S06b Agent Direct Interface (retrospective, 2026-11-27)\n\n## Claim\n\nS06b delivers the conveyor's own `/mcp` as the agent interface. One real agent task creates a project, reads its progress, answers an approval and closes the project; the decision records `decided_by_kind='agent'`; no component called `nonagenticai_mcp_server` is in the path; and every tool carries `_meta.operation`.\n\n## Evidence\n\n`crates/api/tests/mcp_agent.rs` runs the whole task over the real HTTP surface as a licence principal and prints the S06B-RECEIPT quoted in `docs/evidence/S06b-agent-task.md`: the agent's tool count, the project id, a non-null run id, one approval with `allowed_decisions`, the decision `approve` and `decided_by_kind='agent'` with `via.channel='mcp'`. `crates/actions/tests/mcp_meta.rs` asserts every registered action's tool carries its operation key. The machine-authenticator tests cover the JWT-shape rule, the tenant isolation and the cache refusal.\n\n## Verification\n\nThe commands are `cargo test -p conveyor-api --test mcp_agent one_licence_principal_task -- --nocapture`, `cargo test -p conveyor-actions --test mcp_meta`, `cargo test -p conveyor-api --test approval_dual` and `cargo test -p conveyor-auth machine`. The receipt for this pack is `docs/evidence/rework/S06b.json`, green on `acceptance/programme/S06b.toml` at the pinned snapshot; the compiled checks are the repository's preflight and the PR's CI.\n\n## Links\n\nThe plan is `docs/plans/slices/S06b-agent-direct-interface.md`; the evidence file is `docs/evidence/S06b-agent-task.md`; the approval dual-control suite is `crates/api/tests/approval_dual.rs`; the channel policy is `crates/actions/src/channel.rs`. The record carries the project's PI cadence, PI plan, objectives and the tranche-6 review.\n\n## Gap\n\nThe agent's own `mcp-import` is not executed in this repository, and the deployed agent-app task is not run here; both are S14's gate, recorded as deferred. The S06a retirement is a recorded supersession whose receipt depends on this project's receipt being green; that order is deliberate. No other gap is claimed closed.\n",
+ "closure": "S06b is re-closed through the one gate the record carries: the project row is closed only after its charter, baseline, artefacts, registers, contract, WBS, Phase-G review, outputs and closure review exist, and the receipt on `acceptance/programme/S06b.toml` is green at the pinned snapshot. The close records the deferred deployed agent-app task as an open risk, not as a pass.",
+ "closure_review": "# Closure Review — S06b Agent Direct Interface (retrospective, 2026-11-27)\n\n## Outcome vs acceptance\n\nThe outcome is an agent operating the conveyor over `/mcp` with an attributable decision. Against the plan's §7 properties, the local proof covers the tool key, the machine-auth isolation, the JWT-shape rule, attribution, escalation and the end-to-end task; the importer check and the deployed run are S14's and are recorded as deferred rather than met. The retrospective level is compliant for the record set because the pack supplies the lifecycle and the receipt is green on every check the manifest can run.\n\n## Evidence\n\nThe evidence is `crates/api/tests/mcp_agent.rs` and `crates/actions/tests/mcp_meta.rs`, the S06B-RECEIPT in `docs/evidence/S06b-agent-task.md`, the receipt `docs/evidence/rework/S06b.json` at the pinned snapshot, and the seventeen checks in `acceptance/programme/S06b.toml`. The Phase-G review records the same set and names the deferred items explicitly.\n\n## Open items\n\nThe deployed agent-app task and the agent's importer check are S14's gate. The licences service's availability risk and the token-hash cache's blast radius stay registered as S06b-R2. The S06a retirement receipt depends on this receipt being green, and it is produced after this one on the same snapshot, so the ordering is recorded and not circular.\n\n## Decision\n\nThe project is closed. The closure is taken by an approver other than the requester under the standing delegation, the closure review is recorded in the same pack, and the tranche-6 review is the forum that accepts it. No waiver is claimed, and no check in the manifest is weakened to reach this decision.\n"
+}

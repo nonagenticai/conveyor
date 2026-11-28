@@ -6314,7 +6314,12 @@
    ],
    "failure_scenario": "A tenant sets a destructive action's policy to 2 decisions; a copilot proposal opens at 1 and one approval authorises the execution.",
    "acceptance": "A copilot proposal opens at the tenant policy's quorum and the destructive gate refuses an approval below it; a test sets 2 and proves one decision cannot authorise.",
-   "owner_project": "S10"
+   "owner_project": "S10",
+   "resolved_by": {
+    "commit": "643077759d5a41946b17a66b4f04180a00a4c310",
+    "test": "crates/api/tests/copilot_destructive.rs::a_policy_quorum_reaches_the_proposal_and_the_gate",
+    "evidence": "copilot_destructive 11/11 at 643077759: the proposal opens at the tenant policy's three decisions (dual control alone is two), one decision leaves the gate pending and execute is Skipped, and an approval opened at two under the policy is refused 403 approval_below_policy at the invoke boundary."
+   }
   }
  ]
 }

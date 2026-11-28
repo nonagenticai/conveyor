@@ -298,3 +298,101 @@ async fn an_approval_for_another_object_cannot_execute() {
         "the gate's refusal is what was recorded"
     );
 }
+
+/// v1-u5-copilot-gate-quorum — the tenant's policy quorum reaches both doors.
+///
+/// The proposal is the gate-opening door a copilot tool call uses; the invoke boundary is the
+/// door that authorises the destructive call. The policy row sets THREE decisions for
+/// `ops.scale`, while §6.5's dual-control floor is two — so a three-decision gate proves the
+/// policy was read, and an approval opened at two must authorise nothing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_policy_quorum_reaches_the_proposal_and_the_gate() {
+    let pg = copilot::support::Pg::fresh().await;
+    let seeded = copilot::support::seed(&pg, "dev-a", "alice", "Alice").await;
+    copilot::catalogue(&pg).await;
+    copilot::member(&pg, seeded.tenant_id, "ada", "admin").await;
+    sqlx::query(
+        "INSERT INTO approval_policy
+             (tenant_id, action, approval, self_approval, approver_kind, conditions,
+              required_decisions, updated_by)
+         VALUES ($1, 'ops.scale', 'required', 'forbidden', 'human', '{}'::jsonb, 3, $2)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("the tenant's policy raises the quorum");
+
+    let model = copilot::Model::start().await;
+    let running = copilot::boot(&pg, &model).await;
+    model.tool_call("ops_scale", scale_input(3));
+    let conversation = copilot::conversation(&running, "dev:ada").await;
+    let (status, body) = copilot::turn(&running, "dev:ada", conversation, "scale it").await;
+    assert_eq!(status, 201, "{body}");
+    let approval_id =
+        Uuid::parse_str(body["proposal_id"].as_str().expect("a proposal id")).expect("uuid");
+
+    // The proposal opens at the POLICY's three decisions: the dual-control floor alone is two.
+    assert_eq!(
+        recorded_quorum(&pg, seeded.tenant, approval_id).await,
+        3,
+        "a copilot proposal must open at the tenant policy's quorum"
+    );
+
+    // One decision leaves the gate pending and executes nothing.
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            copilot::support::REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    let outcome = execute(
+        &running.state.pool,
+        &running.state.config.app_key,
+        seeded.tenant,
+        approval_id,
+    )
+    .await
+    .expect("execute the proposal");
+    assert!(
+        matches!(outcome, Execution::Skipped),
+        "one decision must not authorise a three-decision gate: {outcome:?}"
+    );
+
+    // An approval opened below the policy is refused at the call even when the gate is approved:
+    // the invoke boundary re-reads the floor rather than trusting whoever opened the gate.
+    sqlx::query("UPDATE approval SET required_decisions = 2 WHERE id = $1")
+        .bind(approval_id)
+        .execute(&pg.super_pool)
+        .await
+        .expect("open the gate below the policy");
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            copilot::support::REVIEWER_TWO,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    let error = execute(
+        &running.state.pool,
+        &running.state.config.app_key,
+        seeded.tenant,
+        approval_id,
+    )
+    .await
+    .expect_err("an approval below the policy must refuse the execution");
+    let conveyor_api::copilot::proposal::ExecutionError::Action(action) = &error else {
+        panic!("the refusal must come from the gate, not the store: {error:?}");
+    };
+    assert_eq!(action.status, 403, "{}", action.detail);
+    assert_eq!(action.code, "approval_below_policy");
+}

@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S06a stays archived; the retirement is a recorded disposition, not a reopen",
+      "detail": "project S06a is archived",
+      "id": "S06a-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 -c 'from pathlib import Path; t=Path(\"docs/plans/slices/S06a-mcp-server-channel.md\").read_text(); assert \"status: superseded\" in t; assert \"S06b-agent-direct-interface.md\" in t; assert \"Nothing here is built or to be built\" in t' ",
+      "description": "the plan is marked superseded by S06b and says nothing here is to be built",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S06a-superseded",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": null,
+      "command": "test ! -d apps/mcp_server && test ! -d crates/mcp_server && test ! -e apps/nonagenticai_mcp_server && test ! -e crates/nonagenticai_mcp_server",
+      "description": "no mcp_server component exists in the tree (S06b's gate clause)",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S06a-no-component",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": null,
+      "command": "python3 -c 'import json; d=json.load(open(\"docs/evidence/rework/S06b.json\")); assert d.get(\"verdict\") == \"green\", d.get(\"verdict\")' ",
+      "description": "S06b, the successor, has a green acceptance receipt",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S06a-successor",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action documents.get --input '{\"id\":\"01a21c64-9256-762d-a3d1-2d2d0d5a6596\"}' | grep -q \"S06a retirement\"",
+      "description": "the retirement decision is a published record document naming S06b",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S06a-decision",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "failures": [],
+  "gate": "S06a is a recorded supersession, not a build: its plan says nothing here is built or to be built, S06b's agent interface is the successor and its receipt is green, no mcp_server component is in the path, and the retirement decision is published.",
+  "generated_at": "2026-11-28T07:44:13.464446+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S06a.toml",
+  "name": "mcp_server signed channel \u2014 both directions",
+  "project": "S06a",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-28T07:39:45.752107+00:00",
+    "git_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff",
+    "path": "retained-snapshot/cdd32ea2e951f937472c90ad513d4c4a42c75cff"
+  },
+  "verdict": "green",
+  "warnings": []
+}

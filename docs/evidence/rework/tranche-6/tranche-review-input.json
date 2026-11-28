@@ -1,0 +1,63 @@
+{
+ "decision": "continue",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+ "evidence": {
+  "baselines": [
+   "01a1fba9-d095-757c-91ed-afd21ecfa960",
+   "01a1fba9-9afd-72e3-b41b-dc4287153c35",
+   "01a1fba9-308c-7cde-9d00-edb7f483f3af"
+  ],
+  "benefit_status": [
+   "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+   "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+   "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+   "01a1e9df-1592-79a5-839e-037d8fe4251b",
+   "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+   "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+   "01a20c80-c0c3-7788-9cc2-bb18a102a2f7"
+  ],
+  "cadences": {
+   "demo": "01a21c62-6aeb-764e-af16-44eefdee7186",
+   "documents": {
+    "pi-objectives": "01a21c62-f797-72b6-9c64-28a2038cdeae",
+    "pi-plan": "01a21c62-f6e3-7717-954d-5f608c72c0d4"
+   },
+   "pi": "01a21c62-698d-7a02-b32a-1e3cad0ba69e",
+   "pi_gate_approval": "01a21c63-4d63-78b2-a489-784cafe0d35f",
+   "refinement": "01a21c62-6a43-7d17-9d5b-836ad1801e45",
+   "retro": "01a21c62-6b8c-73d2-a4cd-425f244cde36"
+  },
+  "lane_head": "cdd32ea2",
+  "note": "Tranche 6 closes on the five members' green and fresh receipts at cdd32ea2; T19F's closure is recorded by this review and tranche 7 is authorised.",
+  "project_acceptance": {
+   "document": "docs/evidence/rework/<key>.json",
+   "verdict": {
+    "green": 5,
+    "members": {
+     "S06a": "green",
+     "S06b": "green",
+     "S10": "green",
+     "S11": "green",
+     "T19F": "green"
+    },
+    "red": 0
+   }
+  },
+  "risk_register": [
+   "01a2210c-3820-767a-8cdb-cf85ca69a217",
+   "01a2210c-38b4-74c6-baa3-ded7ed00904f",
+   "01a2210f-124f-7b7d-bd76-9020a9e064f7",
+   "01a2210f-12e0-7fd6-b737-b123e23e702b",
+   "01a2210f-1373-7e85-9d4b-cf14fe0cebe1",
+   "01a2210f-1406-7169-828a-1a450bc3ba96",
+   "01a22110-35ba-7c8d-ae6b-b4d5efff3f21",
+   "01a22110-3648-7562-99ca-bcd43f99f380",
+   "01a22110-36d8-7bf2-affb-6d5c2fabc200",
+   "01a22113-31c5-793c-a5f8-7d82f4cc3c0f",
+   "01a22113-3251-74b7-88d5-83f13973c52b"
+  ],
+  "snapshot_manifest_sha256": "bb6bb79bfe00d5c943902a08715b3dc9e86d710c75c59092bfdb17bbe515563d",
+  "snapshot_sha": "cdd32ea2e951f937472c90ad513d4c4a42c75cff"
+ },
+ "id": "01a1e9e1-07d3-75d3-8c99-4002d5bfe8f7"
+}

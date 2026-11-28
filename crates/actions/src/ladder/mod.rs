@@ -1777,7 +1777,7 @@ async fn ladder_evaluate(
                 "the key's request body is not this decision's request",
             ));
         }
-        store::idempotency::Lookup::InFlight => {
+        store::idempotency::Lookup::InFlight { .. } => {
             return Err(gate_unavailable(
                 &plan,
                 fail_policy,

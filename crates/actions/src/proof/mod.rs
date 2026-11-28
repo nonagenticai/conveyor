@@ -321,7 +321,7 @@ async fn resolve_invocation(
                  prover checked",
             ));
         }
-        Lookup::InFlight => {
+        Lookup::InFlight { .. } => {
             return Err(refuse(
                 "idempotency_key",
                 "proof_invocation_in_flight",

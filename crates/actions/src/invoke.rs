@@ -394,6 +394,15 @@ pub struct ActionError {
     pub errors: Vec<FieldError>,
     /// The current representation a `412` should carry (CONTRACT §3).
     pub current: Option<Value>,
+    /// How many SECONDS the caller should wait before retrying, when the failure is a wait rather
+    /// than a refusal. Set only on an in-flight idempotency conflict, where the claim names its own
+    /// expiry — the caller may then defer for exactly that long instead of spending a retry
+    /// against a row that cannot move yet (conveyor#900).
+    ///
+    /// Seconds, not a `Duration`, on purpose: this struct is the `Err` of nearly every action
+    /// handler, and a 24-byte `Option<Duration>` here trips `clippy::result_large_err` on every
+    /// one of them.
+    pub retry_after_secs: Option<u16>,
     /// The `gate_unavailable` outcome to record after the handler transaction rolls back.
     pub gate_outage: Option<Box<GateUnavailable>>,
 }
@@ -407,6 +416,7 @@ impl ActionError {
             detail: detail.into(),
             errors: Vec::new(),
             current: None,
+            retry_after_secs: None,
             gate_outage: None,
         }
     }
@@ -489,6 +499,38 @@ impl ActionError {
     /// `409` for an idempotency-key conflict.
     pub fn idempotency(detail: impl Into<String>) -> Self {
         Self::new(409, "idempotency-conflict", detail)
+    }
+
+    /// `409` for a key whose first request is **still running**, carrying how long it may yet run.
+    ///
+    /// This is a wait, not a refusal: the claim names its own expiry, so a caller that can wait
+    /// should (conveyor#900 — a producer that wrote this as a terminal `no_attempt` lost three of
+    /// twelve cases to a claim leaked by a deploy). [`Self::is_in_flight_conflict`] is the
+    /// discriminator; the different-input conflict, [`Self::idempotency`], can never succeed on
+    /// retry and stays terminal.
+    pub fn idempotency_in_flight(remaining: std::time::Duration) -> Self {
+        let mut error = Self::new(
+            409,
+            "idempotency-conflict",
+            "a request with this Idempotency-Key is still running",
+        );
+        // At least one second: a zero-second hint tells the caller to retry immediately, which is
+        // the one thing a held key cannot allow. The cap bounds a job's parked time.
+        error.retry_after_secs = Some(
+            remaining
+                .as_secs()
+                .clamp(1, idempotency::MAX_IN_FLIGHT_WAIT_SECS) as u16,
+        );
+        error
+    }
+
+    /// True when this failure is a **wait** — the key is held by a request that has not settled,
+    /// and the same call may be retried once [`Self::retry_after_secs`] has passed.
+    ///
+    /// Deliberately not `code == "idempotency-conflict"`: the same slug covers the different-input
+    /// conflict, which no retry can ever satisfy.
+    pub fn is_in_flight_conflict(&self) -> bool {
+        self.status == 409 && self.code == "idempotency-conflict" && self.retry_after_secs.is_some()
     }
 
     /// `501` for a `kind: workflow` action (S4-D7).
@@ -1416,12 +1458,21 @@ async fn invoke_internal(
     // CONTRACT §5: a POST that carries a key is deduped, whatever the action's natural
     // repeatability. `idempotent` is the contract hint MCP publishes, not the replay switch.
     if let Some(key) = request.idempotency_key.as_deref() {
-        let claimed = idempotency::begin(&mut tx, ctx.tenant, &spec.name, key, &input_hash)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, action = %spec.name, "claim idempotency key");
-                ActionError::internal()
-            })?;
+        // An internal claim commits with the mutation and is settled by `save` in the same
+        // transaction, so its in-flight window is the contract TTL.
+        let claimed = idempotency::begin(
+            &mut tx,
+            ctx.tenant,
+            &spec.name,
+            key,
+            &input_hash,
+            chrono::Duration::hours(idempotency::TTL_HOURS),
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, action = %spec.name, "claim idempotency key");
+            ActionError::internal()
+        })?;
         if !claimed {
             let found = idempotency::lookup(&mut tx, ctx.tenant, &spec.name, key, &input_hash)
                 .await
@@ -1441,9 +1492,12 @@ async fn invoke_internal(
                 Lookup::ConflictHash => Err(ActionError::idempotency(
                     "the same Idempotency-Key names a different input",
                 )),
-                Lookup::InFlight | Lookup::Miss => Err(ActionError::idempotency(
-                    "a request with this Idempotency-Key is still running",
+                Lookup::InFlight { expires_at } => Err(ActionError::idempotency_in_flight(
+                    claim_wait(Some(expires_at)),
                 )),
+                // The row vanished between `begin` and `lookup` (a holder released it): re-running
+                // is safe immediately.
+                Lookup::Miss => Err(ActionError::idempotency_in_flight(claim_wait(None))),
             };
         }
     }
@@ -1843,12 +1897,24 @@ async fn invoke_external(
         store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS)
             .await
             .map_err(|_| ActionError::internal())?;
-        let claimed = idempotency::begin(&mut tx, ctx.tenant, call.name, key, &input_hash)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, action = call.name, "claim external idempotency key");
-                ActionError::internal()
-            })?;
+        // This claim commits BEFORE the call, so nothing but the call's own deadline bounds how
+        // long the row may sit unsettled. A 24-hour in-flight row outlives every legitimate
+        // invocation: when a deploy SIGKILLs the worker mid-call the row then blocks every retry
+        // for a day (conveyor#900, measured 2026-11-28). `save` still sets the 24-hour replay
+        // window once the call settles.
+        let claimed = idempotency::begin(
+            &mut tx,
+            ctx.tenant,
+            call.name,
+            key,
+            &input_hash,
+            idempotency::in_flight_ttl(call.timeout_ms),
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, action = call.name, "claim external idempotency key");
+            ActionError::internal()
+        })?;
         if !claimed {
             let found = idempotency::lookup(&mut tx, ctx.tenant, call.name, key, &input_hash)
                 .await
@@ -1868,9 +1934,12 @@ async fn invoke_external(
                 Lookup::ConflictHash => Err(ActionError::idempotency(
                     "the same Idempotency-Key names a different input",
                 )),
-                Lookup::InFlight | Lookup::Miss => Err(ActionError::idempotency(
-                    "a request with this Idempotency-Key is still running",
+                Lookup::InFlight { expires_at } => Err(ActionError::idempotency_in_flight(
+                    claim_wait(Some(expires_at)),
                 )),
+                // The row vanished between `begin` and `lookup` (a holder released it): re-running
+                // is safe immediately.
+                Lookup::Miss => Err(ActionError::idempotency_in_flight(claim_wait(None))),
             };
         }
         tx.commit().await.map_err(|_| ActionError::internal())?;
@@ -2497,6 +2566,18 @@ fn settle_claim(settled: &Option<Arc<AtomicBool>>) {
     if let Some(flag) = settled {
         flag.store(true, Ordering::SeqCst);
     }
+}
+
+/// How long a caller should wait before re-offering a request whose key is in flight.
+///
+/// The row's own expiry is the answer when there is one. Two cases collapse to a one-second hint:
+/// a row that vanished between `begin` and `lookup` (the holder released it — re-run immediately)
+/// and a clock that has already passed the expiry.
+fn claim_wait(expires_at: Option<chrono::DateTime<chrono::Utc>>) -> Duration {
+    expires_at
+        .and_then(|at| (at - chrono::Utc::now()).to_std().ok())
+        .unwrap_or_else(|| Duration::from_secs(1))
+        .max(Duration::from_secs(1))
 }
 
 /// Releases an un-settled idempotency claim when the invocation future is dropped (#577).
